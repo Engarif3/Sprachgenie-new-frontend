@@ -1,0 +1,20 @@
+services:
+  react-app:
+    build:
+      context: .
+    container_name: react-app
+    ports:
+      - "5173:5173"  # Ensure this is mapped correctly
+    networks:
+      - restaurant-management
+    command: >
+      /bin/sh -c "npm install && npm run dev"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules # Prevent overwriting node_modules
+    stdin_open: true
+    tty: true
+
+networks:
+  restaurant-management:
+    external: true
