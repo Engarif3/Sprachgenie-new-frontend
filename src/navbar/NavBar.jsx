@@ -9,7 +9,7 @@ const NavBar = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo();
+  const userInfo = getUserInfo() || {};
 
   // const handleCreateButtonClick = () => {
   //   Swal.fire({
@@ -153,7 +153,7 @@ const NavBar = () => {
               Words List
             </Link>
           )}
-          {userLoggedIn && userInfo.role === "super_admin" && (
+          {(userInfo.role === "super_admin" || userInfo.role === "admin") && (
             <>
               <Link
                 // onClick={() => {
@@ -165,7 +165,16 @@ const NavBar = () => {
               >
                 Create Word
               </Link>
-
+            </>
+          )}
+          {userLoggedIn && userInfo.role === "super_admin" && (
+            <>
+              <button
+                onClick={() => handleDeleteAll()}
+                className="btn btn-sm btn-warning  hidden md:block "
+              >
+                Delete All
+              </button>
               <Link
                 onClick={() => {
                   handleCreateTopic();
@@ -175,12 +184,6 @@ const NavBar = () => {
               >
                 Create Topic
               </Link>
-              <button
-                onClick={() => handleDeleteAll()}
-                className="btn btn-sm btn-warning  hidden md:block "
-              >
-                Delete All
-              </button>
             </>
           )}
           {/* <Link to="/login">Login</Link> */}
@@ -188,6 +191,12 @@ const NavBar = () => {
         </div>{" "}
         {/* <-- This div was missing */}
       </div>
+      {userLoggedIn && (
+        <p className="text-end mx-2">
+          Welcome!{" "}
+          <span className="font-semibold text-cyan-700">{userInfo?.name}</span>
+        </p>
+      )}
     </Container>
   );
 };

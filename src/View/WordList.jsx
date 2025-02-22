@@ -41,7 +41,7 @@ const WordList = () => {
 
   // ===================
   const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo();
+  const userInfo = getUserInfo() || {};
 
   const [favorites, setFavorites] = useState([]);
 
