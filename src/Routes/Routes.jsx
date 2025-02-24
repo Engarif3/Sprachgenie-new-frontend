@@ -19,6 +19,7 @@ import ConversationsList from "../View/Conversation/ConversationList";
 import CreateConversation from "../View/Conversation/CreateConversation";
 import ConversationTitleList from "../View/Conversation/ConversationTitleList";
 import ConversationPage from "../View/Conversation/ConversationPage";
+import Home from "../View/Home/Home";
 
 export const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
+        element: <Home />,
+      },
+      {
+        path: "/words",
         element: <WordList />,
       },
       {
