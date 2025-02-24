@@ -14,6 +14,11 @@ import Register from "../register/Register";
 import FavoritesList from "../View/FavoritesList";
 import ResendVerification from "../register/ResendVerification";
 import VerifyEmail from "../register/VerifyEmail";
+import Conversation from "../View/Conversation/Conversation";
+import ConversationsList from "../View/Conversation/ConversationList";
+import CreateConversation from "../View/Conversation/CreateConversation";
+import ConversationTitleList from "../View/Conversation/ConversationTitleList";
+import ConversationPage from "../View/Conversation/ConversationPage";
 
 export const router = createBrowserRouter([
   {
@@ -60,6 +65,26 @@ export const router = createBrowserRouter([
       {
         path: "/favorites",
         element: <FavoritesList></FavoritesList>,
+      },
+      // {
+      //   path: "/conversations",
+      //   element: <Conversation></Conversation>,
+      // },
+      {
+        path: "/conversation-titles",
+        element: <ConversationTitleList></ConversationTitleList>,
+      },
+      {
+        path: "/conversation/:id",
+        element: <ConversationPage></ConversationPage>,
+      },
+      {
+        path: "/update-conversation",
+        element: <ConversationsList></ConversationsList>,
+      },
+      {
+        path: "/create-conversation",
+        element: <CreateConversation></CreateConversation>,
       },
     ],
   },

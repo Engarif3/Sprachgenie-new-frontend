@@ -125,6 +125,12 @@ const NavBar = () => {
             isMenuOpen ? "flex" : "hidden"
           } md:flex flex-col md:flex-row rounded-lg items-center gap-3 md:gap-16 lg:gap-16 w-full md:w-auto px-4 mt-2 md:mt-0 absolute md:static top-full left-0 bg-blue-400 z-10 py-4 md:py-0`}
         >
+          <Link
+            to="/conversation-titles"
+            className="btn btn-sm btn-warning w-full md:w-auto text-center"
+          >
+            Conversations
+          </Link>
           {userLoggedIn && userInfo.role === "basic_user" && (
             <Link
               to="/favorites"
@@ -183,6 +189,18 @@ const NavBar = () => {
                 className="btn btn-sm btn-warning w-full md:w-auto text-center"
               >
                 Create Topic
+              </Link>
+              <Link
+                to="/create-conversation"
+                className="btn btn-sm btn-warning w-full md:w-auto text-center"
+              >
+                Create Conv
+              </Link>
+              <Link
+                to="update-conversation"
+                className="btn btn-sm btn-warning w-full md:w-auto text-center"
+              >
+                Update Conv
               </Link>
             </>
           )}
