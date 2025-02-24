@@ -30,7 +30,7 @@ const ConversationTitleList = () => {
   return (
     <Container>
       <div className="max-w-5xl mx-auto p-4 mb-4 min-h-screen">
-        <h2 className="text-2xl font-bold my-5 md:my-8 lg:my-8 text-center ">
+        <h2 className="text-3xl font-bold my-5 md:my-8 lg:my-8 text-center ">
           Conversation Topics
         </h2>
         {loading ? (
@@ -40,7 +40,7 @@ const ConversationTitleList = () => {
             {conversations.map((conversation) => (
               <div
                 key={conversation.id}
-                className="bg-gray-100 p-4 rounded shadow cursor-pointer hover:bg-gray-200 "
+                className="bg-gradient-to-r from-sky-800 via-blue-500 to-cyan-500 p-4 rounded shadow  transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-indigo-500 text-white will-change-transform"
                 onClick={() => navigate(`/conversation/${conversation.id}`)}
               >
                 <h3 className="text-lg font-semibold">{conversation.topic}</h3>

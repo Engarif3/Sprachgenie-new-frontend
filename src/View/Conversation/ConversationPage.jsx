@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import Container from "../../utils/Container";
 
 // Define colors for the speakers
 const speakerColors = ["#FF0000", "#008000", "#0000FF", "#FFA500", "#000000"];
@@ -61,29 +62,31 @@ const ConversationPage = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4 min-h-screen">
-      <div className="text-cyan-800 mb-0 md:mb-4 lg:mb-4 text-center text-3xl font-bold font-custom5">
-        <h2>{conversation.topic}</h2>
+    <Container>
+      <div className="max-w-4xl mx-auto p-0 md:p-4 lg:p-4 min-h-screen mt-4">
+        <div className="text-cyan-800 mb-0 md:mb-4 lg:mb-4 text-center text-3xl font-bold font-custom5">
+          <h2>{conversation.topic}</h2>
+        </div>
+        <div className="p-4 rounded-lg shadow-md mb-12">
+          {conversation.text.map((message, index) => (
+            <div
+              key={index}
+              className="text-lg my-4 px-2 border-b-2 border-dotted"
+            >
+              <p>
+                <span
+                  className="text-xl font-semibold"
+                  style={{ color: getSpeakerColor(message.speaker) }}
+                >
+                  {message.speaker}:
+                </span>
+                <span className="ml-2">{message.message}</span>
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
-      <div className="p-4 rounded-lg shadow-md mb-12">
-        {conversation.text.map((message, index) => (
-          <div
-            key={index}
-            className="text-lg my-4 px-2 border-b-2 border-dotted"
-          >
-            <p>
-              <span
-                className="text-xl font-semibold"
-                style={{ color: getSpeakerColor(message.speaker) }}
-              >
-                {message.speaker}:
-              </span>
-              <span className="ml-2">{message.message}</span>
-            </p>
-          </div>
-        ))}
-      </div>
-    </div>
+    </Container>
   );
 };
 
