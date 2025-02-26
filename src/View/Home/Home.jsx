@@ -18,18 +18,18 @@ const Home = () => {
 
             <HomeCard
               title="Conversations"
-              text="Learn important german words"
+              text="Conversations on various topics"
               link="/conversation-titles"
             />
             <HomeCard
-              title="Conversations"
-              text="Learn important german words"
-              link="/conversation-titles"
+              title="Words with prefix"
+              text="Learn some prefix+word"
+              link="/prefix-types"
             />
             <HomeCard
-              title="Words List"
-              text="Learn important german words"
-              link="/words"
+              title="Learn Grammar Rules"
+              text="Coming soon ....."
+              link="/grammar"
             />
           </div>
         </div>

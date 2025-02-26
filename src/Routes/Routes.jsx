@@ -20,6 +20,9 @@ import CreateConversation from "../View/Conversation/CreateConversation";
 import ConversationTitleList from "../View/Conversation/ConversationTitleList";
 import ConversationPage from "../View/Conversation/ConversationPage";
 import Home from "../View/Home/Home";
+import PrefixTypeList from "../View/Prefix/PrefixTypeList";
+import PrefixList from "../View/Prefix/PrefixList";
+import Grammar from "../View/Grammar/Grammar";
 
 export const router = createBrowserRouter([
   {
@@ -90,6 +93,18 @@ export const router = createBrowserRouter([
       {
         path: "/create-conversation",
         element: <CreateConversation></CreateConversation>,
+      },
+      {
+        path: "/prefix-types",
+        element: <PrefixTypeList></PrefixTypeList>,
+      },
+      {
+        path: "/prefix-list/:id",
+        element: <PrefixList></PrefixList>,
+      },
+      {
+        path: "/grammar",
+        element: <Grammar></Grammar>,
       },
     ],
   },
