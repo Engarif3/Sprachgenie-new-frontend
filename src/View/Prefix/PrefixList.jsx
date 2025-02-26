@@ -292,28 +292,38 @@ const PrefixList = () => {
       {[...words] // Create copy to avoid mutation
         .sort(sortAlphabetically)
         .map((word, index) => (
-          <div
-            key={word.id}
-            className={index !== words.length - 1 ? "border-b" : ""}
-          >
+          <div key={word.id} className={index !== words.length - 1 ? "" : ""}>
+            {/* <div
+              className="flex justify-between items-center p-3 cursor-pointer bg-gray-200 hover:bg-gray-300 border border-b-sky-400 "
+              onClick={() => toggleExpand(word.id)}
+            > */}
             <div
-              className="flex justify-between items-center p-3 cursor-pointer bg-gray-100 hover:bg-gray-200"
+              key={word.id}
+              className={`flex justify-between items-center p-3 cursor-pointer bg-gray-200 hover:bg-gray-300 border ${
+                index !== words.length - 1
+                  ? "border-b border-dotted border-b-sky-400"
+                  : ""
+              }`}
               onClick={() => toggleExpand(word.id)}
             >
               <div>
                 <span className="font-medium text-lg">{word.prefixWord}</span>
                 <span className=" ml-2">({word.meaning.join(", ")})</span>
               </div>
-              <button className="text-gray-600">
+              <button className="text-sky-700">
                 {expandedWords[word.id] ? <FaMinus /> : <FaPlus />}
               </button>
             </div>
             {expandedWords[word.id] && (
               <div className="p-3 bg-gray-50 text-gray-700">
-                <h4 className="text font-semibold text-gray-800">Sentences:</h4>
-                <ul className="list-disc list-inside text-sm mt-1 space-y-1">
+                <button className="font-semibold capitalize btn btn-sm bg-gradient-to-r from-slate-900 via-cyan-800 to-cyan-600 text-white">
+                  Sentences
+                </button>
+                <ul className="list-disc list-inside  mt-1 space-y-1 ml-1 border-l-8 border-pink-600">
                   {word.sentences.map((sentence, idx) => (
-                    <li key={idx}>{sentence}</li>
+                    <li key={idx} class="normal-case ml-2">
+                      {sentence}
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -326,31 +336,35 @@ const PrefixList = () => {
   return (
     <Container>
       <div className="max-w-4xl mx-auto p-4">
-        <h2 className="text-3xl font-bold font-mono text-center  text-gray-800 mb-4">
+        <h2 className="text-3xl font-bold font-mono text-center  text-sky-700  mb-4">
           {prefixData.name} Prefixes
         </h2>
         {Object.entries(groupedPrefixes).map(
           ([prefixName, { verbs, noVerbs }]) => (
             <div key={prefixName} className="mb-4">
-              <h3 className="text-xl font-bold text-blue-600 mb-2">
+              <h3 className="text-xl font-bold text-sky-700 mb-2 ml-2">
                 {prefixName.toUpperCase()}
               </h3>
-              <div className="border border-gray-300 rounded-md shadow-sm overflow-hidden">
+              <div className=" rounded-md shadow-sm overflow-hidden">
                 <div className="space-y-6">
                   {verbs.length > 0 && (
                     <div>
-                      <h4 className="p-3 font-semibold bg-gray-50 border-b">
+                      <h4 className="p-3 font-semibold bg-gradient-to-r from-slate-900 via-cyan-800 to-cyan-600   text-white">
                         Verbs ({verbs.length})
                       </h4>
-                      {renderWordList(verbs)}
+                      <span className="lowercase text-stone-950">
+                        {renderWordList(verbs)}
+                      </span>
                     </div>
                   )}
                   {noVerbs.length > 0 && (
                     <div>
-                      <h4 className="p-3 font-semibold bg-gray-50 border-b">
+                      <h4 className="p-3 font-semibold bg-gradient-to-r from-slate-900 via-cyan-800 to-cyan-600   text-white rounded-t-md ">
                         Non-Verbs ({noVerbs.length})
                       </h4>
-                      {renderWordList(noVerbs)}
+                      <span className="lowercase text-stone-950">
+                        {renderWordList(noVerbs)}{" "}
+                      </span>
                     </div>
                   )}
                 </div>

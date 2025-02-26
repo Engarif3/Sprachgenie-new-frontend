@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import Container from "../../utils/Container";
+import { FaUser } from "react-icons/fa";
 
 // Define colors for the speakers
 const speakerColors = ["#FF0000", "#008000", "#0000FF", "#FFA500", "#000000"];
@@ -75,12 +76,12 @@ const ConversationPage = () => {
             >
               <p>
                 <span
-                  className="text-xl font-semibold"
+                  className="text-xl font-semibold flex items-center gap-1 border-slate-950"
                   style={{ color: getSpeakerColor(message.speaker) }}
                 >
-                  {message.speaker}:
+                  <FaUser /> {message.speaker}:
                 </span>
-                <span className="ml-2">{message.message}</span>
+                <span>{message.message}</span>
               </p>
             </div>
           ))}
