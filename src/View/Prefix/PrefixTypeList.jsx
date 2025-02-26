@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Container from "../../utils/Container";
 
 const PrefixTypeList = () => {
   const [prefixTypes, setPrefixTypes] = useState([]);
@@ -27,26 +28,28 @@ const PrefixTypeList = () => {
   }, []);
 
   return (
-    <div className="max-w-5xl mx-auto p-4 mb-4 min-h-screen">
-      <h2 className="text-3xl font-bold my-5 md:my-8 lg:my-8 text-center">
-        Prefix Types
-      </h2>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 lg:gap-8">
-          {prefixTypes.map((prefixType) => (
-            <div
-              key={prefixType.id}
-              className="bg-gradient-to-r from-sky-800 via-blue-500 to-cyan-500 p-4 rounded shadow transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-indigo-500 text-white cursor-pointer"
-              onClick={() => navigate(`/prefix-list/${prefixType.id}`)}
-            >
-              <h3 className="text-lg font-semibold">{prefixType.name}</h3>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+    <Container>
+      <div className="max-w-5xl mx-auto p-4 mb-4 min-h-screen">
+        <h2 className="text-3xl font-bold font-mono text-sky-700 my-5 md:my-8 lg:my-8 text-center">
+          Prefix Types
+        </h2>
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 lg:gap-8">
+            {prefixTypes.map((prefixType) => (
+              <div
+                key={prefixType.id}
+                className="bg-gradient-to-r from-slate-900 via-cyan-800 to-cyan-600  p-4 rounded shadow transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 hover:bg-indigo-500 text-white cursor-pointer"
+                onClick={() => navigate(`/prefix-list/${prefixType.id}`)}
+              >
+                <h3 className="text-lg font-semibold">{prefixType.name}</h3>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </Container>
   );
 };
 

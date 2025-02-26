@@ -4,6 +4,7 @@ import Container from "../utils/Container";
 import Swal from "sweetalert2";
 import AuthButton from "../components/UI/AuthButton/AuthButton";
 import { getUserInfo, isLoggedIn } from "../services/auth.services";
+import { FaHome } from "react-icons/fa";
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -59,12 +60,12 @@ const NavBar = () => {
 
   return (
     <Container>
-      <div className="bg-blue-400 flex flex-wrap justify-between items-center py-2 rounded text-lg font-semibold mt-2 relative">
+      <div className="bg-gradient-to-r from-slate-900 via-cyan-800 to-cyan-600  flex flex-wrap justify-between items-center py-2 rounded text-lg font-semibold mt-2 relative">
         {/* Title and Hamburger Menu */}
         <div className="flex justify-between items-center w-full md:w-auto px-4">
           <Link className="text-3xl mb-1" href="/">
             <span className="text-red-600">Sprach</span>
-            <span>Genie</span>
+            <span className="text-white">Genie</span>
           </Link>
           <Link
             onClick={() => setIsMenuOpen(false)}
@@ -94,7 +95,7 @@ const NavBar = () => {
         <div
           className={`${
             isMenuOpen ? "flex" : "hidden"
-          } md:flex flex-col md:flex-row rounded-lg items-center gap-3 md:gap-4 lg:gap-16 w-full md:w-auto px-4 mt-2 md:mt-0 absolute md:static top-full left-0 bg-blue-400 z-10 py-4 md:py-0`}
+          } md:flex flex-col md:flex-row rounded-lg items-center gap-3 md:gap-4 lg:gap-16 w-full md:w-auto px-4 mt-2 md:mt-0 absolute md:static top-full left-0 z-10 py-4 md:py-0`}
         >
           {/* <Link
             onClick={() => setIsMenuOpen(false)}
@@ -105,19 +106,23 @@ const NavBar = () => {
           </Link> */}
           <Link
             to="/"
-            className="btn btn-sm btn-warning hidden  md:flex items-center justify-center "
+            className="hidden  md:flex items-center justify-center text-3xl text-red-600 border-b-2 border-white rounded-md  hover:scale-105 px-1"
+            // className="btn btn-sm btn-warning hidden  md:flex items-center justify-center "
           >
-            Home
+            {/* Home */}
+            <span className="mr-2 text-xl mt-2 text-white">Home</span>{" "}
+            <FaHome />
           </Link>
           {userLoggedIn && userInfo.role === "basic_user" && (
-            <Link
-              onClick={() => setIsMenuOpen(false)}
-              to="/favorites"
-              // className="hidden md:block lg:block h-8 w-8 mt-1"
-              className="btn btn-sm btn-warning w-full md:w-auto text-center"
-            >
-              {/* <img src={emptyHeart} className="w-24 h-24" /> */}
-              {/* <svg
+            <>
+              <Link
+                onClick={() => setIsMenuOpen(false)}
+                to="/favorites"
+                // className="hidden md:block lg:block h-8 w-8 mt-1"
+                className="flex md:hidden lg:hidden btn btn-sm btn-warning w-full md:w-auto text-center "
+              >
+                {/* <img src={emptyHeart} className="w-24 h-24" /> */}
+                {/* <svg
                 id="Layer_1"
                 data-name="Layer 1"
                 xmlns="http://www.w3.org/2000/svg"
@@ -132,8 +137,35 @@ const NavBar = () => {
                   d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z"
                 />
               </svg> */}
-              Favorites
-            </Link>
+                Favorites
+              </Link>
+              <Link
+                onClick={() => setIsMenuOpen(false)}
+                to="/favorites"
+                // className="hidden md:block lg:block h-8 w-8 mt-1"
+                className="hidden md:flex lg:flex w-full md:w-auto border-b-2 border-white rounded-md  hover:scale-105 px-1"
+              >
+                {/* <img src={emptyHeart} className="w-24 h-24" /> */}
+                <span className="mr-2 text-xl mt-2 text-white">Favorites</span>
+                <span className=" w-[28px] mt-2">
+                  <svg
+                    id="Layer_1"
+                    data-name="Layer 1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 122.88 107.39"
+                  >
+                    <defs>
+                      <style>{`.cls-1 { fill: #ed1b24; fillRule: 'evenodd'; }`}</style>
+                    </defs>
+                    <title>Favorites</title>
+                    <path
+                      className="cls-1"
+                      d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z"
+                    />
+                  </svg>
+                </span>
+              </Link>
+            </>
           )}
           {/* {userLoggedIn && (
             <Link

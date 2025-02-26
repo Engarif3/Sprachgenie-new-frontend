@@ -424,7 +424,7 @@ const WordList = () => {
   return (
     <Container>
       {/* Header remains the same */}
-      <h2 className="text-3xl font-bold font-mono my-8 text-center hidden md:block">
+      <h2 className="text-3xl font-bold font-mono text-sky-700 my-8 text-center hidden md:block">
         Words List
       </h2>
 
@@ -514,7 +514,7 @@ const WordList = () => {
                   <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                     Synonym
                   </th>
-                  <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                  <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center hidden lg:table-cell xl:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                     Antonym
                   </th>
                   <th className="border border-gray-600 p-0 md:p-1 lg:p-1 text-center hidden lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
@@ -589,7 +589,7 @@ const WordList = () => {
                         </div>
                       </td>
 
-                      <td className="border border-gray-600 p-2 text-blue-500 cursor-pointer hidden md:table-cell">
+                      <td className="border border-gray-600 p-2 text-blue-500 cursor-pointer hidden lg:table-cell xl:table-cell">
                         <div className="flex flex-wrap gap-1">
                           {word.antonyms?.map((antonym, index) => (
                             <span

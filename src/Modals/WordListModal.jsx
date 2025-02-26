@@ -8,7 +8,7 @@ const WordListModal = ({ closeModal, selectedWord, onEdit }) => {
 
   return (
     <div className="fixed z-50 inset-0 bg-black bg-opacity-50 flex justify-center items-center transition-opacity duration-300  ">
-      <div className="bg-white rounded-lg p-2 md:p-8 lg.p-8 max-w-4xl w-full shadow-2xl transform transition-all duration-300 scale-105 m-4 border">
+      <div className="bg-white rounded-lg p-2 md:p-8 lg:p-8 max-w-4xl w-full shadow-2xl transform transition-all duration-300 scale-105 m-4 border">
         <p className="text-3xl font-bold text-sky-500 text-center mb-4 border-b border-dashed dark:border-gray-600  ">
           <span className="text-orange-500">Topic:</span>{" "}
           {selectedWord.topic?.name || ""}

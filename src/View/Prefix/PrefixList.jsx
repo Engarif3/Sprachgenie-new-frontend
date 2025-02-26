@@ -223,6 +223,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { FaPlus, FaMinus } from "react-icons/fa";
+import Container from "../../utils/Container";
 
 const PrefixList = () => {
   const { id: prefixTypeId } = useParams();
@@ -309,9 +310,7 @@ const PrefixList = () => {
             </div>
             {expandedWords[word.id] && (
               <div className="p-3 bg-gray-50 text-gray-700">
-                <h4 className="text-sm font-semibold text-gray-800">
-                  Example Sentences:
-                </h4>
+                <h4 className="text font-semibold text-gray-800">Sentences:</h4>
                 <ul className="list-disc list-inside text-sm mt-1 space-y-1">
                   {word.sentences.map((sentence, idx) => (
                     <li key={idx}>{sentence}</li>
@@ -325,40 +324,42 @@ const PrefixList = () => {
   );
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <h2 className="text-3xl text-center font-semibold text-gray-800 mb-4">
-        {prefixData.name} Prefixes
-      </h2>
-      {Object.entries(groupedPrefixes).map(
-        ([prefixName, { verbs, noVerbs }]) => (
-          <div key={prefixName} className="mb-4">
-            <h3 className="text-xl font-bold text-blue-600 mb-2">
-              {prefixName.toUpperCase()}
-            </h3>
-            <div className="border border-gray-300 rounded-md shadow-sm overflow-hidden">
-              <div className="space-y-6">
-                {verbs.length > 0 && (
-                  <div>
-                    <h4 className="p-3 font-semibold bg-gray-50 border-b">
-                      Verbs ({verbs.length})
-                    </h4>
-                    {renderWordList(verbs)}
-                  </div>
-                )}
-                {noVerbs.length > 0 && (
-                  <div>
-                    <h4 className="p-3 font-semibold bg-gray-50 border-b">
-                      Non-Verbs ({noVerbs.length})
-                    </h4>
-                    {renderWordList(noVerbs)}
-                  </div>
-                )}
+    <Container>
+      <div className="max-w-4xl mx-auto p-4">
+        <h2 className="text-3xl font-bold font-mono text-center  text-gray-800 mb-4">
+          {prefixData.name} Prefixes
+        </h2>
+        {Object.entries(groupedPrefixes).map(
+          ([prefixName, { verbs, noVerbs }]) => (
+            <div key={prefixName} className="mb-4">
+              <h3 className="text-xl font-bold text-blue-600 mb-2">
+                {prefixName.toUpperCase()}
+              </h3>
+              <div className="border border-gray-300 rounded-md shadow-sm overflow-hidden">
+                <div className="space-y-6">
+                  {verbs.length > 0 && (
+                    <div>
+                      <h4 className="p-3 font-semibold bg-gray-50 border-b">
+                        Verbs ({verbs.length})
+                      </h4>
+                      {renderWordList(verbs)}
+                    </div>
+                  )}
+                  {noVerbs.length > 0 && (
+                    <div>
+                      <h4 className="p-3 font-semibold bg-gray-50 border-b">
+                        Non-Verbs ({noVerbs.length})
+                      </h4>
+                      {renderWordList(noVerbs)}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        )
-      )}
-    </div>
+          )
+        )}
+      </div>
+    </Container>
   );
 };
 

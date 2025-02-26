@@ -5,7 +5,7 @@ const Home = () => {
   return (
     <Container className="flex ">
       <div className="min-h-screen my-12">
-        <h2 className="text-center text-3xl font-mono font-bold text-cyan-900 mb-12">
+        <h2 className="text-center text-3xl font-mono font-bold text-sky-700 mb-12">
           Choose a topic to learn
         </h2>
         <div className="flex justify-center items-center ">
@@ -22,12 +22,17 @@ const Home = () => {
               link="/conversation-titles"
             />
             <HomeCard
-              title="Words with prefix"
+              title="Words With Prefix"
               text="Learn some prefix+word"
               link="/prefix-types"
             />
             <HomeCard
-              title="Learn Grammar Rules"
+              title="Learn Grammar"
+              text="Coming soon ....."
+              link="/grammar"
+            />
+            <HomeCard
+              title="Practice For exam"
               text="Coming soon ....."
               link="/grammar"
             />
