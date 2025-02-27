@@ -13,7 +13,7 @@ const LevelList = () => {
   useEffect(() => {
     const fetchLevels = async () => {
       try {
-        const response = await axios.get("/levels");
+        const response = await axios.get("/level/all");
         setLevels(response.data);
       } catch (error) {
         console.error("Error fetching levels", error);
@@ -25,7 +25,7 @@ const LevelList = () => {
   // Handle level update
   const handleUpdateLevel = async (id) => {
     try {
-      const response = await axios.put(`/levels/${id}`, {
+      const response = await axios.put(`/level/update/${id}`, {
         level: newLevelName,
       });
       setLevels(
@@ -45,7 +45,7 @@ const LevelList = () => {
       return;
     }
     try {
-      const response = await axios.delete(`/levels/${deleteLevelId}`);
+      const response = await axios.delete(`/level/delete/${deleteLevelId}`);
       console.log(response.data);
       setLevels(levels.filter((level) => level.id !== deleteLevelId));
       setShowModal(false);

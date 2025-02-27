@@ -41,8 +41,8 @@ const WordForm = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const levelResponse = await axios.get("/levels");
-        const topicResponse = await axios.get("/topics");
+        const levelResponse = await axios.get("/level/all");
+        const topicResponse = await axios.get("/topic/all");
         const articleResponse = await axios.get("/articles");
         const partOfSpeechResponse = await axios.get("/part-of-speech");
 
@@ -97,7 +97,7 @@ const WordForm = () => {
 
     try {
       // Directly submit the wordData state
-      const response = await axios.post("/words", newWordData);
+      const response = await axios.post("/word/create", newWordData);
       localStorage.removeItem("wordListCache");
       Swal.fire({
         title: "Created",

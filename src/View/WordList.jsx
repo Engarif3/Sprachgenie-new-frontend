@@ -196,11 +196,12 @@ const WordList = () => {
   const fetchAllWords = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get("/words?all=true");
+      // const response = await axios.get("/words?all=true");
+      const response = await axios.get("/word/all?all=true");
       const newCache = {
-        words: response.data.words || [],
-        levels: response.data.levels || [],
-        topics: (response.data.topics || []).sort((a, b) => a.id - b.id),
+        words: response.data.data.words || [],
+        levels: response.data.data.levels || [],
+        topics: (response.data.data.topics || []).sort((a, b) => a.id - b.id),
         lastUpdated: Date.now(),
       };
       setCache(newCache);
@@ -300,7 +301,7 @@ const WordList = () => {
       }).then((result) => {
         if (result.isConfirmed) {
           axios
-            .delete(`/word/${wordId}`)
+            .delete(`/word/delete/${wordId}`)
             .then(() => {
               // Update cache directly instead of refetching
               setCache((prev) => ({

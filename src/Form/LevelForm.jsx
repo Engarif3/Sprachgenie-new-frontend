@@ -30,7 +30,7 @@ const LevelForm = () => {
     }
 
     try {
-      const response = await axios.post("/levels", levelData);
+      const response = await axios.post("/level/create", levelData);
       console.log("Level added successfully:", response.data);
       alert("Level created successfully");
       setLevelData({ levelName: "" }); // Clear form after successful submission

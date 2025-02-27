@@ -23,7 +23,7 @@ const TopicForm = () => {
     setLoading(true); // Set loading to true when starting the submission
 
     try {
-      const response = await axios.post("/topics", topicData);
+      const response = await axios.post("/topic/create", topicData);
       console.log("Topic added successfully:", response.data);
       alert("Topic created successfully");
       setTopicData({ name: "" }); // Clear form after successful submission
