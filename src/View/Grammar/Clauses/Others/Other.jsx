@@ -103,11 +103,11 @@ const Other = () => {
               }`}
               onClick={() => toggleExpand(item.conjunction)}
             >
-              <div>
+              <div className="text-stone-950">
                 <span className="font-medium text-lg uppercase ml-4">
-                  {item.conjunction}
+                  {item.conjunction} -
                 </span>
-                <span className="ml-2 text-xl">
+                <span className="ml-2 text-lg">
                   ({item.meaning}) -{" "}
                   <span className="text-orange-600">{item.type}</span>
                 </span>

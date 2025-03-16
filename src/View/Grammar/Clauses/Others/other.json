@@ -2,7 +2,7 @@
   {
     "conjunction": "wegen",
     "meaning": "because of / due to",
-    "type": "preposition (used in Genetiv)",
+    "type": "preposition (Genetiv)",
     "ruleName": "Genetiv",
     "rules": [
       "der/das + noun + s/es = des Mannes/des Kindes (eines, meines) - Maskulin/Neutrum",
