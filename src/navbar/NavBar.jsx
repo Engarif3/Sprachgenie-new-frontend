@@ -146,7 +146,6 @@ const NavBar = () => {
                 className="hidden md:flex lg:flex w-full md:w-auto border-b-2 border-white rounded-md  hover:scale-105 px-1"
               >
                 {/* <img src={emptyHeart} className="w-24 h-24" /> */}
-                <span className="mr-2 text-xl mt-2 text-white">Favorites</span>
                 <span className=" w-[28px] mt-2">
                   <svg
                     id="Layer_1"
@@ -164,6 +163,7 @@ const NavBar = () => {
                     />
                   </svg>
                 </span>
+                <span className="ml-2 text-xl mt-2 text-white">Favorites</span>
               </Link>
             </>
           )}
