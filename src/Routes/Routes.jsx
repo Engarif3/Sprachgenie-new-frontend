@@ -14,7 +14,7 @@ import Register from "../register/Register";
 import FavoritesList from "../View/FavoritesList";
 import ResendVerification from "../register/ResendVerification";
 import VerifyEmail from "../register/VerifyEmail";
-import Conversation from "../View/Conversation/Conversation";
+// import Conversation from "../View/Conversation/Conversation";
 import ConversationsList from "../View/Conversation/ConversationList";
 import CreateConversation from "../View/Conversation/CreateConversation";
 import ConversationTitleList from "../View/Conversation/ConversationTitleList";
@@ -23,6 +23,10 @@ import Home from "../View/Home/Home";
 import PrefixTypeList from "../View/Prefix/PrefixTypeList";
 import PrefixList from "../View/Prefix/PrefixList";
 import Grammar from "../View/Grammar/Grammar";
+// import CoordinatingConjunction from "../View/Grammar/Clauses/Coordinating/CoordinatingConjunction";
+import Clauses from "../View/Grammar/Clauses/Clauses";
+import Clause from "../View/Grammar/Clauses/Clause";
+import GrammarTopic from "../View/Grammar/GrammarTopic";
 
 export const router = createBrowserRouter([
   {
@@ -102,9 +106,24 @@ export const router = createBrowserRouter([
         path: "/prefix-list/:id",
         element: <PrefixList></PrefixList>,
       },
+      // =============================Grammar ===================================
       {
         path: "/grammar",
         element: <Grammar></Grammar>,
+      },
+      {
+        path: "/grammar/:id",
+        element: <GrammarTopic></GrammarTopic>,
+      },
+      {
+        // path: "/clauses/:id",
+        path: "/clauses",
+        element: <Clauses></Clauses>,
+        // element: <CoordinatingConjunction></CoordinatingConjunction>,
+      },
+      {
+        path: "/clause/:id",
+        element: <Clause />,
       },
     ],
   },

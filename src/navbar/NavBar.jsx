@@ -110,8 +110,8 @@ const NavBar = () => {
             // className="btn btn-sm btn-warning hidden  md:flex items-center justify-center "
           >
             {/* Home */}
-            <span className="mr-2 text-xl mt-2 text-white">Home</span>{" "}
             <FaHome />
+            <span className="ml-2 text-xl mt-2 text-white">Home</span>{" "}
           </Link>
           {userLoggedIn && userInfo.role === "basic_user" && (
             <>

@@ -1,0 +1,140 @@
+[
+  {
+    "conjunction": "und",
+    "meaning": "and",
+
+    "examples": [
+      "Ich lerne Deutsch und mein Freund lernt Französisch.",
+      "Wir spielen Fußball und gehen danach ins Kino.",
+      "Meine Schwester kocht und ich decke den Tisch."
+    ]
+  },
+  {
+    "conjunction": "oder",
+    "meaning": "or",
+
+    "examples": [
+      "Du kannst ins Kino gehen oder wir bleiben zu Hause.",
+      "Ich trinke Kaffee oder nehme lieber Tee.",
+      "Meine Eltern fahren in den Urlaub oder sie bleiben dieses Jahr hier."
+    ]
+  },
+  {
+    "conjunction": "aber",
+    "meaning": "but",
+
+    "examples": [
+      "Er möchte reisen, aber seine Eltern wollen zu Hause bleiben.",
+      "Ich mag Schokolade, aber ich esse sie nicht oft.",
+      "Sie arbeitet viel, aber ihr Bruder macht oft Pause."
+    ]
+  },
+  {
+    "conjunction": "denn",
+    "meaning": "because / weil=da=denn",
+
+    "examples": [
+      "Ich bin müde, denn der Tag war lang.",
+      "Wir bleiben zu Hause, denn es regnet.",
+      "Sie kann nicht kommen, denn sie ist krank."
+    ]
+  },
+  {
+    "conjunction": "sondern",
+    "meaning": "rather / instead",
+
+    "examples": [
+      "Ich trinke keinen Kaffee, sondern meine Schwester trinkt Tee.",
+      "Er fährt nicht mit dem Auto, sondern nimmt den Bus.",
+      "Sie liest kein Buch, sondern schaut einen Film."
+    ]
+  },
+  {
+    "conjunction": "doch",
+    "meaning": "yet / however",
+
+    "examples": [
+      "Es regnet, doch die Kinder spielen draußen.",
+      "Ich bin müde, doch ich mache meine Hausaufgaben.",
+      "Sie ist krank, doch sie geht zur Arbeit."
+    ]
+  },
+  {
+    "conjunction": "sowohl … als auch",
+    "meaning": "both … and",
+
+    "examples": [
+      "Sowohl mein Vater kocht, als auch meine Mutter backt einen Kuchen.",
+      "Sowohl er als auch sein Bruder spielen Fußball.",
+      "Sowohl das Wetter ist schön, als auch die Stimmung ist gut.",
+      "Er spricht sowohl Deutsch als auch Englisch.",
+      "Sie ist sowohl freundlich als auch hilfsbereit.",
+      "Wir haben sowohl Pizza als auch Pasta bestellt.",
+      "Das Hotel war sowohl günstig als auch sauber.",
+      "Er spielt sowohl Fußball als auch Tennis."
+    ]
+  },
+  {
+    "conjunction": "entweder … oder",
+    "meaning": "either … or",
+
+    "examples": [
+      "Wir übernachten entweder im Hotel oder in der Jugendherberge.",
+      "Entweder laufen wir, oder wir fahren mit dem Bus.",
+      "Entweder er lügt oder er ist sehr vergesslich.",
+      "Entweder mit oder ohne ketchup.",
+      "Sie ruft entweder an oder schickt ein Fax.",
+      "Entweder du bringst das Essen, oder wir bestellen Pizza.",
+      "Entweder ich lerne jetzt, oder ich falle durch die Prüfung.",
+      "Entweder er kommt mit oder er bleibt zu Hause."
+    ]
+  },
+  {
+    "conjunction": "weder … noch",
+    "meaning": "neither … nor",
+
+    "examples": [
+      "Ich spiele weder Fußball oder noch Tennis.",
+      "Ich spiele weder Fußball oder noch Tennis noch Golf.",
+      "Er hat weder Lust, lange zu arbeiten, noch Ehrgeiz.",
+      "Ich spreche weder Deutsch  noch Englisch",
+      "Weder mein Bruder mag Gemüse, noch meine Schwester isst Obst.",
+      "Weder ich noch meine Freunde haben Zeit heute Abend.",
+      "Weder das Essen schmeckt gut, noch ist der Service freundlich.",
+      "Mit 12 darf man weder Bier noch Wein trinken",
+      "Mit 20 darf durfte ich weder rauchen noch Alkohol trinken"
+    ]
+  },
+  {
+    "conjunction": "zwar … aber",
+    "meaning": "though … but",
+    "examples": [
+      "Er ist zwar müde, aber er geht trotzdem zur Arbeit.",
+      "Das Buch ist zwar teuer, aber es ist sehr interessant.",
+      "Sie ist zwar keine Expertin, aber sie kennt sich gut aus.",
+      "Wir haben zwar viel zu tun, aber wir nehmen uns Zeit für eine Pause.",
+      "Es ist zwar kalt, aber ich gehe trotzdem spazieren.",
+      "Zwar ist er müde, aber er geht trotzdem zur Arbeit.",
+      "Zwar ist das Buch teuer, aber es ist sehr interessant.",
+      "Zwar ist sie keine Expertin, aber sie kennt sich gut aus.",
+      "Zwar haben wir viel zu tun, aber wir nehmen uns Zeit für eine Pause.",
+      "Zwar ist es kalt, aber ich gehe trotzdem spazieren."
+    ]
+  },
+
+  {
+    "conjunction": "nicht nur … sondern auch",
+    "meaning": "not only … but also",
+
+    "examples": [
+      "Nicht nur mein Freund spielt Fußball, sondern auch seine Schwester liebt den Sport.",
+      "Nicht nur das Essen war lecker, sondern auch die Musik war gut.",
+      "Nicht nur du hast gewonnen, sondern auch dein Team hat gut gespielt.",
+      "Er spricht nicht nur Deutsch, sondern auch Englisch.",
+      "Sie ist nicht nur freundlich, sondern auch hilfsbereit.",
+      "Wir haben nicht nur Pizza bestellt, sondern auch Pasta.",
+      "Das Hotel war nicht nur günstig, sondern auch sauber.",
+      "Er spielt nicht nur Fußball, sondern auch Tennis."
+    ]
+  }
+]

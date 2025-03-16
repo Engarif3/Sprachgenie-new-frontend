@@ -1,0 +1,30 @@
+[
+  {
+    "conjunction": "wegen",
+    "meaning": "because of / due to",
+    "type": "preposition (used in Genetiv)",
+    "ruleName": "Genetiv",
+    "rules": [
+      "der/das + noun + s/es = des Mannes/des Kindes (eines, meines) - Maskulin/Neutrum",
+      "die + noun = der Frau (einer, meiner) - Feminin",
+      "die + noun = der Leute  - Plural"
+    ],
+    "examples": [
+      "Wegen des Sturms fahren die Züge heute nicht.",
+      "Wegen des Wetters kann die Party nicht stattfinden,",
+      "Wegen der Verspätung komme ich nicht pünktlich.",
+      "Wegen der vielen Gäste war kein Platz mehr frei.",
+      "Der Pilot kann wegen des Regens nicht landen.",
+      "-- Der Pilot kann nicht landen, weil es regnet.",
+      "Die Fluggäste sind wegen der Absage des Flugs verärgert. ",
+      "-- Die Fluggäste sind verärgert, weil der Flug abgesagt ist.",
+      "Wegen des Regens bleiben wir zu Hause.",
+      "Wir konnten nicht gehen, wegen der vielen Arbeit.",
+      "Er hat den Job verloren, wegen seiner Unpünktlichkeit.",
+      "Wegen des Staus kamen wir zu spät.",
+      "Sie konnte nicht kommen, wegen einer Krankheit.",
+      "Wegen eines Unfalls konnte ich nicht zur Arbeit gehen.",
+      "Wegen meiner Krankheit musste ich das Treffen absagen."
+    ]
+  }
+]

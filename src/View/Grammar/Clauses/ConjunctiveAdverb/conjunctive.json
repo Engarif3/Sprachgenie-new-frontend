@@ -1,0 +1,128 @@
+[
+  {
+    "conjunction": "deshalb",
+    "meaning": "therefore",
+    "examples": [
+      "Ich habe viel gelernt, deshalb habe ich die Prüfung bestanden.",
+      "Es regnet stark, deshalb bleiben wir zu Hause.",
+      "Sie ist krank, deshalb kann sie nicht zur Arbeit gehen."
+    ]
+  },
+  {
+    "conjunction": "daher",
+    "meaning": "therefore / hence",
+    "examples": [
+      "Er hat viel trainiert, daher hat er das Spiel gewonnen.",
+      "Die Straße ist gesperrt, daher nehmen wir eine andere Route.",
+      "Sie spricht Deutsch, daher kann sie die Texte verstehen."
+    ]
+  },
+  {
+    "conjunction": "deswegen",
+    "meaning": "therefore / because of that",
+    "examples": [
+      "Es ist kalt draußen, deswegen trage ich einen Mantel.",
+      "Er hat den Zug verpasst, deswegen ist er zu spät.",
+      "Die Sonne scheint, deswegen gehen wir spazieren."
+    ]
+  },
+  {
+    "conjunction": "darum",
+    "meaning": "therefore / that's why",
+    "examples": [
+      "Es ist spät, darum gehen wir jetzt nach Hause.",
+      "Sie hat Geburtstag, darum feiern wir heute.",
+      "Ich habe keine Zeit, darum kann ich nicht kommen."
+    ]
+  },
+  {
+    "conjunction": "sonst",
+    "meaning": "otherwise",
+    "examples": [
+      "Komm pünktlich, sonst verpasst du den Beginn.",
+      "Du solltest den Vertrag unterschreiben, sonst gibt es Probleme.",
+      "Ich werde die Arbeit nicht beenden, sonst bekomme ich Ärger."
+    ]
+  },
+  {
+    "conjunction": "trotzdem",
+    "meaning": "nevertheless / still",
+    "examples": [
+      "Es regnet, trotzdem gehen wir spazieren.",
+      "Er war müde, trotzdem hat er weitergearbeitet.",
+      "Die Aufgabe war schwer, trotzdem hat sie sie gelöst."
+    ]
+  },
+  {
+    "conjunction": "jedoch",
+    "meaning": "however",
+    "examples": [
+      "Das Angebot ist gut, jedoch nicht perfekt.",
+      "Ich kann helfen, jedoch erst morgen.",
+      "Er hat gewonnen, jedoch war es knapp."
+    ]
+  },
+  {
+    "conjunction": "dann",
+    "meaning": "then",
+    "examples": [
+      "Erst gehen wir einkaufen, dann machen wir das Abendessen.",
+      "Ich werde zuerst meine Hausaufgaben machen, dann gehe ich ins Fitnessstudio.",
+      "Wir treffen uns um 18 Uhr, dann gehen wir ins Restaurant."
+    ]
+  },
+  {
+    "conjunction": "außerdem",
+    "meaning": "besides / moreover",
+    "examples": [
+      "Ich habe keine Zeit, außerdem bin ich müde.",
+      "Das Wetter ist schön, außerdem haben wir frei.",
+      "Er ist klug, außerdem arbeitet er hart."
+    ]
+  },
+  {
+    "conjunction": "folglich",
+    "meaning": "consequently",
+    "examples": [
+      "Er hat nicht trainiert, folglich war er nicht fit für das Rennen.",
+      "Sie hat viel Geld gespart, folglich konnte sie sich ein Auto kaufen.",
+      "Es gab keine Plätze mehr, folglich mussten sie stehen."
+    ]
+  },
+  {
+    "conjunction": "dennoch",
+    "meaning": "nevertheless",
+    "examples": [
+      "Es regnet, dennoch gehen wir spazieren.",
+      "Sie hat wenig Zeit, dennoch hilft sie uns.",
+      "Er hat den Fehler gemacht, dennoch bleibt er ruhig."
+    ]
+  },
+  {
+    "conjunction": "infolgedessen",
+    "meaning": "as a result",
+    "examples": [
+      "Er hat lange nicht geschlafen, infolgedessen war er sehr müde.",
+      "Das Auto war kaputt, infolgedessen mussten sie den Bus nehmen.",
+      "Es gab ein Missverständnis, infolgedessen kam es zu einem Fehler."
+    ]
+  },
+  {
+    "conjunction": "schließlich",
+    "meaning": "finally",
+    "examples": [
+      "Wir haben lange diskutiert, schließlich haben wir eine Entscheidung getroffen.",
+      "Es gab viele Hindernisse, schließlich haben wir das Ziel erreicht.",
+      "Er war sehr müde, schließlich fiel er ins Bett."
+    ]
+  },
+  {
+    "conjunction": "zuvor",
+    "meaning": "beforehand",
+    "examples": [
+      "Ich habe den Bericht zuvor geschrieben.",
+      "Zuvor war ich beim Arzt.",
+      "Sie hat den Film zuvor schon gesehen."
+    ]
+  }
+]

@@ -1,0 +1,177 @@
+[
+  {
+    "conjunction": "dass",
+    "meaning": "that",
+    "examples": [
+      "Ich hoffe, dass du bald kommst.",
+      "Er sagt, dass er heute keine Zeit hat.",
+      "Wir glauben, dass das Wetter morgen besser wird."
+    ]
+  },
+  {
+    "conjunction": "weil",
+    "meaning": "because / weil=da=denn",
+    "examples": [
+      "Ich bleibe zu Hause, weil es regnet.",
+      "Er kann nicht kommen, weil er krank ist.",
+      "Sie freut sich, weil sie eine gute Note bekommen hat."
+    ]
+  },
+  {
+    "conjunction": "da",
+    "meaning": "since / because",
+    "examples": [
+      "Da es regnet, bleiben wir zu Hause.",
+      "Ich kann nicht kommen, da ich krank bin.",
+      "Da sie viel gearbeitet hat, hat sie sich eine Pause verdient.",
+      "Er hat die Antwort nicht gewusst, da er nicht gelernt hatte.",
+      "Da wir früh aufstehen müssen, gehen wir jetzt schlafen."
+    ]
+  },
+
+  {
+    "conjunction": "wenn",
+    "meaning": "if / when",
+    "examples": [
+      "Wenn es regnet, bleiben wir zu Hause.",
+      "Ich rufe dich an, wenn ich fertig bin.",
+      "Wenn du möchtest, können wir zusammen lernen."
+    ]
+  },
+  {
+    "conjunction": "als",
+    "meaning": "when (past events)",
+    "examples": [
+      "Als ich ein Kind war, spielte ich viel draußen.",
+      "Er war traurig, als er die Nachricht hörte.",
+      "Als wir in Berlin waren, besuchten wir viele Museen."
+    ]
+  },
+  {
+    "conjunction": "falls",
+    "meaning": "if / in case",
+    "examples": [
+      "Falls es regnet, nehmen wir einen Regenschirm mit.",
+      "Falls du Fragen hast, kannst du mich jederzeit fragen.",
+      "Falls du Hunger hast, gibt es Essen in der Küche."
+    ]
+  },
+  {
+    "conjunction": "ob",
+    "meaning": "whether / if",
+    "examples": [
+      "Ich weiß nicht, ob er kommt.",
+      "Frag ihn, ob er mit uns ins Kino gehen möchte.",
+      "Sie fragt sich, ob sie die richtige Entscheidung getroffen hat."
+    ]
+  },
+  {
+    "conjunction": "obwohl",
+    "meaning": "although",
+    "examples": [
+      "Er geht spazieren, obwohl es kalt ist.",
+      "Ich bin gekommen, obwohl ich müde war.",
+      "Sie hat das Rennen gewonnen, obwohl sie sich nicht gut fühlte."
+    ]
+  },
+  {
+    "conjunction": "sodass",
+    "meaning": "so that",
+    "examples": [
+      "Es war sehr laut, sodass ich nichts verstehen konnte.",
+      "Ich habe schnell gearbeitet, sodass wir früher fertig wurden.",
+      "Er hat sich beeilt, sodass er den Bus noch erwischt hat."
+    ]
+  },
+  {
+    "conjunction": "während",
+    "meaning": "while",
+    "examples": [
+      "Ich höre Musik, während ich lerne.",
+      "Während sie kocht, liest er die Zeitung.",
+      "Er spricht, während er gestikuliert."
+    ]
+  },
+  {
+    "conjunction": "bevor",
+    "meaning": "before",
+    "examples": [
+      "Bevor du gehst, musst du dein Zimmer aufräumen.",
+      "Ich dusche, bevor ich ins Bett gehe.",
+      "Bevor wir essen, waschen wir unsere Hände."
+    ]
+  },
+  {
+    "conjunction": "nachdem",
+    "meaning": "after",
+    "examples": [
+      "Nachdem ich gegessen hatte, ging ich ins Bett.",
+      "Wir gingen spazieren, nachdem es aufgehört hatte zu regnen.",
+      "Nachdem er die Prüfung bestanden hatte, feierte er mit Freunden."
+    ]
+  },
+  {
+    "conjunction": "seitdem",
+    "meaning": "since",
+    "examples": [
+      "Seitdem ich hier wohne, habe ich viele Freunde gefunden.",
+      "Er hat sich verändert, seitdem er im Ausland war.",
+      "Seitdem sie arbeitet, hat sie weniger Freizeit."
+    ]
+  },
+  {
+    "conjunction": "bis",
+    "meaning": "until",
+    "examples": [
+      "Ich warte, bis du fertig bist.",
+      "Er bleibt hier, bis seine Eltern kommen.",
+      "Wir müssen warten, bis der Regen aufhört."
+    ]
+  },
+  {
+    "conjunction": "damit",
+    "meaning": "so that / in order to",
+    "examples": [
+      "Ich lerne viel, damit ich die Prüfung bestehe.",
+      "Sie spricht langsam, damit jeder sie versteht.",
+      "Wir sparen Geld, damit wir in den Urlaub fahren können."
+    ]
+  },
+  {
+    "conjunction": "indem",
+    "meaning": "by doing",
+    "examples": [
+      "Er verbessert sein Deutsch, indem er viel spricht.",
+      "Sie bleibt fit, indem sie regelmäßig Sport treibt.",
+      "Ich spare Geld, indem ich weniger einkaufe."
+    ]
+  },
+
+  {
+    "conjunction": "sofern",
+    "meaning": "provided that",
+    "examples": [
+      "Du darfst mitkommen, sofern du deine Hausaufgaben gemacht hast.",
+      "Sofern es nicht regnet, machen wir ein Picknick.",
+      "Ich helfe dir, sofern ich Zeit habe."
+    ]
+  },
+  {
+    "conjunction": "soweit",
+    "meaning": "as far as",
+    "examples": [
+      "Soweit ich weiß, ist er schon in der Stadt.",
+      "Soweit es mich betrifft, kannst du entscheiden.",
+      "Soweit wir informiert sind, gibt es keine Probleme."
+    ]
+  },
+  {
+    "conjunction": "zumal",
+    "meaning": "especially since",
+    "examples": [
+      "Ich bleibe zu Hause, zumal ich krank bin.",
+      "Wir sollten früh losfahren, zumal viel Verkehr erwartet wird.",
+      "Er nimmt das Angebot an, zumal er eine Gehaltserhöhung bekommt."
+    ]
+  }
+]

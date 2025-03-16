@@ -28,7 +28,7 @@ const Home = () => {
             />
             <HomeCard
               title="Learn Grammar"
-              text="Coming soon ....."
+              text="Learn grammar rules to become more perfect"
               link="/grammar"
             />
             <HomeCard
