@@ -27,6 +27,9 @@ import Grammar from "../View/Grammar/Grammar";
 import Clauses from "../View/Grammar/Clauses/Clauses";
 import Clause from "../View/Grammar/Clauses/Clause";
 import GrammarTopic from "../View/Grammar/GrammarTopic";
+import Exam from "../View/Exam/Exam";
+import ForgotPassword from "../Auth/ForgotPassword";
+import ResetPassword from "../Auth/ResetPassword";
 
 export const router = createBrowserRouter([
   {
@@ -125,6 +128,38 @@ export const router = createBrowserRouter([
         path: "/clause/:id",
         element: <Clause />,
       },
+      {
+        path: "/exam",
+        element: <Exam></Exam>,
+      },
+      // Protected routes based on user roles
+      // {
+      //   path: "/admin-dashboard",
+      //   element: (
+      //     <ProtectedRoute
+      //       element={<AdminDashboard />}
+      //       allowedRoles={["admin", "super_admin"]}
+      //     />
+      //   ),
+      // },
+      // {
+      //   path: "/superadmin-dashboard",
+      //   element: (
+      //     <ProtectedRoute
+      //       element={<SuperAdminDashboard />}
+      //       allowedRoles={["super_admin"]}
+      //     />
+      //   ),
+      // },
+      // {
+      //   path: "/basic-dashboard",
+      //   element: (
+      //     <ProtectedRoute
+      //       element={<BasicDashboard />}
+      //       allowedRoles={["basic_user", "admin", "super_admin"]}
+      //     />
+      //   ),
+      // },
     ],
   },
   {
@@ -143,4 +178,9 @@ export const router = createBrowserRouter([
     path: "/resend-verification",
     element: <ResendVerification></ResendVerification>,
   },
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword></ForgotPassword>,
+  },
+  { path: "/reset-password", element: <ResetPassword></ResetPassword> },
 ]);

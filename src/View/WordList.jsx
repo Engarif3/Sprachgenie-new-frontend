@@ -430,7 +430,7 @@ const WordList = () => {
       </h2>
 
       {/* Filters grid */}
-      <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 gap-4 mt-4 md:mt-0">
+      <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 gap-4 mt-4 md:mt-0 ">
         {/* Search Input */}
         <div className="w-full">
           <div className="flex">
@@ -495,8 +495,8 @@ const WordList = () => {
 
       {/* Table content */}
       {isLoading ? (
-        <div className="flex justify-center items-center min-h-screen">
-          <span className="loading loading-spinner text-accent w-24 h-24"></span>
+        <div className="flex justify-center items-center  mt-24 min-h-[45vh] md:min-h-[55vh] lg:min-h-[55vh]">
+          <span className="loading loading-spinner text-accent w-24 h-24 "></span>
         </div>
       ) : (
         <div className="min-h-screen">

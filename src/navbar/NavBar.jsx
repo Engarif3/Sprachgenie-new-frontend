@@ -11,6 +11,7 @@ const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo() || {};
+  console.log(userInfo);
 
   const handleCreateTopic = () => {
     Swal.fire({

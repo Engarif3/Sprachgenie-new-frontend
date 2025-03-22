@@ -34,7 +34,7 @@ const Home = () => {
             <HomeCard
               title="Practice For exam"
               text="Coming soon ....."
-              link="/grammar"
+              link="/exam"
             />
           </div>
         </div>

@@ -220,10 +220,14 @@ const Register = () => {
     const data = modifyPayload(formData);
     try {
       const res = await registerUser(data);
-      if (res?.data?.pending) {
+      if (res?.data) {
         navigate("/verify-email"); // Or "/resend-verification" as needed
         return; // Exit after navigation
       }
+      // if (res?.data?.pending) {
+      //   navigate("/verify-email"); // Or "/resend-verification" as needed
+      //   return; // Exit after navigation
+      // }
 
       // Handle successful registration with user data
       if (res?.data?.id) {
