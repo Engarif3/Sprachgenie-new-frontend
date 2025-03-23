@@ -30,6 +30,8 @@ import GrammarTopic from "../View/Grammar/GrammarTopic";
 import Exam from "../View/Exam/Exam";
 import ForgotPassword from "../Auth/ForgotPassword";
 import ResetPassword from "../Auth/ResetPassword";
+import UpdateBasicUserStatus from "../AdminActions/Admin/UpdateBasicUserStatus";
+import UpdateUserStatus from "../AdminActions/SuperAdmin/UpdateUSerStatus";
 
 export const router = createBrowserRouter([
   {
@@ -160,6 +162,14 @@ export const router = createBrowserRouter([
       //     />
       //   ),
       // },
+      {
+        path: "/update-user-status",
+        element: <UpdateUserStatus></UpdateUserStatus>,
+      },
+      {
+        path: "/update-basic-user-status",
+        element: <UpdateBasicUserStatus></UpdateBasicUserStatus>,
+      },
     ],
   },
   {

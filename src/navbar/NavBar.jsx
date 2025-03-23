@@ -11,7 +11,6 @@ const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo() || {};
-  console.log(userInfo);
 
   const handleCreateTopic = () => {
     Swal.fire({
@@ -187,6 +186,26 @@ const NavBar = () => {
                 className="btn btn-sm btn-warning w-full md:w-auto text-center"
               >
                 Create Word
+              </Link>
+            </>
+          )}
+          {userInfo.role === "admin" && (
+            <>
+              <Link
+                to="/update-basic-user-status"
+                className="btn btn-sm btn-success w-full md:w-auto text-center text-slate-950 font-bold"
+              >
+                Users
+              </Link>
+            </>
+          )}
+          {userInfo.role === "super_admin" && (
+            <>
+              <Link
+                to="/update-user-status"
+                className="btn btn-sm btn-success w-full md:w-auto text-center text-slate-950 font-bold"
+              >
+                Users
               </Link>
             </>
           )}
