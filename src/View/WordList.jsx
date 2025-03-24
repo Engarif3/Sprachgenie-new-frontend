@@ -5,13 +5,14 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import axios from "../axios";
+// import axios from "../axios";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import WordListModal from "../Modals/WordListModal";
 import Container from "../utils/Container";
 import Pagination from "../utils/Pagination";
 import { getUserInfo, isLoggedIn } from "../services/auth.services";
+import api from "../axios";
 
 // Cache key constants
 const CACHE_KEY = "wordListCache";
@@ -19,7 +20,6 @@ const CACHE_EXPIRY = 15 * 60 * 1000; // 15 minutes
 
 const WordList = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [selectedWord, setSelectedWord] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -45,23 +45,51 @@ const WordList = () => {
 
   const [favorites, setFavorites] = useState([]);
 
+  // useEffect(() => {
+  //   const fetchFavorites = async () => {
+  //     // Check if userInfo exists and has an id
+  //     if (!userInfo?.id || userInfo.role !== "basic_user") return;
+
+  //     try {
+  //       const response = await fetch(
+  //         `https://sprcahgenie-new-backend.vercel.app/api/v1/favorite-words/${userInfo.id}`
+  //       );
+  //       if (response.ok) {
+  //         const result = await response.json();
+  //         setFavorites(result.data.map((word) => word.id));
+  //       } else {
+  //         console.error("Failed to fetch favorites");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching favorites:", error);
+  //     }
+  //   };
+
+  //   fetchFavorites();
+  // }, [userInfo?.id]);
+  // Update the fetchFavorites useEffect
+  // Update the fetchFavorites useEffect with Axios
+
   useEffect(() => {
     const fetchFavorites = async () => {
-      // Check if userInfo exists and has an id
-      if (!userInfo?.id) return;
+      if (!userInfo?.id || userInfo.role !== "basic_user") return;
 
       try {
-        const response = await fetch(
-          `https://sprcahgenie-new-backend.vercel.app/api/v1/favorite-words/${userInfo.id}`
-        );
-        if (response.ok) {
-          const result = await response.json();
-          setFavorites(result.data.map((word) => word.id));
-        } else {
-          console.error("Failed to fetch favorites");
-        }
+        const response = await api.get(`/favorite-words/${userInfo.id}`);
+
+        setFavorites(response.data.data.map((word) => word.id));
       } catch (error) {
-        console.error("Error fetching favorites:", error);
+        if (error.response) {
+          if (error.response.status === 404) {
+            setFavorites([]);
+          } else {
+            console.error("Error fetching favorites:", error.response.data);
+          }
+        } else {
+          console.error("Error fetching favorites:", error.message);
+        }
+        // Ensure favorites array is always set
+        setFavorites([]);
       }
     };
 
@@ -70,55 +98,101 @@ const WordList = () => {
 
   const toggleFavorite = async (wordId) => {
     const isFavorite = favorites.includes(wordId);
-    const url =
+    const baseURL =
       "https://sprcahgenie-new-backend.vercel.app/api/v1/favorite-words";
-    const userId = userInfo.id; // Get user ID
+    const userId = userInfo.id;
 
     try {
       setLoadingFavorites((prev) => ({ ...prev, [wordId]: true }));
+
       if (isFavorite) {
         // Remove from favorites (DELETE request)
-        const response = await fetch(`${url}/${wordId}`, {
-          method: "DELETE",
+        await api.delete(`/favorite-words/${wordId}`, {
+          data: { userId, wordId },
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ userId, wordId }),
         });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Failed to remove favorite:", errorData);
-          return;
-        }
-
-        setFavorites((prevFavorites) =>
-          prevFavorites.filter((id) => id !== wordId)
-        );
+        setFavorites((prev) => prev.filter((id) => id !== wordId));
       } else {
         // Add to favorites (POST request)
-        const response = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ userId, wordId }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Failed to add favorite:", errorData);
-          return;
-        }
-
-        setFavorites((prevFavorites) => [...prevFavorites, wordId]);
+        await api.post(
+          "/favorite-words",
+          { userId, wordId },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        setFavorites((prev) => [...prev, wordId]);
       }
     } catch (error) {
-      console.error("Error updating favorites:", error);
+      console.error(
+        "Error updating favorites:",
+        error.response?.data || error.message
+      );
+      // Optional: Show error to user
+      Swal.fire({
+        icon: "error",
+        title: "Favorite Update Failed",
+        text: error.response?.data?.message || "Could not update favorite",
+      });
     } finally {
       setLoadingFavorites((prev) => ({ ...prev, [wordId]: false }));
     }
   };
+  // const toggleFavorite = async (wordId) => {
+  //   const isFavorite = favorites.includes(wordId);
+  //   const url =
+  //     "https://sprcahgenie-new-backend.vercel.app/api/v1/favorite-words";
+  //   const userId = userInfo.id; // Get user ID
+
+  //   try {
+  //     setLoadingFavorites((prev) => ({ ...prev, [wordId]: true }));
+  //     if (isFavorite) {
+  //       // Remove from favorites (DELETE request)
+  //       const response = await fetch(`${url}/${wordId}`, {
+  //         method: "DELETE",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ userId, wordId }),
+  //       });
+
+  //       if (!response.ok) {
+  //         const errorData = await response.json();
+  //         console.error("Failed to remove favorite:", errorData);
+  //         return;
+  //       }
+
+  //       setFavorites((prevFavorites) =>
+  //         prevFavorites.filter((id) => id !== wordId)
+  //       );
+  //     } else {
+  //       // Add to favorites (POST request)
+  //       const response = await fetch(url, {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ userId, wordId }),
+  //       });
+
+  //       if (!response.ok) {
+  //         const errorData = await response.json();
+  //         console.error("Failed to add favorite:", errorData);
+  //         return;
+  //       }
+
+  //       setFavorites((prevFavorites) => [...prevFavorites, wordId]);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating favorites:", error);
+  //   } finally {
+  //     setLoadingFavorites((prev) => ({ ...prev, [wordId]: false }));
+  //   }
+  // };
 
   // ===================
 
@@ -197,7 +271,7 @@ const WordList = () => {
     setIsLoading(true);
     try {
       // const response = await axios.get("/words?all=true");
-      const response = await axios.get("/word/all?all=true");
+      const response = await api.get("/word/all?all=true");
       const newCache = {
         words: response.data.data.words || [],
         levels: response.data.data.levels || [],
@@ -300,7 +374,7 @@ const WordList = () => {
         confirmButtonText: "Yes, delete it!",
       }).then((result) => {
         if (result.isConfirmed) {
-          axios
+          api
             .delete(`/word/delete/${wordId}`)
             .then(() => {
               // Update cache directly instead of refetching
@@ -331,22 +405,6 @@ const WordList = () => {
     },
     [] // No dependencies needed now
   );
-
-  // Edit handler
-  // const handleEditButtonClick = useCallback(
-  //   (wordId) => {
-  //     Swal.fire({
-  //       title: "Enter password",
-  //       input: "password",
-  //       inputValidator: (value) =>
-  //         value === "aydin2" ? null : "Wrong Password!",
-  //       showCancelButton: true,
-  //     }).then((result) => {
-  //       if (result.isConfirmed) navigate(`/edit-word/${wordId}`);
-  //     });
-  //   },
-  //   [navigate]
-  // );
 
   // Learning mode implementation
   const toggleLearningMode = useCallback(() => {

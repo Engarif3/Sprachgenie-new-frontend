@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Container from "../utils/Container";
 import Swal from "sweetalert2";
 import AuthButton from "../components/UI/AuthButton/AuthButton";
@@ -8,6 +8,7 @@ import { FaHome } from "react-icons/fa";
 
 const NavBar = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // Get current route
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo() || {};
@@ -67,22 +68,16 @@ const NavBar = () => {
             <span className="text-red-600">Sprach</span>
             <span className="text-white">Genie</span>
           </Link>
-          <Link
-            onClick={() => setIsMenuOpen(false)}
-            to="/"
-            className="btn btn-sm btn-warning  flex items-center justify-center md:hidden lg:hidden"
-          >
-            Home
-          </Link>
-          {/* {userLoggedIn && userInfo.role === "basic_user" && (
+
+          {location.pathname !== "/" && (
             <Link
-              to="/favorites"
-              // className="ml-10 block md:hidden lg:hidden h-8 w-8 mt-1"
-              className="btn btn-sm btn-warning  text-center flex items-center justify-center md:hidden lg:hidden"
+              onClick={() => setIsMenuOpen(false)}
+              to="/"
+              className="btn btn-sm btn-warning  flex items-center justify-center md:hidden lg:hidden"
             >
-              Favorites
+              Home
             </Link>
-          )} */}
+          )}
 
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -95,24 +90,19 @@ const NavBar = () => {
         <div
           className={`${
             isMenuOpen ? "flex" : "hidden"
-          } md:flex flex-col md:flex-row rounded-lg items-center gap-3 md:gap-4 lg:gap-16 w-full md:w-auto px-4 mt-2 md:mt-0 absolute md:static top-full left-0 z-10 py-4 md:py-0`}
+          } md:flex flex-col md:flex-row rounded-lg items-center gap-3 md:gap-4 lg:gap-16 w-full md:w-auto px-4 mt-2 md:mt-0 absolute md:static top-full left-0 z-10 py-4 md:py-0 bg-sky-500 md:bg-transparent lg:bg-transparent bg-opacity-90 `}
         >
-          {/* <Link
-            onClick={() => setIsMenuOpen(false)}
-            to="/"
-            className="btn btn-sm btn-warning w-full md:w-auto text-center"
-          >
-            Home
-          </Link> */}
-          <Link
-            to="/"
-            className="hidden  md:flex items-center justify-center text-3xl text-red-600 border-b-2 border-white rounded-md  hover:scale-105 px-1"
-            // className="btn btn-sm btn-warning hidden  md:flex items-center justify-center "
-          >
-            {/* Home */}
-            <FaHome />
-            <span className="ml-2 text-xl mt-2 text-white">Home</span>{" "}
-          </Link>
+          {location.pathname !== "/" && (
+            <Link
+              to="/"
+              className="hidden  md:flex items-center justify-center text-3xl text-red-600 border-b-2 border-white rounded-md  hover:scale-105 px-1"
+              // className="btn btn-sm btn-warning hidden  md:flex items-center justify-center "
+            >
+              {/* Home */}
+              <FaHome />
+              <span className="ml-2 text-xl mt-2 text-white">Home</span>{" "}
+            </Link>
+          )}
           {userLoggedIn && userInfo.role === "basic_user" && (
             <>
               <Link
@@ -162,10 +152,6 @@ const NavBar = () => {
           {(userInfo.role === "super_admin" || userInfo.role === "admin") && (
             <>
               <Link
-                // onClick={() => {
-                //   handleCreateButtonClick();
-                //   setIsMenuOpen(false);
-                // }}
                 onClick={() => {
                   setIsMenuOpen(false);
                 }}

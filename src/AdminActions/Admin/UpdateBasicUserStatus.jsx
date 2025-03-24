@@ -6,11 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { getFromLocalStorage } from "../../utils/local-storage";
 import { authKey } from "../../constants/authkey";
 import api from "../../axios";
+import { ScaleLoader } from "react-spinners";
 
 const UpdateBasicUserStatus = () => {
   const [basicUsers, setBasicUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("ALL");
   const userInfo = getUserInfo() || {};
   const navigate = useNavigate();
 
@@ -50,12 +52,12 @@ const UpdateBasicUserStatus = () => {
     }
     // Show SweetAlert confirmation before making the update
     Swal.fire({
-      title: "Are you sure?",
-      text: `Do you want to change the status of this user to ${newStatus}?`,
-      icon: "warning",
+      // title: "Are you sure?",
+      text: `Change the status to ${newStatus}?`,
+      // icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes, update it!",
-      cancelButtonText: "No, cancel!",
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
         // If confirmed, proceed with the status update
@@ -103,107 +105,122 @@ const UpdateBasicUserStatus = () => {
     });
   };
 
-  if (loading) {
-    return <div>Loading users...</div>;
-  }
+  const filteredUsers =
+    selectedStatus === "ALL"
+      ? basicUsers
+      : basicUsers.filter((user) => user.user.status === selectedStatus);
+
+  // if (loading) {
+  //   return <div>Loading users...</div>;
+  // }
 
   if (error) {
     return <div>{error}</div>;
   }
 
   return (
-    // <Container>
-    //   {userInfo?.role === "admin" ? (
-    //     <div className="container mx-auto p-4 min-h-screen">
-    //       <h2 className="text-2xl font-bold mb-4 text-center">
-    //         Update User Status
-    //         <br />
-    //         <span className="text-md"> Total users: {basicUsers.length}</span>
-    //       </h2>
-    //       <div className="space-y-4">
-    //         {basicUsers.map((user) => (
-    //           <div key={user.user.id} className="p-4 border rounded shadow-md">
-    //             <div className="flex justify-between items-center">
-    //               <div>
-    //                 <p className="text-lg font-semibold">{user.name}</p>
-    //                 <p>{user.email}</p>
-    //               </div>
-    //               <div>
-    //                 <select
-    //                   value={user.user.status} // Use current status as the value
-    //                   onChange={(e) =>
-    //                     handleStatusChange(user.user.id, e.target.value)
-    //                   }
-    //                   className="p-2 border rounded"
-    //                 >
-    //                   <option value="ACTIVE">Active</option>
-    //                   <option value="BLOCKED">Blocked</option>
-    //                   <option value="DELETED">Deleted</option>
-    //                   <option value="PENDING">Pending</option>
-    //                 </select>
-    //               </div>
-    //             </div>
-    //           </div>
-    //         ))}
-    //       </div>
-    //     </div>
-    //   ) : null}
-    // </Container>
     <Container>
       {userInfo?.role === "admin" ? (
         <div className="container mx-auto p-4 min-h-screen">
-          <h2 className="text-2xl font-bold mb-4 text-center">
-            Update User Status
-            <br />
-            <span className="text-md"> Total users: {basicUsers.length}</span>
+          <h2 className="text-2xl font-bold mb-4 text-center text-white  py-2 bg-cyan-700 rounded">
+            Update User Status -
+            <span className="text-md text-orange-600">
+              {" "}
+              ({basicUsers.length})
+            </span>
           </h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full table-auto">
-              <thead>
-                <tr className="bg-gray-200">
-                  <th className="p-2 text-center">Name</th>
-                  <th className="p-2 text-center">Email</th>
-                  <th className="p-2 text-center">Role</th>
-                  <th className="p-2 text-center">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {basicUsers.map((user) => (
-                  <tr
-                    key={user.user.id}
-                    className={`${
-                      user.user.role === "ADMIN" ? "bg-cyan-500 font-bold" : ""
-                    } border-b`}
+          <p className="flex justify-center items-center  ">
+            <span>
+              {loading && (
+                <ScaleLoader
+                  color="oklch(0.5 0.134 242.749)"
+                  loading={loading}
+                  // cssOverride={override}
+                  size={150}
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                />
+              )}
+            </span>
+          </p>
+
+          {!loading && (
+            <>
+              {/* Status Filter Dropdown */}
+              <div className="flex justify-end">
+                <div className="mb-4 text-center">
+                  <label className="mr-2 font-semibold">Status:</label>
+                  <select
+                    value={selectedStatus}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    className="border p-1 rounded"
                   >
-                    <td className="p-2 text-center">{user.name}</td>
-                    <td className="p-2 text-center">{user.email}</td>
-                    {/* <td className="p-2 text-center">{user.user.role}</td> */}
-                    <td className="p-2 text-center">
-                      {user.user.role === "BASIC_USER"
-                        ? "USER"
-                        : user.user.role === "ADMIN"
-                        ? "ADMIN"
-                        : user.user.role}
-                    </td>
-                    <td className="p-2 text-center">
-                      <select
-                        value={user.user.status}
-                        onChange={(e) =>
-                          handleStatusChange(user.user.id, e.target.value)
-                        }
-                        className="p-2 border rounded"
+                    <option value="ALL">All</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="BLOCKED">Blocked</option>
+                    <option value="DELETED">Deleted</option>
+                    <option value="PENDING">Pending</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="min-w-full table-auto">
+                  <thead>
+                    <tr className="bg-green-600 text-white">
+                      <th className="p-2 hidden lg:table-cell xl:table-cell text-center ">
+                        Name
+                      </th>
+                      <th className="p-2 text-center">Email</th>
+                      <th className="p-2 text-center">Role</th>
+                      <th className="p-2 text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredUsers.map((user) => (
+                      <tr
+                        key={user.user.id}
+                        className={`${
+                          user.user.role === "ADMIN"
+                            ? "bg-cyan-500 font-bold"
+                            : ""
+                        } border-b  odd:bg-white even:bg-gray-200`}
                       >
-                        <option value="ACTIVE">Active</option>
-                        <option value="BLOCKED">Blocked</option>
-                        <option value="DELETED">Deleted</option>
-                        <option value="PENDING">Pending</option>
-                      </select>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                        <td className="p-1 md:p-1 lg:p-1 hidden lg:table-cell xl:table-cell  text-center text-slate-950">
+                          {user.name}
+                        </td>
+                        <td className="p-1 md:p-1 lg:p-1 text-start md:text-center lg:text-center text-sm md:text-md lg:text-md text-slate-950">
+                          {user.email}
+                        </td>
+                        {/* <td className="p-2 text-center">{user.user.role}</td> */}
+                        <td className="p-1 md:p-1 lg:p-1  text-center">
+                          {user.user.role === "BASIC_USER"
+                            ? "USER"
+                            : user.user.role === "ADMIN"
+                            ? "ADMIN"
+                            : user.user.role}
+                        </td>
+                        <td className="p-1 md:p-1 lg:p-1  text-center">
+                          <select
+                            value={user.user.status}
+                            onChange={(e) =>
+                              handleStatusChange(user.user.id, e.target.value)
+                            }
+                            className="p-1 md:p-1 lg:p-1  border rounded"
+                          >
+                            <option value="ACTIVE">Active</option>
+                            <option value="BLOCKED">Blocked</option>
+                            <option value="DELETED">Deleted</option>
+                            <option value="PENDING">Pending</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
         </div>
       ) : null}
     </Container>
