@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import Container from "../../utils/Container";
+import Loader from "../../utils/Loader";
 
 const PrefixList = () => {
   const { id: prefixTypeId } = useParams();
   const [prefixData, setPrefixData] = useState(null);
   const [expandedWords, setExpandedWords] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPrefixData = async () => {
@@ -44,8 +46,16 @@ const PrefixList = () => {
     }));
   };
 
+  // if (!prefixData) {
+  //   return <Loader loading={loading} />;
+  // }
+
   if (!prefixData) {
-    return <p className="text-center text-gray-500">Loading...</p>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader loading={loading} />
+      </div>
+    );
   }
 
   const groupedPrefixes = prefixData.prefixes.reduce((acc, prefix) => {
@@ -113,7 +123,7 @@ const PrefixList = () => {
 
   return (
     <Container>
-      <div className="max-w-4xl mx-auto p-4">
+      <div className="max-w-4xl mx-auto p-4 ">
         <h2 className="text-3xl font-bold font-mono text-center  text-sky-700  mb-4">
           {prefixData.name} Prefixes
         </h2>

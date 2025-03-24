@@ -13,6 +13,7 @@ import Container from "../utils/Container";
 import Pagination from "../utils/Pagination";
 import { getUserInfo, isLoggedIn } from "../services/auth.services";
 import api from "../axios";
+import Loader from "../utils/Loader";
 
 // Cache key constants
 const CACHE_KEY = "wordListCache";
@@ -553,8 +554,8 @@ const WordList = () => {
 
       {/* Table content */}
       {isLoading ? (
-        <div className="flex justify-center items-center  mt-24 min-h-[45vh] md:min-h-[55vh] lg:min-h-[55vh]">
-          <span className="loading loading-spinner text-accent w-24 h-24 "></span>
+        <div className="flex justify-center items-center mt-24 min-h-[45vh] md:min-h-[55vh] lg:min-h-[55vh] ">
+          <Loader loading={isLoading} />
         </div>
       ) : (
         <div className="min-h-screen">

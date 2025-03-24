@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Container from "../../utils/Container";
+import Loader from "../../utils/Loader";
 
 const PrefixTypeList = () => {
   const [prefixTypes, setPrefixTypes] = useState([]);
@@ -34,7 +35,7 @@ const PrefixTypeList = () => {
           Prefix Types
         </h2>
         {loading ? (
-          <p>Loading...</p>
+          <Loader loading={loading} />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 lg:gap-8">
             {prefixTypes.map((prefixType) => (

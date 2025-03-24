@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { ScaleLoader } from "react-spinners";
 
 // Define the colors for the speakers using hex values
 const speakerColors = ["#FF0000", "#008000", "#0000FF", "#FFA500", "#000000"];
@@ -68,14 +69,26 @@ const Conversation = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div
-          className="spinner-border animate-spin inline-block w-8 h-8 border-4 border-blue-600 rounded-full"
-          role="status"
-        >
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
+      // <div className="flex justify-center items-center h-screen">
+      //   <div
+      //     className="spinner-border animate-spin inline-block w-8 h-8 border-4 border-blue-600 rounded-full"
+      //     role="status"
+      //   >
+      //     <span className="visually-hidden">Loading...</span>
+      //   </div>
+      // </div>
+      <p className="flex justify-center items-center  ">
+        <span>
+          <ScaleLoader
+            color="oklch(0.5 0.134 242.749)"
+            loading={loading}
+            // cssOverride={override}
+            size={150}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+          />
+        </span>
+      </p>
     );
   }
 

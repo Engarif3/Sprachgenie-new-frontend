@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2"; // Ensure SweetAlert2 is imported
 import { getUserInfo } from "../../services/auth.services";
+import { ScaleLoader } from "react-spinners";
 
 const ConversationsList = () => {
   const [conversations, setConversations] = useState([]);
@@ -182,7 +183,18 @@ const ConversationsList = () => {
     <div className="max-w-5xl mx-auto p-4 min-h-screen">
       <h2 className="text-xl font-bold mb-4">Conversation Topics</h2>
       {loading ? (
-        <p>Loading...</p>
+        <p className="flex justify-center items-center  ">
+          <span>
+            <ScaleLoader
+              color="oklch(0.5 0.134 242.749)"
+              loading={loading}
+              // cssOverride={override}
+              size={150}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          </span>
+        </p>
       ) : (
         <ul className="space-y-2">
           {conversations.map((conversation) => (
