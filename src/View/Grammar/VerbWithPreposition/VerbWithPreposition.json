@@ -2,7 +2,7 @@
   {
     "Pronoun": "-",
     "Verb": "abhängen",
-    "Präposition": "von (jn/etw)",
+    "Präposition": "von (jm/etw)",
     "Kasus": "D",
     "Beispielsatz": "Es hängt vom Wetter ab, ob der Ausflug stattfindet.",
     "Übersetzung": "It depends on the weather whether the trip takes place.",
@@ -605,7 +605,7 @@
   {
     "Pronoun": "jn",
     "Verb": "erzählen",
-    "Präposition": "von (jn/etw)",
+    "Präposition": "von (jm/etw)",
     "Kasus": "D",
     "Beispielsatz": "Du hast mir noch nichts von deinem Urlaub erzählt.",
     "Übersetzung": "You haven't told me about your vacation yet.",
@@ -1074,7 +1074,7 @@
     "Pronoun": "sich",
     "Verb": "rächen",
     "Präposition": "an (jn) & für (etw)",
-    "Kasus": "D & A",
+    "Kasus": "D/A",
     "Beispielsatz": "Für diese Beleidigung werde ich mich an dir rächen!",
     "Übersetzung": "I will get revenge on you for this insult!",
     "Meaning": "to take revenge on someone for something"
@@ -1119,7 +1119,7 @@
     "Pronoun": "sich",
     "Verb": "schämen",
     "Präposition": "vor (jn) & für (etw)",
-    "Kasus": "D & A",
+    "Kasus": "D/A",
     "Beispielsatz": "Der Schüler schämte sich vor den Eltern für seine schlechten Noten.",
     "Übersetzung": "The student was ashamed in front of his parents for his bad grades.",
     "Meaning": "to be ashamed in front of someone for something"
@@ -1299,7 +1299,7 @@
   {
     "Pronoun": "-",
     "Verb": "stammen",
-    "Präposition": "von (jn)",
+    "Präposition": "von (jm)",
     "Kasus": "D",
     "Beispielsatz": "Diese Skizze stammt von Picasso.",
     "Übersetzung": "This sketch comes from Picasso.",
@@ -1336,7 +1336,7 @@
     "Pronoun": "sich",
     "Verb": "streiten",
     "Präposition": "mit (jn) & um (etw)",
-    "Kasus": "D & A",
+    "Kasus": "D/A",
     "Beispielsatz": "Er streitet sich mit seinen Geschwistern um das Erbe.",
     "Übersetzung": "He argues with his siblings about the inheritance.",
     "Meaning": "to argue with someone about something"
@@ -1426,7 +1426,7 @@
     "Pronoun": "sich",
     "Verb": "unterhalten",
     "Präposition": "mit (jm) & über (jn/etw)",
-    "Kasus": "D & A",
+    "Kasus": "D/A",
     "Beispielsatz": "Die Lehrerin unterhielt sich zwei Stunden mit einem Schüler über seine schlechten Noten.",
     "Übersetzung": "The teacher talked with a student for two hours about his bad grades.",
     "Meaning": "to converse with someone about something"
@@ -1435,7 +1435,7 @@
     "Pronoun": "sich",
     "Verb": "unterscheiden",
     "Präposition": "von (jm/etw) & durch (etw)",
-    "Kasus": "D & A",
+    "Kasus": "D/A",
     "Beispielsatz": "Anna unterscheidet sich von ihrer Schwester im Aussehen und durch ihre Freundlichkeit.",
     "Übersetzung": "Anna differs from her sister in appearance and through her kindness.",
     "Meaning": "to differ from someone/something in/aspect"
@@ -1498,7 +1498,7 @@
     "Pronoun": "-",
     "Verb": "verhandeln",
     "Präposition": "mit (jm) & über (etw)",
-    "Kasus": "D & A",
+    "Kasus": "D/A",
     "Beispielsatz": "Die beiden Staaten verhandeln über neue Möglichkeiten der kulturellen Zusammenarbeit.",
     "Übersetzung": "The two states are negotiating new possibilities for cultural cooperation.",
     "Meaning": "to negotiate with someone about something"
@@ -1686,8 +1686,8 @@
   {
     "Pronoun": "-",
     "Verb": "wissen",
-    "Präposition": "von (jn/etw) / über (jn/etw)",
-    "Kasus": "D / A",
+    "Präposition": "von (jm/etw) / über (jn/etw)",
+    "Kasus": "D/A",
     "Beispielsatz": "Er weiß wenig über Deutschland. / Er weiß von den Problemen des Projekts.",
     "Übersetzung": "He knows little about Germany. / He knows about the project's problems.",
     "Meaning": "to know about something (von = general awareness; über = detailed knowledge)"

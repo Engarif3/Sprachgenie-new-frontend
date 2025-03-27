@@ -206,8 +206,8 @@ const VerbWithPreposition = () => {
               <tr className="bg-gray-100 text-gray-700">
                 <th className="py-2 px-4 text-start">PN</th>
                 <th className="py-2 px-4 text-start">Verb</th>
-                <th className="py-2 px-4 text-start">Meaning</th>
                 <th className="py-2 px-4 text-start">Präposition</th>
+                <th className="py-2 px-4 text-start">Meaning</th>
                 <th className="py-2 px-4 text-start">K</th>
                 <th className="py-2 px-4 text-center">Beispielsatz</th>
                 <th className="py-2 px-4 text-center">Übersetzung</th>
@@ -225,12 +225,13 @@ const VerbWithPreposition = () => {
                   <td className="py-2 px-4 text-start font-bold ">
                     {item.Verb}
                   </td>
-                  <td className="py-2 px-4 text-start w-[22%]">
-                    {item.Meaning}
-                  </td>
                   <td className="py-2 px-4 text-start ">
                     {item["Präposition"]}
                   </td>
+                  <td className="py-2 px-4 text-start w-[22%]">
+                    {item.Meaning}
+                  </td>
+
                   <td className="py-2 px-4 text-start ">{item.Kasus}</td>
                   <td className="py-2 px-4 text-start w-[35%]">
                     {item.Beispielsatz}
