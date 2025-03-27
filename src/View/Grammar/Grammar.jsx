@@ -6,6 +6,8 @@ const Grammar = () => {
   const grammarTypes = [
     { id: 1, topic: "Clauses" },
     { id: 2, topic: "Passive Voice" },
+    { id: 3, topic: "Verb with Preposition" },
+    { id: 4, topic: "Adjective with Preposition" },
   ];
   return (
     <Container>

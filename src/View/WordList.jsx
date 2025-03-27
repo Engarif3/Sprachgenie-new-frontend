@@ -365,10 +365,10 @@ const WordList = () => {
         // text: `You won't be able to revert this!. Delete ${wordToDelete?.value}`,
         html: `You won't be able to revert this! Delete <strong style="color: #dc2626; font-weight: 800;">"${wordToDelete?.value}"</strong>?`,
         icon: "warning",
-        input: "text",
-        inputPlaceholder: "Type password",
-        inputValidator: (value) =>
-          value === "aydin45" ? null : "Wrong Password!",
+        // input: "text",
+        // inputPlaceholder: "Type password",
+        // inputValidator: (value) =>
+        //   value === "aydin45" ? null : "Wrong Password!",
         showCancelButton: true,
         confirmButtonColor: "#d33",
         cancelButtonColor: "#3085d6",

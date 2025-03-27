@@ -2,6 +2,8 @@ import { useParams } from "react-router-dom";
 import Clauses from "./Clauses/Clauses";
 import SubordinatingConjunction from "./Clauses/Subordinating/SubordinatingConjunction";
 import PassiveVoice from "./PassiveVoice/PassiveVoice";
+import VerbWithPreposition from "./VerbWithPreposition/VerbWithPreposition";
+import AdjectiveWithPreposition from "./AdjectiveWithPreposition/AdjectiveWithPreposition";
 
 const GrammarTopic = () => {
   const { id } = useParams();
@@ -12,6 +14,10 @@ const GrammarTopic = () => {
         <Clauses />
       ) : id === "2" ? (
         <PassiveVoice />
+      ) : id === "3" ? (
+        <VerbWithPreposition />
+      ) : id === "4" ? (
+        <AdjectiveWithPreposition />
       ) : (
         <p className="text-center text-red-500">Invalid Clause Type</p>
       )}

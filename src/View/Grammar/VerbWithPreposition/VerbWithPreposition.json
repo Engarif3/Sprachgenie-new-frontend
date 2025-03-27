@@ -1,0 +1,1740 @@
+[
+  {
+    "Pronoun": "-",
+    "Verb": "abhängen",
+    "Präposition": "von (jn/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Es hängt vom Wetter ab, ob der Ausflug stattfindet.",
+    "Übersetzung": "It depends on the weather whether the trip takes place.",
+    "Meaning": "to depend on someone/something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "achten",
+    "Präposition": "auf (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Der Autofahrer achtete nicht auf das Überholverbot.",
+    "Übersetzung": "The driver didn't pay attention to the overtaking ban.",
+    "Meaning": "to pay attention to someone/something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "anfangen",
+    "Präposition": "mit (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Er hat vor einem Monat mit dem Tennisspielen angefangen.",
+    "Übersetzung": "He started playing tennis a month ago.",
+    "Meaning": "to begin with something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "es kommt an",
+    "Präposition": "auf (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "In der Prüfung kommt es vor allem auf gute Nerven an.",
+    "Übersetzung": "In the exam, it mainly depends on having good nerves.",
+    "Meaning": "to depend on someone/something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "anmelden",
+    "Präposition": "zu (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Ich meldete mich zur Prüfung an.",
+    "Übersetzung": "I registered for the exam.",
+    "Meaning": "to register for something"
+  },
+  {
+    "Pronoun": "jn/etw",
+    "Verb": "ansehen",
+    "Präposition": "als (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Picasso wird als der größte Maler der Moderne angesehen.",
+    "Übersetzung": "Picasso is regarded as the greatest painter of modern times.",
+    "Meaning": "to regard someone/something as something"
+  },
+  {
+    "Pronoun": "jm",
+    "Verb": "antworten",
+    "Präposition": "auf (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Bitte antworte mir auf meine Frage!",
+    "Übersetzung": "Please answer my question!",
+    "Meaning": "to answer to something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "ärgern",
+    "Präposition": "über (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Ich ärgere mich über meine schlechte Note.",
+    "Übersetzung": "I am upset about my bad grade.",
+    "Meaning": "to get upset about someone/something"
+  },
+  {
+    "Pronoun": "jn",
+    "Verb": "auffordern",
+    "Präposition": "zu (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Der Tourist wird zum Öffnen des Koffers aufgefordert.",
+    "Übersetzung": "The tourist is asked to open the suitcase.",
+    "Meaning": "to ask someone to do something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "aufhören",
+    "Präposition": "mit (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Er hat mit dem Rauchen aufgehört.",
+    "Übersetzung": "He has quit smoking.",
+    "Meaning": "to stop doing something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "aufpassen",
+    "Präposition": "auf (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Die Großmutter passt vormittags auf ihre Enkelkinder auf.",
+    "Übersetzung": "The grandmother looks after her grandchildren in the morning.",
+    "Meaning": "to look after someone/something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "aufregen",
+    "Präposition": "über (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Ich rege mich über die Politik der Regierung auf.",
+    "Übersetzung": "I get upset about the government's politics.",
+    "Meaning": "to get upset about someone or something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "auskommen",
+    "Präposition": "mit (jm)",
+    "Kasus": "D",
+    "Beispielsatz": "Ich komme gut mit meinen Kollegen aus.",
+    "Übersetzung": "I get along well with my colleagues.",
+    "Meaning": "to get along with someone"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "auskommen",
+    "Präposition": "mit (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "In München kommt man nicht mit 600 € pro Monat aus.",
+    "Übersetzung": "In Munich, you can't manage with 600 € a month.",
+    "Meaning": "to manage with something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "bedanken",
+    "Präposition": "bei (jm) & für (etw)",
+    "Kasus": "D/A",
+    "Beispielsatz": "Der Chef hat sich bei seinen Mitarbeitern für ihren Einsatz bedankt.",
+    "Übersetzung": "The boss thanked his employees for their effort.",
+    "Meaning": "to thank someone for something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "beeilen",
+    "Präposition": "mit (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Er hat sich mit der Abgabe seiner Doktorarbeit beeilt.",
+    "Übersetzung": "He hurried with the submission of his doctoral thesis.",
+    "Meaning": "to hurry with something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "befassen",
+    "Präposition": "mit (jm/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "In seiner Doktorarbeit befasst er sich mit der deutschen Geschichte.",
+    "Übersetzung": "In his dissertation, he deals with German history.",
+    "Meaning": "to deal with someone or something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "befreien",
+    "Präposition": "von (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Der Psychologe konnte sie von ihren Ängsten befreien.",
+    "Übersetzung": "The psychologist was able to free her from her fears.",
+    "Meaning": "to free someone from something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "beginnen",
+    "Präposition": "mit (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Um 9 Uhr beginnen wir mit dem Unterricht.",
+    "Übersetzung": "We start the class at 9 o'clock.",
+    "Meaning": "to begin something"
+  },
+  {
+    "Pronoun": "jm",
+    "Verb": "beglückwünschen",
+    "Präposition": "zu (jm/etw)",
+    "Kasus": "D/A",
+    "Beispielsatz": "Mein Chef beglückwünschte mich zu meinem Lottogewinn.",
+    "Übersetzung": "My boss congratulated me on my lottery win.",
+    "Meaning": "to congratulate someone on something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "beitragen",
+    "Präposition": "mit/zu (etw)",
+    "Kasus": "D/A",
+    "Beispielsatz": "Er trägt mit seiner Arbeit zum Gelingen des Projekts bei.",
+    "Übersetzung": "He contributes to the success of the project with his work.",
+    "Meaning": "to contribute something to something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "beklagen",
+    "Präposition": "bei (jm) / über (etw)",
+    "Kasus": "D/A",
+    "Beispielsatz": "Maria beklagte sich beim Hausmeister über die Ruhestörung.",
+    "Übersetzung": "Maria complained to the janitor about the noise disturbance.",
+    "Meaning": "to complain to someone about something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "bemühen",
+    "Präposition": "um (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Sie bemüht sich darum, bessere Noten zu bekommen.",
+    "Übersetzung": "She is making an effort to get better grades.",
+    "Meaning": "to make an effort for something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "bemühen",
+    "Präposition": "um (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Der Sanitäter bemühte sich um den Verletzten.",
+    "Übersetzung": "The paramedic (ambulance man) attempted to help the injured person.",
+    "Meaning": "to attempt to help someone"
+  },
+  {
+    "Pronoun": "jn",
+    "Verb": "beneiden",
+    "Präposition": "um (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Herr Meier beneidet Herrn Schmidt um seine Gelassenheit auch in schwierigen Situationen.",
+    "Übersetzung": "Mr. Meier envies Mr. Schmidt for his composure even in difficult situations.",
+    "Meaning": "to envy someone for something"
+  },
+  {
+    "Pronoun": "etw",
+    "Verb": "benutzen",
+    "Präposition": "für (etw) / zu (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Er benutzt die Ferien zur Prüfungsvorbereitung / für eine Reise nach Frankreich.",
+    "Übersetzung": "He uses the holidays for exam preparation / for a trip to France.",
+    "Meaning": "to use something for a purpose"
+  },
+  {
+    "Pronoun": "etw",
+    "Verb": "benutzen",
+    "Präposition": "als (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Er benutzt sein Schlafzimmer als Arbeitsraum.",
+    "Übersetzung": "He uses his bedroom as a workspace.",
+    "Meaning": "to use something as something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "beschäftigen",
+    "Präposition": "mit (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Am Wochenende beschäftigte sich der Vater mit seinen Briefmarken.",
+    "Übersetzung": "On the weekend, the father occupied himself with his stamps.",
+    "Meaning": "to occupy oneself with something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "beschäftigen",
+    "Präposition": "mit (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Dieser Text beschäftigt sich mit dem Verhältnis von Mensch und Natur.",
+    "Übersetzung": "This text deals with the relationship between humans and nature.",
+    "Meaning": "to deal with something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "beschweren",
+    "Präposition": "bei (jm) / über (etw)",
+    "Kasus": "D/A",
+    "Beispielsatz": "Sie beschwerte sich bei ihrem Chef über den niedrigen Lohn.",
+    "Übersetzung": "She complained to her boss about the low salary.",
+    "Meaning": "to complain"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "bestehen",
+    "Präposition": "auf (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Ich bestehe darauf!",
+    "Übersetzung": "I insist on it!",
+    "Meaning": "to insist on something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "bestehen",
+    "Präposition": "aus (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Der Tisch besteht aus wertvollem Holz.",
+    "Übersetzung": "The table is made of valuable wood.",
+    "Meaning": "to consist of something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "beteiligen",
+    "Präposition": "an (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Der Schüler beteiligte sich lebhaft am Unterricht.",
+    "Übersetzung": "The student actively participated in the class.",
+    "Meaning": "to participate in something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "bewerben",
+    "Präposition": "um (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Er bewarb sich um eine neue Stelle.",
+    "Übersetzung": "He applied for a new position.",
+    "Meaning": "to apply for something"
+  },
+  {
+    "Pronoun": "etw",
+    "Verb": "bezeichnen",
+    "Präposition": "als (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Europa wird auch als 'die Alte Welt' bezeichnet.",
+    "Übersetzung": "Europe is also referred to as 'the Old World'.",
+    "Meaning": "to designate as something"
+  },
+  {
+    "Pronoun": "jn",
+    "Verb": "bitten",
+    "Präposition": "um (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Ich bat meinen Vater um Geld.",
+    "Übersetzung": "I asked my father for money.",
+    "Meaning": "to ask someone for something"
+  },
+  {
+    "Pronoun": "jn",
+    "Verb": "bringen",
+    "Präposition": "zu (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Der Clown brachte uns zum Lachen.",
+    "Übersetzung": "The clown made us laugh.",
+    "Meaning": "to cause someone to do something"
+  },
+  {
+    "Pronoun": "jm",
+    "Verb": "danken",
+    "Präposition": "für (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Ich danke dir für deine Geduld!",
+    "Übersetzung": "I thank you for your patience!",
+    "Meaning": "to thank someone for something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "demonstrieren",
+    "Präposition": "für/gegen (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Die Arbeiter demonstrierten für mehr Lohn.",
+    "Übersetzung": "The workers demonstrated for higher wages.",
+    "Meaning": "to demonstrate for/against something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "denken",
+    "Präposition": "an (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Ich denke oft an dich und an unseren schönen Urlaub.",
+    "Übersetzung": "I often think of you and our beautiful vacation.",
+    "Meaning": "to think of someone/something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "denken",
+    "Präposition": "von (jm)",
+    "Kasus": "D",
+    "Beispielsatz": "Er denkt nur Gutes von mir.",
+    "Übersetzung": "He only thinks good things about me.",
+    "Meaning": "to attribute a quality to someone"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "denken",
+    "Präposition": "über (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Wie denkst du darüber?",
+    "Übersetzung": "What do you think about that?",
+    "Meaning": "to have an opinion on something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "dienen",
+    "Präposition": "zu (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Die Broschüre dient zur Information der Studenten.",
+    "Übersetzung": "The brochure serves to inform the students.",
+    "Meaning": "to serve a purpose"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "dienen",
+    "Präposition": "als (etw)",
+    "Kasus": "N",
+    "Beispielsatz": "Die Schere dient (mir) auch als Brieföffner.",
+    "Übersetzung": "The scissors also serve (me) as a letter opener.",
+    "Meaning": "to function as something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "diskutieren",
+    "Präposition": "mit (jm) & über (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Herr Maier diskutierte mit Herrn Müller über das Fußballspiel.",
+    "Übersetzung": "Mr. Maier discussed the soccer game with Mr. Müller.",
+    "Meaning": "to discuss with someone about something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "eignen",
+    "Präposition": "für (jn)",
+    "Kasus": "A",
+    "Beispielsatz": "Das Buch eignet sich für Kinder.",
+    "Übersetzung": "The book is suitable for children.",
+    "Meaning": "to be suitable for a target audience"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "eignen",
+    "Präposition": "für (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Das Buch eignet sich zum Vorlesen.",
+    "Übersetzung": "The book is suitable for reading aloud.",
+    "Meaning": "to be suitable for a purpose"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "eignen",
+    "Präposition": "als (etw)",
+    "Kasus": "N",
+    "Beispielsatz": "Das Buch eignet sich als Reiselektüre.",
+    "Übersetzung": "The book is suitable as travel reading.",
+    "Meaning": "to be suitable for a function"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "einigen",
+    "Präposition": "mit (jm) & über (etw) & auf (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Der Autohändler hat sich mit dem Kunden auf € 10.000 geeinigt.",
+    "Übersetzung": "The car dealer agreed with the customer on €10,000.",
+    "Meaning": "to reach an agreement"
+  },
+  {
+    "Pronoun": "jn",
+    "Verb": "einladen",
+    "Präposition": "zu (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Ich möchte dich zu meiner Geburtstagsparty einladen!",
+    "Übersetzung": "I would like to invite you to my birthday party!",
+    "Meaning": "to invite someone to something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "einmischen",
+    "Präposition": "in (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Die Schwiegermutter mischte sich in ihr Leben ein.",
+    "Übersetzung": "The mother-in-law interfered in their lives.",
+    "Meaning": "to interfere in something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "einsetzen",
+    "Präposition": "für (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Greenpeace setzt sich für den Umweltschutz ein.",
+    "Übersetzung": "Greenpeace advocates for environmental protection.",
+    "Meaning": "to advocate for something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "entscheiden",
+    "Präposition": "für/gegen (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Sie entschied sich für ein Studium in Deutschland.",
+    "Übersetzung": "She decided to study in Germany.",
+    "Meaning": "to choose between options"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "entscheiden",
+    "Präposition": "über (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Das Gericht wird über Schuld oder Unschuld entscheiden.",
+    "Übersetzung": "The court will decide on guilt or innocence.",
+    "Meaning": "to make a decision in a difficult situation"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "entschuldigen",
+    "Präposition": "bei (jm) & für (etw)",
+    "Kasus": "D/A",
+    "Beispielsatz": "Sie entschuldigte sich bei mir für ihr schlechtes Gedächtnis.",
+    "Übersetzung": "She apologized to me for her poor memory.",
+    "Meaning": "to apologize for something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "entstehen",
+    "Präposition": "aus (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Bei Kälte entsteht aus Wasser Eis.",
+    "Übersetzung": "In cold, water turns into ice.",
+    "Meaning": "to arise from something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "erholen",
+    "Präposition": "von (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Sie erholte sich nur langsam von ihrer Krankheit.",
+    "Übersetzung": "She recovered slowly from her illness.",
+    "Meaning": "to recover from something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "erinnern",
+    "Präposition": "an (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Ich erinnere mich gut an meinen ersten Schultag.",
+    "Übersetzung": "I remember my first day of school well.",
+    "Meaning": "to remember someone/something"
+  },
+  {
+    "Pronoun": "jn",
+    "Verb": "erkennen",
+    "Präposition": "an (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Ich habe ihn an der Stimme erkannt.",
+    "Übersetzung": "I recognized him by his voice.",
+    "Meaning": "to recognize someone by something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "erkranken",
+    "Präposition": "an (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Sie ist an Grippe erkrankt.",
+    "Übersetzung": "She fell ill with the flu.",
+    "Meaning": "to fall ill with something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "erkundigen",
+    "Präposition": "bei (jm) & nach (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Er erkundigte sich bei dem Polizisten nach dem Weg.",
+    "Übersetzung": "He asked the policeman for directions.",
+    "Meaning": "to inquire with someone about something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "ernähren",
+    "Präposition": "von (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Löwen ernähren sich von Zebras.",
+    "Übersetzung": "Lions feed on zebras.",
+    "Meaning": "to feed on something"
+  },
+  {
+    "Pronoun": "jn",
+    "Verb": "ernennen",
+    "Präposition": "zu (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Der Kanzler ernannte einen Wissenschaftler zum Bildungsminister.",
+    "Übersetzung": "The chancellor appointed a scientist as the education minister.",
+    "Meaning": "to appoint someone to a position"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "erschrecken",
+    "Präposition": "vor (jn/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Er erschrickt sogar vor kleinen Hunden.",
+    "Übersetzung": "He is scared even of small dogs.",
+    "Meaning": "to be scared of someone/something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "erschrecken",
+    "Präposition": "über (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Ich war über sein schlechtes Aussehen erschrocken.",
+    "Übersetzung": "I was shocked by his bad appearance.",
+    "Meaning": "to be shocked by something"
+  },
+  {
+    "Pronoun": "jn",
+    "Verb": "ersetzen",
+    "Präposition": "durch (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Meine Mutter ersetzte den alten Fernseher durch einen neuen.",
+    "Übersetzung": "My mother replaced the old TV with a new one.",
+    "Meaning": "to replace something with something"
+  },
+  {
+    "Pronoun": "jn",
+    "Verb": "erwarten",
+    "Präposition": "von (jm)",
+    "Kasus": "D",
+    "Beispielsatz": "Der Chef erwartet von seinen Mitarbeitern einen überdurchschnittlichen Einsatz.",
+    "Übersetzung": "The boss expects above-average commitment from his employees.",
+    "Meaning": "to expect something from someone"
+  },
+  {
+    "Pronoun": "jn",
+    "Verb": "erzählen",
+    "Präposition": "von (jn/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Du hast mir noch nichts von deinem Urlaub erzählt.",
+    "Übersetzung": "You haven't told me about your vacation yet.",
+    "Meaning": "to tell someone about something"
+  },
+  {
+    "Pronoun": "jn",
+    "Verb": "erziehen",
+    "Präposition": "zu (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Die Eltern haben ihre Kinder zu Toleranz erzogen.",
+    "Übersetzung": "The parents raised their children to be tolerant.",
+    "Meaning": "to raise someone to be something"
+  },
+  {
+    "Pronoun": "es",
+    "Verb": "fehlen",
+    "Präposition": "an (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Im Katastrophengebiet fehlt es an Lebensmitteln.",
+    "Übersetzung": "The disaster area lacks food.",
+    "Meaning": "to lack something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "fliehen",
+    "Präposition": "vor (jn/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Diese Leute sind vor dem Krieg geflohen.",
+    "Übersetzung": "These people fled from the war.",
+    "Meaning": "to flee from something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "flüchten",
+    "Präposition": "vor (jn/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Die Maus flüchtet vor der Katze.",
+    "Übersetzung": "The mouse escapes from the cat.",
+    "Meaning": "to escape from something"
+  },
+  {
+    "Pronoun": "jn",
+    "Verb": "fordern",
+    "Präposition": "von (jm)",
+    "Kasus": "D",
+    "Beispielsatz": "Der Professor fordert von jedem Studenten ein Referat.",
+    "Übersetzung": "The professor demands a presentation from each student.",
+    "Meaning": "to demand something from someone"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "fragen",
+    "Präposition": "nach (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Viele Reisende fragen am Bahnhof nach einer Zugverbindung.",
+    "Übersetzung": "Many travelers ask about train connections at the station.",
+    "Meaning": "to ask about something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "freuen",
+    "Präposition": "auf (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Alle Schulkinder freuen sich auf die nächsten Ferien.",
+    "Übersetzung": "All schoolchildren look forward to the next holidays.",
+    "Meaning": "to look forward to something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "freuen",
+    "Präposition": "über (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Das kleine Mädchen hat sich sehr über die schönen Geschenke gefreut.",
+    "Übersetzung": "The little girl was very happy about the beautiful gifts.",
+    "Meaning": "to be happy about something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "führen",
+    "Präposition": "zu (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Das neue Gesetz hat zu starken Protesten geführt.",
+    "Übersetzung": "The new law led to strong protests.",
+    "Meaning": "to lead to something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "fürchten",
+    "Präposition": "vor (jn/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Fürchtet er sich wirklich vor dem Lehrer?",
+    "Übersetzung": "Is he really afraid of the teacher?",
+    "Meaning": "to be afraid of someone/something"
+  },
+  {
+    "Pronoun": "es",
+    "Verb": "geht",
+    "Präposition": "um (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "In diesem Buch geht es um die Geschichte einer Familie.",
+    "Übersetzung": "This book is about the story of a family.",
+    "Meaning": "to be about something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "gehören",
+    "Präposition": "zu (jm/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Bayern gehört zu Deutschland.",
+    "Übersetzung": "Bavaria belongs to Germany.",
+    "Meaning": "to belong to"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "gelten",
+    "Präposition": "für (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Der ermäßigte Preis gilt nur für Schüler.",
+    "Übersetzung": "The reduced price applies only to students.",
+    "Meaning": "to apply to/be valid for"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "gelten",
+    "Präposition": "als (etw)",
+    "Kasus": "N",
+    "Beispielsatz": "Sie gilt als ausgezeichnete Chirurgin.",
+    "Übersetzung": "She is regarded as an excellent surgeon.",
+    "Meaning": "to be regarded as"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "geraten",
+    "Präposition": "in (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Diese Familie ist in finanzielle Schwierigkeiten geraten.",
+    "Übersetzung": "This family has gotten into financial difficulties.",
+    "Meaning": "to get into"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "gewöhnen",
+    "Präposition": "an (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "An das Leben in einem fremden Land muss man sich erst gewöhnen.",
+    "Übersetzung": "One must first get used to life in a foreign country.",
+    "Meaning": "to get used to"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "glauben",
+    "Präposition": "an (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Er glaubt fest an den Erfolg dieses Projekts.",
+    "Übersetzung": "He firmly believes in the success of this project.",
+    "Meaning": "to believe in"
+  },
+  {
+    "Pronoun": "jm",
+    "Verb": "gratulieren",
+    "Präposition": "zu (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Ich gratuliere dir zum Examen.",
+    "Übersetzung": "I congratulate you on the exam.",
+    "Meaning": "to congratulate on"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "grenzen",
+    "Präposition": "an (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Die Schweiz grenzt an Deutschland.",
+    "Übersetzung": "Switzerland borders Germany.",
+    "Meaning": "to border"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "halten",
+    "Präposition": "an (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Er hält sich nie an die Verkehrsregeln.",
+    "Übersetzung": "He never adheres to the traffic rules.",
+    "Meaning": "to adhere to"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "halten",
+    "Präposition": "von (jm/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Wir halten nichts von diesem Vorschlag.",
+    "Übersetzung": "We think nothing of this proposal.",
+    "Meaning": "to think of"
+  },
+  {
+    "Pronoun": "jn",
+    "Verb": "halten",
+    "Präposition": "für (etw/ADJ)",
+    "Kasus": "A",
+    "Beispielsatz": "Sie hält ihn für einen guten Freund.",
+    "Übersetzung": "She considers him a good friend.",
+    "Meaning": "to consider"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "handeln",
+    "Präposition": "mit (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Sie handelt mit Antiquitäten.",
+    "Übersetzung": "She deals in antiques.",
+    "Meaning": "to deal in"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "handeln",
+    "Präposition": "von (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Der Roman handelt von einem Liebespaar.",
+    "Übersetzung": "The novel is about a couple in love.",
+    "Meaning": "to be about"
+  },
+  {
+    "Pronoun": "es",
+    "Verb": "handeln",
+    "Präposition": "bei (jm/etw) & um (etw)",
+    "Kasus": "D/A",
+    "Beispielsatz": "Bei diesem Buch handelt es sich um einen Krimi.",
+    "Übersetzung": "This book is a crime novel.",
+    "Meaning": "to be a matter of"
+  },
+  {
+    "Pronoun": "jm",
+    "Verb": "helfen",
+    "Präposition": "bei (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Meine Mutter half mir heute bei den Hausaufgaben.",
+    "Übersetzung": "My mother helped me with the homework today.",
+    "Meaning": "to help with"
+  },
+  {
+    "Pronoun": "jn",
+    "Verb": "hindern",
+    "Präposition": "an (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Die Krankheit hindert mich an der Ausübung meines Berufes.",
+    "Übersetzung": "The illness prevents me from practicing my profession.",
+    "Meaning": "to prevent from"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "hoffen",
+    "Präposition": "auf (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Wir hoffen auf eine baldige Wetterbesserung.",
+    "Übersetzung": "We hope for a quick improvement in the weather.",
+    "Meaning": "to hope for"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "hören",
+    "Präposition": "auf (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Leider hast du nicht auf mich gehört.",
+    "Übersetzung": "Unfortunately, you didn't listen to me.",
+    "Meaning": "to listen to"
+  },
+  {
+    "Pronoun": "etw",
+    "Verb": "hören",
+    "Präposition": "von (jm/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Lange habe ich nichts von ihm gehört.",
+    "Übersetzung": "I haven't heard from him in a long time.",
+    "Meaning": "to hear from"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "hören",
+    "Präposition": "über (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Ich habe nur Gutes über ihn gehört.",
+    "Übersetzung": "I've only heard good things about him.",
+    "Meaning": "to hear about"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "informieren",
+    "Präposition": "über (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Ich möchte mich über die aktuellen Angebote informieren.",
+    "Übersetzung": "I would like to inform myself about the current offers.",
+    "Meaning": "to inform oneself about"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "interessieren",
+    "Präposition": "für (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Er interessiert sich für klassische Musik.",
+    "Übersetzung": "He is interested in classical music.",
+    "Meaning": "to be interested in"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "kämpfen",
+    "Präposition": "mit (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Wir hatten mit großen Schwierigkeiten zu kämpfen.",
+    "Übersetzung": "We had to struggle with great difficulties.",
+    "Meaning": "to struggle with"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "kämpfen",
+    "Präposition": "gegen (jn) / mit (jm)",
+    "Kasus": "D/A",
+    "Beispielsatz": "David kämpfte gegen Goliath.",
+    "Übersetzung": "David fought against Goliath.",
+    "Meaning": "to fight against/with"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "kämpfen",
+    "Präposition": "um (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Die Rivalen kämpften um eine Frau.",
+    "Übersetzung": "The rivals fought over a woman.",
+    "Meaning": "to fight for something/someone; to make an intense effort to get/keep something/someone"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "klagen",
+    "Präposition": "über (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Sie klagte ständig über Schmerzen.",
+    "Übersetzung": "She constantly complained about pain.",
+    "Meaning": "to complain about something/someone"
+  },
+  {
+    "Pronoun": "es",
+    "Verb": "kommen",
+    "Präposition": "zu (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Es darf nicht zu einer Eskalation der Situation kommen.",
+    "Übersetzung": "The situation must not escalate.",
+    "Meaning": "to result in something; to lead to a situation"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "konzentrieren",
+    "Präposition": "auf (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Du musst dich auf das Wesentliche konzentrieren.",
+    "Übersetzung": "You need to concentrate on the essentials.",
+    "Meaning": "to concentrate on something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "kümmern",
+    "Präposition": "um (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Ich kümmere mich um dieses Problem.",
+    "Übersetzung": "I am taking care of this problem.",
+    "Meaning": "to take care of something/someone"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "lachen",
+    "Präposition": "über (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Er musste über ihre Witze lachen.",
+    "Übersetzung": "He had to laugh at her jokes.",
+    "Meaning": "to laugh about something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "leben",
+    "Präposition": "von (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Während des Krieges lebten viele Leute hauptsächlich von Kartoffeln.",
+    "Übersetzung": "During the war, many people lived mainly on potatoes.",
+    "Meaning": "to live on something (sustenance)"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "leiden",
+    "Präposition": "an (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Meine Nachbarin leidet an einer Hautkrankheit.",
+    "Übersetzung": "My neighbor suffers from a skin disease.",
+    "Meaning": "to suffer from something (an illness)"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "leiden",
+    "Präposition": "unter (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Die empfindliche Dame litt sehr unter dem Lärm.",
+    "Übersetzung": "The sensitive lady suffered greatly from the noise.",
+    "Meaning": "to suffer under something (a condition)"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "liegen",
+    "Präposition": "an (jn/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Es liegt natürlich an dir, dass wir ständig Streit haben.",
+    "Übersetzung": "It is, of course, your fault that we constantly argue.",
+    "Meaning": "to be due to something/someone"
+  },
+  {
+    "Pronoun": "es",
+    "Verb": "mangeln",
+    "Präposition": "an (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "In dem Notstandsgebiet mangelte es an Medikamenten und Nahrungsmitteln.",
+    "Übersetzung": "In the disaster area, there was a lack of medicine and food.",
+    "Meaning": "to lack something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "mitmachen",
+    "Präposition": "bei (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Bei dieser Sache mache ich nicht mit.",
+    "Übersetzung": "I won't participate in this matter.",
+    "Meaning": "to participate in something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "mitwirken",
+    "Präposition": "bei/an (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Viele Künstler wirkten bei/an dieser Ausstellung mit.",
+    "Übersetzung": "Many artists collaborated in/on this exhibition.",
+    "Meaning": "to collaborate in/on something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "nachdenken",
+    "Präposition": "über (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Ich muss noch einmal darüber nachdenken, bevor ich mich entscheide.",
+    "Übersetzung": "I need to think about it again before deciding.",
+    "Meaning": "to think about something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "passen",
+    "Präposition": "zu (jn/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Dieser Pullover passt nicht zu der Hose.",
+    "Übersetzung": "This sweater doesn't match the pants.",
+    "Meaning": "to match something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "protestieren",
+    "Präposition": "gegen (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Die Studenten protestierten gegen die Einführung von Studiengebühren.",
+    "Übersetzung": "The students protested against the introduction of tuition fees.",
+    "Meaning": "to protest against something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "rächen",
+    "Präposition": "an (jn) & für (etw)",
+    "Kasus": "D & A",
+    "Beispielsatz": "Für diese Beleidigung werde ich mich an dir rächen!",
+    "Übersetzung": "I will get revenge on you for this insult!",
+    "Meaning": "to take revenge on someone for something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "raten",
+    "Präposition": "zu (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Ich rate dir zu diesem Wörterbuch.",
+    "Übersetzung": "I advise you to use this dictionary.",
+    "Meaning": "to advise to do something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "reagieren",
+    "Präposition": "auf (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Er hat auf meinen Brief noch nicht reagiert.",
+    "Übersetzung": "He hasn't responded to my letter yet.",
+    "Meaning": "to respond to something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "rechnen",
+    "Präposition": "mit (jn/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Morgen müssen wir mit Regen rechnen, sagt der Wetterbericht.",
+    "Übersetzung": "Tomorrow we have to expect rain, according to the weather forecast.",
+    "Meaning": "to expect something; to reckon with"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "riechen",
+    "Präposition": "nach (jn/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Hier riecht es nach frischem Kaffee.",
+    "Übersetzung": "It smells like fresh coffee here.",
+    "Meaning": "to smell like something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "schämen",
+    "Präposition": "vor (jn) & für (etw)",
+    "Kasus": "D & A",
+    "Beispielsatz": "Der Schüler schämte sich vor den Eltern für seine schlechten Noten.",
+    "Übersetzung": "The student was ashamed in front of his parents for his bad grades.",
+    "Meaning": "to be ashamed in front of someone for something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "schätzen",
+    "Präposition": "auf (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Die Experten schätzen die Kosten auf 3 Millionen €.",
+    "Übersetzung": "The experts estimate the costs at 3 million euros.",
+    "Meaning": "to estimate something at a value"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "scheitern",
+    "Präposition": "an (jn/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Das neue Gesetz scheiterte am Widerstand der Gewerkschaften.",
+    "Übersetzung": "The new law failed due to the resistance of the unions.",
+    "Meaning": "to fail due to something/someone"
+  },
+
+  {
+    "Pronoun": "-",
+    "Verb": "schicken",
+    "Präposition": "an (jn)",
+    "Kasus": "A",
+    "Beispielsatz": "Carlos schickt ein Paket an seine Freundin.",
+    "Übersetzung": "Carlos sends a package to his girlfriend.",
+    "Meaning": "to send something to someone"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "schießen",
+    "Präposition": "auf (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Der Jäger schießt auf den Löwen.",
+    "Übersetzung": "The hunter shoots at the lion.",
+    "Meaning": "to shoot at something/someone"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "schimpfen",
+    "Präposition": "auf/über (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Mein Vater schimpft immer auf/über die Regierung.",
+    "Übersetzung": "My father always complains about the government.",
+    "Meaning": "to complain about something/someone"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "schmecken",
+    "Präposition": "nach (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Der Kaffee schmeckt nach Vanille.",
+    "Übersetzung": "The coffee tastes like vanilla.",
+    "Meaning": "to taste like something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "schreiben",
+    "Präposition": "an (jn) & über (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Carlo schreibt eine E-Mail an seine Freundin in Italien.",
+    "Übersetzung": "Carlo writes an email to his girlfriend in Italy.",
+    "Meaning": "to write to someone about something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "schützen",
+    "Präposition": "vor (jn/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Frau Meier schützte ihre Topfblumen vor dem Regen.",
+    "Übersetzung": "Mrs. Meier protected her potted plants from the rain.",
+    "Meaning": "to protect oneself/something from something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "sehnen",
+    "Präposition": "nach (jn/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Exilanten sehnen sich nach ihrer Heimat.",
+    "Übersetzung": "Exiles long for their homeland.",
+    "Meaning": "to long for something/someone"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "senden",
+    "Präposition": "an (jn)",
+    "Kasus": "A",
+    "Beispielsatz": "Carlo sendet eine SMS an seine Freundin in Portugal.",
+    "Übersetzung": "Carlo sends a text message to his girlfriend in Portugal.",
+    "Meaning": "to send something to someone"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "siegen",
+    "Präposition": "über (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "James Bond siegt immer über den Bösewicht.",
+    "Übersetzung": "James Bond always defeats the villain.",
+    "Meaning": "to triumph over someone/something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "sorgen",
+    "Präposition": "für (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Eltern müssen gut für ihre Kinder sorgen.",
+    "Übersetzung": "Parents must take good care of their children.",
+    "Meaning": "to care for someone/something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "sorgen",
+    "Präposition": "um (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Ich sorge mich um deine Gesundheit.",
+    "Übersetzung": "I worry about your health.",
+    "Meaning": "to worry about something/someone"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "sparen",
+    "Präposition": "auf/für (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Sie spart auf/für ein neues Fahrrad.",
+    "Übersetzung": "She is saving up for a new bicycle.",
+    "Meaning": "to save for something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "sprechen",
+    "Präposition": "mit (jn)",
+    "Kasus": "D",
+    "Beispielsatz": "Ich möchte mit dem Chef sprechen.",
+    "Übersetzung": "I would like to speak with the boss.",
+    "Meaning": "to speak with someone"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "sprechen",
+    "Präposition": "zu (jn)",
+    "Kasus": "D",
+    "Beispielsatz": "Der Pfarrer spricht zur Gemeinde.",
+    "Übersetzung": "The priest speaks to the congregation.",
+    "Meaning": "to address someone formally"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "sprechen",
+    "Präposition": "von/über (jn/etw)",
+    "Kasus": "D/A",
+    "Beispielsatz": "Lass uns nicht mehr von der Sache sprechen!",
+    "Übersetzung": "Let's not talk about the matter anymore!",
+    "Meaning": "to talk about something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "sprechen",
+    "Präposition": "für/gegen (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Diese Argumente sprechen für/gegen ein weiteres Studium.",
+    "Übersetzung": "These arguments speak for/against further studies.",
+    "Meaning": "to argue for/against something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "stammen",
+    "Präposition": "aus (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Er stammt aus einer Arbeiterfamilie.",
+    "Übersetzung": "He comes from a working-class family.",
+    "Meaning": "to originate from something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "stammen",
+    "Präposition": "von (jn)",
+    "Kasus": "D",
+    "Beispielsatz": "Diese Skizze stammt von Picasso.",
+    "Übersetzung": "This sketch comes from Picasso.",
+    "Meaning": "to originate from someone"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "staunen",
+    "Präposition": "über (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Ich staune über die Selbständigkeit des Kindes.",
+    "Übersetzung": "I am amazed at the child's independence.",
+    "Meaning": "to be amazed at something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "sterben",
+    "Präposition": "an (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Er starb an einer Überdosis Heroin.",
+    "Übersetzung": "He died from a heroin overdose.",
+    "Meaning": "to die from something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "stimmen",
+    "Präposition": "für/gegen (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Die Gewerkschaftsmitglieder stimmen für/gegen einen Streik.",
+    "Übersetzung": "The union members vote for/against a strike.",
+    "Meaning": "to vote for/against something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "streiten",
+    "Präposition": "mit (jn) & um (etw)",
+    "Kasus": "D & A",
+    "Beispielsatz": "Er streitet sich mit seinen Geschwistern um das Erbe.",
+    "Übersetzung": "He argues with his siblings about the inheritance.",
+    "Meaning": "to argue with someone about something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "suchen",
+    "Präposition": "nach (jm/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Wir haben lange nach einer guten Lösung gesucht.",
+    "Übersetzung": "We searched for a good solution for a long time.",
+    "Meaning": "to search for something/someone"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "teilnehmen",
+    "Präposition": "an (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Tom nimmt jetzt an einem Japanischkurs teil.",
+    "Übersetzung": "Tom is now participating in a Japanese course.",
+    "Meaning": "to participate in something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "trauern",
+    "Präposition": "um (jn)",
+    "Kasus": "A",
+    "Beispielsatz": "Die Hinterbliebenen trauern um die Toten.",
+    "Übersetzung": "The bereaved mourn for the deceased.",
+    "Meaning": "to mourn for someone"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "träumen",
+    "Präposition": "von (jm/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Thomas träumt schon lange von einem echten Abenteuerurlaub.",
+    "Übersetzung": "Thomas has long dreamed of a real adventure vacation.",
+    "Meaning": "to dream of something/someone"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "treffen",
+    "Präposition": "mit (jm)",
+    "Kasus": "D",
+    "Beispielsatz": "Herr Klinismann trifft sich heute mit seinem Kollegen im Café.",
+    "Übersetzung": "Mr. Klinismann is meeting his colleague at the café today.",
+    "Meaning": "to meet with someone"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "trennen",
+    "Präposition": "von (jm)",
+    "Kasus": "D",
+    "Beispielsatz": "Sie konnte sich nicht von ihrem Freund trennen.",
+    "Übersetzung": "She couldn't break up with her boyfriend.",
+    "Meaning": "to separate from someone"
+  },
+  {
+    "Pronoun": "jn",
+    "Verb": "überreden",
+    "Präposition": "zu (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Eva überredete Adam dazu, in den Apfel zu beißen.",
+    "Übersetzung": "Eva persuaded Adam to bite into the apple.",
+    "Meaning": "to persuade someone to do something"
+  },
+  {
+    "Pronoun": "etw",
+    "Verb": "übersetzen",
+    "Präposition": "von/aus (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Diesen Text hat Tanja vom/aus dem Russischen ins Deutsche übersetzt.",
+    "Übersetzung": "Tanja translated this text from Russian into German.",
+    "Meaning": "to translate from a language"
+  },
+  {
+    "Pronoun": "jn",
+    "Verb": "überzeugen",
+    "Präposition": "von (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Petra hat ihren Chef vom Gegenteil überzeugt.",
+    "Übersetzung": "Petra convinced her boss of the opposite.",
+    "Meaning": "to convince someone of something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "unterhalten",
+    "Präposition": "mit (jm) & über (jn/etw)",
+    "Kasus": "D & A",
+    "Beispielsatz": "Die Lehrerin unterhielt sich zwei Stunden mit einem Schüler über seine schlechten Noten.",
+    "Übersetzung": "The teacher talked with a student for two hours about his bad grades.",
+    "Meaning": "to converse with someone about something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "unterscheiden",
+    "Präposition": "von (jm/etw) & durch (etw)",
+    "Kasus": "D & A",
+    "Beispielsatz": "Anna unterscheidet sich von ihrer Schwester im Aussehen und durch ihre Freundlichkeit.",
+    "Übersetzung": "Anna differs from her sister in appearance and through her kindness.",
+    "Meaning": "to differ from someone/something in/aspect"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "unterscheiden",
+    "Präposition": "zwischen (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Er kann nicht zwischen Wichtigem und Unwichtigem unterscheiden.",
+    "Übersetzung": "He cannot distinguish between important and unimportant things.",
+    "Meaning": "to distinguish between things"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "verabreden",
+    "Präposition": "mit (jm) & zu (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Wir verabredeten uns mit den Meiers zu einem Frühstück im Café.",
+    "Übersetzung": "We arranged to meet the Meiers for breakfast at the café.",
+    "Meaning": "to arrange to meet someone for something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "verabschieden",
+    "Präposition": "von (jm)",
+    "Kasus": "D",
+    "Beispielsatz": "Am Bahnhof musste sie sich von ihm verabschieden.",
+    "Übersetzung": "At the train station, she had to say goodbye to him.",
+    "Meaning": "to say goodbye to someone"
+  },
+  {
+    "Pronoun": "jn/etw",
+    "Verb": "verbinden",
+    "Präposition": "mit (jm/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Yoko verbindet die angenehmsten Erinnerungen mit ihrem letzten London-Besuch.",
+    "Übersetzung": "Yoko associates the most pleasant memories with her last visit to London.",
+    "Meaning": "to associate something with someone/something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "verfügen",
+    "Präposition": "über (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Nicht jedes Land verfügt über Rohstoffe.",
+    "Übersetzung": "Not every country has natural resources.",
+    "Meaning": "to have/possess something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "vergleichen",
+    "Präposition": "mit (jm/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Claudia vergleicht ihren Garten mit dem Garten ihres Nachbarn.",
+    "Übersetzung": "Claudia compares her garden with her neighbor's garden.",
+    "Meaning": "to compare oneself/something with someone/something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "verhandeln",
+    "Präposition": "mit (jm) & über (etw)",
+    "Kasus": "D & A",
+    "Beispielsatz": "Die beiden Staaten verhandeln über neue Möglichkeiten der kulturellen Zusammenarbeit.",
+    "Übersetzung": "The two states are negotiating new possibilities for cultural cooperation.",
+    "Meaning": "to negotiate with someone about something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "verlangen",
+    "Präposition": "nach (jm/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Der Kranke verlangte nach einem Arzt.",
+    "Übersetzung": "The sick person demanded a doctor.",
+    "Meaning": "to demand/call for someone/something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "verlassen",
+    "Präposition": "auf (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Auf meinen Freund Sepp kann ich mich wirklich immer verlassen.",
+    "Übersetzung": "I can always rely on my friend Sepp.",
+    "Meaning": "to rely on someone/something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "versöhnen",
+    "Präposition": "mit (jm)",
+    "Kasus": "D",
+    "Beispielsatz": "Lisa hat sich nach einem Streit wieder mit ihrem Freund Alex versöhnt.",
+    "Übersetzung": "Lisa reconciled with her boyfriend Alex after an argument.",
+    "Meaning": "to reconcile with someone"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "verstoßen",
+    "Präposition": "gegen (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "In einem fremden Land kann man sehr leicht gegen bestimmte Verhaltensregeln verstoßen.",
+    "Übersetzung": "In a foreign country, one can easily violate certain behavioral rules.",
+    "Meaning": "to violate something"
+  },
+  {
+    "Pronoun": "etw",
+    "Verb": "vertauschen",
+    "Präposition": "mit (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Hugo hatte aus Versehen seinen Mantel mit dem Mantel seines Kollegen vertauscht.",
+    "Übersetzung": "Hugo accidentally swapped his coat with his colleague's coat.",
+    "Meaning": "to exchange something with something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "verteidigen",
+    "Präposition": "gegen (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Er verteidigte sich gegen die Vorwürfe seiner Frau.",
+    "Übersetzung": "He defended himself against his wife's accusations.",
+    "Meaning": "to defend oneself against something"
+  },
+  {
+    "Pronoun": "etw",
+    "Verb": "verteilen",
+    "Präposition": "an (jn)",
+    "Kasus": "A",
+    "Beispielsatz": "Die Kindergärtnerin verteilt Süßigkeiten an die Kinder.",
+    "Übersetzung": "The kindergarten teacher distributes sweets to the children.",
+    "Meaning": "to distribute something to someone"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "vertragen",
+    "Präposition": "mit (jm)",
+    "Kasus": "D",
+    "Beispielsatz": "Nach einem Streit hat er sich wieder mit ihr vertragen.",
+    "Übersetzung": "After an argument, he reconciled with her.",
+    "Meaning": "to reconcile with someone"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "verurteilen",
+    "Präposition": "zu (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Sie war zu schnell gefahren und wurde zu einer Geldstrafe verurteilt.",
+    "Übersetzung": "She drove too fast and was sentenced to a fine.",
+    "Meaning": "to sentence someone to something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "verwandeln",
+    "Präposition": "in (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Durch Erhitzen verwandelt sich Wasser in Dampf.",
+    "Übersetzung": "Through heating, water turns into steam.",
+    "Meaning": "to transform into something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "verwechseln",
+    "Präposition": "mit (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Der Koch hat heute das Salz mit dem Zucker verwechselt.",
+    "Übersetzung": "The chef confused the salt with the sugar today.",
+    "Meaning": "to confuse something with something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "verzichten",
+    "Präposition": "auf (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Bei einer Diät muss man auf Schokolade verzichten.",
+    "Übersetzung": "During a diet, one must give up chocolate.",
+    "Meaning": "to give up something"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "vorbereiten",
+    "Präposition": "auf (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Sie hat sich gut auf die Prüfung vorbereitet.",
+    "Übersetzung": "She prepared well for the exam.",
+    "Meaning": "to prepare for something"
+  },
+  {
+    "Pronoun": "jn",
+    "Verb": "wählen",
+    "Präposition": "zu (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Er wurde zum Präsidenten gewählt.",
+    "Übersetzung": "He was elected president.",
+    "Meaning": "to elect someone to a position"
+  },
+  {
+    "Pronoun": "jn",
+    "Verb": "warnen",
+    "Präposition": "vor (jn/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Ich habe den Briefträger vor dem bissigen Hund gewarnt.",
+    "Übersetzung": "I warned the mail carrier about the aggressive dog.",
+    "Meaning": "to warn someone about something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "warten",
+    "Präposition": "auf (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Zwanzig Minuten habe ich heute auf die U-Bahn gewartet.",
+    "Übersetzung": "I waited twenty minutes for the subway today.",
+    "Meaning": "to wait for something/someone"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "wenden",
+    "Präposition": "an (jn)",
+    "Kasus": "A",
+    "Beispielsatz": "Wenden Sie sich bei Problemen bitte an das Sekretariat.",
+    "Übersetzung": "Please contact the secretariat if you have any problems.",
+    "Meaning": "to turn to someone for help"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "werben",
+    "Präposition": "für (etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Die Firma wirbt für Schokolade.",
+    "Übersetzung": "The company advertises chocolate.",
+    "Meaning": "to advertise for something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "wirken",
+    "Präposition": "auf (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Kaffee wirkt auf mich beruhigend.",
+    "Übersetzung": "Coffee has a calming effect on me.",
+    "Meaning": "to have an effect on someone/something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "wirken",
+    "Präposition": "auf (jn)",
+    "Kasus": "A",
+    "Beispielsatz": "Er wirkte auf mich ziemlich nervös.",
+    "Übersetzung": "He seemed quite nervous to me.",
+    "Meaning": "to make an impression on someone"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "wissen",
+    "Präposition": "von (jn/etw) / über (jn/etw)",
+    "Kasus": "D / A",
+    "Beispielsatz": "Er weiß wenig über Deutschland. / Er weiß von den Problemen des Projekts.",
+    "Übersetzung": "He knows little about Germany. / He knows about the project's problems.",
+    "Meaning": "to know about something (von = general awareness; über = detailed knowledge)"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "wundern",
+    "Präposition": "über (jn/etw)",
+    "Kasus": "A",
+    "Beispielsatz": "Nach ihrem Streit mit dem Chef wunderte sich niemand über ihre Kündigung.",
+    "Übersetzung": "After her argument with the boss, no one was surprised by her dismissal.",
+    "Meaning": "to be surprised at something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "zögern",
+    "Präposition": "mit (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Er war nicht sicher und zögerte mit der Antwort.",
+    "Übersetzung": "He was unsure and hesitated with the answer.",
+    "Meaning": "to hesitate with something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "zusammenstoßen",
+    "Präposition": "mit (jn/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Beinahe wäre er mit einem Fahrrad zusammengestoßen.",
+    "Übersetzung": "He almost collided with a bicycle.",
+    "Meaning": "to collide with someone/something"
+  },
+  {
+    "Pronoun": "-",
+    "Verb": "zweifeln",
+    "Präposition": "an (jn/etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Als er den versteckten Liebesbrief fand, zweifelte er an der Treue seiner Frau.",
+    "Übersetzung": "When he found the hidden love letter, he doubted his wife's loyalty.",
+    "Meaning": "to doubt something/someone"
+  },
+  {
+    "Pronoun": "sich",
+    "Verb": "zwingen",
+    "Präposition": "zu (etw)",
+    "Kasus": "D",
+    "Beispielsatz": "Ich muss mich (dazu) zwingen, alle diese Verben mit Präpositionen zu lernen.",
+    "Übersetzung": "I have to force myself to learn all these verbs with prepositions.",
+    "Meaning": "to force oneself to do something"
+  }
+]
