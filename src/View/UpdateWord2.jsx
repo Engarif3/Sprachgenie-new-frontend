@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import Container from "../utils/Container";
 import api from "../axios";
+import axios from "axios";
 
 const UpdateWord = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [suggestions, setSuggestions] = useState({
     synonyms: [],
     antonyms: [],
@@ -13,7 +15,7 @@ const UpdateWord = () => {
   });
 
   const [formData, setFormData] = useState({
-    id: id,
+    id: 1,
     value: "",
     meaning: [],
     sentences: [],
@@ -49,9 +51,15 @@ const UpdateWord = () => {
 
   // Fetch existing word data
   useEffect(() => {
+    const controller = new AbortController();
     const fetchWordData = async () => {
       try {
-        const response = await api.get(`/word/${id}`);
+        const response = await axios.get(
+          `http://localhost:5000/api/v1/word/${id}`,
+          {
+            signal: controller.signal,
+          }
+        );
         const word = response.data.data;
         console.log(word);
         setFormData({
@@ -59,27 +67,39 @@ const UpdateWord = () => {
           value: word.value,
           meaning: word.meaning,
           sentences: word.sentences,
-          levelId: word.levelId,
+          //   levelId: word.levelId.toString(), // Keep only IDs, not the entire object
+          levelId: word.levelId, // Keep only IDs, not the entire object
           topicId: word.topicId,
           articleId: word.articleId,
-          partOfSpeechId: word.partOfSpeechId,
+          partOfSpeechId: word.partOfSpeechId?.toString() || "",
           pluralForm: word.pluralForm || "",
           synonyms: word.synonyms?.map((item) => item.value) || [],
           antonyms: word.antonyms?.map((item) => item.value) || [],
           similarWords: word.similarWords?.map((item) => item.value) || [],
-          level: word.level,
-          topic: word.topic,
-          article: word.article,
-          partOfSpeech: word.partOfSpeech,
         });
       } catch (error) {
-        console.error("Error fetching word data:", error);
+        // console.error("Error fetching word data:", error);
+        if (!controller.signal.aborted) {
+          console.error("Error fetching word data:", error);
+        }
       }
     };
 
+    // const fetchLevels = async () => {
+    //   const response = await api.get("/levels");
+    //   setLevels(response.data);
+    // };
     const fetchLevels = async () => {
-      const response = await api.get("/levels");
-      setLevels(response.data);
+      try {
+        const response = await api.get("/levels", {
+          signal: controller.signal,
+        });
+        setLevels(response.data);
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          console.error("Error fetching levels:", error);
+        }
+      }
     };
 
     const fetchTopics = async () => {
@@ -102,6 +122,7 @@ const UpdateWord = () => {
     fetchTopics();
     fetchArticles();
     fetchPartOfSpeeches();
+    return () => controller.abort();
   }, [id]);
 
   const handleInputChange = async (e) => {
@@ -171,132 +192,145 @@ const UpdateWord = () => {
     });
 
     if (result.isConfirmed) {
-      setLoading(true);
-      // Remove the item from the array
-      const updatedArray = [...formData[field]];
-      updatedArray.splice(index, 1);
-
-      // Remove empty strings from the array
-      const filteredArray = updatedArray.filter((item) => item.trim() !== "");
-
-      // Update the state
       setFormData((prev) => ({
         ...prev,
-        [field]: filteredArray,
+        [field]: prev[field].filter((_, i) => i !== index),
       }));
 
-      try {
-        // Send the updated data to the backend
-        const response = await api.put(`/word/update/${formData.id}`, {
-          ...formData,
-          [field]: filteredArray, // Send the updated list to the backend
-        });
-
-        Swal.fire({
-          title: "Removed!",
-          text: "The item has been removed successfully.",
-          timer: 1000,
-          showConfirmButton: false,
-          icon: "success",
-        });
-      } catch (error) {
-        console.error(
-          "Error updating the backend:",
-          error.response?.data || error
-        );
-        Swal.fire({
-          title: "Error!",
-          text: "Failed to update the backend. Please try again.",
-          icon: "error",
-        });
-      } finally {
-        setLoading(false);
-      }
+      await Swal.fire({
+        title: "Removed!",
+        text: "The item has been removed successfully.",
+        timer: 1000,
+        showConfirmButton: false,
+        icon: "success",
+      });
     }
   };
 
+  const updateWordData = async (updatedFormData) => {
+    try {
+      // Send the updated data to the backend
+      const response = await api.put(`/word/update/${updatedFormData.id}`);
+      console.log("Response:", response);
+    } catch (error) {
+      console.error("Error updating word:", error.response || error);
+    }
+  };
+
+  // 2. Update the handleSubmit function
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
 
-    // Ensure the necessary fields are arrays and remove empty strings
+    // Validate required fields first
+    if (!formData.levelId || !formData.topicId || !formData.articleId) {
+      setMessage("Please select Level, Topic, and Article");
+      setLoading(false);
+      return;
+    }
+
+    // Construct dataToSend with proper validation
     const dataToSend = {
-      ...formData,
-      meaning: formData.meaning.concat(
-        inputData.meaning
-          .split(",")
-          .map((item) => item.trim())
-          .filter((item) => item !== "")
-      ),
-      sentences: formData.sentences.concat(
-        inputData.sentences
-          .split(",")
-          .map((item) => item.trim())
-          .filter((item) => item !== "")
-      ),
-      synonyms: formData.synonyms.concat(
-        inputData.synonyms
-          .split(",")
-          .map((item) => item.trim())
-          .filter((item) => item !== "")
-      ),
-      antonyms: formData.antonyms.concat(
-        inputData.antonyms
-          .split(",")
-          .map((item) => item.trim())
-          .filter((item) => item !== "")
-      ),
-      similarWords: formData.similarWords.concat(
-        inputData.similarWords
-          .split(",")
-          .map((item) => item.trim())
-          .filter((item) => item !== "")
-      ),
+      value: formData.value,
+      meaning: [
+        ...new Set([
+          // Add deduplication
+          ...formData.meaning,
+          ...inputData.meaning
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+        ]),
+      ],
+      sentences: [
+        ...new Set([
+          // Add deduplication
+          ...formData.sentences,
+          ...inputData.sentences
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+        ]),
+      ],
+      levelId: formData.levelId,
+      topicId: formData.topicId,
+      articleId: formData.articleId,
+      partOfSpeechId: formData.partOfSpeechId || "", // Keep as empty string instead of null
+      pluralForm: formData.pluralForm || "", // Use empty string instead of null
+      synonyms: [
+        ...new Set([
+          // Add deduplication
+          ...formData.synonyms,
+          ...inputData.synonyms
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+        ]),
+      ],
+      antonyms: [
+        ...new Set([
+          // Add deduplication
+          ...formData.antonyms,
+          ...inputData.antonyms
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+        ]),
+      ],
+      similarWords: [
+        ...new Set([
+          // Add deduplication
+          ...formData.similarWords,
+          ...inputData.similarWords
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+        ]),
+      ],
     };
 
-    // Show SweetAlert confirmation
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "Do you want to update this word?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, update it!",
-      cancelButtonText: "Cancel",
-    });
-
-    if (result.isConfirmed) {
-      try {
-        const response = await api.put(
-          `/word/update/${formData.id}`,
-          dataToSend
-        );
-        setMessage(response.data.message);
-        setInputData({
-          meaning: "",
-          sentences: "",
-          synonyms: "",
-          antonyms: "",
-          similarWords: "",
-        });
-
-        // Clear the word list cache after successful update
-        localStorage.removeItem("wordListCache");
-        // Show SweetAlert success message
-        await Swal.fire({
-          title: "Updated!",
-          text: "The word has been updated successfully.",
-          icon: "success",
-          timer: 1000,
-          showConfirmButton: false,
-        });
-        // navigate("/");
-      } catch (error) {
-        console.error("Error updating word:", error);
-        setMessage("Failed to update the word.");
-      } finally {
+    try {
+      if (!formData.id || isNaN(formData.id)) {
+        setMessage("Invalid word ID");
         setLoading(false);
+        return;
       }
+      const response = await api.put(`/word/update/${formData.id}`, dataToSend);
+
+      // Clear input fields after successful update
+      setInputData({
+        meaning: "",
+        sentences: "",
+        synonyms: "",
+        antonyms: "",
+        similarWords: "",
+      });
+
+      // Handle success
+      await Swal.fire({
+        title: "Updated!",
+        text: "Word updated successfully!",
+        icon: "success",
+        timer: 1000,
+        showConfirmButton: false,
+      });
+
+      navigate("/");
+    } catch (error) {
+      console.error("Update error:", error.response?.data);
+      const errorMessage =
+        error.response?.data?.message || "Failed to update word";
+
+      setMessage(errorMessage);
+      await Swal.fire({
+        title: "Error!",
+        text: errorMessage,
+        icon: "error",
+        timer: 3000,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -314,17 +348,12 @@ const UpdateWord = () => {
           </Link>
         </span>
         <div className="w-8/12 mx-auto mb-4">
-          {/* <label className="block   text-cyan-600 ">
-            {" "}
-            <span className="font-medium text-2xl "> Word</span>
-          </label> */}
-
           <input
             type="text"
             name="value"
             value={formData.value}
             onChange={handleInputChange}
-            className="w-full text-4xl font-semibold p-3 border-2 border-blue-500 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2 capitalize text-slate-950"
+            className="w-full text-4xl font-semibold p-3 border border-blue-500 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2 capitalize text-center text-slate-950 "
             placeholder="Enter the word"
           />
         </div>
@@ -521,7 +550,8 @@ const UpdateWord = () => {
               </label>
               <select
                 name="levelId"
-                value={formData.levelId || "Select"}
+                // value={formData.levelId || "Select"}
+                value={formData.levelId ? formData.levelId : "1"}
                 onChange={handleInputChange}
                 className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
@@ -529,7 +559,8 @@ const UpdateWord = () => {
                   Select
                 </option>
                 {levels.map((level) => (
-                  <option key={level.id} value={level.id}>
+                  //   <option key={level.id} value={level.id}>
+                  <option key={level.id} value={String(level.id)}>
                     {level.level}
                   </option>
                 ))}
@@ -543,7 +574,7 @@ const UpdateWord = () => {
               </label>
               <select
                 name="topicId"
-                value={formData.topicId || "Select"}
+                value={formData.topicId || "1"}
                 onChange={handleInputChange}
                 className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
@@ -565,7 +596,7 @@ const UpdateWord = () => {
               </label>
               <select
                 name="articleId"
-                value={formData.articleId || "Select"}
+                value={formData.articleId || "4"}
                 onChange={handleInputChange}
                 className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
@@ -587,7 +618,7 @@ const UpdateWord = () => {
               </label>
               <select
                 name="partOfSpeechId"
-                value={formData.partOfSpeechId || "Select"}
+                value={formData.partOfSpeechId || "1"}
                 onChange={handleInputChange}
                 className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
@@ -595,7 +626,8 @@ const UpdateWord = () => {
                   Select
                 </option>
                 {partOfSpeeches.map((pos) => (
-                  <option key={pos.id} value={pos.id}>
+                  //   <option key={pos.id} value={pos.id}>
+                  <option key={pos.id} value={String(pos.id)}>
                     {pos.name}
                   </option>
                 ))}
@@ -606,8 +638,13 @@ const UpdateWord = () => {
         </div>
         {/* Submit Button */}
         <div className="text-center mt-6">
-          <button type="submit" className="btn btn-wide btn-warning">
-            Update Word
+          <button
+            type="submit"
+            className="btn btn-wide btn-warning"
+            disabled={loading}
+          >
+            {/* Update Word */}
+            {loading ? "Updating..." : "Update Word"}
           </button>
         </div>
       </form>

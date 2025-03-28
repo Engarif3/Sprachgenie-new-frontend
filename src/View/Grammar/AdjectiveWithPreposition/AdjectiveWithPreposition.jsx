@@ -13,8 +13,10 @@ const AdjectiveWithPreposition = () => {
   return (
     <Container>
       <div className=" mx-auto mt-16 mb-24 p-1">
-        <h2 className="text-3xl font-bold font-mono text-sky-700 my-5 md:my-8 lg:my-8 text-center">
+        <h2 className="text-3xl font-bold font-mono text-sky-700 my-5  text-center">
           Adjectives with Prepositions
+          <br />
+          <span className="">({data.length})</span>
         </h2>
         <div className="flex flex-col md:flex-row lg:flex-row justify-between items-center ">
           <div className="text-center my-8 w-full md:w-4/12 lg:w-4/12 flex border border-cyan-700 rounded-lg ">
@@ -50,9 +52,13 @@ const AdjectiveWithPreposition = () => {
                           {item.Adjective}
                         </span>{" "}
                         -{" "}
-                        <span className="text-sm font-mono">
-                          ({item.Meaning})
+                        <span className=" font-mono">
+                          {item["Preposition"]}
                         </span>
+                        <span className=" text-orange-600 font-bold ml-2">
+                          Case:{" "}
+                        </span>{" "}
+                        ({item.Kasus})
                       </span>
                     </span>
                   </div>
@@ -65,16 +71,12 @@ const AdjectiveWithPreposition = () => {
                   </div>
                 )}
               </div>
-              <div className="my-3 border-b">
-                <span className=" text-orange-600 font-bold">Preposition:</span>{" "}
-                {item["Präposition"]}
-                <span className=" text-orange-600 font-bold ml-2">
-                  Case:{" "}
-                </span>{" "}
-                ({item.Kasus})
+              <div className=" border-b  pb-2">
+                <span className=" text-orange-600 font-bold">Meaning:</span>{" "}
+                {item.Meaning}
               </div>
-              <div className="my-3 border-b">{item.Beispielsatz}</div>
-              <div>{item.Übersetzung}</div>
+              <div className="py-2 border-b italic">{item.Beispielsatz}</div>
+              <div className="pt-2  italic">{item.Übersetzung}</div>
             </div>
           ))}
         </div>
@@ -86,11 +88,11 @@ const AdjectiveWithPreposition = () => {
               <tr className="bg-gray-100 text-gray-700">
                 {/* <th className="py-2 px-4 text-start">PN</th> */}
                 <th className="py-2 px-4 text-start">Adjektiv</th>
-                <th className="py-2 px-4 text-start">Meaning</th>
                 <th className="py-2 px-4 text-start">Präposition</th>
+                <th className="py-2 px-4 text-start">Meaning</th>
                 <th className="py-2 px-4 text-start">K</th>
-                <th className="py-2 px-4 text-center">Beispielsatz</th>
-                <th className="py-2 px-4 text-center">Übersetzung</th>
+                <th className="py-2 px-4 text-start">Beispielsatz</th>
+                <th className="py-2 px-4 text-start">Übersetzung</th>
               </tr>
             </thead>
             <tbody>
@@ -105,11 +107,11 @@ const AdjectiveWithPreposition = () => {
                   <td className="py-2 px-4 text-start font-bold ">
                     {item.Adjective}
                   </td>
+                  <td className="py-2 px-4 text-center ">
+                    {item["Preposition"]}
+                  </td>
                   <td className="py-2 px-4 text-start w-[22%]">
                     {item.Meaning}
-                  </td>
-                  <td className="py-2 px-4 text-start ">
-                    {item["Präposition"]}
                   </td>
                   <td className="py-2 px-4 text-start ">{item.Kasus}</td>
                   <td className="py-2 px-4 text-start w-[35%]">

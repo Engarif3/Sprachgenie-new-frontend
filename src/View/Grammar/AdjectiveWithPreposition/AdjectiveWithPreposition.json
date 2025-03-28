@@ -1,7 +1,7 @@
 [
   {
     "Adjective": "abhängig",
-    "Präposition": "von",
+    "Preposition": "von",
     "Kasus": "D",
     "Beispielsatz": "Er ist abhängig vom Geld seiner Eltern.",
     "Übersetzung": "He is dependent on his parents' money.",
@@ -9,7 +9,7 @@
   },
   {
     "Adjective": "adressiert",
-    "Präposition": "an",
+    "Preposition": "an",
     "Kasus": "A",
     "Beispielsatz": "Der Brief ist an dich adressiert.",
     "Übersetzung": "The letter is addressed to you.",
@@ -17,7 +17,7 @@
   },
   {
     "Adjective": "angesehen",
-    "Präposition": "bei",
+    "Preposition": "bei",
     "Kasus": "D",
     "Beispielsatz": "Er ist bei allen Experten sehr angesehen.",
     "Übersetzung": "He is highly respected among all experts.",
@@ -25,7 +25,7 @@
   },
   {
     "Adjective": "angewiesen",
-    "Präposition": "auf",
+    "Preposition": "auf",
     "Kasus": "A",
     "Beispielsatz": "Ich bin auf deine Hilfe angewiesen.",
     "Übersetzung": "I rely on your help.",
@@ -33,7 +33,7 @@
   },
   {
     "Adjective": "befreundet",
-    "Präposition": "mit",
+    "Preposition": "mit",
     "Kasus": "D",
     "Beispielsatz": "Ich bin seit Jahren mit ihm befreundet.",
     "Übersetzung": "I have been friends with him for years.",
@@ -41,7 +41,7 @@
   },
   {
     "Adjective": "bekannt",
-    "Präposition": "für",
+    "Preposition": "für",
     "Kasus": "A",
     "Beispielsatz": "Er ist bekannt für seinen geschmacklosen Humor.",
     "Übersetzung": "He is known for his tasteless humor.",
@@ -49,7 +49,7 @@
   },
   {
     "Adjective": "beliebt",
-    "Präposition": "bei",
+    "Preposition": "bei",
     "Kasus": "D",
     "Beispielsatz": "Sie ist bei allen Kollegen sehr beliebt.",
     "Übersetzung": "She is very popular with all colleagues.",
@@ -57,7 +57,7 @@
   },
   {
     "Adjective": "bereit",
-    "Präposition": "zu",
+    "Preposition": "zu",
     "Kasus": "D",
     "Beispielsatz": "Ich bin zu allem bereit.",
     "Übersetzung": "I am ready for anything.",
@@ -65,7 +65,7 @@
   },
   {
     "Adjective": "beschäftigt",
-    "Präposition": "mit",
+    "Preposition": "mit",
     "Kasus": "D",
     "Beispielsatz": "Er ist immer noch mit seiner Arbeit beschäftigt.",
     "Übersetzung": "He is still busy with his work.",
@@ -73,7 +73,7 @@
   },
   {
     "Adjective": "besorgt",
-    "Präposition": "über",
+    "Preposition": "über",
     "Kasus": "A",
     "Beispielsatz": "Ich bin besorgt über die Zustände hier.",
     "Übersetzung": "I am concerned about the conditions here.",
@@ -81,7 +81,7 @@
   },
   {
     "Adjective": "beteiligt",
-    "Präposition": "an",
+    "Preposition": "an",
     "Kasus": "D",
     "Beispielsatz": "Er war von Anfang an dem Projekt beteiligt.",
     "Übersetzung": "He was involved in the project from the beginning.",
@@ -89,7 +89,7 @@
   },
   {
     "Adjective": "beunruhigt",
-    "Präposition": "über",
+    "Preposition": "über",
     "Kasus": "A",
     "Beispielsatz": "Über die Konflikte in dem Land bin ich sehr beunruhigt.",
     "Übersetzung": "I am very worried about the conflicts in the country.",
@@ -97,7 +97,7 @@
   },
   {
     "Adjective": "böse",
-    "Präposition": "auf",
+    "Preposition": "auf",
     "Kasus": "A",
     "Beispielsatz": "Bist du immer noch böse auf mich?",
     "Übersetzung": "Are you still angry at me?",
@@ -105,7 +105,7 @@
   },
   {
     "Adjective": "charakteristisch",
-    "Präposition": "für",
+    "Preposition": "für",
     "Kasus": "A",
     "Beispielsatz": "Die gute Küche ist charakteristisch für diese Gegend.",
     "Übersetzung": "The good cuisine is characteristic of this region.",
@@ -113,7 +113,7 @@
   },
   {
     "Adjective": "dankbar",
-    "Präposition": "für",
+    "Preposition": "für",
     "Kasus": "A",
     "Beispielsatz": "Ich bin dir sehr dankbar für deine Worte.",
     "Übersetzung": "I am very grateful to you for your words.",
@@ -121,7 +121,7 @@
   },
   {
     "Adjective": "eifersüchtig",
-    "Präposition": "auf",
+    "Preposition": "auf",
     "Kasus": "A",
     "Beispielsatz": "Er war schon immer eifersüchtig auf dich.",
     "Übersetzung": "He has always been jealous of you.",
@@ -129,7 +129,7 @@
   },
   {
     "Adjective": "einverstanden",
-    "Präposition": "mit",
+    "Preposition": "mit",
     "Kasus": "D",
     "Beispielsatz": "Ich bin mit deinem Vorschlag einverstanden.",
     "Übersetzung": "I agree with your proposal.",
@@ -137,7 +137,7 @@
   },
   {
     "Adjective": "entfernt",
-    "Präposition": "von",
+    "Preposition": "von",
     "Kasus": "D",
     "Beispielsatz": "Der Bahnhof ist nicht weit entfernt von unserem Hotel.",
     "Übersetzung": "The train station is not far from our hotel.",
@@ -145,7 +145,7 @@
   },
   {
     "Adjective": "entscheidend",
-    "Präposition": "für",
+    "Preposition": "für",
     "Kasus": "A",
     "Beispielsatz": "Sein Tor war entscheidend für den Ausgang des Spiels.",
     "Übersetzung": "His goal was decisive for the outcome of the game.",
@@ -153,7 +153,7 @@
   },
   {
     "Adjective": "entschlossen",
-    "Präposition": "zu",
+    "Preposition": "zu",
     "Kasus": "D",
     "Beispielsatz": "Er ist zu allem entschlossen.",
     "Übersetzung": "He is determined to do anything.",
@@ -161,7 +161,7 @@
   },
   {
     "Adjective": "enttäuscht",
-    "Präposition": "von",
+    "Preposition": "von",
     "Kasus": "D",
     "Beispielsatz": "Er ist sehr enttäuscht von dir.",
     "Übersetzung": "He is very disappointed with you.",
@@ -169,7 +169,7 @@
   },
   {
     "Adjective": "enttäuscht",
-    "Präposition": "über",
+    "Preposition": "über",
     "Kasus": "A",
     "Beispielsatz": "Über sein Verhalten bin ich sehr enttäuscht.",
     "Übersetzung": "I am very disappointed about his behavior.",
@@ -177,7 +177,7 @@
   },
   {
     "Adjective": "erfahren",
-    "Präposition": "in",
+    "Preposition": "in",
     "Kasus": "D",
     "Beispielsatz": "Sie ist sehr erfahren im Umgang mit schwierigen Kunden.",
     "Übersetzung": "She is very experienced in dealing with difficult customers.",
@@ -185,7 +185,7 @@
   },
   {
     "Adjective": "erfreut",
-    "Präposition": "über",
+    "Preposition": "über",
     "Kasus": "A",
     "Beispielsatz": "Ich bin sehr erfreut über deine guten Noten.",
     "Übersetzung": "I am very pleased about your good grades.",
@@ -193,7 +193,7 @@
   },
   {
     "Adjective": "erstaunt",
-    "Präposition": "über",
+    "Preposition": "über",
     "Kasus": "A",
     "Beispielsatz": "Er war erstaunt über meine Frage.",
     "Übersetzung": "He was surprised by my question.",
@@ -201,7 +201,7 @@
   },
   {
     "Adjective": "fähig",
-    "Präposition": "zu",
+    "Preposition": "zu",
     "Kasus": "D",
     "Beispielsatz": "Er ist zu allem fähig.",
     "Übersetzung": "He is capable of anything.",
@@ -209,7 +209,7 @@
   },
   {
     "Adjective": "fertig",
-    "Präposition": "mit",
+    "Preposition": "mit",
     "Kasus": "D",
     "Beispielsatz": "Wann bist du endlich mit der Arbeit fertig?",
     "Übersetzung": "When will you finally be done with the work?",
@@ -217,7 +217,7 @@
   },
   {
     "Adjective": "freundlich",
-    "Präposition": "zu",
+    "Preposition": "zu",
     "Kasus": "D",
     "Beispielsatz": "Sie war immer freundlich zu uns.",
     "Übersetzung": "She was always friendly to us.",
@@ -225,7 +225,7 @@
   },
   {
     "Adjective": "froh",
-    "Präposition": "über",
+    "Preposition": "über",
     "Kasus": "A",
     "Beispielsatz": "Ich bin sehr froh über deine Entscheidung.",
     "Übersetzung": "I am very happy about your decision.",
@@ -233,7 +233,7 @@
   },
   {
     "Adjective": "geeignet",
-    "Präposition": "für",
+    "Preposition": "für",
     "Kasus": "A",
     "Beispielsatz": "Er ist nicht geeignet für eine solche Position.",
     "Übersetzung": "He is not suitable for such a position.",
@@ -241,7 +241,7 @@
   },
   {
     "Adjective": "gespannt",
-    "Präposition": "auf",
+    "Preposition": "auf",
     "Kasus": "A",
     "Beispielsatz": "Ich bin gespannt auf seine Reaktion.",
     "Übersetzung": "I am curious about his reaction.",
@@ -249,7 +249,7 @@
   },
   {
     "Adjective": "gewöhnt",
-    "Präposition": "an",
+    "Preposition": "an",
     "Kasus": "A",
     "Beispielsatz": "Er ist an die Kälte gewöhnt.",
     "Übersetzung": "He is used to the cold.",
@@ -257,7 +257,7 @@
   },
   {
     "Adjective": "glücklich",
-    "Präposition": "über",
+    "Preposition": "über",
     "Kasus": "A",
     "Beispielsatz": "Ich bin glücklich über deine Entscheidung.",
     "Übersetzung": "I am happy about your decision.",
@@ -265,7 +265,7 @@
   },
   {
     "Adjective": "gut",
-    "Präposition": "zu",
+    "Preposition": "zu",
     "Kasus": "D",
     "Beispielsatz": "Er war immer sehr gut zu uns.",
     "Übersetzung": "He was always very good to us.",
@@ -273,7 +273,7 @@
   },
   {
     "Adjective": "gut",
-    "Präposition": "für",
+    "Preposition": "für",
     "Kasus": "A",
     "Beispielsatz": "Diese Erfahrungen waren sehr gut für meine Entwicklung.",
     "Übersetzung": "These experiences were very good for my development.",
@@ -281,7 +281,7 @@
   },
   {
     "Adjective": "interessiert",
-    "Präposition": "an",
+    "Preposition": "an",
     "Kasus": "D",
     "Beispielsatz": "Anna ist interessiert an einem anderen Deutschkurs bei DkfA.",
     "Übersetzung": "Anna is interested in another German course at DkfA.",
@@ -289,7 +289,7 @@
   },
   {
     "Adjective": "neidisch",
-    "Präposition": "auf",
+    "Preposition": "auf",
     "Kasus": "A",
     "Beispielsatz": "Er war schon immer neidisch auf seinen Bruder.",
     "Übersetzung": "He has always been jealous of his brother.",
@@ -297,7 +297,7 @@
   },
   {
     "Adjective": "nett",
-    "Präposition": "zu",
+    "Preposition": "zu",
     "Kasus": "D",
     "Beispielsatz": "Er ist immer nett zu allen gewesen.",
     "Übersetzung": "He has always been nice to everyone.",
@@ -305,7 +305,7 @@
   },
   {
     "Adjective": "neugierig",
-    "Präposition": "auf",
+    "Preposition": "auf",
     "Kasus": "A",
     "Beispielsatz": "Ich bin sehr neugierig auf deine Erklärung.",
     "Übersetzung": "I am very curious about your explanation.",
@@ -313,7 +313,7 @@
   },
   {
     "Adjective": "nötig",
-    "Präposition": "für",
+    "Preposition": "für",
     "Kasus": "A",
     "Beispielsatz": "Für den Unterhalt des Hauses ist sehr viel Geld nötig.",
     "Übersetzung": "A lot of money is necessary for the upkeep of the house.",
@@ -321,7 +321,7 @@
   },
   {
     "Adjective": "notwendig",
-    "Präposition": "für",
+    "Preposition": "für",
     "Kasus": "A",
     "Beispielsatz": "Diese Medikamente sind notwendig für eine schnelle Heilung.",
     "Übersetzung": "These medications are necessary for a quick recovery.",
@@ -329,7 +329,7 @@
   },
   {
     "Adjective": "nützlich",
-    "Präposition": "für",
+    "Preposition": "für",
     "Kasus": "A",
     "Beispielsatz": "Diese Information ist sehr nützlich für mich.",
     "Übersetzung": "This information is very useful for me.",
@@ -337,7 +337,7 @@
   },
   {
     "Adjective": "offen",
-    "Präposition": "für",
+    "Preposition": "für",
     "Kasus": "A",
     "Beispielsatz": "Ich bin offen für Veränderungen.",
     "Übersetzung": "I am open to changes.",
@@ -345,7 +345,7 @@
   },
   {
     "Adjective": "reich",
-    "Präposition": "an",
+    "Preposition": "an",
     "Kasus": "D",
     "Beispielsatz": "Der Boden ist reich an Mineralien.",
     "Übersetzung": "The soil is rich in minerals.",
@@ -353,7 +353,7 @@
   },
   {
     "Adjective": "schädlich",
-    "Präposition": "für",
+    "Preposition": "für",
     "Kasus": "A",
     "Beispielsatz": "Rauchen ist schädlich für die Gesundheit.",
     "Übersetzung": "Smoking is harmful to health.",
@@ -361,7 +361,7 @@
   },
   {
     "Adjective": "schuld",
-    "Präposition": "an",
+    "Preposition": "an",
     "Kasus": "D",
     "Beispielsatz": "Niemand ist schuld an diesem Unglück.",
     "Übersetzung": "No one is to blame for this accident.",
@@ -369,7 +369,7 @@
   },
   {
     "Adjective": "stolz",
-    "Präposition": "auf",
+    "Preposition": "auf",
     "Kasus": "A",
     "Beispielsatz": "Er ist stolz auf seine Herkunft.",
     "Übersetzung": "He is proud of his origin.",
@@ -377,7 +377,7 @@
   },
   {
     "Adjective": "traurig",
-    "Präposition": "über",
+    "Preposition": "über",
     "Kasus": "A",
     "Beispielsatz": "Ich bin sehr traurig über deine Äußerungen.",
     "Übersetzung": "I am very sad about your remarks.",
@@ -385,7 +385,7 @@
   },
   {
     "Adjective": "überzeugt",
-    "Präposition": "von",
+    "Preposition": "von",
     "Kasus": "D",
     "Beispielsatz": "Ich war schon immer von seinen Talenten überzeugt.",
     "Übersetzung": "I have always been convinced of his talents.",
@@ -393,7 +393,7 @@
   },
   {
     "Adjective": "unabhängig",
-    "Präposition": "von",
+    "Preposition": "von",
     "Kasus": "D",
     "Beispielsatz": "Sie entscheidet völlig unabhängig von ihrem Chef.",
     "Übersetzung": "She makes decisions completely independent of her boss.",
@@ -401,7 +401,7 @@
   },
   {
     "Adjective": "unbeliebt",
-    "Präposition": "bei",
+    "Preposition": "bei",
     "Kasus": "D",
     "Beispielsatz": "Er ist unbeliebt bei allen Kollegen.",
     "Übersetzung": "He is unpopular with all colleagues.",
@@ -409,7 +409,7 @@
   },
   {
     "Adjective": "unerfahren",
-    "Präposition": "in",
+    "Preposition": "in",
     "Kasus": "D",
     "Beispielsatz": "Er ist noch unerfahren in solchen Dingen.",
     "Übersetzung": "He is still inexperienced in such matters.",
@@ -417,7 +417,7 @@
   },
   {
     "Adjective": "unfähig",
-    "Präposition": "zu",
+    "Preposition": "zu",
     "Kasus": "D",
     "Beispielsatz": "Sie ist unfähig zu einer schnellen Entscheidung.",
     "Übersetzung": "She is incapable of making a quick decision.",
@@ -425,7 +425,7 @@
   },
   {
     "Adjective": "unfreundlich",
-    "Präposition": "zu",
+    "Preposition": "zu",
     "Kasus": "D",
     "Beispielsatz": "Er war sehr unfreundlich zu uns.",
     "Übersetzung": "He was very unfriendly to us.",
@@ -433,7 +433,7 @@
   },
   {
     "Adjective": "ungeeignet",
-    "Präposition": "für",
+    "Preposition": "für",
     "Kasus": "A",
     "Beispielsatz": "Er ist ungeeignet für eine so wichtige Aufgabe.",
     "Übersetzung": "He is unsuitable for such an important task.",
@@ -441,7 +441,7 @@
   },
   {
     "Adjective": "unglücklich",
-    "Präposition": "über",
+    "Preposition": "über",
     "Kasus": "A",
     "Beispielsatz": "Über diese Entscheidung sind wir alle sehr unglücklich.",
     "Übersetzung": "We are all very unhappy about this decision.",
@@ -449,7 +449,7 @@
   },
   {
     "Adjective": "unschädlich",
-    "Präposition": "für",
+    "Preposition": "für",
     "Kasus": "A",
     "Beispielsatz": "Diese Substanz ist unschädlich für den menschlichen Körper.",
     "Übersetzung": "This substance is harmless to the human body.",
@@ -457,7 +457,7 @@
   },
   {
     "Adjective": "unterteilt",
-    "Präposition": "in",
+    "Preposition": "in",
     "Kasus": "A",
     "Beispielsatz": "Das Gebiet ist in verschiedene Regionen unterteilt.",
     "Übersetzung": "The area is divided into different regions.",
@@ -465,7 +465,7 @@
   },
   {
     "Adjective": "unzufrieden",
-    "Präposition": "mit",
+    "Preposition": "mit",
     "Kasus": "D",
     "Beispielsatz": "Sie ist sehr unzufrieden mit ihrer jetzigen Arbeit.",
     "Übersetzung": "She is very dissatisfied with her current job.",
@@ -473,7 +473,7 @@
   },
   {
     "Adjective": "verantwortlich",
-    "Präposition": "für",
+    "Preposition": "für",
     "Kasus": "A",
     "Beispielsatz": "Er ist für das ganze Projekt verantwortlich.",
     "Übersetzung": "He is responsible for the entire project.",
@@ -481,7 +481,7 @@
   },
   {
     "Adjective": "verärgert",
-    "Präposition": "über",
+    "Preposition": "über",
     "Kasus": "A",
     "Beispielsatz": "Sie ist sehr verärgert über seine Äußerungen.",
     "Übersetzung": "She is very angry about his remarks.",
@@ -489,7 +489,7 @@
   },
   {
     "Adjective": "vergleichbar",
-    "Präposition": "mit",
+    "Preposition": "mit",
     "Kasus": "D",
     "Beispielsatz": "Das Klima hier ist nicht mit dem [Klima] an der Nordsee vergleichbar.",
     "Übersetzung": "The climate here is not comparable to that of the North Sea.",
@@ -497,7 +497,7 @@
   },
   {
     "Adjective": "verheiratet",
-    "Präposition": "mit",
+    "Preposition": "mit",
     "Kasus": "D",
     "Beispielsatz": "Sie ist seit vier Jahren mit ihrem Jugendfreund verheiratet.",
     "Übersetzung": "She has been married to her childhood sweetheart for four years.",
@@ -505,7 +505,7 @@
   },
   {
     "Adjective": "verliebt",
-    "Präposition": "in",
+    "Preposition": "in",
     "Kasus": "A",
     "Beispielsatz": "Er ist in seine Kollegin verliebt.",
     "Übersetzung": "He is in love with his colleague.",
@@ -513,7 +513,7 @@
   },
   {
     "Adjective": "verwandt",
-    "Präposition": "mit",
+    "Preposition": "mit",
     "Kasus": "D",
     "Beispielsatz": "Tim und Mia sind miteinander verwandt; er mit ihr und sie mit ihm.",
     "Übersetzung": "Tim and Mia are related to each other; he to her and she to him.",
@@ -521,7 +521,7 @@
   },
   {
     "Adjective": "wütend",
-    "Präposition": "auf",
+    "Preposition": "auf",
     "Kasus": "A",
     "Beispielsatz": "Sie ist ziemlich wütend auf ihren Chef.",
     "Übersetzung": "She is quite angry at her boss.",
@@ -529,7 +529,7 @@
   },
   {
     "Adjective": "wütend",
-    "Präposition": "über",
+    "Preposition": "über",
     "Kasus": "A",
     "Beispielsatz": "Ich bin wütend über seine Entscheidung.",
     "Übersetzung": "I am angry about his decision.",
@@ -537,7 +537,7 @@
   },
   {
     "Adjective": "zufrieden",
-    "Präposition": "mit",
+    "Preposition": "mit",
     "Kasus": "D",
     "Beispielsatz": "Er ist sehr zufrieden mit seiner jetzigen Arbeitsstelle.",
     "Übersetzung": "He is very satisfied with his current job.",

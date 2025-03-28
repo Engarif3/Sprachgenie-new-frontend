@@ -235,10 +235,28 @@ const WordList = () => {
         );
       }
 
+      // if (selectedTopic) {
+      //   filtered = filtered.filter(
+      //     (word) => word.topic?.name === selectedTopic
+      //   );
+      // }
+
+      // Find default topic (ID 1)
+      const defaultTopic = topics.find((topic) => topic.id === 1);
+      const defaultTopicName = defaultTopic?.name;
+
+      // Enhanced topic filter
       if (selectedTopic) {
-        filtered = filtered.filter(
-          (word) => word.topic?.name === selectedTopic
-        );
+        filtered = filtered.filter((word) => {
+          const hasNoMeaning = !word.meaning?.length;
+          const hasNoTopic = !word.topic;
+
+          // Check if matches selected topic OR is default candidate
+          return (
+            word.topic?.name === selectedTopic ||
+            (selectedTopic === defaultTopicName && hasNoMeaning && hasNoTopic)
+          );
+        });
       }
 
       // Modified search filter logic
@@ -265,7 +283,14 @@ const WordList = () => {
         setTotalPages(Math.ceil(filtered.length / 40));
       }
     },
-    [currentPage, selectedLevel, selectedTopic, searchValue, showAllData]
+    [
+      currentPage,
+      selectedLevel,
+      selectedTopic,
+      searchValue,
+      showAllData,
+      topics,
+    ]
   );
 
   const fetchAllWords = useCallback(async () => {
@@ -355,59 +380,99 @@ const WordList = () => {
     setCurrentPage(1);
   }, []);
 
-  const handleDelete = useCallback(
-    (wordId) => {
-      // Find the word in cache
-      const wordToDelete = cache.words.find((word) => word.id === wordId);
+  // const handleDelete = useCallback(
+  //   (wordId) => {
+  //     // Find the word in cache
+  //     const wordToDelete = cache.words.find((word) => word.id === wordId);
 
-      Swal.fire({
-        title: "Are you sure?",
-        // text: `You won't be able to revert this!. Delete ${wordToDelete?.value}`,
-        html: `You won't be able to revert this! Delete <strong style="color: #dc2626; font-weight: 800;">"${wordToDelete?.value}"</strong>?`,
-        icon: "warning",
-        // input: "text",
-        // inputPlaceholder: "Type password",
-        // inputValidator: (value) =>
-        //   value === "aydin45" ? null : "Wrong Password!",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Yes, delete it!",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          api
-            .delete(`/word/delete/${wordId}`)
-            .then(() => {
-              // Update cache directly instead of refetching
-              setCache((prev) => ({
-                ...prev,
-                words: prev.words.filter((word) => word.id !== wordId),
-                lastUpdated: Date.now(),
-              }));
+  //     Swal.fire({
+  //       title: "Are you sure?",
+  //       // text: `You won't be able to revert this!. Delete ${wordToDelete?.value}`,
+  //       html: `You won't be able to revert this! Delete <strong style="color: #dc2626; font-weight: 800;">"${wordToDelete?.value}"</strong>?`,
+  //       icon: "warning",
+  //       // input: "text",
+  //       // inputPlaceholder: "Type password",
+  //       // inputValidator: (value) =>
+  //       //   value === "aydin45" ? null : "Wrong Password!",
+  //       showCancelButton: true,
+  //       confirmButtonColor: "#d33",
+  //       cancelButtonColor: "#3085d6",
+  //       confirmButtonText: "Yes, delete it!",
+  //     }).then((result) => {
+  //       if (result.isConfirmed) {
+  //         api
+  //           .delete(`/word/delete/${wordId}`)
+  //           .then(() => {
+  //             // Update cache directly instead of refetching
+  //             setCache((prev) => ({
+  //               ...prev,
+  //               words: prev.words.filter((word) => word.id !== wordId),
+  //               lastUpdated: Date.now(),
+  //             }));
 
-              // Update filtered words immediately
-              setFilteredWords((prev) =>
-                prev.filter((word) => word.id !== wordId)
-              );
-              // localStorage.removeItem("wordListCache");
-              Swal.fire({
-                title: "Deleted!",
-                icon: "success",
-                timer: 1000,
-                showConfirmButton: false,
-              });
-            })
-            .catch((error) => {
-              console.error("Error deleting word:", error);
-              Swal.fire("Error!", "Something went wrong.", "error");
-            });
-        }
-      });
-    },
-    [] // No dependencies needed now
-  );
+  //             // Update filtered words immediately
+  //             setFilteredWords((prev) =>
+  //               prev.filter((word) => word.id !== wordId)
+  //             );
+  //             // localStorage.removeItem("wordListCache");
+  //             Swal.fire({
+  //               title: "Deleted!",
+  //               icon: "success",
+  //               timer: 1000,
+  //               showConfirmButton: false,
+  //             });
+  //           })
+  //           .catch((error) => {
+  //             console.error("Error deleting word:", error);
+  //             Swal.fire("Error!", "Something went wrong.", "error");
+  //           });
+  //       }
+  //     });
+  //   },
+  //   [] // No dependencies needed now
+  // );
 
   // Learning mode implementation
+  const handleDelete = useCallback((wordId, wordValue) => {
+    Swal.fire({
+      title: "Are you sure?",
+      html: `You won't be able to revert this! Delete <strong style="color: #dc2626; font-weight: 800;">"${wordValue}"</strong>?`,
+      icon: "warning",
+      input: "text",
+      inputPlaceholder: "Type password",
+      inputValidator: (value) => (value === "aydin" ? null : "Wrong Password!"),
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Delete",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        api
+          .delete(`/word/delete/${wordId}`)
+          .then(() => {
+            setCache((prev) => ({
+              ...prev,
+              words: prev.words.filter((word) => word.id !== wordId),
+              lastUpdated: Date.now(),
+            }));
+            setFilteredWords((prev) =>
+              prev.filter((word) => word.id !== wordId)
+            );
+            Swal.fire({
+              title: "Deleted!",
+              icon: "success",
+              timer: 1000,
+              showConfirmButton: false,
+            });
+          })
+          .catch((error) => {
+            console.error("Error deleting word:", error);
+            Swal.fire("Error!", "Something went wrong.", "error");
+          });
+      }
+    });
+  }, []); // Empty dependencies still work as we're not using external values
+
   const toggleLearningMode = useCallback(() => {
     setLearningMode((prev) => !prev);
     setRevealedWords([]);
@@ -699,7 +764,7 @@ const WordList = () => {
                             Edit
                           </Link>
                           <button
-                            onClick={() => handleDelete(word.id)}
+                            onClick={() => handleDelete(word.id, word.value)}
                             className="btn btn-sm btn-error"
                           >
                             Delete

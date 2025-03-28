@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "../axios";
-import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import api from "../axios";
 
 const WordForm = () => {
   // const navigate = useNavigate();
@@ -18,9 +17,9 @@ const WordForm = () => {
     topicId: "",
     articleId: "",
     partOfSpeechId: "",
-    synonyms: "", // Add this line
-    antonyms: "", // Add this line
-    similarWords: "", // Add this line
+    synonyms: "",
+    antonyms: "",
+    similarWords: "",
   });
   const [loading, setLoading] = useState(true); // Loading state
   const initialWordData = {
@@ -41,13 +40,13 @@ const WordForm = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const levelResponse = await axios.get("/level/all");
-        const topicResponse = await axios.get("/topic/all");
-        const articleResponse = await axios.get("/articles");
-        const partOfSpeechResponse = await axios.get("/part-of-speech");
+        const levelResponse = await api.get("/level/all");
+        const topicResponse = await api.get("/topic/all");
+        const articleResponse = await api.get("/articles");
+        const partOfSpeechResponse = await api.get("/part-of-speech");
 
-        setLevels(levelResponse.data);
-        setTopics(topicResponse.data);
+        setLevels(levelResponse.data.data);
+        setTopics(topicResponse.data.data);
         setArticles(articleResponse.data);
         setPartsOfSpeech(partOfSpeechResponse.data);
 
@@ -74,30 +73,81 @@ const WordForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Ensure meaning and sentences are arrays
+    // const newWordData = {
+    //   value: wordData.value,
+    //   meaning:
+    //     typeof wordData.meaning === "string"
+    //       ? wordData.meaning.split(",").map((item) => item.trim())
+    //       : [],
+    //   sentences:
+    //     typeof wordData.sentences === "string"
+    //       ? wordData.sentences
+    //           .split(",")
+    //           .map((item) => item.trim())
+    //           .filter((item) => item)
+    //       : [],
+    //   pluralForm: wordData.pluralForm,
+    //   levelId: wordData.levelId || "2",
+    //   topicId: wordData.topicId || "1",
+    //   articleId: wordData.articleId || "4",
+    //   partOfSpeechId: wordData.partOfSpeechId || "3",
+    //   synonyms:
+    //     typeof wordData.synonyms === "string"
+    //       ? wordData.synonyms.split(",").map((item) => item.trim())
+    //       : [],
+    //   antonyms:
+    //     typeof wordData.antonyms === "string"
+    //       ? wordData.antonyms.split(",").map((item) => item.trim())
+    //       : [],
+    //   similarWords:
+    //     typeof wordData.similarWords === "string"
+    //       ? wordData.similarWords.split(",").map((item) => item.trim())
+    //       : [],
+    // };
     const newWordData = {
       value: wordData.value,
-      meaning: wordData.meaning.split(",").map((item) => item.trim()), // Split and trim meaning by commas
-      // sentences: wordData.sentences.split(",").map((item) => item.trim()), // Split and trim sentences by commas
-      sentences: wordData.sentences
-        ? wordData.sentences
-            .split(",")
-            .map((item) => item.trim())
-            .filter((item) => item) // Remove empty strings
-        : [], // If no input, set as empty array
+      meaning:
+        typeof wordData.meaning === "string"
+          ? wordData.meaning.split(",").map((item) => item.trim())
+          : [],
+      sentences:
+        typeof wordData.sentences === "string"
+          ? wordData.sentences
+              .split(",")
+              .map((item) => item.trim())
+              .filter((item) => item) // Removes empty strings
+          : [],
       pluralForm: wordData.pluralForm,
-      levelId: wordData.levelId,
+      levelId: wordData.levelId || "2",
       topicId: wordData.topicId || "1",
-      articleId: wordData.articleId,
-      partOfSpeechId: wordData.partOfSpeechId,
-      synonyms: wordData.synonyms.split(",").map((item) => item.trim()),
-      antonyms: wordData.antonyms.split(",").map((item) => item.trim()),
-      similarWords: wordData.similarWords.split(",").map((item) => item.trim()),
+      articleId: wordData.articleId || "4",
+      partOfSpeechId: wordData.partOfSpeechId || "3",
+      synonyms:
+        typeof wordData.synonyms === "string"
+          ? wordData.synonyms
+              .split(",")
+              .map((item) => item.trim())
+              .filter((item) => item) // Add filter here
+          : [],
+      antonyms:
+        typeof wordData.antonyms === "string"
+          ? wordData.antonyms
+              .split(",")
+              .map((item) => item.trim())
+              .filter((item) => item) // Add filter here
+          : [],
+      similarWords:
+        typeof wordData.similarWords === "string"
+          ? wordData.similarWords
+              .split(",")
+              .map((item) => item.trim())
+              .filter((item) => item) // Add filter here
+          : [],
     };
 
     try {
       // Directly submit the wordData state
-      const response = await axios.post("/word/create", newWordData);
+      const response = await api.post("/word/create", newWordData);
       localStorage.removeItem("wordListCache");
       Swal.fire({
         title: "Created",
@@ -334,7 +384,7 @@ const WordForm = () => {
                 type="text"
                 id="synonyms"
                 name="synonyms"
-                value={wordData.synonyms || ""}
+                value={wordData.synonyms}
                 onChange={handleChange}
                 className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
               />
@@ -351,7 +401,7 @@ const WordForm = () => {
                 type="text"
                 id="antonyms"
                 name="antonyms"
-                value={wordData.antonyms || ""}
+                value={wordData.antonyms}
                 onChange={handleChange}
                 className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
               />
@@ -368,7 +418,7 @@ const WordForm = () => {
                 type="text"
                 id="similarWords"
                 name="similarWords"
-                value={wordData.similarWords || ""}
+                value={wordData.similarWords}
                 onChange={handleChange}
                 className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
               />
