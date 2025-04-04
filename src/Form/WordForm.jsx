@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import api from "../axios";
+import { instance } from "../helpers/axios/axiosInstance";
 
 const WordForm = () => {
   // const navigate = useNavigate();
@@ -147,6 +148,12 @@ const WordForm = () => {
 
     try {
       // Directly submit the wordData state
+      // const response = await instance({
+      //   url: "https://sprcahgenie-new-backend.vercel.app/api/v1/word/create",
+      //   // url: "http://localhost:5000/api/v1/word/create",
+      //   method: "POST",
+      //   data: newWordData,
+      // });
       const response = await api.post("/word/create", newWordData);
       localStorage.removeItem("wordListCache");
       Swal.fire({

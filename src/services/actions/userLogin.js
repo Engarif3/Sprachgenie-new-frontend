@@ -7,7 +7,8 @@ export const userLogin = async (loginData) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(loginData),
-      cache: "no-store",
+      // cache: "no-store",
+      credentials: "include",
     }
   );
   const loggedInInfo = await res.json();
