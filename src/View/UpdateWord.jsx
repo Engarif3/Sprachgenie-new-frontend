@@ -17,10 +17,10 @@ const UpdateWord = () => {
     value: "",
     meaning: [],
     sentences: [],
-    levelId: "",
-    topicId: "",
-    articleId: "",
-    partOfSpeechId: "",
+    levelId: "" || null,
+    topicId: "" || null,
+    articleId: "" || null,
+    partOfSpeechId: "" || null,
     pluralForm: "",
     synonyms: [],
     antonyms: [],
@@ -59,10 +59,10 @@ const UpdateWord = () => {
           value: word.value,
           meaning: word.meaning,
           sentences: word.sentences,
-          levelId: word.levelId,
-          topicId: word.topicId,
-          articleId: word.articleId,
-          partOfSpeechId: word.partOfSpeechId,
+          levelId: word.levelId || 1,
+          topicId: word.topicId || 1,
+          articleId: word.articleId || 4,
+          partOfSpeechId: word.partOfSpeechId || 3,
           pluralForm: word.pluralForm || "",
           synonyms: word.synonyms?.map((item) => item.value) || [],
           antonyms: word.antonyms?.map((item) => item.value) || [],
@@ -521,7 +521,7 @@ const UpdateWord = () => {
               </label>
               <select
                 name="levelId"
-                value={formData.levelId || "Select"}
+                value={formData.levelId || "1"}
                 onChange={handleInputChange}
                 className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
@@ -543,7 +543,7 @@ const UpdateWord = () => {
               </label>
               <select
                 name="topicId"
-                value={formData.topicId || "Select"}
+                value={formData.topicId || "1"}
                 onChange={handleInputChange}
                 className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
@@ -565,7 +565,7 @@ const UpdateWord = () => {
               </label>
               <select
                 name="articleId"
-                value={formData.articleId || "Select"}
+                value={formData.articleId || "4"}
                 onChange={handleInputChange}
                 className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
@@ -587,7 +587,7 @@ const UpdateWord = () => {
               </label>
               <select
                 name="partOfSpeechId"
-                value={formData.partOfSpeechId || "Select"}
+                value={formData.partOfSpeechId || "3"}
                 onChange={handleInputChange}
                 className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
@@ -605,7 +605,7 @@ const UpdateWord = () => {
           </div>
         </div>
         {/* Submit Button */}
-        <div className="text-center mt-6">
+        <div className="text-center mt-6 mb-24">
           <button type="submit" className="btn btn-wide btn-warning">
             Update Word
           </button>

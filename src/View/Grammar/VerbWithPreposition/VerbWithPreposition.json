@@ -249,7 +249,7 @@
     "Kasus": "D",
     "Beispielsatz": "Am Wochenende beschäftigte sich der Vater mit seinen Briefmarken.",
     "Übersetzung": "On the weekend, the father occupied himself with his stamps.",
-    "Meaning": "to occupy oneself with something"
+    "Meaning": "to get busy/occupy oneself with something"
   },
   {
     "Pronoun": "sich",
@@ -258,7 +258,7 @@
     "Kasus": "D",
     "Beispielsatz": "Dieser Text beschäftigt sich mit dem Verhältnis von Mensch und Natur.",
     "Übersetzung": "This text deals with the relationship between humans and nature.",
-    "Meaning": "to deal with something"
+    "Meaning": "to engage/deal with something"
   },
   {
     "Pronoun": "sich",
@@ -285,7 +285,7 @@
     "Kasus": "D",
     "Beispielsatz": "Der Tisch besteht aus wertvollem Holz.",
     "Übersetzung": "The table is made of valuable wood.",
-    "Meaning": "to consist of something"
+    "Meaning": "to consist of (made of) something "
   },
   {
     "Pronoun": "sich",
@@ -312,7 +312,7 @@
     "Kasus": "A",
     "Beispielsatz": "Europa wird auch als 'die Alte Welt' bezeichnet.",
     "Übersetzung": "Europe is also referred to as 'the Old World'.",
-    "Meaning": "to designate as something"
+    "Meaning": "to consider/designate as something"
   },
   {
     "Pronoun": "jn",
@@ -321,7 +321,7 @@
     "Kasus": "A",
     "Beispielsatz": "Ich bat meinen Vater um Geld.",
     "Übersetzung": "I asked my father for money.",
-    "Meaning": "to ask someone for something"
+    "Meaning": "to ask(request) someone for something"
   },
   {
     "Pronoun": "jn",
@@ -330,7 +330,7 @@
     "Kasus": "D",
     "Beispielsatz": "Der Clown brachte uns zum Lachen.",
     "Übersetzung": "The clown made us laugh.",
-    "Meaning": "to cause someone to do something"
+    "Meaning": "to make/cause someone to do something"
   },
   {
     "Pronoun": "jm",
@@ -347,8 +347,8 @@
     "Preposition": "für/gegen (etw)",
     "Kasus": "A",
     "Beispielsatz": "Die Arbeiter demonstrierten für mehr Lohn.",
-    "Übersetzung": "The workers demonstrated for higher wages.",
-    "Meaning": "to demonstrate for/against something"
+    "Übersetzung": "The workers protested for higher wages.",
+    "Meaning": "to protest/demonstrate for/against something"
   },
   {
     "Pronoun": "-",
@@ -366,7 +366,7 @@
     "Kasus": "D",
     "Beispielsatz": "Er denkt nur Gutes von mir.",
     "Übersetzung": "He only thinks good things about me.",
-    "Meaning": "to attribute a quality to someone"
+    "Meaning": "to think (good/bad) about someone/something"
   },
   {
     "Pronoun": "-",
@@ -416,8 +416,8 @@
   {
     "Pronoun": "sich",
     "Verb": "eignen",
-    "Preposition": "für (etw)",
-    "Kasus": "A",
+    "Preposition": "für/zu (etw)",
+    "Kasus": "A/D",
     "Beispielsatz": "Das Buch eignet sich zum Vorlesen.",
     "Übersetzung": "The book is suitable for reading aloud.",
     "Meaning": "to be suitable for a purpose"
@@ -429,7 +429,7 @@
     "Kasus": "N",
     "Beispielsatz": "Das Buch eignet sich als Reiselektüre.",
     "Übersetzung": "The book is suitable as travel reading.",
-    "Meaning": "to be suitable for a function"
+    "Meaning": "to be suitable for something"
   },
   {
     "Pronoun": "sich",
@@ -464,8 +464,8 @@
     "Preposition": "für (jn/etw)",
     "Kasus": "A",
     "Beispielsatz": "Greenpeace setzt sich für den Umweltschutz ein.",
-    "Übersetzung": "Greenpeace advocates for environmental protection.",
-    "Meaning": "to advocate for something"
+    "Übersetzung": "Greenpeace supports/(stands up for) environmental protection.",
+    "Meaning": "to (stand up for)/support (someone/something)"
   },
   {
     "Pronoun": "sich",
@@ -474,7 +474,7 @@
     "Kasus": "A",
     "Beispielsatz": "Sie entschied sich für ein Studium in Deutschland.",
     "Übersetzung": "She decided to study in Germany.",
-    "Meaning": "to choose between options"
+    "Meaning": "To make a choice(decision) in favor of/against (someone or something)"
   },
   {
     "Pronoun": "-",
@@ -483,7 +483,7 @@
     "Kasus": "A",
     "Beispielsatz": "Das Gericht wird über Schuld oder Unschuld entscheiden.",
     "Übersetzung": "The court will decide on guilt or innocence.",
-    "Meaning": "to make a decision in a difficult situation"
+    "Meaning": "to make a decision on something"
   },
   {
     "Pronoun": "sich",
@@ -492,7 +492,7 @@
     "Kasus": "D/A",
     "Beispielsatz": "Sie entschuldigte sich bei mir für ihr schlechtes Gedächtnis.",
     "Übersetzung": "She apologized to me for her poor memory.",
-    "Meaning": "to apologize for something"
+    "Meaning": "to apologize to someone for something"
   },
   {
     "Pronoun": "-",
@@ -501,7 +501,7 @@
     "Kasus": "D",
     "Beispielsatz": "Bei Kälte entsteht aus Wasser Eis.",
     "Übersetzung": "In cold, water turns into ice.",
-    "Meaning": "to arise from something"
+    "Meaning": "To arise/emerge/develop from (turn into) something"
   },
   {
     "Pronoun": "sich",
@@ -536,8 +536,8 @@
     "Preposition": "an (etw)",
     "Kasus": "D",
     "Beispielsatz": "Sie ist an Grippe erkrankt.",
-    "Übersetzung": "She fell ill with the flu.",
-    "Meaning": "to fall ill with something"
+    "Übersetzung": "She became ill due to flu.",
+    "Meaning": "to become ill due to something"
   },
   {
     "Pronoun": "sich",
@@ -546,7 +546,7 @@
     "Kasus": "D",
     "Beispielsatz": "Er erkundigte sich bei dem Polizisten nach dem Weg.",
     "Übersetzung": "He asked the policeman for directions.",
-    "Meaning": "to inquire with someone about something"
+    "Meaning": "to ask someone for something(information)"
   },
   {
     "Pronoun": "sich",
@@ -555,7 +555,7 @@
     "Kasus": "D",
     "Beispielsatz": "Löwen ernähren sich von Zebras.",
     "Übersetzung": "Lions feed on zebras.",
-    "Meaning": "to feed on something"
+    "Meaning": "to feed/live on something"
   },
   {
     "Pronoun": "jn",
