@@ -32,6 +32,7 @@ import ForgotPassword from "../Auth/ForgotPassword";
 import ResetPassword from "../Auth/ResetPassword";
 import UpdateBasicUserStatus from "../AdminActions/Admin/UpdateBasicUserStatus";
 import UpdateUserStatus from "../AdminActions/SuperAdmin/UpdateUSerStatus";
+import PerfectAndPastForm from "../View/Grammar/PerfectAndPastForm/PerfectAndPastForm";
 
 export const router = createBrowserRouter([
   {
@@ -134,34 +135,6 @@ export const router = createBrowserRouter([
         path: "/exam",
         element: <Exam></Exam>,
       },
-      // Protected routes based on user roles
-      // {
-      //   path: "/admin-dashboard",
-      //   element: (
-      //     <ProtectedRoute
-      //       element={<AdminDashboard />}
-      //       allowedRoles={["admin", "super_admin"]}
-      //     />
-      //   ),
-      // },
-      // {
-      //   path: "/superadmin-dashboard",
-      //   element: (
-      //     <ProtectedRoute
-      //       element={<SuperAdminDashboard />}
-      //       allowedRoles={["super_admin"]}
-      //     />
-      //   ),
-      // },
-      // {
-      //   path: "/basic-dashboard",
-      //   element: (
-      //     <ProtectedRoute
-      //       element={<BasicDashboard />}
-      //       allowedRoles={["basic_user", "admin", "super_admin"]}
-      //     />
-      //   ),
-      // },
       {
         path: "/update-user-status",
         element: <UpdateUserStatus></UpdateUserStatus>,
@@ -169,6 +142,10 @@ export const router = createBrowserRouter([
       {
         path: "/update-basic-user-status",
         element: <UpdateBasicUserStatus></UpdateBasicUserStatus>,
+      },
+      {
+        path: "/past-perfect",
+        element: <PerfectAndPastForm></PerfectAndPastForm>,
       },
     ],
   },

@@ -4,6 +4,7 @@ import SubordinatingConjunction from "./Clauses/Subordinating/SubordinatingConju
 import PassiveVoice from "./PassiveVoice/PassiveVoice";
 import VerbWithPreposition from "./VerbWithPreposition/VerbWithPreposition";
 import AdjectiveWithPreposition from "./AdjectiveWithPreposition/AdjectiveWithPreposition";
+import PerfectAndPastForm from "./PerfectAndPastForm/PerfectAndPastForm";
 
 const GrammarTopic = () => {
   const { id } = useParams();
@@ -18,6 +19,8 @@ const GrammarTopic = () => {
         <VerbWithPreposition />
       ) : id === "4" ? (
         <AdjectiveWithPreposition />
+      ) : id === "5" ? (
+        <PerfectAndPastForm />
       ) : (
         <p className="text-center text-red-500">Invalid Clause Type</p>
       )}

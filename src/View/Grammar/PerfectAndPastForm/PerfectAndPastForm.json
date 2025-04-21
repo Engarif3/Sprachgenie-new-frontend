@@ -1,0 +1,1266 @@
+[
+  {
+    "name": "Gruppe 1: i/ie/ü - o - o",
+    "verbs": [
+      {
+        "Präsens": "betrügen",
+        "meaning": "to deceive",
+        "Präteritum": "betrog",
+        "PräteritumSentence": "Er betrog seine Freunde.",
+        "Perfekt": "betrogen",
+        "PerfektSentence": "Er hat seine Freunde betrogen."
+      },
+      {
+        "Präsens": "biegen",
+        "meaning": "to bend",
+        "Präteritum": "bog",
+        "PräteritumSentence": "Sie bog das Metall.",
+        "Perfekt": "gebogen",
+        "PerfektSentence": "Sie hat das Metall gebogen."
+      },
+      {
+        "Präsens": "abbiegen",
+        "meaning": "to turn (off/aside)",
+        "Präteritum": "bog ab",
+        "PräteritumSentence": "Das Auto bog nach rechts ab.",
+        "Perfekt": "ist abgebogen",
+        "PerfektSentence": "Das Auto ist nach rechts abgebogen."
+      },
+      {
+        "Präsens": "bieten",
+        "meaning": "to offer",
+        "Präteritum": "bot",
+        "PräteritumSentence": "Sie bot ihm Hilfe an.",
+        "Perfekt": "geboten",
+        "PerfektSentence": "Sie hat ihm Hilfe geboten."
+      },
+      {
+        "Präsens": "anbieten",
+        "meaning": "to offer",
+        "Präteritum": "bot an",
+        "PräteritumSentence": "Er bot mir Kaffee an.",
+        "Perfekt": "angeboten",
+        "PerfektSentence": "Er hat mir Kaffee angeboten."
+      },
+      {
+        "Präsens": "verbieten",
+        "meaning": "to forbid",
+        "Präteritum": "verbot",
+        "PräteritumSentence": "Sie verboten das Rauchen.",
+        "Perfekt": "verboten",
+        "PerfektSentence": "Sie haben das Rauchen verboten."
+      },
+      {
+        "Präsens": "fliegen",
+        "meaning": "to fly",
+        "Präteritum": "flog",
+        "PräteritumSentence": "Er flog nach Berlin.",
+        "Perfekt": "ist geflogen",
+        "PerfektSentence": "Er ist nach Berlin geflogen."
+      },
+      {
+        "Präsens": "fliehen",
+        "meaning": "to flee",
+        "Präteritum": "floh",
+        "PräteritumSentence": "Sie flohen vor dem Feuer.",
+        "Perfekt": "ist geflohen",
+        "PerfektSentence": "Sie sind vor dem Feuer geflohen."
+      },
+      {
+        "Präsens": "fließen",
+        "meaning": "to flow",
+        "Präteritum": "floss",
+        "PräteritumSentence": "Der Fluss floss ruhig.",
+        "Perfekt": "ist geflossen",
+        "PerfektSentence": "Der Fluss ist ruhig geflossen."
+      },
+      {
+        "Präsens": "frieren",
+        "meaning": "to freeze",
+        "Präteritum": "fror",
+        "PräteritumSentence": "Ich fror in der Kälte.",
+        "Perfekt": "gefroren",
+        "PerfektSentence": "Ich habe in der Kälte gefroren."
+      },
+      {
+        "Präsens": "genießen",
+        "meaning": "to enjoy",
+        "Präteritum": "genoss",
+        "PräteritumSentence": "Er genoss das Abendessen.",
+        "Perfekt": "genossen",
+        "PerfektSentence": "Er hat das Abendessen genossen."
+      },
+      {
+        "Präsens": "gießen",
+        "meaning": "to pour",
+        "Präteritum": "goss",
+        "PräteritumSentence": "Sie goss die Blumen.",
+        "Perfekt": "gegossen",
+        "PerfektSentence": "Sie hat die Blumen gegossen."
+      },
+      {
+        "Präsens": "liegen",
+        "meaning": "to lie (down)",
+        "Präteritum": "lag",
+        "PräteritumSentence": "Er lag im Bett.",
+        "Perfekt": "gelegen",
+        "PerfektSentence": "Er hat im Bett gelegen."
+      },
+      {
+        "Präsens": "riechen",
+        "meaning": "to smell",
+        "Präteritum": "roch",
+        "PräteritumSentence": "Es roch nach Kaffee.",
+        "Perfekt": "gerochen",
+        "PerfektSentence": "Es hat nach Kaffee gerochen."
+      },
+      {
+        "Präsens": "schieben",
+        "meaning": "to push",
+        "Präteritum": "schob",
+        "PräteritumSentence": "Er schob den Tisch.",
+        "Perfekt": "geschoben",
+        "PerfektSentence": "Er hat den Tisch geschoben."
+      },
+      {
+        "Präsens": "verschieben",
+        "meaning": "to postpone",
+        "Präteritum": "verschob",
+        "PräteritumSentence": "Sie verschob das Treffen.",
+        "Perfekt": "verschoben",
+        "PerfektSentence": "Sie hat das Treffen verschoben."
+      },
+      {
+        "Präsens": "schießen",
+        "meaning": "to shoot",
+        "Präteritum": "schoss",
+        "PräteritumSentence": "Er schoss den Ball.",
+        "Perfekt": "geschossen",
+        "PerfektSentence": "Er hat den Ball geschossen."
+      },
+      {
+        "Präsens": "schließen",
+        "meaning": "to close",
+        "Präteritum": "schloss",
+        "PräteritumSentence": "Sie schloss das Fenster.",
+        "Perfekt": "geschlossen",
+        "PerfektSentence": "Sie hat das Fenster geschlossen."
+      },
+      {
+        "Präsens": "entschließen",
+        "meaning": "to decide",
+        "Präteritum": "entschloss",
+        "PräteritumSentence": "Ich entschloss mich zur Reise.",
+        "Perfekt": "entschlossen",
+        "PerfektSentence": "Ich habe mich zur Reise entschlossen."
+      },
+      {
+        "Präsens": "verlieren",
+        "meaning": "to lose",
+        "Präteritum": "verlor",
+        "PräteritumSentence": "Er verlor seinen Schlüssel.",
+        "Perfekt": "verloren",
+        "PerfektSentence": "Er hat seinen Schlüssel verloren."
+      },
+      {
+        "Präsens": "wiegen",
+        "meaning": "to weigh",
+        "Präteritum": "wog",
+        "PräteritumSentence": "Der Apfel wog 200 Gramm.",
+        "Perfekt": "gewogen",
+        "PerfektSentence": "Der Apfel hat 200 Gramm gewogen."
+      },
+      {
+        "Präsens": "ziehen",
+        "meaning": "to pull",
+        "Präteritum": "zog",
+        "PräteritumSentence": "Er zog die Tür.",
+        "Perfekt": "hat gezogen",
+        "PerfektSentence": "Er hat die Tür gezogen."
+      },
+      {
+        "Präsens": "beziehen",
+        "meaning": "to refer",
+        "Präteritum": "bezog",
+        "PräteritumSentence": "Er bezog sich auf das Thema.",
+        "Perfekt": "bezogen",
+        "PerfektSentence": "Er hat sich auf das Thema bezogen."
+      },
+      {
+        "Präsens": "erziehen",
+        "meaning": "to educate",
+        "Präteritum": "erzog",
+        "PräteritumSentence": "Sie erzog ihre Kinder gut.",
+        "Perfekt": "erzogen",
+        "PerfektSentence": "Sie hat ihre Kinder gut erzogen."
+      },
+      {
+        "Präsens": "umziehen",
+        "meaning": "to move (house)",
+        "Präteritum": "zog um",
+        "PräteritumSentence": "Er zog nach Berlin um.",
+        "Perfekt": "ist umgezogen",
+        "PerfektSentence": "Er ist nach Berlin umgezogen."
+      }
+    ]
+  },
+  {
+    "name": "Gruppe 2: i - a - u",
+    "verbs": [
+      {
+        "Präsens": "binden",
+        "meaning": "to tie",
+        "Präteritum": "band",
+        "PräteritumSentence": "Er band das Paket.",
+        "Perfekt": "gebunden",
+        "PerfektSentence": "Er hat das Paket gebunden."
+      },
+      {
+        "Präsens": "verbinden",
+        "meaning": "to connect",
+        "Präteritum": "verband",
+        "PräteritumSentence": "Sie verband die Kabel.",
+        "Perfekt": "verbunden",
+        "PerfektSentence": "Sie hat die Kabel verbunden."
+      },
+      {
+        "Präsens": "finden",
+        "meaning": "to find",
+        "Präteritum": "fand",
+        "PräteritumSentence": "Ich fand den Schlüssel.",
+        "Perfekt": "gefunden",
+        "PerfektSentence": "Ich habe den Schlüssel gefunden."
+      },
+      {
+        "Präsens": "erfinden",
+        "meaning": "to invent",
+        "Präteritum": "erfand",
+        "PräteritumSentence": "Er erfand eine neue Maschine.",
+        "Perfekt": "erfunden",
+        "PerfektSentence": "Er hat eine neue Maschine erfunden."
+      },
+      {
+        "Präsens": "gelingen",
+        "meaning": "to succeed",
+        "Präteritum": "gelang",
+        "PräteritumSentence": "Der Plan gelang ihm.",
+        "Perfekt": "ist gelungen",
+        "PerfektSentence": "Der Plan ist ihm gelungen."
+      },
+      {
+        "Präsens": "misslingen",
+        "meaning": "to fail",
+        "Präteritum": "misslang",
+        "PräteritumSentence": "Das Experiment misslang.",
+        "Perfekt": "ist misslungen",
+        "PerfektSentence": "Das Experiment ist misslungen."
+      },
+      {
+        "Präsens": "singen",
+        "meaning": "to sing",
+        "Präteritum": "sang",
+        "PräteritumSentence": "Sie sang ein Lied.",
+        "Perfekt": "gesungen",
+        "PerfektSentence": "Sie hat ein Lied gesungen."
+      },
+      {
+        "Präsens": "sinken",
+        "meaning": "to sink",
+        "Präteritum": "sank",
+        "PräteritumSentence": "Das Schiff sank schnell.",
+        "Perfekt": "ist gesunken",
+        "PerfektSentence": "Das Schiff ist schnell gesunken."
+      },
+      {
+        "Präsens": "springen",
+        "meaning": "to jump",
+        "Präteritum": "sprang",
+        "PräteritumSentence": "Er sprang über den Zaun.",
+        "Perfekt": "ist gesprungen",
+        "PerfektSentence": "Er ist über den Zaun gesprungen."
+      },
+      {
+        "Präsens": "stinken",
+        "meaning": "to stink",
+        "Präteritum": "stank",
+        "PräteritumSentence": "Der Fisch stank schrecklich.",
+        "Perfekt": "gestunken",
+        "PerfektSentence": "Der Fisch hat schrecklich gestunken."
+      },
+      {
+        "Präsens": "trinken",
+        "meaning": "to drink",
+        "Präteritum": "trank",
+        "PräteritumSentence": "Sie trank ein Glas Wasser.",
+        "Perfekt": "getrunken",
+        "PerfektSentence": "Sie hat ein Glas Wasser getrunken."
+      },
+      {
+        "Präsens": "verschwinden",
+        "meaning": "to disappear",
+        "Präteritum": "verschwand",
+        "PräteritumSentence": "Das Kind verschwand plötzlich.",
+        "Perfekt": "ist verschwunden",
+        "PerfektSentence": "Das Kind ist plötzlich verschwunden."
+      },
+      {
+        "Präsens": "zwingen",
+        "meaning": "to force",
+        "Präteritum": "zwang",
+        "PräteritumSentence": "Sie zwang ihn zur Wahrheit.",
+        "Perfekt": "gezwungen",
+        "PerfektSentence": "Sie hat ihn zur Wahrheit gezwungen."
+      }
+    ]
+  },
+  {
+    "name": "Gruppe 3a: ei → ie → ie",
+    "verbs": [
+      {
+        "Präsens": "beweisen",
+        "meaning": "to prove",
+        "Präteritum": "bewies",
+        "PräteritumSentence": "Er bewies den Satz.",
+        "Perfekt": "bewiesen",
+        "PerfektSentence": "Er hat den Satz bewiesen."
+      },
+      {
+        "Präsens": "bleiben",
+        "meaning": "to stay",
+        "Präteritum": "blieb",
+        "PräteritumSentence": "Sie blieb zu Hause.",
+        "Perfekt": "ist geblieben",
+        "PerfektSentence": "Sie ist zu Hause geblieben."
+      },
+      {
+        "Präsens": "sich entscheiden",
+        "meaning": "to decide (oneself)",
+        "Präteritum": "entschied",
+        "PräteritumSentence": "Er entschied sich für den Job.",
+        "Perfekt": "entschieden",
+        "PerfektSentence": "Er hat sich für den Job entschieden."
+      },
+      {
+        "Präsens": "sich unterscheiden",
+        "meaning": "to differ",
+        "Präteritum": "unterschied",
+        "PräteritumSentence": "Die Methode unterschied sich stark.",
+        "Perfekt": "unterschieden",
+        "PerfektSentence": "Die Methode hat sich stark unterschieden."
+      },
+      {
+        "Präsens": "leihen",
+        "meaning": "to borrow",
+        "Präteritum": "lieh",
+        "PräteritumSentence": "Er lieh das Buch.",
+        "Perfekt": "geliehen",
+        "PerfektSentence": "Er hat das Buch geliehen."
+      },
+      {
+        "Präsens": "reiben",
+        "meaning": "to rub",
+        "Präteritum": "rieb",
+        "PräteritumSentence": "Sie rieb die Haut.",
+        "Perfekt": "gerieben",
+        "PerfektSentence": "Sie hat die Haut gerieben."
+      },
+      {
+        "Präsens": "scheinen",
+        "meaning": "to shine",
+        "Präteritum": "schien",
+        "PräteritumSentence": "Die Sonne schien hell.",
+        "Perfekt": "geschienen",
+        "PerfektSentence": "Die Sonne hat hell geschienen."
+      },
+      {
+        "Präsens": "schreiben",
+        "meaning": "to write",
+        "Präteritum": "schrieb",
+        "PräteritumSentence": "Er schrieb einen Brief.",
+        "Perfekt": "geschrieben",
+        "PerfektSentence": "Er hat einen Brief geschrieben."
+      },
+      {
+        "Präsens": "schreien",
+        "meaning": "to scream",
+        "Präteritum": "schrie",
+        "PräteritumSentence": "Das Kind schrie laut.",
+        "Perfekt": "geschrien",
+        "PerfektSentence": "Das Kind hat laut geschrien."
+      },
+      {
+        "Präsens": "schweigen",
+        "meaning": "to be silent",
+        "Präteritum": "schwieg",
+        "PräteritumSentence": "Sie schwieg während der Debatte.",
+        "Perfekt": "geschwiegen",
+        "PerfektSentence": "Sie hat während der Debatte geschwiegen."
+      },
+      {
+        "Präsens": "steigen",
+        "meaning": "to climb",
+        "Präteritum": "stieg",
+        "PräteritumSentence": "Er stieg auf den Berg.",
+        "Perfekt": "ist gestiegen",
+        "PerfektSentence": "Er ist auf den Berg gestiegen."
+      },
+      {
+        "Präsens": "aussteigen",
+        "meaning": "to exit (vehicle)",
+        "Präteritum": "stieg aus",
+        "PräteritumSentence": "Sie stieg aus dem Bus aus.",
+        "Perfekt": "ist ausgestiegen",
+        "PerfektSentence": "Sie ist aus dem Bus ausgestiegen."
+      },
+      {
+        "Präsens": "einsteigen",
+        "meaning": "to enter (vehicle)",
+        "Präteritum": "stieg ein",
+        "PräteritumSentence": "Er stieg in den Zug ein.",
+        "Perfekt": "ist eingestiegen",
+        "PerfektSentence": "Er ist in den Zug eingestiegen."
+      },
+      {
+        "Präsens": "umsteigen",
+        "meaning": "to change (transport)",
+        "Präteritum": "stieg um",
+        "PräteritumSentence": "Wir stiegen in Berlin um.",
+        "Perfekt": "ist umgestiegen",
+        "PerfektSentence": "Wir sind in Berlin umgestiegen."
+      },
+      {
+        "Präsens": "vermeiden",
+        "meaning": "to avoid",
+        "Präteritum": "vermied",
+        "PräteritumSentence": "Er vermied den Konflikt.",
+        "Perfekt": "vermieden",
+        "PerfektSentence": "Er hat den Konflikt vermieden."
+      },
+      {
+        "Präsens": "verzeihen",
+        "meaning": "to forgive",
+        "Präteritum": "verzieh",
+        "PräteritumSentence": "Sie verzieh ihm schnell.",
+        "Perfekt": "verziehen",
+        "PerfektSentence": "Sie hat ihm schnell verziehen."
+      }
+    ]
+  },
+  {
+    "name": "Gruppe 3b: ei → i → i",
+    "verbs": [
+      {
+        "Präsens": "ausweichen",
+        "meaning": "to avoid (by moving)",
+        "Präteritum": "wich aus",
+        "PräteritumSentence": "Er wich dem Auto aus.",
+        "Perfekt": "ist ausgewichen",
+        "PerfektSentence": "Er ist dem Auto ausgewichen."
+      },
+      {
+        "Präsens": "beißen",
+        "meaning": "to bite",
+        "Präteritum": "biss",
+        "PräteritumSentence": "Der Hund biss den Postboten.",
+        "Perfekt": "gebissen",
+        "PerfektSentence": "Der Hund hat den Postboten gebissen."
+      },
+      {
+        "Präsens": "gleichen",
+        "meaning": "to resemble",
+        "Präteritum": "glich",
+        "PräteritumSentence": "Das Foto glich dem Original.",
+        "Perfekt": "geglichen",
+        "PerfektSentence": "Das Foto hat dem Original geglichen."
+      },
+      {
+        "Präsens": "vergleichen",
+        "meaning": "to compare",
+        "Präteritum": "verglich",
+        "PräteritumSentence": "Sie verglich die Preise.",
+        "Perfekt": "verglichen",
+        "PerfektSentence": "Sie hat die Preise verglichen."
+      },
+      {
+        "Präsens": "gleiten",
+        "meaning": "to glide",
+        "Präteritum": "glitt",
+        "PräteritumSentence": "Das Boot glitt über das Wasser.",
+        "Perfekt": "ist geglitten",
+        "PerfektSentence": "Das Boot ist über das Wasser geglitten."
+      },
+      {
+        "Präsens": "leiden",
+        "meaning": "to suffer",
+        "Präteritum": "litt",
+        "PräteritumSentence": "Er litt unter Schmerzen.",
+        "Perfekt": "gelitten",
+        "PerfektSentence": "Er hat unter Schmerzen gelitten."
+      },
+      {
+        "Präsens": "reißen",
+        "meaning": "to tear",
+        "Präteritum": "riss",
+        "PräteritumSentence": "Sie riss das Papier.",
+        "Perfekt": "gerissen",
+        "PerfektSentence": "Sie hat das Papier gerissen."
+      },
+      {
+        "Präsens": "zerreißen",
+        "meaning": "to tear apart",
+        "Präteritum": "zerriss",
+        "PräteritumSentence": "Er zerriss den Vertrag.",
+        "Perfekt": "zerrissen",
+        "PerfektSentence": "Er hat den Vertrag zerrissen."
+      },
+      {
+        "Präsens": "reiten",
+        "meaning": "to ride (horse)",
+        "Präteritum": "ritt",
+        "PräteritumSentence": "Er ritt durch den Wald.",
+        "Perfekt": "ist geritten",
+        "PerfektSentence": "Er ist durch den Wald geritten."
+      },
+      {
+        "Präsens": "schneiden",
+        "meaning": "to cut",
+        "Präteritum": "schnitt",
+        "PräteritumSentence": "Sie schnitt das Brot.",
+        "Perfekt": "geschnitten",
+        "PerfektSentence": "Sie hat das Brot geschnitten."
+      },
+      {
+        "Präsens": "streichen",
+        "meaning": "to paint",
+        "Präteritum": "strich",
+        "PräteritumSentence": "Er strich die Wand.",
+        "Perfekt": "gestrichen",
+        "PerfektSentence": "Er hat die Wand gestrichen."
+      },
+      {
+        "Präsens": "anstreichen",
+        "meaning": "to paint (a surface)",
+        "Präteritum": "strich an",
+        "PräteritumSentence": "Sie strich das Haus an.",
+        "Perfekt": "angestrichen",
+        "PerfektSentence": "Sie hat das Haus angestrichen."
+      },
+      {
+        "Präsens": "unterstreichen",
+        "meaning": "to underline",
+        "Präteritum": "unterstrich",
+        "PräteritumSentence": "Er unterstrich die Wörter.",
+        "Perfekt": "unterstrichen",
+        "PerfektSentence": "Er hat die Wörter unterstrichen."
+      }
+    ]
+  },
+  {
+    "name": "Gruppe 4a: e → a/a: → o/o:",
+    "verbs": [
+      {
+        "Präsens": "befehlen",
+        "meaning": "to command",
+        "Präteritum": "befahl",
+        "PräteritumSentence": "Er befahl den Rückzug.",
+        "Perfekt": "befohlen",
+        "PerfektSentence": "Er hat den Rückzug befohlen."
+      },
+      {
+        "Präsens": "brechen",
+        "meaning": "to break",
+        "Präteritum": "brach",
+        "PräteritumSentence": "Das Glas brach.",
+        "Perfekt": "gebrochen",
+        "PerfektSentence": "Das Glas ist gebrochen."
+      },
+      {
+        "Präsens": "einbrechen",
+        "meaning": "to break in",
+        "Präteritum": "brach ein",
+        "PräteritumSentence": "Die Diebe brachen ein.",
+        "Perfekt": "eingebrochen",
+        "PerfektSentence": "Die Diebe sind eingebrochen."
+      },
+      {
+        "Präsens": "empfehlen",
+        "meaning": "to recommend",
+        "Präteritum": "empfahl",
+        "PräteritumSentence": "Sie empfahl das Restaurant.",
+        "Perfekt": "empfohlen",
+        "PerfektSentence": "Sie hat das Restaurant empfohlen."
+      },
+      {
+        "Präsens": "erschrecken",
+        "meaning": "to scare",
+        "Präteritum": "erschrak",
+        "PräteritumSentence": "Er erschrak vor dem Geräusch.",
+        "Perfekt": "ist erschrocken",
+        "PerfektSentence": "Er ist vor dem Geräusch erschrocken."
+      },
+      {
+        "Präsens": "gelten",
+        "meaning": "to be valid",
+        "Präteritum": "galt",
+        "PräteritumSentence": "Das Ticket galt einen Tag.",
+        "Perfekt": "gegolten",
+        "PerfektSentence": "Das Ticket hat einen Tag gegolten."
+      },
+      {
+        "Präsens": "helfen",
+        "meaning": "to help",
+        "Präteritum": "half",
+        "PräteritumSentence": "Sie half ihm.",
+        "Perfekt": "geholfen",
+        "PerfektSentence": "Sie hat ihm geholfen."
+      },
+      {
+        "Präsens": "nehmen",
+        "meaning": "to take",
+        "Präteritum": "nahm",
+        "PräteritumSentence": "Er nahm das Buch.",
+        "Perfekt": "genommen",
+        "PerfektSentence": "Er hat das Buch genommen."
+      },
+      {
+        "Präsens": "teilnehmen",
+        "meaning": "to participate",
+        "Präteritum": "nahm teil",
+        "PräteritumSentence": "Sie nahm am Wettbewerb teil.",
+        "Perfekt": "teilgenommen",
+        "PerfektSentence": "Sie hat am Wettbewerb teilgenommen."
+      },
+      {
+        "Präsens": "sprechen",
+        "meaning": "to speak",
+        "Präteritum": "sprach",
+        "PräteritumSentence": "Er sprach mit dem Lehrer.",
+        "Perfekt": "gesprochen",
+        "PerfektSentence": "Er hat mit dem Lehrer gesprochen."
+      },
+      {
+        "Präsens": "stechen",
+        "meaning": "to sting",
+        "Präteritum": "stach",
+        "PräteritumSentence": "Die Biene stach ihn.",
+        "Perfekt": "gestochen",
+        "PerfektSentence": "Die Biene hat ihn gestochen."
+      },
+      {
+        "Präsens": "stehlen",
+        "meaning": "to steal",
+        "Präteritum": "stahl",
+        "PräteritumSentence": "Er stahl das Geld.",
+        "Perfekt": "gestohlen",
+        "PerfektSentence": "Er hat das Geld gestohlen."
+      },
+      {
+        "Präsens": "sterben",
+        "meaning": "to die",
+        "Präteritum": "starb",
+        "PräteritumSentence": "Die Pflanze starb.",
+        "Perfekt": "ist gestorben",
+        "PerfektSentence": "Die Pflanze ist gestorben."
+      },
+      {
+        "Präsens": "treffen",
+        "meaning": "to meet",
+        "Präteritum": "traf",
+        "PräteritumSentence": "Er traf seinen Freund.",
+        "Perfekt": "getroffen",
+        "PerfektSentence": "Er hat seinen Freund getroffen."
+      },
+      {
+        "Präsens": "werben",
+        "meaning": "to advertise",
+        "Präteritum": "warb",
+        "PräteritumSentence": "Das Unternehmen warb für das Produkt.",
+        "Perfekt": "geworben",
+        "PerfektSentence": "Das Unternehmen hat für das Produkt geworben."
+      },
+      {
+        "Präsens": "bewerben",
+        "meaning": "to apply",
+        "Präteritum": "bewarb",
+        "PräteritumSentence": "Sie bewarb sich um den Job.",
+        "Perfekt": "beworben",
+        "PerfektSentence": "Sie hat sich um den Job beworben."
+      },
+      {
+        "Präsens": "werfen",
+        "meaning": "to throw",
+        "Präteritum": "warf",
+        "PräteritumSentence": "Er warf den Ball.",
+        "Perfekt": "geworfen",
+        "PerfektSentence": "Er hat den Ball geworfen."
+      }
+    ]
+  },
+  {
+    "name": "Gruppe 4b: a → o",
+    "verbs": [
+      {
+        "Präsens": "beginnen",
+        "meaning": "to begin",
+        "Präteritum": "begann",
+        "PräteritumSentence": "Das Konzert begann pünktlich.",
+        "Perfekt": "begonnen",
+        "PerfektSentence": "Das Konzert hat pünktlich begonnen."
+      },
+      {
+        "Präsens": "gewinnen",
+        "meaning": "to win",
+        "Präteritum": "gewann",
+        "PräteritumSentence": "Sie gewann das Spiel.",
+        "Perfekt": "gewonnen",
+        "PerfektSentence": "Sie hat das Spiel gewonnen."
+      },
+      {
+        "Präsens": "schwimmen",
+        "meaning": "to swim",
+        "Präteritum": "schwamm",
+        "PräteritumSentence": "Er schwamm im See.",
+        "Perfekt": "ist geschwommen",
+        "PerfektSentence": "Er ist im See geschwommen."
+      }
+    ]
+  },
+  {
+    "name": "Gruppe 4c: a: → o",
+    "verbs": [
+      {
+        "Präsens": "kommen",
+        "meaning": "to come",
+        "Präteritum": "kam",
+        "PräteritumSentence": "Er kam spät nach Hause.",
+        "Perfekt": "ist gekommen",
+        "PerfektSentence": "Er ist spät nach Hause gekommen."
+      },
+      {
+        "Präsens": "ankommen",
+        "meaning": "to arrive",
+        "Präteritum": "kam an",
+        "PräteritumSentence": "Der Zug kam pünktlich an.",
+        "Perfekt": "ist angekommen",
+        "PerfektSentence": "Der Zug ist pünktlich angekommen."
+      }
+    ]
+  },
+  {
+    "name": "Gruppe 4d: e:/e/o: → o:/o",
+    "verbs": [
+      {
+        "Präsens": "heben",
+        "meaning": "to lift",
+        "Präteritum": "hob",
+        "PräteritumSentence": "Er hob die Kiste.",
+        "Perfekt": "gehoben",
+        "PerfektSentence": "Er hat die Kiste gehoben."
+      },
+      {
+        "Präsens": "aufheben",
+        "meaning": "to lift up/preserve",
+        "Präteritum": "hob auf",
+        "PräteritumSentence": "Sie hob das Dokument auf.",
+        "Perfekt": "aufgehoben",
+        "PerfektSentence": "Sie hat das Dokument aufgehoben."
+      },
+      {
+        "Präsens": "schmelzen",
+        "meaning": "to melt",
+        "Präteritum": "schmolz",
+        "PräteritumSentence": "Das Eis schmolz schnell.",
+        "Perfekt": "ist geschmolzen",
+        "PerfektSentence": "Das Eis ist schnell geschmolzen."
+      },
+      {
+        "Präsens": "schwören",
+        "meaning": "to swear",
+        "Präteritum": "schwor",
+        "PräteritumSentence": "Er schwor einen Eid.",
+        "Perfekt": "geschworen",
+        "PerfektSentence": "Er hat einen Eid geschworen."
+      }
+    ]
+  },
+  {
+    "name": "Gruppe 5a: e:/e → a: → e",
+    "verbs": [
+      {
+        "Präsens": "essen",
+        "meaning": "to eat",
+        "Präteritum": "aß",
+        "PräteritumSentence": "Sie aß einen Apfel.",
+        "Perfekt": "gegessen",
+        "PerfektSentence": "Sie hat einen Apfel gegessen."
+      },
+      {
+        "Präsens": "fressen",
+        "meaning": "to eat (animals)",
+        "Präteritum": "fraß",
+        "PräteritumSentence": "Der Hund fraß das Futter.",
+        "Perfekt": "gefressen",
+        "PerfektSentence": "Der Hund hat das Futter gefressen."
+      },
+      {
+        "Präsens": "geben",
+        "meaning": "to give",
+        "Präteritum": "gab",
+        "PräteritumSentence": "Er gab ihr ein Geschenk.",
+        "Perfekt": "gegeben",
+        "PerfektSentence": "Er hat ihr ein Geschenk gegeben."
+      },
+      {
+        "Präsens": "aufgeben",
+        "meaning": "to give up",
+        "Präteritum": "gab auf",
+        "PräteritumSentence": "Sie gab das Spiel auf.",
+        "Perfekt": "aufgegeben",
+        "PerfektSentence": "Sie hat das Spiel aufgegeben."
+      },
+      {
+        "Präsens": "geschehen",
+        "meaning": "to happen",
+        "Präteritum": "geschah",
+        "PräteritumSentence": "Ein Unfall geschah.",
+        "Perfekt": "ist geschehen",
+        "PerfektSentence": "Ein Unfall ist geschehen."
+      },
+      {
+        "Präsens": "lesen",
+        "meaning": "to read",
+        "Präteritum": "las",
+        "PräteritumSentence": "Er las ein Buch.",
+        "Perfekt": "gelesen",
+        "PerfektSentence": "Er hat ein Buch gelesen."
+      },
+      {
+        "Präsens": "messen",
+        "meaning": "to measure",
+        "Präteritum": "maß",
+        "PräteritumSentence": "Sie maß die Länge.",
+        "Perfekt": "gemessen",
+        "PerfektSentence": "Sie hat die Länge gemessen."
+      },
+      {
+        "Präsens": "sehen",
+        "meaning": "to see",
+        "Präteritum": "sah",
+        "PräteritumSentence": "Er sah den Film.",
+        "Perfekt": "gesehen",
+        "PerfektSentence": "Er hat den Film gesehen."
+      },
+      {
+        "Präsens": "treten",
+        "meaning": "to step",
+        "Präteritum": "trat",
+        "PräteritumSentence": "Er trat gegen den Ball.",
+        "Perfekt": "getreten",
+        "PerfektSentence": "Er hat gegen den Ball getreten."
+      },
+      {
+        "Präsens": "vergessen",
+        "meaning": "to forget",
+        "Präteritum": "vergaß",
+        "PräteritumSentence": "Sie vergaß den Termin.",
+        "Perfekt": "vergessen",
+        "PerfektSentence": "Sie hat den Termin vergessen."
+      }
+    ]
+  },
+  {
+    "name": "Gruppe 5b: i/ie → a: → e:/e",
+    "verbs": [
+      {
+        "Präsens": "bitten",
+        "meaning": "to ask",
+        "Präteritum": "bat",
+        "PräteritumSentence": "Er bat um Hilfe.",
+        "Perfekt": "gebeten",
+        "PerfektSentence": "Er hat um Hilfe gebeten."
+      },
+      {
+        "Präsens": "liegen",
+        "meaning": "to lie (down)",
+        "Präteritum": "lag",
+        "PräteritumSentence": "Das Buch lag auf dem Tisch.",
+        "Perfekt": "gelegen",
+        "PerfektSentence": "Das Buch hat auf dem Tisch gelegen."
+      },
+      {
+        "Präsens": "sitzen",
+        "meaning": "to sit",
+        "Präteritum": "saß",
+        "PräteritumSentence": "Sie saß im Garten.",
+        "Perfekt": "gesessen",
+        "PerfektSentence": "Sie hat im Garten gesessen."
+      }
+    ]
+  },
+  {
+    "name": "Gruppe 6: a:/a → u: → a/a:",
+    "verbs": [
+      {
+        "Präsens": "backen",
+        "meaning": "to bake",
+        "Präteritum": "backte",
+        "PräteritumSentence": "Sie backte einen Kuchen.",
+        "Perfekt": "gebacken",
+        "PerfektSentence": "Sie hat einen Kuchen gebacken."
+      },
+      {
+        "Präsens": "einladen",
+        "meaning": "to invite",
+        "Präteritum": "lud ein",
+        "PräteritumSentence": "Er lud Freunde ein.",
+        "Perfekt": "eingeladen",
+        "PerfektSentence": "Er hat Freunde eingeladen."
+      },
+      {
+        "Präsens": "fahren",
+        "meaning": "to drive",
+        "Präteritum": "fuhr",
+        "PräteritumSentence": "Sie fuhr nach Hause.",
+        "Perfekt": "ist gefahren",
+        "PerfektSentence": "Sie ist nach Hause gefahren."
+      },
+      {
+        "Präsens": "graben",
+        "meaning": "to dig",
+        "Präteritum": "grub",
+        "PräteritumSentence": "Er grub ein Loch.",
+        "Perfekt": "gegraben",
+        "PerfektSentence": "Er hat ein Loch gegraben."
+      },
+      {
+        "Präsens": "schlagen",
+        "meaning": "to hit",
+        "Präteritum": "schlug",
+        "PräteritumSentence": "Er schlug den Ball.",
+        "Perfekt": "geschlagen",
+        "PerfektSentence": "Er hat den Ball geschlagen."
+      },
+      {
+        "Präsens": "tragen",
+        "meaning": "to carry",
+        "Präteritum": "trug",
+        "PräteritumSentence": "Sie trug die Tasche.",
+        "Perfekt": "getragen",
+        "PerfektSentence": "Sie hat die Tasche getragen."
+      },
+      {
+        "Präsens": "wachsen",
+        "meaning": "to grow",
+        "Präteritum": "wuchs",
+        "PräteritumSentence": "Das Kind wuchs schnell.",
+        "Perfekt": "ist gewachsen",
+        "PerfektSentence": "Das Kind ist schnell gewachsen."
+      },
+      {
+        "Präsens": "waschen",
+        "meaning": "to wash",
+        "Präteritum": "wusch",
+        "PräteritumSentence": "Er wusch das Auto.",
+        "Perfekt": "gewaschen",
+        "PerfektSentence": "Er hat das Auto gewaschen."
+      }
+    ]
+  },
+  {
+    "name": "Gruppe 7a: a:/a → ie/i",
+    "verbs": [
+      {
+        "Präsens": "blasen",
+        "meaning": "to blow",
+        "Präteritum": "blies",
+        "PräteritumSentence": "Er blies die Kerze aus.",
+        "Perfekt": "geblasen",
+        "PerfektSentence": "Er hat die Kerze ausgeblasen."
+      },
+      {
+        "Präsens": "braten",
+        "meaning": "to roast",
+        "Präteritum": "briet",
+        "PräteritumSentence": "Sie briet das Fleisch.",
+        "Perfekt": "gebraten",
+        "PerfektSentence": "Sie hat das Fleisch gebraten."
+      },
+      {
+        "Präsens": "fallen",
+        "meaning": "to fall",
+        "Präteritum": "fiel",
+        "PräteritumSentence": "Das Glas fiel auf den Boden.",
+        "Perfekt": "ist gefallen",
+        "PerfektSentence": "Das Glas ist auf den Boden gefallen."
+      },
+      {
+        "Präsens": "fangen",
+        "meaning": "to catch",
+        "Präteritum": "fing",
+        "PräteritumSentence": "Er fing den Ball.",
+        "Perfekt": "gefangen",
+        "PerfektSentence": "Er hat den Ball gefangen."
+      },
+      {
+        "Präsens": "halten",
+        "meaning": "to hold",
+        "Präteritum": "hielt",
+        "PräteritumSentence": "Sie hielt das Seil fest.",
+        "Perfekt": "gehalten",
+        "PerfektSentence": "Sie hat das Seil festgehalten."
+      },
+      {
+        "Präsens": "lassen",
+        "meaning": "to let",
+        "Präteritum": "ließ",
+        "PräteritumSentence": "Er ließ die Tür offen.",
+        "Perfekt": "gelassen",
+        "PerfektSentence": "Er hat die Tür offen gelassen."
+      },
+      {
+        "Präsens": "schlafen",
+        "meaning": "to sleep",
+        "Präteritum": "schlief",
+        "PräteritumSentence": "Das Kind schlief tief.",
+        "Perfekt": "geschlafen",
+        "PerfektSentence": "Das Kind hat tief geschlafen."
+      }
+    ]
+  },
+  {
+    "name": "Gruppe 7b: X → ie/i → X",
+    "verbs": [
+      {
+        "Präsens": "gehen",
+        "meaning": "to go",
+        "Präteritum": "ging",
+        "PräteritumSentence": "Er ging zur Schule.",
+        "Perfekt": "ist gegangen",
+        "PerfektSentence": "Er ist zur Schule gegangen."
+      },
+      {
+        "Präsens": "heißen",
+        "meaning": "to be called",
+        "Präteritum": "hieß",
+        "PräteritumSentence": "Sie hieß Anna.",
+        "Perfekt": "geheißen",
+        "PerfektSentence": "Sie hat Anna geheißen."
+      },
+      {
+        "Präsens": "laufen",
+        "meaning": "to run",
+        "Präteritum": "lief",
+        "PräteritumSentence": "Er lief schnell.",
+        "Perfekt": "ist gelaufen",
+        "PerfektSentence": "Er ist schnell gelaufen."
+      },
+      {
+        "Präsens": "rufen",
+        "meaning": "to call",
+        "Präteritum": "rief",
+        "PräteritumSentence": "Sie rief seinen Namen.",
+        "Perfekt": "gerufen",
+        "PerfektSentence": "Sie hat seinen Namen gerufen."
+      },
+      {
+        "Präsens": "anrufen",
+        "meaning": "to call (phone)",
+        "Präteritum": "rief an",
+        "PräteritumSentence": "Er rief seinen Freund an.",
+        "Perfekt": "angerufen",
+        "PerfektSentence": "Er hat seinen Freund angerufen."
+      },
+      {
+        "Präsens": "stoßen",
+        "meaning": "to push",
+        "Präteritum": "stieß",
+        "PräteritumSentence": "Er stieß die Tür auf.",
+        "Perfekt": "gestoßen",
+        "PerfektSentence": "Er hat die Tür aufgestoßen."
+      }
+    ]
+  },
+  {
+    "name": "Gruppe 8: Mischverben e/i → a → a",
+    "verbs": [
+      {
+        "Präsens": "brennen",
+        "meaning": "to burn",
+        "Präteritum": "brannte",
+        "PräteritumSentence": "Das Feuer brannte hell.",
+        "Perfekt": "gebrannt",
+        "PerfektSentence": "Das Feuer hat hell gebrannt."
+      },
+      {
+        "Präsens": "bringen",
+        "meaning": "to bring",
+        "Präteritum": "brachte",
+        "PräteritumSentence": "Er brachte das Paket.",
+        "Perfekt": "gebracht",
+        "PerfektSentence": "Er hat das Paket gebracht."
+      },
+      {
+        "Präsens": "denken",
+        "meaning": "to think",
+        "Präteritum": "dachte",
+        "PräteritumSentence": "Sie dachte an die Zukunft.",
+        "Perfekt": "gedacht",
+        "PerfektSentence": "Sie hat an die Zukunft gedacht."
+      },
+      {
+        "Präsens": "kennen",
+        "meaning": "to know",
+        "Präteritum": "kannte",
+        "PräteritumSentence": "Er kannte den Weg.",
+        "Perfekt": "gekannt",
+        "PerfektSentence": "Er hat den Weg gekannt."
+      },
+      {
+        "Präsens": "nennen",
+        "meaning": "to name",
+        "Präteritum": "nannte",
+        "PräteritumSentence": "Sie nannte ihren Sohn Max.",
+        "Perfekt": "genannt",
+        "PerfektSentence": "Sie hat ihren Sohn Max genannt."
+      },
+      {
+        "Präsens": "rennen",
+        "meaning": "to run",
+        "Präteritum": "rannte",
+        "PräteritumSentence": "Er rannte schnell.",
+        "Perfekt": "gerannt",
+        "PerfektSentence": "Er ist schnell gerannt."
+      }
+    ]
+  },
+  {
+    "name": "Modalverben",
+    "verbs": [
+      {
+        "Präsens": "dürfen",
+        "meaning": "to be allowed",
+        "Präteritum": "durfte",
+        "PräteritumSentence": "Er durfte ausgehen.",
+        "Perfekt": "gedurft",
+        "PerfektSentence": "Er hat ausgehen gedurft."
+      },
+      {
+        "Präsens": "können",
+        "meaning": "to be able",
+        "Präteritum": "konnte",
+        "PräteritumSentence": "Sie konnte schwimmen.",
+        "Perfekt": "gekonnt",
+        "PerfektSentence": "Sie hat schwimmen gekonnt."
+      },
+      {
+        "Präsens": "mögen",
+        "meaning": "to like",
+        "Präteritum": "mochte",
+        "PräteritumSentence": "Er mochte Schokolade.",
+        "Perfekt": "gemocht",
+        "PerfektSentence": "Er hat Schokolade gemocht."
+      },
+      {
+        "Präsens": "müssen",
+        "meaning": "to must",
+        "Präteritum": "musste",
+        "PräteritumSentence": "Sie musste arbeiten.",
+        "Perfekt": "gemusst",
+        "PerfektSentence": "Sie hat arbeiten gemusst."
+      },
+      {
+        "Präsens": "sollen",
+        "meaning": "to should",
+        "Präteritum": "sollte",
+        "PräteritumSentence": "Er sollte früher kommen.",
+        "Perfekt": "gesollt",
+        "PerfektSentence": "Er hat früher kommen gesollt."
+      },
+      {
+        "Präsens": "wollen",
+        "meaning": "to want",
+        "Präteritum": "wollte",
+        "PräteritumSentence": "Sie wollte reisen.",
+        "Perfekt": "gewollt",
+        "PerfektSentence": "Sie hat reisen gewollt."
+      }
+    ]
+  },
+  {
+    "name": "Besondere Verben",
+    "verbs": [
+      {
+        "Präsens": "haben",
+        "meaning": "to have",
+        "Präteritum": "hatte",
+        "PräteritumSentence": "Er hatte Glück.",
+        "Perfekt": "gehabt",
+        "PerfektSentence": "Er hat Glück gehabt."
+      },
+      {
+        "Präsens": "sein",
+        "meaning": "to be",
+        "Präteritum": "war",
+        "PräteritumSentence": "Sie war müde.",
+        "Perfekt": "ist gewesen",
+        "PerfektSentence": "Sie ist müde gewesen."
+      },
+      {
+        "Präsens": "tun",
+        "meaning": "to do",
+        "Präteritum": "tat",
+        "PräteritumSentence": "Er tat sein Bestes.",
+        "Perfekt": "getan",
+        "PerfektSentence": "Er hat sein Bestes getan."
+      },
+      {
+        "Präsens": "werden",
+        "meaning": "to become",
+        "Präteritum": "wurde",
+        "PräteritumSentence": "Es wurde dunkel.",
+        "Perfekt": "ist geworden",
+        "PerfektSentence": "Es ist dunkel geworden."
+      },
+      {
+        "Präsens": "wissen",
+        "meaning": "to know",
+        "Präteritum": "wusste",
+        "PräteritumSentence": "Er wusste die Antwort.",
+        "Perfekt": "gewusst",
+        "PerfektSentence": "Er hat die Antwort gewusst."
+      },
+      {
+        "Präsens": "stehen",
+        "meaning": "to stand",
+        "Präteritum": "stand",
+        "PräteritumSentence": "Das Bild stand an der Wand.",
+        "Perfekt": "gestanden",
+        "PerfektSentence": "Das Bild hat an der Wand gestanden."
+      },
+      {
+        "Präsens": "bestehen",
+        "meaning": "to insist on / consist of / exist in",
+        "Präteritum": "bestand",
+        "PräteritumSentence": "Er bestand auf seiner Meinung.",
+        "Perfekt": "bestanden",
+        "PerfektSentence": "Er hat auf seiner Meinung bestanden."
+      },
+      {
+        "Präsens": "entstehen",
+        "meaning": "to arise from",
+        "Präteritum": "entstand",
+        "PräteritumSentence": "Das Problem entstand aus einem Missverständnis.",
+        "Perfekt": "ist entstanden",
+        "PerfektSentence": "Das Problem ist aus einem Missverständnis entstanden."
+      },
+      {
+        "Präsens": "verstehen",
+        "meaning": "to understand",
+        "Präteritum": "verstand",
+        "PräteritumSentence": "Sie verstand den Text nicht.",
+        "Perfekt": "verstanden",
+        "PerfektSentence": "Sie hat den Text nicht verstanden."
+      }
+    ]
+  }
+]
