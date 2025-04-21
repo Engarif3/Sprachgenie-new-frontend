@@ -83,7 +83,8 @@ const PerfectAndPastForm = () => {
     <Container>
       <div className="mx-auto mt-16 mb-24 p-1">
         <h2 className="text-3xl font-bold font-mono text-sky-700 my-5 text-center">
-          Perfekt & Präteritum ({totalPraesens})
+          Starke und unregelmäßige Verben
+          <br />({totalPraesens})
         </h2>
 
         {data.map((group, groupIndex) => (
