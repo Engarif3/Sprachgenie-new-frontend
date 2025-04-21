@@ -1,6 +1,6 @@
 [
   {
-    "name": "Gruppe 1: i/ie/ü - o - o",
+    "name": "Gruppe 1: i/ie/ü → o → o",
     "verbs": [
       {
         "Präsens": "betrügen",
@@ -213,7 +213,7 @@
     ]
   },
   {
-    "name": "Gruppe 2: i - a - u",
+    "name": "Gruppe 2: i → a → u",
     "verbs": [
       {
         "Präsens": "binden",
@@ -580,7 +580,7 @@
     ]
   },
   {
-    "name": "Gruppe 4a: e → a/a: → o/o:",
+    "name": "Gruppe 4a: e (+ Vokalwechsel zu i) → a:/a → o:/o",
     "verbs": [
       {
         "Präsens": "befehlen (befiehlt)",
@@ -731,7 +731,7 @@
     ]
   },
   {
-    "name": "Gruppe 4b: a → o",
+    "name": "Gruppe 4b: i → a → o",
     "verbs": [
       {
         "Präsens": "beginnen mit",
@@ -761,7 +761,7 @@
     ]
   },
   {
-    "name": "Gruppe 4c: a: → o",
+    "name": "Gruppe 4c: o → a: → o",
     "verbs": [
       {
         "Präsens": "kommen",
@@ -782,7 +782,7 @@
     ]
   },
   {
-    "name": "Gruppe 4d: e:/e/o: → o:/o",
+    "name": "Gruppe 4d: e:/e/ö: → o:/o → o:/o",
     "verbs": [
       {
         "Präsens": "heben",
@@ -819,7 +819,7 @@
     ]
   },
   {
-    "name": "Gruppe 5a: e:/e → a: → e",
+    "name": "Gruppe 5a: e:/e (+ Vokalwechsel zu i) → a: → e",
     "verbs": [
       {
         "Präsens": "essen (isst)",
@@ -933,7 +933,7 @@
     ]
   },
   {
-    "name": "Gruppe 6: a:/a → u: → a/a:",
+    "name": "Gruppe 6: a:/a (+Vokalwechsel zu ä) → u: → a/a:",
     "verbs": [
       {
         "Präsens": "backen (bäckt)",
@@ -1020,7 +1020,7 @@
     ]
   },
   {
-    "name": "Gruppe 7a: a:/a → ie/i",
+    "name": "Gruppe 7a: a:/a (+ Vokalwechsel zu ä) → ie/i → a:/a",
     "verbs": [
       {
         "Präsens": "blasen (bläst)",
