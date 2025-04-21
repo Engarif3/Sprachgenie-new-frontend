@@ -231,7 +231,7 @@ const UpdateWord = () => {
       ),
       sentences: formData.sentences.concat(
         inputData.sentences
-          .split(",")
+          .split(". ")
           .map((item) => item.trim())
           .filter((item) => item !== "")
       ),
@@ -368,7 +368,7 @@ const UpdateWord = () => {
             <div>
               <label className="block  mb-2 text-white">
                 <span className="font-medium text-lg">Sentences</span> (for
-                multiple input use comma)
+                multiple input use dot and a space)
               </label>
               {/* <div className="border border-slate-300 p-1 rounded-lg"> */}
               <input
@@ -377,7 +377,7 @@ const UpdateWord = () => {
                 value={inputData.sentences}
                 onChange={handleInputChange}
                 className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter example sentences"
+                placeholder="Sentence A. SentenceB."
               />
               <div className="mt-2">
                 {formData.sentences.map((item, index) => (
