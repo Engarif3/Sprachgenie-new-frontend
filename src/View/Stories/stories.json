@@ -1,0 +1,38 @@
+[
+  {
+    "title": "Ein ruhiger Tag am Fluss",
+    "image": "/images/story1.png",
+    "description": {
+      "text": "Auf dem Bild sehe ich einen jungen Mann, der am Ufer eines Flusses sitzt. Er ist vielleicht 20 oder 25 Jahre alt. Er hat kurze, braune Haare und trägt einen braunen Pullover und eine blaue Jeans. Der Mann sitzt auf dem Gras und liest ein Buch. Er sieht ruhig und konzentriert aus. Neben ihm liegt ein beiger Rucksack. Vor dem Rucksack stehen ein blauer Thermobecher, ein Notizbuch und eine Brille. Wahrscheinlich macht er eine Pause vom Wandern oder Lernen und genießt die Natur. Das Wetter ist schön – die Sonne scheint und der Himmel ist blau mit einigen weißen Wolken. Um ihn herum gibt es grüne Bäume, Blumen und frisches Gras. Der Fluss fließt ruhig und friedlich. Die Landschaft ist sehr ruhig und natürlich. Man hat das Gefühl, dass es ein perfekter Tag ist, um draußen zu sein – zum Lesen, Entspannen oder Nachdenken."
+    },
+    "passage_vocabulary": [
+      { "word": "Flusses", "meaning": "the river (Gen: des Flusses)" },
+      { "word": "Ufer", "meaning": "the shore / bank" },
+      { "word": "ruhig", "meaning": "calm / peaceful" },
+      { "word": "konzentriert", "meaning": "focused / concentrated" },
+      { "word": "Rucksack", "meaning": "backpack" },
+      { "word": "Thermobecher", "meaning": "thermo mug / travel mug" },
+      { "word": "Natur", "meaning": "nature" },
+      { "word": "Landschaft", "meaning": "landscape" },
+      { "word": "fließt", "meaning": "flows (3rd person singular)" },
+      { "word": "genießt", "meaning": "enjoys (3rd person singular)" },
+      { "word": "entspannt", "meaning": "relaxed (past participle)" },
+      { "word": "entspannen", "meaning": "to relax" },
+      { "word": "Nachdenken", "meaning": "to reflect or to think deeply" }
+    ],
+    "vocabulary": [
+      { "word": "der Fluss", "meaning": "the river" },
+      { "word": "das Ufer", "meaning": "the shore / bank" },
+      { "word": "ruhig", "meaning": "calm / peaceful" },
+      { "word": "konzentriert", "meaning": "focused / concentrated" },
+      { "word": "der Rucksack", "meaning": "backpack" },
+      { "word": "der Thermobecher", "meaning": "thermo mug / travel mug" },
+      { "word": "genießen", "meaning": "to enjoy" },
+      { "word": "die Natur", "meaning": "nature" },
+      { "word": "fließen", "meaning": "to flow" },
+      { "word": "die Landschaft", "meaning": "landscape" },
+      { "word": "entspannen", "meaning": "to relax" },
+      { "word": "Nachdenken", "meaning": "to reflect or to think deeply" }
+    ]
+  }
+]

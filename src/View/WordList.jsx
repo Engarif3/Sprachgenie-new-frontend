@@ -46,30 +46,12 @@ const WordList = () => {
 
   const [favorites, setFavorites] = useState([]);
 
-  // useEffect(() => {
-  //   const fetchFavorites = async () => {
-  //     // Check if userInfo exists and has an id
-  //     if (!userInfo?.id || userInfo.role !== "basic_user") return;
-
-  //     try {
-  //       const response = await fetch(
-  //         `https://sprcahgenie-new-backend.vercel.app/api/v1/favorite-words/${userInfo.id}`
-  //       );
-  //       if (response.ok) {
-  //         const result = await response.json();
-  //         setFavorites(result.data.map((word) => word.id));
-  //       } else {
-  //         console.error("Failed to fetch favorites");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching favorites:", error);
-  //     }
-  //   };
-
-  //   fetchFavorites();
-  // }, [userInfo?.id]);
-  // Update the fetchFavorites useEffect
-  // Update the fetchFavorites useEffect with Axios
+  // Pronunciation function using Web Speech API
+  const pronounceWord = (word) => {
+    const utterance = new SpeechSynthesisUtterance(word);
+    utterance.lang = "de-DE"; // German pronunciation
+    speechSynthesis.speak(utterance);
+  };
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -143,57 +125,6 @@ const WordList = () => {
       setLoadingFavorites((prev) => ({ ...prev, [wordId]: false }));
     }
   };
-  // const toggleFavorite = async (wordId) => {
-  //   const isFavorite = favorites.includes(wordId);
-  //   const url =
-  //     "https://sprcahgenie-new-backend.vercel.app/api/v1/favorite-words";
-  //   const userId = userInfo.id; // Get user ID
-
-  //   try {
-  //     setLoadingFavorites((prev) => ({ ...prev, [wordId]: true }));
-  //     if (isFavorite) {
-  //       // Remove from favorites (DELETE request)
-  //       const response = await fetch(`${url}/${wordId}`, {
-  //         method: "DELETE",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({ userId, wordId }),
-  //       });
-
-  //       if (!response.ok) {
-  //         const errorData = await response.json();
-  //         console.error("Failed to remove favorite:", errorData);
-  //         return;
-  //       }
-
-  //       setFavorites((prevFavorites) =>
-  //         prevFavorites.filter((id) => id !== wordId)
-  //       );
-  //     } else {
-  //       // Add to favorites (POST request)
-  //       const response = await fetch(url, {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({ userId, wordId }),
-  //       });
-
-  //       if (!response.ok) {
-  //         const errorData = await response.json();
-  //         console.error("Failed to add favorite:", errorData);
-  //         return;
-  //       }
-
-  //       setFavorites((prevFavorites) => [...prevFavorites, wordId]);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error updating favorites:", error);
-  //   } finally {
-  //     setLoadingFavorites((prev) => ({ ...prev, [wordId]: false }));
-  //   }
-  // };
 
   // ===================
 
@@ -379,58 +310,6 @@ const WordList = () => {
     setSelectedTopic(e.target.value);
     setCurrentPage(1);
   }, []);
-
-  // const handleDelete = useCallback(
-  //   (wordId) => {
-  //     // Find the word in cache
-  //     const wordToDelete = cache.words.find((word) => word.id === wordId);
-
-  //     Swal.fire({
-  //       title: "Are you sure?",
-  //       // text: `You won't be able to revert this!. Delete ${wordToDelete?.value}`,
-  //       html: `You won't be able to revert this! Delete <strong style="color: #dc2626; font-weight: 800;">"${wordToDelete?.value}"</strong>?`,
-  //       icon: "warning",
-  //       // input: "text",
-  //       // inputPlaceholder: "Type password",
-  //       // inputValidator: (value) =>
-  //       //   value === "aydin45" ? null : "Wrong Password!",
-  //       showCancelButton: true,
-  //       confirmButtonColor: "#d33",
-  //       cancelButtonColor: "#3085d6",
-  //       confirmButtonText: "Yes, delete it!",
-  //     }).then((result) => {
-  //       if (result.isConfirmed) {
-  //         api
-  //           .delete(`/word/delete/${wordId}`)
-  //           .then(() => {
-  //             // Update cache directly instead of refetching
-  //             setCache((prev) => ({
-  //               ...prev,
-  //               words: prev.words.filter((word) => word.id !== wordId),
-  //               lastUpdated: Date.now(),
-  //             }));
-
-  //             // Update filtered words immediately
-  //             setFilteredWords((prev) =>
-  //               prev.filter((word) => word.id !== wordId)
-  //             );
-  //             // localStorage.removeItem("wordListCache");
-  //             Swal.fire({
-  //               title: "Deleted!",
-  //               icon: "success",
-  //               timer: 1000,
-  //               showConfirmButton: false,
-  //             });
-  //           })
-  //           .catch((error) => {
-  //             console.error("Error deleting word:", error);
-  //             Swal.fire("Error!", "Something went wrong.", "error");
-  //           });
-  //       }
-  //     });
-  //   },
-  //   [] // No dependencies needed now
-  // );
 
   // Learning mode implementation
   const handleDelete = useCallback((wordId, wordValue) => {
@@ -672,11 +551,26 @@ const WordList = () => {
                       className={index % 2 === 0 ? "bg-white" : "bg-gray-300"}
                     >
                       {/* Table cells remain the same */}
-                      <td
-                        className="border border-gray-600 p-2 capitalize cursor-pointer text-blue-500 text-base sm:text-lg"
-                        onClick={() => openModal(word)}
-                      >
-                        <span className="font-bold">{word.value}</span>
+                      <td className="border border-gray-600 p-2 capitalize">
+                        {/* Move the onClick to the span that contains the word */}
+                        <div className="flex justify-between">
+                          <span
+                            className="cursor-pointer text-blue-500 text-base sm:text-lg font-bold "
+                            onClick={() => openModal(word)}
+                          >
+                            {word.value}
+                          </span>
+                          {/* Pronunciation button remains the same */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation(); // Prevent modal from opening when clicking the button
+                              pronounceWord(word.value);
+                            }}
+                            className=" text-blue-500 hover:text-blue-700 "
+                          >
+                            🔊
+                          </button>
+                        </div>
                       </td>
 
                       <td

@@ -27,12 +27,12 @@ import Grammar from "../View/Grammar/Grammar";
 import Clauses from "../View/Grammar/Clauses/Clauses";
 import Clause from "../View/Grammar/Clauses/Clause";
 import GrammarTopic from "../View/Grammar/GrammarTopic";
-import Exam from "../View/Exam/Exam";
 import ForgotPassword from "../Auth/ForgotPassword";
 import ResetPassword from "../Auth/ResetPassword";
 import UpdateBasicUserStatus from "../AdminActions/Admin/UpdateBasicUserStatus";
 import UpdateUserStatus from "../AdminActions/SuperAdmin/UpdateUSerStatus";
 import PerfectAndPastForm from "../View/Grammar/PerfectAndPastForm/PerfectAndPastForm";
+import Stories from "../View/Stories/Stories";
 
 export const router = createBrowserRouter([
   {
@@ -132,8 +132,8 @@ export const router = createBrowserRouter([
         element: <Clause />,
       },
       {
-        path: "/exam",
-        element: <Exam></Exam>,
+        path: "/stories",
+        element: <Stories></Stories>,
       },
       {
         path: "/update-user-status",

@@ -32,9 +32,9 @@ const Home = () => {
               link="/grammar"
             />
             <HomeCard
-              title="Practice For exam"
-              text="Coming soon ....."
-              link="/exam"
+              title="German Stories"
+              text="Enrich your vocabulary"
+              link="/stories"
             />
           </div>
         </div>
