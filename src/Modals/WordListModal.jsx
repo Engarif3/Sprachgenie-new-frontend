@@ -1,10 +1,17 @@
 import { Link } from "react-router-dom";
 import { getUserInfo, isLoggedIn } from "../services/auth.services";
+import { pronounceWord } from "../utils/wordPronounciation";
 
 const WordListModal = ({ closeModal, selectedWord, onEdit }) => {
   if (!selectedWord) return null;
   const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo();
+
+  // const pronounceWord = (word) => {
+  //   const utterance = new SpeechSynthesisUtterance(word);
+  //   utterance.lang = "de-DE"; // German pronunciation
+  //   speechSynthesis.speak(utterance);
+  // };
 
   return (
     <div className="fixed z-50 inset-0 bg-black bg-opacity-50 flex justify-center items-center transition-opacity duration-300  ">
@@ -17,6 +24,13 @@ const WordListModal = ({ closeModal, selectedWord, onEdit }) => {
         <div className="flex justify-between items-center ">
           <h3 className="text-xl font-semibold text-gray-800 text-center flex items-center gap-4">
             <span> Word Details</span>
+            <button
+              onClick={() => pronounceWord(selectedWord.value)}
+              className="text-blue-600 hover:text-blue-800"
+              title="Pronounce"
+            >
+              🔊
+            </button>
             {userLoggedIn && userInfo.role === "super_admin" && (
               <Link
                 to={`/edit-word/${selectedWord.id}`}
@@ -27,26 +41,6 @@ const WordListModal = ({ closeModal, selectedWord, onEdit }) => {
               </Link>
             )}
           </h3>
-
-          {/* <button
-            onClick={closeModal}
-            className="text-gray-500 hover:text-gray-700 focus:outline-none"
-            aria-label="Close"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-6 h-6"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                fillRule="evenodd"
-                d="M6.293 4.293a1 1 0 011.414 0L10 6.586l2.293-2.293a1 1 0 111.414 1.414L11.414 8l2.293 2.293a1 1 0 11-1.414 1.414L10 9.414l-2.293 2.293a1 1 0 11-1.414-1.414L8.586 8 6.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button> */}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6 lg.gap-6  p-2 md:p-4 lg:p-4">
           <p className="text-lg font-medium text-gray-700">
