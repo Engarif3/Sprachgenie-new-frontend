@@ -14,6 +14,7 @@ import Pagination from "../utils/Pagination";
 import { getUserInfo, isLoggedIn } from "../services/auth.services";
 import api from "../axios";
 import Loader from "../utils/Loader";
+import { pronounceWord } from "../utils/wordPronounciation";
 
 // Cache key constants
 const CACHE_KEY = "wordListCache";
@@ -45,13 +46,6 @@ const WordList = () => {
   const userInfo = getUserInfo() || {};
 
   const [favorites, setFavorites] = useState([]);
-
-  // Pronunciation function using Web Speech API
-  const pronounceWord = (word) => {
-    const utterance = new SpeechSynthesisUtterance(word);
-    utterance.lang = "de-DE"; // German pronunciation
-    speechSynthesis.speak(utterance);
-  };
 
   useEffect(() => {
     const fetchFavorites = async () => {

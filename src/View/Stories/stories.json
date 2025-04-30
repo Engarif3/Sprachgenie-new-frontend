@@ -1,7 +1,7 @@
 [
   {
     "title": "Ein ruhiger Tag am Fluss",
-    "image": "/images/story1.png",
+    "image": "/images/story1.webp",
     "description": {
       "text": "Auf dem Bild sehe ich einen jungen Mann, der am Ufer eines Flusses sitzt. Er ist vielleicht 20 oder 25 Jahre alt. Er hat kurze, braune Haare und trägt einen braunen Pullover und eine blaue Jeans. Der Mann sitzt auf dem Gras und liest ein Buch. Er sieht ruhig und konzentriert aus. Neben ihm liegt ein beiger Rucksack. Vor dem Rucksack stehen ein blauer Thermobecher, ein Notizbuch und eine Brille. Wahrscheinlich macht er eine Pause vom Wandern oder Lernen und genießt die Natur. Das Wetter ist schön – die Sonne scheint und der Himmel ist blau mit einigen weißen Wolken. Um ihn herum gibt es grüne Bäume, Blumen und frisches Gras. Der Fluss fließt ruhig und friedlich. Die Landschaft ist sehr ruhig und natürlich. Man hat das Gefühl, dass es ein perfekter Tag ist, um draußen zu sein – zum Lesen, Entspannen oder Nachdenken."
     },
@@ -33,6 +33,99 @@
       { "word": "die Landschaft", "meaning": "landscape" },
       { "word": "entspannen", "meaning": "to relax" },
       { "word": "Nachdenken", "meaning": "to reflect or to think deeply" }
+    ]
+  },
+  {
+    "title": "Ein Spaziergang im Wald",
+    "image": "/images/story2.webp",
+    "description": {
+      "text": "Auf dem Bild sehe ich einen älteren Mann, der in einem dichten Wald spaziert. Er trägt einen grünen Mantel und einen grauen Hut. Der Mann scheint in den Wald versunken zu sein, während er langsam den schmalen Pfad entlanggeht. Es ist Frühling, und die Bäume sind mit frischen, grünen Blättern bedeckt. Die Sonne scheint durch die Äste und taucht den Wald in ein warmes Licht. Einige Vögel sind in den Bäumen zu hören, und es gibt das Rauschen des Windes. Der Mann hält einen Spazierstock in der Hand, als ob er sich bei jedem Schritt stützen muss. Die Luft im Wald ist frisch, und es fühlt sich ruhig und friedlich an. Um ihn herum gibt es keine Menschen, nur die Natur. Es scheint, als ob der Mann diesen Ort regelmäßig besucht, um sich zu entspannen und die Natur zu genießen."
+    },
+    "passage_vocabulary": [
+      { "word": "Wald", "meaning": "forest" },
+      { "word": "spazieren", "meaning": "to walk / to stroll" },
+      { "word": "dicht", "meaning": "dense" },
+      { "word": "Pfad", "meaning": "path" },
+      { "word": "frühling", "meaning": "spring" },
+      { "word": "Vögel", "meaning": "birds" },
+      { "word": "Rauschen", "meaning": "rustling / swishing sound" },
+      { "word": "Stütze", "meaning": "support" },
+      { "word": "entspannen", "meaning": "to relax" },
+      { "word": "genießen", "meaning": "to enjoy" }
+    ],
+    "vocabulary": [
+      { "word": "der Wald", "meaning": "forest" },
+      { "word": "spazieren", "meaning": "to walk / to stroll" },
+      { "word": "der Pfad", "meaning": "path" },
+      { "word": "frühling", "meaning": "spring" },
+      { "word": "die Vögel", "meaning": "birds" },
+      { "word": "der Spazierstock", "meaning": "walking stick" },
+      { "word": "der Rauschen", "meaning": "rustling / swishing sound" },
+      { "word": "die Natur", "meaning": "nature" },
+      { "word": "entspannen", "meaning": "to relax" },
+      { "word": "genießen", "meaning": "to enjoy" }
+    ]
+  },
+  {
+    "title": "Ein Morgen im Café",
+    "image": "/images/story3.webp",
+    "description": {
+      "text": "Auf dem Bild sehe ich eine junge Frau, die an einem Fensterplatz in einem gemütlichen Café sitzt. Sie ist etwa 30 Jahre alt, hat lange, dunkle Haare und trägt eine beige Jacke. Auf dem Tisch vor ihr steht eine Tasse Cappuccino, ein Croissant und ein Notizbuch. Sie schaut nachdenklich nach draußen, während sie langsam an ihrem Kaffee nippt. Draußen sieht man eine belebte Straße mit Menschen, die zur Arbeit gehen. Die Frau wirkt ruhig, vielleicht plant sie ihren Tag oder schreibt etwas Wichtiges auf. Das Licht im Café ist warm, es gibt viele Holzmöbel und Pflanzen, die dem Ort eine angenehme Atmosphäre geben. Im Hintergrund hört man leise Musik. Es scheint ein perfekter Ort zu sein, um den Tag entspannt zu beginnen."
+    },
+    "passage_vocabulary": [
+      { "word": "Café", "meaning": "coffee shop / café" },
+      { "word": "gemütlich", "meaning": "cozy / comfortable" },
+      { "word": "nachdenklich", "meaning": "thoughtful" },
+      { "word": "belebte Straße", "meaning": "busy street" },
+      { "word": "nippt", "meaning": "sips (3rd person singular)" },
+      { "word": "Notizbuch", "meaning": "notebook" },
+      { "word": "Holzmöbel", "meaning": "wooden furniture" },
+      { "word": "Atmosphäre", "meaning": "atmosphere" },
+      { "word": "entspannt", "meaning": "relaxed" },
+      { "word": "beginnen", "meaning": "to begin / to start" }
+    ],
+    "vocabulary": [
+      { "word": "das Café", "meaning": "coffee shop / café" },
+      { "word": "gemütlich", "meaning": "cozy / comfortable" },
+      { "word": "die Straße", "meaning": "street" },
+      { "word": "nachdenklich", "meaning": "thoughtful" },
+      { "word": "die Tasse", "meaning": "cup" },
+      { "word": "das Croissant", "meaning": "croissant" },
+      { "word": "das Notizbuch", "meaning": "notebook" },
+      { "word": "die Atmosphäre", "meaning": "atmosphere" },
+      { "word": "entspannt", "meaning": "relaxed" },
+      { "word": "beginnen", "meaning": "to begin / to start" }
+    ]
+  },
+  {
+    "title": "Ein Picknick im Park",
+    "image": "/images/story4.webp",
+    "description": {
+      "text": "Auf dem Bild sehe ich vier Freunde, die ein Picknick im Park machen. Zwei Männer und zwei Frauen sitzen auf einer großen, karierten Decke. Sie lachen, reden und essen gemeinsam. Eine Frau trägt ein weißes Kleid und hat einen Sonnenhut auf. Sie schenkt Orangensaft in Gläser ein. Ein Mann mit dunklen Locken spielt auf seiner Gitarre und die anderen hören ihm zu. Auf der Decke liegen verschiedene Snacks – Sandwiches, Obst, Kekse und Chips. Es ist ein sonniger Tag, der Himmel ist blau und es gibt viele Bäume im Hintergrund. In der Nähe spielen Kinder mit einem Ball, und ein Hund läuft über das Gras. Die Stimmung ist fröhlich und entspannt. Es sieht aus wie ein perfekter Sommertag, an dem man Zeit mit Freunden in der Natur verbringt."
+    },
+    "passage_vocabulary": [
+      { "word": "Picknick", "meaning": "picnic" },
+      { "word": "kariert", "meaning": "checkered / plaid" },
+      { "word": "Decke", "meaning": "blanket" },
+      { "word": "schenkt ein", "meaning": "pours (into glasses)" },
+      { "word": "Orangensaft", "meaning": "orange juice" },
+      { "word": "Locken", "meaning": "curls" },
+      { "word": "Gitarre", "meaning": "guitar" },
+      { "word": "Snacks", "meaning": "snacks" },
+      { "word": "fröhlich", "meaning": "cheerful" },
+      { "word": "verbringt", "meaning": "spends (time)" }
+    ],
+    "vocabulary": [
+      { "word": "das Picknick", "meaning": "picnic" },
+      { "word": "die Decke", "meaning": "blanket" },
+      { "word": "der Orangensaft", "meaning": "orange juice" },
+      { "word": "die Locken", "meaning": "curls" },
+      { "word": "die Gitarre", "meaning": "guitar" },
+      { "word": "der Snack", "meaning": "snack" },
+      { "word": "fröhlich", "meaning": "cheerful" },
+      { "word": "verbringen", "meaning": "to spend (time)" },
+      { "word": "die Stimmung", "meaning": "mood / atmosphere" },
+      { "word": "der Sommertag", "meaning": "summer day" }
     ]
   }
 ]
