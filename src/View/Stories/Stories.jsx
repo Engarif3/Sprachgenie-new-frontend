@@ -116,7 +116,7 @@ const Stories = () => {
                         <span> {item.word}</span>
                         <div
                           onClick={() => pronounceWord(item.word)}
-                          className=" text-blue-600 hover:text-blue-800 ml-2"
+                          className=" text-blue-600 hover:text-blue-800 ml-2 cursor-pointer"
                           title="Pronounce"
                         >
                           🔊

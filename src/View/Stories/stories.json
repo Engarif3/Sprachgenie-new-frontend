@@ -73,10 +73,9 @@
       "text": "Auf dem Bild sehe ich eine junge Frau, die an einem Fensterplatz in einem gemütlichen Café sitzt. Sie ist etwa 30 Jahre alt, hat lange, dunkle Haare und trägt eine beige Jacke. Auf dem Tisch vor ihr steht eine Tasse Cappuccino, ein Croissant und ein Notizbuch. Sie schaut nachdenklich nach draußen, während sie langsam an ihrem Kaffee nippt. Draußen sieht man eine belebte Straße mit Menschen, die zur Arbeit gehen. Die Frau wirkt ruhig, vielleicht plant sie ihren Tag oder schreibt etwas Wichtiges auf. Das Licht im Café ist warm, es gibt viele Holzmöbel und Pflanzen, die dem Ort eine angenehme Atmosphäre geben. Im Hintergrund hört man leise Musik. Es scheint ein perfekter Ort zu sein, um den Tag entspannt zu beginnen."
     },
     "passage_vocabulary": [
-      { "word": "Café", "meaning": "coffee shop / café" },
-      { "word": "gemütlich", "meaning": "cozy / comfortable" },
+      { "word": "gemütlichen", "meaning": "cozy / comfortable" },
       { "word": "nachdenklich", "meaning": "thoughtful" },
-      { "word": "belebte Straße", "meaning": "busy street" },
+      { "word": "belebte", "meaning": "busy" },
       { "word": "nippt", "meaning": "sips (3rd person singular)" },
       { "word": "Notizbuch", "meaning": "notebook" },
       { "word": "Holzmöbel", "meaning": "wooden furniture" },
