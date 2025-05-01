@@ -503,6 +503,9 @@ const WordList = () => {
               <thead>
                 <tr className="bg-cyan-600 text-xl text-white ">
                   {/* ... existing header cells ... */}
+                  <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[3%] lg:w-[3%] ">
+                    Article
+                  </th>
                   <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[10%] lg:w-[10%] ">
                     Word
                   </th>
@@ -545,6 +548,9 @@ const WordList = () => {
                       className={index % 2 === 0 ? "bg-white" : "bg-gray-300"}
                     >
                       {/* Table cells remain the same */}
+                      <td className="border border-gray-600 p-2 capitalize font-bold text-rose-500">
+                        {word.article?.name}
+                      </td>
                       <td className="border border-gray-600 p-2 capitalize">
                         {/* Move the onClick to the span that contains the word */}
                         <div className="flex justify-between">
