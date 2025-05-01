@@ -9,7 +9,7 @@ import WordList from "../View/WordList";
 import UpdateWord from "../View/UpdateWord";
 import DeleteAllWords from "../View/DeleteAllWords";
 import WordForm from "../Form/WordForm";
-import LoginPage from "../login/login";
+// import LoginPage from "../login/login";
 import Register from "../register/Register";
 import FavoritesList from "../View/FavoritesList";
 import ResendVerification from "../register/ResendVerification";
@@ -33,6 +33,7 @@ import UpdateBasicUserStatus from "../AdminActions/Admin/UpdateBasicUserStatus";
 import UpdateUserStatus from "../AdminActions/SuperAdmin/UpdateUSerStatus";
 import PerfectAndPastForm from "../View/Grammar/PerfectAndPastForm/PerfectAndPastForm";
 import Stories from "../View/Stories/Stories";
+import Login from "../login/login";
 
 export const router = createBrowserRouter([
   {
@@ -151,7 +152,8 @@ export const router = createBrowserRouter([
   },
   {
     path: "/login",
-    element: <LoginPage />,
+    element: <Login />,
+    // element: <LoginPage />,
   },
   {
     path: "/register",
