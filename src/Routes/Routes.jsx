@@ -33,7 +33,7 @@ import UpdateBasicUserStatus from "../AdminActions/Admin/UpdateBasicUserStatus";
 import UpdateUserStatus from "../AdminActions/SuperAdmin/UpdateUSerStatus";
 import PerfectAndPastForm from "../View/Grammar/PerfectAndPastForm/PerfectAndPastForm";
 import Stories from "../View/Stories/Stories";
-import Login from "../login/login";
+import Login from "../login/Login";
 
 export const router = createBrowserRouter([
   {
