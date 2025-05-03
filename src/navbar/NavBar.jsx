@@ -103,44 +103,47 @@ const NavBar = () => {
               <span className="ml-2 text-xl mt-2 text-white">Home</span>{" "}
             </Link>
           )}
-          {userLoggedIn && userInfo.role === "basic_user" && (
-            <>
-              <Link
-                onClick={() => setIsMenuOpen(false)}
-                to="/favorites"
-                // className="hidden md:block lg:block h-8 w-8 mt-1"
-                className="flex md:hidden lg:hidden btn btn-sm btn-warning w-full md:w-auto text-center "
-              >
-                Favorites
-              </Link>
-              <Link
-                onClick={() => setIsMenuOpen(false)}
-                to="/favorites"
-                // className="hidden md:block lg:block h-8 w-8 mt-1"
-                className="hidden md:flex lg:flex w-full md:w-auto border-b-2 border-white rounded-md  hover:scale-105 px-1"
-              >
-                {/* <img src={emptyHeart} className="w-24 h-24" /> */}
-                <span className=" w-[28px] mt-2">
-                  <svg
-                    id="Layer_1"
-                    data-name="Layer 1"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 122.88 107.39"
-                  >
-                    <defs>
-                      <style>{`.cls-1 { fill: #ed1b24; fillRule: 'evenodd'; }`}</style>
-                    </defs>
-                    <title>Favorites</title>
-                    <path
-                      className="cls-1"
-                      d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z"
-                    />
-                  </svg>
-                </span>
-                <span className="ml-2 text-xl mt-2 text-white">Favorites</span>
-              </Link>
-            </>
-          )}
+          {userLoggedIn &&
+            (userInfo.role === "basic_user" || userInfo.role === "admin") && (
+              <>
+                <Link
+                  onClick={() => setIsMenuOpen(false)}
+                  to="/favorites"
+                  // className="hidden md:block lg:block h-8 w-8 mt-1"
+                  className="flex md:hidden lg:hidden btn btn-sm btn-warning w-full md:w-auto text-center "
+                >
+                  Favorites
+                </Link>
+                <Link
+                  onClick={() => setIsMenuOpen(false)}
+                  to="/favorites"
+                  // className="hidden md:block lg:block h-8 w-8 mt-1"
+                  className="hidden md:flex lg:flex w-full md:w-auto border-b-2 border-white rounded-md  hover:scale-105 px-1"
+                >
+                  {/* <img src={emptyHeart} className="w-24 h-24" /> */}
+                  <span className=" w-[28px] mt-2">
+                    <svg
+                      id="Layer_1"
+                      data-name="Layer 1"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 122.88 107.39"
+                    >
+                      <defs>
+                        <style>{`.cls-1 { fill: #ed1b24; fillRule: 'evenodd'; }`}</style>
+                      </defs>
+                      <title>Favorites</title>
+                      <path
+                        className="cls-1"
+                        d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z"
+                      />
+                    </svg>
+                  </span>
+                  <span className="ml-2 text-xl mt-2 text-white">
+                    Favorites
+                  </span>
+                </Link>
+              </>
+            )}
           {/* {userLoggedIn && (
             <Link
               to={"/words"}

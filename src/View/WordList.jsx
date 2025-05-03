@@ -5,7 +5,7 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-// import axios from "../axios";
+
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import WordListModal from "../Modals/WordListModal";
@@ -160,13 +160,6 @@ const WordList = () => {
         );
       }
 
-      // if (selectedTopic) {
-      //   filtered = filtered.filter(
-      //     (word) => word.topic?.name === selectedTopic
-      //   );
-      // }
-
-      // Find default topic (ID 1)
       const defaultTopic = topics.find((topic) => topic.id === 1);
       const defaultTopicName = defaultTopic?.name;
 
@@ -346,6 +339,7 @@ const WordList = () => {
     });
   }, []); // Empty dependencies still work as we're not using external values
 
+  //learning mode
   const toggleLearningMode = useCallback(() => {
     setLearningMode((prev) => !prev);
     setRevealedWords([]);
@@ -503,39 +497,41 @@ const WordList = () => {
               <thead>
                 <tr className="bg-cyan-600 text-xl text-white ">
                   {/* ... existing header cells ... */}
-                  <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[3%] lg:w-[3%] ">
+                  <th className="border-l border-gray-400  p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[3%] lg:w-[3%] ">
                     Article
                   </th>
-                  <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[10%] lg:w-[10%] ">
+                  <th className="border-l border-gray-400  p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[10%] lg:w-[10%] ">
                     Word
                   </th>
-                  <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center w-[10%] md:w-[25%] lg:w-[25%]">
+                  <th className="border-l border-gray-400  p-0 md:p-1 lg:p-1  text-center w-[10%] md:w-[25%] lg:w-[25%]">
                     Meaning
                   </th>
-                  <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                  <th className="border-l border-gray-400 p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                     Synonym
                   </th>
-                  <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center hidden lg:table-cell xl:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                  <th className="border-l border-gray-400  p-0 md:p-1 lg:p-1  text-center hidden lg:table-cell xl:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                     Antonym
                   </th>
-                  <th className="border border-gray-600 p-0 md:p-1 lg:p-1 text-center hidden lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                  <th className="border-l border-gray-400  p-0 md:p-1 lg:p-1 text-center hidden lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                     Deceptive Word
                   </th>
-                  <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[3%] lg:w-[3%]">
+                  <th className="border-l border-gray-400  p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[3%] lg:w-[3%]">
                     Level
                   </th>
                   <th
-                    className={`border border-gray-600 p-1 text-center ${
+                    className={`border-l border-gray-400 p-1 text-center ${
                       showActionColumn ? "table-cell" : "hidden"
                     } `}
                   >
                     Action
                   </th>
-                  {userLoggedIn && userInfo.role === "basic_user" && (
-                    <th className="border border-gray-600 p-0 md:p-1 lg:p-1 text-center  w-[3%] md:w-[3%] lg:w-[3%]">
-                      Fav
-                    </th>
-                  )}
+                  {userLoggedIn &&
+                    (userInfo.role === "basic_user" ||
+                      userInfo.role === "admin") && (
+                      <th className="border-l border-gray-400  p-0 md:p-1 lg:p-1 text-center  w-[3%] md:w-[3%] lg:w-[3%]">
+                        Fav
+                      </th>
+                    )}
                 </tr>
               </thead>
 
@@ -548,10 +544,10 @@ const WordList = () => {
                       className={index % 2 === 0 ? "bg-white" : "bg-gray-300"}
                     >
                       {/* Table cells remain the same */}
-                      <td className="border border-gray-600 p-2 capitalize font-bold text-rose-500">
+                      <td className="border-l border-gray-400  p-2 capitalize font-bold text-rose-500">
                         {word.article?.name}
                       </td>
-                      <td className="border border-gray-600 p-2 capitalize">
+                      <td className="border-l border-gray-400  p-2 capitalize">
                         {/* Move the onClick to the span that contains the word */}
                         <div className="flex justify-between">
                           <span
@@ -560,13 +556,9 @@ const WordList = () => {
                           >
                             {word.value}
                           </span>
-                          {/* Pronunciation button remains the same */}
                           <button
-                            onClick={(e) => {
-                              e.stopPropagation(); // Prevent modal from opening when clicking the button
-                              pronounceWord(word.value);
-                            }}
-                            className=" text-blue-500 hover:text-blue-700 "
+                            onClick={() => pronounceWord(word.value)}
+                            className=" text-blue-500 hover:text-blue-700 ml-2"
                           >
                             🔊
                           </button>
@@ -574,7 +566,7 @@ const WordList = () => {
                       </td>
 
                       <td
-                        className={`border border-gray-600 p-2 text-base sm:text-lg ${
+                        className={`border-l border-gray-400  p-2 text-base sm:text-lg ${
                           learningMode && index === currentIndex
                             ? "bg-sky-400 text-white font-bold"
                             : "text-sky-800 font-serif"
@@ -587,13 +579,13 @@ const WordList = () => {
                         {learningMode && !revealedWords.includes(word.id) ? (
                           <span className="opacity-0">Hidden</span>
                         ) : (
-                          <span className="line-clamp-2 hover:line-clamp-none">
+                          <span className="line-clamp-2 hover:line-clamp-none  ">
                             {word.meaning?.join(", ")}
                           </span>
                         )}
                       </td>
 
-                      <td className="border border-gray-600 p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
+                      <td className="border-l border-gray-400  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
                         <div className="flex flex-wrap gap-1">
                           {word.synonyms?.map((synonym, index) => (
                             <span
@@ -608,7 +600,7 @@ const WordList = () => {
                         </div>
                       </td>
 
-                      <td className="border border-gray-600 p-2 text-blue-500 cursor-pointer hidden lg:table-cell xl:table-cell">
+                      <td className="border-l border-gray-400  p-2 text-blue-500 cursor-pointer hidden lg:table-cell xl:table-cell">
                         <div className="flex flex-wrap gap-1">
                           {word.antonyms?.map((antonym, index) => (
                             <span
@@ -623,7 +615,7 @@ const WordList = () => {
                         </div>
                       </td>
 
-                      <td className="border border-gray-600 p-2 text-blue-500 cursor-pointer hidden lg:table-cell">
+                      <td className="border-l border-gray-400  p-2 text-blue-500 cursor-pointer hidden lg:table-cell">
                         <div className="flex flex-wrap gap-1">
                           {word.similarWords?.map((similarword, index) => (
                             <span
@@ -638,14 +630,14 @@ const WordList = () => {
                         </div>
                       </td>
 
-                      <td className="border border-gray-600 p-2 hidden md:table-cell text-center">
+                      <td className="border-l border-r border-gray-400  p-2 hidden md:table-cell text-center">
                         <span className="text-base sm:text-lg ">
                           {word.level?.level}
                         </span>
                       </td>
 
                       <td
-                        className={`border border-gray-600 p-2 text-center ${
+                        className={`border-l border-r border-gray-400  p-2 text-center ${
                           showActionColumn ? "table-cell" : "hidden"
                         } `}
                       >
@@ -666,68 +658,70 @@ const WordList = () => {
                         </div>
                       </td>
                       {/* ======== */}
-                      {userLoggedIn && userInfo.role === "basic_user" && (
-                        <td className="border border-gray-600 p-1 text-center">
-                          <button
-                            onClick={() => toggleFavorite(word.id)}
-                            className="hover:opacity-80 transition-opacity"
-                            disabled={loadingFavorites[word.id]}
-                          >
-                            {loadingFavorites[word.id] ? (
-                              // Loading spinner
-                              <svg
-                                className="w-6 h-6 animate-spin text-gray-400"
-                                viewBox="0 0 24 24"
-                              >
-                                <circle
-                                  className="opacity-25"
-                                  cx="12"
-                                  cy="12"
-                                  r="10"
-                                  stroke="currentColor"
-                                  strokeWidth="4"
-                                  fill="none"
-                                />
-                                <path
-                                  className="opacity-75"
-                                  fill="currentColor"
-                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                />
-                              </svg>
-                            ) : favorites.includes(word.id) ? (
-                              // Filled Heart
-                              <svg
-                                className="w-6 h-6"
-                                viewBox="0 0 122.88 107.39"
-                              >
-                                <path
-                                  style={{
-                                    fill: "#ed1b24",
-                                    fillRule: "evenodd",
-                                  }}
-                                  d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z"
-                                />
-                              </svg>
-                            ) : (
-                              // Outline Heart
-                              <svg
-                                className="w-6 h-6 text-gray-400"
-                                viewBox="0 0 122.88 107.39"
-                              >
-                                <path
-                                  style={{
-                                    fill: "transparent",
-                                    stroke: "currentColor",
-                                    strokeWidth: "3",
-                                    fillRule: "evenodd",
-                                  }}
-                                  d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z"
-                                />
-                              </svg>
-                            )}
-                          </button>
-                        </td>
-                      )}
+                      {userLoggedIn &&
+                        (userInfo.role === "basic_user" ||
+                          userInfo.role === "admin") && (
+                          <td className="border-l border-r border-gray-400  p-1 text-center">
+                            <button
+                              onClick={() => toggleFavorite(word.id)}
+                              className="hover:opacity-80 transition-opacity"
+                              disabled={loadingFavorites[word.id]}
+                            >
+                              {loadingFavorites[word.id] ? (
+                                // Loading spinner
+                                <svg
+                                  className="w-6 h-6 animate-spin text-gray-400"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                    fill="none"
+                                  />
+                                  <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                  />
+                                </svg>
+                              ) : favorites.includes(word.id) ? (
+                                // Filled Heart
+                                <svg
+                                  className="w-6 h-6"
+                                  viewBox="0 0 122.88 107.39"
+                                >
+                                  <path
+                                    style={{
+                                      fill: "#ed1b24",
+                                      fillRule: "evenodd",
+                                    }}
+                                    d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z"
+                                  />
+                                </svg>
+                              ) : (
+                                // Outline Heart
+                                <svg
+                                  className="w-6 h-6 text-gray-400"
+                                  viewBox="0 0 122.88 107.39"
+                                >
+                                  <path
+                                    style={{
+                                      fill: "transparent",
+                                      stroke: "currentColor",
+                                      strokeWidth: "3",
+                                      fillRule: "evenodd",
+                                    }}
+                                    d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z"
+                                  />
+                                </svg>
+                              )}
+                            </button>
+                          </td>
+                        )}
                       {/* ======== */}
                     </tr>
                   ))
