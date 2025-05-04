@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import Container from "../utils/Container";
-import api from "../axios";
+import Container from "../../../utils/Container";
+import api from "../../../axios";
 
 const UpdateWord = () => {
   const { id } = useParams();

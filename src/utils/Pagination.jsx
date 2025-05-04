@@ -6,8 +6,6 @@ const Pagination = ({
   setCurrentPage,
   showAllData,
   toggleView,
-  debounceTimeout,
-  setDebounceTimeout,
   toggleLearningMode,
   learningMode,
   totalWords,
@@ -17,7 +15,7 @@ const Pagination = ({
   const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo();
   return (
-    <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8 ">
+    <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8 mb-12">
       {/* Left Side Controls */}
       <div className="flex flex-wrap gap-4 justify-between md:justify-start w-full md:w-auto  ">
         {/* Show All Button */}

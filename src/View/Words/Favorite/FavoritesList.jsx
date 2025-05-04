@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from "react";
-import axios from "../axios";
+import axios from "../../../axios";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import WordListModal from "../Modals/WordListModal";
-import Container from "../utils/Container";
-import { getUserInfo, isLoggedIn } from "../services/auth.services";
+import Container from "../../../utils/Container";
+import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 
 const FavoritesList = () => {
-  const navigate = useNavigate();
   const [selectedWord, setSelectedWord] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [favoriteWords, setFavoriteWords] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo();
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { getUserInfo, isLoggedIn } from "../services/auth.services";
-import { pronounceWord } from "../utils/wordPronounciation";
+import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
+import { pronounceWord } from "../../../utils/wordPronounciation";
 
 const WordListModal = ({ closeModal, selectedWord, onEdit }) => {
   if (!selectedWord) return null;

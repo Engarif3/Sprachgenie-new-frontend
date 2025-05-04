@@ -6,15 +6,15 @@ import React, {
   useMemo,
 } from "react";
 
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
+import Container from "../../../utils/Container";
+import Pagination from "../../../utils/Pagination";
+import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
+import api from "../../../axios";
+import Loader from "../../../utils/Loader";
+import { pronounceWord } from "../../../utils/wordPronounciation";
 import WordListModal from "../Modals/WordListModal";
-import Container from "../utils/Container";
-import Pagination from "../utils/Pagination";
-import { getUserInfo, isLoggedIn } from "../services/auth.services";
-import api from "../axios";
-import Loader from "../utils/Loader";
-import { pronounceWord } from "../utils/wordPronounciation";
 
 // Cache key constants
 const CACHE_KEY = "wordListCache";
@@ -49,7 +49,11 @@ const WordList = () => {
 
   useEffect(() => {
     const fetchFavorites = async () => {
-      if (!userInfo?.id || userInfo.role !== "basic_user") return;
+      if (
+        (!userInfo?.id && userInfo.role !== "basic_user") ||
+        (!userInfo?.id && userInfo.role !== "admin")
+      )
+        return;
 
       try {
         const response = await api.get(`/favorite-words/${userInfo.id}`);
@@ -75,8 +79,8 @@ const WordList = () => {
 
   const toggleFavorite = async (wordId) => {
     const isFavorite = favorites.includes(wordId);
-    const baseURL =
-      "https://sprcahgenie-new-backend.vercel.app/api/v1/favorite-words";
+    // const baseURL =
+    //   "https://sprcahgenie-new-backend.vercel.app/api/v1/favorite-words";
     const userId = userInfo.id;
 
     try {
@@ -415,12 +419,10 @@ const WordList = () => {
 
   return (
     <Container>
-      {/* Header remains the same */}
       <h2 className="text-3xl font-bold font-mono text-sky-700 my-8 text-center hidden md:block">
         Words List
       </h2>
 
-      {/* Filters grid */}
       <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 gap-4 mt-4 md:mt-0 ">
         {/* Search Input */}
         <div className="w-full">
@@ -490,9 +492,9 @@ const WordList = () => {
           <Loader loading={isLoading} />
         </div>
       ) : (
-        <div className="min-h-screen">
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse mt-2">
+        <div className="min-h-screen ">
+          <div className="overflow-x-auto border-b border-gray-400 ">
+            <table className="w-full  border-collapse mt-2 ">
               {/* Table headers remain the same */}
               <thead>
                 <tr className="bg-cyan-600 text-xl text-white ">
@@ -541,7 +543,7 @@ const WordList = () => {
                   filteredWords.map((word, index) => (
                     <tr
                       key={word.id}
-                      className={index % 2 === 0 ? "bg-white" : "bg-gray-300"}
+                      className={index % 2 === 0 ? "bg-white " : "bg-gray-300"}
                     >
                       {/* Table cells remain the same */}
                       <td className="border-l border-gray-400  p-2 capitalize font-bold text-rose-500">
