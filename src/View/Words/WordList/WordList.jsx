@@ -434,7 +434,8 @@ const WordList = () => {
           className="text-lg font-custom1"
         >
           {level && level.id !== 6 ? levelName : ""}
-          {level && level.id !== 6 ? " →" : ""} {topic.name}
+          {level && level.id !== 6 ? <strong> &#128313;</strong> : ""}{" "}
+          {topic.name}
         </option>
       );
     });
