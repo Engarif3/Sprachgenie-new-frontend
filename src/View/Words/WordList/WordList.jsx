@@ -431,7 +431,7 @@ const WordList = () => {
         <option
           key={topic.id}
           value={topic.name}
-          className="text-lg font-custom"
+          className="text-lg font-custom1"
         >
           {level && level.id !== 6 ? levelName : ""}
           {level && level.id !== 6 ? " →" : ""} {topic.name}
