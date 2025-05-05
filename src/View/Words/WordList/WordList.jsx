@@ -414,7 +414,11 @@ const WordList = () => {
   const levelOptions = useMemo(
     () =>
       levels.map((level) => (
-        <option key={level.id} value={level.level}>
+        <option
+          key={level.id}
+          value={level.level}
+          className="text-xl font-custom1 bg-gray-700 text-white"
+        >
           {level.level}
         </option>
       )),
@@ -431,11 +435,10 @@ const WordList = () => {
         <option
           key={topic.id}
           value={topic.name}
-          className="text-lg font-custom1"
+          className="text-xl font-custom1 bg-gray-700 text-white"
         >
           {level && level.id !== 6 ? levelName : ""}
-          {level && level.id !== 6 ? <strong> &#128313;</strong> : ""}{" "}
-          {topic.name}
+          {level && level.id !== 6 ? <> &#128313;</> : ""} {topic.name}
         </option>
       );
     });
