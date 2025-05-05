@@ -22,7 +22,6 @@ const CACHE_EXPIRY = 15 * 60 * 1000; // 15 minutes
 
 const WordList = () => {
   const { id } = useParams();
-  const [filteredTopics, setFilteredTopics] = useState([]);
   const [selectedWord, setSelectedWord] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -292,35 +291,11 @@ const WordList = () => {
     [cache.words, openModal]
   );
 
-  const handleLevelChange = useCallback(
-    (e) => {
-      const selected = e.target.value;
-      setSelectedLevel(selected);
-      setSelectedTopic(""); // Reset topic to "All Topics"
-      setCurrentPage(1);
-
-      if (selected === "") {
-        setFilteredTopics(topics); // Show all topics if no level is selected
-      } else {
-        const relatedTopics = cache.words
-          .filter((word) => word.level?.level === selected && word.topic.name)
-          .map((word) => word.topic.name);
-
-        const uniqueTopics = Array.from(new Set(relatedTopics));
-        const matchedTopics = topics.filter((topic) =>
-          uniqueTopics.includes(topic.name)
-        );
-        setFilteredTopics(matchedTopics);
-      }
-    },
-    [topics, cache.words]
-  );
-
-  useEffect(() => {
-    if (topics.length > 0) {
-      setFilteredTopics(topics);
-    }
-  }, [topics]);
+  // Memoized filter handlers
+  const handleLevelChange = useCallback((e) => {
+    setSelectedLevel(e.target.value);
+    setCurrentPage(1);
+  }, []);
 
   const handleTopicChange = useCallback((e) => {
     setSelectedTopic(e.target.value);
@@ -411,6 +386,7 @@ const WordList = () => {
     }
   }, [currentIndex]);
 
+  // Memoized components
   const levelOptions = useMemo(
     () =>
       levels.map((level) => (
@@ -421,24 +397,15 @@ const WordList = () => {
     [levels]
   );
 
-  const topicOptions = useMemo(() => {
-    return filteredTopics.map((topic) => {
-      const level = levels.find((lvl) => lvl.id === topic.levelId);
-      const levelName = level ? level.level : "N/A";
-
-      // Only show levelName if levelId is not 6
-      return (
-        <option
-          key={topic.id}
-          value={topic.name}
-          className="text-lg font-custom"
-        >
-          {level && level.id !== 6 ? levelName : ""}
-          {level && level.id !== 6 ? " →" : ""} {topic.name}
+  const topicOptions = useMemo(
+    () =>
+      topics.map((topic) => (
+        <option key={topic.id} value={topic.name}>
+          {topic.name}
         </option>
-      );
-    });
-  }, [filteredTopics, levels]);
+      )),
+    [topics]
+  );
 
   // Update the toggleView function
   const toggleView = useCallback(() => {
@@ -496,7 +463,6 @@ const WordList = () => {
               className="border rounded px-4 py-2 w-full"
             >
               <option value="">All Topics</option>
-
               {topicOptions}
             </select>
             <p className="text-lg text-info font-bold whitespace-nowrap md:ml-2 hidden md:block">

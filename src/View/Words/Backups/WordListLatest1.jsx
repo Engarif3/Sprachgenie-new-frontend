@@ -292,6 +292,38 @@ const WordList = () => {
     [cache.words, openModal]
   );
 
+  // Memoized filter handlers
+  // const handleLevelChange = useCallback((e) => {
+  //   setSelectedLevel(e.target.value);
+  //   setCurrentPage(1);
+  // }, []);
+
+  // const handleLevelChange = useCallback(
+  //   (e) => {
+  //     const selected = e.target.value;
+  //     setSelectedLevel(selected);
+  //     setCurrentPage(1);
+
+  //     if (selected === "") {
+  //       setFilteredTopics(topics);
+  //     } else {
+  //       const relatedTopics = cache.words
+  //         .filter((word) => word.level?.level === selected && word.topic.name)
+  //         .map((word) => word.topic.name);
+
+  //       // Get unique topics to avoid duplicates
+  //       const uniqueTopics = Array.from(new Set(relatedTopics));
+
+  //       // Filter the topics array to only include the matched topics
+  //       const matchedTopics = topics.filter((topic) =>
+  //         uniqueTopics.includes(topic.name)
+  //       );
+  //       setFilteredTopics(matchedTopics);
+  //     }
+  //   },
+  //   [topics, cache.words]
+  // );
+
   const handleLevelChange = useCallback(
     (e) => {
       const selected = e.target.value;
@@ -411,6 +443,16 @@ const WordList = () => {
     }
   }, [currentIndex]);
 
+  // Memoized components
+  // const levelOptions = useMemo(
+  //   () =>
+  //     levels.map((level) => (
+  //       <option key={level.id} value={level.level}>
+  //         {level.level}
+  //       </option>
+  //     )),
+  //   [levels]
+  // );
   const levelOptions = useMemo(
     () =>
       levels.map((level) => (
@@ -421,6 +463,29 @@ const WordList = () => {
     [levels]
   );
 
+  // const topicOptions = useMemo(
+  //   () =>
+  //     filteredTopics.map((topic) => (
+  //       <option key={topic.id} value={topic.name}>
+  //         {topic.name}
+  //       </option>
+  //     )),
+  //   [filteredTopics]
+  // );
+
+  // const topicOptions = useMemo(() => {
+  //   return filteredTopics.map((topic) => {
+  //     const levelName =
+  //       levels.find((lvl) => lvl.id === topic.levelId)?.level || "N/A";
+
+  //     return (
+  //       <option key={topic.id} value={topic.name}>
+  //         {levelName} {topic.name}
+  //       </option>
+  //     );
+  //   });
+  // }, [filteredTopics, levels]);
+
   const topicOptions = useMemo(() => {
     return filteredTopics.map((topic) => {
       const level = levels.find((lvl) => lvl.id === topic.levelId);
@@ -428,13 +493,8 @@ const WordList = () => {
 
       // Only show levelName if levelId is not 6
       return (
-        <option
-          key={topic.id}
-          value={topic.name}
-          className="text-lg font-custom"
-        >
-          {level && level.id !== 6 ? levelName : ""}
-          {level && level.id !== 6 ? " →" : ""} {topic.name}
+        <option key={topic.id} value={topic.name}>
+          {level && level.id !== 6 ? levelName : ""} {topic.name}
         </option>
       );
     });
