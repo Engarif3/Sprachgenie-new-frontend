@@ -417,7 +417,7 @@ const WordList = () => {
         <option
           key={level.id}
           value={level.level}
-          className="text-xl font-custom1 bg-gray-700 text-white"
+          className="text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white"
         >
           {level.level}
         </option>
@@ -435,7 +435,7 @@ const WordList = () => {
         <option
           key={topic.id}
           value={topic.name}
-          className="text-xl font-custom1 bg-gray-700 text-white"
+          className="text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white"
         >
           {level && level.id !== 6 ? levelName : ""}
           {level && level.id !== 6 ? <> &#128313;</> : ""} {topic.name}
