@@ -783,7 +783,7 @@ const WordList = () => {
                           <>
                             <td className="border-l border-gray-400  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
                               <div>
-                                <span className="text-sm">
+                                <span className="text-xs">
                                   {word.creator?.name || "Unknown"}
                                 </span>{" "}
                                 <br />
@@ -798,7 +798,7 @@ const WordList = () => {
                                     <ul>
                                       {word.history.map((h) => (
                                         <li key={h.id}>
-                                          <span className="text-sm">
+                                          <span className="text-xs">
                                             {h.user?.name}
                                           </span>{" "}
                                           <br />
