@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import Container from "../../../utils/Container";
 import api from "../../../axios";
+import { getUserInfo } from "../../../services/auth.services";
 
 const UpdateWord = () => {
   const { id } = useParams();
+  const userInfo = getUserInfo() || {};
   const [suggestions, setSuggestions] = useState({
     synonyms: [],
     antonyms: [],
@@ -189,13 +191,14 @@ const UpdateWord = () => {
         // Send the updated data to the backend
         const response = await api.put(`/word/update/${formData.id}`, {
           ...formData,
+          userId: userInfo.id,
           [field]: filteredArray, // Send the updated list to the backend
         });
 
         Swal.fire({
           title: "Removed!",
           text: "The item has been removed successfully.",
-          timer: 1000,
+          timer: 500,
           showConfirmButton: false,
           icon: "success",
         });
@@ -223,6 +226,7 @@ const UpdateWord = () => {
     // Ensure the necessary fields are arrays and remove empty strings
     const dataToSend = {
       ...formData,
+
       meaning: formData.meaning.concat(
         inputData.meaning
           .split(",")
@@ -253,6 +257,7 @@ const UpdateWord = () => {
           .map((item) => item.trim())
           .filter((item) => item !== "")
       ),
+      userId: userInfo.id,
     };
 
     // Show SweetAlert confirmation

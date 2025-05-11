@@ -6,7 +6,7 @@ import React, {
   useMemo,
 } from "react";
 
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import Container from "../../../utils/Container";
 import Pagination from "../../../utils/Pagination";
@@ -21,7 +21,6 @@ const CACHE_KEY = "wordListCache";
 const CACHE_EXPIRY = 15 * 60 * 1000; // 15 minutes
 
 const WordList = () => {
-  const { id } = useParams();
   const [filteredTopics, setFilteredTopics] = useState([]);
   const [selectedWord, setSelectedWord] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -221,6 +220,7 @@ const WordList = () => {
     try {
       // const response = await axios.get("/words?all=true");
       const response = await api.get("/word/all?all=true");
+
       const newCache = {
         words: response.data.data.words || [],
         levels: response.data.data.levels || [],
@@ -543,6 +543,7 @@ const WordList = () => {
                   <th className="border-l border-gray-400  p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[10%] lg:w-[10%] ">
                     Word
                   </th>
+
                   <th className="border-l border-gray-400  p-0 md:p-1 lg:p-1  text-center w-[10%] md:w-[25%] lg:w-[25%]">
                     Meaning
                   </th>
@@ -572,6 +573,18 @@ const WordList = () => {
                         Fav
                       </th>
                     )}
+                  {userLoggedIn &&
+                    (userInfo.role === "super_admin" ||
+                      userInfo.role === "admin") && (
+                      <>
+                        <th className="border-l border-gray-400 p-0 md:p-1 lg:p-1 text-center w-[15%] md:w-[10%] lg:w-[10%]">
+                          Created By
+                        </th>
+                        <th className="border-l border-gray-400 p-0 md:p-1 lg:p-1 text-center w-[15%] md:w-[10%] lg:w-[10%]">
+                          Modified By
+                        </th>
+                      </>
+                    )}
                 </tr>
               </thead>
 
@@ -596,6 +609,7 @@ const WordList = () => {
                           >
                             {word.value}
                           </span>
+
                           <button
                             onClick={() => pronounceWord(word.value)}
                             className=" text-blue-500 hover:text-blue-700 ml-2"
@@ -763,6 +777,36 @@ const WordList = () => {
                           </td>
                         )}
                       {/* ======== */}
+                      {userLoggedIn &&
+                        (userInfo.role === "super_admin" ||
+                          userInfo.role === "admin") && (
+                          <>
+                            <td className="border-l border-gray-400  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
+                              <div>
+                                <span>{word.creator?.name || "Unknown"}</span>{" "}
+                                <br />
+                                {/* <span>{word.creator?.email || "Not provided"}</span> */}
+                              </div>
+                            </td>
+
+                            <td className="border-l border-gray-400  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
+                              <div>
+                                {word.history?.length > 0 && (
+                                  <div>
+                                    <ul>
+                                      {word.history.map((h) => (
+                                        <li key={h.id}>
+                                          {h.user?.name} <br />
+                                          {/* ({h.user?.email}) */}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                          </>
+                        )}
                     </tr>
                   ))
                 ) : (

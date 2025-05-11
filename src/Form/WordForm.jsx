@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import api from "../axios";
-import { instance } from "../helpers/axios/axiosInstance";
+
+import { getUserInfo } from "../services/auth.services";
 
 const WordForm = () => {
   // const navigate = useNavigate();
@@ -9,6 +10,8 @@ const WordForm = () => {
   const [topics, setTopics] = useState([]);
   const [articles, setArticles] = useState([]);
   const [partsOfSpeech, setPartsOfSpeech] = useState([]);
+  const userInfo = getUserInfo() || {};
+
   const [wordData, setWordData] = useState({
     value: "",
     meaning: "",
@@ -144,6 +147,7 @@ const WordForm = () => {
               .map((item) => item.trim())
               .filter((item) => item) // Add filter here
           : [],
+      createdBy: userInfo.id,
     };
 
     try {
@@ -166,11 +170,24 @@ const WordForm = () => {
       // navigate("/");
       setWordData(initialWordData); // Reset form state
     } catch (error) {
+      // catch (error) {
+      //   Swal.fire({
+      //     title: "Error",
+      //     text: "There was an error creating the word.",
+      //     icon: "error",
+      //     timer: 1500,
+      //     showConfirmButton: false,
+      //   });
+      // }
+      const errorMessage =
+        error.response?.data?.message ||
+        "There was an error creating the word.";
+
       Swal.fire({
         title: "Error",
-        text: "There was an error creating the word.",
+        text: errorMessage,
         icon: "error",
-        timer: 1500,
+        timer: 2000,
         showConfirmButton: false,
       });
     }
