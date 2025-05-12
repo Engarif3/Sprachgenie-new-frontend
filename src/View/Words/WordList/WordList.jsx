@@ -535,9 +535,9 @@ const WordList = () => {
             <table className="w-full  border-collapse mt-2 ">
               {/* Table headers remain the same */}
               <thead>
-                <tr className="bg-cyan-600 text-xl text-white ">
+                <tr className="bg-cyan-600 text-md md:text-xl lg:text-lg text-white ">
                   {/* ... existing header cells ... */}
-                  <th className="border-l border-gray-400  p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[3%] lg:w-[3%] ">
+                  <th className="border-l border-gray-400 text-sm md:text-lg lg:text-lg   p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[3%] lg:w-[3%] ">
                     Article
                   </th>
                   <th className="border-l border-gray-400  p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[10%] lg:w-[10%] ">
@@ -569,7 +569,7 @@ const WordList = () => {
                   {userLoggedIn &&
                     (userInfo.role === "basic_user" ||
                       userInfo.role === "admin") && (
-                      <th className="border-l border-gray-400  p-0 md:p-1 lg:p-1 text-center  w-[3%] md:w-[3%] lg:w-[3%]">
+                      <th className="border-l border-gray-400 text-sm md:text-lg lg:text-lg  p-0 md:p-1 lg:p-1 text-center  w-[3%] md:w-[3%] lg:w-[3%]">
                         Fav
                       </th>
                     )}
@@ -577,10 +577,10 @@ const WordList = () => {
                     (userInfo.role === "super_admin" ||
                       userInfo.role === "admin") && (
                       <>
-                        <th className="border-l border-gray-400 p-0 md:p-1 text-xs lg:p-1 text-center w-[15%] md:w-[10%] lg:w-[10%]">
+                        <th className="border-l border-gray-400 p-0 md:p-1 text-xs lg:p-1 text-center w-[15%] md:w-[10%] lg:w-[10%] hidden lg:table-cell">
                           Created By
                         </th>
-                        <th className="border-l border-gray-400 p-0 md:p-1 text-xs lg:p-1 text-center w-[15%] md:w-[10%] lg:w-[10%]">
+                        <th className="border-l border-gray-400 p-0 md:p-1 text-xs lg:p-1 text-center w-[15%] md:w-[10%] lg:w-[10%] hidden lg:table-cell">
                           Modified By
                         </th>
                       </>
