@@ -577,10 +577,10 @@ const WordList = () => {
                     (userInfo.role === "super_admin" ||
                       userInfo.role === "admin") && (
                       <>
-                        <th className="border-l border-gray-400 p-0 md:p-1 lg:p-1 text-center w-[15%] md:w-[10%] lg:w-[10%]">
+                        <th className="border-l border-gray-400 p-0 md:p-1 text-xs lg:p-1 text-center w-[15%] md:w-[10%] lg:w-[10%]">
                           Created By
                         </th>
-                        <th className="border-l border-gray-400 p-0 md:p-1 lg:p-1 text-center w-[15%] md:w-[10%] lg:w-[10%]">
+                        <th className="border-l border-gray-400 p-0 md:p-1 text-xs lg:p-1 text-center w-[15%] md:w-[10%] lg:w-[10%]">
                           Modified By
                         </th>
                       </>
