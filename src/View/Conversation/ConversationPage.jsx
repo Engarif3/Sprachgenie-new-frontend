@@ -52,29 +52,28 @@ const ConversationPage = () => {
 
   return (
     <Container>
-      <div className="min-h-screen flex justify-center items-center">
+      <div className="min-h-screen flex justify-center items-center ">
         {loading ? (
           <Loader loading={loading} />
         ) : (
-          <div className="max-w-4xl mx-auto p-0 md:p-4 lg:p-4  mt-4">
+          <div className="mx-auto p-0 md:p-4 lg:p-4  mt-4 w-8/12">
             <div className="text-cyan-800 mb-0 md:mb-4 lg:mb-4 text-center text-3xl font-bold font-custom5">
               <h2>{conversation.topic}</h2>
             </div>
-            <div className="p-4 rounded-lg shadow-md mb-12">
+            <div className="md:p-4 lg.p-4 rounded-lg shadow-md mb-12 ">
               {conversation.text.map((message, index) => (
-                <div
-                  key={index}
-                  className="text-lg my-4 px-2 border-b-2 border-dotted"
-                >
-                  <p>
+                <div key={index} className="text-lg my-4 px-2 ">
+                  <div className="flex flex-col md:flex-row lg.flex-row md:gap-4 lg:gap-4 ">
                     <span
-                      className="text-xl font-semibold flex items-center gap-1 border-slate-950"
+                      className="text-xl font-semibold flex items-center gap-1 md:border lg.border bg-cyan-750 w-full md:w-1/12 lg:w-1/12 rounded-md p-1 "
                       style={{ color: getSpeakerColor(message.speaker) }}
                     >
                       <FaUser /> {message.speaker}:
                     </span>
-                    <span>{message.message}</span>
-                  </p>
+                    <p className="text-start w-full p-1 border border-cyan-700 rounded-md px-2 font-serif text-slate-950">
+                      {message.message}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
