@@ -8,6 +8,8 @@ import { authKey } from "../../constants/authkey";
 import api from "../../axios";
 import { ScaleLoader } from "react-spinners";
 
+const token = getFromLocalStorage(authKey); // Get the token from local storage
+
 const UpdateBasicUserStatus = () => {
   const [basicUsers, setBasicUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,12 +25,16 @@ const UpdateBasicUserStatus = () => {
 
     // Fetch all users from the API
     api
-      .get("/basicUser")
+      .get("https://sprcahgenie-new-backend.vercel.app/api/v1/user", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
         if (response.data.success && Array.isArray(response.data.data)) {
           // Filter only BASIC_USER role users
           const users = response.data.data.filter(
-            (user) => user.user.role === "BASIC_USER"
+            (user) => user.role === "BASIC_USER"
           );
           setBasicUsers(users);
         } else {
@@ -42,8 +48,6 @@ const UpdateBasicUserStatus = () => {
         setLoading(false);
       });
   }, []);
-
-  const token = getFromLocalStorage(authKey); // Get the token from local storage
 
   const handleStatusChange = (userId, newStatus) => {
     if (!token) {
@@ -64,22 +68,17 @@ const UpdateBasicUserStatus = () => {
         api
           .patch(
             `/user/update-basicUser-status/${userId}`,
-            {
-              status: newStatus,
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${token}`, // Send the token with the request
-              },
-            }
+            // { status: newStatus },
+            { status: newStatus, performedById: userInfo.id },
+            { headers: { Authorization: `Bearer ${token}` } }
           )
           .then((response) => {
             if (response.data.success) {
               // Update only the status of the specific user in the local state
               setBasicUsers((prevUsers) =>
                 prevUsers.map((user) =>
-                  user.user.id === userId // Ensure matching the user's ID
-                    ? { ...user, user: { ...user.user, status: newStatus } }
+                  user.id === userId // Ensure matching the user's ID
+                    ? { ...user, status: newStatus }
                     : user
                 )
               );
@@ -108,7 +107,7 @@ const UpdateBasicUserStatus = () => {
   const filteredUsers =
     selectedStatus === "ALL"
       ? basicUsers
-      : basicUsers.filter((user) => user.user.status === selectedStatus);
+      : basicUsers.filter((user) => user.status === selectedStatus);
 
   // if (loading) {
   //   return <div>Loading users...</div>;
@@ -179,11 +178,9 @@ const UpdateBasicUserStatus = () => {
                   <tbody>
                     {filteredUsers.map((user) => (
                       <tr
-                        key={user.user.id}
+                        key={user.id}
                         className={`${
-                          user.user.role === "ADMIN"
-                            ? "bg-cyan-500 font-bold"
-                            : ""
+                          user.role === "ADMIN" ? "bg-cyan-500 font-bold" : ""
                         } border-b  odd:bg-white even:bg-gray-200`}
                       >
                         <td className="p-1 md:p-1 lg:p-1 hidden lg:table-cell xl:table-cell  text-center text-slate-950">
@@ -192,19 +189,19 @@ const UpdateBasicUserStatus = () => {
                         <td className="p-1 md:p-1 lg:p-1 text-start md:text-center lg:text-center text-sm md:text-md lg:text-md text-slate-950">
                           {user.email}
                         </td>
-                        {/* <td className="p-2 text-center">{user.user.role}</td> */}
+                        {/* <td className="p-2 text-center">{user.role}</td> */}
                         <td className="p-1 md:p-1 lg:p-1  text-center">
-                          {user.user.role === "BASIC_USER"
+                          {user.role === "BASIC_USER"
                             ? "USER"
-                            : user.user.role === "ADMIN"
+                            : user.role === "ADMIN"
                             ? "ADMIN"
-                            : user.user.role}
+                            : user.role}
                         </td>
                         <td className="p-1 md:p-1 lg:p-1  text-center">
                           <select
-                            value={user.user.status}
+                            value={user.status}
                             onChange={(e) =>
-                              handleStatusChange(user.user.id, e.target.value)
+                              handleStatusChange(user.id, e.target.value)
                             }
                             className="p-1 md:p-1 lg:p-1  border rounded"
                           >

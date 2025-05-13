@@ -8,6 +8,8 @@ import { authKey } from "../../constants/authkey";
 import api from "../../axios";
 import { ScaleLoader } from "react-spinners";
 
+const token = getFromLocalStorage(authKey);
+
 const UpdateUserStatus = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +24,11 @@ const UpdateUserStatus = () => {
     }
 
     api
-      .get("/basicUser")
+      .get("https://sprcahgenie-new-backend.vercel.app/api/v1/user", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
         if (response.data.success && Array.isArray(response.data.data)) {
           setUsers(response.data.data);
@@ -37,8 +43,6 @@ const UpdateUserStatus = () => {
         setLoading(false);
       });
   }, []);
-
-  const token = getFromLocalStorage(authKey);
 
   const handleStatusChange = (userId, newStatus) => {
     if (!token) {
@@ -66,8 +70,8 @@ const UpdateUserStatus = () => {
             if (response.data.success) {
               setUsers((prevUsers) =>
                 prevUsers.map((user) =>
-                  user.user.id === userId
-                    ? { ...user, user: { ...user.user, status: newStatus } }
+                  user.id === userId
+                    ? { ...user, status: newStatus } // or role: newRole
                     : user
                 )
               );
@@ -116,9 +120,7 @@ const UpdateUserStatus = () => {
             if (response.data.success) {
               setUsers((prevUsers) =>
                 prevUsers.map((user) =>
-                  user.user.id === userId
-                    ? { ...user, user: { ...user.user, role: newRole } }
-                    : user
+                  user.id === userId ? { ...user, role: newRole } : user
                 )
               );
               Swal.fire({
@@ -138,12 +140,12 @@ const UpdateUserStatus = () => {
       }
     });
   };
-  const admins = users.filter((user) => user.user.role === "ADMIN");
-  const basicUsers = users.filter((user) => user.user.role === "BASIC_USER");
+  const admins = users.filter((user) => user.role === "ADMIN");
+  const basicUsers = users.filter((user) => user.role === "BASIC_USER");
   const filteredUsers =
     selectedStatus === "ALL"
       ? basicUsers
-      : basicUsers.filter((user) => user.user.status === selectedStatus);
+      : basicUsers.filter((user) => user.status === selectedStatus);
 
   // if (loading) return <div>Loading users...</div>;
   if (error) return <div>{error}</div>;
@@ -200,7 +202,7 @@ const UpdateUserStatus = () => {
                   <tbody>
                     {admins.map((user) => (
                       <tr
-                        key={user.user.id}
+                        key={user.id}
                         className="border-b  odd:bg-white even:bg-gray-200"
                       >
                         <td className="p-1 md:p-1 lg:p-1 text-center hidden lg:table-cell xl:table-cell text-slate-950">
@@ -212,9 +214,9 @@ const UpdateUserStatus = () => {
                         {/* <td className="p-2 text-center">ADMIN</td> */}
                         <td className="p-1 md:p-1 lg:p-1 text-center">
                           <select
-                            value={user.user.role}
+                            value={user.role}
                             onChange={(e) =>
-                              handleRoleChange(user.user.id, e.target.value)
+                              handleRoleChange(user.id, e.target.value)
                             }
                             className="p-1 md:p-1 lg:p-1 border rounded"
                           >
@@ -224,9 +226,9 @@ const UpdateUserStatus = () => {
                         </td>
                         <td className="p-1 md:p-1 lg:p-1 text-center">
                           <select
-                            value={user.user.status}
+                            value={user.status}
                             onChange={(e) =>
-                              handleStatusChange(user.user.id, e.target.value)
+                              handleStatusChange(user.id, e.target.value)
                             }
                             className="p-1 md:p-1 lg:p-1 border rounded"
                           >
@@ -285,7 +287,7 @@ const UpdateUserStatus = () => {
                   <tbody>
                     {filteredUsers.map((user) => (
                       <tr
-                        key={user.user.id}
+                        key={user.id}
                         className="border-b  odd:bg-white even:bg-gray-200"
                       >
                         <td className="p-1 md:p-1 lg:p-1 text-center hidden lg:table-cell xl:table-cell text-slate-950">
@@ -297,9 +299,9 @@ const UpdateUserStatus = () => {
                         {/* <td className="p-2 text-center">USER</td> */}
                         <td className="p-1 md:p-1 lg:p-1 text-center">
                           <select
-                            value={user.user.role}
+                            value={user.role}
                             onChange={(e) =>
-                              handleRoleChange(user.user.id, e.target.value)
+                              handleRoleChange(user.id, e.target.value)
                             }
                             className="p-1 md:p-1 lg:p-1 border rounded"
                           >
@@ -309,9 +311,9 @@ const UpdateUserStatus = () => {
                         </td>
                         <td className="p-1 md:p-1 lg:p-1 text-center">
                           <select
-                            value={user.user.status}
+                            value={user.status}
                             onChange={(e) =>
-                              handleStatusChange(user.user.id, e.target.value)
+                              handleStatusChange(user.id, e.target.value)
                             }
                             className="p-1 md:p-1 lg:p-1 border rounded"
                           >
