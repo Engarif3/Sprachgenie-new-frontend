@@ -58,7 +58,8 @@ const UpdateUserStatus = () => {
         api
           .patch(
             `/user/update-status/${userId}`,
-            { status: newStatus },
+            // { status: newStatus },
+            { status: newStatus, performedById: userInfo.id },
             { headers: { Authorization: `Bearer ${token}` } }
           )
           .then((response) => {
@@ -106,7 +107,9 @@ const UpdateUserStatus = () => {
         api
           .patch(
             `/user/update-role/${userId}`,
-            { role: newRole },
+            // { role: newRole },
+            { role: newRole, performedById: userInfo.id },
+
             { headers: { Authorization: `Bearer ${token}` } }
           )
           .then((response) => {

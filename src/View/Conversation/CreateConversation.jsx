@@ -1,8 +1,10 @@
 import { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2"; // Ensure SweetAlert2 is imported
+import { getUserInfo } from "../../services/auth.services";
 
 const CreateConversation = () => {
+  const userInfo = getUserInfo() || {};
   const [formData, setFormData] = useState({
     topic: "",
     levelId: 1, // Default level A1
@@ -55,6 +57,7 @@ const CreateConversation = () => {
         topic: formData.topic,
         levelId: formData.levelId,
         text: conversationText,
+        createdBy: userInfo.id,
       };
 
       const response = await axios.post(
