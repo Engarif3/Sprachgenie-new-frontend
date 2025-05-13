@@ -163,6 +163,24 @@ const NavBar = () => {
               >
                 Create Word
               </Link>
+              <Link
+                onClick={() => {
+                  setIsMenuOpen(false);
+                }}
+                to="/create-conversation"
+                className="btn btn-sm btn-warning w-full md:w-auto text-center"
+              >
+                Create Conv
+              </Link>
+              <Link
+                onClick={() => {
+                  setIsMenuOpen(false);
+                }}
+                to="update-conversation"
+                className="btn btn-sm btn-warning w-full md:w-auto text-center"
+              >
+                Update Conv
+              </Link>
             </>
           )}
           {userInfo.role === "admin" && (
@@ -207,24 +225,6 @@ const NavBar = () => {
                 className="btn btn-sm btn-warning w-full md:w-auto text-center hidden lg:flex justify-center items-center "
               >
                 Create Topic
-              </Link>
-              <Link
-                onClick={() => {
-                  setIsMenuOpen(false);
-                }}
-                to="/create-conversation"
-                className="btn btn-sm btn-warning w-full md:w-auto text-center"
-              >
-                Create Conv
-              </Link>
-              <Link
-                onClick={() => {
-                  setIsMenuOpen(false);
-                }}
-                to="update-conversation"
-                className="btn btn-sm btn-warning w-full md:w-auto text-center"
-              >
-                Update Conv
               </Link>
             </>
           )}
