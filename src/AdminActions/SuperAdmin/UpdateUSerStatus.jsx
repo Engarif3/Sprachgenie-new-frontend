@@ -44,6 +44,8 @@ const UpdateUserStatus = () => {
       });
   }, []);
 
+  console.log(users);
+
   const handleStatusChange = (userId, newStatus) => {
     if (!token) {
       Swal.fire("Error", "No authorization token found", "error");

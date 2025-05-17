@@ -329,6 +329,10 @@ const WordList = () => {
 
   // Learning mode implementation
   const handleDelete = useCallback((wordId, wordValue) => {
+    if (!userInfo.id) {
+      Swal.fire("Error", "User not logged in or user ID missing.", "error");
+      return;
+    }
     Swal.fire({
       title: "Are you sure?",
       html: `You won't be able to revert this! Delete <strong style="color: #dc2626; font-weight: 800;">"${wordValue}"</strong>?`,
@@ -343,7 +347,11 @@ const WordList = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         api
-          .delete(`/word/delete/${wordId}`)
+          .delete(`/word/delete/${wordId}`, {
+            headers: {
+              userid: userInfo.id, // get this from your React state or context
+            },
+          })
           .then(() => {
             setCache((prev) => ({
               ...prev,
