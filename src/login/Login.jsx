@@ -1,3 +1,5 @@
+// auth, helpers/axios folder important for implementing cookies
+
 import { useState } from "react";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
