@@ -15,12 +15,19 @@ import api from "../../../axios";
 import Loader from "../../../utils/Loader";
 import { pronounceWord } from "../../../utils/wordPronounciation";
 import WordListModal from "../Modals/WordListModal";
+import HistoryModal from "../Modals/HistoryModal";
 
 // Cache key constants
 const CACHE_KEY = "wordListCache";
 const CACHE_EXPIRY = 15 * 60 * 1000; // 15 minutes
 
 const WordList = () => {
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [selectedHistory, setSelectedHistory] = useState({
+    creator: "",
+    modifiers: [],
+  });
+  // ===
   const [filteredTopics, setFilteredTopics] = useState([]);
   const [selectedWord, setSelectedWord] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -576,7 +583,8 @@ const WordList = () => {
                   </th>
                   {userLoggedIn &&
                     (userInfo.role === "basic_user" ||
-                      userInfo.role === "admin") && (
+                      userInfo.role === "admin" ||
+                      userInfo.role === "super_admin") && (
                       <th className="border-l border-gray-400 text-sm md:text-lg lg:text-lg  p-0 md:p-1 lg:p-1 text-center  w-[3%] md:w-[3%] lg:w-[3%]">
                         Fav
                       </th>
@@ -586,10 +594,7 @@ const WordList = () => {
                       userInfo.role === "admin") && (
                       <>
                         <th className="border-l border-gray-400 p-0 md:p-1 text-xs lg:p-1 text-center w-[15%] md:w-[10%] lg:w-[10%] hidden lg:table-cell">
-                          Created By
-                        </th>
-                        <th className="border-l border-gray-400 p-0 md:p-1 text-xs lg:p-1 text-center w-[15%] md:w-[10%] lg:w-[10%] hidden lg:table-cell">
-                          Modified By
+                          Modified by
                         </th>
                       </>
                     )}
@@ -722,7 +727,8 @@ const WordList = () => {
                       {/* ======== */}
                       {userLoggedIn &&
                         (userInfo.role === "basic_user" ||
-                          userInfo.role === "admin") && (
+                          userInfo.role === "admin" ||
+                          userInfo.role === "super_admin") && (
                           <td className="border-l border-r border-gray-400  p-1 text-center">
                             <button
                               onClick={() => toggleFavorite(word.id)}
@@ -785,41 +791,57 @@ const WordList = () => {
                           </td>
                         )}
                       {/* ======== */}
+                      {/* modified by */}
+                      {/* ========== */}
                       {userLoggedIn &&
                         (userInfo.role === "super_admin" ||
                           userInfo.role === "admin") && (
-                          <>
-                            <td className="border-l border-gray-400  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
-                              <div>
-                                <span className="text-xs">
-                                  {word.creator?.name || "Unknown"}
-                                </span>{" "}
-                                <br />
-                                {/* <span>{word.creator?.email || "Not provided"}</span> */}
-                              </div>
-                            </td>
-
-                            <td className="border-l border-gray-400  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
-                              <div>
-                                {word.history?.length > 0 && (
-                                  <div>
-                                    <ul>
-                                      {word.history.map((h) => (
-                                        <li key={h.id}>
-                                          <span className="text-xs">
-                                            {h.user?.name}
-                                          </span>{" "}
-                                          <br />
-                                          {/* ({h.user?.email}) */}
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </div>
-                                )}
-                              </div>
-                            </td>
-                          </>
+                          <td className="border-l border-gray-400 p-2 text-center hidden lg:table-cell">
+                            <button
+                              onClick={() => {
+                                setSelectedHistory({
+                                  creator: {
+                                    name: word.creator?.name,
+                                    email: word.creator?.email,
+                                  },
+                                  modifiers:
+                                    word.history?.map((h) => ({
+                                      name: h.user?.name,
+                                      email: h.user?.email,
+                                    })) || [],
+                                });
+                                setIsHistoryModalOpen(true);
+                              }}
+                              className={`hover:text-blue-700 ${
+                                word.history?.some(
+                                  (h) =>
+                                    h.user?.email !==
+                                      "arif.aust.eng@gmail.com" &&
+                                    h.user?.email !== "almon.arif@gmail.com"
+                                )
+                                  ? "text-red-500"
+                                  : "text-blue-500"
+                              }`}
+                              aria-label="View history"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="w-5 h-5"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                              </svg>
+                            </button>
+                          </td>
                         )}
+                      {/* ========== */}
                     </tr>
                   ))
                 ) : (
@@ -858,6 +880,15 @@ const WordList = () => {
         showAction={showActionColumn}
         totalWords={filteredWords.length}
       />
+
+      {/* ========= */}
+      <HistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+        creator={selectedHistory.creator}
+        modifiers={selectedHistory.modifiers}
+      />
+      {/* ========= */}
     </Container>
   );
 };

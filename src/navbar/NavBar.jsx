@@ -104,7 +104,9 @@ const NavBar = () => {
             </Link>
           )}
           {userLoggedIn &&
-            (userInfo.role === "basic_user" || userInfo.role === "admin") && (
+            (userInfo.role === "basic_user" ||
+              userInfo.role === "admin" ||
+              userInfo.role === "super_admin") && (
               <>
                 <Link
                   onClick={() => setIsMenuOpen(false)}
