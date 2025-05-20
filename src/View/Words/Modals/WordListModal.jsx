@@ -31,15 +31,17 @@ const WordListModal = ({ closeModal, selectedWord, onEdit }) => {
             >
               🔊
             </button>
-            {userLoggedIn && userInfo.role === "super_admin" && (
-              <Link
-                to={`/edit-word/${selectedWord.id}`}
-                // onClick={() => onEdit(selectedWord.id)}
-                className="btn btn-sm btn-warning"
-              >
-                Edit
-              </Link>
-            )}
+            {userLoggedIn &&
+              (userInfo.role === "super_admin" ||
+                userInfo.role === "admin") && (
+                <Link
+                  to={`/edit-word/${selectedWord.id}`}
+                  // onClick={() => onEdit(selectedWord.id)}
+                  className="btn btn-sm btn-warning"
+                >
+                  Edit
+                </Link>
+              )}
           </h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6 lg.gap-6  p-2 md:p-4 lg:p-4">

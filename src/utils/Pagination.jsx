@@ -66,14 +66,15 @@ const Pagination = ({
           Show Paginated View
         </button>
       )}
-      {userLoggedIn && userInfo.role === "super_admin" && (
-        <button
-          onClick={() => setAction(!showAction)}
-          className="bg-blue-500 text-white px-2 py-1 my-2 md:mt-6 rounded-lg hidden md:block"
-        >
-          {showAction ? "Hide Actions" : "Show Actions"}
-        </button>
-      )}
+      {userLoggedIn &&
+        (userInfo.role === "super_admin" || userInfo.role === "admin") && (
+          <button
+            onClick={() => setAction(!showAction)}
+            className="bg-blue-500 text-white px-2 py-1 my-2 md:mt-6 rounded-lg hidden md:block"
+          >
+            {showAction ? "Hide Actions" : "Show Actions"}
+          </button>
+        )}
       {/* Pagination Buttons */}
       <div className="flex justify-between md:justify-end  my-2  w-full md:w-auto">
         {userLoggedIn && userInfo.role === "super_admin" && (
