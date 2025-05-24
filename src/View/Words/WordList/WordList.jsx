@@ -864,7 +864,6 @@ const WordList = () => {
         isOpen={isModalOpen}
         closeModal={closeModal}
         selectedWord={selectedWord}
-        // onEdit={handleEditButtonClick}
       />
 
       {/* Bottom pagination */}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "../../../axios";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -40,7 +40,7 @@ const FavoritesList = () => {
 
     fetchFavorites();
   }, [userInfo?.id]);
-
+  console.log(favoriteWords);
   useEffect(() => {
     const newTotalPages = Math.ceil(favoriteWords.length / 40);
     setTotalPages(newTotalPages);
@@ -52,6 +52,91 @@ const FavoritesList = () => {
       setCurrentPage(1);
     }
   }, [favoriteWords]);
+
+  const openWordInModal = useCallback(
+    (wordValue) => {
+      const word = favoriteWords.find(
+        (w) =>
+          w.value === wordValue ||
+          (w.synonyms && w.synonyms.some((syn) => syn.value === wordValue)) ||
+          (w.antonyms && w.antonyms.some((ant) => ant.value === wordValue)) ||
+          (w.similarWords &&
+            w.similarWords.some((sim) => sim.value === wordValue))
+      );
+
+      if (!word) {
+        Swal.fire(
+          "Not Found",
+          "The word or synonym/antonym/similar word doesn't exist.",
+          "error"
+        );
+        return;
+      }
+
+      const isParent = word.value === wordValue;
+      const isSynonym =
+        !isParent &&
+        word.synonyms &&
+        word.synonyms.some((syn) => syn.value === wordValue);
+      const isAntonym =
+        !isParent &&
+        word.antonyms &&
+        word.antonyms.some((ant) => ant.value === wordValue);
+      const isSimilar =
+        !isParent &&
+        word.similarWords &&
+        word.similarWords.some((sim) => sim.value === wordValue);
+
+      const clickedWord = isParent
+        ? word
+        : isSynonym
+        ? word.synonyms.find((syn) => syn.value === wordValue)
+        : isAntonym
+        ? word.antonyms.find((ant) => ant.value === wordValue)
+        : word.similarWords.find((sim) => sim.value === wordValue);
+
+      const enrichedSynonyms = isParent
+        ? word.synonyms || []
+        : isSynonym
+        ? [
+            { value: word.value }, // original favorite word included here
+            ...word.synonyms.filter((syn) => syn.value !== wordValue),
+          ]
+        : [];
+
+      const enrichedAntonyms = isParent
+        ? word.antonyms || []
+        : isSynonym
+        ? word.antonyms || []
+        : isAntonym
+        ? [{ value: word.value }, ...(word.synonyms || [])].filter(
+            (entry) => entry.value !== wordValue
+          )
+        : [];
+
+      const enrichedSimilarWords = isParent
+        ? word.similarWords || []
+        : isSimilar
+        ? [
+            { value: word.value },
+            ...word.similarWords.filter((sim) => sim.value !== wordValue),
+          ]
+        : [];
+
+      const enriched = {
+        ...clickedWord,
+        level: word.level,
+        topic: word.topic,
+        article: word.article,
+        synonyms: enrichedSynonyms,
+        antonyms: enrichedAntonyms,
+        similarWords: enrichedSimilarWords,
+      };
+
+      openModal(enriched);
+    },
+    [favoriteWords]
+  );
 
   const handleRemoveFavorite = async (wordId) => {
     const result = await Swal.fire({
@@ -129,6 +214,12 @@ const FavoritesList = () => {
                   <th className="border border-gray-600 p-1 text-center">
                     Meaning
                   </th>
+                  <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                    Synonym
+                  </th>
+                  <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                    Antonym
+                  </th>
                   <th className="border border-gray-600 p-1 text-center">
                     Actions
                   </th>
@@ -139,7 +230,8 @@ const FavoritesList = () => {
                   paginatedFavorites.map((word) => (
                     <tr key={word.id} className="bg-white hover:bg-gray-50">
                       <td
-                        className="border border-gray-600 p-2 text-blue-500 cursor-pointer"
+                        className="border border-gray-600 p-2 text-blue-500 cursor-pointer
+                        font-bold text-lg"
                         onClick={() => openModal(word)}
                       >
                         {word.value}
@@ -147,6 +239,35 @@ const FavoritesList = () => {
                       <td className="border border-gray-600 p-2">
                         {word.meaning?.join(", ")}
                       </td>
+                      <td className="border border-gray-600  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
+                        <div className="flex flex-wrap gap-1">
+                          {word.synonyms?.map((synonym, index) => (
+                            <span
+                              key={index}
+                              onClick={() => openWordInModal(synonym.value)}
+                              // className="text-sm sm:text-base hover:underline"
+                              className="text-sm sm:text-base btn btn-sm btn-info"
+                            >
+                              {synonym.value}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+
+                      <td className="border border-gray-600  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
+                        <div className="flex flex-wrap gap-1">
+                          {word.antonyms?.map((antonym, index) => (
+                            <span
+                              key={index}
+                              onClick={() => openWordInModal(antonym.value)}
+                              className="text-sm sm:text-base btn btn-sm btn-info"
+                            >
+                              {antonym.value}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+
                       <td className="border border-gray-600 p-2 text-center">
                         <button
                           onClick={() => handleRemoveFavorite(word.id)}

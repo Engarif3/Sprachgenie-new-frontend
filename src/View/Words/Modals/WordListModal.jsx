@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 import { pronounceWord } from "../../../utils/wordPronounciation";
 
-const WordListModal = ({ closeModal, selectedWord, onEdit }) => {
+const WordListModal = ({ closeModal, selectedWord }) => {
   if (!selectedWord) return null;
   const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo();
