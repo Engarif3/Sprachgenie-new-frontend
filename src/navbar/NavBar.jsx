@@ -4,7 +4,7 @@ import Container from "../utils/Container";
 import Swal from "sweetalert2";
 import AuthButton from "../components/UI/AuthButton/AuthButton";
 import { getUserInfo, isLoggedIn } from "../services/auth.services";
-import { FaHome } from "react-icons/fa";
+import { FaBook, FaHome } from "react-icons/fa";
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -101,6 +101,18 @@ const NavBar = () => {
               {/* Home */}
               <FaHome />
               <span className="ml-2 text-xl mt-2 text-white">Home</span>{" "}
+            </Link>
+          )}
+          {/* //for large screen */}
+          {location.pathname !== "/words" && (
+            <Link
+              onClick={() => setIsMenuOpen(false)}
+              to="/words"
+              // className="btn btn-sm btn-warning  flex items-center justify-center md:hidden lg:hidden"
+              className="hidden md:flex  w-full md:w-auto border-b-2 border-white rounded-md  hover:scale-105 px-1 mt-2"
+            >
+              <FaBook className="text-red-500" size={24} />{" "}
+              <span className="ml-2 text-xl  text-white">Words</span>
             </Link>
           )}
           {userLoggedIn &&

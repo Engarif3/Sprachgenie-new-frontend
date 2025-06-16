@@ -40,7 +40,7 @@ const FavoritesList = () => {
 
     fetchFavorites();
   }, [userInfo?.id]);
-  console.log(favoriteWords);
+
   useEffect(() => {
     const newTotalPages = Math.ceil(favoriteWords.length / 40);
     setTotalPages(newTotalPages);
