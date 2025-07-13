@@ -18,44 +18,121 @@ const UpdateUserStatus = () => {
   const userInfo = getUserInfo() || {};
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (userInfo?.role !== "super_admin") {
-      navigate("/");
-    }
+  // useEffect(() => {
+  //   if (userInfo?.role !== "super_admin") {
+  //     navigate("/");
+  //   }
 
-    api
-      .get("https://sprcahgenie-new-backend.vercel.app/api/v1/user", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
+  //   api
+  //     .get("https://sprcahgenie-new-backend.vercel.app/api/v1/user", {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     })
+  //     .then((response) => {
+  //       if (response.data.success && Array.isArray(response.data.data)) {
+  //         setUsers(response.data.data);
+  //       } else {
+  //         setError("Failed to fetch users or invalid data format");
+  //       }
+  //     })
+  //     .catch(() => {
+  //       setError("Error fetching users");
+  //     })
+  //     .finally(() => {
+  //       setLoading(false);
+  //     });
+  // }, []);
+
+  // const handleStatusChange = (userId, newStatus) => {
+  //   if (!token) {
+  //     Swal.fire("Error", "No authorization token found", "error");
+  //     return;
+  //   }
+
+  //   Swal.fire({
+  //     // title: "Are you sure?",
+  //     text: `Change the status to ${newStatus}?`,
+  //     // icon: "warning",
+  //     showCancelButton: true,
+  //     confirmButtonText: "Yes",
+  //     cancelButtonText: "No",
+  //   }).then((result) => {
+  //     if (result.isConfirmed) {
+  //       api
+  //         .patch(
+  //           `/user/update-status/${userId}`,
+  //           // { status: newStatus },
+  //           { status: newStatus, performedById: userInfo.id },
+  //           { headers: { Authorization: `Bearer ${token}` } }
+  //         )
+  //         .then((response) => {
+  //           if (response.data.success) {
+  //             setUsers((prevUsers) =>
+  //               prevUsers.map((user) =>
+  //                 user.id === userId
+  //                   ? { ...user, status: newStatus } // or role: newRole
+  //                   : user
+  //               )
+  //             );
+  //             Swal.fire({
+  //               title: "Success",
+  //               text: "User status updated successfully!",
+  //               icon: "success",
+  //               timer: 1000, // Auto-close after 1 second
+  //               showConfirmButton: false, // Hide the confirm button
+  //             });
+  //           } else {
+  //             Swal.fire("Failed", "Failed to update user status", "error");
+  //           }
+  //         })
+  //         .catch(() => {
+  //           Swal.fire("Error", "Failed to update user status", "error");
+  //         });
+  //     }
+  //   });
+  // };
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const freshToken = getFromLocalStorage(authKey);
+        const response = await api.get("/user", {
+          headers: { Authorization: `Bearer ${freshToken}` },
+        });
+
         if (response.data.success && Array.isArray(response.data.data)) {
           setUsers(response.data.data);
         } else {
           setError("Failed to fetch users or invalid data format");
         }
-      })
-      .catch(() => {
+      } catch (err) {
+        console.error(
+          "Error fetching users:",
+          err.response || err.message || err
+        );
         setError("Error fetching users");
-      })
-      .finally(() => {
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    if (userInfo?.role === "super_admin") {
+      fetchUsers();
+    } else {
+      navigate("/");
+    }
   }, []);
 
-  console.log(users);
-
   const handleStatusChange = (userId, newStatus) => {
-    if (!token) {
+    const freshToken = getFromLocalStorage(authKey);
+    if (!freshToken) {
       Swal.fire("Error", "No authorization token found", "error");
       return;
     }
 
     Swal.fire({
-      // title: "Are you sure?",
       text: `Change the status to ${newStatus}?`,
-      // icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes",
       cancelButtonText: "No",
@@ -64,25 +141,22 @@ const UpdateUserStatus = () => {
         api
           .patch(
             `/user/update-status/${userId}`,
-            // { status: newStatus },
             { status: newStatus, performedById: userInfo.id },
-            { headers: { Authorization: `Bearer ${token}` } }
+            { headers: { Authorization: `Bearer ${freshToken}` } }
           )
           .then((response) => {
             if (response.data.success) {
               setUsers((prevUsers) =>
                 prevUsers.map((user) =>
-                  user.id === userId
-                    ? { ...user, status: newStatus } // or role: newRole
-                    : user
+                  user.id === userId ? { ...user, status: newStatus } : user
                 )
               );
               Swal.fire({
                 title: "Success",
                 text: "User status updated successfully!",
                 icon: "success",
-                timer: 1000, // Auto-close after 1 second
-                showConfirmButton: false, // Hide the confirm button
+                timer: 1000,
+                showConfirmButton: false,
               });
             } else {
               Swal.fire("Failed", "Failed to update user status", "error");
@@ -96,7 +170,13 @@ const UpdateUserStatus = () => {
   };
 
   const handleRoleChange = (userId, newRole) => {
-    if (!token) {
+    // if (!token) {
+    //   Swal.fire("Error", "No authorization token found", "error");
+    //   return;
+    // }
+
+    const freshToken = getFromLocalStorage(authKey);
+    if (!freshToken) {
       Swal.fire("Error", "No authorization token found", "error");
       return;
     }
