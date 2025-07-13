@@ -181,9 +181,11 @@ const UpdateUserStatus = () => {
       return;
     }
 
+    let role = newRole === "BASIC_USER" ? "Basic User" : "Admin";
+
     Swal.fire({
       // title: "Are you sure?",
-      text: `change the role to ${newRole}?`,
+      text: `Change the role to  ${role}?`,
       // icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes",
