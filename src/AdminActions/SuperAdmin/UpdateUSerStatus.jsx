@@ -198,7 +198,7 @@ const UpdateUserStatus = () => {
             // { role: newRole },
             { role: newRole, performedById: userInfo.id },
 
-            { headers: { Authorization: `Bearer ${token}` } }
+            { headers: { Authorization: `Bearer ${freshToken}` } }
           )
           .then((response) => {
             if (response.data.success) {
@@ -224,6 +224,7 @@ const UpdateUserStatus = () => {
       }
     });
   };
+
   const admins = users.filter((user) => user.role === "ADMIN");
   const basicUsers = users.filter((user) => user.role === "BASIC_USER");
   const filteredUsers =
