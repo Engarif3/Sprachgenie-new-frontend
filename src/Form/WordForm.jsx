@@ -117,7 +117,7 @@ const WordForm = () => {
       sentences:
         typeof wordData.sentences === "string"
           ? wordData.sentences
-              .split(",")
+              .split("|")
               .map((item) => item.trim())
               .filter((item) => item) // Removes empty strings
           : [],
@@ -253,7 +253,7 @@ const WordForm = () => {
               htmlFor="sentences"
               className="block text-sm font-medium text-gray-700"
             >
-              Sentences (comma separated, Optional)
+              Sentences(Optional, eg. sentence A. | Sentence B.)
             </label>
             <input
               type="text"

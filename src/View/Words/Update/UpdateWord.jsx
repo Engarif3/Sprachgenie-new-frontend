@@ -235,7 +235,7 @@ const UpdateWord = () => {
       ),
       sentences: formData.sentences.concat(
         inputData.sentences
-          .split(". ")
+          .split("|")
           .map((item) => item.trim())
           .filter((item) => item !== "")
       ),
@@ -373,7 +373,7 @@ const UpdateWord = () => {
             <div>
               <label className="block  mb-2 text-white">
                 <span className="font-medium text-lg">Sentences</span> (for
-                multiple input use dot and a space)
+                multiple input use "|". eg. sentence A. | Sentence B.)
               </label>
               {/* <div className="border border-slate-300 p-1 rounded-lg"> */}
               <input
