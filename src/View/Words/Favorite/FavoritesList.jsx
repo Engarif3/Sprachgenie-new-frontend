@@ -192,6 +192,8 @@ const FavoritesList = () => {
     currentPage * 40
   );
 
+  console.log(paginatedFavorites);
+
   return (
     <Container>
       <h2 className="text-3xl font-bold font-mono my-8 text-center">
@@ -219,6 +221,9 @@ const FavoritesList = () => {
                   </th>
                   <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                     Antonym
+                  </th>
+                  <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                    Deceptive
                   </th>
                   <th className="border border-gray-600 p-1 text-center">
                     Actions
@@ -263,6 +268,19 @@ const FavoritesList = () => {
                               className="text-sm sm:text-base btn btn-sm btn-info"
                             >
                               {antonym.value}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="border border-gray-600  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
+                        <div className="flex flex-wrap gap-1">
+                          {word.similarWords?.map((similarWord, index) => (
+                            <span
+                              key={index}
+                              onClick={() => openWordInModal(similarWord.value)}
+                              className="text-sm sm:text-base btn btn-sm btn-info"
+                            >
+                              {similarWord.value}
                             </span>
                           ))}
                         </div>
