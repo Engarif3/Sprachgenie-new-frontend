@@ -192,8 +192,6 @@ const FavoritesList = () => {
     currentPage * 40
   );
 
-  console.log(paginatedFavorites);
-
   return (
     <Container>
       <h2 className="text-3xl font-bold font-mono my-8 text-center">
