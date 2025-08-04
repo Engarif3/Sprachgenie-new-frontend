@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import WordListModal from "../Modals/WordListModal";
 import Container from "../../../utils/Container";
 import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
+import Pagination from "./Pagination";
 
 const FavoritesList = () => {
   const [selectedWord, setSelectedWord] = useState(null);
@@ -195,7 +196,7 @@ const FavoritesList = () => {
   return (
     <Container>
       <h2 className="text-3xl font-bold font-mono my-8 text-center">
-        {paginatedFavorites.length} Favorite Words
+        {favoriteWords.length} Favorite Words
       </h2>
 
       {isLoading ? (
@@ -204,8 +205,18 @@ const FavoritesList = () => {
         </div>
       ) : (
         <div className="min-h-screen mb-12">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            setCurrentPage={setCurrentPage}
+          />
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse mt-2">
+            <h2 className="text-md  font-mono  text-right  ">
+              <span className="bg-green-700 px-1 rounded text-white ">
+                Showing-{paginatedFavorites.length}
+              </span>
+            </h2>
+            <table className="w-full border-collapse ">
               <thead>
                 <tr className="bg-cyan-600 text-xl text-white">
                   <th className="border border-gray-600 p-1 text-center">
@@ -305,41 +316,11 @@ const FavoritesList = () => {
             </table>
           </div>
 
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 my-4">
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition-colors"
-              >
-                Previous
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`px-4 py-2 rounded transition-colors ${
-                      currentPage === page
-                        ? "bg-cyan-600 text-white hover:bg-cyan-700"
-                        : "bg-gray-200 hover:bg-gray-300"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                )
-              )}
-              <button
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-                }
-                disabled={currentPage === totalPages}
-                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition-colors"
-              >
-                Next
-              </button>
-            </div>
-          )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            setCurrentPage={setCurrentPage}
+          />
         </div>
       )}
 
