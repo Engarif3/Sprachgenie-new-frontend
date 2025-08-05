@@ -88,7 +88,7 @@ const WordListModal = ({ closeModal, selectedWord }) => {
             <span className="font-bold text-sky-500">Level:</span>{" "}
             {selectedWord.level?.level || ""}
           </p>
-          <p className="text-lg text-gray-600">
+          <div className="text-lg text-gray-600">
             <span className="font-bold text-sky-500">Sentences:</span>
             {selectedWord.sentences && selectedWord.sentences.length > 0 ? (
               <ul className="list-disc pl-5 space-y-2">
@@ -101,7 +101,7 @@ const WordListModal = ({ closeModal, selectedWord }) => {
             ) : (
               <span className="text-gray-400">No sentences available.</span>
             )}
-          </p>
+          </div>
         </div>
 
         <div className="mt-8 flex justify-center">

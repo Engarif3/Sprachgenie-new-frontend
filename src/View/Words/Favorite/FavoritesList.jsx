@@ -211,109 +211,123 @@ const FavoritesList = () => {
             setCurrentPage={setCurrentPage}
           />
           <div className="overflow-x-auto">
-            <h2 className="text-md  font-mono  text-right  ">
-              <span className="bg-green-700 px-1 rounded text-white ">
-                Showing-{paginatedFavorites.length}
-              </span>
-            </h2>
-            <table className="w-full border-collapse ">
-              <thead>
-                <tr className="bg-cyan-600 text-xl text-white">
-                  <th className="border border-gray-600 p-1 text-center">
-                    Word
-                  </th>
-                  <th className="border border-gray-600 p-1 text-center">
-                    Meaning
-                  </th>
-                  <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
-                    Synonym
-                  </th>
-                  <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
-                    Antonym
-                  </th>
-                  <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
-                    Deceptive
-                  </th>
-                  <th className="border border-gray-600 p-1 text-center">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedFavorites.length > 0 ? (
-                  paginatedFavorites.map((word) => (
-                    <tr key={word.id} className="bg-white hover:bg-gray-50">
-                      <td
-                        className="border border-gray-600 p-2 text-blue-500 cursor-pointer
-                        font-bold text-lg"
-                        onClick={() => openModal(word)}
-                      >
-                        {word.value}
-                      </td>
-                      <td className="border border-gray-600 p-2">
-                        {word.meaning?.join(", ")}
-                      </td>
-                      <td className="border border-gray-600  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
-                        <div className="flex flex-wrap gap-1">
-                          {word.synonyms?.map((synonym, index) => (
-                            <span
-                              key={index}
-                              onClick={() => openWordInModal(synonym.value)}
-                              // className="text-sm sm:text-base hover:underline"
-                              className="text-sm sm:text-base btn btn-sm btn-info"
-                            >
-                              {synonym.value}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
+            {paginatedFavorites.length > 0 ? (
+              <>
+                <h2 className="text-md  font-mono  text-right  ">
+                  <span className="bg-green-700 px-1 rounded text-white ">
+                    Showing-{paginatedFavorites.length}
+                  </span>
+                </h2>
 
-                      <td className="border border-gray-600  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
-                        <div className="flex flex-wrap gap-1">
-                          {word.antonyms?.map((antonym, index) => (
-                            <span
-                              key={index}
-                              onClick={() => openWordInModal(antonym.value)}
-                              className="text-sm sm:text-base btn btn-sm btn-info"
-                            >
-                              {antonym.value}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-                      <td className="border border-gray-600  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
-                        <div className="flex flex-wrap gap-1">
-                          {word.similarWords?.map((similarWord, index) => (
-                            <span
-                              key={index}
-                              onClick={() => openWordInModal(similarWord.value)}
-                              className="text-sm sm:text-base btn btn-sm btn-info"
-                            >
-                              {similarWord.value}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-
-                      <td className="border border-gray-600 p-2 text-center">
-                        <button
-                          onClick={() => handleRemoveFavorite(word.id)}
-                          className="text-red-500 hover:text-red-700 font-bold py-1 px-3 rounded"
-                        >
-                          Remove
-                        </button>
-                      </td>
+                <table className="w-full border-collapse ">
+                  <thead>
+                    <tr className="bg-cyan-600 text-xl text-white">
+                      <th className="border border-gray-600 p-1 text-center">
+                        Word
+                      </th>
+                      <th className="border border-gray-600 p-1 text-center">
+                        Meaning
+                      </th>
+                      <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                        Synonym
+                      </th>
+                      <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                        Antonym
+                      </th>
+                      <th className="border border-gray-600 p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                        Deceptive
+                      </th>
+                      <th className="border border-gray-600 p-1 text-center">
+                        Actions
+                      </th>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="4" className="text-center py-4">
-                      No favorite words found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody>
+                    {paginatedFavorites.map((word) => (
+                      <tr key={word.id} className="bg-white hover:bg-gray-50">
+                        <td
+                          className="border border-gray-600 p-2 text-blue-500 cursor-pointer
+                        font-bold text-lg"
+                          onClick={() => openModal(word)}
+                        >
+                          {word.value}
+                        </td>
+                        <td className="border border-gray-600 p-2">
+                          {word.meaning?.join(", ")}
+                        </td>
+                        <td className="border border-gray-600  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
+                          <div className="flex flex-wrap gap-1">
+                            {word.synonyms?.map((synonym, index) => (
+                              <span
+                                key={index}
+                                onClick={() => openWordInModal(synonym.value)}
+                                // className="text-sm sm:text-base hover:underline"
+                                className="text-sm sm:text-base btn btn-sm btn-info"
+                              >
+                                {synonym.value}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+
+                        <td className="border border-gray-600  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
+                          <div className="flex flex-wrap gap-1">
+                            {word.antonyms?.map((antonym, index) => (
+                              <span
+                                key={index}
+                                onClick={() => openWordInModal(antonym.value)}
+                                className="text-sm sm:text-base btn btn-sm btn-info"
+                              >
+                                {antonym.value}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+                        <td className="border border-gray-600  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
+                          <div className="flex flex-wrap gap-1">
+                            {word.similarWords?.map((similarWord, index) => (
+                              <span
+                                key={index}
+                                onClick={() =>
+                                  openWordInModal(similarWord.value)
+                                }
+                                className="text-sm sm:text-base btn btn-sm btn-info"
+                              >
+                                {similarWord.value}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+
+                        <td className="border border-gray-600 p-2 text-center">
+                          <button
+                            onClick={() => handleRemoveFavorite(word.id)}
+                            className="text-red-500 hover:text-red-700 font-bold py-1 px-3 rounded"
+                          >
+                            Remove
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            ) : (
+              <div className="min-h-screen flex justify-center items-center  ">
+                <p className="text-xl text-center mb-52">
+                  No favorite words found. <br /> Add some first. <br />
+                  <Link
+                    to="/words"
+                    // className="btn btn-sm btn-warning  flex items-center justify-center md:hidden lg:hidden"
+                    className="hover:scale-105 px-1 mt-2"
+                  >
+                    <button className=" btn btn-sm btn-secondary ml-2 text-xl  text-white mt-2">
+                      Words
+                    </button>
+                  </Link>
+                </p>
+              </div>
+            )}
           </div>
 
           <Pagination
