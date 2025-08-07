@@ -88,7 +88,7 @@ const WordListModal = ({ closeModal, selectedWord }) => {
             <span className="font-bold text-sky-500">Level:</span>{" "}
             {selectedWord.level?.level || ""}
           </p>
-          <div className="text-lg text-gray-600">
+          {/* <div className="text-lg text-gray-600">
             <span className="font-bold text-sky-500">Sentences:</span>
             {selectedWord.sentences && selectedWord.sentences.length > 0 ? (
               <ul className="list-disc pl-5 space-y-2">
@@ -97,6 +97,43 @@ const WordListModal = ({ closeModal, selectedWord }) => {
                     {sentence}
                   </li>
                 ))}
+              </ul>
+            ) : (
+              <span className="text-gray-400">No sentences available.</span>
+            )}
+          </div> */}
+          <div className="text-lg text-gray-600">
+            <span className="font-bold text-sky-500">Sentences:</span>
+            {selectedWord.sentences && selectedWord.sentences.length > 0 ? (
+              <ul className="pl-5 space-y-2 list-disc">
+                {selectedWord.sentences.map((sentence, index) => {
+                  const trimmed = sentence.trim();
+
+                  let isSpecial = false;
+                  let className = "text-gray-600 list-disc";
+                  let cleanSentence = sentence;
+
+                  if (trimmed.startsWith("##")) {
+                    isSpecial = true;
+                    className =
+                      "font-semibold text-cyan-700 list-none text-center underline capitalize";
+                    cleanSentence = sentence.replace(/^(\#\#|)\s*/, "");
+                  } else if (trimmed.startsWith("**")) {
+                    isSpecial = true;
+                    className =
+                      " text-green-600 list-none text-sm first-letter:uppercase";
+                    cleanSentence = sentence
+                      .replace(/^\*\*\s*/, "-")
+                      .replace(/\*\*$/, "")
+                      .trim();
+                  }
+
+                  return (
+                    <li key={index} className={className}>
+                      {cleanSentence}
+                    </li>
+                  );
+                })}
               </ul>
             ) : (
               <span className="text-gray-400">No sentences available.</span>

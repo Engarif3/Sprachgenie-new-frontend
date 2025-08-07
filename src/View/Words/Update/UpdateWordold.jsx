@@ -37,8 +37,6 @@ const UpdateWord = () => {
   const [topics, setTopics] = useState([]);
   const [articles, setArticles] = useState([]);
   const [partOfSpeeches, setPartOfSpeeches] = useState([]);
-  const [editingField, setEditingField] = useState(null); // { type: 'meaning' | 'sentences', index: number }
-  const [editValue, setEditValue] = useState("");
 
   const [inputData, setInputData] = useState({
     meaning: "",
@@ -307,44 +305,6 @@ const UpdateWord = () => {
     }
   };
 
-  const handleSaveEdit = async (field, index) => {
-    const updatedArray = [...formData[field]];
-    updatedArray[index] = editValue.trim();
-
-    // Optional: Prevent saving empty values
-    if (!updatedArray[index]) return;
-
-    setFormData((prev) => ({
-      ...prev,
-      [field]: updatedArray,
-    }));
-
-    try {
-      await api.put(`/word/update/${formData.id}`, {
-        ...formData,
-        userId: userInfo.id,
-        [field]: updatedArray,
-      });
-
-      Swal.fire({
-        title: "Updated!",
-        text: "The item has been edited successfully.",
-        timer: 800,
-        showConfirmButton: false,
-        icon: "success",
-      });
-    } catch (error) {
-      Swal.fire({
-        title: "Error!",
-        text: "Failed to update. Please try again.",
-        icon: "error",
-      });
-    } finally {
-      setEditingField(null);
-      setEditValue("");
-    }
-  };
-
   return (
     <Container>
       <h2 className="text-3xl font-semibold mb-6 text-center mt-8 text-orange-600">
@@ -396,54 +356,14 @@ const UpdateWord = () => {
                     key={index}
                     className="flex items-center justify-between bg-slate-300 p-2 rounded-lg mb-2 shadow-sm"
                   >
-                    {editingField?.type === "meaning" &&
-                    editingField?.index === index ? (
-                      <>
-                        <input
-                          type="text"
-                          value={editValue}
-                          onChange={(e) => setEditValue(e.target.value)}
-                          className="w-full p-2 mr-2 border border-gray-400 rounded"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleSaveEdit("meaning", index)}
-                          className="btn btn-sm btn-success mr-1"
-                        >
-                          Save
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setEditingField(null)}
-                          className="btn btn-sm btn-ghost"
-                        >
-                          Cancel
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <li>{item}</li>
-                        <div className="space-x-2">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setEditingField({ type: "meaning", index });
-                              setEditValue(item);
-                            }}
-                            className="btn btn-sm btn-info"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveItem("meaning", index)}
-                            className="btn btn-sm btn-error"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </>
-                    )}
+                    <li>{item}</li>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveItem("meaning", index)}
+                      className="btn btn-sm btn-error"
+                    >
+                      Remove
+                    </button>
                   </div>
                 ))}
               </div>
@@ -470,58 +390,17 @@ const UpdateWord = () => {
                     key={index}
                     className="flex items-center justify-between bg-slate-300 p-2 rounded-lg mb-2 shadow-sm"
                   >
-                    {editingField?.type === "sentences" &&
-                    editingField?.index === index ? (
-                      <>
-                        <input
-                          type="text"
-                          value={editValue}
-                          onChange={(e) => setEditValue(e.target.value)}
-                          className="w-full p-2 mr-2 border border-gray-400 rounded"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleSaveEdit("sentences", index)}
-                          className="btn btn-sm btn-success mr-1"
-                        >
-                          Save
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setEditingField(null)}
-                          className="btn btn-sm btn-ghost"
-                        >
-                          Cancel
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <li className="mr-4">{item}</li>
-                        <div className="space-x-2">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setEditingField({ type: "sentences", index });
-                              setEditValue(item);
-                            }}
-                            className="btn btn-sm btn-info"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveItem("sentences", index)}
-                            className="btn btn-sm btn-error"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </>
-                    )}
+                    <li>{item}</li>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveItem("sentences", index)}
+                      className="btn btn-sm btn-error"
+                    >
+                      Remove
+                    </button>
                   </div>
                 ))}
               </div>
-
               {/* </div> */}
             </div>
 
