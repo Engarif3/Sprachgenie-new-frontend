@@ -31,6 +31,7 @@ import UpdateUserStatus from "../AdminActions/SuperAdmin/UpdateUSerStatus";
 import PerfectAndPastForm from "../View/Grammar/PerfectAndPastForm/PerfectAndPastForm";
 import Stories from "../View/Stories/Stories";
 import Login from "../login/Login";
+import UsersFavoriteCount from "../AdminActions/Admin/UsersFavoriteCount";
 
 export const router = createBrowserRouter([
   {
@@ -140,6 +141,10 @@ export const router = createBrowserRouter([
       {
         path: "/update-basic-user-status",
         element: <UpdateBasicUserStatus></UpdateBasicUserStatus>,
+      },
+      {
+        path: "/users-favorite-count",
+        element: <UsersFavoriteCount></UsersFavoriteCount>,
       },
       {
         path: "/past-perfect",
