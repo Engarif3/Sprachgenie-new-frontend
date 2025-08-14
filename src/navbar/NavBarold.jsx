@@ -5,7 +5,6 @@ import Swal from "sweetalert2";
 import AuthButton from "../components/UI/AuthButton/AuthButton";
 import { getUserInfo, isLoggedIn } from "../services/auth.services";
 import { FaBook, FaHome } from "react-icons/fa";
-import { MdDashboard } from "react-icons/md";
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -167,24 +166,6 @@ const NavBar = () => {
               Words List
             </Link>
           )} */}
-
-          {/* ============ */}
-          {userLoggedIn && (
-            <Link
-              to="/dashboard"
-              onClick={() => setIsMenuOpen(false)}
-              // className="btn btn-sm btn-warning w-full md:w-auto text-center hidden lg:flex justify-center items-center"
-              className="hidden  md:flex items-center justify-center text-3xl text-red-600 border-b-2 border-white rounded-md  hover:scale-105 px-1"
-            >
-              {/* Dashboard */}
-              <MdDashboard />
-              <span className="ml-2 text-xl mt-2 text-white">
-                Dashboard
-              </span>{" "}
-            </Link>
-          )}
-
-          {/* ============ */}
           {(userInfo.role === "super_admin" || userInfo.role === "admin") && (
             <>
               <Link
@@ -192,7 +173,7 @@ const NavBar = () => {
                   setIsMenuOpen(false);
                 }}
                 to="/create-word"
-                className="btn btn-sm btn-warning w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
+                className="btn btn-sm btn-warning w-full md:w-auto text-center"
               >
                 Create Word
               </Link>
@@ -201,7 +182,7 @@ const NavBar = () => {
                   setIsMenuOpen(false);
                 }}
                 to="/create-conversation"
-                className="btn btn-sm btn-warning w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
+                className="btn btn-sm btn-warning w-full md:w-auto text-center"
               >
                 Create Conv
               </Link>
@@ -210,7 +191,7 @@ const NavBar = () => {
                   setIsMenuOpen(false);
                 }}
                 to="update-conversation"
-                className="btn btn-sm btn-warning w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
+                className="btn btn-sm btn-warning w-full md:w-auto text-center"
               >
                 Update Conv
               </Link>
@@ -223,7 +204,7 @@ const NavBar = () => {
                   setIsMenuOpen(false);
                 }}
                 to="/update-basic-user-status"
-                className="btn btn-sm btn-success w-full md:w-auto text-center text-slate-950 font-bold flex justify-center items-center md:hidden lg:hidden"
+                className="btn btn-sm btn-success w-full md:w-auto text-center text-slate-950 font-bold"
               >
                 Users
               </Link>
@@ -236,7 +217,7 @@ const NavBar = () => {
                   setIsMenuOpen(false);
                 }}
                 to="/update-user-status"
-                className="btn btn-sm btn-success w-full md:w-auto text-center text-slate-950 font-bold flex justify-center items-center md:hidden lg:hidden"
+                className="btn btn-sm btn-success w-full md:w-auto text-center text-slate-950 font-bold"
               >
                 Users
               </Link>
@@ -246,7 +227,7 @@ const NavBar = () => {
             <>
               <button
                 onClick={() => handleDeleteAll()}
-                className="btn btn-sm btn-warning  hidden "
+                className="btn btn-sm btn-warning  hidden lg:block "
               >
                 Delete All
               </button>
@@ -255,7 +236,7 @@ const NavBar = () => {
                   handleCreateTopic();
                   setIsMenuOpen(false);
                 }}
-                className="btn btn-sm btn-warning w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden "
+                className="btn btn-sm btn-warning w-full md:w-auto text-center hidden lg:flex justify-center items-center "
               >
                 Create Topic
               </Link>

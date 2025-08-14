@@ -14,15 +14,25 @@ const UsersFavoriteCount = () => {
   const userInfo = getUserInfo() || {};
   const navigate = useNavigate();
 
+  const hasAccess =
+    userInfo?.role === "admin" || userInfo?.role === "super_admin";
+
   useEffect(() => {
-    if (userInfo?.role !== "admin") {
-      navigate("/"); // redirect non-admins
+    if (!hasAccess) {
+      navigate("/");
       return;
     }
 
     const fetchData = async () => {
       try {
         const token = getFromLocalStorage(authKey);
+
+        if (!token) {
+          setError("No authentication token found");
+          setLoading(false);
+          return; // Stop execution here
+        }
+
         const response = await api.get(
           //   "http://localhost:5000/api/v1/users-favorite-count",
           "/users-favorite-count",
@@ -45,15 +55,15 @@ const UsersFavoriteCount = () => {
     };
 
     fetchData();
-  }, [userInfo?.role, navigate]);
+  }, [hasAccess, navigate]);
 
   return (
-    <Container>
-      {userInfo?.role === "admin" && (
+    <>
+      {hasAccess && (
         <div className="container mx-auto p-4 min-h-screen">
           <h2 className="text-2xl font-bold mb-4 text-center text-white py-2 bg-cyan-700 rounded">
             Users & Favorite Words Count{" "}
-            <span className="text-md text-orange-300">({users.length})</span>
+            {/* <span className="text-md text-orange-300">({users.length})</span> */}
           </h2>
 
           {loading ? (
@@ -95,7 +105,7 @@ const UsersFavoriteCount = () => {
           )}
         </div>
       )}
-    </Container>
+    </>
   );
 };
 

@@ -9,6 +9,7 @@ const Grammar = () => {
     { id: 3, topic: "Verb with Preposition" },
     { id: 4, topic: "Adjective with Preposition" },
     { id: 5, topic: "Perfekt & Präteritum" },
+    { id: 6, topic: "Verbs ending with - gehen" },
   ];
   return (
     <Container>

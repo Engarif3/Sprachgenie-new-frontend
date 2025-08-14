@@ -1,0 +1,334 @@
+{
+  "words": [
+    {
+      "word": "abgehen",
+      "meaning": "to depart, leave",
+      "sentences": {
+        "present": "Der Zug geht um zehn Uhr ab.",
+        "past": "Der Flug ging pünktlich ab.",
+        "perfect": "Das Schiff ist schon abgegangen.",
+        "modal": "Wir müssen bald abgehen."
+      }
+    },
+    {
+      "word": "angeln gehen",
+      "meaning": "to go fishing",
+      "sentences": {
+        "present": "Wir gehen jeden Samstag angeln.",
+        "past": "Gestern gingen wir am See angeln.",
+        "perfect": "Wir sind den ganzen Morgen angeln gegangen.",
+        "modal": "Wir wollen morgen angeln gehen."
+      }
+    },
+    {
+      "word": "auf sich gehen",
+      "meaning": "to turn inward, focus on oneself",
+      "sentences": {
+        "present": "Er geht oft auf sich selbst.",
+        "past": "Er ging früher immer auf sich selbst.",
+        "perfect": "Er ist viel auf sich selbst gegangen.",
+        "modal": "Er soll auf sich selbst gehen."
+      }
+    },
+    {
+      "word": "aufgehen",
+      "meaning": "to rise (sun, dough)",
+      "sentences": {
+        "present": "Die Sonne geht um sechs Uhr auf.",
+        "past": "Die Sonne ging heute früh sehr schön auf.",
+        "perfect": "Die Sonne ist schon aufgegangen.",
+        "modal": "Die Sonne wird bald aufgehen."
+      }
+    },
+    {
+      "word": "ausgehen",
+      "meaning": "to go out (for leisure)",
+      "sentences": {
+        "present": "Wir gehen heute Abend mit Freunden aus.",
+        "past": "Wir gingen gestern zusammen aus.",
+        "perfect": "Wir sind am Wochenende lange ausgegangen.",
+        "modal": "Wir wollen morgen zusammen ausgehen."
+      }
+    },
+    {
+      "word": "baden gehen",
+      "meaning": "to go bathing, swimming",
+      "sentences": {
+        "present": "Wir gehen im Sommer oft im See baden.",
+        "past": "Wir gingen gestern am Strand baden.",
+        "perfect": "Wir sind im Meer badengegangen.",
+        "modal": "Wir wollen morgen baden gehen."
+      }
+    },
+    {
+      "word": "beigehen",
+      "meaning": "to approach, to attend to",
+      "sentences": {
+        "present": "Wir gehen dem Problem sofort bei.",
+        "past": "Sie gingen der Aufgabe mutig bei.",
+        "perfect": "Wir sind der Reparatur erfolgreich beigegangen.",
+        "modal": "Wir wollen der Sache direkt beigehen."
+      }
+    },
+    {
+      "word": "durchgehen",
+      "meaning": "to go through, to review",
+      "sentences": {
+        "present": "Wir gehen den Plan noch einmal durch.",
+        "past": "Sie gingen die Liste sorgfältig durch.",
+        "perfect": "Wir sind alle Punkte durchgegangen.",
+        "modal": "Wir müssen das Dokument durchgehen."
+      }
+    },
+    {
+      "word": "duschen gehen",
+      "meaning": "to go take a shower",
+      "sentences": {
+        "present": "Ich gehe jetzt duschen.",
+        "past": "Gestern ging er nach dem Sport duschen.",
+        "perfect": "Wir sind nach dem Training duschen gegangen.",
+        "modal": "Ich möchte jetzt duschen gehen."
+      }
+    },
+    {
+      "word": "einhergehen",
+      "meaning": "to accompany, to go along with",
+      "sentences": {
+        "present": "Viel Verantwortung geht oft mit Stress einher.",
+        "past": "Große Veränderungen gingen mit Unsicherheit einher.",
+        "perfect": "Die Reform ist mit Problemen einhergegangen.",
+        "modal": "Stress kann mit Krankheiten einhergehen."
+      }
+    },
+    {
+      "word": "einkaufen gehen",
+      "meaning": "to go shopping",
+      "sentences": {
+        "present": "Wir gehen oft in der Stadt einkaufen.",
+        "past": "Sie gingen gestern einkaufen.",
+        "perfect": "Wir sind für Schuhe einkaufen gegangen.",
+        "modal": "Ich muss heute noch einkaufen gehen."
+      }
+    },
+    {
+      "word": "entgehen",
+      "meaning": "to escape, to avoid",
+      "sentences": {
+        "present": "Kein Detail darf uns entgehen.",
+        "past": "Dieser Fehler ist uns leider entgangen.",
+        "perfect": "Nichts ist uns entgangen.",
+        "modal": "Es darf uns nichts entgehen."
+      }
+    },
+    {
+      "word": "essen gehen",
+      "meaning": "to go eat",
+      "sentences": {
+        "present": "Am Freitag gehen wir gemeinsam essen.",
+        "past": "Wir gingen gestern Abend im Restaurant essen.",
+        "perfect": "Wir sind in der Stadt essengegangen.",
+        "modal": "Ich möchte heute Abend essen gehen."
+      }
+    },
+    {
+      "word": "hingehen",
+      "meaning": "to go there, to attend",
+      "sentences": {
+        "present": "Gehst du morgen ins Konzert hin?",
+        "past": "Ich ging gestern allein dorthin hin.",
+        "perfect": "Ich bin noch nie zu diesem Markt hingegangen.",
+        "modal": "Wir sollen nächste Woche wieder hingehen."
+      }
+    },
+    {
+      "word": "joggen gehen",
+      "meaning": "to go jogging",
+      "sentences": {
+        "present": "Ich gehe jeden Morgen joggen.",
+        "past": "Gestern gingen wir zusammen joggen.",
+        "perfect": "Wir sind heute früh joggen gegangen.",
+        "modal": "Ich möchte morgen joggen gehen."
+      }
+    },
+    {
+      "word": "kaputtgehen",
+      "meaning": "to break, get damaged",
+      "sentences": {
+        "present": "Mein Handy geht im Regen kaputt.",
+        "past": "Mein Laptop ging gestern kaputt.",
+        "perfect": "Mein Auto ist letzte Woche kaputtgegangen.",
+        "modal": "Es kann leicht kaputtgehen."
+      }
+    },
+    {
+      "word": "klettern gehen",
+      "meaning": "to go climbing",
+      "sentences": {
+        "present": "Wir gehen am Wochenende klettern.",
+        "past": "Letzten Samstag gingen wir klettern.",
+        "perfect": "Wir sind im Sommer oft klettern gegangen.",
+        "modal": "Ich möchte morgen klettern gehen."
+      }
+    },
+    {
+      "word": "laufen gehen",
+      "meaning": "to go running/exercise",
+      "sentences": {
+        "present": "Ich gehe jeden Abend laufen.",
+        "past": "Gestern ging er eine Stunde laufen.",
+        "perfect": "Wir sind heute morgen laufen gegangen.",
+        "modal": "Wir wollen morgen laufen gehen."
+      }
+    },
+    {
+      "word": "losgehen",
+      "meaning": "to start, to set off",
+      "sentences": {
+        "present": "Das Konzert geht um acht Uhr los.",
+        "past": "Die Veranstaltung ging pünktlich los.",
+        "perfect": "Es ist gerade losgegangen.",
+        "modal": "Wir müssen bald losgehen."
+      }
+    },
+    {
+      "word": "mitgehen",
+      "meaning": "to go along, accompany",
+      "sentences": {
+        "present": "Willst du mit uns mitgehen?",
+        "past": "Sie gingen gestern mit ihm mit.",
+        "perfect": "Ich bin ihm nach Hause mitgegangen.",
+        "modal": "Wir können zusammen mitgehen."
+      }
+    },
+    {
+      "word": "nachgehen",
+      "meaning": "to pursue, follow",
+      "sentences": {
+        "present": "Ich gehe meinen Hobbys nach.",
+        "past": "Sie gingen ihren Interessen nach.",
+        "perfect": "Wir sind unseren Träumen nachgegangen.",
+        "modal": "Du solltest deiner Neugier nachgehen."
+      }
+    },
+    {
+      "word": "shoppengehen",
+      "meaning": "to go shopping",
+      "sentences": {
+        "present": "Wir gehen oft in der Stadt shoppen.",
+        "past": "Sie gingen gestern Kleidung einkaufen.",
+        "perfect": "Wir sind für Schuhe shoppengegangen.",
+        "modal": "Ich möchte heute noch shoppengehen."
+      }
+    },
+    {
+      "word": "schlafen gehen",
+      "meaning": "to go to sleep",
+      "sentences": {
+        "present": "Die Kinder gehen um neun Uhr schlafen.",
+        "past": "Wir gingen gestern früh schlafen.",
+        "perfect": "Sie sind schon schlafengegangen.",
+        "modal": "Du sollst jetzt schlafen gehen."
+      }
+    },
+    {
+      "word": "schwimmengehen",
+      "meaning": "to go swimming",
+      "sentences": {
+        "present": "Ich gehe im Sommer oft im See schwimmen.",
+        "past": "Wir gingen gestern im Meer schwimmen.",
+        "perfect": "Wir sind schon dreimal diesen Monat schwimmengegangen.",
+        "modal": "Wir wollen morgen früh schwimmengehen."
+      }
+    },
+    {
+      "word": "spazierengehen",
+      "meaning": "to go for a walk",
+      "sentences": {
+        "present": "Wir gehen jeden Sonntag im Park spazieren.",
+        "past": "Wir gingen gestern am Fluss spazieren.",
+        "perfect": "Wir sind lange im Wald spazierengegangen.",
+        "modal": "Ich möchte heute Abend spazierengehen."
+      }
+    },
+    {
+      "word": "trinken gehen",
+      "meaning": "to go drinking",
+      "sentences": {
+        "present": "Wir gehen nach der Arbeit ein Bier trinken.",
+        "past": "Wir gingen gestern Cocktails trinken.",
+        "perfect": "Wir sind nach dem Kino noch trinkengegangen.",
+        "modal": "Wir wollen später trinken gehen."
+      }
+    },
+    {
+      "word": "untergehen",
+      "meaning": "to set (sun), to sink",
+      "sentences": {
+        "present": "Die Sonne geht spät am Abend unter.",
+        "past": "Die Sonne ging um acht Uhr unter.",
+        "perfect": "Die Sonne ist gestern früh untergegangen.",
+        "modal": "Die Sonne soll gleich untergehen."
+      }
+    },
+    {
+      "word": "vergehen",
+      "meaning": "to pass (time), to decay",
+      "sentences": {
+        "present": "Die Zeit geht schnell vorbei.",
+        "past": "Die Stunden vergingen wie im Flug.",
+        "perfect": "Die Tage sind schnell vergangen.",
+        "modal": "Die Zeit wird schnell vergehen."
+      }
+    },
+    {
+      "word": "vor sich gehen",
+      "meaning": "to happen, to go on",
+      "sentences": {
+        "present": "Was geht hier eigentlich vor sich?",
+        "past": "Es ging gestern etwas Seltsames vor sich.",
+        "perfect": "Es ist viel vorgegangen.",
+        "modal": "Es muss etwas vorgehen."
+      }
+    },
+    {
+      "word": "vorangehen",
+      "meaning": "to make progress, to lead",
+      "sentences": {
+        "present": "Die Arbeit geht langsam aber sicher voran.",
+        "past": "Das Projekt ging gut voran.",
+        "perfect": "Alles ist wie geplant vorangegangen.",
+        "modal": "Wir müssen schneller vorangehen."
+      }
+    },
+    {
+      "word": "vorübergehen",
+      "meaning": "to pass by, to fade",
+      "sentences": {
+        "present": "Die Schmerzen gehen nach ein paar Tagen vorüber.",
+        "past": "Der Sturm ging schnell vorüber.",
+        "perfect": "Der Ärger ist bald vorübergegangen.",
+        "modal": "Das Problem wird vorübergehen."
+      }
+    },
+    {
+      "word": "weggehen",
+      "meaning": "to leave, go away",
+      "sentences": {
+        "present": "Er geht früh von der Arbeit weg.",
+        "past": "Er ging gestern um fünf Uhr weg.",
+        "perfect": "Er ist schon vor einer Stunde weggegangen.",
+        "modal": "Er muss jetzt sofort weggehen."
+      }
+    },
+    {
+      "word": "wandern gehen",
+      "meaning": "to go hiking",
+      "sentences": {
+        "present": "Wir gehen oft in den Bergen wandern.",
+        "past": "Letzten Sommer gingen wir wandern.",
+        "perfect": "Wir sind schon viele Male wandern gegangen.",
+        "modal": "Ich möchte am Wochenende wandern gehen."
+      }
+    }
+  ]
+}

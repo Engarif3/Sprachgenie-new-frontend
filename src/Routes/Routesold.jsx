@@ -31,11 +31,6 @@ import UpdateUserStatus from "../AdminActions/SuperAdmin/UpdateUSerStatus";
 import PerfectAndPastForm from "../View/Grammar/PerfectAndPastForm/PerfectAndPastForm";
 import Stories from "../View/Stories/Stories";
 import Login from "../login/Login";
-import UsersFavoriteCount from "../AdminActions/Admin/UsersFavoriteCount";
-// import Dashboard from "../dashboard/Dashboard";
-import DashboardLayout from "../dashboard/DashboardLayout";
-import DashboardHome from "../dashboard/DashboardHome";
-import FavoritesListDashboard from "../View/Words/Favorite/FavoritesListDashboard";
 
 export const router = createBrowserRouter([
   {
@@ -147,45 +142,9 @@ export const router = createBrowserRouter([
         element: <UpdateBasicUserStatus></UpdateBasicUserStatus>,
       },
       {
-        path: "/users-favorite-count",
-        element: <UsersFavoriteCount></UsersFavoriteCount>,
-      },
-      // {
-      //   path: "/dashboard",
-      //   element: <Dashboard></Dashboard>,
-      // },
-      {
         path: "/past-perfect",
         element: <PerfectAndPastForm></PerfectAndPastForm>,
       },
-
-      //   ========dashboard=======
-      {
-        path: "/dashboard",
-        element: <DashboardLayout />,
-        children: [
-          { index: true, element: <DashboardHome /> },
-          // { path: "favorites", element: <FavoritesList /> },
-          { path: "favorites-words", element: <FavoritesListDashboard /> },
-          { path: "update-user-status", element: <UpdateUserStatus /> },
-          {
-            path: "update-basic-user-status",
-            element: <UpdateBasicUserStatus />,
-          },
-          { path: "topic", element: <TopicForm /> },
-          { path: "create-word", element: <WordForm /> },
-          { path: "create-conversation", element: <CreateConversation /> },
-          { path: "update-conversation", element: <ConversationsList /> },
-          { path: "conversation/:id", element: <ConversationPage /> },
-          { path: "users-favorite-count", element: <UsersFavoriteCount /> },
-          {
-            path: "delete-all",
-            element: <DeleteAllWords />,
-          },
-        ],
-      },
-
-      //   ========dashboard=======
     ],
   },
   {

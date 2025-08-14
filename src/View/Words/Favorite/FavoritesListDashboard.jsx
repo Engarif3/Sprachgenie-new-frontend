@@ -7,7 +7,7 @@ import Container from "../../../utils/Container";
 import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 import Pagination from "./Pagination";
 
-const FavoritesList = () => {
+const FavoritesListDashboard = () => {
   const [selectedWord, setSelectedWord] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [favoriteWords, setFavoriteWords] = useState([]);
@@ -195,7 +195,7 @@ const FavoritesList = () => {
 
   return (
     // <Container>
-    <Container>
+    <>
       <h2 className="text-3xl font-bold font-mono my-8 text-center">
         {favoriteWords.length} Favorite Words
       </h2>
@@ -345,8 +345,8 @@ const FavoritesList = () => {
         selectedWord={selectedWord}
       />
       {/* </Container> */}
-    </Container>
+    </>
   );
 };
 
-export default FavoritesList;
+export default FavoritesListDashboard;

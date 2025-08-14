@@ -5,7 +5,6 @@ import Swal from "sweetalert2";
 import AuthButton from "../components/UI/AuthButton/AuthButton";
 import { getUserInfo, isLoggedIn } from "../services/auth.services";
 import { FaBook, FaHome } from "react-icons/fa";
-import { MdDashboard } from "react-icons/md";
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -173,14 +172,9 @@ const NavBar = () => {
             <Link
               to="/dashboard"
               onClick={() => setIsMenuOpen(false)}
-              // className="btn btn-sm btn-warning w-full md:w-auto text-center hidden lg:flex justify-center items-center"
-              className="hidden  md:flex items-center justify-center text-3xl text-red-600 border-b-2 border-white rounded-md  hover:scale-105 px-1"
+              className="btn btn-sm btn-warning w-full md:w-auto text-center hidden lg:flex justify-center items-center"
             >
-              {/* Dashboard */}
-              <MdDashboard />
-              <span className="ml-2 text-xl mt-2 text-white">
-                Dashboard
-              </span>{" "}
+              Dashboard
             </Link>
           )}
 

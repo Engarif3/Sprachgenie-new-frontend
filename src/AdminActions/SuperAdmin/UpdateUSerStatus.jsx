@@ -238,7 +238,8 @@ const UpdateUserStatus = () => {
   // Separate admins and basic users
 
   return (
-    <Container>
+    // <Container>
+    <>
       {userInfo?.role === "super_admin" && (
         <div className="container mx-auto p-4 min-h-screen">
           <h2 className="text-md md:text-2xl lg:text-2xl font-bold mb-4 text-center  py-2 text-white bg-cyan-700  rounded">
@@ -417,7 +418,8 @@ const UpdateUserStatus = () => {
           )}
         </div>
       )}
-    </Container>
+      {/* </Container> */}
+    </>
   );
 };
 
