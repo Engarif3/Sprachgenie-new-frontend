@@ -16,7 +16,6 @@ import Loader from "../../../utils/Loader";
 import { pronounceWord } from "../../../utils/wordPronounciation";
 import WordListModal from "../Modals/WordListModal";
 import HistoryModal from "../Modals/HistoryModal";
-import { getFromStorage, setToStorage } from "../../../utils/storage";
 
 // Cache key constants
 const CACHE_KEY = "wordListCache";
@@ -142,40 +141,22 @@ const WordList = () => {
   });
 
   // Initialize cache from localStorage on mount
-  //   useEffect(() => {
-  //     const savedCache = localStorage.getItem(CACHE_KEY);
-  //     if (savedCache) {
-  //       const parsedCache = JSON.parse(savedCache);
-  //       if (Date.now() - parsedCache.lastUpdated < CACHE_EXPIRY) {
-  //         setCache(parsedCache);
-  //         setLevels(parsedCache.levels);
-  //         setTopics(parsedCache.topics);
-  //         applyFilters(parsedCache.words); // Apply filters with cached data
-  //       }
-  //     }
-  //   }, []);
-
   useEffect(() => {
-    (async () => {
-      const savedCache = await getFromStorage(CACHE_KEY);
-      if (savedCache && Date.now() - savedCache.lastUpdated < CACHE_EXPIRY) {
-        setCache(savedCache);
-        setLevels(savedCache.levels);
-        setTopics(savedCache.topics);
-        applyFilters(savedCache.words);
+    const savedCache = localStorage.getItem(CACHE_KEY);
+    if (savedCache) {
+      const parsedCache = JSON.parse(savedCache);
+      if (Date.now() - parsedCache.lastUpdated < CACHE_EXPIRY) {
+        setCache(parsedCache);
+        setLevels(parsedCache.levels);
+        setTopics(parsedCache.topics);
+        applyFilters(parsedCache.words); // Apply filters with cached data
       }
-    })();
+    }
   }, []);
 
   // Save cache to localStorage whenever it changes
-  //   useEffect(() => {
-  //     localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
-  //   }, [cache]);
-
   useEffect(() => {
-    if (cache.words.length > 0) {
-      setToStorage(CACHE_KEY, cache);
-    }
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
   }, [cache]);
 
   // Memoized fetch functions
