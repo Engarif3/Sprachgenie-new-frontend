@@ -19,7 +19,7 @@ const Pagination = ({
       {/* Left Side Controls */}
       <div className="flex flex-wrap gap-4 justify-between md:justify-start w-full md:w-auto  ">
         {/* Show All Button */}
-        {/* {!showAllData && (
+        {!showAllData && (
           <button
             onClick={toggleView}
             className="btn btn-sm btn-outline btn-info my-2 md:mt-6"
@@ -35,7 +35,7 @@ const Pagination = ({
           >
             Show Paginated View
           </button>
-        )} */}
+        )}
 
         {/* Learning Mode Toggle */}
         {!learningMode && (
