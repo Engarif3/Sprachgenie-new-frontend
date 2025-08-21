@@ -113,7 +113,7 @@ const NavBar = () => {
               className="hidden md:flex  w-full md:w-auto border-b-2 border-white rounded-md  hover:scale-105 px-1 mt-2"
             >
               <FaBook className="text-red-500" size={24} />{" "}
-              <span className="ml-2 text-xl  text-white">Words</span>
+              <span className="ml-2 text-xl  text-white">Vocabulary</span>
             </Link>
           )}
           {userLoggedIn &&
