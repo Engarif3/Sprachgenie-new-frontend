@@ -491,7 +491,13 @@ const WordList = () => {
   return (
     <Container>
       <h2 className="text-3xl font-bold font-mono text-sky-700 my-8 text-center hidden md:block">
-        Words List
+        Vocabulary Library <br />
+        <p className="text-xs text-pink-600 ">
+          {" "}
+          {userLoggedIn &&
+            (userInfo.role === "admin" || userInfo.role === "super_admin") &&
+            cache.words.length}
+        </p>
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 gap-4 mt-4 md:mt-0 ">
