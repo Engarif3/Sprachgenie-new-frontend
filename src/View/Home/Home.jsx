@@ -7,6 +7,8 @@ const Home = () => {
     <Container className="flex ">
       <CircularText
         text="PRACTICE*MAKES*PERFECT*"
+        centerText1="Sprach"
+        centerText2="Genie"
         onHover="speedUp"
         spinDuration={20}
         className="font-custom3"
