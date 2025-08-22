@@ -265,7 +265,7 @@ const UpdateUserStatus = () => {
           {/* Admins Table */}
           {admins.length > 0 && (
             <div className="mb-16">
-              <h3 className="text-xl font-semibold text-center mb-4 uppercase">
+              <h3 className="text-xl font-semibold text-center mb-4 uppercase text-white">
                 Admins
                 <span className="text-md text-cyan-600">
                   {" "}
@@ -335,7 +335,7 @@ const UpdateUserStatus = () => {
           {/* Basic Users Table */}
           {basicUsers.length > 0 && (
             <div>
-              <h3 className="text-xl font-semibold text-center  uppercase">
+              <h3 className="text-xl font-semibold text-center  uppercase text-white">
                 Users{" "}
                 <span className="text-md text-cyan-600">
                   ({basicUsers.length})
@@ -344,7 +344,9 @@ const UpdateUserStatus = () => {
               {/* Status Filter Dropdown */}
               <div className="flex justify-end">
                 <div className="mb-2 text-center">
-                  <label className="mr-2 font-semibold">Status:</label>
+                  <label className="mr-2 font-semibold text-white">
+                    Status:
+                  </label>
                   <select
                     value={selectedStatus}
                     onChange={(e) => setSelectedStatus(e.target.value)}

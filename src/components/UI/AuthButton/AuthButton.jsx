@@ -43,7 +43,7 @@ const AuthButton = () => {
     // Wrap navigation in startTransition to avoid Suspense error
 
     startTransition(() => {
-      navigate("/"); // navigate to login page
+      navigate("/login"); // navigate to login page
     });
   };
 
