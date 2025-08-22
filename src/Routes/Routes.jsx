@@ -1,46 +1,70 @@
-import { createBrowserRouter } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import App from "../App";
-import LevelForm from "../Form/LevelForm";
-import TopicForm from "../Form/TopicForm";
-import ArticleForm from "../Form/ArticleForm";
-import PartOfSpeechForm from "../Form/PartOfSpeechForm";
-import LevelList from "../View/LevelList";
-import WordList from "../View/Words/WordList/WordList";
-import UpdateWord from "../View/Words/Update/UpdateWord";
-import DeleteAllWords from "../View/DeleteAllWords";
-import WordForm from "../Form/WordForm";
-import Register from "../register/Register";
-import FavoritesList from "../View/Words/Favorite/FavoritesList";
-import ResendVerification from "../register/ResendVerification";
-import VerifyEmail from "../register/VerifyEmail";
-import ConversationsList from "../View/Conversation/ConversationList";
-import CreateConversation from "../View/Conversation/CreateConversation";
-import ConversationTitleList from "../View/Conversation/ConversationTitleList";
-import ConversationPage from "../View/Conversation/ConversationPage";
-import Home from "../View/Home/Home";
-import PrefixTypeList from "../View/Prefix/PrefixTypeList";
-import PrefixList from "../View/Prefix/PrefixList";
-import Grammar from "../View/Grammar/Grammar";
-import Clauses from "../View/Grammar/Clauses/Clauses";
-import Clause from "../View/Grammar/Clauses/Clause";
-import GrammarTopic from "../View/Grammar/GrammarTopic";
-import ForgotPassword from "../Auth/ForgotPassword";
-import ResetPassword from "../Auth/ResetPassword";
-import UpdateBasicUserStatus from "../AdminActions/Admin/UpdateBasicUserStatus";
-import UpdateUserStatus from "../AdminActions/SuperAdmin/UpdateUSerStatus";
-import PerfectAndPastForm from "../View/Grammar/PerfectAndPastForm/PerfectAndPastForm";
-import Stories from "../View/Stories/Stories";
-import Login from "../login/Login";
-import UsersFavoriteCount from "../AdminActions/Admin/UsersFavoriteCount";
-// import Dashboard from "../dashboard/Dashboard";
-import DashboardLayout from "../dashboard/DashboardLayout";
-import DashboardHome from "../dashboard/DashboardHome";
-import FavoritesListDashboard from "../View/Words/Favorite/FavoritesListDashboard";
+import { createBrowserRouter } from "react-router-dom";
+const Home = lazy(() => import("../View/Home/Home"));
+const WordList = lazy(() => import("../View/Words/WordList/WordList"));
+const Login = lazy(() => import("../login/Login"));
+const Register = lazy(() => import("../register/Register"));
+const VerifyEmail = lazy(() => import("../register/VerifyEmail"));
+const ResendVerification = lazy(() => import("../register/ResendVerification"));
+const ForgotPassword = lazy(() => import("../Auth/ForgotPassword"));
+const ResetPassword = lazy(() => import("../Auth/ResetPassword"));
+const LevelForm = lazy(() => import("../Form/LevelForm"));
+const TopicForm = lazy(() => import("../Form/TopicForm"));
+const ArticleForm = lazy(() => import("../Form/ArticleForm"));
+const PartOfSpeechForm = lazy(() => import("../Form/PartOfSpeechForm"));
+const LevelList = lazy(() => import("../View/LevelList"));
+const UpdateWord = lazy(() => import("../View/Words/Update/UpdateWord"));
+const DeleteAllWords = lazy(() => import("../View/DeleteAllWords"));
+const WordForm = lazy(() => import("../Form/WordForm"));
+const FavoritesList = lazy(() =>
+  import("../View/Words/Favorite/FavoritesList")
+);
+const ConversationsList = lazy(() =>
+  import("../View/Conversation/ConversationList")
+);
+const CreateConversation = lazy(() =>
+  import("../View/Conversation/CreateConversation")
+);
+const ConversationTitleList = lazy(() =>
+  import("../View/Conversation/ConversationTitleList")
+);
+const ConversationPage = lazy(() =>
+  import("../View/Conversation/ConversationPage")
+);
+const PrefixTypeList = lazy(() => import("../View/Prefix/PrefixTypeList"));
+const PrefixList = lazy(() => import("../View/Prefix/PrefixList"));
+const Grammar = lazy(() => import("../View/Grammar/Grammar"));
+const Clauses = lazy(() => import("../View/Grammar/Clauses/Clauses"));
+const Clause = lazy(() => import("../View/Grammar/Clauses/Clause"));
+const GrammarTopic = lazy(() => import("../View/Grammar/GrammarTopic"));
+const UpdateBasicUserStatus = lazy(() =>
+  import("../AdminActions/Admin/UpdateBasicUserStatus")
+);
+const UpdateUserStatus = lazy(() =>
+  import("../AdminActions/SuperAdmin/UpdateUSerStatus")
+);
+const PerfectAndPastForm = lazy(() =>
+  import("../View/Grammar/PerfectAndPastForm/PerfectAndPastForm")
+);
+const Stories = lazy(() => import("../View/Stories/Stories"));
+const UsersFavoriteCount = lazy(() =>
+  import("../AdminActions/Admin/UsersFavoriteCount")
+);
+const DashboardLayout = lazy(() => import("../dashboard/DashboardLayout"));
+const DashboardHome = lazy(() => import("../dashboard/DashboardHome"));
+const FavoritesListDashboard = lazy(() =>
+  import("../View/Words/Favorite/FavoritesListDashboard")
+);
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: (
+      <Suspense fallback={<div>Loading app...</div>}>
+        <App />
+      </Suspense>
+    ),
     children: [
       {
         path: "/",
