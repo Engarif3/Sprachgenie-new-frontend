@@ -196,8 +196,8 @@ const FavoritesList = () => {
   return (
     // <Container>
     <Container>
-      <h2 className="text-3xl font-bold font-mono my-8 text-center">
-        {favoriteWords.length} Favorite Words
+      <h2 className="text-3xl text-white font-bold font-mono my-8 text-center">
+        Favorite Words - {favoriteWords.length}
       </h2>
 
       {isLoading ? (

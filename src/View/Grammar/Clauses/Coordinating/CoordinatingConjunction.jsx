@@ -74,10 +74,10 @@ const CoordinatingConjunction = () => {
   return (
     <Container>
       <div className="max-w-4xl min-h-screen mx-auto p-4">
-        <h2 className="text-3xl font-bold font-mono text-center text-sky-700 mb-4">
+        <h2 className="text-3xl font-bold font-mono text-center text-white mb-4">
           Coordinating Conjunctions
         </h2>
-        <p className="text-lg text-center my-12">
+        <p className="text-lg text-center my-12 text-white">
           These conjunctions do not affect the word order (verb position) in the
           sentence.
         </p>

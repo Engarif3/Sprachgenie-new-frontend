@@ -110,7 +110,7 @@ const DashboardLayout = () => {
             )}
           </nav>
 
-          <div className="px-4 py-4 border-t border-cyan-700">
+          <div className="px-4 py-4 border-t border-cyan-700 text-white">
             <p className="text-sm">Welcome, {userInfo?.name}</p>
           </div>
         </aside>

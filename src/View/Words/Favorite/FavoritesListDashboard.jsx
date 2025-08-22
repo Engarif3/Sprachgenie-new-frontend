@@ -196,7 +196,7 @@ const FavoritesListDashboard = () => {
   return (
     // <Container>
     <>
-      <h2 className="text-3xl font-bold font-mono my-8 text-center">
+      <h2 className="text-3xl text-white font-bold font-mono my-8 text-center">
         {favoriteWords.length} Favorite Words
       </h2>
 

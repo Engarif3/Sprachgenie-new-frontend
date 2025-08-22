@@ -74,12 +74,12 @@ const ConjunctiveAdverb = () => {
   return (
     <Container>
       <div className="max-w-4xl min-h-screen mx-auto p-4">
-        <h2 className="text-3xl font-bold font-mono text-center text-sky-700 mb-4">
+        <h2 className="text-3xl font-bold font-mono text-center text-white mb-4">
           Conjunctive Adverbs
         </h2>
-        <p className="text-lg text-center my-12">
-          These function like conjunctions but require inverted word order (verb
-          comes right after the conjunction).
+        <p className="text-lg text-center my-12 text-white">
+          These function like conjunctions but verb
+          comes right after the conjunction.
         </p>
         <h4 className="p-3 text-xl font-semibold bg-gradient-to-r from-slate-900 via-cyan-800 to-cyan-600   text-white rounded-t-md">
           <span className="ml-4"> Konjunktive Adverbien</span>

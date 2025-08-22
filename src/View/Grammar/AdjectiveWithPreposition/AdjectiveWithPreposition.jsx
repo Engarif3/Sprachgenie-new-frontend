@@ -13,7 +13,7 @@ const AdjectiveWithPreposition = () => {
   return (
     <Container>
       <div className=" mx-auto mt-16 mb-24 p-1">
-        <h2 className="text-3xl font-bold font-mono text-sky-700 my-5  text-center">
+        <h2 className="text-3xl font-bold font-mono text-white my-5  text-center">
           Adjectives with Prepositions
           <br />
           <span className="">({data.length})</span>

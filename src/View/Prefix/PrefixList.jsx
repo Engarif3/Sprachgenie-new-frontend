@@ -124,13 +124,13 @@ const PrefixList = () => {
   return (
     <Container>
       <div className="max-w-4xl mx-auto p-4 ">
-        <h2 className="text-3xl font-bold font-mono text-center  text-sky-700  mb-4">
+        <h2 className="text-3xl font-bold font-mono text-center  text-white  mb-4">
           {prefixData.name} Prefixes
         </h2>
         {Object.entries(groupedPrefixes).map(
           ([prefixName, { verbs, noVerbs }]) => (
             <div key={prefixName} className="mb-4">
-              <h3 className="text-xl font-bold text-sky-700 mb-2 ml-2">
+              <h3 className="text-xl font-bold text-red-700 mb-2 ml-2">
                 {prefixName.toUpperCase()}
               </h3>
               <div className=" rounded-md shadow-sm overflow-hidden">

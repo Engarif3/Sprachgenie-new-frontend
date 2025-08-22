@@ -6,6 +6,7 @@ import { pronounceWord } from "../../utils/wordPronounciation";
 // Modal component for word meaning
 const Modal = ({ word, meaning, onClose }) => {
   return (
+    // <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-10">
     <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-10">
       <div className="px-4 py-2 rounded-lg shadow-lg md:w-1/5 bg-white">
         <h3 className="text-2xl font-bold text-pink-600 font-mono text-center flex items-center justify-center gap-2">
@@ -76,7 +77,7 @@ const Stories = () => {
 
   return (
     <Container>
-      <div className="bg-white min-h-screen flex flex-col justify-center items-center text-2xl text-slate-950 p-1 md:p-4">
+      <div className=" min-h-screen flex flex-col justify-center items-center text-2xl text-white p-1 md:p-4">
         {stories.map(
           (
             { title, image, description, vocabulary, passage_vocabulary },
@@ -99,7 +100,7 @@ const Stories = () => {
               />
 
               {/* Description */}
-              <p className="text-xl text-black text-justify mb-6 w-full md:w-8/12">
+              <p className="text-xl text-white text-justify mb-6 w-full md:w-8/12">
                 {underlineText(description.text, passage_vocabulary)}
               </p>
 
@@ -110,7 +111,7 @@ const Stories = () => {
                   {vocabulary.map((item, index) => (
                     <div
                       key={index}
-                      className="flex items-between gap-2 justify-start p-3 bg-gray-100 rounded shadow"
+                      className="flex items-between gap-2 justify-start p-3 border rounded shadow"
                     >
                       <div className="text-orange-500 font-bold flex justify-between">
                         <span> {item.word}</span>
@@ -122,7 +123,7 @@ const Stories = () => {
                           🔊
                         </div>
                       </div>
-                      <span className=" text-gray-800">{item.meaning}</span>
+                      <span className="  text-white">{item.meaning}</span>
                     </div>
                   ))}
                 </div>

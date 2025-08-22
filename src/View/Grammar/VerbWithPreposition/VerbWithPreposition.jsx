@@ -13,9 +13,9 @@ const VerbWithPreposition = () => {
   return (
     <Container>
       <div className=" mx-auto mt-16 mb-24 p-1">
-        <h2 className="text-3xl font-bold font-mono text-sky-700 my-5  text-center">
+        <h2 className="text-3xl font-bold font-mono text-white my-5  text-center">
           Verbs with Prepositions <br />
-          <span className="">({data.length})</span>
+          <span className="text-white">({data.length})</span>
         </h2>
         <div className="flex flex-col md:flex-row lg:flex-row justify-between items-center ">
           <div className="text-center my-8 w-full md:w-4/12 lg:w-4/12 flex border border-cyan-700 rounded-lg ">

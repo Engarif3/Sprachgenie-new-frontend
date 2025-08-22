@@ -14,7 +14,7 @@ const Grammar = () => {
   return (
     <Container>
       <div className="max-w-5xl mx-auto p-4 mb-4 min-h-screen">
-        <h2 className="text-3xl font-bold font-mono text-sky-700 my-5 md:my-8 lg:my-8 text-center">
+        <h2 className="text-3xl font-bold font-mono text-white my-5 md:my-8 lg:my-8 text-center">
           Grammar Topics
         </h2>
 

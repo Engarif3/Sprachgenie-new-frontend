@@ -5,7 +5,7 @@ import Container from "../../../utils/Container";
 export default function VerbsWithGehen() {
   return (
     <Container>
-      <h1 className="text-3xl font-bold mb-6 text-center">
+      <h1 className="text-3xl font-bold mb-6 text-center text-white">
         Verbs ending with "-gehen"
       </h1>
 
@@ -21,30 +21,34 @@ export default function VerbsWithGehen() {
 
       {/* Section 2: Each word with four sentences */}
       <div className="m-1 md:m-4 lg:m-4">
-        <h2 className="text-2xl font-semibold mb-4">Sentences</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-orange-600">
+          Sentences
+        </h2>
         <div className="space-y-6 mb-8">
           {verbsData.words.map((verb) => (
             <div
               key={verb.word}
-              className="border rounded-lg p-4 shadow-sm hover:shadow-md transition"
+              className="border rounded-lg p-4 shadow-sm hover:shadow-md transition "
             >
-              <h3 className="text-xl font-semibold mb-2">{verb.word}</h3>
-              <p className="text-gray-600 mb-3">{verb.meaning}</p>
-              <div className="space-y-1">
+              <h3 className="text-xl font-semibold mb-2 text-pink-600">
+                {verb.word}
+              </h3>
+              <p className="text-white mb-3">{verb.meaning}</p>
+              <div className="space-y-1 text-white">
                 <p>
-                  <span className="font-semibold">Present:</span>{" "}
+                  <span className="font-semibold text-pink-600">Present:</span>{" "}
                   {verb.sentences.present}
                 </p>
                 <p>
-                  <span className="font-semibold">Past:</span>{" "}
+                  <span className="font-semibold text-pink-600">Past:</span>{" "}
                   {verb.sentences.past}
                 </p>
                 <p>
-                  <span className="font-semibold">Perfect:</span>{" "}
+                  <span className="font-semibold text-pink-600">Perfect:</span>{" "}
                   {verb.sentences.perfect}
                 </p>
                 <p>
-                  <span className="font-semibold">Modal:</span>{" "}
+                  <span className="font-semibold text-pink-600">Modal:</span>{" "}
                   {verb.sentences.modal}
                 </p>
               </div>

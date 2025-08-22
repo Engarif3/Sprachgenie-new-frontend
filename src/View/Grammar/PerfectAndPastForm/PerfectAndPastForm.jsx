@@ -131,7 +131,7 @@ const PerfectAndPastForm = () => {
   return (
     <Container>
       <div className="mx-auto mt-16 mb-24 p-1">
-        <h2 className="text-3xl font-bold font-mono text-sky-700 my-5 text-center">
+        <h2 className="text-3xl font-bold font-mono text-white my-5 text-center">
           Starke und unregelmäßige Verben
           <br />({totalPraesens})
         </h2>
@@ -160,7 +160,7 @@ const PerfectAndPastForm = () => {
 
           return (
             <div key={groupIndex} className="mb-10">
-              <h2 className="text-xl font-bold mb-4 text-blue-600">
+              <h2 className="text-xl font-bold mb-4 text-white">
                 {group.name}{" "}
                 <span className="text-orange-600">
                   ({filteredVerbs.length})
