@@ -5,7 +5,7 @@ const Home = () => {
   return (
     <Container className="flex ">
       <div className="min-h-screen my-12">
-        <h2 className="text-center text-3xl font-mono font-bold text-sky-700 mb-12">
+        <h2 className="text-center text-3xl font-mono font-bold text-white mb-12">
           Choose a topic
         </h2>
         <div className="flex justify-center items-center ">

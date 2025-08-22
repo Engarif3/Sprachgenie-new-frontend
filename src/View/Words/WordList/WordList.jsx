@@ -490,7 +490,7 @@ const WordList = () => {
 
   return (
     <Container>
-      <h2 className="text-3xl font-bold font-mono text-sky-700 my-8 text-center hidden md:block">
+      <h2 className="text-3xl font-bold font-mono text-white my-8 text-center hidden md:block">
         Vocabulary Library <br />
         <p className="text-xs text-pink-600 ">
           {" "}

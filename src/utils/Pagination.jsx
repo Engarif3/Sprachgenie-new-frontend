@@ -105,7 +105,7 @@ const Pagination = ({
               >
                 Prev
               </button>
-              <span className="text-sm md:text-lg">
+              <span className="text-sm md:text-lg text-white">
                 <span className="hidden sm:inline">page </span>
                 {currentPage}
                 <span className="hidden sm:inline"> of </span>

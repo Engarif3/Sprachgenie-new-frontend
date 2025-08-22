@@ -62,7 +62,8 @@ const NavBar = () => {
 
   return (
     <Container>
-      <div className="bg-gradient-to-r from-slate-900 via-cyan-800 to-cyan-600  flex flex-wrap justify-between items-center py-2 rounded text-lg font-semibold mt-2 relative">
+      {/* <div className="bg-gradient-to-r from-slate-900 via-cyan-800 to-cyan-600  flex flex-wrap justify-between items-center py-2 rounded text-lg font-semibold mt-2 relative"> */}
+      <div className="  flex flex-wrap justify-between items-center py-2 rounded text-lg font-semibold mt-2 relative">
         {/* Title and Hamburger Menu */}
         <div className="flex justify-between items-center w-full md:w-auto px-4">
           <Link className="text-3xl mb-1" href="/">
@@ -112,7 +113,7 @@ const NavBar = () => {
               // className="btn btn-sm btn-warning  flex items-center justify-center md:hidden lg:hidden"
               className="hidden md:flex  w-full md:w-auto border-b-2 border-white rounded-md  hover:scale-105 px-1 mt-2"
             >
-              <FaBook className="text-red-500" size={24} />{" "}
+              <FaBook className="text-red-500" size={20} />{" "}
               <span className="ml-2 text-xl  text-white">Vocabulary</span>
             </Link>
           )}
@@ -132,28 +133,16 @@ const NavBar = () => {
                 <Link
                   onClick={() => setIsMenuOpen(false)}
                   to="/favorites"
-                  // className="hidden md:block lg:block h-8 w-8 mt-1"
-                  className="hidden md:flex lg:flex w-full md:w-auto border-b-2 border-white rounded-md  hover:scale-105 px-1"
+                  className="hidden md:flex lg:flex items-center border-b-2 border-white rounded-md hover:scale-105 px-1"
                 >
-                  {/* <img src={emptyHeart} className="w-24 h-24" /> */}
-                  <span className=" w-[28px] mt-2">
-                    <svg
-                      id="Layer_1"
-                      data-name="Layer 1"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 122.88 107.39"
-                    >
-                      <defs>
-                        <style>{`.cls-1 { fill: #ed1b24; fillRule: 'evenodd'; }`}</style>
-                      </defs>
-                      <title>Favorites</title>
-                      <path
-                        className="cls-1"
-                        d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z"
-                      />
-                    </svg>
-                  </span>
-                  <span className="ml-2 text-xl mt-2 text-white">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 122.88 107.39"
+                    className="w-6 h-6 fill-red-600"
+                  >
+                    <path d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z" />
+                  </svg>
+                  <span className="ml-2 mt-2 text-xl text-white">
                     Favorites
                   </span>
                 </Link>
@@ -177,7 +166,7 @@ const NavBar = () => {
               className="hidden  md:flex items-center justify-center text-3xl text-red-600 border-b-2 border-white rounded-md  hover:scale-105 px-1"
             >
               {/* Dashboard */}
-              <MdDashboard />
+              <MdDashboard size={24} />
               <span className="ml-2 text-xl mt-2 text-white">
                 Dashboard
               </span>{" "}
@@ -267,9 +256,9 @@ const NavBar = () => {
         {/* <-- This div was missing */}
       </div>
       {userLoggedIn && (
-        <p className="text-end mx-2">
+        <p className="text-end mx-2 text-white mt-0 md:mt-4 lg:mt-4">
           Welcome!{" "}
-          <span className="font-semibold text-cyan-700">{userInfo?.name}</span>
+          <span className="font-semibold text-pink-600">{userInfo?.name}</span>
         </p>
       )}
     </Container>
