@@ -199,21 +199,21 @@ const WordForm = () => {
   // }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 p-6">
+    <div className="flex justify-center items-center min-h-screen  p-6">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-lg space-y-6 bg-white p-8 rounded-lg shadow-lg"
+        className="w-full max-w-lg space-y-6  p-8 rounded-lg shadow-lg"
       >
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6 text-center">
+        <h2 className="text-2xl font-semibold text-white mb-6 text-center">
           Add Word
         </h2>
 
-        <div className="space-y-4">
+        <div className="space-y-4 ">
           {/* Word Input */}
           <div>
             <label
               htmlFor="value"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-white"
             >
               Word
             </label>
@@ -232,7 +232,7 @@ const WordForm = () => {
           <div>
             <label
               htmlFor="meaning"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-white"
             >
               Meaning (comma separated)
             </label>
@@ -251,7 +251,7 @@ const WordForm = () => {
           <div>
             <label
               htmlFor="sentences"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-white"
             >
               Sentences(Optional, eg. sentence A. | Sentence B.)
             </label>
@@ -269,7 +269,7 @@ const WordForm = () => {
           <div>
             <label
               htmlFor="pluralForm"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-white"
             >
               Plural Form (Optional)
             </label>
@@ -287,7 +287,7 @@ const WordForm = () => {
           <div>
             <label
               htmlFor="levelId"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-white"
             >
               Level
             </label>
@@ -315,7 +315,7 @@ const WordForm = () => {
           <div>
             <label
               htmlFor="topicId"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-white"
             >
               Topic
             </label>
@@ -343,7 +343,7 @@ const WordForm = () => {
           <div>
             <label
               htmlFor="articleId"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-white"
             >
               Article
             </label>
@@ -371,7 +371,7 @@ const WordForm = () => {
           <div>
             <label
               htmlFor="partOfSpeechId"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-white"
             >
               Part of Speech
             </label>
@@ -400,7 +400,7 @@ const WordForm = () => {
             <div>
               <label
                 htmlFor="synonyms"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-white"
               >
                 Synonyms (comma separated, Optional)
               </label>
@@ -417,7 +417,7 @@ const WordForm = () => {
             <div>
               <label
                 htmlFor="antonyms"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-white"
               >
                 Antonyms (comma separated, Optional)
               </label>
@@ -434,7 +434,7 @@ const WordForm = () => {
             <div>
               <label
                 htmlFor="similarWords"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-white"
               >
                 Deceptive Words (comma separated, Optional)
               </label>
