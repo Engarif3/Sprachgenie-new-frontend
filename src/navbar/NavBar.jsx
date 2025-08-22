@@ -255,6 +255,8 @@ const NavBar = () => {
         </div>{" "}
         {/* <-- This div was missing */}
       </div>
+      <hr className="border-0 border-b border-dotted border-cyan-950" />
+
       {userLoggedIn && (
         <p className="text-end mx-2 text-white mt-0 md:mt-4 lg:mt-4">
           Welcome!{" "}
