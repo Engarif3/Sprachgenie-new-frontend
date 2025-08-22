@@ -60,7 +60,7 @@ const ConversationPage = () => {
             <div className="text-white mb-0 md:mb-4 lg:mb-4 text-center text-3xl font-bold font-custom5 ">
               <h2>{conversation.topic}</h2>
             </div>
-            <div className="md:p-4 lg.p-4 rounded-lg shadow-md mb-12 ">
+            <div className="md:p-4 lg.p-4 rounded-lg shadow-md mb-12 bg-black">
               {conversation.text.map((message, index) => (
                 <div key={index} className="text-lg my-4 px-2 ">
                   <div className="flex flex-col md:flex-row lg.flex-row md:gap-4 lg:gap-4 ">
@@ -70,7 +70,7 @@ const ConversationPage = () => {
                     >
                       <FaUser /> {message.speaker}:
                     </span>
-                    <p className="text-start w-full p-1 border border-cyan-700 rounded-md px-2 font-thin text-white">
+                    <p className="text-start w-full p-1 border border-cyan-700 rounded-md px-2 text-xl font-thin text-white ">
                       {message.message}
                     </p>
                   </div>

@@ -96,11 +96,13 @@ const CreateConversation = () => {
 
   return (
     <div className="max-w-5xl mx-auto p-4 min-h-screen">
-      <h2 className="text-xl font-bold mb-4">Create Conversation</h2>
+      <h2 className="text-3xl font-bold font-mono text-white my-5 md:my-8 lg:my-8 text-center">
+        Create Conversation
+      </h2>
       <form className="space-y-3">
         {/* Topic */}
         <div>
-          <label className="block font-semibold">Topic</label>
+          <label className="block font-semibold text-white">Topic</label>
           <input
             type="text"
             name="topic"
@@ -113,7 +115,7 @@ const CreateConversation = () => {
 
         {/* Level */}
         <div>
-          <label className="block font-semibold">Level</label>
+          <label className="block font-semibold text-white">Level</label>
           <select
             name="levelId"
             value={formData.levelId}
@@ -130,7 +132,9 @@ const CreateConversation = () => {
 
         {/* Text Messages as JSON */}
         <div>
-          <label className="block font-semibold">Text (JSON format)</label>
+          <label className="block font-semibold text-white">
+            Text (JSON format)
+          </label>
           <textarea
             name="text"
             value={formData.text}
@@ -139,7 +143,7 @@ const CreateConversation = () => {
             rows="6"
             placeholder='[{ "speaker": "Lena", "message": "Hallo..." }]'
           />
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm  mt-2 text-white">
             Please enter the text as valid JSON. For example:
             <br />
             <code>[{`{"speaker": "Lena", "message": "Hallo..."}`}]</code>

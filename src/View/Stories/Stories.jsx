@@ -100,14 +100,14 @@ const Stories = () => {
               />
 
               {/* Description */}
-              <p className="text-xl text-white text-justify mb-6 w-full md:w-8/12">
+              <p className="text-xl md:text-2xl lg:text-2xl text-white text-justify mb-6 w-full md:w-8/12 bg-black p-4 rounded-lg">
                 {underlineText(description.text, passage_vocabulary)}
               </p>
 
               {/* Vocabulary List */}
-              <div className="text-lg w-full md:w-8/12 my-12">
+              <div className="text-lg w-full md:w-8/12 my-12 ">
                 <h3 className="font-bold mb-2 uppercase">Vocabulary</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 bg-black">
                   {vocabulary.map((item, index) => (
                     <div
                       key={index}

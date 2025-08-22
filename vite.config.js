@@ -42,6 +42,6 @@ export default defineConfig({
         },
       },
     },
-    chunkSizeWarningLimit: 1500, // (optional) silence warning if chunks are still large
+    // chunkSizeWarningLimit: 1500, // (optional) silence warning if chunks are still large
   },
 });
