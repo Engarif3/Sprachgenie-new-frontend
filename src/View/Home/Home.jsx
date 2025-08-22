@@ -1,10 +1,18 @@
 import Container from "../../utils/Container";
 import HomeCard from "./HomeCard";
+import CircularText from "./CircularText";
 
 const Home = () => {
   return (
     <Container className="flex ">
-      <div className="min-h-screen my-12">
+      <CircularText
+        text="PRACTICE*MAKES*PERFECT*"
+        onHover="speedUp"
+        spinDuration={20}
+        className="font-custom3"
+      />
+
+      <div className="min-h-screen mb-12">
         <h2 className="text-center text-3xl font-mono font-bold text-white mb-12">
           Choose a topic
         </h2>
