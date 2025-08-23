@@ -111,7 +111,7 @@ const NavBar = () => {
               onClick={() => setIsMenuOpen(false)}
               to="/words"
               // className="btn btn-sm btn-warning  flex items-center justify-center md:hidden lg:hidden"
-              className="hidden md:flex  w-full md:w-auto border-b-2 border-white rounded-md  hover:scale-105 px-1 mt-2"
+              className="hidden md:flex  w-full md:w-auto border-b-2 border-white rounded-md  hover:scale-105 px-1 mt-2 cursor-target"
             >
               <FaBook className="text-red-500" size={20} />{" "}
               <span className="ml-2 text-xl  text-white">Vocabulary</span>
