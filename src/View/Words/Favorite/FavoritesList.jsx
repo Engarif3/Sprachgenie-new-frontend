@@ -6,6 +6,7 @@ import WordListModal from "../Modals/WordListModal";
 import Container from "../../../utils/Container";
 import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 import Pagination from "./Pagination";
+import { pronounceWord } from "../../../utils/wordPronounciation";
 
 const FavoritesList = () => {
   const [selectedWord, setSelectedWord] = useState(null);
@@ -248,10 +249,24 @@ const FavoritesList = () => {
                       <tr key={word.id} className="bg-white hover:bg-gray-50">
                         <td
                           className="border border-gray-600 p-2 text-blue-500 cursor-pointer
-                        font-bold text-lg"
-                          onClick={() => openModal(word)}
+                        font-bold text-lg "
                         >
-                          {word.value}
+                          <div className="flex justify-between">
+                            <span
+                              className="cursor-pointer text-blue-500 text-base sm:text-lg font-bold "
+                              onClick={() => openModal(word)}
+                            >
+                              {" "}
+                              {word.value}
+                            </span>
+
+                            <button
+                              onClick={() => pronounceWord(word.value)}
+                              className=" text-blue-500 hover:text-blue-700 ml-2"
+                            >
+                              🔊
+                            </button>
+                          </div>
                         </td>
                         <td className="border border-gray-600 p-2">
                           {word.meaning?.join(", ")}
