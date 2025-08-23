@@ -576,28 +576,28 @@ const WordList = () => {
             <table className="w-full  border-collapse mt-2 ">
               {/* Table headers remain the same */}
               <thead>
-                <tr className="bg-cyan-600 text-md md:text-xl lg:text-lg text-white ">
+                <tr className="bg-cyan-800 text-md md:text-xl lg:text-lg text-white ">
                   {/* ... existing header cells ... */}
-                  <th className="border-l border-gray-400 text-sm md:text-lg lg:text-lg   p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[3%] lg:w-[3%] ">
+                  <th className=" border-gray-400  text-sm md:text-lg lg:text-lg   p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[3%] lg:w-[3%] ">
                     Article
                   </th>
-                  <th className="border-l border-gray-400  p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[10%] lg:w-[10%] ">
+                  <th className="border-l border-gray-400 border-dotted p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[10%] lg:w-[10%] ">
                     Word
                   </th>
 
-                  <th className="border-l border-gray-400  p-0 md:p-1 lg:p-1  text-center w-[10%] md:w-[25%] lg:w-[25%]">
+                  <th className="border-l border-gray-400 border-dotted  p-0 md:p-1 lg:p-1  text-center w-[10%] md:w-[25%] lg:w-[25%]">
                     Meaning
                   </th>
-                  <th className="border-l border-gray-400 p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                  <th className="border-l border-gray-400 border-dotted p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                     Synonym
                   </th>
-                  <th className="border-l border-gray-400  p-0 md:p-1 lg:p-1  text-center hidden lg:table-cell xl:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                  <th className="border-l border-gray-400 border-dotted  p-0 md:p-1 lg:p-1  text-center hidden lg:table-cell xl:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                     Antonym
                   </th>
-                  <th className="border-l border-gray-400  p-0 md:p-1 lg:p-1 text-center hidden lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                  <th className="border-l border-gray-400 border-dotted p-0 md:p-1 lg:p-1 text-center hidden lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                     Deceptive Word
                   </th>
-                  <th className="border-l border-gray-400  p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[3%] lg:w-[3%]">
+                  <th className="border-l border-gray-400 border-dotted  p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[3%] lg:w-[3%]">
                     Level
                   </th>
                   <th
@@ -619,7 +619,7 @@ const WordList = () => {
                     (userInfo.role === "super_admin" ||
                       userInfo.role === "admin") && (
                       <>
-                        <th className="border-l border-gray-400 p-0 md:p-1 text-xs lg:p-1 text-center w-[15%] md:w-[10%] lg:w-[10%] hidden lg:table-cell">
+                        <th className="border-l  border-gray-400 p-0 md:p-1 text-xs lg:p-1 text-center w-[15%] md:w-[10%] lg:w-[10%] hidden lg:table-cell">
                           Modified by
                         </th>
                       </>
@@ -633,13 +633,13 @@ const WordList = () => {
                   filteredWords.map((word, index) => (
                     <tr
                       key={word.id}
-                      className={index % 2 === 0 ? "bg-white " : "bg-gray-300"}
+                      className={index % 2 === 0 ? "bg-white" : "bg-gray-300"}
                     >
                       {/* Table cells remain the same */}
-                      <td className="border-l border-gray-400  p-2 capitalize font-bold text-rose-500">
+                      <td className=" border-gray-400  p-2 capitalize font-bold text-rose-500">
                         {word.article?.name}
                       </td>
-                      <td className="border-l border-gray-400  p-2 capitalize">
+                      <td className="border-l border-gray-400  p-2 capitalize border-dotted">
                         {/* Move the onClick to the span that contains the word */}
                         <div className="flex justify-between">
                           <span
@@ -659,7 +659,7 @@ const WordList = () => {
                       </td>
 
                       <td
-                        className={`border-l border-gray-400  p-2 text-base sm:text-lg ${
+                        className={`border-l border-gray-400 border-dotted  p-2 text-base sm:text-lg ${
                           learningMode && index === currentIndex
                             ? "bg-sky-400 text-white font-bold"
                             : "text-sky-800 font-serif"
@@ -678,7 +678,7 @@ const WordList = () => {
                         )}
                       </td>
 
-                      <td className="border-l border-gray-400  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
+                      <td className="border-l border-gray-400 border-dotted p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
                         <div className="flex flex-wrap gap-1">
                           {word.synonyms?.map((synonym, index) => (
                             <span
@@ -693,7 +693,7 @@ const WordList = () => {
                         </div>
                       </td>
 
-                      <td className="border-l border-gray-400  p-2 text-blue-500 cursor-pointer hidden lg:table-cell xl:table-cell">
+                      <td className="border-l border-gray-400 border-dotted p-2 text-blue-500 cursor-pointer hidden lg:table-cell xl:table-cell">
                         <div className="flex flex-wrap gap-1">
                           {word.antonyms?.map((antonym, index) => (
                             <span
@@ -708,7 +708,7 @@ const WordList = () => {
                         </div>
                       </td>
 
-                      <td className="border-l border-gray-400  p-2 text-blue-500 cursor-pointer hidden lg:table-cell">
+                      <td className="border-l border-gray-400 border-dotted  p-2 text-blue-500 cursor-pointer hidden lg:table-cell">
                         <div className="flex flex-wrap gap-1">
                           {word.similarWords?.map((similarword, index) => (
                             <span
@@ -723,7 +723,7 @@ const WordList = () => {
                         </div>
                       </td>
 
-                      <td className="border-l border-r border-gray-400  p-2 hidden md:table-cell text-center">
+                      <td className="border-l border-r border-gray-400 border-dotted  p-2 hidden md:table-cell text-center">
                         <span className="text-base sm:text-lg ">
                           {word.level?.level}
                         </span>
@@ -755,7 +755,7 @@ const WordList = () => {
                         (userInfo.role === "basic_user" ||
                           userInfo.role === "admin" ||
                           userInfo.role === "super_admin") && (
-                          <td className="border-l border-r border-gray-400  p-1 text-center">
+                          <td className="border-l border-r border-gray-400 border-dotted  p-1 text-center">
                             <button
                               onClick={() => toggleFavorite(word.id)}
                               className="hover:opacity-80 transition-opacity"
@@ -822,7 +822,7 @@ const WordList = () => {
                       {userLoggedIn &&
                         (userInfo.role === "super_admin" ||
                           userInfo.role === "admin") && (
-                          <td className="border-l border-gray-400 p-2 text-center hidden lg:table-cell">
+                          <td className="border-l border-gray-400 border-dotted p-2 text-center hidden lg:table-cell">
                             <button
                               onClick={() => {
                                 setSelectedHistory({
