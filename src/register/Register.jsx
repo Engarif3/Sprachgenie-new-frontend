@@ -141,6 +141,7 @@ import { registerUser } from "../services/actions/registerUser";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { defaultValues, validationSchema } from "./validation";
+import DarkVeil from "../View/Home/DarkVeil";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -207,7 +208,9 @@ const Register = () => {
         // Optional: handle specific cases
         if (message === "User already exists") {
           // Stay on same page
-        } else if (message.includes("verify your email")) {
+        } else if (
+          message.includes("Please check your email to verify your account!")
+        ) {
           navigate("/verify-email");
         }
         return;
@@ -223,9 +226,12 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center p-6">
-      <div className="w-full max-w-lg bg-white shadow-md rounded-lg p-6 text-center">
-        <h2 className="text-xl font-semibold">Register</h2>
+    <div className="min-h-screen flex justify-center items-center p-6 ">
+      <div className="fixed inset-0 -z-10">
+        <DarkVeil />
+      </div>
+      <div className="w-full max-w-lg  shadow-md rounded-lg p-6 text-center">
+        <h2 className="text-xl font-semibold text-white">Register</h2>
         {error && (
           <p className="bg-red-500 text-white p-2 rounded mt-2">{error}</p>
         )}
@@ -306,7 +312,7 @@ const Register = () => {
             Register
           </button>
         </form>
-        <p className="mt-4">
+        <p className="mt-4 text-white">
           Already have an account?
           <Link to="/login" className="text-blue-700 font-semibold ml-1">
             Login

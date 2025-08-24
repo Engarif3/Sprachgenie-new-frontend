@@ -1,5 +1,6 @@
 import { useState } from "react";
 import api from "../axios";
+import DarkVeil from "../View/Home/DarkVeil";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -22,8 +23,13 @@ const ForgotPassword = () => {
 
   return (
     <div className="text-center flex justify-center items-center min-h-screen">
+      <div className="fixed inset-0 -z-10">
+        <DarkVeil />
+      </div>
       <div>
-        <h2 className="text-2xl font-semibold mb-12">Forgot Password</h2>
+        <h2 className="text-2xl font-semibold mb-12 text-white">
+          Forgot Password
+        </h2>
         <p className="flex justify-center items-center gap-4">
           <input
             type="email"
