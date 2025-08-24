@@ -296,6 +296,7 @@ const DashboardHome = lazy(() => import("../dashboard/DashboardHome"));
 const FavoritesListDashboard = lazy(() =>
   import("../View/Words/Favorite/FavoritesListDashboard")
 );
+const Backend = lazy(() => import("../Backend/Backend"));
 
 // Helper function to wrap pages in Suspense
 const withSuspense = (Component) => (
@@ -393,4 +394,5 @@ export const router = createBrowserRouter([
   { path: "/resend-verification", element: withSuspense(ResendVerification) },
   { path: "/forgot-password", element: withSuspense(ForgotPassword) },
   { path: "/reset-password", element: withSuspense(ResetPassword) },
+  { path: "/backend", element: withSuspense(Backend) },
 ]);
