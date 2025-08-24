@@ -667,7 +667,7 @@ const FavoritesListDashboard = () => {
 
                 <table className="w-full border-collapse ">
                   <thead>
-                    <tr className="bg-cyan-600 text-xl text-white">
+                    <tr className="bg-cyan-800 text-xl text-white">
                       <th className="border border-gray-600 border-dotted p-1 text-center">
                         Article
                       </th>
