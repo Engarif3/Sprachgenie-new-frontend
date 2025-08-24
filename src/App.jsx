@@ -4,6 +4,7 @@ import NavBar from "./navbar/NavBar";
 import Footer from "./footer/Footer";
 import ScrollToTop from "./ScrollToTop";
 import DarkVeil from "./View/Home/DarkVeil";
+import Loader from "./utils/Loader";
 
 const App = () => {
   const location = useLocation();
@@ -23,7 +24,8 @@ const App = () => {
       {!noHeaderFooter && <NavBar />}
 
       {/* Suspense here so lazy-loaded routes work */}
-      <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+      {/* <Suspense fallback={<div className="p-8 text-center">Loading...</div>}> */}
+      <Suspense fallback={<Loader></Loader>}>
         <Outlet />
       </Suspense>
 

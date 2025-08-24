@@ -239,6 +239,7 @@
 import { lazy, Suspense } from "react";
 import App from "../App";
 import { createBrowserRouter } from "react-router-dom";
+import Loader from "../utils/Loader";
 
 // Lazy-loaded pages
 const Home = lazy(() => import("../View/Home/Home"));
@@ -300,7 +301,8 @@ const Backend = lazy(() => import("../Backend/Backend"));
 
 // Helper function to wrap pages in Suspense
 const withSuspense = (Component) => (
-  <Suspense fallback={<div>Loading...</div>}>
+  // <Suspense fallback={<div className="text-white">Loading...</div>}>
+  <Suspense fallback={<Loader></Loader>}>
     <Component />
   </Suspense>
 );
