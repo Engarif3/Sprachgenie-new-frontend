@@ -231,7 +231,7 @@ const Register = () => {
         <DarkVeil />
       </div>
       <div className="w-full max-w-lg  shadow-md rounded-lg p-6 text-center">
-        <h2 className="text-xl font-semibold text-white">Register</h2>
+        <h2 className="text-xl font-semibold text-white">Register </h2>
         {error && (
           <p className="bg-red-500 text-white p-2 rounded mt-2">{error}</p>
         )}
