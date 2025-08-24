@@ -2,15 +2,8 @@ import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 import { pronounceWord } from "../../../utils/wordPronounciation";
-import FavoriteButton from "./FavoriteButton";
 
-const WordListModal = ({
-  closeModal,
-  selectedWord,
-  favorites = [],
-  toggleFavorite,
-  loadingFavorites = {},
-}) => {
+const WordListModal = ({ closeModal, selectedWord }) => {
   const modalRef = useRef(null);
 
   const userLoggedIn = isLoggedIn();
@@ -36,22 +29,13 @@ const WordListModal = ({
     <div className="fixed z-50 inset-0 bg-black bg-opacity-50 flex justify-center items-center transition-opacity duration-300">
       <div
         ref={modalRef}
-        className="relative bg-white rounded-lg p-2 md:p-8 max-w-4xl w-full shadow-2xl transform transition-all duration-300 scale-105 m-4 border max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-lg p-2 md:p-8 max-w-4xl w-full shadow-2xl transform transition-all duration-300 scale-105 m-4 border max-h-[90vh] overflow-y-auto"
       >
-        {/* Favorite Toggle Button */}
-
-        {userLoggedIn && (
-          <FavoriteButton
-            isFavorite={favorites.includes(selectedWord.id)}
-            loading={loadingFavorites[selectedWord.id]}
-            onClick={() => toggleFavorite(selectedWord.id)}
-            className="absolute top-2 right-2 "
-          />
-        )}
         <p className="text-3xl font-bold text-sky-500 text-center mb-4 border-b border-dashed">
           <span className="text-orange-500">Topic:</span>{" "}
           {selectedWord.topic?.name || ""}
         </p>
+
         <div className="flex justify-between items-center">
           <h3 className="text-xl font-semibold text-gray-800 text-center flex items-center gap-4">
             <span>Word Details</span>
@@ -74,6 +58,7 @@ const WordListModal = ({
               )}
           </h3>
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6 p-2 md:p-4">
           <p className="text-lg font-medium text-gray-700">
             <span className="font-bold text-sky-500">Word:</span>{" "}
@@ -103,20 +88,38 @@ const WordListModal = ({
             <span className="font-bold text-sky-500">Level:</span>{" "}
             {selectedWord.level?.level || ""}
           </p>
+          {/* <div className="text-lg text-gray-600">
+            <span className="font-bold text-sky-500">Sentences:</span>
+            {selectedWord.sentences && selectedWord.sentences.length > 0 ? (
+              <ul className="list-disc pl-5 space-y-2">
+                {selectedWord.sentences.map((sentence, index) => (
+                  <li key={index} className="text-gray-600">
+                    {sentence}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <span className="text-gray-400">No sentences available.</span>
+            )}
+          </div> */}
           <div className="text-lg text-gray-600">
             <span className="font-bold text-sky-500">Sentences:</span>
             {selectedWord.sentences && selectedWord.sentences.length > 0 ? (
               <ul className="pl-5 space-y-2 list-disc">
                 {selectedWord.sentences.map((sentence, index) => {
                   const trimmed = sentence.trim();
+
+                  let isSpecial = false;
                   let className = "text-gray-600 list-disc";
                   let cleanSentence = sentence;
 
                   if (trimmed.startsWith("##")) {
+                    isSpecial = true;
                     className =
                       "font-semibold text-cyan-700 list-none text-center underline capitalize";
                     cleanSentence = sentence.replace(/^(\#\#|)\s*/, "");
                   } else if (trimmed.startsWith("**")) {
+                    isSpecial = true;
                     className =
                       " text-green-600 list-none text-sm first-letter:uppercase";
                     cleanSentence = sentence
@@ -137,12 +140,13 @@ const WordListModal = ({
             )}
           </div>
         </div>
-        <div className="mt-8 flex justify-center ">
+
+        <div className="mt-8 flex justify-center">
           <button
             onClick={closeModal}
-            className="btn btn-sm  bg-[#ff000d] font-semibold text-xl text-white  absolute bottom-4 right-4 "
+            className="btn btn-wide bg-[#ff000d] font-semibold text-xl text-white"
           >
-            X
+            Close
           </button>
         </div>
       </div>

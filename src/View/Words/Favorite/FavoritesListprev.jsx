@@ -8,11 +8,6 @@ import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 import Pagination from "./Pagination";
 import { pronounceWord } from "../../../utils/wordPronounciation";
 import { IoTrashBin } from "react-icons/io5";
-import {
-  getFromLocalStorage,
-  removeFromLocalStorage,
-  setToLocalStorage,
-} from "../../../utils/local-storage";
 
 const FavoritesList = () => {
   const [selectedWord, setSelectedWord] = useState(null);
@@ -22,12 +17,6 @@ const FavoritesList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const userInfo = getUserInfo();
-  const [favorites, setFavorites] = useState([]);
-  const [loadingFavorites, setLoadingFavorites] = useState({});
-
-  useEffect(() => {
-    setFavorites(favoriteWords.map((w) => w.id));
-  }, [favoriteWords]);
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -206,115 +195,6 @@ const FavoritesList = () => {
     currentPage * 40
   );
 
-  //favorites in modal
-  useEffect(() => {
-    const loadFavoritesFromDB = async () => {
-      const keys = favoriteWords.map((w) => `favorite-${w.id}`);
-      const cachedFavorites = await Promise.all(
-        keys.map((key) => getFromLocalStorage(key))
-      );
-
-      const validFavorites = cachedFavorites.filter(Boolean);
-      if (validFavorites.length > 0) {
-        setFavoriteWords(validFavorites);
-        setFavorites(validFavorites.map((w) => w.id));
-      }
-    };
-
-    loadFavoritesFromDB();
-  }, []);
-
-  useEffect(() => {
-    setFavorites(favoriteWords.map((w) => w.id));
-  }, [favoriteWords]);
-
-  const toggleFavorite = async (wordId) => {
-    setLoadingFavorites((prev) => ({ ...prev, [wordId]: true }));
-
-    try {
-      if (favorites.includes(wordId)) {
-        // Remove favorite
-        await axios.delete(`/favorite-words/${wordId}`, {
-          data: { userId: userInfo.id },
-        });
-
-        setFavorites((prev) => prev.filter((id) => id !== wordId));
-        setFavoriteWords((prev) => prev.filter((w) => w.id !== wordId));
-
-        Swal.fire({
-          title: "Removed!",
-          text: "The word has been removed from favorites.",
-          icon: "success",
-          timer: 1000,
-          showConfirmButton: false,
-        });
-
-        await removeFromLocalStorage(`favorite-${wordId}`);
-      } else {
-        // Add favorite
-        const response = await axios.post(`/favorite-words`, {
-          userId: userInfo.id,
-          wordId,
-        });
-
-        if (response.data.success) {
-          // Fetch updated favorites list
-          const favResponse = await axios.get(`/favorite-words/${userInfo.id}`);
-          if (favResponse.data.success) {
-            setFavoriteWords(favResponse.data.data);
-            setFavorites(favResponse.data.data.map((w) => w.id));
-
-            // Optional: update IndexedDB cache
-            for (let word of favResponse.data.data) {
-              await setToLocalStorage(`favorite-${word.id}`, word);
-            }
-          }
-
-          Swal.fire({
-            title: "Added!",
-            text: "The word has been added to favorites.",
-            icon: "success",
-            timer: 1000,
-            showConfirmButton: false,
-          });
-        }
-      }
-    } catch (err) {
-      console.error("Error toggling favorite:", err);
-      Swal.fire("Error", "Failed to update favorites", "error");
-    } finally {
-      setLoadingFavorites((prev) => ({ ...prev, [wordId]: false }));
-    }
-  };
-
-  // const toggleFavorite = async (wordId) => {
-  //   setLoadingFavorites((prev) => ({ ...prev, [wordId]: true }));
-  //   try {
-  //     if (favorites.includes(wordId)) {
-  //       // Remove favorite
-  //       await axios.delete(`/favorite-words/${wordId}`, {
-  //         data: { userId: userInfo.id },
-  //       });
-  //       setFavorites((prev) => prev.filter((id) => id !== wordId));
-  //       setFavoriteWords((prev) => prev.filter((w) => w.id !== wordId));
-  //     } else {
-  //       // Add favorite
-  //       const response = await axios.post(`/favorite-words`, {
-  //         userId: userInfo.id,
-  //         wordId,
-  //       });
-  //       if (response.data.success) {
-  //         setFavorites((prev) => [...prev, wordId]);
-  //       }
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //     Swal.fire("Error", "Failed to update favorites", "error");
-  //   } finally {
-  //     setLoadingFavorites((prev) => ({ ...prev, [wordId]: false }));
-  //   }
-  // };
-
   return (
     // <Container>
     <Container>
@@ -479,20 +359,11 @@ const FavoritesList = () => {
         </div>
       )}
 
-      {/* <WordListModal
-        isOpen={isModalOpen}
-        closeModal={closeModal}
-        selectedWord={selectedWord}
-      /> */}
       <WordListModal
         isOpen={isModalOpen}
         closeModal={closeModal}
         selectedWord={selectedWord}
-        favorites={favorites}
-        toggleFavorite={toggleFavorite}
-        loadingFavorites={loadingFavorites}
       />
-
       {/* </Container> */}
     </Container>
   );

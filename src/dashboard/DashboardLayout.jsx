@@ -11,8 +11,8 @@ const DashboardLayout = () => {
     <Container>
       <div className="flex min-h-screen  mb-12">
         {/* Sidebar */}
-        <aside className="w-64 bg-slate-700 text-white flex flex-col">
-          <div className="px-6 py-2 text-2xl font-bold border-b text-center">
+        <aside className="w-64  text-white flex flex-col border border-dashed ">
+          <div className="px-6 py-2 text-2xl font-bold border-b  text-center">
             Dashboard
           </div>
 
