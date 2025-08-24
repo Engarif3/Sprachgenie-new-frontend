@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 import { pronounceWord } from "../../../utils/wordPronounciation";
 import FavoriteButton from "./FavoriteButton";
+import { RiCloseCircleFill } from "react-icons/ri";
 
 const WordListModal = ({
   closeModal,
@@ -137,13 +138,15 @@ const WordListModal = ({
             )}
           </div>
         </div>
-        <div className="mt-8 flex justify-center ">
-          <button
+        {/* <div className="mt-8 flex justify-center text-white  "> */}
+        <div className=" text-red-500  absolute bottom-2 right-2 hover:scale-105">
+          {/* <button
             onClick={closeModal}
             className="btn btn-sm  bg-[#ff000d] font-semibold text-xl text-white  absolute bottom-4 right-4 "
           >
             X
-          </button>
+          </button> */}
+          <RiCloseCircleFill onClick={closeModal} size={50} />
         </div>
       </div>
     </div>
