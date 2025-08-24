@@ -163,80 +163,59 @@ const Register = () => {
   //   const data = modifyPayload(formData);
   //   try {
   //     const res = await registerUser(data);
+  //     if (res?.data) {
+  //       navigate("/verify-email"); // Or "/resend-verification" as needed
+  //       return; // Exit after navigation
+  //     }
+  //     // if (res?.data?.pending) {
+  //     //   navigate("/verify-email"); // Or "/resend-verification" as needed
+  //     //   return; // Exit after navigation
+  //     // }
+
+  //     // Handle successful registration with user data
   //     if (res?.data?.id) {
-  //       if (res.data?.status === "PENDING") {
-  //         // Display email verification message
-  //         setEmailVerificationMessage(
-  //           "Please verify your email before logging in."
-  //         );
-  //       } else {
-  //         toast.success("Registration successful");
-  //         navigate("/login");
-  //       }
+  //       toast.success("Registration successful");
+  //       // navigate("/login"); // Uncomment if needed
   //     } else {
-  //       setError(res.message);
+  //       // Handle other errors
+  //       setError(res.message || "Registration failed");
   //     }
   //   } catch (error) {
-  //     console.log(error.message);
-  //   }
-  // };
-  // const handleRegister = async (formData) => {
-  //   const data = modifyPayload(formData);
-  //   try {
-  //     const res = await registerUser(data);
-  //     console.log(res);
-  //     if (res?.data?.id) {
-  //       // if (res.data?.status === "PENDING") {
-  //       //   // Display message for pending verification
-  //       //   // setEmailVerificationMessage(
-  //       //   //   "Please verify your email before logging in."
-  //       //   // );
-  //       //   navigate("/verify-email");
-  //       // } else if (res.data?.status === "ACTIVE") {
-  //       //   // Display message if user already exists
-  //       //   setEmailVerificationMessage("User already exists.");
-  //       // } else if (res.data?.status === "BLOCKED") {
-  //       //   setEmailVerificationMessage("Your account is blocked");
-  //       // }
-  //       if (
-  //         res?.success === false &&
-  //         res?.message === "Please verify your email before logging in."
-  //       ) {
-  //         // Redirect to verify-email page
-  //         navigate("/verify-email");
-  //       } else {
-  //         toast.success("Registration successful");
-  //         // navigate("/login");
-  //       }
-  //     } else {
-  //       setError(res.message);
-  //     }
-  //   } catch (error) {
-  //     console.log(error.message);
+  //     console.error("Registration error:", error);
+  //     setError(error.message || "An error occurred during registration");
   //   }
   // };
 
   const handleRegister = async (formData) => {
     const data = modifyPayload(formData);
+
     try {
       const res = await registerUser(data);
-      if (res?.data) {
-        navigate("/verify-email"); // Or "/resend-verification" as needed
-        return; // Exit after navigation
-      }
-      // if (res?.data?.pending) {
-      //   navigate("/verify-email"); // Or "/resend-verification" as needed
-      //   return; // Exit after navigation
-      // }
 
-      // Handle successful registration with user data
-      if (res?.data?.id) {
-        toast.success("Registration successful");
-        // navigate("/login"); // Uncomment if needed
-      } else {
-        // Handle other errors
-        setError(res.message || "Registration failed");
+      if (!res?.data) {
+        setError("No response from server");
+        return;
       }
+
+      const { success, message } = res.data;
+
+      if (!success) {
+        // Show error inline + toast
+        setError(message || "Registration failed");
+        toast.error(message || "Registration failed");
+
+        // Optional: handle specific cases
+        if (message === "User already exists") {
+          // Stay on same page
+        } else if (message.includes("verify your email")) {
+          navigate("/verify-email");
+        }
+        return;
+      }
+
+      // Success case
+      toast.success("Registration successful!");
+      navigate("/verify-email");
     } catch (error) {
       console.error("Registration error:", error);
       setError(error.message || "An error occurred during registration");
