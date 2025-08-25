@@ -207,82 +207,85 @@ const FavoritesList = () => {
   );
 
   //favorites in modal
-useEffect(() => {
-  const loadFavoritesFromDB = async () => {
-    // Get all favorites as a single array
-    const cachedFavorites = getFromLocalStorage('favorites');
-    
-    if (cachedFavorites && Array.isArray(cachedFavorites)) {
-      setFavoriteWords(cachedFavorites);
-      setFavorites(cachedFavorites.map((w) => w.id));
-    }
-  };
+  useEffect(() => {
+    const loadFavoritesFromDB = async () => {
+      const keys = favoriteWords.map((w) => `favorite-${w.id}`);
+      const cachedFavorites = await Promise.all(
+        keys.map((key) => getFromLocalStorage(key))
+      );
 
-  loadFavoritesFromDB();
-}, []);
+      const validFavorites = cachedFavorites.filter(Boolean);
+      if (validFavorites.length > 0) {
+        setFavoriteWords(validFavorites);
+        setFavorites(validFavorites.map((w) => w.id));
+      }
+    };
+
+    loadFavoritesFromDB();
+  }, []);
 
   useEffect(() => {
     setFavorites(favoriteWords.map((w) => w.id));
   }, [favoriteWords]);
 
   const toggleFavorite = async (wordId) => {
-  setLoadingFavorites((prev) => ({ ...prev, [wordId]: true }));
+    setLoadingFavorites((prev) => ({ ...prev, [wordId]: true }));
 
-  try {
-    if (favorites.includes(wordId)) {
-      // Remove favorite
-      await axios.delete(`/favorite-words/${wordId}`, {
-        data: { userId: userInfo.id },
-      });
+    try {
+      if (favorites.includes(wordId)) {
+        // Remove favorite
+        await axios.delete(`/favorite-words/${wordId}`, {
+          data: { userId: userInfo.id },
+        });
 
-      const updatedFavorites = favoriteWords.filter((w) => w.id !== wordId);
-      setFavorites(updatedFavorites.map((w) => w.id));
-      setFavoriteWords(updatedFavorites);
-
-      // Store updated array in localStorage
-      setToLocalStorage('favorites', updatedFavorites);
-
-      Swal.fire({
-        title: "Removed!",
-        text: "The word has been removed from favorites.",
-        icon: "success",
-        timer: 1000,
-        showConfirmButton: false,
-      });
-    } else {
-      // Add favorite
-      const response = await axios.post(`/favorite-words`, {
-        userId: userInfo.id,
-        wordId,
-      });
-
-      if (response.data.success) {
-        // Fetch updated favorites list
-        const favResponse = await axios.get(`/favorite-words/${userInfo.id}`);
-        if (favResponse.data.success) {
-          setFavoriteWords(favResponse.data.data);
-          setFavorites(favResponse.data.data.map((w) => w.id));
-
-          // Store all favorites as a single array in localStorage
-          setToLocalStorage('favorites', favResponse.data.data);
-        }
+        setFavorites((prev) => prev.filter((id) => id !== wordId));
+        setFavoriteWords((prev) => prev.filter((w) => w.id !== wordId));
 
         Swal.fire({
-          title: "Added!",
-          text: "The word has been added to favorites.",
+          title: "Removed!",
+          text: "The word has been removed from favorites.",
           icon: "success",
           timer: 1000,
           showConfirmButton: false,
         });
+
+        await removeFromLocalStorage(`favorite-${wordId}`);
+      } else {
+        // Add favorite
+        const response = await axios.post(`/favorite-words`, {
+          userId: userInfo.id,
+          wordId,
+        });
+
+        if (response.data.success) {
+          // Fetch updated favorites list
+          const favResponse = await axios.get(`/favorite-words/${userInfo.id}`);
+          if (favResponse.data.success) {
+            setFavoriteWords(favResponse.data.data);
+            setFavorites(favResponse.data.data.map((w) => w.id));
+
+            // Optional: update IndexedDB cache
+            for (let word of favResponse.data.data) {
+              await setToLocalStorage(`favorite-${word.id}`, word);
+            }
+          }
+
+          Swal.fire({
+            title: "Added!",
+            text: "The word has been added to favorites.",
+            icon: "success",
+            timer: 1000,
+            showConfirmButton: false,
+          });
+        }
       }
+    } catch (err) {
+      console.error("Error toggling favorite:", err);
+      Swal.fire("Error", "Failed to update favorites", "error");
+    } finally {
+      setLoadingFavorites((prev) => ({ ...prev, [wordId]: false }));
     }
-  } catch (err) {
-    console.error("Error toggling favorite:", err);
-    Swal.fire("Error", "Failed to update favorites", "error");
-  } finally {
-    setLoadingFavorites((prev) => ({ ...prev, [wordId]: false }));
-  }
-};
+  };
 
   //   // const toggleFavorite = async (wordId) => {
   //   //   setLoadingFavorites((prev) => ({ ...prev, [wordId]: true }));
@@ -496,4 +499,3 @@ useEffect(() => {
 };
 
 export default FavoritesList;
-

@@ -1,9 +1,11 @@
-export const setToLocalStorage = (key, token) => {
+export const setToLocalStorage = (key, data) => {
   if (!key || typeof window === "undefined") {
     return "";
   }
 
-  return localStorage.setItem(key, token);
+  // Stringify data if it's an object/array
+  const value = typeof data === "object" ? JSON.stringify(data) : data;
+  return localStorage.setItem(key, value);
 };
 
 export const getFromLocalStorage = (key) => {
@@ -11,8 +13,16 @@ export const getFromLocalStorage = (key) => {
     return "";
   }
 
-  return localStorage.getItem(key);
+  const value = localStorage.getItem(key);
+  
+  // Try to parse as JSON, return as is if it fails
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
 };
+
 export const removeFromLocalStorage = (key) => {
   if (!key || typeof window === "undefined") {
     return "";
