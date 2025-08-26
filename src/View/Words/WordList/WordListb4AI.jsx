@@ -18,8 +18,6 @@ import WordListModal from "../Modals/WordListModal";
 import HistoryModal from "../Modals/HistoryModal";
 import { getFromStorage, setToStorage } from "../../../utils/storage";
 import FavoriteButton from "../Modals/FavoriteButton";
-import aiApi from "../../../AI_axios";
-import { PuffLoader } from "react-spinners";
 
 // Cache key constants
 const CACHE_KEY = "wordListCache";
@@ -57,15 +55,6 @@ const WordList = () => {
   const userInfo = getUserInfo() || {};
 
   const [favorites, setFavorites] = useState([]);
-
-  //   =========AI ===============
-  const [aiWord, setAiWord] = useState(null);
-  const [generatedParagraphs, setGeneratedParagraphs] = useState({});
-  const [loadingParagraphs, setLoadingParagraphs] = useState({});
-  const [selectedParagraph, setSelectedParagraph] = useState("");
-  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
-
-  //   =========AI ===============
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -513,40 +502,6 @@ const WordList = () => {
     }
   }, [applyFilters, cache.words]);
 
-  //   ==============AI===============
-
-  const generateParagraph = async (word) => {
-    try {
-      setLoadingParagraphs((prev) => ({ ...prev, [word.id]: true }));
-
-      const response = await aiApi.post(`/paragraphs/generate`, {
-        wordId: word.id,
-        word: word.value,
-        level: word.level?.level || "A1",
-        language: "de",
-      });
-
-      const paragraph = response.data.paragraph;
-
-      setGeneratedParagraphs((prev) => ({
-        ...prev,
-        [word.id]: paragraph,
-      }));
-
-      // 👇 only update AI modal state
-      setAiWord(word);
-      setSelectedParagraph(paragraph);
-      setIsAIModalOpen(true);
-    } catch (error) {
-      console.error("Error generating paragraph:", error);
-      Swal.fire("Error", "Failed to generate paragraph", "error");
-    } finally {
-      setLoadingParagraphs((prev) => ({ ...prev, [word.id]: false }));
-    }
-  };
-
-  //   ==============AI===============
-
   return (
     <Container>
       <h2 className="text-3xl font-bold font-mono text-white my-8 text-center hidden md:block">
@@ -708,53 +663,12 @@ const WordList = () => {
                             {word.value}
                           </span>
 
-                          <div className="flex gap-4 ">
-                            <button
-                              onClick={() => pronounceWord(word.value)}
-                              className=" text-blue-500 hover:text-blue-700 ml-2 "
-                            >
-                              🔊
-                            </button>
-                            {/* <div
-                              onClick={() => generateParagraph(word)}
-                              className="border-2 bg-green-700 text-white italic px-1 text-sm rounded-full mt-4 cursor-pointer hover:scale-105 hover:bg-green-600 hover:text-white border-orange-500"
-                              disabled={loadingParagraphs[word.id]}
-                            >
-                              {loadingParagraphs[word.id] ? (
-                                <PuffLoader
-                                  size={24}
-                                  className="rounded-full "
-                                />
-                              ) : (
-                                "ai"
-                              )}
-                            </div> */}
-                            {userLoggedIn && (
-                              <div
-                                onClick={() => generateParagraph(word)}
-                                className="relative border-2 bg-green-700 text-white italic px-2 py-1 text-sm rounded-full mt-4 h-6 w-6 cursor-pointer hover:scale-105 hover:bg-green-600 hover:text-white border-orange-500 "
-                                disabled={loadingParagraphs[word.id]}
-                              >
-                                {/* Spinner overlay */}
-                                {loadingParagraphs[word.id] && (
-                                  <span className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                                    <PuffLoader size={20} color="#FF0000" />
-                                  </span>
-                                )}
-
-                                {/* Button text underneath */}
-                                <span
-                                  className={`${
-                                    loadingParagraphs[word.id]
-                                      ? "invisible"
-                                      : "flex items-center justify-center relative bottom-1"
-                                  }`}
-                                >
-                                  ai
-                                </span>
-                              </div>
-                            )}
-                          </div>
+                          <button
+                            onClick={() => pronounceWord(word.value)}
+                            className=" text-blue-500 hover:text-blue-700 ml-2"
+                          >
+                            🔊
+                          </button>
                         </div>
                       </td>
 
@@ -963,30 +877,6 @@ const WordList = () => {
         modifiers={selectedHistory.modifiers}
       />
       {/* ========= */}
-      {/* =======AI modal=============== */}
-      {isAIModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-slate-900 rounded-lg shadow-lg p-6 w-full md:w-1/2 lg:w-1/2  px-4 mx-2">
-            <h2 className="text-2xl md:text-5xl lg:text-5xl font-bold  text-center text-cyan-600 mb-8 ">
-              {aiWord?.value}
-            </h2>
-            <p className="whitespace-pre-line text-xl md:text-2xl lg:text-2xl  font-mono text-gray-200 border border-cyan-600 rounded-md p-2">
-              {selectedParagraph}
-            </p>
-
-            <div className="mt-8 flex justify-end">
-              <button
-                onClick={() => setIsAIModalOpen(false)}
-                className="btn btn-sm btn-warning"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* =======AI modal=============== */}
     </Container>
   );
 };
