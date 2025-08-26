@@ -446,17 +446,30 @@ const WordList = () => {
     }
   }, [currentIndex]);
 
+  // A1>level id:1 ... B2> id:4 C1> id:6
   const levelOptions = useMemo(
     () =>
-      levels.map((level) => (
-        <option
-          key={level.id}
-          value={level.level}
-          className="text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white"
-        >
-          {level.level}
-        </option>
-      )),
+      levels
+        // .filter((level) => level.id !== 6) // exclude id 6 for all
+        // exclude id:6 for only users and basic users
+        .filter((level) => {
+          if (
+            level.id === 6 &&
+            !["admin", "super_admin"].includes(userInfo.role)
+          ) {
+            return false;
+          }
+          return true;
+        })
+        .map((level) => (
+          <option
+            key={level.id}
+            value={level.level}
+            className="text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white"
+          >
+            {level.level}
+          </option>
+        )),
     [levels]
   );
 
