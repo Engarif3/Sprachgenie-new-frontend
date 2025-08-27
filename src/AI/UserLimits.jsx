@@ -140,6 +140,83 @@ const UserLimits = () => {
     fetchData();
   }, []);
 
+  const handleResetToGlobal = async (userId) => {
+    const user = users.find((u) => u.id === userId);
+    if (!user) return;
+
+    setUpdatingId(userId);
+
+    try {
+      // Call backend to reset (you can design API to delete user’s limit record or update with global)
+      await aiApi.post("/paragraphs/update-limit", {
+        userId,
+        dailyLimit: globalLimits.dailyLimit,
+        monthlyLimit: globalLimits.monthlyLimit,
+        yearlyLimit: globalLimits.yearlyLimit,
+      });
+
+      // Update local state immediately
+      setUsers((prev) =>
+        prev.map((u) => (u.id === userId ? { ...u, ...globalLimits } : u))
+      );
+
+      Swal.fire({
+        icon: "success",
+        title: "Limits reset",
+        text: `${user.name}'s limits were reset to global.`,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Failed to reset limits", "error");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handleResetAllToGlobal = async () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This will reset ALL users' limits to the global values.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, reset all!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          setLoading(true);
+
+          // Call backend API to reset all
+          await aiApi.post("/paragraphs/reset-all-limits");
+
+          // Update state in frontend (all users → global limits)
+          setUsers((prev) =>
+            prev.map((u) => ({
+              ...u,
+              dailyLimit: globalLimits.dailyLimit,
+              monthlyLimit: globalLimits.monthlyLimit,
+              yearlyLimit: globalLimits.yearlyLimit,
+            }))
+          );
+
+          Swal.fire(
+            "Reset!",
+            "All users' limits were reset to global.",
+            "success"
+          );
+        } catch (err) {
+          console.error(err);
+          Swal.fire("Error", "Failed to reset all limits", "error");
+        } finally {
+          setLoading(false);
+        }
+      }
+    });
+  };
+
   const handleLimitChange = (userId, field, value) => {
     setUsers((prev) =>
       prev.map((u) => (u.id === userId ? { ...u, [field]: value } : u))
@@ -208,6 +285,15 @@ const UserLimits = () => {
         </span>
       </p>
       <div className="overflow-x-auto">
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={handleResetAllToGlobal}
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          >
+            Reset All to Global
+          </button>
+        </div>
+
         <table className="min-w-full table-auto border">
           <thead>
             <tr className="bg-cyan-700 text-white">
@@ -273,13 +359,20 @@ const UserLimits = () => {
                   />
                 </td>
 
-                <td className="p-2 text-center">
+                <td className="p-2 text-center flex gap-2 justify-center">
                   <button
                     onClick={() => handleUpdateLimits(user.id)}
                     disabled={updatingId === user.id}
                     className="bg-cyan-700 text-white px-3 py-1 rounded hover:bg-cyan-800"
                   >
                     {updatingId === user.id ? "Updating..." : "Update"}
+                  </button>
+                  <button
+                    onClick={() => handleResetToGlobal(user.id)}
+                    disabled={updatingId === user.id}
+                    className="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700"
+                  >
+                    Reset
                   </button>
                 </td>
               </tr>
