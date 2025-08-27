@@ -56,6 +56,8 @@ const WordList = () => {
   const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo() || {};
 
+  // console.log(userInfo);
+
   const [favorites, setFavorites] = useState([]);
 
   //   =========AI ===============
@@ -515,11 +517,87 @@ const WordList = () => {
 
   //   ==============AI===============
 
+  // const generateParagraph = async (word) => {
+  //   try {
+  //     setLoadingParagraphs((prev) => ({ ...prev, [word.id]: true }));
+
+  //     const response = await aiApi.post(`/paragraphs/generate`, {
+  //       userId: userInfo?.id,
+  //       wordId: word.id,
+  //       word: word.value,
+  //       level: word.level?.level || "A1",
+  //       language: "de",
+  //     });
+
+  //     const paragraph = response.data.paragraph;
+
+  //     setGeneratedParagraphs((prev) => ({
+  //       ...prev,
+  //       [word.id]: paragraph,
+  //     }));
+
+  //     // 👇 only update AI modal state
+  //     setAiWord(word);
+  //     setSelectedParagraph(paragraph);
+  //     setIsAIModalOpen(true);
+  //   } catch (error) {
+  //     console.error("Error generating paragraph:", error);
+  //     Swal.fire("Error", "Failed to generate paragraph", "error");
+  //   } finally {
+  //     setLoadingParagraphs((prev) => ({ ...prev, [word.id]: false }));
+  //   }
+  // };
+
+  // const generateParagraph = async (word) => {
+  //   try {
+  //     setLoadingParagraphs((prev) => ({ ...prev, [word.id]: true }));
+
+  //     const response = await aiApi.post(`/paragraphs/generate`, {
+  //       userId: userInfo?.id,
+  //       wordId: word.id,
+  //       word: word.value,
+  //       level: word.level?.level || "A1",
+  //       language: "de",
+  //     });
+
+  //     const paragraph = response.data.paragraph;
+
+  //     setGeneratedParagraphs((prev) => ({
+  //       ...prev,
+  //       [word.id]: paragraph,
+  //     }));
+
+  //     // 👇 only update AI modal state
+  //     setAiWord(word);
+  //     setSelectedParagraph(paragraph);
+  //     setIsAIModalOpen(true);
+  //   } catch (error) {
+  //     if (error.response && error.response.status === 403) {
+  //       Swal.fire("Limit Reached", error.response.data.error, "warning");
+  //     } else {
+  //       console.error("Error generating paragraph:", error.message);
+  //       Swal.fire("Error", "Failed to generate paragraph", "error");
+  //     }
+  //   } finally {
+  //     setLoadingParagraphs((prev) => ({ ...prev, [word.id]: false }));
+  //   }
+  // };
+
   const generateParagraph = async (word) => {
+    if (!userInfo?.id) {
+      Swal.fire(
+        "Not Logged In",
+        "You must be logged in to generate paragraphs",
+        "warning"
+      );
+      return;
+    }
+
     try {
       setLoadingParagraphs((prev) => ({ ...prev, [word.id]: true }));
 
       const response = await aiApi.post(`/paragraphs/generate`, {
+        userId: userInfo.id,
         wordId: word.id,
         word: word.value,
         level: word.level?.level || "A1",
@@ -533,13 +611,18 @@ const WordList = () => {
         [word.id]: paragraph,
       }));
 
-      // 👇 only update AI modal state
       setAiWord(word);
       setSelectedParagraph(paragraph);
       setIsAIModalOpen(true);
     } catch (error) {
-      console.error("Error generating paragraph:", error);
-      Swal.fire("Error", "Failed to generate paragraph", "error");
+      const errorMessage = error.response?.data?.error || error.message;
+
+      if (error.response?.status === 403) {
+        Swal.fire("Limit Reached", errorMessage, "warning");
+      } else {
+        console.error("Error generating paragraph:", errorMessage);
+        Swal.fire("Error", "Failed to generate paragraph", "error");
+      }
     } finally {
       setLoadingParagraphs((prev) => ({ ...prev, [word.id]: false }));
     }

@@ -299,6 +299,16 @@ const FavoritesListDashboard = lazy(() =>
 );
 const Backend = lazy(() => import("../Backend/Backend"));
 
+// =================AI====================
+// const UpdateLimits = lazy(() => import("../AI/UpdateLimits"));
+const GlobalLimits = lazy(() => import("../AI/GlobalLimits"));
+const UserLimits = lazy(() => import("../AI/UserLimits"));
+
+// import GlobalLimits from "../AI/GlobalLimits";
+// import UserLimits from "../AI/UserLimits";
+
+// =================AI====================
+
 // Helper function to wrap pages in Suspense
 const withSuspense = (Component) => (
   // <Suspense fallback={<div className="text-white">Loading...</div>}>
@@ -386,6 +396,18 @@ export const router = createBrowserRouter([
             element: withSuspense(UsersFavoriteCount),
           },
           { path: "delete-all", element: withSuspense(DeleteAllWords) },
+          // {
+          //   path: "update-limits",
+          //   element: withSuspense(UpdateLimits),
+          // },
+          {
+            path: "global-limits",
+            element: withSuspense(GlobalLimits),
+          },
+          {
+            path: "user-limits",
+            element: withSuspense(UserLimits),
+          },
         ],
       },
     ],
