@@ -70,7 +70,7 @@ const Home = () => {
       <div className="text-orange-600 text-xl md:text-2xl lg:text-2xl flex justify-center my-8 md:my-2 lg:my-2">
         {!userLoggedIn && (
           <div className="w-11/12  md:w-6/12 lg:w-6/12">
-            <Marquee gradient={false} speed={20}>
+            <Marquee gradient={false} speed={30}>
               <p>
                 ✨Log in to unleash AI-powered magic and step into the future of
                 learning!✨
