@@ -243,6 +243,12 @@ const DashboardLayout = () => {
                 >
                   User Limits
                 </Link>
+                <Link
+                  to="/dashboard/get-usage"
+                  className="block py-2 px-3 rounded hover:bg-cyan-700"
+                >
+                  Limit Usage
+                </Link>
               </>
             )}
 
