@@ -60,19 +60,24 @@ import HomeCard from "./HomeCard";
 import CircularText from "./CircularText";
 import SplashCursor from "./SplashCursor";
 import Marquee from "react-fast-marquee";
+import { isLoggedIn } from "../../services/auth.services";
 
 const Home = () => {
+  const userLoggedIn = isLoggedIn();
+  // const userInfo = getUserInfo() || {};
   return (
     <Container className="flex ">
       <div className="text-orange-600 text-xl md:text-2xl lg:text-2xl flex justify-center my-8 md:my-2 lg:my-2">
-        <div className="w-11/12  md:w-6/12 lg:w-6/12">
-          <Marquee gradient={false} speed={10}>
-            <p>
-              ✨Log in to unleash AI-powered magic and step into the future of
-              learning!✨
-            </p>
-          </Marquee>
-        </div>
+        {userLoggedIn && (
+          <div className="w-11/12  md:w-6/12 lg:w-6/12">
+            <Marquee gradient={false} speed={15}>
+              <p>
+                ✨Log in to unleash AI-powered magic and step into the future of
+                learning!✨
+              </p>
+            </Marquee>
+          </div>
+        )}
       </div>
       <SplashCursor />
       <CircularText
