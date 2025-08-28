@@ -583,6 +583,51 @@ const WordList = () => {
   //   }
   // };
 
+  // const generateParagraph = async (word) => {
+  //   if (!userInfo?.id) {
+  //     Swal.fire(
+  //       "Not Logged In",
+  //       "You must be logged in to generate paragraphs",
+  //       "warning"
+  //     );
+  //     return;
+  //   }
+
+  //   try {
+  //     setLoadingParagraphs((prev) => ({ ...prev, [word.id]: true }));
+
+  //     const response = await aiApi.post(`/paragraphs/generate`, {
+  //       userId: userInfo.id,
+  //       wordId: word.id,
+  //       word: word.value,
+  //       level: word.level?.level || "A1",
+  //       language: "de",
+  //     });
+
+  //     const paragraph = response.data.paragraph;
+
+  //     setGeneratedParagraphs((prev) => ({
+  //       ...prev,
+  //       [word.id]: paragraph,
+  //     }));
+
+  //     setAiWord(word);
+  //     setSelectedParagraph(paragraph);
+  //     setIsAIModalOpen(true);
+  //   } catch (error) {
+  //     const errorMessage = error.response?.data?.error || error.message;
+
+  //     if (error.response?.status === 403) {
+  //       Swal.fire("Limit Reached", errorMessage, "warning");
+  //     } else {
+  //       console.error("Error generating paragraph:", errorMessage);
+  //       Swal.fire("Error", "Failed to generate paragraph", "error");
+  //     }
+  //   } finally {
+  //     setLoadingParagraphs((prev) => ({ ...prev, [word.id]: false }));
+  //   }
+  // };
+
   const generateParagraph = async (word) => {
     if (!userInfo?.id) {
       Swal.fire(
@@ -605,18 +650,23 @@ const WordList = () => {
       });
 
       const paragraph = response.data.paragraph;
+      const wordId = response.data.wordId || word.id; // depends on AI API response
+
+      // 🔑 Find the full word object in your /all words cache
+      const fullWord = cache.words.find((w) => w.id === wordId);
+
+      // Save enriched word into modal state
+      setAiWord(fullWord || { id: wordId, value: word.value });
 
       setGeneratedParagraphs((prev) => ({
         ...prev,
-        [word.id]: paragraph,
+        [wordId]: paragraph,
       }));
 
-      setAiWord(word);
       setSelectedParagraph(paragraph);
       setIsAIModalOpen(true);
     } catch (error) {
       const errorMessage = error.response?.data?.error || error.message;
-
       if (error.response?.status === 403) {
         Swal.fire("Limit Reached", errorMessage, "warning");
       } else {
@@ -1049,11 +1099,20 @@ const WordList = () => {
       {/* =======AI modal=============== */}
       {isAIModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-slate-900 rounded-lg shadow-lg p-6 w-full md:w-1/2 lg:w-1/2  px-4 mx-2">
-            <h2 className="text-2xl md:text-5xl lg:text-5xl font-bold  text-center text-cyan-600 mb-8 ">
-              {aiWord?.value}
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full md:w-1/2 lg:w-1/2  px-4 mx-2">
+            <h2 className="text-2xl md:text-5xl lg:text-5xl font-bold  text-center mb-2">
+              <span className="text-orange-600">
+                {" "}
+                {typeof aiWord?.article === "string"
+                  ? aiWord.article
+                  : aiWord?.article?.name || ""}{" "}
+              </span>
+              <span className="text-slate-800 capitalize">{aiWord?.value}</span>
             </h2>
-            <p className="whitespace-pre-line text-xl md:text-2xl lg:text-2xl  font-mono text-gray-200 border border-cyan-600 rounded-md p-2">
+            <p className="text-center text-cyan-800 text-2xl mb-6">
+              [{aiWord?.meaning || ""}]
+            </p>
+            <p className="whitespace-pre-line text-xl md:text-2xl lg:text-2xl  font-mono text-slate900 border border-cyan-600 rounded-md p-2">
               {selectedParagraph}
             </p>
 
