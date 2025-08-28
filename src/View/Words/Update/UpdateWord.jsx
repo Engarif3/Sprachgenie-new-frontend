@@ -57,7 +57,6 @@ const UpdateWord = () => {
       try {
         const response = await api.get(`/word/${id}`);
         const word = response.data.data;
-        console.log(word);
         setFormData({
           id: word.id,
           value: word.value,

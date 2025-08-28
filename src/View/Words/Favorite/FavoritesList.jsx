@@ -13,6 +13,8 @@ import {
   removeFromLocalStorage,
   setToLocalStorage,
 } from "../../../utils/local-storage";
+import aiApi from "../../../AI_axios";
+import { PuffLoader } from "react-spinners";
 
 const FavoritesList = () => {
   const [selectedWord, setSelectedWord] = useState(null);
@@ -24,6 +26,15 @@ const FavoritesList = () => {
   const userInfo = getUserInfo();
   const [favorites, setFavorites] = useState([]);
   const [loadingFavorites, setLoadingFavorites] = useState({});
+
+  // =================ai===========================
+  const [aiWord, setAiWord] = useState(null);
+  const [generatedParagraphs, setGeneratedParagraphs] = useState({});
+  const [loadingParagraphs, setLoadingParagraphs] = useState({});
+  const [selectedParagraph, setSelectedParagraph] = useState("");
+  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
+
+  // =================ai===========================
 
   useEffect(() => {
     setFavorites(favoriteWords.map((w) => w.id));
@@ -207,82 +218,82 @@ const FavoritesList = () => {
   );
 
   //favorites in modal
-useEffect(() => {
-  const loadFavoritesFromDB = async () => {
-    // Get all favorites as a single array
-    const cachedFavorites = getFromLocalStorage('favorites');
-    
-    if (cachedFavorites && Array.isArray(cachedFavorites)) {
-      setFavoriteWords(cachedFavorites);
-      setFavorites(cachedFavorites.map((w) => w.id));
-    }
-  };
+  useEffect(() => {
+    const loadFavoritesFromDB = async () => {
+      // Get all favorites as a single array
+      const cachedFavorites = getFromLocalStorage("favorites");
 
-  loadFavoritesFromDB();
-}, []);
+      if (cachedFavorites && Array.isArray(cachedFavorites)) {
+        setFavoriteWords(cachedFavorites);
+        setFavorites(cachedFavorites.map((w) => w.id));
+      }
+    };
+
+    loadFavoritesFromDB();
+  }, []);
 
   useEffect(() => {
     setFavorites(favoriteWords.map((w) => w.id));
   }, [favoriteWords]);
 
   const toggleFavorite = async (wordId) => {
-  setLoadingFavorites((prev) => ({ ...prev, [wordId]: true }));
+    setLoadingFavorites((prev) => ({ ...prev, [wordId]: true }));
 
-  try {
-    if (favorites.includes(wordId)) {
-      // Remove favorite
-      await axios.delete(`/favorite-words/${wordId}`, {
-        data: { userId: userInfo.id },
-      });
+    try {
+      if (favorites.includes(wordId)) {
+        // Remove favorite
+        await axios.delete(`/favorite-words/${wordId}`, {
+          data: { userId: userInfo.id },
+        });
 
-      const updatedFavorites = favoriteWords.filter((w) => w.id !== wordId);
-      setFavorites(updatedFavorites.map((w) => w.id));
-      setFavoriteWords(updatedFavorites);
+        const updatedFavorites = favoriteWords.filter((w) => w.id !== wordId);
+        setFavorites(updatedFavorites.map((w) => w.id));
+        setFavoriteWords(updatedFavorites);
 
-      // Store updated array in localStorage
-      setToLocalStorage('favorites', updatedFavorites);
-
-      Swal.fire({
-        title: "Removed!",
-        text: "The word has been removed from favorites.",
-        icon: "success",
-        timer: 1000,
-        showConfirmButton: false,
-      });
-    } else {
-      // Add favorite
-      const response = await axios.post(`/favorite-words`, {
-        userId: userInfo.id,
-        wordId,
-      });
-
-      if (response.data.success) {
-        // Fetch updated favorites list
-        const favResponse = await axios.get(`/favorite-words/${userInfo.id}`);
-        if (favResponse.data.success) {
-          setFavoriteWords(favResponse.data.data);
-          setFavorites(favResponse.data.data.map((w) => w.id));
-
-          // Store all favorites as a single array in localStorage
-          setToLocalStorage('favorites', favResponse.data.data);
-        }
+        // Store updated array in localStorage
+        setToLocalStorage("favorites", updatedFavorites);
 
         Swal.fire({
-          title: "Added!",
-          text: "The word has been added to favorites.",
+          title: "Removed!",
+          text: "The word has been removed from favorites.",
           icon: "success",
           timer: 1000,
           showConfirmButton: false,
         });
+      } else {
+        // Add favorite
+        const response = await axios.post(`/favorite-words`, {
+          userId: userInfo.id,
+          wordId,
+        });
+
+        if (response.data.success) {
+          // Fetch updated favorites list
+          const favResponse = await axios.get(`/favorite-words/${userInfo.id}`);
+          if (favResponse.data.success) {
+            setFavoriteWords(favResponse.data.data);
+            setFavorites(favResponse.data.data.map((w) => w.id));
+
+            // Store all favorites as a single array in localStorage
+            setToLocalStorage("favorites", favResponse.data.data);
+          }
+
+          Swal.fire({
+            title: "Added!",
+            text: "The word has been added to favorites.",
+            icon: "success",
+            timer: 1000,
+            showConfirmButton: false,
+          });
+        }
       }
+    } catch (err) {
+      console.error("Error toggling favorite:", err);
+      Swal.fire("Error", "Failed to update favorites", "error");
+    } finally {
+      setLoadingFavorites((prev) => ({ ...prev, [wordId]: false }));
     }
-  } catch (err) {
-    console.error("Error toggling favorite:", err);
-    Swal.fire("Error", "Failed to update favorites", "error");
-  } finally {
-    setLoadingFavorites((prev) => ({ ...prev, [wordId]: false }));
-  }
-};
+  };
 
   //   // const toggleFavorite = async (wordId) => {
   //   //   setLoadingFavorites((prev) => ({ ...prev, [wordId]: true }));
@@ -311,6 +322,52 @@ useEffect(() => {
   //   //     setLoadingFavorites((prev) => ({ ...prev, [wordId]: false }));
   //   //   }
   //   // };
+
+  // ==========================ai ===============================
+  const generateParagraph = async (word) => {
+    if (!userInfo?.id) {
+      Swal.fire(
+        "Not Logged In",
+        "You must be logged in to generate paragraphs",
+        "warning"
+      );
+      return;
+    }
+
+    try {
+      setLoadingParagraphs((prev) => ({ ...prev, [word.id]: true }));
+
+      const response = await aiApi.post(`/paragraphs/generate`, {
+        userId: userInfo.id,
+        wordId: word.id,
+        word: word.value,
+        level: word.level?.level || "A1",
+        language: "de",
+      });
+
+      const paragraph = response.data.paragraph;
+      const wordId = response.data.wordId || word.id;
+
+      const fullWord = favoriteWords.find((w) => w.id === wordId);
+
+      setAiWord(fullWord || { id: wordId, value: word.value });
+      setGeneratedParagraphs((prev) => ({ ...prev, [wordId]: paragraph }));
+      setSelectedParagraph(paragraph);
+      setIsAIModalOpen(true);
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || error.message;
+      if (error.response?.status === 403) {
+        Swal.fire("Limit Reached", errorMessage, "warning");
+      } else {
+        console.error("Error generating paragraph:", errorMessage);
+        Swal.fire("Error", "Failed to generate paragraph", "error");
+      }
+    } finally {
+      setLoadingParagraphs((prev) => ({ ...prev, [word.id]: false }));
+    }
+  };
+
+  // ==========================ai ===============================
 
   return (
     // <Container>
@@ -382,12 +439,41 @@ useEffect(() => {
                               {word.value}
                             </span>
 
-                            <button
+                            {/* <button
                               onClick={() => pronounceWord(word.value)}
                               className=" text-blue-500 hover:text-blue-700 ml-2"
                             >
                               🔊
-                            </button>
+                            </button> */}
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => pronounceWord(word.value)}
+                                className="text-blue-500 hover:text-blue-700 ml-2"
+                              >
+                                🔊
+                              </button>
+
+                              <div
+                                onClick={() => generateParagraph(word)}
+                                className="relative border-2 bg-green-700 text-white italic px-2 py-1 text-sm rounded-full h-6 w-6 cursor-pointer hover:scale-105 hover:bg-green-600 hover:text-white border-orange-500"
+                                disabled={loadingParagraphs[word.id]}
+                              >
+                                {loadingParagraphs[word.id] && (
+                                  <span className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                                    <PuffLoader size={20} color="#FF0000" />
+                                  </span>
+                                )}
+                                <span
+                                  className={`${
+                                    loadingParagraphs[word.id]
+                                      ? "invisible"
+                                      : "flex items-center justify-center relative bottom-1"
+                                  }`}
+                                >
+                                  ai
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </td>
                         <td className="border border-gray-600 border-dotted p-2">
@@ -490,10 +576,43 @@ useEffect(() => {
         loadingFavorites={loadingFavorites}
       />
 
-      {/* </Container> */}
+      {/* =================ai modal ===================== */}
+      {isAIModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full md:w-1/2 lg:w-1/2 px-4 mx-2">
+            <h2 className="text-2xl md:text-5xl font-bold text-center mb-2">
+              <span className="text-orange-600">
+                {typeof aiWord?.article === "string"
+                  ? aiWord.article
+                  : aiWord?.article?.name || ""}
+              </span>{" "}
+              <span className="text-slate-800 capitalize">{aiWord?.value}</span>
+            </h2>
+            <p className="text-center text-cyan-800 text-2xl mb-6">
+              {/* [{aiWord?.meaning || ""}] */}[
+              {Array.isArray(aiWord?.meaning)
+                ? aiWord.meaning.join(", ")
+                : aiWord?.meaning || ""}
+              ]
+            </p>
+            <p className="whitespace-pre-line text-xl md:text-2xl font-mono text-slate-900 border border-cyan-600 rounded-md p-2">
+              {selectedParagraph}
+            </p>
+            <div className="mt-8 flex justify-end">
+              <button
+                onClick={() => setIsAIModalOpen(false)}
+                className="btn btn-sm btn-warning"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =================ai modal ===================== */}
     </Container>
   );
 };
 
 export default FavoritesList;
-

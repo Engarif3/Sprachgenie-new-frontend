@@ -1110,7 +1110,11 @@ const WordList = () => {
               <span className="text-slate-800 capitalize">{aiWord?.value}</span>
             </h2>
             <p className="text-center text-cyan-800 text-2xl mb-6">
-              [{aiWord?.meaning || ""}]
+              {/* [{aiWord?.meaning || ""}] */}[
+              {Array.isArray(aiWord?.meaning)
+                ? aiWord.meaning.join(", ")
+                : aiWord?.meaning || ""}
+              ]
             </p>
             <p className="whitespace-pre-line text-xl md:text-2xl lg:text-2xl  font-mono text-slate900 border border-cyan-600 rounded-md p-2">
               {selectedParagraph}
