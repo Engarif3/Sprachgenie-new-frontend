@@ -467,7 +467,7 @@ const FavoritesList = () => {
                                   className={`${
                                     loadingParagraphs[word.id]
                                       ? "invisible"
-                                      : "flex items-center justify-center relative bottom-1"
+                                      : "flex items-center justify-center relative bottom-1 capitalize"
                                   }`}
                                 >
                                   ai
