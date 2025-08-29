@@ -1,75 +1,36 @@
-// import { useEffect, useState } from "react";
-// import aiApi from "../AI_axios";
-
-// const ReportsByUsers = () => {
-//   const [reports, setReports] = useState([]);
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState("");
-
-//   const fetchReports = async () => {
-//     try {
-//       setLoading(true);
-//       const response = await aiApi.get("/paragraphs/get-reports");
-//       setReports(response.data || []);
-//     } catch (err) {
-//       console.error("Error fetching reports:", err);
-//       setError("Failed to load reports");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchReports();
-//   }, []);
-
-//   if (loading) return <p>Loading reports...</p>;
-//   if (error) return <p className="text-red-600">{error}</p>;
-//   if (reports.length === 0) return <p>No reports found.</p>;
-
-//   return (
-//     <div className="overflow-x-auto mt-4 bg-white">
-//       <table className="table-auto w-full border border-gray-300 rounded-lg">
-//         <thead className="bg-gray-100">
-//           <tr>
-//             <th className="px-4 py-2 border">Word</th>
-//             <th className="px-4 py-2 border">Total Reports</th>
-//             <th className="px-4 py-2 border">Reported by</th>
-//             <th className="px-4 py-2 border">Message</th>
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {reports.map((r, index) => (
-//             <tr key={index} className="hover:bg-gray-50">
-//               <td className="px-4 py-2 border">
-//                 <p className="truncate max-w-xs">{r.paragraph?.word}</p>
-//               </td>
-//               <td className="px-4 py-2 border">{r.reportCount}</td>
-//               <td className="px-4 py-2 border">{r.paragraph.userId}</td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-//     </div>
-//   );
-// };
-
-// export default ReportsByUsers;
 import { useEffect, useState } from "react";
+import { getFromLocalStorage } from "../utils/local-storage";
+import { authKey } from "../constants/authkey";
+import api from "../axios";
 import aiApi from "../AI_axios";
 
 const ReportsByUsers = () => {
   const [reports, setReports] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedMessage, setSelectedMessage] = useState(null);
 
-  const fetchReports = async () => {
+  const fetchReportsAndUsers = async () => {
     try {
       setLoading(true);
-      const response = await aiApi.get("/paragraphs/get-reports");
-      setReports(response.data || []);
+
+      // fetch reports
+      const reportRes = await aiApi.get("/paragraphs/get-reports");
+      const reportData = reportRes.data || [];
+
+      // fetch all users
+      const freshToken = getFromLocalStorage(authKey);
+      const userRes = await api.get("/user", {
+        headers: { Authorization: `Bearer ${freshToken}` },
+      });
+      const usersData = userRes.data.data;
+
+      setReports(reportData);
+      setUsers(usersData);
     } catch (err) {
-      console.error("Error fetching reports:", err);
+      console.error("Error fetching reports/users:", err);
       setError("Failed to load reports");
     } finally {
       setLoading(false);
@@ -77,21 +38,42 @@ const ReportsByUsers = () => {
   };
 
   useEffect(() => {
-    fetchReports();
+    fetchReportsAndUsers();
   }, []);
 
-  if (loading) return <p>Loading reports...</p>;
+  const getUserInfo = (userId) => {
+    const user = users.find((u) => u.id === userId);
+    if (!user) return userId;
+
+    return (
+      <div className="flex justify-between gap-1">
+        <span>
+          <strong>{user.name || "Unknown"}</strong>
+          {/* <span>- {user.email || "No email"} </span> */}
+        </span>
+        <button
+          onClick={() => setSelectedUser(user)}
+          className="text-blue-600 text-xs underline hover:text-blue-800"
+        >
+          View ID
+        </button>
+      </div>
+    );
+  };
+
+  if (loading) return <p className="text-center">Loading reports...</p>;
   if (error) return <p className="text-red-600">{error}</p>;
   if (reports.length === 0) return <p>No reports found.</p>;
 
   return (
     <div className="overflow-x-auto mt-4 bg-white">
+      {/* Table */}
       <table className="table-auto w-full border border-gray-300 rounded-lg">
         <thead className="bg-gray-100">
           <tr>
             <th className="px-4 py-2 border">Word</th>
             <th className="px-4 py-2 border">Total Reports</th>
-            <th className="px-4 py-2 border">Reported by</th>
+            <th className="px-4 py-2 border">Reported By</th>
             <th className="px-4 py-2 border">Message</th>
           </tr>
         </thead>
@@ -102,18 +84,94 @@ const ReportsByUsers = () => {
               <td className="px-4 py-2 border">{r.reportCount}</td>
               <td className="px-4 py-2 border">
                 {r.reports.map((rep, i) => (
-                  <div key={i}>{rep.userId}</div>
+                  <div key={i} className="mt-2">
+                    {getUserInfo(rep.userId)}
+                    {i < r.reports.length - 1 && (
+                      <hr className="border-gray-300 my-1" />
+                    )}
+                  </div>
                 ))}
               </td>
+
               <td className="px-4 py-2 border">
                 {r.reports.map((rep, i) => (
-                  <div key={i}>{rep.message}</div>
+                  <div key={i}>
+                    <div className="flex justify-between gap-2 items-center mt-2">
+                      {rep.message.length > 25 ? (
+                        <>
+                          <p>{rep.message.slice(0, 10)}...</p>
+                          <button
+                            onClick={() => setSelectedMessage(rep.message)}
+                            className="btn btn-sm btn-accent"
+                          >
+                            View
+                          </button>
+                        </>
+                      ) : (
+                        <p>{rep.message}</p>
+                      )}
+                    </div>
+                    {i < r.reports.length - 1 && (
+                      <hr className="border-gray-300 my-1" />
+                    )}
+                  </div>
                 ))}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {/* Modal */}
+      {selectedUser && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white rounded-lg p-6 shadow-lg max-w-md w-full">
+            <h2 className="text-lg font-semibold mb-4">User Info</h2>
+            <p>
+              <strong>Name:</strong> {selectedUser.name}
+            </p>
+            <p>
+              <strong>Email:</strong> {selectedUser.email}
+            </p>
+            <p>
+              <strong>User ID:</strong> {selectedUser.id}
+            </p>
+            <div className="mt-4 flex justify-end ">
+              <button
+                onClick={() => setSelectedUser(null)}
+                className="btn btn-sm btn-warning"
+              >
+                Close
+              </button>
+              {/* <button
+                onClick={() => {
+                  navigator.clipboard.writeText(selectedUser.id);
+                  alert("User ID copied!");
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Copy ID
+              </button> */}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal */}
+      {selectedMessage && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg w-96 relative">
+            <button
+              className="absolute top-2 right-2 text-red-600 font-bold"
+              onClick={() => setSelectedMessage(null)}
+            >
+              X
+            </button>
+            <h3 className="text-lg font-bold mb-4">Full Message</h3>
+            <p>{selectedMessage}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
