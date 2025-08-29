@@ -304,6 +304,7 @@ const Backend = lazy(() => import("../Backend/Backend"));
 const GlobalLimits = lazy(() => import("../AI/GlobalLimits"));
 const UserLimits = lazy(() => import("../AI/UserLimits"));
 const Usage = lazy(() => import("../AI/Usage"));
+const ReportsByUsers = lazy(() => import("../AI/ReportsByUsers"));
 
 // import GlobalLimits from "../AI/GlobalLimits";
 // import UserLimits from "../AI/UserLimits";
@@ -413,6 +414,10 @@ export const router = createBrowserRouter([
           {
             path: "get-usage",
             element: withSuspense(Usage),
+          },
+          {
+            path: "get-reports",
+            element: withSuspense(ReportsByUsers),
           },
         ],
       },

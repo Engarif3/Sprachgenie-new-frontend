@@ -67,6 +67,9 @@ const WordList = () => {
   const [selectedParagraph, setSelectedParagraph] = useState("");
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
 
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportMessage, setReportMessage] = useState("");
+
   //   =========AI ===============
 
   useEffect(() => {
@@ -517,117 +520,6 @@ const WordList = () => {
 
   //   ==============AI===============
 
-  // const generateParagraph = async (word) => {
-  //   try {
-  //     setLoadingParagraphs((prev) => ({ ...prev, [word.id]: true }));
-
-  //     const response = await aiApi.post(`/paragraphs/generate`, {
-  //       userId: userInfo?.id,
-  //       wordId: word.id,
-  //       word: word.value,
-  //       level: word.level?.level || "A1",
-  //       language: "de",
-  //     });
-
-  //     const paragraph = response.data.paragraph;
-
-  //     setGeneratedParagraphs((prev) => ({
-  //       ...prev,
-  //       [word.id]: paragraph,
-  //     }));
-
-  //     // 👇 only update AI modal state
-  //     setAiWord(word);
-  //     setSelectedParagraph(paragraph);
-  //     setIsAIModalOpen(true);
-  //   } catch (error) {
-  //     console.error("Error generating paragraph:", error);
-  //     Swal.fire("Error", "Failed to generate paragraph", "error");
-  //   } finally {
-  //     setLoadingParagraphs((prev) => ({ ...prev, [word.id]: false }));
-  //   }
-  // };
-
-  // const generateParagraph = async (word) => {
-  //   try {
-  //     setLoadingParagraphs((prev) => ({ ...prev, [word.id]: true }));
-
-  //     const response = await aiApi.post(`/paragraphs/generate`, {
-  //       userId: userInfo?.id,
-  //       wordId: word.id,
-  //       word: word.value,
-  //       level: word.level?.level || "A1",
-  //       language: "de",
-  //     });
-
-  //     const paragraph = response.data.paragraph;
-
-  //     setGeneratedParagraphs((prev) => ({
-  //       ...prev,
-  //       [word.id]: paragraph,
-  //     }));
-
-  //     // 👇 only update AI modal state
-  //     setAiWord(word);
-  //     setSelectedParagraph(paragraph);
-  //     setIsAIModalOpen(true);
-  //   } catch (error) {
-  //     if (error.response && error.response.status === 403) {
-  //       Swal.fire("Limit Reached", error.response.data.error, "warning");
-  //     } else {
-  //       console.error("Error generating paragraph:", error.message);
-  //       Swal.fire("Error", "Failed to generate paragraph", "error");
-  //     }
-  //   } finally {
-  //     setLoadingParagraphs((prev) => ({ ...prev, [word.id]: false }));
-  //   }
-  // };
-
-  // const generateParagraph = async (word) => {
-  //   if (!userInfo?.id) {
-  //     Swal.fire(
-  //       "Not Logged In",
-  //       "You must be logged in to generate paragraphs",
-  //       "warning"
-  //     );
-  //     return;
-  //   }
-
-  //   try {
-  //     setLoadingParagraphs((prev) => ({ ...prev, [word.id]: true }));
-
-  //     const response = await aiApi.post(`/paragraphs/generate`, {
-  //       userId: userInfo.id,
-  //       wordId: word.id,
-  //       word: word.value,
-  //       level: word.level?.level || "A1",
-  //       language: "de",
-  //     });
-
-  //     const paragraph = response.data.paragraph;
-
-  //     setGeneratedParagraphs((prev) => ({
-  //       ...prev,
-  //       [word.id]: paragraph,
-  //     }));
-
-  //     setAiWord(word);
-  //     setSelectedParagraph(paragraph);
-  //     setIsAIModalOpen(true);
-  //   } catch (error) {
-  //     const errorMessage = error.response?.data?.error || error.message;
-
-  //     if (error.response?.status === 403) {
-  //       Swal.fire("Limit Reached", errorMessage, "warning");
-  //     } else {
-  //       console.error("Error generating paragraph:", errorMessage);
-  //       Swal.fire("Error", "Failed to generate paragraph", "error");
-  //     }
-  //   } finally {
-  //     setLoadingParagraphs((prev) => ({ ...prev, [word.id]: false }));
-  //   }
-  // };
-
   const generateParagraph = async (word) => {
     if (!userInfo?.id) {
       Swal.fire(
@@ -649,6 +541,8 @@ const WordList = () => {
         language: "de",
       });
 
+      const aiMeanings = response.data.meanings || [];
+      const sentences = response.data.sentences || [];
       const paragraph = response.data.paragraph;
       const wordId = response.data.wordId || word.id; // depends on AI API response
 
@@ -656,7 +550,13 @@ const WordList = () => {
       const fullWord = cache.words.find((w) => w.id === wordId);
 
       // Save enriched word into modal state
-      setAiWord(fullWord || { id: wordId, value: word.value });
+      // setAiWord(fullWord || { id: wordId, value: word.value });
+
+      setAiWord({
+        ...(fullWord || { id: word.id, value: word.value }),
+        aiMeanings, // this will now always be included
+        otherSentences: sentences || [], // make sure sentences is defined
+      });
 
       setGeneratedParagraphs((prev) => ({
         ...prev,
@@ -675,6 +575,35 @@ const WordList = () => {
       }
     } finally {
       setLoadingParagraphs((prev) => ({ ...prev, [word.id]: false }));
+    }
+  };
+
+  // =============report================
+
+  const handleReportSubmit = async () => {
+    if (!aiWord?.id) {
+      Swal.fire("Error", "Missing word ID", "error");
+      return;
+    }
+
+    try {
+      const response = await aiApi.post(`/paragraphs/report`, {
+        wordId: aiWord.id, // ✅ send wordId instead of paragraphId
+        userId: userInfo?.id ?? null, // optional
+        message: reportMessage?.trim() || null, // optional
+      });
+
+      Swal.fire(
+        "Reported",
+        response.data.message || "Report submitted",
+        "success"
+      );
+
+      setIsReportModalOpen(false);
+      setReportMessage("");
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || error.message;
+      Swal.fire("Error", errorMessage, "error");
     }
   };
 
@@ -1116,11 +1045,41 @@ const WordList = () => {
                 : aiWord?.meaning || ""}
               ]
             </p>
-            <p className="whitespace-pre-line text-xl md:text-2xl lg:text-2xl  font-mono text-slate900 border border-cyan-600 rounded-md p-2">
-              {selectedParagraph}
+
+            <p className="whitespace-pre-line text-xl md:text-2xl lg:text-2xl  font-mono text-slate900 -md p-2">
+              <div>
+                {" "}
+                {aiWord?.aiMeanings?.length > 0 && (
+                  <p className=" text-gray-700 text-lg ml-2">
+                    <strong className="text-orange-600">Meanings (AI):</strong>{" "}
+                    {aiWord.aiMeanings.join(", ")}
+                  </p>
+                )}
+              </div>
+              <div className="border border-cyan-600 rounded p-2">
+                <span> {selectedParagraph}</span>
+              </div>
+              <div>
+                {aiWord?.otherSentences?.length > 0 && (
+                  <span className="mt-4 text-left text-slate-700 ">
+                    {aiWord.otherSentences.map((s, i) => (
+                      <p key={i} className=" text-lg ml-2">
+                        <strong className="text-green-700">Sentences:</strong>
+                        {s}
+                      </p>
+                    ))}
+                  </span>
+                )}
+              </div>
             </p>
 
-            <div className="mt-8 flex justify-end">
+            <div className="mt-8 flex justify-between">
+              <button
+                onClick={() => setIsReportModalOpen(true)}
+                className="btn btn-sm btn-error "
+              >
+                Report
+              </button>
               <button
                 onClick={() => setIsAIModalOpen(false)}
                 className="btn btn-sm btn-warning"
@@ -1133,6 +1092,42 @@ const WordList = () => {
       )}
 
       {/* =======AI modal=============== */}
+
+      {/* ===================report========= */}
+      {isReportModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full md:w-1/3 mx-2">
+            <h2 className="text-xl font-bold mb-4 text-center">Report</h2>
+
+            <p className="text-gray-600 text-sm mb-2">
+              Reason for reporting this AI generation. (optional)
+            </p>
+            <textarea
+              value={reportMessage}
+              onChange={(e) => setReportMessage(e.target.value)}
+              className="w-full border rounded-md p-2 text-sm"
+              rows={4}
+              placeholder="Enter a message (optional)"
+            />
+
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                onClick={() => setIsReportModalOpen(false)}
+                className="btn btn-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReportSubmit}
+                className="btn btn-sm btn-error"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ===================report========= */}
     </Container>
   );
 };
