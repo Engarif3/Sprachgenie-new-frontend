@@ -542,20 +542,18 @@ const WordList = () => {
       });
 
       const aiMeanings = response.data.meanings || [];
-      const sentences = response.data.sentences || [];
+      const sentences = response.data.otherSentences || [];
       const paragraph = response.data.paragraph;
       const wordId = response.data.wordId || word.id; // depends on AI API response
 
       // 🔑 Find the full word object in your /all words cache
       const fullWord = cache.words.find((w) => w.id === wordId);
 
-      // Save enriched word into modal state
-      // setAiWord(fullWord || { id: wordId, value: word.value });
-
       setAiWord({
         ...(fullWord || { id: word.id, value: word.value }),
-        aiMeanings, // this will now always be included
-        otherSentences: sentences || [], // make sure sentences is defined
+        aiMeanings,
+        sentences:
+          sentences.length > 0 ? sentences : paragraph.split(/(?<=[.!?])\s+/),
       });
 
       setGeneratedParagraphs((prev) => ({
@@ -1060,9 +1058,9 @@ const WordList = () => {
                 <span> {selectedParagraph}</span>
               </div>
               <div>
-                {aiWord?.otherSentences?.length > 0 && (
+                {aiWord?.sentences?.length > 0 && (
                   <span className="mt-4 text-left text-slate-700 ">
-                    {aiWord.otherSentences.map((s, i) => (
+                    {aiWord.sentences.map((s, i) => (
                       <p key={i} className=" text-lg ml-2">
                         <strong className="text-green-700">Sentences:</strong>
                         {s}
