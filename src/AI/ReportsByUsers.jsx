@@ -3,6 +3,7 @@ import { getFromLocalStorage } from "../utils/local-storage";
 import { authKey } from "../constants/authkey";
 import api from "../axios";
 import aiApi from "../AI_axios";
+import { ScaleLoader } from "react-spinners";
 
 const ReportsByUsers = () => {
   const [reports, setReports] = useState([]);
