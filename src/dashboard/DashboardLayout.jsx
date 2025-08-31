@@ -247,7 +247,7 @@ const DashboardLayout = () => {
                   to="/dashboard/get-usage"
                   className="block py-2 px-3 rounded hover:bg-cyan-700"
                 >
-                  Limit Usage
+                  AI Usage By Users
                 </Link>
                 <Link
                   to="/dashboard/get-reports"

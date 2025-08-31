@@ -87,6 +87,9 @@ const ReportsByUsers = () => {
 
   return (
     <div className="overflow-x-auto mt-4 bg-white">
+      <h2 className="text-md md:text-2xl lg:text-2xl font-bold mb-4 text-center  py-2 text-white bg-cyan-700  rounded">
+        Reports By Users
+      </h2>
       {/* Table */}
       <table className="table-auto w-full border border-gray-300 rounded-lg">
         <thead className="bg-gray-100">
