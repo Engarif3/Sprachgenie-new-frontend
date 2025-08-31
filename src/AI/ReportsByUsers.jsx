@@ -61,9 +61,28 @@ const ReportsByUsers = () => {
     );
   };
 
-  if (loading) return <p className="text-center">Loading reports...</p>;
+  if (loading)
+    return (
+      <p className="flex justify-center items-center  ">
+        <span>
+          {loading && (
+            <ScaleLoader
+              color="oklch(0.5 0.134 242.749)"
+              loading={loading}
+              // cssOverride={override}
+              size={150}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          )}
+        </span>
+      </p>
+    );
   if (error) return <p className="text-red-600">{error}</p>;
-  if (reports.length === 0) return <p>No reports found.</p>;
+  if (reports.length === 0)
+    return (
+      <p className="flex justify-center items-center  ">No reports found.</p>
+    );
 
   return (
     <div className="overflow-x-auto mt-4 bg-white">
