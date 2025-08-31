@@ -7,6 +7,7 @@ import { getFromLocalStorage } from "../../utils/local-storage";
 import { authKey } from "../../constants/authkey";
 import api from "../../axios";
 import { ScaleLoader } from "react-spinners";
+import { dateTimeFormatter } from "../../utils/formatDateTime";
 
 const token = getFromLocalStorage(authKey);
 
@@ -17,81 +18,6 @@ const UpdateUserStatus = () => {
   const [selectedStatus, setSelectedStatus] = useState("ALL");
   const userInfo = getUserInfo() || {};
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   if (userInfo?.role !== "super_admin") {
-  //     navigate("/");
-  //   }
-
-  //   api
-  //     .get("https://sprcahgenie-new-backend.vercel.app/api/v1/user", {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     })
-  //     .then((response) => {
-  //       if (response.data.success && Array.isArray(response.data.data)) {
-  //         setUsers(response.data.data);
-  //       } else {
-  //         setError("Failed to fetch users or invalid data format");
-  //       }
-  //     })
-  //     .catch(() => {
-  //       setError("Error fetching users");
-  //     })
-  //     .finally(() => {
-  //       setLoading(false);
-  //     });
-  // }, []);
-
-  // const handleStatusChange = (userId, newStatus) => {
-  //   if (!token) {
-  //     Swal.fire("Error", "No authorization token found", "error");
-  //     return;
-  //   }
-
-  //   Swal.fire({
-  //     // title: "Are you sure?",
-  //     text: `Change the status to ${newStatus}?`,
-  //     // icon: "warning",
-  //     showCancelButton: true,
-  //     confirmButtonText: "Yes",
-  //     cancelButtonText: "No",
-  //   }).then((result) => {
-  //     if (result.isConfirmed) {
-  //       api
-  //         .patch(
-  //           `/user/update-status/${userId}`,
-  //           // { status: newStatus },
-  //           { status: newStatus, performedById: userInfo.id },
-  //           { headers: { Authorization: `Bearer ${token}` } }
-  //         )
-  //         .then((response) => {
-  //           if (response.data.success) {
-  //             setUsers((prevUsers) =>
-  //               prevUsers.map((user) =>
-  //                 user.id === userId
-  //                   ? { ...user, status: newStatus } // or role: newRole
-  //                   : user
-  //               )
-  //             );
-  //             Swal.fire({
-  //               title: "Success",
-  //               text: "User status updated successfully!",
-  //               icon: "success",
-  //               timer: 1000, // Auto-close after 1 second
-  //               showConfirmButton: false, // Hide the confirm button
-  //             });
-  //           } else {
-  //             Swal.fire("Failed", "Failed to update user status", "error");
-  //           }
-  //         })
-  //         .catch(() => {
-  //           Swal.fire("Error", "Failed to update user status", "error");
-  //         });
-  //     }
-  //   });
-  // };
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -235,7 +161,20 @@ const UpdateUserStatus = () => {
   // if (loading) return <div>Loading users...</div>;
   if (error) return <div>{error}</div>;
 
-  // Separate admins and basic users
+  // const getStatusColor = (status) => {
+  //   switch (status) {
+  //     case "PENDING":
+  //       return "text-orange-600";
+  //     case "BLOCKED":
+  //       return "text-red-600";
+  //     case "ACTIVE":
+  //       return "text-green-600";
+  //     case "DELETED":
+  //       return "text-red-800";
+  //     default:
+  //       return "text-gray-600"; // fallback
+  //   }
+  // };
 
   return (
     // <Container>
@@ -243,9 +182,9 @@ const UpdateUserStatus = () => {
       {userInfo?.role === "super_admin" && (
         <div className="container mx-auto p-4 min-h-screen">
           <h2 className="text-md md:text-2xl lg:text-2xl font-bold mb-4 text-center  py-2 text-white bg-cyan-700  rounded">
-            Update User Status -{" "}
+            Update User Status
             <span className="text-md text-orange-600">
-              ({admins.length + basicUsers.length})
+              {/* ({admins.length + basicUsers.length}) */}
             </span>
           </h2>
           <p className="flex justify-center items-center  ">
@@ -265,7 +204,7 @@ const UpdateUserStatus = () => {
           {/* Admins Table */}
           {admins.length > 0 && (
             <div className="mb-16">
-              <h3 className="text-xl font-semibold text-center mb-4 uppercase text-white">
+              <h3 className="text-xl font-semibold text-center mb-4 uppercase text-white mt-12">
                 Admins
                 <span className="text-md text-cyan-600">
                   {" "}
@@ -276,13 +215,20 @@ const UpdateUserStatus = () => {
               <div className="overflow-x-auto">
                 <table className="min-w-full table-auto border">
                   <thead>
-                    <tr className="bg-green-500 text-white">
+                    <tr className="bg-sky-900 text-white">
                       <th className="p-2 text-center hidden lg:table-cell xl:table-cell">
                         Name
                       </th>
                       <th className="p-2 text-center">Email</th>
                       <th className="p-2 text-center">Role</th>
                       <th className="p-2 text-center">Action</th>
+                      <th className="p-2 text-center">
+                        Created at <br />{" "}
+                        <span className="text-sm font-thin">
+                          {" "}
+                          DD:MM:YYYY-HH:MM:SS
+                        </span>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -310,6 +256,7 @@ const UpdateUserStatus = () => {
                             <option value="BASIC_USER">USER</option>
                           </select>
                         </td>
+
                         <td className="p-1 md:p-1 lg:p-1 text-center">
                           <select
                             value={user.status}
@@ -324,6 +271,18 @@ const UpdateUserStatus = () => {
                             <option value="PENDING">Pending</option>
                           </select>
                         </td>
+                        {/* ====================date-time ========= */}
+                        <td className="p-1 md:p-1 lg:p-1 text-center hidden lg:table-cell xl:table-cell text-slate-950">
+                          <span className="bg-blue-200 px-1 rounded">
+                            {dateTimeFormatter(user.createdAt).split(" - ")[0]}
+                          </span>
+                          {" - "}
+                          <span className="bg-green-200 px-1 rounded">
+                            {dateTimeFormatter(user.createdAt).split(" - ")[1]}
+                          </span>
+                        </td>
+
+                        {/* ====================date-time ========= */}
                       </tr>
                     ))}
                   </tbody>
@@ -363,13 +322,20 @@ const UpdateUserStatus = () => {
               <div className="overflow-x-auto">
                 <table className="min-w-full table-auto border">
                   <thead>
-                    <tr className="bg-red-500 text-white">
+                    <tr className="bg-stone-700 text-white">
                       <th className="p-2 text-center hidden lg:table-cell xl:table-cell">
                         Name
                       </th>
                       <th className="p-2 text-center">Email</th>
                       <th className="p-2 text-center">Role</th>
                       <th className="p-2 text-center">Action</th>
+                      <th className="p-2 text-center">
+                        Created at <br />{" "}
+                        <span className="text-sm font-thin">
+                          {" "}
+                          DD:MM:YYYY-HH:MM:SS
+                        </span>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -410,6 +376,15 @@ const UpdateUserStatus = () => {
                             <option value="DELETED">Deleted</option>
                             <option value="PENDING">Pending</option>
                           </select>
+                        </td>
+                        <td className="p-1 md:p-1 lg:p-1 text-center hidden lg:table-cell xl:table-cell text-slate-950">
+                          <span className="bg-blue-200 px-1 rounded">
+                            {dateTimeFormatter(user.createdAt).split(" - ")[0]}
+                          </span>
+                          {" - "}
+                          <span className="bg-green-200 px-1 rounded">
+                            {dateTimeFormatter(user.createdAt).split(" - ")[1]}
+                          </span>
                         </td>
                       </tr>
                     ))}

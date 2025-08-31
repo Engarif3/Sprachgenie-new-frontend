@@ -7,6 +7,7 @@ import { getFromLocalStorage } from "../../utils/local-storage";
 import { authKey } from "../../constants/authkey";
 import api from "../../axios";
 import { ScaleLoader } from "react-spinners";
+import { dateTimeFormatter } from "../../utils/formatDateTime";
 
 const token = getFromLocalStorage(authKey); // Get the token from local storage
 
@@ -246,13 +247,20 @@ const UpdateBasicUserStatus = () => {
               <div className="overflow-x-auto">
                 <table className="min-w-full table-auto">
                   <thead>
-                    <tr className="bg-green-600 text-white">
+                    <tr className="bg-stone-700 text-white">
                       <th className="p-2 hidden lg:table-cell xl:table-cell text-center ">
                         Name
                       </th>
                       <th className="p-2 text-center">Email</th>
                       <th className="p-2 text-center">Role</th>
                       <th className="p-2 text-center">Action</th>
+                      <th className="p-2 text-center">
+                        Created at <br />{" "}
+                        <span className="text-sm font-thin">
+                          {" "}
+                          DD:MM:YYYY-HH:MM:SS
+                        </span>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -290,6 +298,15 @@ const UpdateBasicUserStatus = () => {
                             <option value="DELETED">Deleted</option>
                             <option value="PENDING">Pending</option>
                           </select>
+                        </td>
+                        <td className="p-1 md:p-1 lg:p-1 text-center hidden lg:table-cell xl:table-cell text-slate-950">
+                          <span className="bg-blue-200 px-1 rounded">
+                            {dateTimeFormatter(user.createdAt).split(" - ")[0]}
+                          </span>
+                          {" - "}
+                          <span className="bg-green-200 px-1 rounded">
+                            {dateTimeFormatter(user.createdAt).split(" - ")[1]}
+                          </span>
                         </td>
                       </tr>
                     ))}
