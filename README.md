@@ -47,7 +47,7 @@ SprachGenie is an AI-powered language learning platform built with React JS, Typ
 ### Prerequisites
 
 - Node.js v18+ installed
-- Setup SprachGenie Backend (link to backend repo)
+- Setup SprachGenie Backend [Link Text](https://sprach-genie.netlify.app/backend)
 - Update the base API URL in `.env` file
 
 ### Run Locally
