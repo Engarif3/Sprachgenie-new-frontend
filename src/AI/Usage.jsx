@@ -5,12 +5,16 @@ import { getFromLocalStorage } from "../utils/local-storage";
 import { authKey } from "../constants/authkey";
 import api from "../axios";
 import aiApi from "../AI_axios";
+import Pagination from "../AdminActions/AdminPaginationForUsers";
 
 const Usage = () => {
   const [usageData, setUsageData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 50;
 
-  const fetchUsage = async () => {
+  const fetchUsage = async (page = 1) => {
     try {
       setLoading(true);
 
@@ -27,12 +31,17 @@ const Usage = () => {
         globalLimits = resGlobal.data;
       } catch {}
 
-      // Fetch users
-      const freshToken = getFromLocalStorage(authKey);
-      const userRes = await api.get("/user", {
-        headers: { Authorization: `Bearer ${freshToken}` },
-      });
-      const users = userRes.data.data;
+      // Fetch active users with pagination
+      const token = getFromLocalStorage(authKey);
+      const userRes = await api.get(
+        `/user?page=${page}&limit=${limit}&status=ACTIVE`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const users = userRes.data.data || [];
+      const total = userRes.data.meta?.total || users.length;
+      setTotalPages(Math.ceil(total / limit));
 
       // Fetch usage
       const usageRes = await aiApi.get("/paragraphs/get-usage");
@@ -45,6 +54,7 @@ const Usage = () => {
           userId: user.id,
           name: user.name,
           email: user.email,
+          status: user.status || "N/A",
           daily: {
             used: usage.daily?.used ?? 0,
             limit: usage.daily?.limit ?? globalLimits.dailyLimit,
@@ -70,8 +80,8 @@ const Usage = () => {
   };
 
   useEffect(() => {
-    fetchUsage();
-  }, []);
+    fetchUsage(page);
+  }, [page]);
 
   if (loading) {
     return (
@@ -82,12 +92,14 @@ const Usage = () => {
   }
 
   if (!usageData.length)
-    return <p className="text-center mt-4 text-white">No usage data found.</p>;
+    return (
+      <p className="text-center mt-4 text-white">No active users found.</p>
+    );
 
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4 text-center text-white">
-        User Limits Usage
+        Active Users Limits Usage
       </h2>
 
       <div className="overflow-x-auto">
@@ -97,6 +109,7 @@ const Usage = () => {
               <th className="p-2 text-center">User ID</th>
               <th className="p-2 text-center">Name</th>
               <th className="p-2 text-center">Email</th>
+              <th className="p-2 text-center">Status</th>
               <th className="p-2 text-center">
                 Daily <br /> Used / Limit
               </th>
@@ -117,6 +130,7 @@ const Usage = () => {
                 <td className="p-2 text-center">{u.userId}</td>
                 <td className="p-2 text-center">{u.name}</td>
                 <td className="p-2 text-center">{u.email}</td>
+                <td className="p-2 text-center">{u.status}</td>
                 <td className="p-2 text-center">
                   {u.daily.used} / {u.daily.limit}
                 </td>
@@ -130,6 +144,14 @@ const Usage = () => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="mt-4 flex justify-center">
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
       </div>
     </div>
   );

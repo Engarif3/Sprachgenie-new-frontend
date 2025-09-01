@@ -136,7 +136,7 @@ const ForgotPassword = () => {
       <div className="fixed inset-0 -z-10">
         <DarkVeil />
       </div>
-      <div className="bg-stone-800 p-16 rounded-md">
+      <div className="bg-stone-800 p-8 md:p-16 lg:p-16 rounded-md">
         <h2 className="text-2xl font-semibold mb-12 text-white ">
           Forgot Password
         </h2>
