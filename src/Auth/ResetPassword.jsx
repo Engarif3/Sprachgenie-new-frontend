@@ -104,7 +104,7 @@
 
 // export default ResetPassword;
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Container from "../utils/Container";
 import api from "../axios";
@@ -115,7 +115,8 @@ const ResetPassword = () => {
   const [repeatPassword, setRepeatPassword] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // Prevent multiple clicks
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false); // Disable form if token used
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -125,12 +126,19 @@ const ResetPassword = () => {
   const userId = params.get("userId");
   const token = params.get("token");
 
+  useEffect(() => {
+    // Check if this token was already used
+    const usedToken = localStorage.getItem("usedResetToken");
+    if (usedToken && usedToken === token) {
+      setError("This link is invalid or has already been used.");
+      setIsDisabled(true);
+    }
+  }, [token]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isDisabled || isLoading) return;
 
-    if (isLoading) return; // Prevent multiple submissions
-
-    // Clear previous messages
     setError("");
     setMessage("");
 
@@ -149,13 +157,18 @@ const ResetPassword = () => {
     try {
       const response = await api.post("/auth/reset-password", {
         id: userId,
-        token: token,
+        token,
         password,
       });
 
       setMessage(response.data.message);
 
-      // Redirect to login after short delay
+      // Store token in localStorage to prevent reuse
+      localStorage.setItem("usedResetToken", token);
+
+      setIsDisabled(true); // Disable form after successful submission
+
+      // Redirect after short delay
       setTimeout(() => navigate("/login"), 1000);
     } catch (err) {
       setError("Invalid link or failed to reset password. Please try again.");
@@ -190,6 +203,7 @@ const ResetPassword = () => {
               required
               placeholder="Enter new password"
               className="border border-purple-600 rounded text-lg p-2 text-center w-full mb-4"
+              disabled={isDisabled}
             />
             <input
               type="password"
@@ -198,13 +212,14 @@ const ResetPassword = () => {
               required
               placeholder="Repeat new password"
               className="border border-purple-600 rounded text-lg p-2 text-center w-full mb-4"
+              disabled={isDisabled}
             />
             <button
               type="submit"
               className={`btn btn-sm btn-warning w-full ${
-                isLoading ? "opacity-70 cursor-not-allowed" : ""
+                isDisabled || isLoading ? "opacity-70 cursor-not-allowed" : ""
               }`}
-              disabled={isLoading}
+              disabled={isDisabled || isLoading}
             >
               {isLoading ? "Resetting..." : "Reset Password"}
             </button>
