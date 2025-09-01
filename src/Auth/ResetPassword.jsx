@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom"; // Updated import
 import Container from "../utils/Container";
 import api from "../axios";
+import DarkVeil from "../View/Home/DarkVeil";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -54,6 +55,9 @@ const ResetPassword = () => {
   return (
     <Container>
       <div className="min-h-screen flex justify-center items-center">
+        <div className="fixed inset-0 -z-10">
+          <DarkVeil />
+        </div>
         <div>
           <h2 className="text-center text-xl mb-8 text-green-700">
             Reset Your Password
