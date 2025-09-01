@@ -163,7 +163,7 @@ const Login = () => {
       </div>
 
       {/* Login form */}
-      <div className="w-full max-w-md  text-white p-6 rounded-lg shadow-md text-center z-10">
+      <div className="w-full max-w-md  text-white p-6 rounded-lg shadow-md text-center z-10 bg-stone-800">
         <h2 className="text-2xl font-semibold mb-4">Login</h2>
 
         {error && (
