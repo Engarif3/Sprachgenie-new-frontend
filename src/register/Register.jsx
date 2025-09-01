@@ -13,6 +13,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [emailVerificationMessage, setEmailVerificationMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
@@ -30,6 +31,11 @@ const Register = () => {
   const passwordValue = watch("password", "");
 
   const handleRegister = async (formData) => {
+    if (isSubmitting) return; // prevent multiple calls
+
+    setIsSubmitting(true); // disable button immediately
+    setError("");
+
     const data = modifyPayload(formData);
 
     try {
@@ -61,6 +67,8 @@ const Register = () => {
     } catch (error) {
       console.error("Registration error:", error);
       setError(error.message || "An error occurred during registration");
+    } finally {
+      setIsSubmitting(false); // re-enable button after request completes
     }
   };
 
@@ -159,11 +167,20 @@ const Register = () => {
             )}
 
             {/* Submit */}
-            <button
+            {/* <button
               type="submit"
               className="w-full bg-blue-600 text-white p-2 rounded mt-2"
             >
               Register
+            </button> */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`w-full p-2 rounded mt-2 text-white ${
+                isSubmitting ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600"
+              }`}
+            >
+              {isSubmitting ? "Registering..." : "Register"}
             </button>
           </form>
 
