@@ -128,6 +128,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
@@ -141,6 +142,10 @@ const Login = () => {
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   const handleLogin = async (formData) => {
+    // if (isSubmitting) return; // prevent duplicate calls
+
+    setIsSubmitting(true);
+    setError("");
     try {
       const res = await userLogin(formData);
       if (res?.data?.accessToken) {
@@ -152,6 +157,8 @@ const Login = () => {
       }
     } catch (err) {
       setError(err?.message || "An error occurred");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -216,11 +223,45 @@ const Login = () => {
             </Link>
           </div>
 
-          <button
+          {/* <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 rounded mt-2 hover:bg-blue-600"
           >
             Login
+          </button> */}
+          {/* Submit button with spinner */}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`w-full flex justify-center items-center gap-2 py-2 rounded mt-2 text-white ${
+              isSubmitting
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600"
+            }`}
+          >
+            {isSubmitting && (
+              <svg
+                className="animate-spin h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                ></path>
+              </svg>
+            )}
+            {isSubmitting ? "Logging in..." : "Login"}
           </button>
 
           <p className="text-sm text-white mt-4">
