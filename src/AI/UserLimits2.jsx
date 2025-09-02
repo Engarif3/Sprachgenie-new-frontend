@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import aiApi from "../AI_axios";
 import { ScaleLoader } from "react-spinners";
@@ -15,94 +15,94 @@ const UserLimits = () => {
   });
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 10; // users per page
+
+  const fetchUsers = async (pageNumber = 1) => {
+    try {
+      setLoading(true);
+
+      // fetch global limits
+      let fetchedGlobalLimits = {
+        dailyLimit: 10,
+        monthlyLimit: 300,
+        yearlyLimit: 3000,
+      };
+      try {
+        const res = await aiApi.get("/paragraphs/get-limit", {
+          params: { userId: "GLOBAL" },
+        });
+        fetchedGlobalLimits = res.data;
+      } catch {}
+      setGlobalLimits(fetchedGlobalLimits);
+
+      // fetch active users with pagination
+      const token = getFromLocalStorage(authKey);
+      const res = await api.get(
+        `/user?role=BASIC_USER&status=ACTIVE&page=${pageNumber}&limit=${limit}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const usersData = res.data.data;
+      const total = res.data.meta.total || usersData.length;
+      setTotalPages(Math.ceil(total / limit));
+
+      // fetch individual user limits
+      const usersWithLimits = await Promise.all(
+        usersData.map(async (user) => {
+          try {
+            const limitRes = await aiApi.get("/paragraphs/get-limit", {
+              params: { userId: user.id },
+            });
+            return {
+              ...user,
+              dailyLimit:
+                limitRes.data.dailyLimit ?? fetchedGlobalLimits.dailyLimit,
+              monthlyLimit:
+                limitRes.data.monthlyLimit ?? fetchedGlobalLimits.monthlyLimit,
+              yearlyLimit:
+                limitRes.data.yearlyLimit ?? fetchedGlobalLimits.yearlyLimit,
+            };
+          } catch {
+            return {
+              ...user,
+              dailyLimit: fetchedGlobalLimits.dailyLimit,
+              monthlyLimit: fetchedGlobalLimits.monthlyLimit,
+              yearlyLimit: fetchedGlobalLimits.yearlyLimit,
+            };
+          }
+        })
+      );
+
+      setUsers(usersWithLimits);
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Failed to fetch users", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        let fetchedGlobalLimits = {
-          dailyLimit: 10,
-          monthlyLimit: 300,
-          yearlyLimit: 3000,
-        };
-        try {
-          const res = await aiApi.get("/paragraphs/get-limit", {
-            params: { userId: "GLOBAL" },
-          });
-          fetchedGlobalLimits = res.data;
-        } catch {
-          console.warn("Global limits not found, using defaults");
-        }
-
-        setGlobalLimits(fetchedGlobalLimits);
-
-        // 2️⃣ Fetch users
-        const freshToken = getFromLocalStorage(authKey);
-        const userRes = await api.get("/user", {
-          headers: { Authorization: `Bearer ${freshToken}` },
-        });
-        const usersData = userRes.data.data;
-
-        // 3️⃣ Merge user limits with normalized fallback
-        const usersWithLimits = await Promise.all(
-          usersData.map(async (user) => {
-            try {
-              const limitRes = await aiApi.get("/paragraphs/get-limit", {
-                params: { userId: user.id },
-              });
-
-              return {
-                ...user,
-                dailyLimit:
-                  limitRes.data.dailyLimit ?? fetchedGlobalLimits.dailyLimit,
-                monthlyLimit:
-                  limitRes.data.monthlyLimit ??
-                  fetchedGlobalLimits.monthlyLimit,
-                yearlyLimit:
-                  limitRes.data.yearlyLimit ?? fetchedGlobalLimits.yearlyLimit,
-              };
-            } catch {
-              // fallback to global limits if user has no record
-              return {
-                ...user,
-                dailyLimit: fetchedGlobalLimits.dailyLimit,
-                monthlyLimit: fetchedGlobalLimits.monthlyLimit,
-                yearlyLimit: fetchedGlobalLimits.yearlyLimit,
-              };
-            }
-          })
-        );
-
-        setUsers(usersWithLimits);
-      } catch (err) {
-        console.error("Error fetching users or limits:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+    fetchUsers(page);
+  }, [page]);
 
   const handleResetToGlobal = async (userId) => {
     const user = users.find((u) => u.id === userId);
     if (!user) return;
 
     setUpdatingId(userId);
-
     try {
-      // Call backend to reset (you can design API to delete user’s limit record or update with global)
       await aiApi.post("/paragraphs/update-limit", {
         userId,
-        dailyLimit: globalLimits.dailyLimit,
-        monthlyLimit: globalLimits.monthlyLimit,
-        yearlyLimit: globalLimits.yearlyLimit,
+        ...globalLimits,
       });
-
-      // Update local state immediately
       setUsers((prev) =>
         prev.map((u) => (u.id === userId ? { ...u, ...globalLimits } : u))
       );
-
       Swal.fire({
         icon: "success",
         title: "Limits reset",
@@ -121,33 +121,21 @@ const UserLimits = () => {
   const handleResetAllToGlobal = async () => {
     Swal.fire({
       title: "Are you sure?",
-      text: "This will reset ALL users' limits to the global values.",
+      text: "This will reset ALL ACTIVE users' limits to the global values.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
       confirmButtonText: "Yes, reset all!",
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
           setLoading(true);
-
-          // Call backend API to reset all
-          await aiApi.post("/paragraphs/reset-all-limits");
-
-          // Update state in frontend (all users → global limits)
-          setUsers((prev) =>
-            prev.map((u) => ({
-              ...u,
-              dailyLimit: globalLimits.dailyLimit,
-              monthlyLimit: globalLimits.monthlyLimit,
-              yearlyLimit: globalLimits.yearlyLimit,
-            }))
-          );
-
+          await aiApi.post("/paragraphs/reset-all-limits", {
+            status: "ACTIVE",
+          });
+          fetchUsers(1); // refetch first page of active users
           Swal.fire(
             "Reset!",
-            "All users' limits were reset to global.",
+            "All ACTIVE users' limits were reset to global.",
             "success"
           );
         } catch (err) {
@@ -171,17 +159,13 @@ const UserLimits = () => {
     if (!user) return;
 
     setUpdatingId(userId);
-
     try {
       await aiApi.post("/paragraphs/update-limit", {
         userId,
-        dailyLimit: user.dailyLimit ? parseInt(user.dailyLimit) : undefined,
-        monthlyLimit: user.monthlyLimit
-          ? parseInt(user.monthlyLimit)
-          : undefined,
-        yearlyLimit: user.yearlyLimit ? parseInt(user.yearlyLimit) : undefined,
+        dailyLimit: parseInt(user.dailyLimit),
+        monthlyLimit: parseInt(user.monthlyLimit),
+        yearlyLimit: parseInt(user.yearlyLimit),
       });
-
       Swal.fire({
         icon: "success",
         title: "Limits updated",
@@ -197,46 +181,44 @@ const UserLimits = () => {
     }
   };
 
-  if (loading) {
+  if (loading)
     return (
       <div className="flex justify-center items-center h-64">
         <ScaleLoader color="#36d7b7" loading={loading} size={150} />
       </div>
     );
-  }
-
-  if (!users.length) return <p className="text-center mt-4">No users found.</p>;
+  if (!users.length)
+    return <p className="text-center mt-4">No active users found.</p>;
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold  text-center text-white mb-12">
-        User Limits
+      <h2 className="text-2xl font-bold text-center text-white mb-4">
+        User Limits (Active Users)
       </h2>
+
       <p className="text-white text-center my-2">
-        <span className="text-lg font-bold  rounded px-1">Global Limits:</span>{" "}
-        <span className=" bg-red-600 rounded px-1">
-          Daily-
-          {globalLimits.dailyLimit}
+        <span className="text-lg font-bold rounded px-1">Global Limits:</span>
+        <span className="bg-red-600 rounded px-1">
+          Daily-{globalLimits.dailyLimit}
         </span>{" "}
-        <span className=" bg-green-600 rounded px-1">
-          Monthly-
-          {globalLimits.monthlyLimit}
+        <span className="bg-green-600 rounded px-1">
+          Monthly-{globalLimits.monthlyLimit}
         </span>{" "}
-        <span className=" bg-blue-600 rounded px-1">
-          {" "}
+        <span className="bg-blue-600 rounded px-1">
           Yearly-{globalLimits.yearlyLimit}
         </span>
       </p>
-      <div className="overflow-x-auto">
-        <div className="flex justify-end mb-4">
-          <button
-            onClick={handleResetAllToGlobal}
-            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-          >
-            Reset All to Global
-          </button>
-        </div>
 
+      <div className="flex justify-end mb-4">
+        <button
+          onClick={handleResetAllToGlobal}
+          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+        >
+          Reset All to Global
+        </button>
+      </div>
+
+      <div className="overflow-x-auto">
         <table className="min-w-full table-auto border">
           <thead>
             <tr className="bg-cyan-700 text-white">
@@ -262,11 +244,7 @@ const UserLimits = () => {
                 <td className="p-2 text-center">
                   <input
                     type="number"
-                    value={
-                      user.dailyLimit != null && user.dailyLimit !== 0
-                        ? user.dailyLimit
-                        : globalLimits.dailyLimit
-                    }
+                    value={user.dailyLimit}
                     onChange={(e) =>
                       handleLimitChange(user.id, "dailyLimit", e.target.value)
                     }
@@ -276,11 +254,7 @@ const UserLimits = () => {
                 <td className="p-2 text-center">
                   <input
                     type="number"
-                    value={
-                      user.monthlyLimit != null && user.monthlyLimit !== 0
-                        ? user.monthlyLimit
-                        : globalLimits.monthlyLimit
-                    }
+                    value={user.monthlyLimit}
                     onChange={(e) =>
                       handleLimitChange(user.id, "monthlyLimit", e.target.value)
                     }
@@ -290,11 +264,7 @@ const UserLimits = () => {
                 <td className="p-2 text-center">
                   <input
                     type="number"
-                    value={
-                      user.yearlyLimit != null && user.yearlyLimit !== 0
-                        ? user.yearlyLimit
-                        : globalLimits.yearlyLimit
-                    }
+                    value={user.yearlyLimit}
                     onChange={(e) =>
                       handleLimitChange(user.id, "yearlyLimit", e.target.value)
                     }
@@ -322,6 +292,27 @@ const UserLimits = () => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex justify-center mt-4 gap-2">
+        <button
+          disabled={page <= 1}
+          onClick={() => setPage(page - 1)}
+          className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700"
+        >
+          Prev
+        </button>
+        <span className="px-3 py-1 text-white">
+          {page} / {totalPages}
+        </span>
+        <button
+          disabled={page >= totalPages}
+          onClick={() => setPage(page + 1)}
+          className="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700"
+        >
+          Next
+        </button>
       </div>
     </div>
   );
