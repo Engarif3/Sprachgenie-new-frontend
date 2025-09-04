@@ -88,7 +88,7 @@ const Register = () => {
       <div className="fixed inset-0 -z-10">
         <DarkVeil />
       </div>
-      <div className="flex flex-col md:flex-row lg:flex-row gap-4 md:gap-12 lg:gap-12 items-center md:items-end  lg:items-end">
+      <div className="flex flex-col md:flex-row lg:flex-row gap-4 md:gap-8 lg:gap-8 items-center md:items-end  lg:items-end">
         <div className="w-full max-w-lg shadow-md rounded-lg p-6 text-center bg-stone-800">
           <h2 className="text-xl font-semibold text-white">Register</h2>
           {error && (
@@ -193,13 +193,21 @@ const Register = () => {
         </div>
 
         {/* Password checklist */}
-        <div className=" text-left  p-1 mb-12 rounded-md w-full md:w-10/12 lg:md:w-10/12 bg-sky-700 text-white">
-          <ul className="steps steps-vertical  w-full ">
+        <div className=" text-left  p-1 mb-12 rounded-md w-full md:w-10/12 lg:md:w-10/12  text-white text-sm">
+          <p className="text-center text-sky-500 underline underline-offset-2">
+            Password Instructions
+          </p>
+          <ul
+            className="steps steps-vertical  [&>.step::after]:w-5 [&>.step::after]:h-5
+  [&>.step]:[grid-template-columns:28px_1fr]
+  [&>.step]:min-h-[3rem]
+  [&>.step::before]:w-1"
+          >
             <li className={`step ${rules.uppercase ? "step-primary" : ""}`}>
               {rules.uppercase ? "✅" : "❌"} At least one uppercase letter
             </li>
             <li className={`step ${rules.lowercase ? "step-primary" : ""}`}>
-              {rules.lowercase ? "✅" : "❌"} At least one lowercase letter
+              {rules.lowercase ? "✅" : "❌ "} At least one lowercase letter
             </li>
             <li className={`step ${rules.number ? "step-primary" : ""}`}>
               {rules.number ? "✅" : "❌"} At least one number

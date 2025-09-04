@@ -138,15 +138,16 @@ const WordListModal = ({
             )}
           </div>
         </div>
-        {/* <div className="mt-8 flex justify-center text-white  "> */}
+        {/* 
         <div className=" text-red-500  absolute bottom-2 right-2 hover:scale-105">
-          {/* <button
-            onClick={closeModal}
-            className="btn btn-sm  bg-[#ff000d] font-semibold text-xl text-white  absolute bottom-4 right-4 "
-          >
-            X
-          </button> */}
           <RiCloseCircleFill onClick={closeModal} size={50} />
+        </div> */}
+        <div className="sticky bottom-0 right-0 flex justify-end pr-2  text-red-500">
+          <RiCloseCircleFill
+            onClick={closeModal}
+            size={50}
+            className="hover:scale-105 transition-transform duration-200 cursor-pointer"
+          />
         </div>
       </div>
     </div>
