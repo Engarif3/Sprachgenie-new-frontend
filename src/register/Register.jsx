@@ -88,7 +88,7 @@ const Register = () => {
       <div className="fixed inset-0 -z-10">
         <DarkVeil />
       </div>
-      <div className="flex flex-col md:flex-row lg:flex-row gap-4 md:gap-8 lg:gap-8 items-center md:items-end  lg:items-end">
+      <div className="flex flex-col-reverse md:flex-row lg:flex-row gap-4 md:gap-8 lg:gap-8 items-center md:items-end  lg:items-end">
         <div className="w-full max-w-lg shadow-md rounded-lg p-6 text-center bg-stone-800">
           <h2 className="text-xl font-semibold text-white">Register</h2>
           {error && (
