@@ -695,9 +695,9 @@ const WordList = () => {
             <table className="w-full  border-collapse mt-2 ">
               {/* Table headers remain the same */}
               <thead>
-                <tr className="bg-cyan-800 text-md md:text-xl lg:text-lg text-white ">
+                <tr className="bg-stone-800 text-md md:text-xl lg:text-lg text-white ">
                   {/* ... existing header cells ... */}
-                  <th className=" border-gray-400  text-sm md:text-lg lg:text-lg   p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[3%] lg:w-[3%] ">
+                  <th className=" border-gray-400  text-sm md:text-lg lg:text-lg   p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[3%] lg:w-[3%] rounded-tl-md">
                     Article
                   </th>
                   <th className="border-l border-gray-400 border-dotted p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[10%] lg:w-[10%] ">
@@ -716,30 +716,44 @@ const WordList = () => {
                   <th className="border-l border-gray-400 border-dotted p-0 md:p-1 lg:p-1 text-center hidden lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                     Word to Watch
                   </th>
-                  <th className="border-l border-gray-400 border-dotted  p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[3%] lg:w-[3%]">
+                  <th
+                    className={`border-l border-dotted hidden md:table-cell lg:table-cell border-gray-400 text-sm md:text-lg lg:text-lg  p-0 md:p-1 lg:p-1 text-center  w-[3%] md:w-[3%] lg:w-[3%] ${
+                      userLoggedIn ? "" : "rounded-tr-md"
+                    }`}
+                  >
                     Level
                   </th>
                   <th
-                    className={`border-l border-gray-400 p-1 text-center ${
+                    className={`border-l  border-dotted border-gray-400 p-1 text-center ${
                       showActionColumn ? "table-cell" : "hidden"
                     } `}
                   >
                     Action
                   </th>
-                  {userLoggedIn &&
-                    (userInfo.role === "basic_user" ||
-                      userInfo.role === "admin" ||
-                      userInfo.role === "super_admin") && (
-                      <th className="border-l border-gray-400 text-sm md:text-lg lg:text-lg  p-0 md:p-1 lg:p-1 text-center  w-[3%] md:w-[3%] lg:w-[3%]">
-                        Fav
-                      </th>
-                    )}
+                  {userLoggedIn && (
+                    // (userInfo.role === "basic_user" ||
+                    //   userInfo.role === "admin" ||
+                    //   userInfo.role === "super_admin") && (
+                    <th
+                      className={`border-l border-dotted border-gray-400 text-sm md:text-lg lg:text-lg  p-0 md:p-1 lg:p-1 text-center  w-[3%] md:w-[3%] lg:w-[3%] ${
+                        userInfo.role === "basic_user" ? "rounded-tr-md" : ""
+                      }`}
+                    >
+                      Fav
+                    </th>
+                  )}
                   {userLoggedIn &&
                     (userInfo.role === "super_admin" ||
                       userInfo.role === "admin") && (
                       <>
-                        <th className="border-l  border-gray-400 p-0 md:p-1 text-xs lg:p-1 text-center w-[15%] md:w-[10%] lg:w-[10%] hidden lg:table-cell">
-                          Modified by
+                        <th
+                          className={`border-l border-dotted hidden md:table-cell lg:table-cell border-gray-400 text-sm md:text-lg lg:text-lg  p-0 md:p-1 lg:p-1 text-center   w-[3%] md:w-[3%] lg:w-[3%] ${
+                            userInfo.role !== "basic_user"
+                              ? "rounded-tr-md"
+                              : ""
+                          }`}
+                        >
+                          #
                         </th>
                       </>
                     )}
@@ -913,7 +927,7 @@ const WordList = () => {
                       {/* ======== */}
                       {/* // favorites */}
                       {userLoggedIn && (
-                        <td className="border-l border-r border-gray-400 border-dotted p-1 text-center">
+                        <td className="border-l border-r border-gray-400 border-dotted p-1 text-center ">
                           <FavoriteButton
                             isFavorite={favorites.includes(word.id)}
                             loading={loadingFavorites[word.id]}

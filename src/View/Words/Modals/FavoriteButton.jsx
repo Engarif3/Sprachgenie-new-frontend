@@ -8,7 +8,7 @@ const FavoriteButton = ({
     <button
       onClick={onClick}
       disabled={loading}
-      className={`p-1 rounded-full hover:opacity-80 transition-opacity mr-0 md:mt-4 lg:mt-4 md:mr-4 lg:mr-4 ${className}`}
+      className={`p-1 rounded-full hover:opacity-80 transition-opacity  ${className}`}
       title="Toggle Favorite"
     >
       {loading ? (

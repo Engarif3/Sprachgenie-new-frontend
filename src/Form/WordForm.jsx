@@ -169,15 +169,12 @@ const WordForm = () => {
   // }
 
   return (
-    <div className="w-full   p-6 bg-stone-800 rounded-md mt-4">
+    <div className="w-full  p-0 md:p-6  lg:p-6 mt-4">
       <h2 className="text-2xl font-semibold text-white mb-6 text-center">
         Create a Word
       </h2>
-      <form
-        onSubmit={handleSubmit}
-        className="w-full  space-y-6  p-1 md:p-8 rounded-lg shadow-lg"
-      >
-        <div className="w-full ">
+      <form onSubmit={handleSubmit} className="w-full shadow-lg ">
+        <div className="w-full bg-stone-800 rounded-md p-1   md:p-8 lg:p-8 ">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-8">
             <div className="space-y-6">
               {/* Word Input */}
@@ -426,16 +423,15 @@ const WordForm = () => {
               </div>
             </div>
           </div>
-
-          {/* Submit Button */}
-          <div>
-            <button
-              type="submit"
-              className="w-full py-2 text-white font-medium bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              Submit
-            </button>
-          </div>
+        </div>
+        {/* Submit Button */}
+        <div>
+          <button
+            type="submit"
+            className="w-full py-2 text-white font-medium bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-8"
+          >
+            Submit
+          </button>
         </div>
       </form>
     </div>
