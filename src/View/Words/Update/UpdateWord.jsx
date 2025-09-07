@@ -346,18 +346,18 @@ const UpdateWord = () => {
 
   return (
     <Container>
-      <h2 className="text-3xl font-semibold mb-6 text-center mt-8 text-orange-600">
-        Update Word
+      <h2 className="text-3xl font-semibold mb-6 text-center mt-8 text-white">
+        Update
       </h2>
 
       {message && <p className="mb-4 text-green-600 text-center">{message}</p>}
-      <form onSubmit={handleSubmit}>
-        <span className="flex justify-end w-10/12">
+      <form onSubmit={handleSubmit} className="w-full ">
+        <span className="flex justify-end w-full md:w-10/12">
           <Link to="/" className="btn btn-sm btn-error ">
             Cancel
           </Link>
         </span>
-        <div className="w-8/12 mx-auto mb-4">
+        <div className="w-full md:w-8/12 mx-auto mb-4 ">
           {/* <label className="block   text-cyan-600 ">
             {" "}
             <span className="font-medium text-2xl "> Word</span>
@@ -373,8 +373,8 @@ const UpdateWord = () => {
           />
         </div>
 
-        <div className="flex flex-col md:flex-row lg:flex-row justify-center items-center mt-8  ">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 justify-center items-start  gap-4 w-8/12 border border-pink-600 p-8 rounded-lg bg-sky-600">
+        <div className="w-full  flex flex-col md:flex-row lg:flex-row justify-center items-center mt-8  ">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 justify-center items-start  gap-4 w-full md:w-8/12 p-1  md:p-8 lg:p-8 rounded-lg bg-stone-800">
             {/* Meanings Section */}
             <div className="w-full">
               <label className="block  mb-2 text-white">
@@ -397,32 +397,34 @@ const UpdateWord = () => {
                   >
                     {editingField?.type === "meaning" &&
                     editingField?.index === index ? (
-                      <>
+                      <div className="flex flex-col md:flex-row justify-between  w-full">
                         <input
                           type="text"
                           value={editValue}
                           onChange={(e) => setEditValue(e.target.value)}
                           className="w-full p-2 mr-2 border border-gray-400 rounded"
                         />
-                        <button
-                          type="button"
-                          onClick={() => handleSaveEdit("meaning", index)}
-                          className="btn btn-sm btn-success mr-1"
-                        >
-                          Save
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setEditingField(null)}
-                          className="btn btn-sm btn-ghost"
-                        >
-                          Cancel
-                        </button>
-                      </>
+                        <div className=" flex justify-end gap-2 ml-4 mt-1 md:mt-0">
+                          <button
+                            type="button"
+                            onClick={() => handleSaveEdit("meaning", index)}
+                            className="btn btn-sm btn-success mr-1"
+                          >
+                            Save
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEditingField(null)}
+                            className="btn btn-sm btn-ghost"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
                     ) : (
-                      <>
+                      <div className="flex flex-col md:flex-row justify-between  w-full">
                         <li>{item}</li>
-                        <div className="space-x-2">
+                        <div className=" flex justify-end gap-2 ml-4 mt-1 md:mt-0">
                           <button
                             type="button"
                             onClick={() => {
@@ -441,7 +443,7 @@ const UpdateWord = () => {
                             Remove
                           </button>
                         </div>
-                      </>
+                      </div>
                     )}
                   </div>
                 ))}
@@ -471,32 +473,35 @@ const UpdateWord = () => {
                   >
                     {editingField?.type === "sentences" &&
                     editingField?.index === index ? (
-                      <>
+                      <div className="flex flex-col md:flex-row justify-between  w-full">
                         <input
                           type="text"
                           value={editValue}
                           onChange={(e) => setEditValue(e.target.value)}
                           className="w-full p-2 mr-2 border border-gray-400 rounded"
                         />
-                        <button
-                          type="button"
-                          onClick={() => handleSaveEdit("sentences", index)}
-                          className="btn btn-sm btn-success mr-1"
-                        >
-                          Save
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setEditingField(null)}
-                          className="btn btn-sm btn-ghost"
-                        >
-                          Cancel
-                        </button>
-                      </>
+                        <div className=" flex justify-end gap-2 ml-4 mt-1 md:mt-0">
+                          <button
+                            type="button"
+                            onClick={() => handleSaveEdit("sentences", index)}
+                            className="btn btn-sm btn-success mr-1"
+                          >
+                            Save
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEditingField(null)}
+                            className="btn btn-sm btn-error"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
                     ) : (
-                      <>
-                        <li className="mr-4">{item}</li>
-                        <div className="space-x-2">
+                      <div className="flex flex-col md:flex-row justify-between  w-full">
+                        <li className="">{item}</li>
+
+                        <div className=" flex justify-end gap-2 ml-4 mt-1 md:mt-0">
                           <button
                             type="button"
                             onClick={() => {
@@ -515,7 +520,7 @@ const UpdateWord = () => {
                             Remove
                           </button>
                         </div>
-                      </>
+                      </div>
                     )}
                   </div>
                 ))}
@@ -730,9 +735,12 @@ const UpdateWord = () => {
           </div>
         </div>
         {/* Submit Button */}
-        <div className="text-center mt-6 mb-24">
-          <button type="submit" className="btn btn-wide btn-warning">
-            Update Word
+        <div className="text-center mt-6 mb-24 w-full p-1">
+          <button
+            type="submit"
+            className="btn w-full md:w-8/12 lg:w-8/12 btn-primary"
+          >
+            Update
           </button>
         </div>
       </form>
