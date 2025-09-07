@@ -9,6 +9,10 @@ const DashboardLayout = () => {
   const userInfo = getUserInfo() || {};
   const role = userInfo.role;
 
+  if (!userInfo) {
+    return <Navigate to="/login" replace />;
+  }
+
   return (
     <Container>
       <div className="flex min-h-screen   mb-12">
