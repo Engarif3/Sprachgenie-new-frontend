@@ -524,7 +524,7 @@ const FavoritesList = () => {
           <div className="overflow-x-auto">
             {paginatedFavorites.length > 0 ? (
               <>
-                <h2 className="text-md  font-mono  text-right  ">
+                <h2 className="text-md  font-mono  text-right mb-2 ">
                   <span className="bg-green-700 px-1 rounded text-white ">
                     Showing-{paginatedFavorites.length}
                   </span>
@@ -533,25 +533,25 @@ const FavoritesList = () => {
                 <table className="w-full border-collapse ">
                   <thead>
                     <tr className="bg-stone-800 text-xl text-white p-1">
-                      <th className="border border-gray-600 border-dotted p-1 text-center">
+                      <th className="   p-1 text-center rounded-tl-md">
                         Article
                       </th>
-                      <th className="border border-gray-600 border-dotted p-1 text-center">
+                      <th className=" border-l border-gray-600 border-dotted p-1 text-center">
                         Word
                       </th>
-                      <th className="border border-gray-600 border-dotted p-1 text-center">
+                      <th className=" border-l border-gray-600 border-dotted p-1 text-center">
                         Meaning
                       </th>
-                      <th className="border border-gray-600 border-dotted p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                      <th className=" border-l border-gray-600 border-dotted p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                         Synonym
                       </th>
-                      <th className="border border-gray-600 border-dotted p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                      <th className=" border-l border-gray-600 border-dotted p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                         Antonym
                       </th>
-                      <th className="border border-gray-600 border-dotted p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                      <th className=" border-l border-gray-600 border-dotted p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                         Deceptive
                       </th>
-                      <th className="border border-gray-600 border-dotted p-1 text-center"></th>
+                      <th className="border-l border-gray-600 border-dotted p-1 text-center rounded-tr-md"></th>
                     </tr>
                   </thead>
                   <tbody>
