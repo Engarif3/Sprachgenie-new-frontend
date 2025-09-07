@@ -744,7 +744,7 @@ const FavoritesList = () => {
               <div className="border border-cyan-600 rounded p-2">
                 <span> {selectedParagraph}</span>
               </div>
-              <div>
+              <div className="hidden">
                 {aiWord?.sentences?.length > 0 && (
                   <span className="mt-4 text-left text-slate-700 ">
                     {aiWord.sentences.map((s, i) => (
