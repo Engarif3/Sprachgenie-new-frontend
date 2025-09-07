@@ -1049,7 +1049,7 @@ const WordList = () => {
                 {" "}
                 {aiWord?.aiMeanings?.length > 0 && (
                   <p className=" text-gray-700 text-lg ml-2">
-                    <strong className="text-orange-600">Meanings (AI):</strong>{" "}
+                    <strong className="text-green-700">Meanings (AI):</strong>{" "}
                     {aiWord.aiMeanings.join(", ")}
                   </p>
                 )}
