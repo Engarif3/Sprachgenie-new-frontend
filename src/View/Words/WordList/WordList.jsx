@@ -835,7 +835,7 @@ const WordList = () => {
                       <td
                         className={`border-l border-gray-400 border-dotted  p-2 text-base sm:text-lg ${
                           learningMode && index === currentIndex
-                            ? "bg-sky-400 text-white font-bold"
+                            ? "bg-sky-700 text-white font-bold"
                             : "text-sky-800 font-serif"
                         }`}
                         onClick={() => learningMode && revealMeaning(word.id)}

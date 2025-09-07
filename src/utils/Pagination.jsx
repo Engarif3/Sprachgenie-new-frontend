@@ -101,7 +101,7 @@ const Pagination = ({
                   // );
                 }}
                 disabled={currentPage === 1}
-                className="btn btn-sm btn-accent"
+                className="btn btn-sm btn-success  "
               >
                 Prev
               </button>
@@ -124,7 +124,7 @@ const Pagination = ({
                   // );
                 }}
                 disabled={currentPage === totalPages}
-                className="btn btn-sm btn-accent"
+                className="btn btn-sm btn-success "
               >
                 Next
               </button>
