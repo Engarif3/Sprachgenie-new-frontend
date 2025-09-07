@@ -1045,7 +1045,7 @@ const WordList = () => {
             </p>
 
             <p className="whitespace-pre-line text-xl md:text-2xl lg:text-2xl  font-mono text-slate900 -md p-2">
-              <div>
+              <div className="hidden">
                 {" "}
                 {aiWord?.aiMeanings?.length > 0 && (
                   <p className=" text-gray-700 text-lg ml-2">
