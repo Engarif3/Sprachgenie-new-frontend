@@ -171,7 +171,7 @@ const WordForm = () => {
   return (
     <div className="w-full   p-6 bg-stone-800 rounded-md mt-4">
       <h2 className="text-2xl font-semibold text-white mb-6 text-center">
-        Add Word
+        Create a Word
       </h2>
       <form
         onSubmit={handleSubmit}
@@ -184,7 +184,7 @@ const WordForm = () => {
               <div className="text-lg">
                 <label
                   htmlFor="value"
-                  className="block text-sm font-medium text-orange-500"
+                  className="block text-sm font-medium text-white"
                 >
                   Word
                 </label>
@@ -203,7 +203,7 @@ const WordForm = () => {
               <div>
                 <label
                   htmlFor="meaning"
-                  className="block text-sm font-medium text-orange-500"
+                  className="block text-sm font-medium text-white"
                 >
                   Meaning (comma separated)
                 </label>
@@ -222,7 +222,7 @@ const WordForm = () => {
               <div>
                 <label
                   htmlFor="sentences"
-                  className="block text-sm font-medium text-orange-500"
+                  className="block text-sm font-medium text-white"
                 >
                   Sentences(Optional, eg. sentence A. | Sentence B.)
                 </label>
@@ -240,7 +240,7 @@ const WordForm = () => {
               <div>
                 <label
                   htmlFor="articleId"
-                  className="block text-sm font-medium text-orange-500"
+                  className="block text-sm font-medium text-white"
                 >
                   Article
                 </label>
@@ -271,7 +271,7 @@ const WordForm = () => {
               <div>
                 <label
                   htmlFor="pluralForm"
-                  className="block text-sm font-medium text-orange-500"
+                  className="block text-sm font-medium text-white"
                 >
                   Plural Form (Optional)
                 </label>
@@ -289,7 +289,7 @@ const WordForm = () => {
               <div>
                 <label
                   htmlFor="levelId"
-                  className="block text-sm font-medium text-orange-500"
+                  className="block text-sm font-medium text-white"
                 >
                   Level
                 </label>
@@ -319,7 +319,7 @@ const WordForm = () => {
               <div>
                 <label
                   htmlFor="partOfSpeechId"
-                  className="block text-sm font-medium text-orange-500"
+                  className="block text-sm font-medium text-white"
                 >
                   Part of Speech
                 </label>
@@ -347,7 +347,7 @@ const WordForm = () => {
               <div>
                 <label
                   htmlFor="topicId"
-                  className="block text-sm font-medium text-orange-500"
+                  className="block text-sm font-medium text-white"
                 >
                   Topic
                 </label>
@@ -376,7 +376,7 @@ const WordForm = () => {
                 <div>
                   <label
                     htmlFor="synonyms"
-                    className="block text-sm font-medium text-orange-500"
+                    className="block text-sm font-medium text-white"
                   >
                     Synonyms (comma separated, Optional)
                   </label>
@@ -393,7 +393,7 @@ const WordForm = () => {
                 <div>
                   <label
                     htmlFor="antonyms"
-                    className="block text-sm font-medium text-orange-500"
+                    className="block text-sm font-medium text-white"
                   >
                     Antonyms (comma separated, Optional)
                   </label>
@@ -410,7 +410,7 @@ const WordForm = () => {
                 <div>
                   <label
                     htmlFor="similarWords"
-                    className="block text-sm font-medium text-orange-500"
+                    className="block text-sm font-medium text-white"
                   >
                     Deceptive Words (comma separated, Optional)
                   </label>
