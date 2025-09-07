@@ -75,20 +75,12 @@ const ReportsByUsers = lazy(() => import("../AI/ReportsByUsers"));
 // =================AI====================
 
 // Helper function to wrap pages in Suspense
-// const withSuspense = (Component) => (
-//   // <Suspense fallback={<div className="text-white">Loading...</div>}>
-//   <Suspense fallback={<Loader></Loader>}>
-//     <Component />
-//   </Suspense>
-// );
-
-const withSuspense = (Component) => {
-  return (props) => (
-    <Suspense fallback={<Loader loading={true} />}>
-      <Component {...props} />
-    </Suspense>
-  );
-};
+const withSuspense = (Component) => (
+  // <Suspense fallback={<div className="text-white">Loading...</div>}>
+  <Suspense fallback={<Loader></Loader>}>
+    <Component />
+  </Suspense>
+);
 
 export const router = createBrowserRouter([
   {
