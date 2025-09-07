@@ -18,7 +18,7 @@ const ArticleForm = lazy(() => import("../Form/ArticleForm"));
 const PartOfSpeechForm = lazy(() => import("../Form/PartOfSpeechForm"));
 const LevelList = lazy(() => import("../View/LevelList"));
 const UpdateWord = lazy(() => import("../View/Words/Update/UpdateWord"));
-const DeleteAllWords = lazy(() => import("../View/DeleteAllWords"));
+// const DeleteAllWords = lazy(() => import("../View/DeleteAllWords"));
 const WordForm = lazy(() => import("../Form/WordForm"));
 const FavoritesList = lazy(() =>
   import("../View/Words/Favorite/FavoritesList")
@@ -75,12 +75,20 @@ const ReportsByUsers = lazy(() => import("../AI/ReportsByUsers"));
 // =================AI====================
 
 // Helper function to wrap pages in Suspense
-const withSuspense = (Component) => (
-  // <Suspense fallback={<div className="text-white">Loading...</div>}>
-  <Suspense fallback={<Loader></Loader>}>
-    <Component />
-  </Suspense>
-);
+// const withSuspense = (Component) => (
+//   // <Suspense fallback={<div className="text-white">Loading...</div>}>
+//   <Suspense fallback={<Loader></Loader>}>
+//     <Component />
+//   </Suspense>
+// );
+
+const withSuspense = (Component) => {
+  return (props) => (
+    <Suspense fallback={<Loader loading={true} />}>
+      <Component {...props} />
+    </Suspense>
+  );
+};
 
 export const router = createBrowserRouter([
   {
@@ -96,7 +104,7 @@ export const router = createBrowserRouter([
       { path: "/part-of-Speech", element: withSuspense(PartOfSpeechForm) },
       { path: "/level-list", element: withSuspense(LevelList) },
       { path: "/edit-word/:id", element: withSuspense(UpdateWord) },
-      { path: "/delete-all", element: withSuspense(DeleteAllWords) },
+      // { path: "/delete-all", element: withSuspense(DeleteAllWords) },
       { path: "/favorites", element: withSuspense(FavoritesList) },
       {
         path: "/conversation-titles",
@@ -160,7 +168,7 @@ export const router = createBrowserRouter([
             path: "users-favorite-count",
             element: withSuspense(UsersFavoriteCount),
           },
-          { path: "delete-all", element: withSuspense(DeleteAllWords) },
+          // { path: "delete-all", element: withSuspense(DeleteAllWords) },
 
           {
             path: "global-limits",

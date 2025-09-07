@@ -129,10 +129,14 @@ const TopicForm = () => {
 
   return (
     <Container>
-      <div className="min-h-screen">
-        <form onSubmit={handleSubmit} className="space-y-4 p-4">
+      <div className="min-h-screen ">
+       <h2 className="text-white text-3xl font-semibold mt-8 mb-6 text-center" >Create a Topic</h2>
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 p-4 bg-stone-800 rounded-md text-white "
+        >
           <div>
-            <label htmlFor="name" className="block  font-medium text-gray-700">
+            <label htmlFor="name" className="block  font-medium ">
               Topic Name
             </label>
             <input
@@ -142,15 +146,12 @@ const TopicForm = () => {
               value={topicData.name}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+              className="mt-1 block w-full input-md rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
             />
           </div>
 
           <div>
-            <label
-              htmlFor="levelId"
-              className="block  font-medium text-gray-700"
-            >
+            <label htmlFor="levelId" className="block  font-medium ">
               Select Level
             </label>
             <select
@@ -159,7 +160,7 @@ const TopicForm = () => {
               value={topicData.levelId}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+              className="mt-1 block w-full input-md rounded-md text-black border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
             >
               <option value="">Select Level</option>
               {levels.map((level) => (

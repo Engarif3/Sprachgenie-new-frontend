@@ -37,28 +37,28 @@ const NavBar = () => {
     });
   };
 
-  const handleDeleteAll = () => {
-    Swal.fire({
-      title: "Enter password",
-      input: "password",
-      inputPlaceholder: "Type password",
-      inputValidator: (value) => {
-        if (value !== "aydin451280") {
-          return "Wrong Password!";
-        }
-      },
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Proceed to create",
-    }).then((result) => {
-      if (result.isConfirmed && result.value === "aydin451280") {
-        navigate("/delete-all");
-      } else {
-        console.log("Action canceled or incorrect password.");
-      }
-    });
-  };
+  // const handleDeleteAll = () => {
+  //   Swal.fire({
+  //     title: "Enter password",
+  //     input: "password",
+  //     inputPlaceholder: "Type password",
+  //     inputValidator: (value) => {
+  //       if (value !== "aydin451280") {
+  //         return "Wrong Password!";
+  //       }
+  //     },
+  //     showCancelButton: true,
+  //     confirmButtonColor: "#3085d6",
+  //     cancelButtonColor: "#d33",
+  //     confirmButtonText: "Proceed to create",
+  //   }).then((result) => {
+  //     if (result.isConfirmed && result.value === "aydin451280") {
+  //       navigate("/delete-all");
+  //     } else {
+  //       console.log("Action canceled or incorrect password.");
+  //     }
+  //   });
+  // };
 
   return (
     <Container>
@@ -66,7 +66,7 @@ const NavBar = () => {
       <div className="  flex flex-wrap justify-between items-center py-2 rounded text-lg font-semibold mt-2 relative">
         {/* Title and Hamburger Menu */}
         <div className="flex justify-between items-center w-full md:w-auto px-4">
-          <Link className="text-3xl mb-1" href="/">
+          <Link className="text-3xl mb-1" to="/">
             <span className="text-red-600">Sprach</span>
             <span className="text-white">Genie</span>
           </Link>
@@ -117,37 +117,59 @@ const NavBar = () => {
               <span className="ml-2 text-xl  text-white">Vocabulary</span>
             </Link>
           )}
-          {userLoggedIn &&
-            (userInfo.role === "basic_user" ||
-              userInfo.role === "admin" ||
-              userInfo.role === "super_admin") && (
-              <>
-                <Link
-                  onClick={() => setIsMenuOpen(false)}
-                  to="/favorites"
-                  // className="hidden md:block lg:block h-8 w-8 mt-1"
-                  className="flex md:hidden lg:hidden btn btn-sm btn-warning w-full md:w-auto text-center "
+          {userLoggedIn && (
+            // (userInfo.role === "basic_user" ||
+            //   userInfo.role === "admin" ||
+            //   userInfo.role === "super_admin") && (
+            <>
+              {/* ====pc=== */}
+              <Link
+                to="/dashboard"
+                onClick={() => setIsMenuOpen(false)}
+                // className="btn btn-sm btn-warning w-full md:w-auto text-center hidden lg:flex justify-center items-center"
+                className="hidden  md:flex items-center justify-center text-3xl text-red-600 border-b-2 border-white rounded-md  hover:scale-105 px-1"
+              >
+                {/* Dashboard */}
+                <MdDashboard size={24} />
+                <span className="ml-2 text-xl mt-2 text-white">
+                  Dashboard
+                </span>{" "}
+              </Link>
+              {/* ====pc=== */}
+
+              {/* ====mobile=== */}
+
+              <Link
+                to="/dashboard"
+                onClick={() => setIsMenuOpen(false)}
+                className=" btn btn-sm btn-warning w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
+              >
+                Dashboard
+              </Link>
+              <Link
+                onClick={() => setIsMenuOpen(false)}
+                to="/favorites"
+                // className="hidden md:block lg:block h-8 w-8 mt-1"
+                className="flex md:hidden lg:hidden btn btn-sm btn-warning w-full md:w-auto text-center "
+              >
+                Favorites
+              </Link>
+              <Link
+                onClick={() => setIsMenuOpen(false)}
+                to="/favorites"
+                className="hidden md:flex lg:flex items-center border-b-2 border-white rounded-md hover:scale-105 px-1"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 122.88 107.39"
+                  className="w-6 h-6 fill-red-600"
                 >
-                  Favorites
-                </Link>
-                <Link
-                  onClick={() => setIsMenuOpen(false)}
-                  to="/favorites"
-                  className="hidden md:flex lg:flex items-center border-b-2 border-white rounded-md hover:scale-105 px-1"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 122.88 107.39"
-                    className="w-6 h-6 fill-red-600"
-                  >
-                    <path d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z" />
-                  </svg>
-                  <span className="ml-2 mt-2 text-xl text-white">
-                    Favorites
-                  </span>
-                </Link>
-              </>
-            )}
+                  <path d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z" />
+                </svg>
+                <span className="ml-2 mt-2 text-xl text-white">Favorites</span>
+              </Link>
+            </>
+          )}
           {/* {userLoggedIn && (
             <Link
               to={"/words"}
@@ -157,23 +179,7 @@ const NavBar = () => {
             </Link>
           )} */}
 
-          {/* ============ */}
-          {userLoggedIn && (
-            <Link
-              to="/dashboard"
-              onClick={() => setIsMenuOpen(false)}
-              // className="btn btn-sm btn-warning w-full md:w-auto text-center hidden lg:flex justify-center items-center"
-              className="hidden  md:flex items-center justify-center text-3xl text-red-600 border-b-2 border-white rounded-md  hover:scale-105 px-1"
-            >
-              {/* Dashboard */}
-              <MdDashboard size={24} />
-              <span className="ml-2 text-xl mt-2 text-white">
-                Dashboard
-              </span>{" "}
-            </Link>
-          )}
-
-          {/* ============ */}
+          {/* ============  mobile*/}
           {(userInfo.role === "super_admin" || userInfo.role === "admin") && (
             <>
               <Link
@@ -233,12 +239,12 @@ const NavBar = () => {
           )}
           {userLoggedIn && userInfo.role === "super_admin" && (
             <>
-              <button
+              {/* <button
                 onClick={() => handleDeleteAll()}
                 className="btn btn-sm btn-warning  hidden "
               >
                 Delete All
-              </button>
+              </button> */}
               <Link
                 onClick={() => {
                   handleCreateTopic();
@@ -253,7 +259,6 @@ const NavBar = () => {
           {/* <Link to="/login">Login</Link> */}
           <AuthButton></AuthButton>
         </div>{" "}
-        {/* <-- This div was missing */}
       </div>
       <hr className="border-0 border-b border-dotted border-cyan-950" />
 
