@@ -17,7 +17,7 @@ const DashboardLayout = () => {
     <Container>
       <div className="flex min-h-screen   mb-12">
         <button
-          className="lg:hidden absolute mt-[4px] left-2 z-50 bg-sky-600 text-white p-2 rounded-md"
+          className="fixed md:hidden lg:hidden  mt-[4px] left-2 z-50 bg-sky-600 text-white p-2 rounded-md"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? "✖" : "☰"}
