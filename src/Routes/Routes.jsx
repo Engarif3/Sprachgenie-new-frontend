@@ -195,6 +195,7 @@ import { lazy, Suspense } from "react";
 import App from "../App";
 import { createBrowserRouter } from "react-router-dom";
 import Loader from "../utils/Loader";
+import ProtectedRoute from "./ProtectedRoute";
 
 // Lazy-loaded pages
 const Home = lazy(() => import("../View/Home/Home"));
@@ -360,7 +361,12 @@ export const router = createBrowserRouter([
       { path: "/past-perfect", element: <PerfectAndPastFormWithSuspense /> },
       {
         path: "/dashboard",
-        element: <DashboardLayoutWithSuspense />,
+        // element: <DashboardLayoutWithSuspense />,
+        element: (
+          <ProtectedRoute>
+            <DashboardLayoutWithSuspense />
+          </ProtectedRoute>
+        ),
         children: [
           { index: true, element: <DashboardHomeWithSuspense /> },
           {
