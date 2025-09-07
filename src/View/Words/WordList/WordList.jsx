@@ -714,7 +714,7 @@ const WordList = () => {
                     Antonym
                   </th>
                   <th className="border-l border-gray-400 border-dotted p-0 md:p-1 lg:p-1 text-center hidden lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
-                    Deceptive Word
+                    Word to Watch
                   </th>
                   <th className="border-l border-gray-400 border-dotted  p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[3%] lg:w-[3%]">
                     Level
