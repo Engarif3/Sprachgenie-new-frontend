@@ -92,7 +92,7 @@ const NavBar = () => {
         <div
           className={`${
             isMenuOpen ? "flex" : "hidden"
-          } md:flex flex-col md:flex-row rounded-lg items-center gap-3 md:gap-4 lg:gap-16 w-full md:w-auto px-4 mt-2 md:mt-0 absolute md:static top-full left-0 z-10 py-4 md:py-0 bg-sky-500 md:bg-transparent lg:bg-transparent bg-opacity-90 `}
+          } md:flex flex-col md:flex-row rounded-lg items-center gap-3 md:gap-4 lg:gap-16 w-full md:w-auto px-4 mt-2 md:mt-0 absolute md:static top-full left-0 z-10 py-4 md:py-0 bg-stone-800 md:bg-transparent lg:bg-transparent bg-opacity-90 `}
         >
           {location.pathname !== "/" && (
             <Link
@@ -142,15 +142,22 @@ const NavBar = () => {
               <Link
                 to="/dashboard"
                 onClick={() => setIsMenuOpen(false)}
-                className=" btn btn-sm btn-warning w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
+                className=" btn btn-sm btn-info w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
               >
                 Dashboard
+              </Link>
+              <Link
+                to="/words"
+                onClick={() => setIsMenuOpen(false)}
+                className=" btn btn-sm btn-primary w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
+              >
+                Vocabulary
               </Link>
               <Link
                 onClick={() => setIsMenuOpen(false)}
                 to="/favorites"
                 // className="hidden md:block lg:block h-8 w-8 mt-1"
-                className="flex md:hidden lg:hidden btn btn-sm btn-warning w-full md:w-auto text-center "
+                className="flex md:hidden lg:hidden btn btn-sm btn-primary  w-full md:w-auto text-center "
               >
                 Favorites
               </Link>
@@ -187,7 +194,7 @@ const NavBar = () => {
                   setIsMenuOpen(false);
                 }}
                 to="/create-word"
-                className="btn btn-sm btn-warning w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
+                className="btn btn-sm btn-primary  w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
               >
                 Create Word
               </Link>
@@ -196,7 +203,7 @@ const NavBar = () => {
                   setIsMenuOpen(false);
                 }}
                 to="/create-conversation"
-                className="btn btn-sm btn-warning w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
+                className="btn btn-sm btn-primary  w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
               >
                 Create Conv
               </Link>
@@ -205,7 +212,7 @@ const NavBar = () => {
                   setIsMenuOpen(false);
                 }}
                 to="update-conversation"
-                className="btn btn-sm btn-warning w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
+                className="btn btn-sm btn-primary w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
               >
                 Update Conv
               </Link>
@@ -250,7 +257,7 @@ const NavBar = () => {
                   handleCreateTopic();
                   setIsMenuOpen(false);
                 }}
-                className="btn btn-sm btn-warning w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden "
+                className="btn btn-sm btn-primary  w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden "
               >
                 Create Topic
               </Link>

@@ -1,4 +1,4 @@
-import { Link, Navigate, Outlet } from "react-router-dom";
+import { Link, Navigate, Outlet, NavLink } from "react-router-dom";
 import { getUserInfo } from "../services/auth.services";
 import Container from "../utils/Container";
 import { useState } from "react";
@@ -15,171 +15,198 @@ const DashboardLayout = () => {
 
   return (
     <Container>
-      <div className="flex min-h-screen   mb-12">
+      <div className="flex min-h-screen mb-12">
         <button
-          className="fixed md:hidden lg:hidden  mt-[4px] left-2 z-50 bg-sky-600 text-white p-2 rounded-md"
+          className="fixed md:hidden lg:hidden mt-[4px] left-2 z-50 bg-sky-600 text-white p-2 rounded-md"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? "✖" : "☰"}
         </button>
+
         {/* Sidebar */}
-        {/* <aside className="w-64  text-white flex flex-col  rounded-md bg-stone-800"> */}
         <aside
           className={`fixed lg:static w-64 text-white flex flex-col rounded-md bg-stone-800 z-40 transform transition-transform duration-300
     ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
         >
-          <div className=" py-2 text-2xl font-bold  text-center  text-sky-500">
+          <div className="py-2 text-2xl font-bold text-center text-sky-500">
             Dashboard
           </div>
-          <hr className="border-0 border-b  border-orange-600 mx-2" />
+          <hr className="border-0 border-b border-orange-600 mx-2" />
 
           {/* Sidebar menu */}
           <nav className="flex-1 px-4 py-6 space-y-2">
-            <Link
+            <NavLink
               to="/dashboard"
-              className="block py-2 px-3 rounded hover:bg-cyan-700"
+              end
+              className={({ isActive }) =>
+                `block py-2 px-3 rounded hover:bg-cyan-700 ${
+                  isActive ? "bg-cyan-700 font-bold" : ""
+                }`
+              }
               onClick={() => setIsOpen(!isOpen)}
             >
               Overview
-            </Link>
-            {/* <Link
-              to="/dashboard/favorites"
-              className="block py-2 px-3 rounded hover:bg-cyan-700"
-            >
-              Favorites Words
-            </Link> */}
+            </NavLink>
 
-            <Link
+            <NavLink
               to="/dashboard/favorites-words"
-              className="block py-2 px-3 rounded hover:bg-cyan-700"
+              className={({ isActive }) =>
+                `block py-2 px-3 rounded hover:bg-cyan-700 ${
+                  isActive ? "bg-cyan-700 font-bold" : ""
+                }`
+              }
               onClick={() => setIsOpen(!isOpen)}
             >
               Favorites Words
-            </Link>
-
-            {/* <hr className="border-0 border-b  border-pink-950 mx-2" /> */}
+            </NavLink>
 
             {role === "super_admin" && (
               <div className=" ">
-                <Link
+                <NavLink
                   to="/dashboard/update-user-status"
-                  className="block py-2 px-3 rounded hover:bg-cyan-700"
+                  className={({ isActive }) =>
+                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
+                      isActive ? "bg-cyan-700 font-bold" : ""
+                    }`
+                  }
                   onClick={() => setIsOpen(!isOpen)}
                 >
                   Manage Users
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   to="/dashboard/topic"
-                  className="block py-2 px-3 rounded hover:bg-cyan-700"
+                  className={({ isActive }) =>
+                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
+                      isActive ? "bg-cyan-700 font-bold" : ""
+                    }`
+                  }
                   onClick={() => setIsOpen(!isOpen)}
                 >
                   Create Topic
-                </Link>
+                </NavLink>
               </div>
             )}
 
             {role === "admin" && (
-              <Link
+              <NavLink
                 to="/dashboard/update-basic-user-status"
-                className="block py-2 px-3 rounded hover:bg-cyan-700"
+                className={({ isActive }) =>
+                  `block py-2 px-3 rounded hover:bg-cyan-700 ${
+                    isActive ? "bg-cyan-700 font-bold" : ""
+                  }`
+                }
                 onClick={() => setIsOpen(!isOpen)}
               >
                 Manage Users
-              </Link>
+              </NavLink>
             )}
 
             {(role === "admin" || role === "super_admin") && (
               <>
-                {/* <Link
-                  to="/dashboard/update-basic-user-status"
-                  className="block py-2 px-3 rounded hover:bg-cyan-700"
-                >
-                  Manage Users
-                </Link> */}
-                <Link
+                <NavLink
                   to="/dashboard/create-word"
-                  className="block py-2 px-3 rounded hover:bg-cyan-700"
+                  className={({ isActive }) =>
+                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
+                      isActive ? "bg-cyan-700 font-bold" : ""
+                    }`
+                  }
                   onClick={() => setIsOpen(!isOpen)}
                 >
                   Create Word
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   to="/dashboard/create-conversation"
-                  className="block py-2 px-3 rounded hover:bg-cyan-700"
+                  className={({ isActive }) =>
+                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
+                      isActive ? "bg-cyan-700 font-bold" : ""
+                    }`
+                  }
                   onClick={() => setIsOpen(!isOpen)}
                 >
                   Create Conversation
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   to="/dashboard/update-conversation"
-                  className="block py-2 px-3 rounded hover:bg-cyan-700"
+                  className={({ isActive }) =>
+                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
+                      isActive ? "bg-cyan-700 font-bold" : ""
+                    }`
+                  }
                   onClick={() => setIsOpen(!isOpen)}
                 >
                   Update Conversation
-                </Link>
+                </NavLink>
 
-                <Link
+                <NavLink
                   to="/dashboard/users-favorite-count"
-                  className="block py-2 px-3 rounded hover:bg-cyan-700"
+                  className={({ isActive }) =>
+                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
+                      isActive ? "bg-cyan-700 font-bold" : ""
+                    }`
+                  }
                   onClick={() => setIsOpen(!isOpen)}
                 >
                   Favorites Count
-                </Link>
-                {/* <Link
-                  to="/dashboard/update-limits"
-                  className="block py-2 px-3 rounded hover:bg-cyan-700"
-                >
-                  Update Limits
-                </Link> */}
-                <Link
+                </NavLink>
+
+                <NavLink
                   to="/dashboard/global-limits"
-                  className="block py-2 px-3 rounded hover:bg-cyan-700"
+                  className={({ isActive }) =>
+                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
+                      isActive ? "bg-cyan-700 font-bold" : ""
+                    }`
+                  }
                   onClick={() => setIsOpen(!isOpen)}
                 >
                   Global Limits
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   to="/dashboard/user-limits"
-                  className="block py-2 px-3 rounded hover:bg-cyan-700"
+                  className={({ isActive }) =>
+                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
+                      isActive ? "bg-cyan-700 font-bold" : ""
+                    }`
+                  }
                   onClick={() => setIsOpen(!isOpen)}
                 >
                   User Limits
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   to="/dashboard/get-usage"
-                  className="block py-2 px-3 rounded hover:bg-cyan-700"
+                  className={({ isActive }) =>
+                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
+                      isActive ? "bg-cyan-700 font-bold" : ""
+                    }`
+                  }
                   onClick={() => setIsOpen(!isOpen)}
                 >
                   AI Usage By Users
-                </Link>
-                <Link
+                </NavLink>
+                <NavLink
                   to="/dashboard/get-reports"
-                  className="block py-2 px-3 rounded hover:bg-cyan-700"
+                  className={({ isActive }) =>
+                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
+                      isActive ? "bg-cyan-700 font-bold" : ""
+                    }`
+                  }
                   onClick={() => setIsOpen(!isOpen)}
                 >
                   User Reports
-                </Link>
+                </NavLink>
               </>
             )}
-            {/* 
-            {role === "super_admin" && (
-              <Link
-                to="/dashboard/delete-all"
-                className="block py-2 px-3 rounded hover:bg-cyan-700"
-                onClick={() => setIsOpen(!isOpen)}
-              >
-                Delete All
-              </Link>
-            )} */}
           </nav>
-          <hr className="border-0 border-b  border-orange-600 mx-2" />
-          <div className="px-4  text-center text-sky-500 italic">
-            <p className="text-sm my-3 "> {userInfo?.name}</p>
+          <hr className="border-0 border-b border-orange-600 mx-2" />
+          <div className="px-4 text-center text-sky-500 italic">
+            <p className="text-sm my-3"> {userInfo?.name}</p>
           </div>
         </aside>
 
         {/* Main Content on the right side */}
-        <main className="flex-1 pl-0 md:pl-4 lg:pl-4 overflow-y-auto mt-8">
+        <main
+          className="flex-1 pl-0 md:pl-4 lg:pl-4 overflow-y-auto mt-8"
+          onClick={() => setIsOpen(false)}
+        >
           <Outlet />
         </main>
       </div>

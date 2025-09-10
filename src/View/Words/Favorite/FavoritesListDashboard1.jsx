@@ -13,8 +13,6 @@ import {
   removeFromLocalStorage,
   setToLocalStorage,
 } from "../../../utils/local-storage";
-import aiApi from "../../../AI_axios";
-import { PuffLoader } from "react-spinners";
 
 const FavoritesListDashboard = () => {
   const [selectedWord, setSelectedWord] = useState(null);
@@ -26,18 +24,6 @@ const FavoritesListDashboard = () => {
   const userInfo = getUserInfo();
   const [favorites, setFavorites] = useState([]);
   const [loadingFavorites, setLoadingFavorites] = useState({});
-
-  // =================ai===========================
-  const [aiWord, setAiWord] = useState(null);
-  const [generatedParagraphs, setGeneratedParagraphs] = useState({});
-  const [loadingParagraphs, setLoadingParagraphs] = useState({});
-  const [selectedParagraph, setSelectedParagraph] = useState("");
-  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
-
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [reportMessage, setReportMessage] = useState("");
-
-  // =================ai===========================
 
   useEffect(() => {
     setFavorites(favoriteWords.map((w) => w.id));
@@ -326,185 +312,7 @@ const FavoritesListDashboard = () => {
   //   //   }
   //   // };
 
-  // // ==========================ai ===============================
-  // const generateParagraph = async (word) => {
-  //   if (!userInfo?.id) {
-  //     Swal.fire(
-  //       "Not Logged In",
-  //       "You must be logged in to generate paragraphs",
-  //       "warning"
-  //     );
-  //     return;
-  //   }
-
-  //   try {
-  //     setLoadingParagraphs((prev) => ({ ...prev, [word.id]: true }));
-
-  //     const response = await aiApi.post(`/paragraphs/generate`, {
-  //       userId: userInfo.id,
-  //       word: word.value,
-  //       wordId: word.id,
-  //       level: word.level?.level || "A1",
-  //       language: "de",
-  //     });
-
-  //     const paragraph = response.data.paragraph;
-  //     const wordId = response.data.wordId || word.id;
-
-  //     const fullWord = favoriteWords.find((w) => w.id === wordId);
-
-  //     setAiWord(fullWord || { id: wordId, value: word.value });
-  //     setGeneratedParagraphs((prev) => ({ ...prev, [wordId]: paragraph }));
-  //     setSelectedParagraph(paragraph);
-  //     setIsAIModalOpen(true);
-  //   } catch (error) {
-  //     const errorMessage = error.response?.data?.error || error.message;
-  //     if (error.response?.status === 403) {
-  //       Swal.fire("Limit Reached", errorMessage, "warning");
-  //     } else {
-  //       console.error("Error generating paragraph:", errorMessage);
-  //       Swal.fire("Error", "Failed to generate paragraph", "error");
-  //     }
-  //   } finally {
-  //     setLoadingParagraphs((prev) => ({ ...prev, [word.id]: false }));
-  //   }
-  // };
-
-  // // =============report================
-
-  // const handleReportSubmit = async () => {
-  //   if (!aiWord?.id) {
-  //     Swal.fire("Error", "Missing word ID", "error");
-  //     return;
-  //   }
-
-  //   try {
-  //     const response = await aiApi.post(`/paragraphs/report`, {
-  //       wordId: aiWord.id, // ✅ send wordId instead of paragraphId
-  //       userId: userInfo?.id ?? null, // optional
-  //       message: reportMessage?.trim() || null, // optional
-  //     });
-
-  //     Swal.fire(
-  //       "Reported",
-  //       response.data.message || "Report submitted",
-  //       "success"
-  //     );
-
-  //     setIsReportModalOpen(false);
-  //     setReportMessage("");
-  //   } catch (error) {
-  //     const errorMessage = error.response?.data?.error || error.message;
-  //     Swal.fire("Error", errorMessage, "error");
-  //   }
-  // };
-
-  // // ==========================ai ===============================
-
-  //   ==============AI===============
-
-  const generateParagraph = async (word) => {
-    if (!userInfo?.id) {
-      Swal.fire(
-        "Not Logged In",
-        "You must be logged in to generate paragraphs",
-        "warning"
-      );
-      return;
-    }
-
-    try {
-      setLoadingParagraphs((prev) => ({ ...prev, [word.id]: true }));
-
-      const response = await aiApi.post(`/paragraphs/generate`, {
-        userId: userInfo.id,
-        wordId: word.id,
-        word: word.value,
-        level: word.level?.level || "A1",
-        language: "de",
-      });
-
-      const splitSentences = (text) =>
-        text
-          .split(/(?<=[.!?])\s+/) // split after ., !, ?
-          .map((s) => s.trim())
-          .filter(Boolean);
-
-      const aiMeanings = response.data.meanings || [];
-      const otherSentences = response.data.otherSentences || [];
-      const paragraph = response.data.paragraph;
-      const wordId = response.data.wordId || word.id; // depends on AI API response
-
-      // Always split paragraph into sentences
-      let sentences = splitSentences(paragraph);
-
-      // Optionally add unique otherSentences
-      otherSentences.forEach((s) => {
-        if (!sentences.includes(s)) sentences.push(s);
-      });
-
-      const fullWord = favoriteWords.find((w) => w.id === wordId);
-
-      setAiWord({
-        ...(fullWord || { id: word.id, value: word.value }),
-        aiMeanings,
-        sentences:
-          sentences.length > 0 ? sentences : paragraph.split(/(?<=[.!?])\s+/),
-      });
-
-      setGeneratedParagraphs((prev) => ({
-        ...prev,
-        [wordId]: paragraph,
-      }));
-
-      setSelectedParagraph(paragraph);
-      setIsAIModalOpen(true);
-    } catch (error) {
-      const errorMessage = error.response?.data?.error || error.message;
-      if (error.response?.status === 403) {
-        Swal.fire("Limit Reached", errorMessage, "warning");
-      } else {
-        console.error("Error generating paragraph:", errorMessage);
-        Swal.fire("Error", "Failed to generate paragraph", "error");
-      }
-    } finally {
-      setLoadingParagraphs((prev) => ({ ...prev, [word.id]: false }));
-    }
-  };
-
-  // =============report================
-
-  const handleReportSubmit = async () => {
-    if (!aiWord?.id) {
-      Swal.fire("Error", "Missing word ID", "error");
-      return;
-    }
-
-    try {
-      const response = await aiApi.post(`/paragraphs/report`, {
-        wordId: aiWord.id, // ✅ send wordId instead of paragraphId
-        userId: userInfo?.id ?? null, // optional
-        message: reportMessage?.trim() || null, // optional
-      });
-
-      Swal.fire(
-        "Reported",
-        response.data.message || "Report submitted",
-        "success"
-      );
-
-      setIsReportModalOpen(false);
-      setReportMessage("");
-    } catch (error) {
-      const errorMessage = error.response?.data?.error || error.message;
-      Swal.fire("Error", errorMessage, "error");
-    }
-  };
-
-  //   ==============AI===============
-
   return (
-    // <Container>
     <>
       <h2 className="text-3xl text-white font-bold font-mono my-8 text-center">
         Favorite Words - {favoriteWords.length}
@@ -521,10 +329,10 @@ const FavoritesListDashboard = () => {
             totalPages={totalPages}
             setCurrentPage={setCurrentPage}
           />
-          <div className="overflow-x-auto ">
+          <div className="overflow-x-auto">
             {paginatedFavorites.length > 0 ? (
               <>
-                <h2 className="text-md  font-mono  text-right mt-6 mb-2">
+                <h2 className="text-md  font-mono  text-right mb-2 ">
                   <span className="bg-green-700 px-1 rounded text-white ">
                     Showing-{paginatedFavorites.length}
                   </span>
@@ -532,86 +340,59 @@ const FavoritesListDashboard = () => {
 
                 <table className="w-full border-collapse ">
                   <thead>
-                    <tr className="bg-stone-800 text-sm md:text-xl lg:text-xl text-white py-2">
+                    <tr className="bg-stone-800 text-xl text-white p-1">
                       <th className="   p-1 text-center rounded-tl-md">
                         Article
                       </th>
-                      <th className=" border-l border-gray-600 border-dotted py-2 text-center">
+                      <th className="border-l border-gray-600 border-dotted p-1 text-center">
                         Word
                       </th>
-                      <th className=" border-l border-gray-600 border-dotted py-2 text-center">
+                      <th className="border-l border-gray-600 border-dotted p-1 text-center">
                         Meaning
                       </th>
-                      <th className=" border-l border-gray-600 border-dotted py-2  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                      <th className="border-l border-gray-600 border-dotted p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                         Synonym
                       </th>
-                      <th className=" border-l border-gray-600 border-dotted py-2 text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                      <th className="border-l border-gray-600 border-dotted p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                         Antonym
                       </th>
-                      <th className=" border-l border-gray-600 border-dotted py-2  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                      <th className="border-l border-gray-600 border-dotted p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                         Word to Watch
                       </th>
-                      <th className="border-l border-gray-600 border-dotted py-2 text-center rounded-tr-md"></th>
+                      <th className="border-l border-gray-600 border-dotted p-1 text-center rounded-tr-md"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {paginatedFavorites.map((word) => (
                       <tr key={word.id} className="bg-white hover:bg-gray-50">
-                        <td className=" border border-gray-600 border-dotted p-0 md:p-2 lg:p-2   font-semibold text-orange-600 text-center">
+                        <td className=" border border-gray-600 border-dotted p-2  font-semibold text-orange-600 text-center">
                           {word.article?.name}
                         </td>
                         <td
-                          className="border border-gray-600 border-dotted p-1 md:p-2 lg:p-2 text-blue-500 cursor-pointer
+                          className="border border-gray-600 border-dotted p-2 text-blue-500 cursor-pointer
                          font-bold text-lg "
                         >
                           <div className="flex justify-between">
                             <span
-                              // className="cursor-pointer text-blue-500 text-base sm:text-lg font-bold p-1 md:p-2 lg:p-2 break-words max-w-[120px] md:max-w-full"
-                              className="cursor-pointer text-blue-500 text-sm md:text-lg lg:text-lg font-bold pl-1 md:pl-0 lg:pl-0  p-0 md:p-2 lg:p-2 line-clamp-2 hover:line-clamp-none hover:max-w-full break-words max-w-[120px] md:max-w-full"
+                              className="cursor-pointer text-blue-500 text-base sm:text-lg font-bold "
                               onClick={() => openModal(word)}
                             >
                               {" "}
                               {word.value}
                             </span>
 
-                            <div className="flex gap-1 md:gap-2 lg:gap-2">
-                              <button
-                                onClick={() => pronounceWord(word.value)}
-                                className="text-blue-500 hover:text-blue-700 ml-0 md:ml-2 lg:ml-2 "
-                              >
-                                🔊
-                              </button>
-
-                              <div
-                                onClick={() => generateParagraph(word)}
-                                className="relative border-2 bg-green-700 text-white italic px-2 py-1 text-sm rounded-full h-6 w-6 cursor-pointer hover:scale-105 hover:bg-green-600 hover:text-white border-orange-500"
-                                disabled={loadingParagraphs[word.id]}
-                              >
-                                {loadingParagraphs[word.id] && (
-                                  <span className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                                    <PuffLoader size={20} color="#FF0000" />
-                                  </span>
-                                )}
-                                <span
-                                  className={`${
-                                    loadingParagraphs[word.id]
-                                      ? "invisible"
-                                      : "flex items-center justify-center relative bottom-1 capitalize"
-                                  }`}
-                                >
-                                  ai
-                                </span>
-                              </div>
-                            </div>
+                            <button
+                              onClick={() => pronounceWord(word.value)}
+                              className=" text-blue-500 hover:text-blue-700 ml-2"
+                            >
+                              🔊
+                            </button>
                           </div>
                         </td>
-                        <td className="border border-gray-600 border-dotted pl-1 p-0 md:p-2 lg:p-2">
-                          {/* {word.meaning?.join(", ")} */}
-                          <span className="text-sm md:text-lg lg:text-lg line-clamp-2 hover:line-clamp-none break-words max-w-[120px] md:max-w-full">
-                            {word.meaning?.join(", ")}
-                          </span>
+                        <td className="border border-gray-600 border-dotted p-2">
+                          {word.meaning?.join(", ")}
                         </td>
-                        <td className="border border-gray-600 border-dotted  p-1 md:p-2 lg:p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
+                        <td className="border border-gray-600 border-dotted  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
                           <div className="flex flex-wrap gap-1">
                             {word.synonyms?.map((synonym, index) => (
                               <span
@@ -626,7 +407,7 @@ const FavoritesListDashboard = () => {
                           </div>
                         </td>
 
-                        <td className="border border-gray-600 border-dotted  p-1 md:p-2 lg:p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
+                        <td className="border border-gray-600 border-dotted  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
                           <div className="flex flex-wrap gap-1">
                             {word.antonyms?.map((antonym, index) => (
                               <span
@@ -639,7 +420,7 @@ const FavoritesListDashboard = () => {
                             ))}
                           </div>
                         </td>
-                        <td className="border border-gray-600 border-dotted  p-1 md:p-2 lg:p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
+                        <td className="border border-gray-600 border-dotted  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
                           <div className="flex flex-wrap gap-1">
                             {word.similarWords?.map((similarWord, index) => (
                               <span
@@ -655,7 +436,7 @@ const FavoritesListDashboard = () => {
                           </div>
                         </td>
 
-                        <td className="border border-gray-600 border-dotted p-1 md:p-2 lg:p-2 text-center">
+                        <td className="border border-gray-600 border-dotted p-2 text-center">
                           <button
                             onClick={() => handleRemoveFavorite(word.id)}
                             className="text-red-700 hover:text-red-500 font-bold py-1 px-1 rounded"
@@ -707,112 +488,6 @@ const FavoritesListDashboard = () => {
         toggleFavorite={toggleFavorite}
         loadingFavorites={loadingFavorites}
       />
-
-      {/* =======AI modal=============== */}
-      {isAIModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full md:w-1/2 lg:w-1/2  px-4 mx-2">
-            <h2 className="text-2xl md:text-5xl lg:text-5xl font-bold  text-center mb-2">
-              <span className="text-orange-600">
-                {" "}
-                {typeof aiWord?.article === "string"
-                  ? aiWord.article
-                  : aiWord?.article?.name || ""}{" "}
-              </span>
-              <span className="text-slate-800 capitalize">{aiWord?.value}</span>
-            </h2>
-            <p className="text-center text-cyan-800 text-2xl mb-6">
-              {/* [{aiWord?.meaning || ""}] */}[
-              {Array.isArray(aiWord?.meaning)
-                ? aiWord.meaning.join(", ")
-                : aiWord?.meaning || ""}
-              ]
-            </p>
-
-            <p className="whitespace-pre-line text-xl md:text-2xl lg:text-2xl  font-mono text-slate900 -md p-2">
-              <div>
-                {" "}
-                {aiWord?.aiMeanings?.length > 0 && (
-                  <p className=" text-gray-700 text-lg ml-2">
-                    <strong className="text-green-700">Meanings (AI):</strong>{" "}
-                    {aiWord.aiMeanings.join(", ")}
-                  </p>
-                )}
-              </div>
-              <div className="border border-cyan-600 rounded p-2">
-                <span> {selectedParagraph}</span>
-              </div>
-              <div className="hidden">
-                {aiWord?.sentences?.length > 0 && (
-                  <span className="mt-4 text-left text-slate-700 ">
-                    {aiWord.sentences.map((s, i) => (
-                      <p key={i} className=" text-lg ml-2">
-                        <strong className="text-green-700">Sentences:</strong>
-                        {s}
-                      </p>
-                    ))}
-                  </span>
-                )}
-              </div>
-            </p>
-
-            <div className="mt-8 flex justify-between">
-              <button
-                onClick={() => setIsReportModalOpen(true)}
-                className="btn btn-sm btn-error "
-              >
-                Report
-              </button>
-              <button
-                onClick={() => setIsAIModalOpen(false)}
-                className="btn btn-sm btn-warning"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* =======AI modal=============== */}
-
-      {/* ===================report========= */}
-      {isReportModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full md:w-1/3 mx-2">
-            <h2 className="text-xl font-bold mb-4 text-center">Report</h2>
-
-            <p className="text-gray-600 text-sm mb-2">
-              Reason for reporting this AI generation. (optional)
-            </p>
-            <textarea
-              value={reportMessage}
-              onChange={(e) => setReportMessage(e.target.value)}
-              className="w-full border rounded-md p-2 text-sm"
-              rows={4}
-              placeholder="Enter a message (optional)"
-            />
-
-            <div className="mt-4 flex justify-end space-x-2">
-              <button
-                onClick={() => setIsReportModalOpen(false)}
-                className="btn btn-sm"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleReportSubmit}
-                className="btn btn-sm btn-error"
-              >
-                Submit
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {/* ===================report========= */}
-
-      {/* =================ai modal ===================== */}
     </>
   );
 };
