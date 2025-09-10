@@ -25,7 +25,7 @@ const DashboardLayout = () => {
 
         {/* Sidebar */}
         <aside
-          className={`fixed lg:static w-64 text-white flex flex-col rounded-md bg-stone-800 z-40 transform transition-transform duration-300
+          className={`fixed min-h-[80%] lg:static w-64 text-white flex flex-col rounded-md bg-stone-800 z-40 transform transition-transform duration-300
     ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
         >
           <div className="py-2 text-2xl font-bold text-center text-sky-500">

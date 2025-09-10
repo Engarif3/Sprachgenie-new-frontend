@@ -9,16 +9,23 @@ import { MdDashboard } from "react-icons/md";
 
 const NavBar = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // Get current route
+  const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo() || {};
   const menuRef = useRef(null);
+  const toggleRef = useRef(null);
 
   // Close menu if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+      // if click is outside both menu and toggle button -> close
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target) &&
+        toggleRef.current &&
+        !toggleRef.current.contains(event.target)
+      ) {
         setIsMenuOpen(false);
       }
     };
@@ -102,6 +109,7 @@ const NavBar = () => {
           )}
 
           <button
+            ref={toggleRef}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="md:hidden btn btn-sm btn-warning"
           >
