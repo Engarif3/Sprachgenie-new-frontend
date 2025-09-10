@@ -894,7 +894,7 @@ const WordList = () => {
             <table className="w-full  border-collapse mt-2 ">
               {/* Table headers remain the same */}
               <thead>
-                <tr className="bg-stone-800 text-md md:text-xl lg:text-lg text-white ">
+                <tr className="bg-stone-800 text-sm md:text-xl lg:text-xl text-white ">
                   {/* ... existing header cells ... */}
                   <th className=" border-gray-400  py-2  text-sm md:text-lg lg:text-lg    text-center w-[15%] md:w-[3%] lg:w-[3%] rounded-tl-md">
                     Article
@@ -1022,7 +1022,7 @@ const WordList = () => {
                       </td>
                       {/* word meaning starts here */}
                       <td
-                        className={`border-l border-gray-400 border-dotted pl-1  p-0 md:p-2 lg:p-2 text-sm md:text-lg lg:text-lg${
+                        className={`border-l border-gray-400 border-dotted pl-1  p-0 md:p-2 lg:p-2 text-sm md:text-lg lg:text-lg ${
                           learningMode && index === currentIndex
                             ? "bg-sky-700 text-white font-bold "
                             : "text-sky-800 font-serif"

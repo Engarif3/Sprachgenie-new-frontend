@@ -521,10 +521,10 @@ const FavoritesList = () => {
             totalPages={totalPages}
             setCurrentPage={setCurrentPage}
           />
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto ">
             {paginatedFavorites.length > 0 ? (
               <>
-                <h2 className="text-md  font-mono  text-right mb-2 ">
+                <h2 className="text-md  font-mono  text-right mt-6 mb-2">
                   <span className="bg-green-700 px-1 rounded text-white ">
                     Showing-{paginatedFavorites.length}
                   </span>
@@ -532,57 +532,52 @@ const FavoritesList = () => {
 
                 <table className="w-full border-collapse ">
                   <thead>
-                    <tr className="bg-stone-800 text-xl text-white p-1">
+                    <tr className="bg-stone-800 text-sm md:text-xl lg:text-xl text-white py-2">
                       <th className="   p-1 text-center rounded-tl-md">
                         Article
                       </th>
-                      <th className=" border-l border-gray-600 border-dotted p-1 text-center">
+                      <th className=" border-l border-gray-600 border-dotted py-2 text-center">
                         Word
                       </th>
-                      <th className=" border-l border-gray-600 border-dotted p-1 text-center">
+                      <th className=" border-l border-gray-600 border-dotted py-2 text-center">
                         Meaning
                       </th>
-                      <th className=" border-l border-gray-600 border-dotted p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                      <th className=" border-l border-gray-600 border-dotted py-2  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                         Synonym
                       </th>
-                      <th className=" border-l border-gray-600 border-dotted p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                      <th className=" border-l border-gray-600 border-dotted py-2 text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                         Antonym
                       </th>
-                      <th className=" border-l border-gray-600 border-dotted p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                      <th className=" border-l border-gray-600 border-dotted py-2  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                         Word to Watch
                       </th>
-                      <th className="border-l border-gray-600 border-dotted p-1 text-center rounded-tr-md"></th>
+                      <th className="border-l border-gray-600 border-dotted py-2 text-center rounded-tr-md"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {paginatedFavorites.map((word) => (
                       <tr key={word.id} className="bg-white hover:bg-gray-50">
-                        <td className=" border border-gray-600 border-dotted p-2  font-semibold text-orange-600 text-center">
+                        <td className=" border border-gray-600 border-dotted p-0 md:p-2 lg:p-2   font-semibold text-orange-600 text-center">
                           {word.article?.name}
                         </td>
                         <td
-                          className="border border-gray-600 border-dotted p-2 text-blue-500 cursor-pointer
+                          className="border border-gray-600 border-dotted p-1 md:p-2 lg:p-2 text-blue-500 cursor-pointer
                          font-bold text-lg "
                         >
                           <div className="flex justify-between">
                             <span
-                              className="cursor-pointer text-blue-500 text-base sm:text-lg font-bold "
+                              // className="cursor-pointer text-blue-500 text-base sm:text-lg font-bold p-1 md:p-2 lg:p-2 break-words max-w-[120px] md:max-w-full"
+                              className="cursor-pointer text-blue-500 text-sm md:text-lg lg:text-lg font-bold pl-1 md:pl-0 lg:pl-0  p-0 md:p-2 lg:p-2 line-clamp-2 hover:line-clamp-none hover:max-w-full break-words max-w-[120px] md:max-w-full"
                               onClick={() => openModal(word)}
                             >
                               {" "}
                               {word.value}
                             </span>
 
-                            {/* <button
-                              onClick={() => pronounceWord(word.value)}
-                              className=" text-blue-500 hover:text-blue-700 ml-2"
-                            >
-                              🔊
-                            </button> */}
-                            <div className="flex gap-2">
+                            <div className="flex gap-1 md:gap-2 lg:gap-2">
                               <button
                                 onClick={() => pronounceWord(word.value)}
-                                className="text-blue-500 hover:text-blue-700 ml-2"
+                                className="text-blue-500 hover:text-blue-700 ml-0 md:ml-2 lg:ml-2 "
                               >
                                 🔊
                               </button>
@@ -610,10 +605,13 @@ const FavoritesList = () => {
                             </div>
                           </div>
                         </td>
-                        <td className="border border-gray-600 border-dotted p-2">
-                          {word.meaning?.join(", ")}
+                        <td className="border border-gray-600 border-dotted pl-1 p-0 md:p-2 lg:p-2">
+                          {/* {word.meaning?.join(", ")} */}
+                          <span className="text-sm md:text-lg lg:text-lg line-clamp-2 hover:line-clamp-none break-words max-w-[120px] md:max-w-full">
+                            {word.meaning?.join(", ")}
+                          </span>
                         </td>
-                        <td className="border border-gray-600 border-dotted  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
+                        <td className="border border-gray-600 border-dotted  p-1 md:p-2 lg:p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
                           <div className="flex flex-wrap gap-1">
                             {word.synonyms?.map((synonym, index) => (
                               <span
@@ -628,7 +626,7 @@ const FavoritesList = () => {
                           </div>
                         </td>
 
-                        <td className="border border-gray-600 border-dotted  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
+                        <td className="border border-gray-600 border-dotted  p-1 md:p-2 lg:p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
                           <div className="flex flex-wrap gap-1">
                             {word.antonyms?.map((antonym, index) => (
                               <span
@@ -641,7 +639,7 @@ const FavoritesList = () => {
                             ))}
                           </div>
                         </td>
-                        <td className="border border-gray-600 border-dotted  p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
+                        <td className="border border-gray-600 border-dotted  p-1 md:p-2 lg:p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
                           <div className="flex flex-wrap gap-1">
                             {word.similarWords?.map((similarWord, index) => (
                               <span
@@ -657,7 +655,7 @@ const FavoritesList = () => {
                           </div>
                         </td>
 
-                        <td className="border border-gray-600 border-dotted p-2 text-center">
+                        <td className="border border-gray-600 border-dotted p-1 md:p-2 lg:p-2 text-center">
                           <button
                             onClick={() => handleRemoveFavorite(word.id)}
                             className="text-red-700 hover:text-red-500 font-bold py-1 px-1 rounded"
