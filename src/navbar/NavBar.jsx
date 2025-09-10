@@ -149,7 +149,7 @@ const NavBar = () => {
               <Link
                 to="/words"
                 onClick={() => setIsMenuOpen(false)}
-                className=" btn btn-sm btn-primary w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
+                className=" btn btn-sm btn-info w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
               >
                 Vocabulary
               </Link>
@@ -157,7 +157,7 @@ const NavBar = () => {
                 onClick={() => setIsMenuOpen(false)}
                 to="/favorites"
                 // className="hidden md:block lg:block h-8 w-8 mt-1"
-                className="flex md:hidden lg:hidden btn btn-sm btn-primary  w-full md:w-auto text-center "
+                className="flex md:hidden lg:hidden btn btn-sm btn-info  w-full md:w-auto text-center "
               >
                 Favorites
               </Link>
@@ -194,7 +194,7 @@ const NavBar = () => {
                   setIsMenuOpen(false);
                 }}
                 to="/create-word"
-                className="btn btn-sm btn-primary  w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
+                className="btn btn-sm btn-info  w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
               >
                 Create Word
               </Link>
@@ -203,7 +203,7 @@ const NavBar = () => {
                   setIsMenuOpen(false);
                 }}
                 to="/create-conversation"
-                className="btn btn-sm btn-primary  w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
+                className="btn btn-sm btn-info  w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
               >
                 Create Conv
               </Link>
@@ -212,7 +212,7 @@ const NavBar = () => {
                   setIsMenuOpen(false);
                 }}
                 to="update-conversation"
-                className="btn btn-sm btn-primary w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
+                className="btn btn-sm btn-info w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
               >
                 Update Conv
               </Link>
@@ -225,7 +225,7 @@ const NavBar = () => {
                   setIsMenuOpen(false);
                 }}
                 to="/update-basic-user-status"
-                className="btn btn-sm btn-success w-full md:w-auto text-center text-slate-950 font-bold flex justify-center items-center md:hidden lg:hidden"
+                className="btn btn-sm btn-info w-full md:w-auto text-center text-slate-950 font-bold flex justify-center items-center md:hidden lg:hidden"
               >
                 Users
               </Link>
@@ -238,7 +238,7 @@ const NavBar = () => {
                   setIsMenuOpen(false);
                 }}
                 to="/update-user-status"
-                className="btn btn-sm btn-success w-full md:w-auto text-center text-slate-950 font-bold flex justify-center items-center md:hidden lg:hidden"
+                className="btn btn-sm btn-info w-full md:w-auto text-center text-slate-950 font-bold flex justify-center items-center md:hidden lg:hidden"
               >
                 Users
               </Link>
@@ -257,7 +257,7 @@ const NavBar = () => {
                   handleCreateTopic();
                   setIsMenuOpen(false);
                 }}
-                className="btn btn-sm btn-primary  w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden "
+                className="btn btn-sm btn-info  w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden "
               >
                 Create Topic
               </Link>
