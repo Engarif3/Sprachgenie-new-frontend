@@ -258,7 +258,12 @@ const UpdateUserStatus = () => {
                           <th className="p-2 text-center">Email</th>
                           <th className="p-2 text-center">Role</th>
                           <th className="p-2 text-center">Action</th>
-                          <th className="p-2 text-center">Created At</th>
+                           <th className="p-2 text-center hidden lg:table-cell">
+                        Created at <br />
+                        <span className="text-sm font-thin ">
+                          DD:MM:YYYY-HH:MM:SS
+                        </span>
+                      </th>
                         </tr>
                       </thead>
                       <tbody>
