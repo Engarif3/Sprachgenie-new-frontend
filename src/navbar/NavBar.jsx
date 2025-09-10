@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Container from "../utils/Container";
 import Swal from "sweetalert2";
@@ -13,6 +13,26 @@ const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo() || {};
+  const menuRef = useRef(null);
+
+  // Close menu if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMenuOpen]);
 
   const handleCreateTopic = () => {
     Swal.fire({
@@ -90,6 +110,7 @@ const NavBar = () => {
         </div>
         {/* Navigation Links */}
         <div
+          ref={menuRef}
           className={`${
             isMenuOpen ? "flex" : "hidden"
           } md:flex flex-col md:flex-row rounded-lg items-center gap-3 md:gap-4 lg:gap-16 w-full md:w-auto px-4 mt-2 md:mt-0 absolute md:static top-full left-0 z-10 py-4 md:py-0 bg-stone-800 md:bg-transparent lg:bg-transparent bg-opacity-90 `}
