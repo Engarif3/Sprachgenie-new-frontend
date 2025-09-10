@@ -20,6 +20,7 @@ import { getFromStorage, setToStorage } from "../../../utils/storage";
 import FavoriteButton from "../Modals/FavoriteButton";
 import aiApi from "../../../AI_axios";
 import { PuffLoader } from "react-spinners";
+import { IoSearch } from "react-icons/io5";
 
 // Cache key constants
 const CACHE_KEY = "wordListCache";
@@ -489,24 +490,210 @@ const WordList = () => {
     [levels]
   );
 
-  const topicOptions = useMemo(() => {
-    return filteredTopics.map((topic) => {
-      const level = levels.find((lvl) => lvl.id === topic.levelId);
-      const levelName = level ? level.level : "N/A";
+  // ====== with filtering by default B1,A2....
+  // const topicOptions = useMemo(() => {
+  //   return filteredTopics.map((topic) => {
+  //     const level = levels.find((lvl) => lvl.id === topic.levelId);
+  //     const levelName = level ? level.level : "N/A";
 
-      // Only show levelName if levelId is not 6
-      return (
+  //     // Only show levelName if levelId is not 6
+  //     return (
+  //       <option
+  //         key={topic.id}
+  //         value={topic.name}
+  //         className="text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white"
+  //       >
+  //         {level && level.id !== 6 ? levelName : ""}
+  //         {level && level.id !== 6 ? <> &#128313;</> : ""} {topic.name}
+  //       </option>
+  //     );
+  //   });
+  // }, [filteredTopics, levels]);
+
+  // ====== with filtering by default A1,A2....
+  // const topicOptions = useMemo(() => {
+  //   // Sort topics by level only (by level ID)
+  //   const sortedTopics = [...filteredTopics].sort((a, b) => {
+  //     const levelA = levels.find((lvl) => lvl.id === a.levelId);
+  //     const levelB = levels.find((lvl) => lvl.id === b.levelId);
+
+  //     // If both levels exist, sort by level ID
+  //     if (levelA && levelB) {
+  //       return levelA.id - levelB.id;
+  //     }
+
+  //     // If one level doesn't exist, keep original order
+  //     return 0;
+  //   });
+
+  //   return sortedTopics.map((topic) => {
+  //     const level = levels.find((lvl) => lvl.id === topic.levelId);
+  //     const levelName = level ? level.level : "N/A";
+
+  //     return (
+  //       <option
+  //         key={topic.id}
+  //         value={topic.name}
+  //         className="text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white"
+  //       >
+  //         {level && level.id !== 6 ? levelName : ""}
+  //         {level && level.id !== 6 ? <> &#128313;</> : ""} {topic.name}
+  //       </option>
+  //     );
+  //   });
+  // }, [filteredTopics, levels]);
+
+  // ====== with filtering by default A1,A2... and with topics separator by ---------
+  // const topicOptions = useMemo(() => {
+  //   // Sort topics by level only (by level ID)
+  //   const sortedTopics = [...filteredTopics].sort((a, b) => {
+  //     const levelA = levels.find((lvl) => lvl.id === a.levelId);
+  //     const levelB = levels.find((lvl) => lvl.id === b.levelId);
+
+  //     if (levelA && levelB) {
+  //       return levelA.id - levelB.id;
+  //     }
+
+  //     return 0;
+  //   });
+
+  //   let lastLevelId = null;
+  //   const optionsWithSeparators = [];
+
+  //   sortedTopics.forEach((topic) => {
+  //     const level = levels.find((lvl) => lvl.id === topic.levelId);
+
+  //     // Add horizontal line when level changes
+  //     if (level && level.id !== lastLevelId && lastLevelId !== null) {
+  //       optionsWithSeparators.push(
+  //         <option
+  //           key={`separator-${level.id}`}
+  //           disabled
+  //           className="bg-gray-700 text-gray-400 text-center border-t border-stone-800 cursor-default"
+  //         >
+  //           -------------------------------------
+  //         </option>
+  //       );
+  //     }
+
+  //     lastLevelId = level ? level.id : null;
+
+  //     const levelName = level ? level.level : "N/A";
+
+  //     optionsWithSeparators.push(
+  //       <option
+  //         key={topic.id}
+  //         value={topic.name}
+  //         className="text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white"
+  //       >
+  //         {/* {level && level.id !== 6 ? levelName : ""}
+  //         {level && level.id !== 6 ? <> &#128313;</> : ""} {topic.name} */}
+  //         {level ? levelName : ""}
+  //         {level ? <> &#128313;</> : ""} {topic.name}
+  //       </option>
+  //     );
+  //   });
+
+  //   // Add space after the last topic
+  //   if (optionsWithSeparators.length > 0) {
+  //     optionsWithSeparators.push(
+  //       <option
+  //         key="bottom-space"
+  //         disabled
+  //         className="bg-gray-700 h-4  cursor-default"
+  //       >
+  //         &nbsp;
+  //       </option>
+  //     );
+  //   }
+
+  //   return optionsWithSeparators;
+  // }, [filteredTopics, levels]);
+
+  const topicOptions = useMemo(() => {
+    // For each level, we need to include the "Unknown" topic (id: 1)
+    // but show it with the current selected level's prefix
+
+    const sortedTopics = [...filteredTopics].sort((a, b) => {
+      // Put Unknown topic (id: 1) at the end of each level group
+      if (a.id === 1) return 1;
+      if (b.id === 1) return -1;
+
+      const levelA = levels.find((lvl) => lvl.id === a.levelId);
+      const levelB = levels.find((lvl) => lvl.id === b.levelId);
+
+      if (levelA && levelB) {
+        return levelA.id - levelB.id;
+      }
+
+      return 0;
+    });
+
+    let lastLevelId = null;
+    const optionsWithSeparators = [];
+
+    sortedTopics.forEach((topic) => {
+      const level = levels.find((lvl) => lvl.id === topic.levelId);
+
+      // Add horizontal line when level changes
+      if (level && level.id !== lastLevelId && lastLevelId !== null) {
+        optionsWithSeparators.push(
+          <option
+            key={`separator-${level.id}`}
+            disabled
+            className="bg-gray-700 text-gray-400 text-center border-t border-gray-500 cursor-default"
+          >
+            -------------------------------------
+          </option>
+        );
+      }
+
+      lastLevelId = level ? level.id : null;
+
+      // Special handling for Unknown topic - use selected level or "All Levels"
+      if (topic.id === 1) {
+        const displayLevel = selectedLevel ? selectedLevel : "All";
+        optionsWithSeparators.push(
+          <option
+            key={topic.id}
+            value={topic.name}
+            className="text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white"
+          >
+            {displayLevel} &#128313; {topic.name}
+          </option>
+        );
+        return;
+      }
+
+      const levelName = level ? level.level : "Unknown Level";
+
+      optionsWithSeparators.push(
         <option
           key={topic.id}
           value={topic.name}
           className="text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white"
         >
-          {level && level.id !== 6 ? levelName : ""}
-          {level && level.id !== 6 ? <> &#128313;</> : ""} {topic.name}
+          {levelName}
+          {level ? <> &#128313;</> : ""} {topic.name}
         </option>
       );
     });
-  }, [filteredTopics, levels]);
+
+    // Add space after the last topic
+    if (optionsWithSeparators.length > 0) {
+      optionsWithSeparators.push(
+        <option
+          key="bottom-space"
+          disabled
+          className="bg-gray-700 h-4 cursor-default"
+        >
+          &nbsp;
+        </option>
+      );
+    }
+
+    return optionsWithSeparators;
+  }, [filteredTopics, levels, selectedLevel]); // Added selectedLevel to dependencies
 
   // Update the toggleView function
   const toggleView = useCallback(() => {
@@ -621,19 +808,27 @@ const WordList = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 gap-4 mt-4 md:mt-0 ">
         {/* Search Input */}
-        <div className="w-full">
+        <div className="w-full relative group ">
           <div className="flex">
             <input
               type="text"
               placeholder="Search for a word"
               value={searchValue}
-              onChange={handleSearchInputChange}
-              className="border rounded-l-lg px-2 py-2 w-full md:w-auto flex-1 "
+              // onChange={handleSearchInputChange}
+              onChange={(e) => {
+                const value = e.target.value.replace(/^\s+/, ""); // Remove leading spaces
+                setSearchValue(value);
+              }}
+              className="border rounded px-2 py-2 w-full md:w-auto flex-1 pl-12 "
               // style={{ caretColor: "transparent" }}
             />
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 shrink-0">
+            {/* <button className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 shrink-0">
               Search
-            </button>
+            </button> */}
+            <IoSearch
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 scale-x-[-1] text-gray-500 group-focus-within:hidden"
+              size={30}
+            />
           </div>
         </div>
 
@@ -652,14 +847,18 @@ const WordList = () => {
         </div>
 
         {/* Topic Select */}
-        <div className="w-full">
+        <div className="w-full ">
           <div className="flex flex-col md:flex-row items-center gap-2">
             <select
               value={selectedTopic}
               onChange={handleTopicChange}
-              className="border rounded px-4 py-2 w-full"
+              className="border rounded px-4 py-2 w-full  "
             >
-              <option value="">All Topics</option>
+              {/* <option value=""> `All Topics for {selectedLevel} Level`</option> */}
+              <option value="">
+                {" "}
+                {selectedLevel ? `Topics for  ${selectedLevel} ` : "All Topics"}
+              </option>
 
               {topicOptions}
             </select>
@@ -697,34 +896,34 @@ const WordList = () => {
               <thead>
                 <tr className="bg-stone-800 text-md md:text-xl lg:text-lg text-white ">
                   {/* ... existing header cells ... */}
-                  <th className=" border-gray-400  text-sm md:text-lg lg:text-lg   p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[3%] lg:w-[3%] rounded-tl-md">
+                  <th className=" border-gray-400  py-2  text-sm md:text-lg lg:text-lg    text-center w-[15%] md:w-[3%] lg:w-[3%] rounded-tl-md">
                     Article
                   </th>
-                  <th className="border-l border-gray-400 border-dotted p-0 md:p-1 lg:p-1  text-center w-[15%] md:w-[10%] lg:w-[10%] ">
+                  <th className="border-l  py-2 border-gray-400 border-dotted   text-center w-[15%] md:w-[10%] lg:w-[10%] ">
                     Word
                   </th>
 
-                  <th className="border-l border-gray-400 border-dotted  p-0 md:p-1 lg:p-1  text-center w-[10%] md:w-[25%] lg:w-[25%]">
+                  <th className="border-l  py-2 border-gray-400 border-dotted   text-center w-[10%] md:w-[25%] lg:w-[25%]">
                     Meaning
                   </th>
-                  <th className="border-l border-gray-400 border-dotted p-0 md:p-1 lg:p-1  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                  <th className="border-l  py-2 border-gray-400 border-dotted  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                     Synonym
                   </th>
-                  <th className="border-l border-gray-400 border-dotted  p-0 md:p-1 lg:p-1  text-center hidden lg:table-cell xl:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                  <th className="border-l  py-2 border-gray-400 border-dotted   text-center hidden lg:table-cell xl:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                     Antonym
                   </th>
-                  <th className="border-l border-gray-400 border-dotted p-0 md:p-1 lg:p-1 text-center hidden lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                  <th className="border-l  py-2 border-gray-400 border-dotted text-center hidden lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                     Word to Watch
                   </th>
                   <th
-                    className={`border-l border-dotted hidden md:table-cell lg:table-cell border-gray-400 text-sm md:text-lg lg:text-lg  p-0 md:p-1 lg:p-1 text-center  w-[3%] md:w-[3%] lg:w-[3%] ${
+                    className={`border-l border-dotted hidden md:table-cell lg:table-cell  py-2 border-gray-400 text-sm md:text-lg lg:text-lg    text-center  w-[3%] md:w-[3%] lg:w-[3%] ${
                       userLoggedIn ? "" : "rounded-tr-md"
                     }`}
                   >
                     Level
                   </th>
                   <th
-                    className={`border-l  border-dotted border-gray-400 p-1 text-center ${
+                    className={`border-l  py-2 border-dotted border-gray-400  text-center ${
                       showActionColumn ? "table-cell" : "hidden"
                     } `}
                   >
@@ -735,7 +934,7 @@ const WordList = () => {
                     //   userInfo.role === "admin" ||
                     //   userInfo.role === "super_admin") && (
                     <th
-                      className={`border-l border-dotted border-gray-400 text-sm md:text-lg lg:text-lg  p-0 md:p-1 lg:p-1 text-center  w-[3%] md:w-[3%] lg:w-[3%] ${
+                      className={`border-l border-dotted border-gray-400 text-sm md:text-lg lg:text-lg   py-2 text-center  w-[3%] md:w-[3%] lg:w-[3%] ${
                         userInfo.role === "basic_user" ? "rounded-tr-md" : ""
                       }`}
                     >
@@ -747,7 +946,7 @@ const WordList = () => {
                       userInfo.role === "admin") && (
                       <>
                         <th
-                          className={`border-l border-dotted hidden md:table-cell lg:table-cell border-gray-400 text-sm md:text-lg lg:text-lg  p-0 md:p-1 lg:p-1 text-center   w-[3%] md:w-[3%] lg:w-[3%] ${
+                          className={`border-l py-2 border-dotted hidden md:table-cell lg:table-cell border-gray-400 text-sm md:text-lg lg:text-lg  text-center   w-[3%] md:w-[3%] lg:w-[3%] ${
                             userInfo.role !== "basic_user"
                               ? "rounded-tr-md"
                               : ""
@@ -766,43 +965,33 @@ const WordList = () => {
                   filteredWords.map((word, index) => (
                     <tr
                       key={word.id}
-                      className={index % 2 === 0 ? "bg-white" : "bg-gray-300"}
+                      className={index % 2 === 0 ? "bg-white " : "bg-gray-300"}
                     >
                       {/* Table cells remain the same */}
-                      <td className=" border-gray-400  p-2 font-semibold text-orange-600 text-center">
+                      <td className=" border-gray-400 p-0 md:p-2 lg:p-2 font-semibold text-orange-600 text-center text-sm md:text-lg lg:text-lg">
                         {word.article?.name}
                       </td>
+
+                      {/* word value starts here */}
                       <td className="border-l border-gray-400  p-2 capitalize border-dotted">
                         {/* Move the onClick to the span that contains the word */}
                         <div className="flex justify-between">
                           <span
-                            className="cursor-pointer text-blue-500 text-base sm:text-lg font-bold "
+                            // className="cursor-pointer text-blue-500  text-sm md:text-lg lg:text-lg  font-bold "
+                            className="cursor-pointer p-0 md:p-2 lg:p-2 text-blue-500 text-sm md:text-lg lg:text-lg font-bold break-words max-w-[120px] md:max-w-full"
                             onClick={() => openModal(word)}
                           >
                             {word.value}
                           </span>
 
-                          <div className="flex gap-4 ">
+                          <div className="flex gap-1 md:gap-4 lg:gap-4 ">
                             <button
                               onClick={() => pronounceWord(word.value)}
-                              className=" text-blue-500 hover:text-blue-700 ml-2 "
+                              className=" text-blue-500 hover:text-blue-700 ml-0 md:ml-2 lg:ml-2 "
                             >
                               🔊
                             </button>
-                            {/* <div
-                              onClick={() => generateParagraph(word)}
-                              className="border-2 bg-green-700 text-white italic px-1 text-sm rounded-full mt-4 cursor-pointer hover:scale-105 hover:bg-green-600 hover:text-white border-orange-500"
-                              disabled={loadingParagraphs[word.id]}
-                            >
-                              {loadingParagraphs[word.id] ? (
-                                <PuffLoader
-                                  size={24}
-                                  className="rounded-full "
-                                />
-                              ) : (
-                                "ai"
-                              )}
-                            </div> */}
+
                             {userLoggedIn && (
                               <div
                                 onClick={() => generateParagraph(word)}
@@ -831,11 +1020,11 @@ const WordList = () => {
                           </div>
                         </div>
                       </td>
-
+                      {/* word meaning starts here */}
                       <td
-                        className={`border-l border-gray-400 border-dotted  p-2 text-base sm:text-lg ${
+                        className={`border-l border-gray-400 border-dotted pl-1  p-0 md:p-2 lg:p-2 text-sm md:text-lg lg:text-lg${
                           learningMode && index === currentIndex
-                            ? "bg-sky-700 text-white font-bold"
+                            ? "bg-sky-700 text-white font-bold "
                             : "text-sky-800 font-serif"
                         }`}
                         onClick={() => learningMode && revealMeaning(word.id)}
@@ -846,7 +1035,8 @@ const WordList = () => {
                         {learningMode && !revealedWords.includes(word.id) ? (
                           <span className="opacity-0">Hidden</span>
                         ) : (
-                          <span className="line-clamp-2 hover:line-clamp-none  ">
+                          // <span className="line-clamp-2 hover:line-clamp-none  ">
+                          <span className="line-clamp-2 hover:line-clamp-none break-words max-w-[120px] md:max-w-full">
                             {word.meaning?.join(", ")}
                           </span>
                         )}
@@ -927,7 +1117,7 @@ const WordList = () => {
                       {/* ======== */}
                       {/* // favorites */}
                       {userLoggedIn && (
-                        <td className="border-l border-r border-gray-400 border-dotted p-1 text-center ">
+                        <td className="border-l border-r border-gray-400 border-dotted p-0 md:p-1 lg:p-1 text-center ">
                           <FavoriteButton
                             isFavorite={favorites.includes(word.id)}
                             loading={loadingFavorites[word.id]}
