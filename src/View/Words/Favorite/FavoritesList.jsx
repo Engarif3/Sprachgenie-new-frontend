@@ -711,7 +711,7 @@ const FavoritesList = () => {
       {/* =======AI modal=============== */}
       {isAIModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full md:w-1/2 lg:w-1/2  px-4 mx-2">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full md:w-1/2 lg:w-1/2 max-h-[90vh] overflow-y-auto   px-1 md:px-4 lg:px-4 mx-2">
             <h2 className="text-2xl md:text-5xl lg:text-5xl font-bold  text-center mb-2">
               <span className="text-orange-600">
                 {" "}
@@ -721,13 +721,16 @@ const FavoritesList = () => {
               </span>
               <span className="text-slate-800 capitalize">{aiWord?.value}</span>
             </h2>
-            <p className="text-center text-cyan-800 text-2xl mb-6">
-              {/* [{aiWord?.meaning || ""}] */}[
-              {Array.isArray(aiWord?.meaning)
-                ? aiWord.meaning.join(", ")
-                : aiWord?.meaning || ""}
-              ]
-            </p>
+            <div className="flex justify-center">
+              <p className="text-justify text-cyan-800 text-2xl mb-6  px-1 md:px-4 lg:px-4 mx-2">
+                {/* [{aiWord?.meaning || ""}] */}
+                <span className="text-pink-600 font-semibold text-3xl">[</span>
+                {Array.isArray(aiWord?.meaning)
+                  ? aiWord.meaning.join(", ")
+                  : aiWord?.meaning || ""}
+                <span className="text-pink-600 font-semibold text-3xl">]</span>
+              </p>
+            </div>
 
             <p className="whitespace-pre-line text-xl md:text-2xl lg:text-2xl  font-mono text-slate900 -md p-2">
               <div>
@@ -756,7 +759,7 @@ const FavoritesList = () => {
               </div>
             </p>
 
-            <div className="mt-8 flex justify-between">
+            <div className="mt-8 flex justify-between sticky bottom-0 mx-2">
               <button
                 onClick={() => setIsReportModalOpen(true)}
                 className="btn btn-sm btn-error "
