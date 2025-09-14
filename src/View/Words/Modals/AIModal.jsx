@@ -41,7 +41,8 @@ const AIModal = ({ isOpen, aiWord, selectedParagraph, onClose }) => {
       setReportMessage("");
     } catch (error) {
       const errorMessage = error.response?.data?.error || error.message;
-      Swal.fire("Error", errorMessage, "error");
+      //   Swal.fire("Error", errorMessage, "error");
+      Swal.fire(errorMessage);
     } finally {
       setReportLoading(false);
     }
