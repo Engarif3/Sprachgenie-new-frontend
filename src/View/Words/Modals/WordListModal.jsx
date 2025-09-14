@@ -4,6 +4,7 @@ import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 import { pronounceWord } from "../../../utils/wordPronounciation";
 import FavoriteButton from "./FavoriteButton";
 import { RiCloseCircleFill } from "react-icons/ri";
+import { useLockBodyScroll } from "./ModalScrolling";
 
 const WordListModal = ({
   closeModal,
@@ -17,19 +18,40 @@ const WordListModal = ({
   const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo();
 
-  // Close on outside click
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        closeModal();
-      }
-    };
+  // // Close on outside click
+  // useEffect(() => {
+  //   const handleClickOutside = (event) => {
+  //     if (modalRef.current && !modalRef.current.contains(event.target)) {
+  //       closeModal();
+  //     }
+  //   };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [closeModal]);
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, [closeModal]);
+
+  // useEffect(() => {
+  //   // Lock scroll when component mounts
+  //   const originalOverflow = document.body.style.overflow;
+  //   const originalPaddingRight = document.body.style.paddingRight;
+
+  //   const scrollbarWidth =
+  //     window.innerWidth - document.documentElement.clientWidth;
+
+  //   document.body.style.overflow = "hidden";
+  //   if (scrollbarWidth > 0) {
+  //     document.body.style.paddingRight = `${scrollbarWidth}px`;
+  //   }
+
+  //   return () => {
+  //     // Restore on unmount
+  //     document.body.style.overflow = originalOverflow;
+  //     document.body.style.paddingRight = originalPaddingRight;
+  //   };
+  // }, []); // runs once when modal mounts, restores on unmount
+  useLockBodyScroll(!!selectedWord);
 
   if (!selectedWord) return null;
 
