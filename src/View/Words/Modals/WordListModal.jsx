@@ -1,10 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 import { pronounceWord } from "../../../utils/wordPronounciation";
 import FavoriteButton from "./FavoriteButton";
 import { RiCloseCircleFill } from "react-icons/ri";
 import { useLockBodyScroll } from "./ModalScrolling";
+import { IoMdArrowDropright } from "react-icons/io";
 
 const WordListModal = ({
   closeModal,
@@ -169,29 +170,90 @@ const WordListModal = ({
           <div className="text-lg text-gray-600">
             <span className=" text-sky-600 font-medium">Sentences:</span>
             {selectedWord.sentences && selectedWord.sentences.length > 0 ? (
-              <ul className="pl-5 space-y-2 list-disc">
+              // <ul className="pl-2 space-y-2 list-disc">
+              //   {selectedWord.sentences.map((sentence, index) => {
+              //     const trimmed = sentence.trim();
+              //     let className = "text-gray-600 list-disc";
+              //     let cleanSentence = sentence;
+
+              //     if (trimmed.startsWith("##")) {
+              //       className =
+              //         "font-semibold text-cyan-700 list-none text-center underline capitalize";
+              //       cleanSentence = sentence.replace(/^(\#\#|)\s*/, "");
+              //     } else if (trimmed.startsWith("**")) {
+              //       className =
+              //         " text-green-600 list-none text-sm first-letter:uppercase";
+              //       cleanSentence = sentence
+              //         .replace(/^\*\*\s*/, "-")
+              //         .replace(/\*\*$/, "")
+              //         .trim();
+              //     }
+
+              //     return (
+              //       <div
+              //         key={index}
+              //         className="text-gray-600 flex gap-1 items-start"
+              //       >
+              //         <button
+              //           onClick={() => pronounceWord(cleanSentence)}
+              //           className="text-blue-600 hover:text-blue-800 "
+              //           title="Pronounce"
+              //         >
+              //           🔊
+              //         </button>
+              //         <span> {cleanSentence}</span>
+              //       </div>
+              //     );
+              //   })}
+              // </ul>
+              <ul className=" space-y-2 list-disc">
                 {selectedWord.sentences.map((sentence, index) => {
                   const trimmed = sentence.trim();
-                  let className = "text-gray-600 list-disc";
+                  let className = "text-gray-600 list-disc ";
                   let cleanSentence = sentence;
 
+                  // Determine styling and clean sentence
                   if (trimmed.startsWith("##")) {
                     className =
-                      "font-semibold text-cyan-700 list-none text-center underline capitalize";
-                    cleanSentence = sentence.replace(/^(\#\#|)\s*/, "");
+                      "font-semibold text-cyan-700 list-none w-full text-center underline capitalize ";
+                    cleanSentence = sentence.replace(/^##\s*/, "");
                   } else if (trimmed.startsWith("**")) {
                     className =
-                      " text-green-600 list-none text-sm first-letter:uppercase";
+                      "text-green-600 list-none text-sm first-letter:uppercase";
                     cleanSentence = sentence
                       .replace(/^\*\*\s*/, "-")
                       .replace(/\*\*$/, "")
                       .trim();
                   }
 
+                  // Check if the speaker button should be hidden
+                  const showSpeakerButton =
+                    !trimmed.startsWith("##") && !trimmed.startsWith("**");
+
                   return (
-                    <li key={index} className={className}>
-                      {cleanSentence}
-                    </li>
+                    <div
+                      key={index}
+                      className="text-gray-600 flex  items-start"
+                    >
+                      {showSpeakerButton && (
+                        <span className="flex items-start">
+                          <button
+                            onClick={() => pronounceWord(cleanSentence)}
+                            className="text-blue-600 hover:text-blue-800"
+                            title="Pronounce"
+                          >
+                            🔊
+                          </button>
+                          <span>
+                            <IoMdArrowDropright
+                              className="text-pink-600 mt-1"
+                              size={20}
+                            />
+                          </span>
+                        </span>
+                      )}
+                      <span className={className}>{cleanSentence}</span>
+                    </div>
                   );
                 })}
               </ul>
