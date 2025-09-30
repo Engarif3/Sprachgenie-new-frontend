@@ -151,5 +151,10 @@ export default function DarkVeil({
     warpAmount,
     resolutionScale,
   ]);
-  return <canvas ref={ref} className="w-full h-full block" />;
+  return (
+    // <canvas ref={ref} className="w-full h-full hidden md:block lg:block" />
+    <div className="w-full h-full bg-sky-950 md:bg-transparent lg:bg-transparent">
+      <canvas ref={ref} className="w-full h-full hidden md:block lg:block" />
+    </div>
+  );
 }
