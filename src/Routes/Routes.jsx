@@ -260,6 +260,9 @@ const UserLimits = lazy(() => import("../AI/UserLimits"));
 const Usage = lazy(() => import("../AI/Usage"));
 const ReportsByUsers = lazy(() => import("../AI/ReportsByUsers"));
 
+//translator
+const Translator = lazy(() => import("../Translate/Translator"));
+
 // Helper to wrap lazy components with Suspense
 const withSuspense = (Component) => {
   return (props) => (
@@ -310,6 +313,9 @@ const UserLimitsWithSuspense = withSuspense(UserLimits);
 const UsageWithSuspense = withSuspense(Usage);
 const ReportsByUsersWithSuspense = withSuspense(ReportsByUsers);
 
+//translator
+const TranslatorWithSuspense = withSuspense(Translator);
+
 // Router
 export const router = createBrowserRouter([
   {
@@ -359,6 +365,8 @@ export const router = createBrowserRouter([
         element: <UsersFavoriteCountWithSuspense />,
       },
       { path: "/past-perfect", element: <PerfectAndPastFormWithSuspense /> },
+      //translator
+      { path: "/translator", element: <TranslatorWithSuspense /> },
       {
         path: "/dashboard",
         // element: <DashboardLayoutWithSuspense />,

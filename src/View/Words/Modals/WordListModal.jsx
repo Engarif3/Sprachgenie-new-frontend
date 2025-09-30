@@ -170,42 +170,6 @@ const WordListModal = ({
           <div className="text-lg text-gray-600">
             <span className=" text-sky-600 font-medium">Sentences:</span>
             {selectedWord.sentences && selectedWord.sentences.length > 0 ? (
-              // <ul className="pl-2 space-y-2 list-disc">
-              //   {selectedWord.sentences.map((sentence, index) => {
-              //     const trimmed = sentence.trim();
-              //     let className = "text-gray-600 list-disc";
-              //     let cleanSentence = sentence;
-
-              //     if (trimmed.startsWith("##")) {
-              //       className =
-              //         "font-semibold text-cyan-700 list-none text-center underline capitalize";
-              //       cleanSentence = sentence.replace(/^(\#\#|)\s*/, "");
-              //     } else if (trimmed.startsWith("**")) {
-              //       className =
-              //         " text-green-600 list-none text-sm first-letter:uppercase";
-              //       cleanSentence = sentence
-              //         .replace(/^\*\*\s*/, "-")
-              //         .replace(/\*\*$/, "")
-              //         .trim();
-              //     }
-
-              //     return (
-              //       <div
-              //         key={index}
-              //         className="text-gray-600 flex gap-1 items-start"
-              //       >
-              //         <button
-              //           onClick={() => pronounceWord(cleanSentence)}
-              //           className="text-blue-600 hover:text-blue-800 "
-              //           title="Pronounce"
-              //         >
-              //           🔊
-              //         </button>
-              //         <span> {cleanSentence}</span>
-              //       </div>
-              //     );
-              //   })}
-              // </ul>
               <ul className=" space-y-2 list-disc">
                 {selectedWord.sentences.map((sentence, index) => {
                   const trimmed = sentence.trim();
