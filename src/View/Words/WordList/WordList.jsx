@@ -69,9 +69,6 @@ const WordList = () => {
   const [selectedParagraph, setSelectedParagraph] = useState("");
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
 
-  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [reportMessage, setReportMessage] = useState("");
-
   //   =========AI ===============
 
   useEffect(() => {
@@ -159,20 +156,6 @@ const WordList = () => {
     topics: [],
     lastUpdated: null,
   });
-
-  // Initialize cache from localStorage on mount
-  //   useEffect(() => {
-  //     const savedCache = localStorage.getItem(CACHE_KEY);
-  //     if (savedCache) {
-  //       const parsedCache = JSON.parse(savedCache);
-  //       if (Date.now() - parsedCache.lastUpdated < CACHE_EXPIRY) {
-  //         setCache(parsedCache);
-  //         setLevels(parsedCache.levels);
-  //         setTopics(parsedCache.topics);
-  //         applyFilters(parsedCache.words); // Apply filters with cached data
-  //       }
-  //     }
-  //   }, []);
 
   useEffect(() => {
     (async () => {
@@ -491,130 +474,7 @@ const WordList = () => {
     [levels]
   );
 
-  // ====== with filtering by default B1,A2....
-  // const topicOptions = useMemo(() => {
-  //   return filteredTopics.map((topic) => {
-  //     const level = levels.find((lvl) => lvl.id === topic.levelId);
-  //     const levelName = level ? level.level : "N/A";
-
-  //     // Only show levelName if levelId is not 6
-  //     return (
-  //       <option
-  //         key={topic.id}
-  //         value={topic.name}
-  //         className="text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white"
-  //       >
-  //         {level && level.id !== 6 ? levelName : ""}
-  //         {level && level.id !== 6 ? <> &#128313;</> : ""} {topic.name}
-  //       </option>
-  //     );
-  //   });
-  // }, [filteredTopics, levels]);
-
-  // ====== with filtering by default A1,A2....
-  // const topicOptions = useMemo(() => {
-  //   // Sort topics by level only (by level ID)
-  //   const sortedTopics = [...filteredTopics].sort((a, b) => {
-  //     const levelA = levels.find((lvl) => lvl.id === a.levelId);
-  //     const levelB = levels.find((lvl) => lvl.id === b.levelId);
-
-  //     // If both levels exist, sort by level ID
-  //     if (levelA && levelB) {
-  //       return levelA.id - levelB.id;
-  //     }
-
-  //     // If one level doesn't exist, keep original order
-  //     return 0;
-  //   });
-
-  //   return sortedTopics.map((topic) => {
-  //     const level = levels.find((lvl) => lvl.id === topic.levelId);
-  //     const levelName = level ? level.level : "N/A";
-
-  //     return (
-  //       <option
-  //         key={topic.id}
-  //         value={topic.name}
-  //         className="text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white"
-  //       >
-  //         {level && level.id !== 6 ? levelName : ""}
-  //         {level && level.id !== 6 ? <> &#128313;</> : ""} {topic.name}
-  //       </option>
-  //     );
-  //   });
-  // }, [filteredTopics, levels]);
-
-  // ====== with filtering by default A1,A2... and with topics separator by ---------
-  // const topicOptions = useMemo(() => {
-  //   // Sort topics by level only (by level ID)
-  //   const sortedTopics = [...filteredTopics].sort((a, b) => {
-  //     const levelA = levels.find((lvl) => lvl.id === a.levelId);
-  //     const levelB = levels.find((lvl) => lvl.id === b.levelId);
-
-  //     if (levelA && levelB) {
-  //       return levelA.id - levelB.id;
-  //     }
-
-  //     return 0;
-  //   });
-
-  //   let lastLevelId = null;
-  //   const optionsWithSeparators = [];
-
-  //   sortedTopics.forEach((topic) => {
-  //     const level = levels.find((lvl) => lvl.id === topic.levelId);
-
-  //     // Add horizontal line when level changes
-  //     if (level && level.id !== lastLevelId && lastLevelId !== null) {
-  //       optionsWithSeparators.push(
-  //         <option
-  //           key={`separator-${level.id}`}
-  //           disabled
-  //           className="bg-gray-700 text-gray-400 text-center border-t border-stone-800 cursor-default"
-  //         >
-  //           -------------------------------------
-  //         </option>
-  //       );
-  //     }
-
-  //     lastLevelId = level ? level.id : null;
-
-  //     const levelName = level ? level.level : "N/A";
-
-  //     optionsWithSeparators.push(
-  //       <option
-  //         key={topic.id}
-  //         value={topic.name}
-  //         className="text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white"
-  //       >
-  //         {/* {level && level.id !== 6 ? levelName : ""}
-  //         {level && level.id !== 6 ? <> &#128313;</> : ""} {topic.name} */}
-  //         {level ? levelName : ""}
-  //         {level ? <> &#128313;</> : ""} {topic.name}
-  //       </option>
-  //     );
-  //   });
-
-  //   // Add space after the last topic
-  //   if (optionsWithSeparators.length > 0) {
-  //     optionsWithSeparators.push(
-  //       <option
-  //         key="bottom-space"
-  //         disabled
-  //         className="bg-gray-700 h-4  cursor-default"
-  //       >
-  //         &nbsp;
-  //       </option>
-  //     );
-  //   }
-
-  //   return optionsWithSeparators;
-  // }, [filteredTopics, levels]);
-
   const topicOptions = useMemo(() => {
-    // For each level, we need to include the "Unknown" topic (id: 1)
-    // but show it with the current selected level's prefix
-
     const sortedTopics = [...filteredTopics].sort((a, b) => {
       // Put Unknown topic (id: 1) at the end of each level group
       if (a.id === 1) return 1;
@@ -694,7 +554,7 @@ const WordList = () => {
     }
 
     return optionsWithSeparators;
-  }, [filteredTopics, levels, selectedLevel]); // Added selectedLevel to dependencies
+  }, [filteredTopics, levels, selectedLevel]);
 
   // Update the toggleView function
   const toggleView = useCallback(() => {
@@ -765,33 +625,6 @@ const WordList = () => {
   };
 
   // =============report================
-
-  // const handleReportSubmit = async () => {
-  //   if (!aiWord?.id) {
-  //     Swal.fire("Error", "Missing word ID", "error");
-  //     return;
-  //   }
-
-  //   try {
-  //     const response = await aiApi.post(`/paragraphs/report`, {
-  //       wordId: aiWord.id, // ✅ send wordId instead of paragraphId
-  //       userId: userInfo?.id ?? null, // optional
-  //       message: reportMessage?.trim() || null, // optional
-  //     });
-
-  //     Swal.fire(
-  //       "Reported",
-  //       response.data.message || "Report submitted",
-  //       "success"
-  //     );
-
-  //     setIsReportModalOpen(false);
-  //     setReportMessage("");
-  //   } catch (error) {
-  //     const errorMessage = error.response?.data?.error || error.message;
-  //     Swal.fire("Error", errorMessage, "error");
-  //   }
-  // };
 
   //   ==============AI===============
 
