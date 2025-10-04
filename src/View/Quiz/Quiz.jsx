@@ -1,7 +1,7 @@
 import Container from "../../utils/Container";
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { getFromStorage, setToStorage } from "../../utils/storage"; // adjust path
+import { getFromStorage, setToStorage } from "../../utils/storage";
 import api from "../../axios";
 import { pronounceWord } from "../../utils/wordPronounciation";
 const CACHE_KEY = "wordListCache";
