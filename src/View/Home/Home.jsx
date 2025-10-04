@@ -122,6 +122,11 @@ const Home = () => {
               text="Enrich your vocabulary"
               link="/stories"
             />
+            <HomeCard
+              title="Play Quiz"
+              text="Learn with fun with a friend or alone"
+              link="/quiz"
+            />
           </div>
         </div>
       </div>

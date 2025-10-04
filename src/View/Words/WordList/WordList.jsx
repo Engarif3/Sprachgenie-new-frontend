@@ -631,7 +631,12 @@ const WordList = () => {
   return (
     <Container>
       <h2 className="text-3xl font-bold font-mono text-white my-8 text-center hidden md:block">
-        Vocabulary Library <br />
+        <div className="flex justify-start">
+          <Link to="/quiz" className="btn btn-sm btn-info">
+            Play Quiz
+          </Link>
+        </div>
+        <p>Vocabulary Library</p> <br />
         <p className="text-xs text-pink-600 ">
           {" "}
           {userLoggedIn &&
