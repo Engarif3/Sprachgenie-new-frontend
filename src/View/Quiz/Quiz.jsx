@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { getFromStorage, setToStorage } from "../../utils/storage"; // adjust path
 import api from "../../axios";
+import { pronounceWord } from "../../utils/wordPronounciation";
 const CACHE_KEY = "wordListCache";
 const QUIZ_STORAGE_KEY = "quizState";
 const QUIZ_LENGTH = 30;
@@ -46,6 +47,10 @@ const Quiz = () => {
   const [scores, setScores] = useState({ player1: 0, player2: 0 });
   const [quizStarted, setQuizStarted] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [usedScores, setUsedScores] = useState({
+    player1: false,
+    player2: false,
+  });
 
   useEffect(() => {
     const init = async () => {
@@ -120,14 +125,23 @@ const Quiz = () => {
     );
   };
 
+  // const handleScore = (player, delta) => {
+  //   setScores((prev) => ({ ...prev, [player]: (prev[player] || 0) + delta }));
+  // };
+
   const handleScore = (player, delta) => {
+    // Prevent double scoring for same word
+    if (usedScores[player]) return;
+
     setScores((prev) => ({ ...prev, [player]: (prev[player] || 0) + delta }));
+    setUsedScores((prev) => ({ ...prev, [player]: true }));
   };
 
   const nextWord = () => {
     if (currentIndex + 1 < quizWords.length) {
       setCurrentIndex(currentIndex + 1);
       setShowMeaning(false);
+      setUsedScores({ player1: false, player2: false });
     } else {
       const finalScores = { ...scores };
       const winner =
@@ -160,6 +174,7 @@ const Quiz = () => {
       localStorage.setItem("quizScores", JSON.stringify(history));
 
       // Reset quiz
+      setUsedScores({ player1: false, player2: false });
       setQuizStarted(false);
       setQuizWords([]);
       localStorage.removeItem(QUIZ_STORAGE_KEY);
@@ -182,6 +197,7 @@ const Quiz = () => {
         setScores({ player1: 0, player2: 0 });
         setShowMeaning(false);
         setQuizStarted(false);
+        setUsedScores({ player1: false, player2: false });
         localStorage.removeItem(QUIZ_STORAGE_KEY);
       }
     });
@@ -189,9 +205,11 @@ const Quiz = () => {
 
   if (loading) {
     return (
-      <div className="p-4 bg-gray-800 text-white rounded min-h-screen flex  justify-center items-center">
-        <p>Loading words...</p>
-      </div>
+      <Container>
+        <div className="p-4 bg-gray-800 text-white rounded min-h-screen flex  justify-center items-center">
+          <p>Loading words...</p>
+        </div>
+      </Container>
     );
   }
 
@@ -299,6 +317,16 @@ const Quiz = () => {
         </h2>
 
         <div className="text-3xl font-bold mb-4 text-orange-600 text-center">
+          <button
+            onClick={() =>
+              pronounceWord(
+                currentWord?.article?.name + "" + currentWord?.value
+              )
+            }
+            className=" text-blue-500 hover:text-blue-700 ml-0 md:ml-2 lg:ml-2 "
+          >
+            🔊
+          </button>
           <span className="text-white mr-2">
             {" "}
             {currentWord?.article?.name || ""}
@@ -328,7 +356,7 @@ const Quiz = () => {
             <div className="font-bold">{player1}</div>
             <div className="text-xl">{scores.player1}</div>
             <div className="flex gap-3">
-              <button
+              {/* <button
                 onClick={() => handleScore("player1", -1)}
                 className="bg-red-500 px-4 rounded"
               >
@@ -337,6 +365,24 @@ const Quiz = () => {
               <button
                 onClick={() => handleScore("player1", 1)}
                 className="bg-green-500 px-4 rounded"
+              >
+                +
+              </button> */}
+              <button
+                onClick={() => handleScore("player1", -1)}
+                disabled={usedScores.player1}
+                className={`bg-red-500 px-4 rounded ${
+                  usedScores.player1 ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                -
+              </button>
+              <button
+                onClick={() => handleScore("player1", 1)}
+                disabled={usedScores.player1}
+                className={`bg-green-500 px-4 rounded ${
+                  usedScores.player1 ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
                 +
               </button>
@@ -349,7 +395,7 @@ const Quiz = () => {
               <div className="font-bold">{player2}</div>
               <div className="text-xl">{scores.player2}</div>
               <div className="flex gap-3">
-                <button
+                {/* <button
                   onClick={() => handleScore("player2", -1)}
                   className="bg-red-500 px-4 rounded"
                 >
@@ -360,13 +406,34 @@ const Quiz = () => {
                   className="bg-green-500 px-4 rounded"
                 >
                   +
+                </button> */}
+                <button
+                  onClick={() => handleScore("player2", -1)}
+                  disabled={usedScores.player2}
+                  className={`bg-red-500 px-4 rounded ${
+                    usedScores.player2 ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                >
+                  -
+                </button>
+                <button
+                  onClick={() => handleScore("player2", 1)}
+                  disabled={usedScores.player2}
+                  className={`bg-green-500 px-4 rounded ${
+                    usedScores.player2 ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                >
+                  +
                 </button>
               </div>
             </div>
           )}
         </div>
 
-        <button onClick={nextWord} className="btn btn-sm btn-info mt-4 md:mt-12 lg:mt-12">
+        <button
+          onClick={nextWord}
+          className="btn btn-sm btn-info mt-4 md:mt-12 lg:mt-12"
+        >
           Next Word
         </button>
       </div>
