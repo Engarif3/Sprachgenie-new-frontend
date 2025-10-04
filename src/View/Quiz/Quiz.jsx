@@ -294,7 +294,7 @@ const Quiz = () => {
             Reset
           </button>
         </div>
-        <h2 className="text-xl font-bold mb-12 text-center">
+        <h2 className="text-xl font-bold mb-0 md:mb-12 lg:mb-12 text-center">
           Word {currentIndex + 1} / {quizWords.length}
         </h2>
 
@@ -366,7 +366,7 @@ const Quiz = () => {
           )}
         </div>
 
-        <button onClick={nextWord} className="btn btn-sm btn-info mt-12">
+        <button onClick={nextWord} className="btn btn-sm btn-info mt-4 md:mt-12 lg:mt-12">
           Next Word
         </button>
       </div>
