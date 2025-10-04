@@ -317,12 +317,12 @@ const Quiz = () => {
 
         <button
           onClick={() => setShowMeaning(true)}
-          className="btn btn-sm btn-primary rounded mb-4 "
+          className="btn btn-sm btn-primary rounded "
         >
           Reveal Meaning
         </button>
 
-        <div className="flex justify-center w-10/12 md:w-8/12 lg:w-8/12 gap-8 mt-16 p-4">
+        <div className="flex justify-center w-10/12 md:w-8/12 lg:w-8/12 gap-8 mt-8 p-4">
           {/* Player 1 */}
           <div className="flex flex-col items-center gap-2 border rounded-md p-8 md:p-24 lg:p-24">
             <div className="font-bold">{player1}</div>
@@ -366,7 +366,7 @@ const Quiz = () => {
           )}
         </div>
 
-        <button onClick={nextWord} className="btn btn-sm btn-info mt-24">
+        <button onClick={nextWord} className="btn btn-sm btn-info mt-12">
           Next Word
         </button>
       </div>
