@@ -320,7 +320,9 @@ const Quiz = () => {
           <button
             onClick={() =>
               pronounceWord(
-                currentWord?.article?.name + "" + currentWord?.value
+                `${currentWord?.article?.name ?? ""} ${
+                  currentWord?.value ?? ""
+                }`.trim()
               )
             }
             className=" text-blue-500 hover:text-blue-700 ml-0 md:ml-2 lg:ml-2 "
