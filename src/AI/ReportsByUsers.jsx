@@ -1,3 +1,4 @@
+import Swal from "sweetalert2";
 import { useEffect, useState } from "react";
 import { getFromLocalStorage } from "../utils/local-storage";
 import { authKey } from "../constants/authkey";
@@ -12,6 +13,7 @@ const ReportsByUsers = () => {
   const [error, setError] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedMessage, setSelectedMessage] = useState(null);
+  const [regenerating, setRegenerating] = useState(null);
 
   const fetchReportsAndUsers = async () => {
     try {
@@ -62,6 +64,201 @@ const ReportsByUsers = () => {
     );
   };
 
+  // Re-generate handler
+
+  const handleRegenerate = async (report) => {
+    try {
+      // Step 1: Show confirmation dialog
+      const result = await Swal.fire({
+        title: `Re-generate AI for "${report.word}"?`,
+        text: "This will regenerate the AI content for this word.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, regenerate it!",
+        cancelButtonText: "Cancel",
+      });
+
+      // Step 2: Only proceed if user confirmed
+      if (!result.isConfirmed) return;
+
+      // Step 3: Show loading while API is in progress
+      Swal.fire({
+        title: "Regenerating...",
+        text: `Please wait while AI content for "${report.word}" is regenerated.`,
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      setRegenerating(report.wordId);
+      const freshToken = getFromLocalStorage(authKey);
+
+      // Step 4: Call the API
+      await aiApi.post(
+        "/paragraphs/regenerate",
+        {
+          userId: report.reports[0]?.userId,
+          wordId: report.wordId,
+          word: report.word,
+          level: report.level,
+          language: report.language,
+        },
+        {
+          headers: { Authorization: `Bearer ${freshToken}` },
+        }
+      );
+
+      // Step 5: Update frontend state (mark as regenerated)
+
+      setReports((prev) =>
+        prev.map((r) =>
+          r.wordId === report.wordId ? { ...r, regenerationRequired: false } : r
+        )
+      );
+
+      // Step 6: Close loading and show success
+      Swal.close();
+      Swal.fire({
+        icon: "success",
+        title: "Re-generated!",
+        text: `AI content for "${report.word}" has been regenerated successfully.`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error("Error regenerating:", err);
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: "Failed to re-generate word. Please try again.",
+      });
+    } finally {
+      setRegenerating(null);
+    }
+  };
+  // Add this at the top, inside ReportsByUsers component
+  const handleDeleteAllReports = async () => {
+    try {
+      const result = await Swal.fire({
+        title: "Delete All Reports?",
+        text: "This action cannot be undone.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete all!",
+        cancelButtonText: "Cancel",
+      });
+
+      if (!result.isConfirmed) return;
+
+      Swal.fire({
+        title: "Deleting...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      const freshToken = getFromLocalStorage(authKey);
+
+      await aiApi.delete("/paragraphs/delete-all-reports", {
+        headers: { Authorization: `Bearer ${freshToken}` },
+      });
+
+      setReports([]);
+      Swal.close();
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: "All reports have been deleted successfully.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error("Error deleting all reports:", err);
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: "Failed to delete all reports. Try again.",
+      });
+    }
+  };
+
+  const handleDeleteAllRegeneratedReports = async () => {
+    try {
+      const result = await Swal.fire({
+        title: "Delete All Regenerated Reports?",
+        text: "This will remove only reports linked to regenerated paragraphs.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete them!",
+        cancelButtonText: "Cancel",
+      });
+
+      if (!result.isConfirmed) return;
+
+      Swal.fire({
+        title: "Deleting...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      const freshToken = getFromLocalStorage(authKey);
+
+      await aiApi.delete("/paragraphs/delete-all-regenerated-reports", {
+        headers: { Authorization: `Bearer ${freshToken}` },
+      });
+
+      // Remove regenerated reports from frontend state
+      const updatedReports = reports
+        .map((r) => {
+          const filteredReports = r.reports.filter(
+            (rep) => r.regenerationRequired !== false // keep reports that are not regenerated
+          );
+          return {
+            ...r,
+            reports: filteredReports,
+            reportCount: filteredReports.length,
+          };
+        })
+        .filter((r) => r.reports.length > 0);
+
+      const anyDeleted =
+        updatedReports.length !== reports.length ||
+        reports.some((r) => r.reports.length !== r.reportCount);
+
+      setReports(updatedReports);
+      Swal.close();
+
+      if (anyDeleted) {
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: "All regenerated reports have been deleted successfully.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } else {
+        Swal.fire({
+          icon: "info",
+          title: "Nothing to delete",
+          text: "There were no regenerated reports to delete.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      }
+    } catch (err) {
+      console.error("Error deleting regenerated reports:", err);
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: "Failed to delete regenerated reports. Try again.",
+      });
+    }
+  };
+
+  // loading state
   if (loading)
     return (
       <p className="flex justify-center items-center  ">
@@ -82,7 +279,9 @@ const ReportsByUsers = () => {
   if (error) return <p className="text-red-600">{error}</p>;
   if (reports.length === 0)
     return (
-      <p className="flex justify-center items-center  ">No reports found.</p>
+      <p className="flex justify-center items-center text-2xl text-white mt-12">
+        No reports found.
+      </p>
     );
 
   return (
@@ -90,6 +289,22 @@ const ReportsByUsers = () => {
       <h2 className="text-md md:text-2xl lg:text-2xl font-bold mb-4 text-center  py-2 text-white bg-cyan-700  rounded">
         Reports By Users
       </h2>
+      <div className="flex justify-center gap-4 mb-4 ">
+        <button
+          onClick={handleDeleteAllReports}
+          className="btn btn-sm bg-red-600 text-white hover:bg-red-700"
+        >
+          Delete All Reports
+        </button>
+
+        <button
+          onClick={handleDeleteAllRegeneratedReports}
+          className="btn btn-sm bg-orange-500 text-white hover:bg-orange-600"
+        >
+          Delete All Regenerated Reports
+        </button>
+      </div>
+
       <div className="overflow-x-auto mt-12 bg-white">
         {/* Table */}
         <table className="table-auto w-full border border-gray-300 rounded-lg">
@@ -140,6 +355,29 @@ const ReportsByUsers = () => {
                       )}
                     </div>
                   ))}
+                </td>
+                {/* 🔹 Re-generate button */}
+
+                <td className="px-4 py-2 border text-center">
+                  <button
+                    onClick={() => handleRegenerate(r)}
+                    className={`btn btn-sm ${
+                      r.regenerationRequired === false
+                        ? // ? "bg-gray-400 text-white cursor-not-allowed"
+                          "bg-cyan-700 text-white "
+                        : "bg-red-600 text-white"
+                    }`}
+                    // disabled={
+                    //   regenerating === r.wordId ||
+                    //   r.regenerationRequired === false
+                    // }
+                  >
+                    {regenerating === r.wordId
+                      ? "Regenerating..."
+                      : r.regenerationRequired === false
+                      ? "Generated"
+                      : "Re-generate"}
+                  </button>
                 </td>
               </tr>
             ))}
