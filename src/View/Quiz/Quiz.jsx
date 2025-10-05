@@ -468,7 +468,7 @@ const Quiz = () => {
           Word {currentIndex + 1} / {quizWords.length}
         </h2>
 
-        <div className="text-3xl font-bold mb-4 text-orange-600 text-center">
+        <div className="text-xl md:text-3xl lg:text-3xl font-bold mb-4 text-orange-600 text-center">
           <button
             onClick={() =>
               pronounceWord(
@@ -488,7 +488,7 @@ const Quiz = () => {
           {currentWord?.value || "No word available"}
         </div>
 
-        <div className=" h-20">
+        <div className=" h-40">
           {showMeaning && (
             <div className=" text-yellow-300 text-center">
               {(currentWord?.meaning && currentWord.meaning.join(", ")) ||
@@ -504,7 +504,7 @@ const Quiz = () => {
           Reveal Meaning
         </button>
 
-        <div className="flex justify-center w-10/12 md:w-8/12 lg:w-8/12 gap-8 mt-8 p-4">
+        <div className="flex justify-center w-10/12 md:w-8/12 lg:w-8/12 gap-8 mt-6 p-4">
           {/* Player 1 */}
           <div className="flex flex-col items-center gap-2 border rounded-md p-8 md:p-24 lg:p-24">
             <div className="font-bold">{player1}</div>
