@@ -4,43 +4,107 @@ import Swal from "sweetalert2";
 import { getFromStorage, setToStorage } from "../../utils/storage";
 import api from "../../axios";
 import { pronounceWord } from "../../utils/wordPronounciation";
+
 const CACHE_KEY = "wordListCache";
 const QUIZ_STORAGE_KEY = "quizState";
 const QUIZ_LENGTH = 30;
-
 const CACHE_EXPIRY = 15 * 60 * 1000; // 15 mins
 
+// Updated Difficulty configuration with 3 levels
+const DIFFICULTY_LEVELS = {
+  1: { name: "Easy", description: "Level A1 & A2 words (Beginner)" },
+  2: {
+    name: "Difficult",
+    description: "Level B1 & B2 words (Intermediate/Advanced)",
+  },
+  3: {
+    name: "Easy + Difficult",
+    description: "All levels mixed together",
+  },
+};
+
 const loadWords = async () => {
-  const cachedData = await getFromStorage(CACHE_KEY);
-
-  if (cachedData && Date.now() - cachedData.lastUpdated < CACHE_EXPIRY) {
-    return cachedData.words || [];
-  }
-
-  // Fetch from API if cache empty or expired
   try {
+    const cachedData = await getFromStorage(CACHE_KEY);
+    console.log("Cached data:", cachedData);
+
+    if (
+      cachedData &&
+      cachedData.words &&
+      Date.now() - cachedData.lastUpdated < CACHE_EXPIRY
+    ) {
+      console.log("Using cached words");
+      return cachedData;
+    }
+
+    // Fetch from API if cache empty or expired
+    console.log("Fetching fresh data from API");
     const response = await api.get("/word/all?all=true");
-    const words = response.data.data.words || [];
+    console.log("API response:", response.data);
+
+    const words = response.data.data?.words || [];
+    const levels = response.data.data?.levels || [];
+    const topics = response.data.data?.topics || [];
+
     const newCache = {
       words,
-      levels: response.data.data.levels || [],
-      topics: response.data.data.topics || [],
+      levels,
+      topics,
       lastUpdated: Date.now(),
     };
 
+    console.log("Saving to storage:", newCache);
     await setToStorage(CACHE_KEY, newCache);
-    return words;
+    return newCache;
   } catch (error) {
     console.error("Error fetching words for quiz:", error);
-    return [];
+    return { words: [], levels: [], topics: [] };
+  }
+};
+
+// Updated filter function with 3 difficulty levels
+// From WordList: A1>level id:1, A2>id:2, B1>id:3, B2>id:4, C1>id:6
+const filterWordsByDifficulty = (words, difficulty) => {
+  if (!words.length) return [];
+
+  console.log(`Filtering ${words.length} words for difficulty ${difficulty}`);
+
+  switch (difficulty) {
+    case 1: // Easy - A1 (id:1) and A2 (id:2)
+      const easyWords = words.filter(
+        (word) => word.level?.id === 1 || word.level?.id === 2
+      );
+      console.log(`Found ${easyWords.length} easy words (A1 & A2)`);
+      return easyWords;
+    case 2: // Difficult - B1 (id:3) and B2 (id:4)
+      const hardWords = words.filter(
+        (word) => word.level?.id === 3 || word.level?.id === 4
+      );
+      console.log(`Found ${hardWords.length} hard words (B1 & B2)`);
+      return hardWords;
+    case 3: // Easy + Difficult - All levels (A1, A2, B1, B2, C1)
+      const allWords = words.filter(
+        (word) =>
+          word.level?.id === 1 ||
+          word.level?.id === 2 ||
+          word.level?.id === 3 ||
+          word.level?.id === 4 ||
+          word.level?.id === 6
+      );
+      console.log(`Found ${allWords.length} words from all levels`);
+      return allWords;
+    default:
+      return words;
   }
 };
 
 const Quiz = () => {
   const [mode, setMode] = useState(""); // "single" or "multi"
+  const [difficulty, setDifficulty] = useState(1); // Default to easy
   const [player1, setPlayer1] = useState("");
   const [player2, setPlayer2] = useState("");
   const [words, setWords] = useState([]);
+  const [allWords, setAllWords] = useState([]); // Store all words for filtering
   const [quizWords, setQuizWords] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMeaning, setShowMeaning] = useState(false);
@@ -56,20 +120,36 @@ const Quiz = () => {
     const init = async () => {
       setLoading(true);
 
-      // Load words (from cache or API)
-      const wordList = await loadWords();
-      setWords(wordList);
+      try {
+        // Load words (from cache or API)
+        const cachedData = await loadWords();
+        console.log("Loaded cached data:", cachedData);
 
-      // Load previous quiz state if exists
-      const savedState = JSON.parse(localStorage.getItem(QUIZ_STORAGE_KEY));
-      if (savedState) {
-        setMode(savedState.mode || "");
-        setPlayer1(savedState.player1);
-        setPlayer2(savedState.player2);
-        setQuizWords(savedState.quizWords);
-        setCurrentIndex(savedState.currentIndex);
-        setScores(savedState.scores);
-        setQuizStarted(savedState.quizStarted);
+        setAllWords(cachedData.words || []);
+
+        // Apply initial difficulty filter
+        const initialWords = filterWordsByDifficulty(
+          cachedData.words || [],
+          difficulty
+        );
+        setWords(initialWords);
+
+        // Load previous quiz state if exists
+        const savedState = JSON.parse(localStorage.getItem(QUIZ_STORAGE_KEY));
+        if (savedState) {
+          setMode(savedState.mode || "");
+          setDifficulty(savedState.difficulty || 1);
+          setPlayer1(savedState.player1);
+          setPlayer2(savedState.player2);
+          setQuizWords(savedState.quizWords);
+          setCurrentIndex(savedState.currentIndex);
+          setScores(savedState.scores);
+          setQuizStarted(savedState.quizStarted);
+        }
+      } catch (error) {
+        console.error("Error initializing quiz:", error);
+        setAllWords([]);
+        setWords([]);
       }
 
       setLoading(false);
@@ -78,11 +158,21 @@ const Quiz = () => {
     init();
   }, []);
 
+  // Update words when difficulty changes
+  useEffect(() => {
+    if (allWords.length > 0) {
+      //   console.log(`Difficulty changed to ${difficulty}, filtering words...`);
+      const filteredWords = filterWordsByDifficulty(allWords, difficulty);
+      setWords(filteredWords);
+    }
+  }, [difficulty, allWords]);
+
   // Save quiz state
   useEffect(() => {
     if (quizStarted) {
       const stateToSave = {
         mode,
+        difficulty,
         player1,
         player2,
         quizWords,
@@ -92,7 +182,16 @@ const Quiz = () => {
       };
       localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(stateToSave));
     }
-  }, [mode, player1, player2, quizWords, currentIndex, scores, quizStarted]);
+  }, [
+    mode,
+    difficulty,
+    player1,
+    player2,
+    quizWords,
+    currentIndex,
+    scores,
+    quizStarted,
+  ]);
 
   // Start quiz
   const startQuiz = () => {
@@ -105,6 +204,11 @@ const Quiz = () => {
       0,
       Math.min(QUIZ_LENGTH, words.length)
     );
+
+    console.log(
+      `Starting quiz with ${selectedWords.length} words for difficulty ${difficulty}`
+    );
+
     setQuizWords(selectedWords);
     setCurrentIndex(0);
     setScores({ player1: 0, player2: 0 });
@@ -115,6 +219,7 @@ const Quiz = () => {
       QUIZ_STORAGE_KEY,
       JSON.stringify({
         mode,
+        difficulty,
         player1: actualPlayer1,
         player2,
         quizWords: selectedWords,
@@ -124,10 +229,6 @@ const Quiz = () => {
       })
     );
   };
-
-  // const handleScore = (player, delta) => {
-  //   setScores((prev) => ({ ...prev, [player]: (prev[player] || 0) + delta }));
-  // };
 
   const handleScore = (player, delta) => {
     // Prevent double scoring for same word
@@ -157,14 +258,15 @@ const Quiz = () => {
         title: "Quiz Finished!",
         html:
           mode === "single"
-            ? `<p>${player1}: ${finalScores.player1}</p>`
-            : `<p>${player1}: ${finalScores.player1}</p><p>${player2}: ${finalScores.player2}</p><p>Winner: <strong>${winner}</strong></p>`,
+            ? `<p>${player1}: ${finalScores.player1}</p><p>Difficulty: ${DIFFICULTY_LEVELS[difficulty].name}</p>`
+            : `<p>${player1}: ${finalScores.player1}</p><p>${player2}: ${finalScores.player2}</p><p>Difficulty: ${DIFFICULTY_LEVELS[difficulty].name}</p><p>Winner: <strong>${winner}</strong></p>`,
         icon: "success",
       });
 
       const history = JSON.parse(localStorage.getItem("quizScores") || "[]");
       history.push({
         mode,
+        difficulty: DIFFICULTY_LEVELS[difficulty].name,
         player1: { name: player1, score: finalScores.player1 },
         ...(mode === "multi" && {
           player2: { name: player2, score: finalScores.player2 },
@@ -206,7 +308,7 @@ const Quiz = () => {
   if (loading) {
     return (
       <Container>
-        <div className="p-4 bg-gray-800 text-white rounded min-h-screen flex  justify-center items-center">
+        <div className="p-4 bg-gray-800 text-white rounded min-h-screen flex justify-center items-center">
           <p>Loading game data...</p>
         </div>
       </Container>
@@ -218,7 +320,7 @@ const Quiz = () => {
       // Mode selection screen
       return (
         <Container>
-          <div className="p-4 text-white rounded min-h-screen flex flex-col justify-center items-center  ">
+          <div className="p-4 text-white rounded min-h-screen flex flex-col justify-center items-center">
             <h2 className="text-2xl font-bold mb-6 text-center">Choose Mode</h2>
             <div className="flex gap-4">
               <button
@@ -239,11 +341,53 @@ const Quiz = () => {
       );
     }
 
-    // Player name input screen - only show for multiplayer
+    // Player name input screen with difficulty selection
     return (
       <Container>
-        <div className="p-4 text-white rounded min-h-screen flex flex-col justify-center items-center ">
+        <div className="p-4 text-white rounded min-h-screen flex flex-col justify-center items-center">
           <h2 className="text-2xl font-bold mb-4 text-center">Start Quiz</h2>
+
+          {/* Difficulty Selection */}
+          <div className="mb-6 w-full max-w-sm">
+            <label className="block text-center mb-2 font-bold">
+              Select Difficulty:
+            </label>
+            <div className="flex flex-col gap-2">
+              {Object.entries(DIFFICULTY_LEVELS).map(([level, config]) => (
+                <button
+                  key={level}
+                  onClick={() => setDifficulty(parseInt(level))}
+                  className={`p-3 rounded text-left ${
+                    difficulty === parseInt(level)
+                      ? "bg-blue-600 border-2 border-blue-400"
+                      : "bg-gray-700 hover:bg-gray-600"
+                  }`}
+                >
+                  <div className="font-bold">
+                    Level {level}: {config.name}
+                  </div>
+                  <div className="text-sm text-gray-300">
+                    {config.description}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Available words count */}
+          <div className="mb-4 text-center">
+            <p className="text-sm text-gray-300">
+              Available words for {DIFFICULTY_LEVELS[difficulty].name}:{" "}
+              {words.length}
+            </p>
+            {words.length < QUIZ_LENGTH && (
+              <p className="text-sm text-yellow-400 mt-1">
+                Not enough words for a full quiz. Quiz will use{" "}
+                {Math.min(words.length, QUIZ_LENGTH)} words.
+              </p>
+            )}
+          </div>
+
           <div className="flex flex-col gap-2 mb-4 w-full max-w-sm">
             {mode === "multi" ? (
               <>
@@ -278,7 +422,7 @@ const Quiz = () => {
                   : words.length === 0
               }
               onClick={startQuiz}
-              className="bg-blue-600 hover:bg-blue-700 p-2 rounded font-bold"
+              className="bg-blue-600 hover:bg-blue-700 p-2 rounded font-bold disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Start Quiz
             </button>
@@ -290,9 +434,10 @@ const Quiz = () => {
             </button>
           </div>
           {words.length === 0 && (
-            <p className="mt-4 text-red-400 text-center">
-              No words available for the quiz.
-            </p>
+            <div className="mt-4 text-red-400 text-center">
+              <p>No words available for the selected difficulty level.</p>
+              <p className="text-sm">Total words loaded: {allWords.length}</p>
+            </div>
           )}
         </div>
       </Container>
@@ -304,7 +449,13 @@ const Quiz = () => {
   return (
     <Container>
       <div className="p-2 bg-gray-800 text-white rounded min-h-screen flex flex-col items-center mt-4 mb-12">
-        <div className="w-full flex justify-end">
+        <div className="w-full flex justify-between items-center">
+          <div className="text-sm bg-gray-700 px-2 py-1 rounded">
+            Difficulty:{" "}
+            <span className="font-bold">
+              {DIFFICULTY_LEVELS[difficulty].name}
+            </span>
+          </div>
           <button
             onClick={resetQuiz}
             className="btn btn-sm btn-warning mb-4 mt-4"
@@ -312,7 +463,8 @@ const Quiz = () => {
             Reset
           </button>
         </div>
-        <h2 className="text-xl font-bold mb-0 md:mb-12 lg:mb-12 text-center">
+        <p className="text-sm italic text-pink-600 mb-2">Guess the meaning</p>
+        <h2 className="text-md font-bold mb-0 md:mb-12 lg:mb-12 text-center">
           Word {currentIndex + 1} / {quizWords.length}
         </h2>
 
@@ -358,18 +510,6 @@ const Quiz = () => {
             <div className="font-bold">{player1}</div>
             <div className="text-xl">{scores.player1}</div>
             <div className="flex gap-3">
-              {/* <button
-                onClick={() => handleScore("player1", -1)}
-                className="bg-red-500 px-4 rounded"
-              >
-                -
-              </button>
-              <button
-                onClick={() => handleScore("player1", 1)}
-                className="bg-green-500 px-4 rounded"
-              >
-                +
-              </button> */}
               <button
                 onClick={() => handleScore("player1", -1)}
                 disabled={usedScores.player1}
@@ -397,18 +537,6 @@ const Quiz = () => {
               <div className="font-bold">{player2}</div>
               <div className="text-xl">{scores.player2}</div>
               <div className="flex gap-3">
-                {/* <button
-                  onClick={() => handleScore("player2", -1)}
-                  className="bg-red-500 px-4 rounded"
-                >
-                  -
-                </button>
-                <button
-                  onClick={() => handleScore("player2", 1)}
-                  className="bg-green-500 px-4 rounded"
-                >
-                  +
-                </button> */}
                 <button
                   onClick={() => handleScore("player2", -1)}
                   disabled={usedScores.player2}
