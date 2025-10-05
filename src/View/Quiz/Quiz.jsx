@@ -207,7 +207,7 @@ const Quiz = () => {
     return (
       <Container>
         <div className="p-4 bg-gray-800 text-white rounded min-h-screen flex  justify-center items-center">
-          <p>Loading words...</p>
+          <p>Loading game data...</p>
         </div>
       </Container>
     );
