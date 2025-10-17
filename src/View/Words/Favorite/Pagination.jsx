@@ -100,7 +100,7 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
           <button
             onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
-            className="px-2 md:px-4 lg:px-4 py-1 md:py-2 lg:py-2 bg-sky-600 rounded disabled:opacity-50 hover:bg-sky-500 transition-colors"
+            className="px-2 md:px-4 lg:px-4 py-1 md:py-2 lg:py-2 bg-sky-500 rounded disabled:opacity-50 hover:bg-sky-400 transition-colors text-white font-semibold"
           >
             Prev
           </button>
@@ -138,7 +138,7 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
               setCurrentPage((prev) => Math.min(totalPages, prev + 1))
             }
             disabled={currentPage === totalPages}
-            className="px-2 md:px-4 lg:px-4 py-1 md:py-2 lg:py-2 bg-sky-600 rounded disabled:opacity-50 hover:bg-sky-500 transition-colors"
+            className="px-2 md:px-4 lg:px-4 py-1 md:py-2 lg:py-2 bg-sky-500 rounded disabled:opacity-50 hover:bg-sky-400 transition-colors text-white font-semibold"
           >
             Next
           </button>
