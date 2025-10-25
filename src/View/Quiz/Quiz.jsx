@@ -10,7 +10,6 @@ const QUIZ_STORAGE_KEY = "quizState";
 const QUIZ_LENGTH = 30;
 const CACHE_EXPIRY = 15 * 60 * 1000; // 15 mins
 
-// Updated Difficulty configuration with 3 levels
 const DIFFICULTY_LEVELS = {
   1: { name: "Easy", description: "Level A1 & A2 words (Beginner)" },
   2: {

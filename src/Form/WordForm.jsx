@@ -409,7 +409,7 @@ const WordForm = () => {
                     htmlFor="similarWords"
                     className="block text-sm font-medium text-white"
                   >
-                    Deceptive Words (comma separated, Optional)
+                    Word to Watch (comma separated, Optional)
                   </label>
                   <input
                     type="text"
@@ -428,7 +428,7 @@ const WordForm = () => {
         <div>
           <button
             type="submit"
-            className="w-full py-2 text-white font-medium bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 mt-8"
+            className="w-full py-2 text-white font-medium bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 my-8"
           >
             Submit
           </button>

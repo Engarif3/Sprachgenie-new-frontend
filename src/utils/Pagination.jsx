@@ -101,11 +101,11 @@ const Pagination = ({
                   // );
                 }}
                 disabled={currentPage === 1}
-                className="btn btn-sm btn-success  "
+                className="btn btn-sm border-none text-cyan-600"
               >
                 Prev
               </button>
-              <span className="text-sm md:text-lg text-white">
+              <span className="text-sm md:text-sm text-white">
                 <span className="hidden sm:inline">page </span>
                 {currentPage}
                 <span className="hidden sm:inline"> of </span>
@@ -114,8 +114,6 @@ const Pagination = ({
               </span>
               <button
                 onClick={() => {
-                  // if (debounceTimeout) clearTimeout(debounceTimeout);
-                  // setDebounceTimeout(
                   setTimeout(() => {
                     setCurrentPage((prevPage) =>
                       Math.min(prevPage + 1, totalPages)
@@ -124,7 +122,7 @@ const Pagination = ({
                   // );
                 }}
                 disabled={currentPage === totalPages}
-                className="btn btn-sm btn-success "
+                className="btn btn-sm border-none text-cyan-600"
               >
                 Next
               </button>

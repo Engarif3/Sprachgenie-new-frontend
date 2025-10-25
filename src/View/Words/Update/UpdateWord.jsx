@@ -613,8 +613,8 @@ const UpdateWord = () => {
             {/* Similar Words Section */}
             <div>
               <label className="block mb-2 text-white">
-                <span className="font-medium text-lg"> Deceptive Words</span>{" "}
-                (for multiple input use comma)
+                <span className="font-medium text-lg"> Word to Watch</span> (for
+                multiple input use comma)
               </label>
 
               <input

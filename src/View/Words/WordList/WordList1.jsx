@@ -22,12 +22,10 @@ import aiApi from "../../../AI_axios";
 import { PuffLoader } from "react-spinners";
 import { IoSearch } from "react-icons/io5";
 import AIModal from "../Modals/AIModal";
-import useDebounce from "../../../hooks/useDebounce";
 
 // Cache key constants
 const CACHE_KEY = "wordListCache";
 const CACHE_EXPIRY = 15 * 60 * 1000; // 15 minutes
-const WORDS_PER_PAGE = 40;
 
 const WordList = () => {
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
@@ -42,6 +40,7 @@ const WordList = () => {
   const [searchValue, setSearchValue] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("");
   const [levels, setLevels] = useState([]);
+  const [filteredWords, setFilteredWords] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState("");
   const [topics, setTopics] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -59,20 +58,19 @@ const WordList = () => {
   const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo() || {};
 
+  // console.log(userInfo);
+
   const [favorites, setFavorites] = useState([]);
 
-  // 	=========AI ===============
+  //   =========AI ===============
   const [aiWord, setAiWord] = useState(null);
   const [generatedParagraphs, setGeneratedParagraphs] = useState({});
   const [loadingParagraphs, setLoadingParagraphs] = useState({});
   const [selectedParagraph, setSelectedParagraph] = useState("");
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
 
-  // 	=========AI ===============
+  //   =========AI ===============
 
-  const debouncedSearchValue = useDebounce(searchValue, 300);
-
-  // useEffect for fetching favorites (Logic remains the same, good to leave)
   useEffect(() => {
     const fetchFavorites = async () => {
       if (
@@ -83,6 +81,7 @@ const WordList = () => {
 
       try {
         const response = await api.get(`/favorite-words/${userInfo.id}`);
+
         setFavorites(response.data.data.map((word) => word.id));
       } catch (error) {
         if (error.response) {
@@ -94,19 +93,25 @@ const WordList = () => {
         } else {
           console.error("Error fetching favorites:", error.message);
         }
+        // Ensure favorites array is always set
         setFavorites([]);
       }
     };
+
     fetchFavorites();
   }, [userInfo?.id]);
 
   const toggleFavorite = async (wordId) => {
     const isFavorite = favorites.includes(wordId);
+    // const baseURL =
+    //   "https://sprcahgenie-new-backend.vercel.app/api/v1/favorite-words";
     const userId = userInfo.id;
 
     try {
       setLoadingFavorites((prev) => ({ ...prev, [wordId]: true }));
+
       if (isFavorite) {
+        // Remove from favorites (DELETE request)
         await api.delete(`/favorite-words/${wordId}`, {
           data: { userId, wordId },
           headers: {
@@ -115,6 +120,7 @@ const WordList = () => {
         });
         setFavorites((prev) => prev.filter((id) => id !== wordId));
       } else {
+        // Add to favorites (POST request)
         await api.post(
           "/favorite-words",
           { userId, wordId },
@@ -131,6 +137,7 @@ const WordList = () => {
         "Error updating favorites:",
         error.response?.data || error.message
       );
+      // Optional: Show error to user
       Swal.fire({
         icon: "error",
         title: "Favorite Update Failed",
@@ -150,7 +157,6 @@ const WordList = () => {
     lastUpdated: null,
   });
 
-  // Load cache from storage on mount
   useEffect(() => {
     (async () => {
       const savedCache = await getFromStorage(CACHE_KEY);
@@ -158,24 +164,89 @@ const WordList = () => {
         setCache(savedCache);
         setLevels(savedCache.levels);
         setTopics(savedCache.topics);
-        // NO NEED to call applyFilters here, useMemo handles initial filter
+        applyFilters(savedCache.words);
       }
     })();
   }, []);
 
-  // Save cache to storage whenever it changes (Logic remains the same, good to leave)
+  // Save cache to localStorage whenever it changes
+  //   useEffect(() => {
+  //     localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+  //   }, [cache]);
+
   useEffect(() => {
     if (cache.words.length > 0) {
       setToStorage(CACHE_KEY, cache);
     }
   }, [cache]);
 
-  // REMOVED: The old applyFilters useCallback.
-  // The filtering logic is now split into two useMemo blocks.
+  // Memoized fetch functions
+
+  const applyFilters = useCallback(
+    (wordsArray) => {
+      let filtered = wordsArray.filter((word) => word.value?.trim());
+
+      if (selectedLevel) {
+        filtered = filtered.filter(
+          (word) => word.level?.level === selectedLevel
+        );
+      }
+
+      const defaultTopic = topics.find((topic) => topic.id === 1);
+      const defaultTopicName = defaultTopic?.name;
+
+      // Enhanced topic filter
+      if (selectedTopic) {
+        filtered = filtered.filter((word) => {
+          const hasNoMeaning = !word.meaning?.length;
+          const hasNoTopic = !word.topic;
+
+          // Check if matches selected topic OR is default candidate
+          return (
+            word.topic?.name === selectedTopic ||
+            (selectedTopic === defaultTopicName && hasNoMeaning && hasNoTopic)
+          );
+        });
+      }
+
+      // Modified search filter logic
+      if (searchValue.trim().length > 0) {
+        filtered = filtered.filter(
+          (word) =>
+            word.value.toLowerCase().includes(searchValue.toLowerCase()) ||
+            word.meaning
+              ?.join(" ")
+              .toLowerCase()
+              .includes(searchValue.toLowerCase())
+        );
+      }
+
+      if (showAllData) {
+        setFilteredWords(filtered);
+        setTotalPages(1);
+      } else {
+        const paginated = filtered.slice(
+          (currentPage - 1) * 40,
+          currentPage * 40
+        );
+        setFilteredWords(paginated);
+        setTotalPages(Math.ceil(filtered.length / 40));
+      }
+    },
+    [
+      currentPage,
+      selectedLevel,
+      selectedTopic,
+      searchValue,
+      showAllData,
+      topics,
+    ]
+  );
 
   const fetchAllWords = useCallback(async () => {
     setIsLoading(true);
     try {
+      // const response = await axios.get("/words?all=true");
       const response = await api.get("/word/all?all=true");
 
       const newCache = {
@@ -187,7 +258,7 @@ const WordList = () => {
       setCache(newCache);
       setLevels(newCache.levels);
       setTopics(newCache.topics);
-      // NO NEED to call applyFilters here anymore
+      applyFilters(newCache.words); // Apply filters with new data
     } catch (error) {
       console.error("Error fetching all words:", error);
     } finally {
@@ -195,73 +266,31 @@ const WordList = () => {
     }
   }, []);
 
-  // Effect to fetch data if cache is empty
+  // Handle page changes
+  useEffect(() => {
+    if (cache.words.length > 0) {
+      applyFilters(cache.words);
+    }
+  }, [currentPage, selectedLevel, selectedTopic, searchValue, showAllData]);
+
   useEffect(() => {
     if (cache.words.length === 0) {
       fetchAllWords();
     }
-  }, [fetchAllWords, cache.words.length]);
-
-  const allFilteredWords = useMemo(() => {
-    const wordsArray = cache.words;
-    let filtered = wordsArray.filter((word) => word.value?.trim());
-    const defaultTopic = topics.find((topic) => topic.id === 1);
-    const defaultTopicName = defaultTopic?.name;
-
-    // 1. Level Filter
-    if (selectedLevel) {
-      filtered = filtered.filter((word) => word.level?.level === selectedLevel);
-    }
-
-    // 2. Topic Filter
-    if (selectedTopic) {
-      filtered = filtered.filter((word) => {
-        const hasNoMeaning = !word.meaning?.length;
-        const hasNoTopic = !word.topic;
-        return (
-          word.topic?.name === selectedTopic ||
-          (selectedTopic === defaultTopicName && hasNoMeaning && hasNoTopic)
-        );
-      });
-    }
-
-    // 3. Search Filter (Uses the debounced value)
-    if (debouncedSearchValue.trim().length > 0) {
-      const lowerCaseSearch = debouncedSearchValue.toLowerCase();
-      filtered = filtered.filter(
-        (word) =>
-          word.value.toLowerCase().includes(lowerCaseSearch) ||
-          word.meaning?.join(" ").toLowerCase().includes(lowerCaseSearch)
-      );
-    }
-
-    return filtered;
-  }, [cache.words, selectedLevel, selectedTopic, debouncedSearchValue, topics]);
-
-  const paginatedWords = useMemo(() => {
-    const totalWords = allFilteredWords.length;
-
-    if (showAllData) {
-      setTotalPages(1);
-      return allFilteredWords;
-    }
-
-    const newTotalPages = Math.ceil(totalWords / WORDS_PER_PAGE);
-    setTotalPages(newTotalPages); // Set total pages here
-
-    return allFilteredWords.slice(
-      (currentPage - 1) * WORDS_PER_PAGE,
-      currentPage * WORDS_PER_PAGE
-    );
-  }, [allFilteredWords, currentPage, showAllData]);
-
-  const filteredWords = paginatedWords;
-
-  // Handlers remain the same, but simplified input handler
-  const handleSearchInputChange = useCallback((event) => {
-    const value = event.target.value.replace(/^\s+/, ""); // Remove leading spaces
-    setSearchValue(value);
   }, []);
+
+  const handleSearchInputChange = useCallback(
+    (event) => {
+      const query = event.target.value;
+      setSearchValue(query);
+
+      // Immediate filter update when clearing search
+      if (query.trim() === "") {
+        applyFilters(cache.words);
+      }
+    },
+    [applyFilters, cache.words]
+  );
 
   // Memoized modal handlers
   const openModal = useCallback((word) => {
@@ -296,12 +325,11 @@ const WordList = () => {
       const selected = e.target.value;
       setSelectedLevel(selected);
       setSelectedTopic(""); // Reset topic to "All Topics"
-      setCurrentPage(1); // Reset page on filter change
+      setCurrentPage(1);
 
       if (selected === "") {
         setFilteredTopics(topics); // Show all topics if no level is selected
       } else {
-        // This is a potentially costly operation, but necessary for filtering topic options
         const relatedTopics = cache.words
           .filter((word) => word.level?.level === selected && word.topic.name)
           .map((word) => word.topic.name);
@@ -324,10 +352,10 @@ const WordList = () => {
 
   const handleTopicChange = useCallback((e) => {
     setSelectedTopic(e.target.value);
-    setCurrentPage(1); // Reset page on filter change
+    setCurrentPage(1);
   }, []);
 
-  // Learning mode implementation (Logic remains the same, good to leave)
+  // Learning mode implementation
   const handleDelete = useCallback((wordId, wordValue) => {
     if (!userInfo.id) {
       Swal.fire("Error", "User not logged in or user ID missing.", "error");
@@ -349,17 +377,18 @@ const WordList = () => {
         api
           .delete(`/word/delete/${wordId}`, {
             headers: {
-              userid: userInfo.id,
+              userid: userInfo.id, // get this from your React state or context
             },
           })
           .then(() => {
-            // Update cache directly to avoid refetching all data
             setCache((prev) => ({
               ...prev,
               words: prev.words.filter((word) => word.id !== wordId),
               lastUpdated: Date.now(),
             }));
-
+            setFilteredWords((prev) =>
+              prev.filter((word) => word.id !== wordId)
+            );
             Swal.fire({
               title: "Deleted!",
               icon: "success",
@@ -373,7 +402,7 @@ const WordList = () => {
           });
       }
     });
-  }, []);
+  }, []); // Empty dependencies still work as we're not using external values
 
   //learning mode
   const toggleLearningMode = useCallback(() => {
@@ -422,6 +451,8 @@ const WordList = () => {
   const levelOptions = useMemo(
     () =>
       levels
+        // .filter((level) => level.id !== 6) // exclude id 6 for all
+        // exclude id:6 for only users and basic users
         .filter((level) => {
           if (
             level.id === 6 &&
@@ -440,7 +471,7 @@ const WordList = () => {
             {level.level}
           </option>
         )),
-    [levels, userInfo.role]
+    [levels]
   );
 
   const topicOptions = useMemo(() => {
@@ -528,10 +559,14 @@ const WordList = () => {
   // Update the toggleView function
   const toggleView = useCallback(() => {
     setShowAllData((prev) => !prev);
-    setCurrentPage(1); // Reset page on view change
-  }, []); // Dependencies are removed because useMemo handles the re-filtering
+    setCurrentPage(1);
+    // Force immediate filter update
+    if (cache.words.length > 0) {
+      applyFilters(cache.words);
+    }
+  }, [applyFilters, cache.words]);
 
-  // 	==============AI===============
+  //   ==============AI===============
 
   const generateParagraph = async (word) => {
     if (!userInfo?.id) {
@@ -589,16 +624,9 @@ const WordList = () => {
     }
   };
 
-  // 	==============AI===============
-  const handleResetFilters = useCallback(() => {
-    // Reset all filter-related states
-    setSearchValue("");
-    setSelectedLevel("");
-    setSelectedTopic("");
-    setCurrentPage(1);
-    setShowAllData(false);
-    setFilteredTopics(topics); // Reset filtered topics back to the full list
-  }, [topics]);
+  // =============report================
+
+  //   ==============AI===============
 
   return (
     <Container>
@@ -617,19 +645,6 @@ const WordList = () => {
         </p>
       </h2>
 
-      <div className="w-full">
-        <div className="flex justify-end my-1 mr-0 md:mr-24 lg:mr-24">
-          {(searchValue || selectedLevel || selectedTopic) && (
-            <button
-              onClick={handleResetFilters}
-              className="btn btn-error btn-sm  text-white font-bold  "
-            >
-              Reset
-            </button>
-          )}
-        </div>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 gap-4 mt-4 md:mt-0 ">
         {/* Search Input */}
         <div className="w-full relative group ">
@@ -638,8 +653,13 @@ const WordList = () => {
               type="text"
               placeholder="Search for a word"
               value={searchValue}
-              onChange={handleSearchInputChange}
+              // onChange={handleSearchInputChange}
+              onChange={(e) => {
+                const value = e.target.value.replace(/^\s+/, ""); // Remove leading spaces
+                setSearchValue(value);
+              }}
               className="border rounded px-2 py-2 w-full md:w-auto flex-1 pl-12 "
+              // style={{ caretColor: "transparent" }}
             />
             {/* <button className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 shrink-0">
               Search
@@ -715,7 +735,7 @@ const WordList = () => {
               <thead>
                 <tr className="bg-stone-800 text-sm md:text-xl lg:text-xl text-white ">
                   {/* ... existing header cells ... */}
-                  <th className=" border-gray-400  py-2  text-sm md:text-lg lg:text-lg    text-center w-[5%] md:w-[3%] lg:w-[3%] rounded-tl-md">
+                  <th className=" border-gray-400  py-2  text-sm md:text-lg lg:text-lg    text-center w-[15%] md:w-[3%] lg:w-[3%] rounded-tl-md">
                     Article
                   </th>
                   <th className="border-l  py-2 border-gray-400 border-dotted   text-center w-[15%] md:w-[10%] lg:w-[10%] ">

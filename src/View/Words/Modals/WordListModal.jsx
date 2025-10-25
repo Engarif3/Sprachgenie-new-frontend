@@ -19,48 +19,15 @@ const WordListModal = ({
   const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo();
 
-  // // Close on outside click
-  // useEffect(() => {
-  //   const handleClickOutside = (event) => {
-  //     if (modalRef.current && !modalRef.current.contains(event.target)) {
-  //       closeModal();
-  //     }
-  //   };
-
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, [closeModal]);
-
-  // useEffect(() => {
-  //   // Lock scroll when component mounts
-  //   const originalOverflow = document.body.style.overflow;
-  //   const originalPaddingRight = document.body.style.paddingRight;
-
-  //   const scrollbarWidth =
-  //     window.innerWidth - document.documentElement.clientWidth;
-
-  //   document.body.style.overflow = "hidden";
-  //   if (scrollbarWidth > 0) {
-  //     document.body.style.paddingRight = `${scrollbarWidth}px`;
-  //   }
-
-  //   return () => {
-  //     // Restore on unmount
-  //     document.body.style.overflow = originalOverflow;
-  //     document.body.style.paddingRight = originalPaddingRight;
-  //   };
-  // }, []); // runs once when modal mounts, restores on unmount
   useLockBodyScroll(!!selectedWord);
 
   if (!selectedWord) return null;
 
   return (
-    <div className="fixed z-50 inset-0 bg-black bg-opacity-50 flex justify-center items-center transition-opacity duration-300">
+    <div className="fixed z-50 inset-0 bg-black bg-opacity-50 flex justify-center items-center transition-opacity duration-300 ">
       <div
         ref={modalRef}
-        className="relative bg-white rounded-lg  max-w-4xl w-full shadow-2xl transform transition-all duration-300 scale-105  border max-h-[90vh] overflow-y-auto "
+        className="relative bg-white rounded-lg  max-w-4xl w-full mx-4 shadow-2xl transform transition-all duration-300 scale-105  border max-h-[90vh] overflow-y-auto "
       >
         {/* Favorite Toggle Button */}
 
@@ -109,7 +76,7 @@ const WordListModal = ({
               <span className=" mr-2 font-semibold text-orange-600 text-center text-sm md:text-lg lg:text-lg">
                 {selectedWord.article?.name}
               </span>
-              <span className="capitalize">
+              <span className="capitalize text-rose-900 font-bold">
                 {selectedWord.value.charAt(0).toUpperCase() +
                   selectedWord.value.slice(1)}
               </span>
@@ -124,7 +91,11 @@ const WordListModal = ({
                 <span className=" text-sky-600 font-medium capitalize">
                   Synonyms:
                 </span>{" "}
-                {selectedWord.synonyms?.map((s) => s.value).join(", ") || ""}
+                <span className="italic text-stone-950">
+                  {" "}
+                  {selectedWord.synonyms?.map((s) => s.value).join(", ") ||
+                    ""}{" "}
+                </span>
               </p>
             )}
 
@@ -133,7 +104,11 @@ const WordListModal = ({
                 <span className=" text-sky-600 font-medium capitalize">
                   Antonyms:
                 </span>{" "}
-                {selectedWord.antonyms?.map((a) => a.value).join(", ") || ""}
+                <span className="italic text-stone-950">
+                  {" "}
+                  {selectedWord.antonyms?.map((a) => a.value).join(", ") ||
+                    ""}{" "}
+                </span>
               </p>
             )}
 
@@ -157,8 +132,11 @@ const WordListModal = ({
                 <span className=" text-sky-600 font-medium">
                   Word to Watch:
                 </span>{" "}
-                {selectedWord.similarWords?.map((sw) => sw.value).join(", ") ||
-                  ""}
+                <span className="italic text-stone-950">
+                  {selectedWord.similarWords
+                    ?.map((sw) => sw.value)
+                    .join(", ") || ""}
+                </span>
               </p>
             )}
 
