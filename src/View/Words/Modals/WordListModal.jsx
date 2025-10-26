@@ -142,7 +142,10 @@ const WordListModal = ({
 
             <p className="text-lg text-gray-600">
               <span className=" text-sky-600 font-medium">Level:</span>{" "}
-             <span className="text-xs bg-stone-950 rounded py-[1px] px-[3px] text-white font-semibold"> {selectedWord.level?.level || ""} </span>
+              <span className="text-xs bg-stone-950 rounded py-[1px] px-[3px] text-white font-semibold ">
+                {" "}
+                {selectedWord.level?.level || ""}{" "}
+              </span>
             </p>
           </div>
           <div className="text-lg text-gray-600">
@@ -205,11 +208,11 @@ const WordListModal = ({
           </div>
         </div>
 
-        <div className="sticky bottom-0 right-2 flex justify-end pr-2  text-red-700">
+        <div className="sticky bottom-0 right-2 flex justify-end pr-2  text-red-500">
           <RiCloseCircleFill
             onClick={closeModal}
-            size={50}
-            className="hover:text-red-500 transition-transform duration-200 cursor-pointer"
+            size={40}
+            className="hover:text-rose-700 transition-transform duration-200 cursor-pointer"
           />
         </div>
       </div>
