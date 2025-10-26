@@ -29,9 +29,6 @@ const CACHE_KEY = "wordListCache";
 const CACHE_EXPIRY = 15 * 60 * 1000; // 15 minutes
 const WORDS_PER_PAGE = 40;
 
-const UNKNOWN_TOPIC_ID = 1;
-const RESTRICTED_LEVEL_ID = 6;
-
 const WordList = () => {
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [selectedHistory, setSelectedHistory] = useState({
@@ -62,11 +59,6 @@ const WordList = () => {
   const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo() || {};
 
-  const isAdmin = useMemo(
-    () => ["admin", "super_admin"].includes(userInfo.role),
-    [userInfo.role]
-  );
-
   const [favorites, setFavorites] = useState([]);
 
   // 	=========AI ===============
@@ -83,13 +75,11 @@ const WordList = () => {
   // useEffect for fetching favorites (Logic remains the same, good to leave)
   useEffect(() => {
     const fetchFavorites = async () => {
-      //   if (
-      //     (!userInfo?.id && userInfo.role !== "basic_user") ||
-      //     (!userInfo?.id && userInfo.role !== "admin")
-      //   )
-      //     return;
-
-      if (!userLoggedIn || !userInfo.id) return;
+      if (
+        (!userInfo?.id && userInfo.role !== "basic_user") ||
+        (!userInfo?.id && userInfo.role !== "admin")
+      )
+        return;
 
       try {
         const response = await api.get(`/favorite-words/${userInfo.id}`);
@@ -108,7 +98,7 @@ const WordList = () => {
       }
     };
     fetchFavorites();
-  }, [userInfo?.id, userLoggedIn]);
+  }, [userInfo?.id]);
 
   const toggleFavorite = async (wordId) => {
     const isFavorite = favorites.includes(wordId);
@@ -167,9 +157,7 @@ const WordList = () => {
       if (savedCache && Date.now() - savedCache.lastUpdated < CACHE_EXPIRY) {
         setCache(savedCache);
         setLevels(savedCache.levels);
-        const loadedTopics = savedCache.topics; // Get the loaded topics
-        setTopics(loadedTopics);
-        setFilteredTopics(loadedTopics);
+        setTopics(savedCache.topics);
         // NO NEED to call applyFilters here, useMemo handles initial filter
       }
     })();
@@ -200,7 +188,6 @@ const WordList = () => {
       setLevels(newCache.levels);
       setTopics(newCache.topics);
       // NO NEED to call applyFilters here anymore
-      setFilteredTopics(newCache.topics);
     } catch (error) {
       console.error("Error fetching all words:", error);
     } finally {
@@ -218,7 +205,7 @@ const WordList = () => {
   const allFilteredWords = useMemo(() => {
     const wordsArray = cache.words;
     let filtered = wordsArray.filter((word) => word.value?.trim());
-    const defaultTopic = topics.find((topic) => topic.id === UNKNOWN_TOPIC_ID);
+    const defaultTopic = topics.find((topic) => topic.id === 1);
     const defaultTopicName = defaultTopic?.name;
 
     // 1. Level Filter
@@ -251,29 +238,24 @@ const WordList = () => {
     return filtered;
   }, [cache.words, selectedLevel, selectedTopic, debouncedSearchValue, topics]);
 
-  useEffect(() => {
-    const totalWords = allFilteredWords.length;
-    let newTotalPages = 1;
-
-    if (!showAllData) {
-      newTotalPages = Math.ceil(totalWords / WORDS_PER_PAGE);
-      if (newTotalPages === 0) newTotalPages = 1;
-    }
-
-    setTotalPages(newTotalPages);
-    if (currentPage > newTotalPages) {
-      setCurrentPage(newTotalPages);
-    }
-  }, [allFilteredWords.length, showAllData, currentPage]);
-
-  // The useMemo for paginatedWords can then be simplified to:
   const paginatedWords = useMemo(() => {
-    if (showAllData) return allFilteredWords;
+    const totalWords = allFilteredWords.length;
+
+    if (showAllData) {
+      setTotalPages(1);
+      return allFilteredWords;
+    }
+
+    const newTotalPages = Math.ceil(totalWords / WORDS_PER_PAGE);
+    setTotalPages(newTotalPages); // Set total pages here
+
     return allFilteredWords.slice(
       (currentPage - 1) * WORDS_PER_PAGE,
       currentPage * WORDS_PER_PAGE
     );
   }, [allFilteredWords, currentPage, showAllData]);
+
+  const filteredWords = paginatedWords;
 
   // Handlers remain the same, but simplified input handler
   const handleSearchInputChange = useCallback((event) => {
@@ -309,39 +291,29 @@ const WordList = () => {
     [cache.words, openModal]
   );
 
-  const levelToTopicsMap = useMemo(() => {
-    const map = new Map();
-    cache.words.forEach((word) => {
-      const levelName = word.level?.level;
-      const topicName = word.topic?.name;
-      if (levelName && topicName) {
-        if (!map.has(levelName)) {
-          map.set(levelName, new Set());
-        }
-        map.get(levelName).add(topicName);
-      }
-    });
-    return map;
-  }, [cache.words]);
-
   const handleLevelChange = useCallback(
     (e) => {
       const selected = e.target.value;
       setSelectedLevel(selected);
-      setSelectedTopic("");
-      setCurrentPage(1);
+      setSelectedTopic(""); // Reset topic to "All Topics"
+      setCurrentPage(1); // Reset page on filter change
 
       if (selected === "") {
-        setFilteredTopics(topics);
+        setFilteredTopics(topics); // Show all topics if no level is selected
       } else {
-        const topicNamesForLevel = levelToTopicsMap.get(selected) || new Set();
+        // This is a potentially costly operation, but necessary for filtering topic options
+        const relatedTopics = cache.words
+          .filter((word) => word.level?.level === selected && word.topic.name)
+          .map((word) => word.topic.name);
+
+        const uniqueTopics = Array.from(new Set(relatedTopics));
         const matchedTopics = topics.filter((topic) =>
-          topicNamesForLevel.has(topic.name)
+          uniqueTopics.includes(topic.name)
         );
         setFilteredTopics(matchedTopics);
       }
     },
-    [topics, levelToTopicsMap]
+    [topics, cache.words]
   );
 
   useEffect(() => {
@@ -356,56 +328,52 @@ const WordList = () => {
   }, []);
 
   // Learning mode implementation (Logic remains the same, good to leave)
-  const handleDelete = useCallback(
-    (wordId, wordValue) => {
-      if (!userInfo.id) {
-        Swal.fire("Error", "User not logged in or user ID missing.", "error");
-        return;
-      }
-      Swal.fire({
-        title: "Are you sure?",
-        html: `You won't be able to revert this! Delete <strong style="color: #dc2626; font-weight: 800;">"${wordValue}"</strong>?`,
-        icon: "warning",
-        input: "text",
-        inputPlaceholder: "Type password",
-        inputValidator: (value) =>
-          value === "aydin" ? null : "Wrong Password!",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Delete",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          api
-            .delete(`/word/delete/${wordId}`, {
-              headers: {
-                userid: userInfo.id,
-              },
-            })
-            .then(() => {
-              // Update cache directly to avoid refetching all data
-              setCache((prev) => ({
-                ...prev,
-                words: prev.words.filter((word) => word.id !== wordId),
-                lastUpdated: Date.now(),
-              }));
+  const handleDelete = useCallback((wordId, wordValue) => {
+    if (!userInfo.id) {
+      Swal.fire("Error", "User not logged in or user ID missing.", "error");
+      return;
+    }
+    Swal.fire({
+      title: "Are you sure?",
+      html: `You won't be able to revert this! Delete <strong style="color: #dc2626; font-weight: 800;">"${wordValue}"</strong>?`,
+      icon: "warning",
+      input: "text",
+      inputPlaceholder: "Type password",
+      inputValidator: (value) => (value === "aydin" ? null : "Wrong Password!"),
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Delete",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        api
+          .delete(`/word/delete/${wordId}`, {
+            headers: {
+              userid: userInfo.id,
+            },
+          })
+          .then(() => {
+            // Update cache directly to avoid refetching all data
+            setCache((prev) => ({
+              ...prev,
+              words: prev.words.filter((word) => word.id !== wordId),
+              lastUpdated: Date.now(),
+            }));
 
-              Swal.fire({
-                title: "Deleted!",
-                icon: "success",
-                timer: 1000,
-                showConfirmButton: false,
-              });
-            })
-            .catch((error) => {
-              console.error("Error deleting word:", error);
-              Swal.fire("Error!", "Something went wrong.", "error");
+            Swal.fire({
+              title: "Deleted!",
+              icon: "success",
+              timer: 1000,
+              showConfirmButton: false,
             });
-        }
-      });
-    },
-    [userInfo.id, setCache]
-  );
+          })
+          .catch((error) => {
+            console.error("Error deleting word:", error);
+            Swal.fire("Error!", "Something went wrong.", "error");
+          });
+      }
+    });
+  }, []);
 
   //learning mode
   const toggleLearningMode = useCallback(() => {
@@ -434,13 +402,13 @@ const WordList = () => {
       if (action) {
         e.preventDefault();
         const newIndex = action();
-        if (newIndex >= 0 && newIndex < paginatedWords.length) {
-          revealMeaning(paginatedWords[newIndex].id);
+        if (newIndex >= 0 && newIndex < filteredWords.length) {
+          revealMeaning(filteredWords[newIndex].id);
           setCurrentIndex(newIndex);
         }
       }
     },
-    [paginatedWords, revealMeaning]
+    [filteredWords, revealMeaning]
   );
 
   // Focus management
@@ -450,56 +418,52 @@ const WordList = () => {
     }
   }, [currentIndex]);
 
-  const allowedLevels = useMemo(
-    () =>
-      levels.filter((level) => {
-        if (level.id === RESTRICTED_LEVEL_ID && !isAdmin) {
-          return false;
-        }
-        return true;
-      }),
-    [levels, isAdmin]
-  );
-
+  // A1>level id:1 ... B2> id:4 C1> id:6
   const levelOptions = useMemo(
     () =>
-      allowedLevels.map((level) => (
-        <option
-          key={level.id}
-          value={level.level}
-          className="text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white"
-        >
-          {level.level}
-        </option>
-      )),
-    [allowedLevels]
+      levels
+        .filter((level) => {
+          if (
+            level.id === 6 &&
+            !["admin", "super_admin"].includes(userInfo.role)
+          ) {
+            return false;
+          }
+          return true;
+        })
+        .map((level) => (
+          <option
+            key={level.id}
+            value={level.level}
+            className="text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white"
+          >
+            {level.level}
+          </option>
+        )),
+    [levels, userInfo.role]
   );
 
-  // Update the toggleView function
-
   const topicOptions = useMemo(() => {
-    const levelIdToLevelMap = new Map(levels.map((level) => [level.id, level]));
-
     const sortedTopics = [...filteredTopics].sort((a, b) => {
-      if (a.id === UNKNOWN_TOPIC_ID) return 1;
-      if (b.id === UNKNOWN_TOPIC_ID) return -1;
+      // Put Unknown topic (id: 1) at the end of each level group
+      if (a.id === 1) return 1;
+      if (b.id === 1) return -1;
 
-      const levelA = levelIdToLevelMap.get(a.levelId);
-      const levelB = levelIdToLevelMap.get(b.levelId);
+      const levelA = levels.find((lvl) => lvl.id === a.levelId);
+      const levelB = levels.find((lvl) => lvl.id === b.levelId);
 
       if (levelA && levelB) {
         return levelA.id - levelB.id;
       }
+
       return 0;
     });
 
     let lastLevelId = null;
     const optionsWithSeparators = [];
-    const baseClass =
-      "text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white";
 
     sortedTopics.forEach((topic) => {
-      const level = levelIdToLevelMap.get(topic.levelId);
+      const level = levels.find((lvl) => lvl.id === topic.levelId);
 
       // Add horizontal line when level changes
       if (level && level.id !== lastLevelId && lastLevelId !== null) {
@@ -516,12 +480,16 @@ const WordList = () => {
 
       lastLevelId = level ? level.id : null;
 
-      // Special handling for Unknown topic (ID: 1)
-      if (topic.id === UNKNOWN_TOPIC_ID) {
+      // Special handling for Unknown topic - use selected level or "All Levels"
+      if (topic.id === 1) {
         const displayLevel = selectedLevel ? selectedLevel : "All";
         optionsWithSeparators.push(
-          <option key={topic.id} value={topic.name} className={baseClass}>
-            {displayLevel} ➡️ {topic.name}
+          <option
+            key={topic.id}
+            value={topic.name}
+            className="text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white"
+          >
+            {displayLevel} &#128313; {topic.name}
           </option>
         );
         return;
@@ -530,8 +498,13 @@ const WordList = () => {
       const levelName = level ? level.level : "Unknown Level";
 
       optionsWithSeparators.push(
-        <option key={topic.id} value={topic.name} className={baseClass}>
-          {levelName} {level ? <> ➡️</> : ""} {topic.name}
+        <option
+          key={topic.id}
+          value={topic.name}
+          className="text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white"
+        >
+          {levelName}
+          {level ? <> &#128313;</> : ""} {topic.name}
         </option>
       );
     });
@@ -552,6 +525,7 @@ const WordList = () => {
     return optionsWithSeparators;
   }, [filteredTopics, levels, selectedLevel]);
 
+  // Update the toggleView function
   const toggleView = useCallback(() => {
     setShowAllData((prev) => !prev);
     setCurrentPage(1); // Reset page on view change
@@ -708,7 +682,7 @@ const WordList = () => {
               {topicOptions}
             </select>
             <p className="text-lg text-info font-bold whitespace-nowrap md:ml-2 hidden md:block">
-              {paginatedWords.length} words
+              {filteredWords.length} words
             </p>
           </div>
         </div>
@@ -725,7 +699,7 @@ const WordList = () => {
         learningMode={learningMode}
         setAction={setShowActionColumn}
         showAction={showActionColumn}
-        totalWords={paginatedWords.length}
+        totalWords={filteredWords.length}
       />
 
       {/* Table content */}
@@ -804,8 +778,8 @@ const WordList = () => {
 
               {/* Table body */}
               <tbody>
-                {paginatedWords.length > 0 ? (
-                  paginatedWords.map((word, index) => (
+                {filteredWords.length > 0 ? (
+                  filteredWords.map((word, index) => (
                     <tr
                       key={word.id}
                       className={index % 2 === 0 ? "bg-white " : "bg-gray-300"}
@@ -820,12 +794,6 @@ const WordList = () => {
                         {/* Move the onClick to the span that contains the word */}
                         <div className="flex justify-between">
                           <span
-                            tabIndex={learningMode ? 0 : -1}
-                            ref={
-                              learningMode && index === currentIndex
-                                ? focusElement
-                                : null
-                            }
                             // className="cursor-pointer text-blue-500  text-sm md:text-lg lg:text-lg  font-bold "
                             className="cursor-pointer p-0 md:p-2 lg:p-2 text-blue-500 text-sm md:text-lg lg:text-lg font-bold break-words max-w-[120px] md:max-w-full"
                             onClick={() => openModal(word)}
@@ -1067,7 +1035,7 @@ const WordList = () => {
         learningMode={learningMode}
         setAction={setShowActionColumn}
         showAction={showActionColumn}
-        totalWords={paginatedWords.length}
+        totalWords={filteredWords.length}
       />
 
       {/* ========= */}

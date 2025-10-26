@@ -142,7 +142,7 @@ const WordListModal = ({
 
             <p className="text-lg text-gray-600">
               <span className=" text-sky-600 font-medium">Level:</span>{" "}
-              {selectedWord.level?.level || ""}
+             <span className="text-xs bg-stone-950 rounded py-[1px] px-[3px] text-white font-semibold"> {selectedWord.level?.level || ""} </span>
             </p>
           </div>
           <div className="text-lg text-gray-600">
