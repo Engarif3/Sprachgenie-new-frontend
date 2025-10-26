@@ -83,7 +83,10 @@ const WordListModal = ({
             </p>
             <p className="text-lg text-gray-600">
               <span className=" text-sky-600 font-medium">Meaning:</span>{" "}
-              {selectedWord.meaning?.join(", ")}
+              <span className="text-sm md:text-lg lg:text-lg">
+                {" "}
+                {selectedWord.meaning?.join(", ")}{" "}
+              </span>
             </p>
 
             {selectedWord.synonyms.length > 0 && (
@@ -154,7 +157,8 @@ const WordListModal = ({
               <ul className=" space-y-2 list-disc">
                 {selectedWord.sentences.map((sentence, index) => {
                   const trimmed = sentence.trim();
-                  let className = "text-gray-600 list-disc ";
+                  let className =
+                    "text-gray-600 list-disc text-sm md:text-lg lg:text-lg";
                   let cleanSentence = sentence;
 
                   // Determine styling and clean sentence
