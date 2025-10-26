@@ -27,7 +27,7 @@ const WordListModal = ({
     <div className="fixed z-50 inset-0 bg-black bg-opacity-50 flex justify-center items-center transition-opacity duration-300 ">
       <div
         ref={modalRef}
-        className="relative bg-white rounded-lg  max-w-4xl w-full mx-4 shadow-2xl transform transition-all duration-300 scale-105  border max-h-[90vh] overflow-y-auto "
+        className="relative bg-white rounded-lg  max-w-4xl w-full mx-3  shadow-2xl transform transition-all duration-300 scale-105  border max-h-[90vh] overflow-y-auto "
       >
         {/* Favorite Toggle Button */}
 
@@ -47,7 +47,7 @@ const WordListModal = ({
           </span>
         </p>
         <hr className="border-0 border-b border-cyan-800  border-dashed  mx-8  mt-2" />
-        <div className="flex justify-between items-center px-6 mt-4">
+        <div className="flex justify-between items-center px-3 md:px-8 lg:px-8 mt-4">
           <h3 className="text-xl font-semibold text-gray-800 text-center flex items-center gap-4">
             <span>Word Details</span>
             <button
@@ -69,7 +69,7 @@ const WordListModal = ({
               )}
           </h3>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6  px-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6  mx-2 px-1 md:px-6 lg:px-6 ">
           <div className="">
             <p className="text-lg  text-gray-700">
               <span className=" text-sky-600  font-medium">Word:</span>{" "}
@@ -83,7 +83,7 @@ const WordListModal = ({
             </p>
             <p className="text-lg text-gray-600">
               <span className=" text-sky-600 font-medium">Meaning:</span>{" "}
-              <span className="text-sm md:text-lg lg:text-lg">
+              <span className="text-md md:text-lg lg:text-lg">
                 {" "}
                 {selectedWord.meaning?.join(", ")}{" "}
               </span>
@@ -158,7 +158,7 @@ const WordListModal = ({
                 {selectedWord.sentences.map((sentence, index) => {
                   const trimmed = sentence.trim();
                   let className =
-                    "text-gray-600 list-disc text-sm md:text-lg lg:text-lg";
+                    "text-gray-600 list-disc text-md md:text-lg lg:text-lg";
                   let cleanSentence = sentence;
 
                   // Determine styling and clean sentence
