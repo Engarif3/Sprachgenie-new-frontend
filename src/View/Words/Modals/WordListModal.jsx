@@ -69,7 +69,7 @@ const WordListModal = ({
               )}
           </h3>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6  mx-2 px-1 md:px-6 lg:px-6 ">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6  mx-2 px-1  md:px-6 lg:px-6 ">
           <div className="">
             <p className="text-lg  text-gray-700">
               <span className=" text-sky-600  font-medium">Word:</span>{" "}
