@@ -16,7 +16,7 @@ const HomeCard = ({ title, text, link }) => {
             <h2 className="text-green-500 text-2xl font-bold capitalize">
               {title}
             </h2>
-            <p className=" text-white font-mono text-lg">{text}</p>
+            <p className=" text-white font-mono text-lg mr-4">{text}</p>
           </div>
         </div>
       </Link>
