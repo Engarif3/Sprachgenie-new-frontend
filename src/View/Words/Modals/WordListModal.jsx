@@ -89,6 +89,21 @@ const WordListModal = ({
               </span>
             </p>
 
+            {selectedWord.pluralForm && (
+              <p className="text-lg text-gray-600">
+                <span className=" text-sky-600 font-medium">Plural:</span>{" "}
+                {selectedWord.pluralForm && (
+                  <>
+                    <span className=" font-semibold text-orange-600 text-center text-sm md:text-lg lg:text-lg">
+                      die
+                    </span>{" "}
+                    {selectedWord.pluralForm.charAt(0).toUpperCase() +
+                      selectedWord.pluralForm.slice(1)}
+                  </>
+                )}
+              </p>
+            )}
+
             {selectedWord.synonyms.length > 0 && (
               <p className="text-lg text-gray-600">
                 <span className=" text-sky-600 font-medium capitalize">
@@ -112,21 +127,6 @@ const WordListModal = ({
                   {selectedWord.antonyms?.map((a) => a.value).join(", ") ||
                     ""}{" "}
                 </span>
-              </p>
-            )}
-
-            {selectedWord.pluralForm && (
-              <p className="text-lg text-gray-600">
-                <span className=" text-sky-600 font-medium">Plural:</span>{" "}
-                {selectedWord.pluralForm && (
-                  <>
-                    <span className=" font-semibold text-orange-600 text-center text-sm md:text-lg lg:text-lg">
-                      die
-                    </span>{" "}
-                    {selectedWord.pluralForm.charAt(0).toUpperCase() +
-                      selectedWord.pluralForm.slice(1)}
-                  </>
-                )}
               </p>
             )}
 
