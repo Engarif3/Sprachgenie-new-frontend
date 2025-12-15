@@ -139,10 +139,11 @@ const Footer = () => {
         <div>
           <p>
             {" "}
-            Copyright © {new Date().getFullYear()} - All right reserved by
-            SprachGenie
+            Copyright © {new Date().getFullYear()} - All rights reserved.
             <br />
-            arif.aust.eng@gmail.com
+            Contact: arif.aust.eng@gmail.com
+            <br />
+            Topic titles inspired by Telc A1–B2 books.
           </p>
         </div>
       </footer>
