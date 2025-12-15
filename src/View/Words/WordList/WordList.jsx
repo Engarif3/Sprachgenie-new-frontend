@@ -643,7 +643,7 @@ const WordList = () => {
 
   return (
     <Container>
-      <h2 className="text-3xl font-bold font-mono text-white my-8 text-center hidden md:block">
+      <h2 className="text-3xl font-bold font-mono text-white my-2 text-center hidden md:block">
         <div className="flex justify-start">
           <Link to="/quiz" className="btn btn-sm btn-info">
             Play Quiz
@@ -658,54 +658,56 @@ const WordList = () => {
         </p>
       </h2>
 
-      <div className="w-full">
-        <div className="flex justify-end my-1 mr-0 md:mr-24 lg:mr-24">
-          {(searchValue || selectedLevel || selectedTopic) && (
-            <button
-              onClick={handleResetFilters}
-              className="btn btn-error btn-sm  text-white font-bold  "
-            >
-              Reset
-            </button>
-          )}
+      {/* =============radio buttons ========== */}
+      <div className="flex justify-between text-white">
+        <div className="flex gap-4 items-center mb-2">
+          <label className="flex items-center gap-1 cursor-pointer">
+            <input
+              type="radio"
+              name="searchType"
+              value="word"
+              checked={searchType === "word"}
+              onChange={(e) => setSearchType(e.target.value)}
+            />
+            <span>By Word</span>
+          </label>
+
+          <label className="flex items-center gap-1 cursor-pointer">
+            <input
+              type="radio"
+              name="searchType"
+              value="meaning"
+              checked={searchType === "meaning"}
+              onChange={(e) => setSearchType(e.target.value)}
+            />
+            <span>By Meaning</span>
+          </label>
+        </div>
+        {/* ===============showing words by page ==================  */}
+        <div className="flex justify-end gap-2">
+          <div className="w-full">
+            <div className="flex justify-end  mr-0 ">
+              {(searchValue || selectedLevel || selectedTopic) && (
+                <p
+                  onClick={handleResetFilters}
+                  className=" text-red-600 font-bold  underline cursor-pointer"
+                >
+                  Reset Filter
+                </p>
+              )}
+            </div>
+          </div>
+          {/* ===============showing words by page ==================  */}
+          <p className="text-md text-info font-bold whitespace-nowrap md:ml-2 hidden md:block w-36 text-end">
+            {paginatedWords.length} words
+          </p>
         </div>
       </div>
-
+      {/* =============radio buttons ========== */}
       <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 gap-4 mt-4 md:mt-0 ">
-        {/* Search Input */}
-        {/* <div className="w-full relative group ">
-          <div className="flex">
-            <input
-              type="text"
-              placeholder="Search for a word"
-              value={searchValue}
-              onChange={handleSearchInputChange}
-              className="border rounded px-2 py-2 w-full md:w-auto flex-1 pl-12 "
-            />
-            {/* <button className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 shrink-0">
-              Search
-            </button> */}
-        {/* <IoSearch
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 scale-x-[-1] text-gray-500 group-focus-within:hidden"
-              size={30}
-            />
-          </div>
-        </div> */}
-
-        {/* =====select search type======== */}
-        <div className="flex gap-2 w-full relative group">
-          {/* Search Type */}
-          <select
-            value={searchType}
-            onChange={(e) => setSearchType(e.target.value)}
-            className="border rounded px-2 py-2"
-          >
-            <option value="word">Word</option>
-            <option value="meaning">Meaning</option>
-          </select>
-
-          {/* Search Input */}
-          <div className="relative flex-1">
+        <div className="w-full space-y-2">
+          {/* Search input */}
+          <div className="relative">
             <input
               type="text"
               placeholder={
@@ -754,9 +756,6 @@ const WordList = () => {
 
               {topicOptions}
             </select>
-            <p className="text-lg text-info font-bold whitespace-nowrap md:ml-2 hidden md:block">
-              {paginatedWords.length} words
-            </p>
           </div>
         </div>
       </div>

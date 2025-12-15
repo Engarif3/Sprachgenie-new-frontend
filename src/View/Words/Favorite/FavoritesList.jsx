@@ -1,16 +1,15 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "../../../axios";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import WordListModal from "../Modals/WordListModal";
 import Container from "../../../utils/Container";
 import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 import Pagination from "./Pagination";
 import { pronounceWord } from "../../../utils/wordPronounciation";
-import { IoTrashBin } from "react-icons/io5";
+import { ImBin } from "react-icons/im";
 import {
   getFromLocalStorage,
-  removeFromLocalStorage,
   setToLocalStorage,
 } from "../../../utils/local-storage";
 import aiApi from "../../../AI_axios";
@@ -296,111 +295,6 @@ const FavoritesList = () => {
     }
   };
 
-  //   // const toggleFavorite = async (wordId) => {
-  //   //   setLoadingFavorites((prev) => ({ ...prev, [wordId]: true }));
-  //   //   try {
-  //   //     if (favorites.includes(wordId)) {
-  //   //       // Remove favorite
-  //   //       await axios.delete(`/favorite-words/${wordId}`, {
-  //   //         data: { userId: userInfo.id },
-  //   //       });
-  //   //       setFavorites((prev) => prev.filter((id) => id !== wordId));
-  //   //       setFavoriteWords((prev) => prev.filter((w) => w.id !== wordId));
-  //   //     } else {
-  //   //       // Add favorite
-  //   //       const response = await axios.post(`/favorite-words`, {
-  //   //         userId: userInfo.id,
-  //   //         wordId,
-  //   //       });
-  //   //       if (response.data.success) {
-  //   //         setFavorites((prev) => [...prev, wordId]);
-  //   //       }
-  //   //     }
-  //   //   } catch (err) {
-  //   //     console.error(err);
-  //   //     Swal.fire("Error", "Failed to update favorites", "error");
-  //   //   } finally {
-  //   //     setLoadingFavorites((prev) => ({ ...prev, [wordId]: false }));
-  //   //   }
-  //   // };
-
-  // // ==========================ai ===============================
-  // const generateParagraph = async (word) => {
-  //   if (!userInfo?.id) {
-  //     Swal.fire(
-  //       "Not Logged In",
-  //       "You must be logged in to generate paragraphs",
-  //       "warning"
-  //     );
-  //     return;
-  //   }
-
-  //   try {
-  //     setLoadingParagraphs((prev) => ({ ...prev, [word.id]: true }));
-
-  //     const response = await aiApi.post(`/paragraphs/generate`, {
-  //       userId: userInfo.id,
-  //       word: word.value,
-  //       wordId: word.id,
-  //       level: word.level?.level || "A1",
-  //       language: "de",
-  //     });
-
-  //     const paragraph = response.data.paragraph;
-  //     const wordId = response.data.wordId || word.id;
-
-  //     const fullWord = favoriteWords.find((w) => w.id === wordId);
-
-  //     setAiWord(fullWord || { id: wordId, value: word.value });
-  //     setGeneratedParagraphs((prev) => ({ ...prev, [wordId]: paragraph }));
-  //     setSelectedParagraph(paragraph);
-  //     setIsAIModalOpen(true);
-  //   } catch (error) {
-  //     const errorMessage = error.response?.data?.error || error.message;
-  //     if (error.response?.status === 403) {
-  //       Swal.fire("Limit Reached", errorMessage, "warning");
-  //     } else {
-  //       console.error("Error generating paragraph:", errorMessage);
-  //       Swal.fire("Error", "Failed to generate paragraph", "error");
-  //     }
-  //   } finally {
-  //     setLoadingParagraphs((prev) => ({ ...prev, [word.id]: false }));
-  //   }
-  // };
-
-  // // =============report================
-
-  // const handleReportSubmit = async () => {
-  //   if (!aiWord?.id) {
-  //     Swal.fire("Error", "Missing word ID", "error");
-  //     return;
-  //   }
-
-  //   try {
-  //     const response = await aiApi.post(`/paragraphs/report`, {
-  //       wordId: aiWord.id, // ✅ send wordId instead of paragraphId
-  //       userId: userInfo?.id ?? null, // optional
-  //       message: reportMessage?.trim() || null, // optional
-  //     });
-
-  //     Swal.fire(
-  //       "Reported",
-  //       response.data.message || "Report submitted",
-  //       "success"
-  //     );
-
-  //     setIsReportModalOpen(false);
-  //     setReportMessage("");
-  //   } catch (error) {
-  //     const errorMessage = error.response?.data?.error || error.message;
-  //     Swal.fire("Error", errorMessage, "error");
-  //   }
-  // };
-
-  // // ==========================ai ===============================
-
-  //   ==============AI===============
-
   const generateParagraph = async (word) => {
     if (!userInfo?.id) {
       Swal.fire(
@@ -576,7 +470,7 @@ const FavoritesList = () => {
                         </td>
                         <td className="border border-gray-600 border-dotted pl-1 p-0 md:p-2 lg:p-2">
                           {/* {word.meaning?.join(", ")} */}
-                          <span className="text-sm md:text-lg lg:text-lg line-clamp-2 hover:line-clamp-none break-words max-w-[120px] md:max-w-full text-sky-800 font-serif abc">
+                          <span className="text-sm md:text-lg lg:text-lg line-clamp-2 hover:line-clamp-none break-words max-w-[120px] md:max-w-full text-sky-800 font-serif">
                             {word.meaning?.join(", ")}
                           </span>
                         </td>
@@ -629,7 +523,7 @@ const FavoritesList = () => {
                             onClick={() => handleRemoveFavorite(word.id)}
                             className="text-red-700 hover:text-red-500 font-bold py-1 px-1 rounded"
                           >
-                            <IoTrashBin size={24} />
+                            <ImBin size={24} />
                           </button>
                         </td>
                       </tr>
@@ -663,11 +557,6 @@ const FavoritesList = () => {
         </div>
       )}
 
-      {/* <WordListModal
-         isOpen={isModalOpen}
-         closeModal={closeModal}
-         selectedWord={selectedWord}
-       /> */}
       <WordListModal
         isOpen={isModalOpen}
         closeModal={closeModal}

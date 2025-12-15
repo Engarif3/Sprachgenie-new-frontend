@@ -54,7 +54,7 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
   return (
     <Container>
       {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-1 md:gap-2 lg:gap-2 mt-4">
+        <div className="flex justify-center items-center gap-1 md:gap-2 lg:gap-2 mt-4 text-sky-800 ">
           <button
             onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
