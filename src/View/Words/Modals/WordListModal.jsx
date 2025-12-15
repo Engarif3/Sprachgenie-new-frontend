@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 import { pronounceWord } from "../../../utils/wordPronounciation";
@@ -6,7 +6,6 @@ import FavoriteButton from "./FavoriteButton";
 import { RiCloseCircleFill } from "react-icons/ri";
 import { useLockBodyScroll } from "./ModalScrolling";
 import { IoMdArrowDropright } from "react-icons/io";
-import { Renderer } from "ogl";
 
 const WordListModal = ({
   closeModal,
@@ -16,20 +15,6 @@ const WordListModal = ({
   loadingFavorites = {},
 }) => {
   const modalRef = useRef(null);
-  // ==========to remove render problem =========
-  useEffect(() => {
-    if (!modalRef.current) return;
-
-    const renderer = new Renderer();
-    modalRef.current.renderer = renderer;
-
-    return () => {
-      // Cleanup renderer on modal close/unmount
-      if (modalRef.current) modalRef.current.renderer = null;
-    };
-  }, [selectedWord]);
-
-  // ==========to remove render problem =========
 
   const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo();

@@ -165,7 +165,14 @@ const WordList = () => {
   useEffect(() => {
     (async () => {
       const savedCache = await getFromStorage(CACHE_KEY);
-      if (savedCache && Date.now() - savedCache.lastUpdated < CACHE_EXPIRY) {
+      // if (savedCache && Date.now() - savedCache.lastUpdated < CACHE_EXPIRY) {
+      if (
+        savedCache &&
+        savedCache.words &&
+        savedCache.levels &&
+        savedCache.topics &&
+        Date.now() - savedCache.lastUpdated < CACHE_EXPIRY
+      ) {
         setCache(savedCache);
         setLevels(savedCache.levels);
         const loadedTopics = savedCache.topics; // Get the loaded topics
@@ -177,11 +184,17 @@ const WordList = () => {
   }, []);
 
   // Save cache to storage whenever it changes (Logic remains the same, good to leave)
+  // useEffect(() => {
+  //   if (cache.words.length > 0) {
+  //     setToStorage(CACHE_KEY, cache);
+  //   }
+  // }, [cache]);
+
   useEffect(() => {
-    if (cache.words.length > 0) {
+    if (cache.lastUpdated) {
       setToStorage(CACHE_KEY, cache);
     }
-  }, [cache]);
+  }, [cache.lastUpdated]);
 
   // REMOVED: The old applyFilters useCallback.
   // The filtering logic is now split into two useMemo blocks.
@@ -312,7 +325,8 @@ const WordList = () => {
       const word = cache.words.find(
         (w) =>
           w.value === wordValue ||
-          (w.synonyms && w.synonyms.includes(wordValue))
+          // (w.synonyms && w.synonyms.includes(wordValue))
+          w.synonyms?.some((s) => s.value === wordValue)
       );
 
       if (word) {
