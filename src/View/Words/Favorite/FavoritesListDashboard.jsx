@@ -3,11 +3,9 @@ import axios from "../../../axios";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import WordListModal from "../Modals/WordListModal";
-import Container from "../../../utils/Container";
 import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 import Pagination from "./Pagination";
 import { pronounceWord } from "../../../utils/wordPronounciation";
-import { IoTrashBin } from "react-icons/io5";
 import {
   getFromLocalStorage,
   setToLocalStorage,
@@ -15,6 +13,7 @@ import {
 import aiApi from "../../../AI_axios";
 import { PuffLoader } from "react-spinners";
 import AIModal from "../Modals/AIModal";
+import { ImBin } from "react-icons/im";
 
 const FavoritesListDashboard = () => {
   const [selectedWord, setSelectedWord] = useState(null);
@@ -472,7 +471,7 @@ const FavoritesListDashboard = () => {
                         </td>
                         <td className="border border-gray-600 border-dotted pl-1 p-0 md:p-2 lg:p-2">
                           {/* {word.meaning?.join(", ")} */}
-                          <span className="text-sm md:text-lg lg:text-lg line-clamp-2 hover:line-clamp-none break-words max-w-[120px] md:max-w-full">
+                          <span className="text-sm md:text-lg lg:text-lg line-clamp-2 hover:line-clamp-none break-words max-w-[120px] md:max-w-full text-sky-950 font-serif">
                             {word.meaning?.join(", ")}
                           </span>
                         </td>
@@ -525,7 +524,7 @@ const FavoritesListDashboard = () => {
                             onClick={() => handleRemoveFavorite(word.id)}
                             className="text-red-700 hover:text-red-500 font-bold py-1 px-1 rounded"
                           >
-                            <IoTrashBin size={24} />
+                            <ImBin size={24} />
                           </button>
                         </td>
                       </tr>

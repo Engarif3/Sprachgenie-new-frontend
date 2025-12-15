@@ -18,25 +18,6 @@ const Pagination = ({
     <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8 mb-12">
       {/* Left Side Controls */}
       <div className="flex flex-wrap gap-4 justify-between md:justify-start w-full md:w-auto  ">
-        {/* Show All Button */}
-        {/* {!showAllData && (
-          <button
-            onClick={toggleView}
-            className="btn btn-sm btn-outline btn-info my-2 md:mt-6"
-          >
-            Show All Words
-          </button>
-        )}
-
-        {showAllData && (
-          <button
-            onClick={toggleView}
-            className="btn btn-sm btn-outline btn-info my-2 md:mt-6"
-          >
-            Show Paginated View
-          </button>
-        )} */}
-
         {/* Learning Mode Toggle */}
         {!learningMode && (
           <button

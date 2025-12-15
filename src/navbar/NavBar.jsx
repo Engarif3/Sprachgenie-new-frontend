@@ -64,29 +64,6 @@ const NavBar = () => {
     });
   };
 
-  // const handleDeleteAll = () => {
-  //   Swal.fire({
-  //     title: "Enter password",
-  //     input: "password",
-  //     inputPlaceholder: "Type password",
-  //     inputValidator: (value) => {
-  //       if (value !== "aydin451280") {
-  //         return "Wrong Password!";
-  //       }
-  //     },
-  //     showCancelButton: true,
-  //     confirmButtonColor: "#3085d6",
-  //     cancelButtonColor: "#d33",
-  //     confirmButtonText: "Proceed to create",
-  //   }).then((result) => {
-  //     if (result.isConfirmed && result.value === "aydin451280") {
-  //       navigate("/delete-all");
-  //     } else {
-  //       console.log("Action canceled or incorrect password.");
-  //     }
-  //   });
-  // };
-
   return (
     <Container>
       {/* <div className="bg-gradient-to-r from-slate-900 via-cyan-800 to-cyan-600  flex flex-wrap justify-between items-center py-2 rounded text-lg font-semibold mt-2 relative"> */}
@@ -299,7 +276,7 @@ const NavBar = () => {
       <hr className="border-0 border-b border-dotted border-cyan-950" />
 
       {userLoggedIn && (
-        <p className="text-end mx-2 text-white mt-0 md:mt-4 lg:mt-4">
+        <p className="text-end mx-2 text-white mb-3 md:mb-0 lg:mb-0 mt-0 md:mt-4 lg:mt-4">
           Welcome!{" "}
           <span className="font-semibold text-pink-600">{userInfo?.name}</span>
         </p>

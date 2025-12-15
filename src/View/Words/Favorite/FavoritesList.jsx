@@ -470,7 +470,7 @@ const FavoritesList = () => {
                         </td>
                         <td className="border border-gray-600 border-dotted pl-1 p-0 md:p-2 lg:p-2">
                           {/* {word.meaning?.join(", ")} */}
-                          <span className="text-sm md:text-lg lg:text-lg line-clamp-2 hover:line-clamp-none break-words max-w-[120px] md:max-w-full text-sky-800 font-serif">
+                          <span className="text-sm md:text-lg lg:text-lg line-clamp-2 hover:line-clamp-none break-words max-w-[120px] md:max-w-full text-sky-950 font-serif">
                             {word.meaning?.join(", ")}
                           </span>
                         </td>

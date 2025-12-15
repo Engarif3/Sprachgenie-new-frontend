@@ -660,7 +660,7 @@ const WordList = () => {
 
       {/* =============radio buttons ========== */}
       <div className="flex justify-between text-white">
-        <div className="flex gap-4 items-center mb-2">
+        <div className="flex gap-4 items-center -mb-3 md:mb-2 lg:mb-2">
           <label className="flex items-center gap-1 cursor-pointer">
             <input
               type="radio"
@@ -684,7 +684,7 @@ const WordList = () => {
           </label>
         </div>
         {/* ===============showing words by page ==================  */}
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2 -mb-3 md:mb-2 lg:mb-2">
           <div className="w-full">
             <div className="flex justify-end  mr-0 ">
               {(searchValue || selectedLevel || selectedTopic) && (
@@ -920,7 +920,7 @@ const WordList = () => {
                         className={`border-l border-gray-400 border-dotted pl-1  p-0 md:p-2 lg:p-2 text-sm md:text-lg lg:text-lg ${
                           learningMode && index === currentIndex
                             ? "bg-sky-700 text-white font-bold "
-                            : "text-sky-800 font-serif"
+                            : "text-sky-950 font-serif"
                         }`}
                         onClick={() => learningMode && revealMeaning(word.id)}
                         tabIndex="0"
