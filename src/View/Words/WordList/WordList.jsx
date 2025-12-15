@@ -937,7 +937,7 @@ const WordList = () => {
                         )}
                       </td>
 
-                      <td className="border-l border-gray-400 border-dotted p-2 text-blue-500 cursor-pointer hidden md:table-cell ">
+                      <td className="border-l border-gray-400 border-dotted p-2 text-blue-500  hidden md:table-cell ">
                         <div className="flex flex-wrap gap-1">
                           {word.synonyms?.map((synonym, index) => (
                             <span
@@ -952,7 +952,7 @@ const WordList = () => {
                         </div>
                       </td>
 
-                      <td className="border-l border-gray-400 border-dotted p-2 text-blue-500 cursor-pointer hidden lg:table-cell xl:table-cell">
+                      <td className="border-l border-gray-400 border-dotted p-2 text-blue-500  hidden lg:table-cell xl:table-cell">
                         <div className="flex flex-wrap gap-1">
                           {word.antonyms?.map((antonym, index) => (
                             <span
@@ -967,7 +967,7 @@ const WordList = () => {
                         </div>
                       </td>
 
-                      <td className="border-l border-gray-400 border-dotted  p-2 text-blue-500 cursor-pointer hidden lg:table-cell">
+                      <td className="border-l border-gray-400 border-dotted  p-2 text-blue-500  hidden lg:table-cell">
                         <div className="flex flex-wrap gap-1">
                           {word.similarWords?.map((similarword, index) => (
                             <span
