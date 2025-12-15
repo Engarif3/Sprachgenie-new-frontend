@@ -57,6 +57,7 @@ const WordList = () => {
   const focusElement = useRef(null);
   const [showActionColumn, setShowActionColumn] = useState(false);
   const [loadingFavorites, setLoadingFavorites] = useState({});
+  const [searchType, setSearchType] = useState("word"); // 'word' | 'meaning'
 
   // ===================
   const userLoggedIn = isLoggedIn();
@@ -240,16 +241,30 @@ const WordList = () => {
 
     // 3. Search Filter (Uses the debounced value)
     if (debouncedSearchValue.trim().length > 0) {
-      const lowerCaseSearch = debouncedSearchValue.toLowerCase();
-      filtered = filtered.filter(
-        (word) =>
-          word.value.toLowerCase().includes(lowerCaseSearch) ||
-          word.meaning?.join(" ").toLowerCase().includes(lowerCaseSearch)
-      );
+      const lower = debouncedSearchValue.toLowerCase();
+
+      filtered = filtered.filter((word) => {
+        if (searchType === "word") {
+          return word.value?.toLowerCase().includes(lower);
+        }
+
+        if (searchType === "meaning") {
+          return word.meaning?.join(" ").toLowerCase().includes(lower);
+        }
+
+        return true;
+      });
     }
 
     return filtered;
-  }, [cache.words, selectedLevel, selectedTopic, debouncedSearchValue, topics]);
+  }, [
+    cache.words,
+    selectedLevel,
+    selectedTopic,
+    debouncedSearchValue,
+    searchType,
+    topics,
+  ]);
 
   useEffect(() => {
     const totalWords = allFilteredWords.length;
@@ -658,7 +673,7 @@ const WordList = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 gap-4 mt-4 md:mt-0 ">
         {/* Search Input */}
-        <div className="w-full relative group ">
+        {/* <div className="w-full relative group ">
           <div className="flex">
             <input
               type="text"
@@ -670,12 +685,44 @@ const WordList = () => {
             {/* <button className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 shrink-0">
               Search
             </button> */}
-            <IoSearch
+        {/* <IoSearch
               className="absolute left-3 top-1/2 transform -translate-y-1/2 scale-x-[-1] text-gray-500 group-focus-within:hidden"
               size={30}
             />
           </div>
+        </div> */}
+
+        {/* =====select search type======== */}
+        <div className="flex gap-2 w-full relative group">
+          {/* Search Type */}
+          <select
+            value={searchType}
+            onChange={(e) => setSearchType(e.target.value)}
+            className="border rounded px-2 py-2"
+          >
+            <option value="word">Word</option>
+            <option value="meaning">Meaning</option>
+          </select>
+
+          {/* Search Input */}
+          <div className="relative flex-1">
+            <input
+              type="text"
+              placeholder={
+                searchType === "word" ? "Search by word" : "Search by meaning"
+              }
+              value={searchValue}
+              onChange={handleSearchInputChange}
+              className="border rounded px-2 py-2 w-full pl-10"
+            />
+            <IoSearch
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+              size={22}
+            />
+          </div>
         </div>
+
+        {/* =====select search type======== */}
 
         {/* Level Select */}
         <div className="w-full">
