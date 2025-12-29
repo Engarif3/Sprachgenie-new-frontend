@@ -325,8 +325,8 @@ const WordList = () => {
       const word = cache.words.find(
         (w) =>
           w.value === wordValue ||
-          // (w.synonyms && w.synonyms.includes(wordValue))
-          w.synonyms?.some((s) => s.value === wordValue)
+          (w.synonyms && w.synonyms.includes(wordValue))
+        // w.synonyms?.some((s) => s.value === wordValue)
       );
 
       if (word) {
