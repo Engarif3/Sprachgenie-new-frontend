@@ -257,8 +257,17 @@ const WordList = () => {
       const lower = debouncedSearchValue.toLowerCase();
 
       filtered = filtered.filter((word) => {
+        // if (searchType === "word") {
+        //   return word.value?.toLowerCase().includes(lower);
+        // }
         if (searchType === "word") {
-          return word.value?.toLowerCase().includes(lower);
+          const lowerWord = lower.toLowerCase();
+
+          // Check both singular (value) and plural (pluralForm)
+          const singular = word.value?.toLowerCase() || "";
+          const plural = word.pluralForm?.toLowerCase() || "";
+
+          return singular.includes(lowerWord) || plural.includes(lowerWord);
         }
 
         if (searchType === "meaning") {
