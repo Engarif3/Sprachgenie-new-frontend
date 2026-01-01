@@ -23,6 +23,7 @@ import { PuffLoader } from "react-spinners";
 import { IoSearch } from "react-icons/io5";
 import AIModal from "../Modals/AIModal";
 import useDebounce from "../../../hooks/useDebounce";
+import WordTableRow from "./WordTableRow";
 
 // Cache key constants
 const CACHE_KEY = "wordListCache";
@@ -40,7 +41,7 @@ const WordList = () => {
   });
   // ===
   const [filteredTopics, setFilteredTopics] = useState([]);
-  const [selectedWord, setSelectedWord] = useState(null);
+  // const [selectedWord, setSelectedWord] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("");
@@ -58,6 +59,7 @@ const WordList = () => {
   const [showActionColumn, setShowActionColumn] = useState(false);
   const [loadingFavorites, setLoadingFavorites] = useState({});
   const [searchType, setSearchType] = useState("word"); // 'word' | 'meaning'
+  const [selectedWordId, setSelectedWordId] = useState(null);
 
   // ===================
   const userLoggedIn = isLoggedIn();
@@ -72,14 +74,14 @@ const WordList = () => {
 
   // 	=========AI ===============
   const [aiWord, setAiWord] = useState(null);
-  const [generatedParagraphs, setGeneratedParagraphs] = useState({});
   const [loadingParagraphs, setLoadingParagraphs] = useState({});
   const [selectedParagraph, setSelectedParagraph] = useState("");
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
-
   // 	=========AI ===============
 
   const debouncedSearchValue = useDebounce(searchValue, 300);
+  const cacheDebounceTimer = useRef(null);
+  const aiAbortControllers = useRef(new Map());
 
   // useEffect for fetching favorites (Logic remains the same, good to leave)
   useEffect(() => {
@@ -183,17 +185,25 @@ const WordList = () => {
     })();
   }, []);
 
-  // Save cache to storage whenever it changes (Logic remains the same, good to leave)
-  // useEffect(() => {
-  //   if (cache.words.length > 0) {
-  //     setToStorage(CACHE_KEY, cache);
-  //   }
-  // }, [cache]);
-
+  // Save cache to storage with debouncing to prevent excessive writes
   useEffect(() => {
-    if (cache.lastUpdated) {
-      setToStorage(CACHE_KEY, cache);
+    if (!cache.lastUpdated) return;
+
+    // Clear existing timer
+    if (cacheDebounceTimer.current) {
+      clearTimeout(cacheDebounceTimer.current);
     }
+
+    // Set new timer for debounced save (500ms)
+    cacheDebounceTimer.current = setTimeout(() => {
+      setToStorage(CACHE_KEY, cache);
+    }, 500);
+
+    return () => {
+      if (cacheDebounceTimer.current) {
+        clearTimeout(cacheDebounceTimer.current);
+      }
+    };
   }, [cache.lastUpdated]);
 
   // REMOVED: The old applyFilters useCallback.
@@ -319,15 +329,32 @@ const WordList = () => {
   }, []);
 
   // Memoized modal handlers
+  // const openModal = useCallback((word) => {
+  //   setSelectedWord(word);
+  //   setIsModalOpen(true);
+  // }, []);
+  // ========================new ============
+
   const openModal = useCallback((word) => {
-    setSelectedWord(word);
+    setSelectedWordId(word.id);
     setIsModalOpen(true);
   }, []);
 
   const closeModal = useCallback(() => {
-    setSelectedWord(null);
+    setSelectedWordId(null);
     setIsModalOpen(false);
   }, []);
+
+  const selectedWord = useMemo(() => {
+    if (!selectedWordId) return null;
+    return cache.words.find((w) => w.id === selectedWordId);
+  }, [selectedWordId, cache.words]);
+
+  // =========================================
+  // const closeModal = useCallback(() => {
+  //   setSelectedWord(null);
+  //   setIsModalOpen(false);
+  // }, []);
 
   const openWordInModal = useCallback(
     (wordValue) => {
@@ -407,7 +434,9 @@ const WordList = () => {
         input: "text",
         inputPlaceholder: "Type password",
         inputValidator: (value) =>
-          value === "aydin" ? null : "Wrong Password!",
+          value === import.meta.env.VITE_DELETE_PASSWORD
+            ? null
+            : "Wrong Password!",
         showCancelButton: true,
         confirmButtonColor: "#d33",
         cancelButtonColor: "#3085d6",
@@ -488,6 +517,20 @@ const WordList = () => {
     }
   }, [currentIndex]);
 
+  // Cleanup abort controllers on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      aiAbortControllers.current.forEach((controller) => {
+        try {
+          controller.abort();
+        } catch (e) {
+          // Ignore errors if already aborted
+        }
+      });
+      aiAbortControllers.current.clear();
+    };
+  }, []);
+
   const allowedLevels = useMemo(
     () =>
       levels.filter((level) => {
@@ -515,10 +558,11 @@ const WordList = () => {
 
   // Update the toggleView function
 
-  const topicOptions = useMemo(() => {
+  // Memoize sorted topics separately to avoid recreating JSX on every render
+  const sortedTopicData = useMemo(() => {
     const levelIdToLevelMap = new Map(levels.map((level) => [level.id, level]));
 
-    const sortedTopics = [...filteredTopics].sort((a, b) => {
+    const sorted = [...filteredTopics].sort((a, b) => {
       if (a.id === UNKNOWN_TOPIC_ID) return 1;
       if (b.id === UNKNOWN_TOPIC_ID) return -1;
 
@@ -531,15 +575,22 @@ const WordList = () => {
       return 0;
     });
 
-    let lastLevelId = null;
-    const optionsWithSeparators = [];
+    return { sorted, levelIdToLevelMap };
+  }, [filteredTopics, levels]);
+
+  // Create JSX options separately - still memoized but simpler
+  const topicOptions = useMemo(() => {
+    const { sorted: sortedTopics, levelIdToLevelMap } = sortedTopicData;
     const baseClass =
       "text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white";
+
+    let lastLevelId = null;
+    const optionsWithSeparators = [];
 
     sortedTopics.forEach((topic) => {
       const level = levelIdToLevelMap.get(topic.levelId);
 
-      // Add horizontal line when level changes
+      // Add separator when level changes
       if (level && level.id !== lastLevelId && lastLevelId !== null) {
         optionsWithSeparators.push(
           <option
@@ -554,7 +605,7 @@ const WordList = () => {
 
       lastLevelId = level ? level.id : null;
 
-      // Special handling for Unknown topic (ID: 1)
+      // Special handling for Unknown topic
       if (topic.id === UNKNOWN_TOPIC_ID) {
         const displayLevel = selectedLevel ? selectedLevel : "All";
         optionsWithSeparators.push(
@@ -566,15 +617,14 @@ const WordList = () => {
       }
 
       const levelName = level ? level.level : "Unknown Level";
-
       optionsWithSeparators.push(
         <option key={topic.id} value={topic.name} className={baseClass}>
-          {levelName} {level ? <> ➡️</> : ""} {topic.name}
+          {levelName} {level ? " ➡️" : ""} {topic.name}
         </option>
       );
     });
 
-    // Add space after the last topic
+    // Add spacing option
     if (optionsWithSeparators.length > 0) {
       optionsWithSeparators.push(
         <option
@@ -588,7 +638,7 @@ const WordList = () => {
     }
 
     return optionsWithSeparators;
-  }, [filteredTopics, levels, selectedLevel]);
+  }, [sortedTopicData, selectedLevel]);
 
   const toggleView = useCallback(() => {
     setShowAllData((prev) => !prev);
@@ -607,16 +657,32 @@ const WordList = () => {
       return;
     }
 
+    // Cancel any existing request for this word
+    const existingController = aiAbortControllers.current.get(word.id);
+    if (existingController) {
+      existingController.abort();
+    }
+
+    // Create new abort controller for this request
+    const abortController = new AbortController();
+    aiAbortControllers.current.set(word.id, abortController);
+
     try {
       setLoadingParagraphs((prev) => ({ ...prev, [word.id]: true }));
 
-      const response = await aiApi.post(`/paragraphs/generate`, {
-        userId: userInfo.id,
-        wordId: word.id,
-        word: word.value,
-        level: word.level?.level || "A1",
-        language: "de",
-      });
+      const response = await aiApi.post(
+        `/paragraphs/generate`,
+        {
+          userId: userInfo.id,
+          wordId: word.id,
+          word: word.value,
+          level: word.level?.level || "A1",
+          language: "de",
+        },
+        {
+          signal: abortController.signal,
+        }
+      );
 
       const aiMeanings = response.data.meanings || [];
       const sentences = response.data.otherSentences || [];
@@ -641,6 +707,11 @@ const WordList = () => {
       setSelectedParagraph(paragraph);
       setIsAIModalOpen(true);
     } catch (error) {
+      // Ignore abort errors (user cancelled request or new request initiated)
+      if (error.name === "AbortError") {
+        return;
+      }
+
       const errorMessage = error.response?.data?.error || error.message;
       if (error.response?.status === 403) {
         Swal.fire("Limit Reached", errorMessage, "warning");
@@ -649,6 +720,7 @@ const WordList = () => {
         Swal.fire("Error", "Failed to generate paragraph", "error");
       }
     } finally {
+      aiAbortControllers.current.delete(word.id);
       setLoadingParagraphs((prev) => ({ ...prev, [word.id]: false }));
     }
   };
@@ -875,228 +947,30 @@ const WordList = () => {
               <tbody>
                 {paginatedWords.length > 0 ? (
                   paginatedWords.map((word, index) => (
-                    <tr
+                    <WordTableRow
                       key={word.id}
-                      className={index % 2 === 0 ? "bg-white " : "bg-gray-300"}
-                    >
-                      {/* Table cells remain the same */}
-                      <td className=" border-gray-400 p-0 md:p-2 lg:p-2 font-semibold text-orange-600 text-center text-sm md:text-lg lg:text-lg">
-                        {word.article?.name}
-                      </td>
-
-                      {/* word value starts here */}
-                      <td className="border-l border-gray-400  p-2 capitalize border-dotted">
-                        {/* Move the onClick to the span that contains the word */}
-                        <div className="flex justify-between">
-                          <span
-                            tabIndex={learningMode ? 0 : -1}
-                            ref={
-                              learningMode && index === currentIndex
-                                ? focusElement
-                                : null
-                            }
-                            // className="cursor-pointer text-blue-500  text-sm md:text-lg lg:text-lg  font-bold "
-                            className="cursor-pointer p-0 md:p-2 lg:p-2 text-blue-500 text-sm md:text-lg lg:text-lg font-bold break-words max-w-[120px] md:max-w-full"
-                            onClick={() => openModal(word)}
-                          >
-                            {word.value}
-                          </span>
-
-                          <div className="flex gap-1 md:gap-4 lg:gap-4 ">
-                            <button
-                              onClick={() => pronounceWord(word.value)}
-                              className=" text-blue-500 hover:text-blue-700 ml-0 md:ml-2 lg:ml-2 "
-                            >
-                              🔊
-                            </button>
-
-                            {userLoggedIn && (
-                              <div
-                                onClick={() => generateParagraph(word)}
-                                className="relative border-2 bg-green-700 text-white italic px-2 py-1 text-sm rounded-full mt-4 h-6 w-6 cursor-pointer hover:scale-105 hover:bg-green-600 hover:text-white border-orange-500 "
-                                disabled={loadingParagraphs[word.id]}
-                              >
-                                {/* Spinner overlay */}
-                                {loadingParagraphs[word.id] && (
-                                  <span className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                                    <PuffLoader size={20} color="#FF0000" />
-                                  </span>
-                                )}
-
-                                {/* Button text underneath */}
-                                <span
-                                  className={`${
-                                    loadingParagraphs[word.id]
-                                      ? "invisible"
-                                      : "flex items-center justify-center relative bottom-1"
-                                  }`}
-                                >
-                                  ai
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                      {/* word meaning starts here */}
-                      <td
-                        className={`border-l border-gray-400 border-dotted pl-1  p-0 md:p-2 lg:p-2 text-sm md:text-lg lg:text-lg ${
-                          learningMode && index === currentIndex
-                            ? "bg-sky-700 text-white font-bold "
-                            : "text-sky-950 font-serif"
-                        }`}
-                        onClick={() => learningMode && revealMeaning(word.id)}
-                        tabIndex="0"
-                        onKeyDown={(e) => handleArrowKeyPress(e, index)}
-                        ref={currentIndex === index ? focusElement : null}
-                      >
-                        {learningMode && !revealedWords.includes(word.id) ? (
-                          <span className="opacity-0">Hidden</span>
-                        ) : (
-                          // <span className="line-clamp-2 hover:line-clamp-none  ">
-                          <span className="line-clamp-2 hover:line-clamp-none break-words max-w-[120px] md:max-w-full">
-                            {word.meaning?.join(", ")}
-                          </span>
-                        )}
-                      </td>
-
-                      <td className="border-l border-gray-400 border-dotted p-2 text-blue-500  hidden md:table-cell ">
-                        <div className="flex flex-wrap gap-1">
-                          {word.synonyms?.map((synonym, index) => (
-                            <span
-                              key={index}
-                              onClick={() => openWordInModal(synonym.value)}
-                              // className="text-sm sm:text-base hover:underline"
-                              className="text-sm sm:text-base btn btn-sm btn-info"
-                            >
-                              {synonym.value}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-
-                      <td className="border-l border-gray-400 border-dotted p-2 text-blue-500  hidden lg:table-cell xl:table-cell">
-                        <div className="flex flex-wrap gap-1">
-                          {word.antonyms?.map((antonym, index) => (
-                            <span
-                              key={index}
-                              onClick={() => openWordInModal(antonym.value)}
-                              // className="text-sm sm:text-base hover:underline"
-                              className="text-sm sm:text-base btn btn-sm btn-info "
-                            >
-                              {antonym.value}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-
-                      <td className="border-l border-gray-400 border-dotted  p-2 text-blue-500  hidden lg:table-cell">
-                        <div className="flex flex-wrap gap-1">
-                          {word.similarWords?.map((similarword, index) => (
-                            <span
-                              key={index}
-                              onClick={() => openWordInModal(similarword.value)}
-                              // className="text-sm sm:text-base hover:underline"
-                              className="text-sm sm:text-base btn btn-sm btn-info"
-                            >
-                              {similarword.value}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-
-                      <td className="border-l border-r border-gray-400 border-dotted  p-2 hidden md:table-cell text-center">
-                        <span className="text-base sm:text-lg ">
-                          {word.level?.level}
-                        </span>
-                      </td>
-
-                      <td
-                        className={`border-l border-r border-gray-400  p-2 text-center ${
-                          showActionColumn ? "table-cell" : "hidden"
-                        } `}
-                      >
-                        <div className="flex  gap-1 justify-center">
-                          <Link
-                            // onClick={() => handleEditButtonClick(word.id)}
-                            to={`/edit-word/${word.id}`}
-                            className="btn btn-sm btn-warning "
-                          >
-                            Edit
-                          </Link>
-                          <button
-                            onClick={() => handleDelete(word.id, word.value)}
-                            className="btn btn-sm btn-error"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                      {/* ======== */}
-                      {/* // favorites */}
-                      {userLoggedIn && (
-                        <td className="border-l border-r border-gray-400 border-dotted p-0 md:p-1 lg:p-1 text-center ">
-                          <FavoriteButton
-                            isFavorite={favorites.includes(word.id)}
-                            loading={loadingFavorites[word.id]}
-                            onClick={() => toggleFavorite(word.id)}
-                          />
-                        </td>
-                      )}
-
-                      {/* ======== */}
-                      {/* modified by */}
-                      {/* ========== */}
-                      {userLoggedIn &&
-                        (userInfo.role === "super_admin" ||
-                          userInfo.role === "admin") && (
-                          <td className="border-l border-gray-400 border-dotted p-2 text-center hidden lg:table-cell">
-                            <button
-                              onClick={() => {
-                                setSelectedHistory({
-                                  creator: {
-                                    name: word.creator?.name,
-                                    email: word.creator?.email,
-                                  },
-                                  modifiers:
-                                    word.history?.map((h) => ({
-                                      name: h.user?.name,
-                                      email: h.user?.email,
-                                    })) || [],
-                                });
-                                setIsHistoryModalOpen(true);
-                              }}
-                              className={`hover:text-blue-700 ${
-                                word.history?.some(
-                                  (h) =>
-                                    h.user?.email !==
-                                      "arif.aust.eng@gmail.com" &&
-                                    h.user?.email !== "almon.arif@gmail.com"
-                                )
-                                  ? "text-red-500"
-                                  : "text-blue-500"
-                              }`}
-                              aria-label="View history"
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={1.5}
-                                stroke="currentColor"
-                                className="w-5 h-5"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                                />
-                              </svg>
-                            </button>
-                          </td>
-                        )}
-                      {/* ========== */}
-                    </tr>
+                      word={word}
+                      index={index}
+                      learningMode={learningMode}
+                      currentIndex={currentIndex}
+                      revealedWords={revealedWords}
+                      showActionColumn={showActionColumn}
+                      userLoggedIn={userLoggedIn}
+                      userInfo={userInfo}
+                      favorites={favorites}
+                      loadingFavorites={loadingFavorites}
+                      loadingParagraphs={loadingParagraphs}
+                      focusElement={focusElement}
+                      revealMeaning={revealMeaning}
+                      openModal={openModal}
+                      generateParagraph={generateParagraph}
+                      handleArrowKeyPress={handleArrowKeyPress}
+                      openWordInModal={openWordInModal}
+                      handleDelete={handleDelete}
+                      toggleFavorite={toggleFavorite}
+                      setSelectedHistory={setSelectedHistory}
+                      setIsHistoryModalOpen={setIsHistoryModalOpen}
+                    />
                   ))
                 ) : (
                   <tr>

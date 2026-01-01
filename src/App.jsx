@@ -9,8 +9,11 @@ import Loader from "./utils/Loader";
 const App = () => {
   const location = useLocation();
 
-  const noHeaderFooter =
-    location.pathname.includes("login") || location.pathname.includes("signup");
+  // const noHeaderFooter =
+  //   location.pathname.includes("login") || location.pathname.includes("signup");
+  const noHeaderFooter = ["/login", "/register"].some((p) =>
+    location.pathname.startsWith(p)
+  );
 
   return (
     <div className="relative min-h-screen">
@@ -24,8 +27,8 @@ const App = () => {
       {!noHeaderFooter && <NavBar />}
 
       {/* Suspense here so lazy-loaded routes work */}
-      {/* <Suspense fallback={<div className="p-8 text-center">Loading...</div>}> */}
-      <Suspense fallback={<Loader></Loader>}>
+      <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+        {/* <Suspense fallback={<Loader></Loader>}> */}
         <Outlet />
       </Suspense>
 
