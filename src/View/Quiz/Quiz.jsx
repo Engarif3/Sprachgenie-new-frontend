@@ -275,7 +275,7 @@ const Quiz = () => {
     return (
       <Container>
         <div className="p-4 bg-gray-800 text-white rounded min-h-screen flex justify-center items-center">
-          <p>Loading Quiz Data...</p>
+          <p>Loading Quiz Data....</p>
         </div>
       </Container>
     );
