@@ -54,7 +54,6 @@ const FavoritesListDashboard = () => {
         if (error.response?.status === 404) {
           setFavoriteWords([]);
         } else {
-          console.error("Error fetching favorites:", error);
           Swal.fire("Error", "Failed to load favorites", "error");
         }
       } finally {
@@ -189,7 +188,6 @@ const FavoritesListDashboard = () => {
           showConfirmButton: false,
         });
       } catch (error) {
-        console.error("Error removing favorite:", error);
         Swal.fire({
           title: "Error!",
           text: "Failed to remove favorite.",
@@ -287,7 +285,6 @@ const FavoritesListDashboard = () => {
         }
       }
     } catch (err) {
-      console.error("Error toggling favorite:", err);
       Swal.fire("Error", "Failed to update favorites", "error");
     } finally {
       setLoadingFavorites((prev) => ({ ...prev, [wordId]: false }));
@@ -355,7 +352,6 @@ const FavoritesListDashboard = () => {
       if (error.response?.status === 403) {
         Swal.fire("Limit Reached", errorMessage, "warning");
       } else {
-        console.error("Error generating paragraph:", errorMessage);
         Swal.fire("Error", "Failed to generate paragraph", "error");
       }
     } finally {

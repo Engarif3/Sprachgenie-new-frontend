@@ -1,5 +1,5 @@
 import Container from "../../utils/Container";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer } from "react";
 import Swal from "sweetalert2";
 import { getFromStorage, setToStorage } from "../../utils/storage";
 import api from "../../axios";
@@ -25,21 +25,17 @@ const DIFFICULTY_LEVELS = {
 const loadWords = async () => {
   try {
     const cachedData = await getFromStorage(CACHE_KEY);
-    console.log("Cached data:", cachedData);
 
     if (
       cachedData &&
       cachedData.words &&
       Date.now() - cachedData.lastUpdated < CACHE_EXPIRY
     ) {
-      console.log("Using cached words");
       return cachedData;
     }
 
     // Fetch from API if cache empty or expired
-    console.log("Fetching fresh data from API");
     const response = await api.get("/word/all?all=true");
-    console.log("API response:", response.data);
 
     const words = response.data.data?.words || [];
     const levels = response.data.data?.levels || [];
@@ -52,11 +48,9 @@ const loadWords = async () => {
       lastUpdated: Date.now(),
     };
 
-    console.log("Saving to storage:", newCache);
     await setToStorage(CACHE_KEY, newCache);
     return newCache;
   } catch (error) {
-    console.error("Error fetching words for quiz:", error);
     return { words: [], levels: [], topics: [] };
   }
 };
@@ -66,23 +60,17 @@ const loadWords = async () => {
 const filterWordsByDifficulty = (words, difficulty) => {
   if (!words.length) return [];
 
-  console.log(`Filtering ${words.length} words for difficulty ${difficulty}`);
-
   switch (difficulty) {
     case 1: // Easy - A1 (id:1) and A2 (id:2)
-      const easyWords = words.filter(
+      return words.filter(
         (word) => word.level?.id === 1 || word.level?.id === 2
       );
-      console.log(`Found ${easyWords.length} easy words (A1 & A2)`);
-      return easyWords;
     case 2: // Difficult - B1 (id:3) and B2 (id:4)
-      const hardWords = words.filter(
+      return words.filter(
         (word) => word.level?.id === 3 || word.level?.id === 4
       );
-      console.log(`Found ${hardWords.length} hard words (B1 & B2)`);
-      return hardWords;
     case 3: // Easy + Difficult - All levels (A1, A2, B1, B2, C1)
-      const allWords = words.filter(
+      return words.filter(
         (word) =>
           word.level?.id === 1 ||
           word.level?.id === 2 ||
@@ -90,65 +78,94 @@ const filterWordsByDifficulty = (words, difficulty) => {
           word.level?.id === 4 ||
           word.level?.id === 6
       );
-      console.log(`Found ${allWords.length} words from all levels`);
-      return allWords;
     default:
       return words;
   }
 };
 
 const Quiz = () => {
-  const [mode, setMode] = useState(""); // "single" or "multi"
-  const [difficulty, setDifficulty] = useState(1); // Default to easy
-  const [player1, setPlayer1] = useState("");
-  const [player2, setPlayer2] = useState("");
-  const [words, setWords] = useState([]);
-  const [allWords, setAllWords] = useState([]); // Store all words for filtering
-  const [quizWords, setQuizWords] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [showMeaning, setShowMeaning] = useState(false);
-  const [scores, setScores] = useState({ player1: 0, player2: 0 });
-  const [quizStarted, setQuizStarted] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [usedScores, setUsedScores] = useState({
-    player1: false,
-    player2: false,
-  });
+  // Initial state for all quiz-related variables
+  const initialState = {
+    mode: "", // "single" or "multi"
+    difficulty: 1, // Default to easy
+    player1: "",
+    player2: "",
+    words: [],
+    allWords: [], // Store all words for filtering
+    quizWords: [],
+    currentIndex: 0,
+    showMeaning: false,
+    scores: { player1: 0, player2: 0 },
+    quizStarted: false,
+    loading: true,
+    usedScores: { player1: false, player2: false },
+  };
+
+  // Reducer function
+  const quizReducer = (state, action) => {
+    switch (action.type) {
+      case "SET_MODE":
+        return { ...state, mode: action.payload };
+      case "SET_DIFFICULTY":
+        return { ...state, difficulty: action.payload };
+      case "SET_PLAYER1":
+        return { ...state, player1: action.payload };
+      case "SET_PLAYER2":
+        return { ...state, player2: action.payload };
+      case "SET_WORDS":
+        return { ...state, words: action.payload };
+      case "SET_ALL_WORDS":
+        return { ...state, allWords: action.payload };
+      case "SET_QUIZ_WORDS":
+        return { ...state, quizWords: action.payload };
+      case "SET_CURRENT_INDEX":
+        return { ...state, currentIndex: action.payload };
+      case "SET_SHOW_MEANING":
+        return { ...state, showMeaning: action.payload };
+      case "SET_SCORES":
+        return { ...state, scores: action.payload };
+      case "SET_QUIZ_STARTED":
+        return { ...state, quizStarted: action.payload };
+      case "SET_LOADING":
+        return { ...state, loading: action.payload };
+      case "SET_USED_SCORES":
+        return { ...state, usedScores: action.payload };
+      case "RESET_QUIZ":
+        return initialState;
+      case "LOAD_STATE":
+        return { ...state, ...action.payload };
+      default:
+        return state;
+    }
+  };
+
+  const [state, dispatch] = useReducer(quizReducer, initialState);
 
   useEffect(() => {
     const init = async () => {
-      setLoading(true);
+      dispatch({ type: "SET_LOADING", payload: true });
 
       try {
         // Load words (from cache or API)
         const cachedData = await loadWords();
-        console.log("Loaded cached data:", cachedData);
 
-        setAllWords(cachedData.words || []);
+        dispatch({ type: "SET_ALL_WORDS", payload: cachedData.words || [] });
 
         // Apply initial difficulty filter
         const initialWords = filterWordsByDifficulty(
           cachedData.words || [],
-          difficulty
+          state.difficulty
         );
-        setWords(initialWords);
+        dispatch({ type: "SET_WORDS", payload: initialWords });
 
         // Load previous quiz state if exists
         const savedState = JSON.parse(localStorage.getItem(QUIZ_STORAGE_KEY));
         if (savedState) {
-          setMode(savedState.mode || "");
-          setDifficulty(savedState.difficulty || 1);
-          setPlayer1(savedState.player1);
-          setPlayer2(savedState.player2);
-          setQuizWords(savedState.quizWords);
-          setCurrentIndex(savedState.currentIndex);
-          setScores(savedState.scores);
-          setQuizStarted(savedState.quizStarted);
+          dispatch({ type: "LOAD_STATE", payload: savedState });
         }
       } catch (error) {
-        console.error("Error initializing quiz:", error);
-        setAllWords([]);
-        setWords([]);
+        dispatch({ type: "SET_ALL_WORDS", payload: [] });
+        dispatch({ type: "SET_WORDS", payload: [] });
       }
 
       setLoading(false);
@@ -159,60 +176,58 @@ const Quiz = () => {
 
   // Update words when difficulty changes
   useEffect(() => {
-    if (allWords.length > 0) {
-      //   console.log(`Difficulty changed to ${difficulty}, filtering words...`);
-      const filteredWords = filterWordsByDifficulty(allWords, difficulty);
-      setWords(filteredWords);
+    if (state.allWords.length > 0) {
+      const filteredWords = filterWordsByDifficulty(
+        state.allWords,
+        state.difficulty
+      );
+      dispatch({ type: "SET_WORDS", payload: filteredWords });
     }
-  }, [difficulty, allWords]);
+  }, [state.difficulty, state.allWords]);
 
   // Save quiz state
   useEffect(() => {
-    if (quizStarted) {
+    if (state.quizStarted) {
       const stateToSave = {
-        mode,
-        difficulty,
-        player1,
-        player2,
-        quizWords,
-        currentIndex,
-        scores,
-        quizStarted,
+        mode: state.mode,
+        difficulty: state.difficulty,
+        player1: state.player1,
+        player2: state.player2,
+        quizWords: state.quizWords,
+        currentIndex: state.currentIndex,
+        scores: state.scores,
+        quizStarted: state.quizStarted,
       };
       localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(stateToSave));
     }
   }, [
-    mode,
-    difficulty,
-    player1,
-    player2,
-    quizWords,
-    currentIndex,
-    scores,
-    quizStarted,
+    state.mode,
+    state.difficulty,
+    state.player1,
+    state.player2,
+    state.quizWords,
+    state.currentIndex,
+    state.scores,
+    state.quizStarted,
   ]);
 
   // Start quiz
   const startQuiz = () => {
     // Set default player name for single player
-    const actualPlayer1 = mode === "single" ? "YOU" : player1;
-    setPlayer1(actualPlayer1);
+    const actualPlayer1 = state.mode === "single" ? "YOU" : state.player1;
 
-    const shuffled = [...words].sort(() => 0.5 - Math.random());
+    const shuffled = [...state.words].sort(() => 0.5 - Math.random());
     const selectedWords = shuffled.slice(
       0,
-      Math.min(QUIZ_LENGTH, words.length)
+      Math.min(QUIZ_LENGTH, state.words.length)
     );
 
-    console.log(
-      `Starting quiz with ${selectedWords.length} words for difficulty ${difficulty}`
-    );
-
-    setQuizWords(selectedWords);
-    setCurrentIndex(0);
-    setScores({ player1: 0, player2: 0 });
-    setShowMeaning(false);
-    setQuizStarted(true);
+    dispatch({ type: "SET_PLAYER1", payload: actualPlayer1 });
+    dispatch({ type: "SET_QUIZ_WORDS", payload: selectedWords });
+    dispatch({ type: "SET_CURRENT_INDEX", payload: 0 });
+    dispatch({ type: "SET_SCORES", payload: { player1: 0, player2: 0 } });
+    dispatch({ type: "SET_SHOW_MEANING", payload: false });
+    dispatch({ type: "SET_QUIZ_STARTED", payload: true });
 
     localStorage.setItem(
       QUIZ_STORAGE_KEY,
@@ -231,53 +246,72 @@ const Quiz = () => {
 
   const handleScore = (player, delta) => {
     // Prevent double scoring for same word
-    if (usedScores[player]) return;
+    if (state.usedScores[player]) return;
 
-    setScores((prev) => ({ ...prev, [player]: (prev[player] || 0) + delta }));
-    setUsedScores((prev) => ({ ...prev, [player]: true }));
+    const newScores = {
+      ...state.scores,
+      [player]: (state.scores[player] || 0) + delta,
+    };
+    dispatch({ type: "SET_SCORES", payload: newScores });
+    dispatch({
+      type: "SET_USED_SCORES",
+      payload: { ...state.usedScores, [player]: true },
+    });
   };
 
   const nextWord = () => {
-    if (currentIndex + 1 < quizWords.length) {
-      setCurrentIndex(currentIndex + 1);
-      setShowMeaning(false);
-      setUsedScores({ player1: false, player2: false });
+    if (state.currentIndex + 1 < state.quizWords.length) {
+      dispatch({ type: "SET_CURRENT_INDEX", payload: state.currentIndex + 1 });
+      dispatch({ type: "SET_SHOW_MEANING", payload: false });
+      dispatch({
+        type: "SET_USED_SCORES",
+        payload: { player1: false, player2: false },
+      });
     } else {
-      const finalScores = { ...scores };
+      const finalScores = { ...state.scores };
       const winner =
-        mode === "single"
-          ? `${player1}'s Score: ${finalScores.player1}`
+        state.mode === "single"
+          ? `${state.player1}'s Score: ${finalScores.player1}`
           : finalScores.player1 === finalScores.player2
           ? "It's a tie!"
           : finalScores.player1 > finalScores.player2
-          ? player1
-          : player2;
+          ? state.player1
+          : state.player2;
 
       Swal.fire({
         title: "Quiz Finished!",
         html:
-          mode === "single"
-            ? `<p>${player1}: ${finalScores.player1}</p><p>Difficulty: ${DIFFICULTY_LEVELS[difficulty].name}</p>`
-            : `<p>${player1}: ${finalScores.player1}</p><p>${player2}: ${finalScores.player2}</p><p>Difficulty: ${DIFFICULTY_LEVELS[difficulty].name}</p><p>Winner: <strong>${winner}</strong></p>`,
+          state.mode === "single"
+            ? `<p>${state.player1}: ${finalScores.player1}</p><p>Difficulty: ${
+                DIFFICULTY_LEVELS[state.difficulty].name
+              }</p>`
+            : `<p>${state.player1}: ${finalScores.player1}</p><p>${
+                state.player2
+              }: ${finalScores.player2}</p><p>Difficulty: ${
+                DIFFICULTY_LEVELS[state.difficulty].name
+              }</p><p>Winner: <strong>${winner}</strong></p>`,
         icon: "success",
       });
 
       const history = JSON.parse(localStorage.getItem("quizScores") || "[]");
       history.push({
-        mode,
-        difficulty: DIFFICULTY_LEVELS[difficulty].name,
-        player1: { name: player1, score: finalScores.player1 },
-        ...(mode === "multi" && {
-          player2: { name: player2, score: finalScores.player2 },
+        mode: state.mode,
+        difficulty: DIFFICULTY_LEVELS[state.difficulty].name,
+        player1: { name: state.player1, score: finalScores.player1 },
+        ...(state.mode === "multi" && {
+          player2: { name: state.player2, score: finalScores.player2 },
         }),
         date: new Date().toISOString(),
       });
       localStorage.setItem("quizScores", JSON.stringify(history));
 
       // Reset quiz
-      setUsedScores({ player1: false, player2: false });
-      setQuizStarted(false);
-      setQuizWords([]);
+      dispatch({
+        type: "SET_USED_SCORES",
+        payload: { player1: false, player2: false },
+      });
+      dispatch({ type: "SET_QUIZ_STARTED", payload: false });
+      dispatch({ type: "SET_QUIZ_WORDS", payload: [] });
       localStorage.removeItem(QUIZ_STORAGE_KEY);
     }
   };
@@ -293,18 +327,24 @@ const Quiz = () => {
       confirmButtonText: "Yes, reset",
     }).then((result) => {
       if (result.isConfirmed) {
-        setQuizWords([]);
-        setCurrentIndex(0);
-        setScores({ player1: 0, player2: 0 });
-        setShowMeaning(false);
-        setQuizStarted(false);
-        setUsedScores({ player1: false, player2: false });
+        dispatch({ type: "SET_QUIZ_WORDS", payload: [] });
+        dispatch({ type: "SET_CURRENT_INDEX", payload: 0 });
+        dispatch({
+          type: "SET_SCORES",
+          payload: { player1: 0, player2: 0 },
+        });
+        dispatch({ type: "SET_SHOW_MEANING", payload: false });
+        dispatch({ type: "SET_QUIZ_STARTED", payload: false });
+        dispatch({
+          type: "SET_USED_SCORES",
+          payload: { player1: false, player2: false },
+        });
         localStorage.removeItem(QUIZ_STORAGE_KEY);
       }
     });
   };
 
-  if (loading) {
+  if (state.loading) {
     return (
       <Container>
         <div className="p-4 bg-gray-800 text-white rounded min-h-screen flex justify-center items-center">
@@ -314,8 +354,8 @@ const Quiz = () => {
     );
   }
 
-  if (!quizStarted) {
-    if (!mode) {
+  if (!state.quizStarted) {
+    if (!state.mode) {
       // Mode selection screen
       return (
         <Container>
@@ -323,13 +363,15 @@ const Quiz = () => {
             <h2 className="text-2xl font-bold mb-6 text-center">Choose Mode</h2>
             <div className="flex gap-4">
               <button
-                onClick={() => setMode("single")}
+                onClick={() =>
+                  dispatch({ type: "SET_MODE", payload: "single" })
+                }
                 className="bg-blue-600 hover:bg-blue-700 p-2 rounded font-bold"
               >
                 Play Yourself
               </button>
               <button
-                onClick={() => setMode("multi")}
+                onClick={() => dispatch({ type: "SET_MODE", payload: "multi" })}
                 className="bg-green-600 hover:bg-green-700 p-2 rounded font-bold"
               >
                 Play with a Friend
@@ -355,9 +397,14 @@ const Quiz = () => {
               {Object.entries(DIFFICULTY_LEVELS).map(([level, config]) => (
                 <button
                   key={level}
-                  onClick={() => setDifficulty(parseInt(level))}
+                  onClick={() =>
+                    dispatch({
+                      type: "SET_DIFFICULTY",
+                      payload: parseInt(level),
+                    })
+                  }
                   className={`p-3 rounded text-left ${
-                    difficulty === parseInt(level)
+                    state.difficulty === parseInt(level)
                       ? "bg-blue-600 border-2 border-blue-400"
                       : "bg-gray-700 hover:bg-gray-600"
                   }`}
@@ -376,32 +423,36 @@ const Quiz = () => {
           {/* Available words count */}
           <div className="mb-4 text-center">
             <p className="text-sm text-gray-300">
-              Available words for {DIFFICULTY_LEVELS[difficulty].name}:{" "}
-              {words.length}
+              Available words for {DIFFICULTY_LEVELS[state.difficulty].name}:{" "}
+              {state.words.length}
             </p>
-            {words.length < QUIZ_LENGTH && (
+            {state.words.length < QUIZ_LENGTH && (
               <p className="text-sm text-yellow-400 mt-1">
                 Not enough words for a full quiz. Quiz will use{" "}
-                {Math.min(words.length, QUIZ_LENGTH)} words.
+                {Math.min(state.words.length, QUIZ_LENGTH)} words.
               </p>
             )}
           </div>
 
           <div className="flex flex-col gap-2 mb-4 w-full max-w-sm">
-            {mode === "multi" ? (
+            {state.mode === "multi" ? (
               <>
                 <input
                   type="text"
                   placeholder="Player 1: Name"
-                  value={player1}
-                  onChange={(e) => setPlayer1(e.target.value)}
+                  value={state.player1}
+                  onChange={(e) =>
+                    dispatch({ type: "SET_PLAYER1", payload: e.target.value })
+                  }
                   className="p-2 rounded text-black"
                 />
                 <input
                   type="text"
                   placeholder="Player 2: Name"
-                  value={player2}
-                  onChange={(e) => setPlayer2(e.target.value)}
+                  value={state.player2}
+                  onChange={(e) =>
+                    dispatch({ type: "SET_PLAYER2", payload: e.target.value })
+                  }
                   className="p-2 rounded text-black"
                 />
               </>
@@ -416,9 +467,9 @@ const Quiz = () => {
           <div className="flex gap-4">
             <button
               disabled={
-                mode === "multi"
-                  ? !player1 || !player2 || words.length === 0
-                  : words.length === 0
+                state.mode === "multi"
+                  ? !state.player1 || !state.player2 || state.words.length === 0
+                  : state.words.length === 0
               }
               onClick={startQuiz}
               className="bg-blue-600 hover:bg-blue-700 p-2 rounded font-bold disabled:opacity-50 disabled:cursor-not-allowed"
@@ -426,16 +477,18 @@ const Quiz = () => {
               Start Quiz
             </button>
             <button
-              onClick={() => setMode("")}
+              onClick={() => dispatch({ type: "SET_MODE", payload: "" })}
               className="bg-red-600 hover:bg-red-700 p-2 rounded font-bold"
             >
               Back
             </button>
           </div>
-          {words.length === 0 && (
+          {state.words.length === 0 && (
             <div className="mt-4 text-red-400 text-center">
               <p>No words available for the selected difficulty level.</p>
-              <p className="text-sm">Total words loaded: {allWords.length}</p>
+              <p className="text-sm">
+                Total words loaded: {state.allWords.length}
+              </p>
             </div>
           )}
         </div>
@@ -443,7 +496,7 @@ const Quiz = () => {
     );
   }
 
-  const currentWord = quizWords[currentIndex];
+  const currentWord = state.quizWords[state.currentIndex];
 
   return (
     <Container>
@@ -452,7 +505,7 @@ const Quiz = () => {
           <div className="text-sm bg-gray-700 px-2 py-1 rounded">
             Difficulty:{" "}
             <span className="font-bold">
-              {DIFFICULTY_LEVELS[difficulty].name}
+              {DIFFICULTY_LEVELS[state.difficulty].name}
             </span>
           </div>
           <button
@@ -464,7 +517,7 @@ const Quiz = () => {
         </div>
         <p className="text-sm italic text-pink-600 mb-2">Guess the meaning</p>
         <h2 className="text-md font-bold mb-0 md:mb-12 lg:mb-12 text-center">
-          Word {currentIndex + 1} / {quizWords.length}
+          Word {state.currentIndex + 1} / {state.quizWords.length}
         </h2>
 
         <div className="text-xl md:text-3xl lg:text-3xl font-bold mb-4 text-orange-600 text-center">
@@ -488,7 +541,7 @@ const Quiz = () => {
         </div>
 
         <div className=" h-40">
-          {showMeaning && (
+          {state.showMeaning && (
             <div className=" text-yellow-300 text-center">
               {(currentWord?.meaning && currentWord.meaning.join(", ")) ||
                 "No meaning available"}
@@ -497,7 +550,7 @@ const Quiz = () => {
         </div>
 
         <button
-          onClick={() => setShowMeaning(true)}
+          onClick={() => dispatch({ type: "SET_SHOW_MEANING", payload: true })}
           className="btn btn-sm btn-primary rounded "
         >
           Reveal Meaning
@@ -506,23 +559,27 @@ const Quiz = () => {
         <div className="flex justify-center w-10/12 md:w-8/12 lg:w-8/12 gap-8 mt-6 p-4">
           {/* Player 1 */}
           <div className="flex flex-col items-center gap-2 border rounded-md p-8 md:p-24 lg:p-24">
-            <div className="font-bold">{player1}</div>
-            <div className="text-xl">{scores.player1}</div>
+            <div className="font-bold">{state.player1}</div>
+            <div className="text-xl">{state.scores.player1}</div>
             <div className="flex gap-3">
               <button
                 onClick={() => handleScore("player1", -1)}
-                disabled={usedScores.player1}
+                disabled={state.usedScores.player1}
                 className={`bg-red-500 px-4 rounded ${
-                  usedScores.player1 ? "opacity-50 cursor-not-allowed" : ""
+                  state.usedScores.player1
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
                 }`}
               >
                 -
               </button>
               <button
                 onClick={() => handleScore("player1", 1)}
-                disabled={usedScores.player1}
+                disabled={state.usedScores.player1}
                 className={`bg-green-500 px-4 rounded ${
-                  usedScores.player1 ? "opacity-50 cursor-not-allowed" : ""
+                  state.usedScores.player1
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
                 }`}
               >
                 +
@@ -531,25 +588,29 @@ const Quiz = () => {
           </div>
 
           {/* Player 2 (only for multi) */}
-          {mode === "multi" && (
+          {state.mode === "multi" && (
             <div className="flex flex-col items-center gap-2 border rounded-md p-8 md:p-24 lg:p-24">
-              <div className="font-bold">{player2}</div>
-              <div className="text-xl">{scores.player2}</div>
+              <div className="font-bold">{state.player2}</div>
+              <div className="text-xl">{state.scores.player2}</div>
               <div className="flex gap-3">
                 <button
                   onClick={() => handleScore("player2", -1)}
-                  disabled={usedScores.player2}
+                  disabled={state.usedScores.player2}
                   className={`bg-red-500 px-4 rounded ${
-                    usedScores.player2 ? "opacity-50 cursor-not-allowed" : ""
+                    state.usedScores.player2
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
                   }`}
                 >
                   -
                 </button>
                 <button
                   onClick={() => handleScore("player2", 1)}
-                  disabled={usedScores.player2}
+                  disabled={state.usedScores.player2}
                   className={`bg-green-500 px-4 rounded ${
-                    usedScores.player2 ? "opacity-50 cursor-not-allowed" : ""
+                    state.usedScores.player2
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
                   }`}
                 >
                   +

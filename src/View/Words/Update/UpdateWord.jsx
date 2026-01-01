@@ -76,7 +76,7 @@ const UpdateWord = () => {
           partOfSpeech: word.partOfSpeech,
         });
       } catch (error) {
-        console.error("Error fetching word data:", error);
+        // Error handled - form will show validation errors
       }
     };
 
@@ -152,7 +152,7 @@ const UpdateWord = () => {
             }));
           }
         } catch (error) {
-          console.error("Error fetching suggestions:", error);
+          // Suggestions API call failed, continue without suggestions
         }
       } else {
         setSuggestions((prevSuggestions) => ({
@@ -204,10 +204,6 @@ const UpdateWord = () => {
           icon: "success",
         });
       } catch (error) {
-        console.error(
-          "Error updating the backend:",
-          error.response?.data || error
-        );
         Swal.fire({
           title: "Error!",
           text: "Failed to update the backend. Please try again.",
@@ -298,7 +294,6 @@ const UpdateWord = () => {
         });
         // navigate("/");
       } catch (error) {
-        console.error("Error updating word:", error);
         setMessage("Failed to update the word.");
       } finally {
         setLoading(false);

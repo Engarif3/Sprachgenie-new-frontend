@@ -101,11 +101,7 @@ const WordList = () => {
         if (error.response) {
           if (error.response.status === 404) {
             setFavorites([]);
-          } else {
-            console.error("Error fetching favorites:", error.response.data);
           }
-        } else {
-          console.error("Error fetching favorites:", error.message);
         }
         setFavorites([]);
       }
@@ -140,10 +136,6 @@ const WordList = () => {
         setFavorites((prev) => [...prev, wordId]);
       }
     } catch (error) {
-      console.error(
-        "Error updating favorites:",
-        error.response?.data || error.message
-      );
       Swal.fire({
         icon: "error",
         title: "Favorite Update Failed",
@@ -226,7 +218,7 @@ const WordList = () => {
       // NO NEED to call applyFilters here anymore
       setFilteredTopics(newCache.topics);
     } catch (error) {
-      console.error("Error fetching all words:", error);
+      // Error handled silently; users see empty list if fetch fails
     } finally {
       setIsLoading(false);
     }
@@ -465,7 +457,6 @@ const WordList = () => {
               });
             })
             .catch((error) => {
-              console.error("Error deleting word:", error);
               Swal.fire("Error!", "Something went wrong.", "error");
             });
         }
@@ -699,11 +690,6 @@ const WordList = () => {
           sentences.length > 0 ? sentences : paragraph.split(/(?<=[.!?])\s+/),
       });
 
-      setGeneratedParagraphs((prev) => ({
-        ...prev,
-        [wordId]: paragraph,
-      }));
-
       setSelectedParagraph(paragraph);
       setIsAIModalOpen(true);
     } catch (error) {
@@ -716,7 +702,6 @@ const WordList = () => {
       if (error.response?.status === 403) {
         Swal.fire("Limit Reached", errorMessage, "warning");
       } else {
-        console.error("Error generating paragraph:", errorMessage);
         Swal.fire("Error", "Failed to generate paragraph", "error");
       }
     } finally {
