@@ -231,6 +231,30 @@ const WordList = () => {
   const allFilteredWords = useMemo(() => {
     const wordsArray = cache.words;
     let filtered = wordsArray.filter((word) => word.value?.trim());
+    // Normalize strings for alphabetical sorting:
+    // - remove parenthetical content (e.g. "(fast) alle" -> " alle")
+    // - strip remaining punctuation/extra characters
+    // - collapse spaces and lowercase for consistent comparison
+    const normalizeForSort = (str) => {
+      if (!str) return "";
+      try {
+        return String(str)
+          .replace(/\(.*?\)/g, "")
+          .replace(/[^\p{L}\p{N}\s-]/gu, " ")
+          .replace(/[-_]+/g, " ")
+          .replace(/\s+/g, " ")
+          .trim()
+          .toLowerCase();
+      } catch (e) {
+        return String(str).toLowerCase();
+      }
+    };
+
+    const compareNormalized = (a, b) => {
+      const na = normalizeForSort(a || "");
+      const nb = normalizeForSort(b || "");
+      return na.localeCompare(nb, "de", { sensitivity: "base" });
+    };
     const defaultTopic = topics.find((topic) => topic.id === UNKNOWN_TOPIC_ID);
     const defaultTopicName = defaultTopic?.name;
 
@@ -273,6 +297,10 @@ const WordList = () => {
         return true;
       });
     }
+
+    // Sort alphabetically by normalized word value so entries starting
+    // with punctuation or parentheses don't float to the top.
+    filtered.sort((x, y) => compareNormalized(x.value, y.value));
 
     return filtered;
   }, [
