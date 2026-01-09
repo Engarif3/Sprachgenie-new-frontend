@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useCallback, useMemo, memo } from "react";
 import { Link } from "react-router-dom";
 import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 import { pronounceWord } from "../../../utils/wordPronounciation";
@@ -7,20 +7,126 @@ import { RiCloseCircleFill } from "react-icons/ri";
 import { useLockBodyScroll } from "./ModalScrolling";
 import { IoMdArrowDropright } from "react-icons/io";
 
+// Memoized sentence renderer component
+const SentenceRenderer = memo(({ sentence, index }) => {
+  const trimmed = sentence.trim();
+  let className = "text-gray-600 list-disc text-md md:text-lg lg:text-lg";
+  let cleanSentence = sentence;
+
+  // Determine styling and clean sentence
+  if (trimmed.startsWith("##")) {
+    className =
+      "font-semibold text-cyan-700 list-none w-full text-center underline capitalize ";
+    cleanSentence = sentence.replace(/^##\s*/, "");
+  } else if (trimmed.startsWith("**")) {
+    className = "text-green-600 list-none text-sm first-letter:uppercase";
+    cleanSentence = sentence
+      .replace(/^\*\*\s*/, "-")
+      .replace(/\*\*$/, "")
+      .trim();
+  }
+
+  const showSpeakerButton =
+    !trimmed.startsWith("##") && !trimmed.startsWith("**");
+
+  // Always call useCallback - hooks must be called unconditionally
+  const handlePronounce = useCallback(() => {
+    if (showSpeakerButton) {
+      pronounceWord(cleanSentence);
+    }
+  }, [cleanSentence, showSpeakerButton]);
+
+  return (
+    <div className="text-gray-600 flex items-start">
+      {showSpeakerButton && (
+        <span className="flex items-start">
+          <button
+            onClick={handlePronounce}
+            className="text-blue-600 hover:text-blue-800"
+            title="Pronounce"
+          >
+            🔊
+          </button>
+          <span>
+            <IoMdArrowDropright className="text-pink-600 mt-1" size={20} />
+          </span>
+        </span>
+      )}
+      <span className={className}>{cleanSentence}</span>
+    </div>
+  );
+});
+
+SentenceRenderer.displayName = "SentenceRenderer";
+
 const WordListModal = ({
   closeModal,
   selectedWord,
   favorites = [],
   toggleFavorite,
   loadingFavorites = {},
+  isOpen = true,
 }) => {
   const modalRef = useRef(null);
 
   const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo();
 
+  // Call hooks BEFORE any conditional returns
   useLockBodyScroll(!!selectedWord);
 
+  // Memoized callbacks (called unconditionally)
+  const handlePronounceWord = useCallback(() => {
+    pronounceWord(selectedWord?.value);
+  }, [selectedWord?.value]);
+
+  const handleToggleFavorite = useCallback(() => {
+    if (selectedWord) {
+      toggleFavorite(selectedWord.id);
+    }
+  }, [toggleFavorite, selectedWord?.id]);
+
+  const handleCloseModal = useCallback(() => {
+    closeModal();
+  }, [closeModal]);
+
+  // Memoized capitalized word
+  const capitalizedWord = useMemo(() => {
+    if (!selectedWord?.value) return "";
+    return (
+      selectedWord.value.charAt(0).toUpperCase() + selectedWord.value.slice(1)
+    );
+  }, [selectedWord?.value]);
+
+  // Memoized pluralized word
+  const capitalizedPluralForm = useMemo(() => {
+    if (!selectedWord?.pluralForm) return null;
+    return (
+      selectedWord.pluralForm.charAt(0).toUpperCase() +
+      selectedWord.pluralForm.slice(1)
+    );
+  }, [selectedWord?.pluralForm]);
+
+  // Memoized derived lists
+  const synonymsList = useMemo(() => {
+    return (selectedWord?.synonyms || [])?.map((s) => s.value).join(", ") || "";
+  }, [selectedWord?.synonyms]);
+
+  const antonymsList = useMemo(() => {
+    return (selectedWord?.antonyms || [])?.map((a) => a.value).join(", ") || "";
+  }, [selectedWord?.antonyms]);
+
+  const similarWordsList = useMemo(() => {
+    return (
+      (selectedWord?.similarWords || [])?.map((sw) => sw.value).join(", ") || ""
+    );
+  }, [selectedWord?.similarWords]);
+
+  const meaningsList = useMemo(() => {
+    return selectedWord?.meaning?.join(", ") || "";
+  }, [selectedWord?.meaning]);
+
+  // Now check if we should render
   if (!selectedWord) return null;
 
   return (
@@ -35,7 +141,7 @@ const WordListModal = ({
           <FavoriteButton
             isFavorite={favorites.includes(selectedWord.id)}
             loading={loadingFavorites[selectedWord.id]}
-            onClick={() => toggleFavorite(selectedWord.id)}
+            onClick={handleToggleFavorite}
             className="absolute top-2 right-2 "
           />
         )}
@@ -51,7 +157,7 @@ const WordListModal = ({
           <h3 className="text-xl font-semibold text-gray-800 text-center flex items-center gap-4">
             <span>Word Details</span>
             <button
-              onClick={() => pronounceWord(selectedWord.value)}
+              onClick={handlePronounceWord}
               className="text-blue-600 hover:text-blue-800"
               title="Pronounce"
             >
@@ -77,15 +183,14 @@ const WordListModal = ({
                 {selectedWord.article?.name}
               </span>
               <span className="capitalize text-rose-900 font-bold">
-                {selectedWord.value.charAt(0).toUpperCase() +
-                  selectedWord.value.slice(1)}
+                {capitalizedWord}
               </span>
             </p>
             <p className="text-lg text-gray-600">
               <span className=" text-sky-600 font-medium">Meaning:</span>{" "}
               <span className="text-md md:text-lg lg:text-lg">
                 {" "}
-                {selectedWord.meaning?.join(", ")}{" "}
+                {meaningsList}{" "}
               </span>
             </p>
 
@@ -97,48 +202,37 @@ const WordListModal = ({
                     <span className=" font-semibold text-orange-600 text-center text-sm md:text-lg lg:text-lg">
                       die
                     </span>{" "}
-                    {selectedWord.pluralForm.charAt(0).toUpperCase() +
-                      selectedWord.pluralForm.slice(1)}
+                    {capitalizedPluralForm}
                   </>
                 )}
               </p>
             )}
 
-            {selectedWord.synonyms.length > 0 && (
+            {(selectedWord.synonyms?.length || 0) > 0 && (
               <p className="text-lg text-gray-600">
                 <span className=" text-sky-600 font-medium capitalize">
                   Synonyms:
                 </span>{" "}
-                <span className="italic text-stone-950">
-                  {" "}
-                  {selectedWord.synonyms?.map((s) => s.value).join(", ") ||
-                    ""}{" "}
-                </span>
+                <span className="italic text-stone-950"> {synonymsList} </span>
               </p>
             )}
 
-            {selectedWord.antonyms.length > 0 && (
+            {(selectedWord.antonyms?.length || 0) > 0 && (
               <p className="text-lg text-gray-600">
                 <span className=" text-sky-600 font-medium capitalize">
                   Antonyms:
                 </span>{" "}
-                <span className="italic text-stone-950">
-                  {" "}
-                  {selectedWord.antonyms?.map((a) => a.value).join(", ") ||
-                    ""}{" "}
-                </span>
+                <span className="italic text-stone-950"> {antonymsList} </span>
               </p>
             )}
 
-            {selectedWord.similarWords.length > 0 && (
+            {(selectedWord.similarWords?.length || 0) > 0 && (
               <p className="text-lg text-gray-600 capitalize">
                 <span className=" text-sky-600 font-medium">
                   Word to Watch:
                 </span>{" "}
                 <span className="italic text-stone-950">
-                  {selectedWord.similarWords
-                    ?.map((sw) => sw.value)
-                    .join(", ") || ""}
+                  {similarWordsList}
                 </span>
               </p>
             )}
@@ -153,58 +247,15 @@ const WordListModal = ({
           </div>
           <div className="text-lg text-gray-600">
             <span className=" text-sky-600 font-medium">Sentences:</span>
-            {selectedWord.sentences && selectedWord.sentences.length > 0 ? (
+            {(selectedWord.sentences?.length || 0) > 0 ? (
               <ul className=" space-y-2 list-disc">
-                {selectedWord.sentences.map((sentence, index) => {
-                  const trimmed = sentence.trim();
-                  let className =
-                    "text-gray-600 list-disc text-md md:text-lg lg:text-lg";
-                  let cleanSentence = sentence;
-
-                  // Determine styling and clean sentence
-                  if (trimmed.startsWith("##")) {
-                    className =
-                      "font-semibold text-cyan-700 list-none w-full text-center underline capitalize ";
-                    cleanSentence = sentence.replace(/^##\s*/, "");
-                  } else if (trimmed.startsWith("**")) {
-                    className =
-                      "text-green-600 list-none text-sm first-letter:uppercase";
-                    cleanSentence = sentence
-                      .replace(/^\*\*\s*/, "-")
-                      .replace(/\*\*$/, "")
-                      .trim();
-                  }
-
-                  // Check if the speaker button should be hidden
-                  const showSpeakerButton =
-                    !trimmed.startsWith("##") && !trimmed.startsWith("**");
-
-                  return (
-                    <div
-                      key={index}
-                      className="text-gray-600 flex  items-start"
-                    >
-                      {showSpeakerButton && (
-                        <span className="flex items-start">
-                          <button
-                            onClick={() => pronounceWord(cleanSentence)}
-                            className="text-blue-600 hover:text-blue-800"
-                            title="Pronounce"
-                          >
-                            🔊
-                          </button>
-                          <span>
-                            <IoMdArrowDropright
-                              className="text-pink-600 mt-1"
-                              size={20}
-                            />
-                          </span>
-                        </span>
-                      )}
-                      <span className={className}>{cleanSentence}</span>
-                    </div>
-                  );
-                })}
+                {(selectedWord.sentences || []).map((sentence, index) => (
+                  <SentenceRenderer
+                    key={`${selectedWord.id}-${index}`}
+                    sentence={sentence}
+                    index={index}
+                  />
+                ))}
               </ul>
             ) : (
               <span className="text-gray-400">No sentences available.</span>
@@ -214,7 +265,7 @@ const WordListModal = ({
 
         <div className="sticky bottom-0 right-2 flex justify-end pr-2  text-red-500">
           <RiCloseCircleFill
-            onClick={closeModal}
+            onClick={handleCloseModal}
             size={40}
             className="hover:text-rose-700 transition-transform duration-200 cursor-pointer"
           />
@@ -224,4 +275,4 @@ const WordListModal = ({
   );
 };
 
-export default WordListModal;
+export default memo(WordListModal);

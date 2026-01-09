@@ -253,14 +253,11 @@ const WordList = () => {
 
     // 3. Search Filter (Uses the debounced value)
     if (debouncedSearchValue.trim().length > 0) {
-      const lower = debouncedSearchValue.toLowerCase();
+      const lower = debouncedSearchValue.trim().toLowerCase();
 
       filtered = filtered.filter((word) => {
-        // if (searchType === "word") {
-        //   return word.value?.toLowerCase().includes(lower);
-        // }
         if (searchType === "word") {
-          const lowerWord = lower.toLowerCase();
+          const lowerWord = lower;
 
           // Check both singular (value) and plural (pluralForm)
           const singular = word.value?.toLowerCase() || "";
@@ -313,7 +310,7 @@ const WordList = () => {
 
   // Handlers remain the same, but simplified input handler
   const handleSearchInputChange = useCallback((event) => {
-    const value = event.target.value.replace(/^\s+/, ""); // Remove leading spaces
+    const value = event.target.value.trim(); // Remove both leading and trailing spaces
     setSearchValue(value);
   }, []);
 

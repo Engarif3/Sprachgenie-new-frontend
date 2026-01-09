@@ -36,9 +36,25 @@ const FavoritesList = () => {
 
   // =================ai===========================
 
+  // Initialize favorites from localStorage on mount
   useEffect(() => {
-    setFavorites(favoriteWords.map((w) => w.id));
-  }, [favoriteWords]);
+    const cachedFavorites = getFromLocalStorage("favorites");
+    if (cachedFavorites && Array.isArray(cachedFavorites)) {
+      // Ensure all required fields exist
+      const sanitizedFavorites = cachedFavorites.map((w) => ({
+        ...w,
+        sentences: w.sentences || [],
+        meaning: w.meaning || [],
+        synonyms: w.synonyms || [],
+        antonyms: w.antonyms || [],
+        similarWords: w.similarWords || [],
+        pluralForm: w.pluralForm || "",
+      }));
+      setFavoriteWords(sanitizedFavorites);
+      setFavorites(sanitizedFavorites.map((w) => w.id));
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -47,13 +63,26 @@ const FavoritesList = () => {
       try {
         const response = await axios.get(`/favorite-words/${userInfo.id}`);
         if (response.data.success) {
-          setFavoriteWords(response.data.data);
+          const sanitizedData = response.data.data.map((w) => ({
+            ...w,
+            sentences: w.sentences || [],
+            meaning: w.meaning || [],
+            synonyms: w.synonyms || [],
+            antonyms: w.antonyms || [],
+            similarWords: w.similarWords || [],
+            pluralForm: w.pluralForm || "",
+          }));
+          setFavoriteWords(sanitizedData);
+          setFavorites(sanitizedData.map((w) => w.id));
+          setToLocalStorage("favorites", sanitizedData);
         } else {
           setFavoriteWords([]);
+          setFavorites([]);
         }
       } catch (error) {
         if (error.response?.status === 404) {
           setFavoriteWords([]);
+          setFavorites([]);
         } else {
           Swal.fire("Error", "Failed to load favorites", "error");
         }
@@ -148,10 +177,15 @@ const FavoritesList = () => {
         : [];
 
       const enriched = {
+        ...word,
         ...clickedWord,
+        id: word.id,
         level: word.level,
         topic: word.topic,
         article: word.article,
+        sentences: word.sentences || [],
+        meaning: word.meaning || [],
+        pluralForm: word.pluralForm || "",
         synonyms: enrichedSynonyms,
         antonyms: enrichedAntonyms,
         similarWords: enrichedSimilarWords,
@@ -209,30 +243,6 @@ const FavoritesList = () => {
     setSelectedWord(null);
     setIsModalOpen(false);
   };
-
-  const paginatedFavorites = favoriteWords.slice(
-    (currentPage - 1) * 40,
-    currentPage * 40
-  );
-
-  //favorites in modal
-  useEffect(() => {
-    const loadFavoritesFromDB = async () => {
-      // Get all favorites as a single array
-      const cachedFavorites = getFromLocalStorage("favorites");
-
-      if (cachedFavorites && Array.isArray(cachedFavorites)) {
-        setFavoriteWords(cachedFavorites);
-        setFavorites(cachedFavorites.map((w) => w.id));
-      }
-    };
-
-    loadFavoritesFromDB();
-  }, []);
-
-  useEffect(() => {
-    setFavorites(favoriteWords.map((w) => w.id));
-  }, [favoriteWords]);
 
   const toggleFavorite = async (wordId) => {
     setLoadingFavorites((prev) => ({ ...prev, [wordId]: true }));
@@ -361,6 +371,11 @@ const FavoritesList = () => {
   };
 
   //   ==============AI===============
+
+  const paginatedFavorites = favoriteWords.slice(
+    (currentPage - 1) * 40,
+    currentPage * 40
+  );
 
   return (
     // <Container>
