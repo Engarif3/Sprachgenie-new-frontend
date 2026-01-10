@@ -307,10 +307,7 @@ const UpdateUserStatus = () => {
                           </th>
                           <th className="p-2 text-center">Email</th>
                           <th className="p-2 text-center">Role</th>
-                          <th className="p-2 text-center">Action</th>
-                          <th className="p-2 text-center hidden lg:table-cell">
-                            Delete
-                          </th>
+                          <th className="p-2 text-center">Delete</th>
                           <th className="p-2 text-center hidden lg:table-cell">
                             Created at <br />
                             <span className="text-sm font-thin ">
@@ -446,10 +443,7 @@ const UpdateUserStatus = () => {
                           </th>
                           <th className="p-2 text-center">Email</th>
                           <th className="p-2 text-center">Role</th>
-                          <th className="p-2 text-center">Action</th>
-                          <th className="p-2 text-center hidden lg:table-cell">
-                            Permanent Delete
-                          </th>
+                          <th className="p-2 text-center">Delete</th>
                           <th className="p-2 text-center hidden lg:table-cell">
                             Created at <br />
                             <span className="text-sm font-thin ">
