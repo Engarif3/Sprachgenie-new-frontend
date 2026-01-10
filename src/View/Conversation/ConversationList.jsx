@@ -130,8 +130,9 @@ const ConversationsList = () => {
       }
 
       const updatedData = {
-        ...formData,
-        text: updatedText, // Update `text` with the parsed array
+        topic: formData.topic,
+        text: updatedText,
+        levelId: formData.levelId,
       };
 
       // Log the updated data after parsing
