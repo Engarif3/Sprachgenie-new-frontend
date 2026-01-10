@@ -523,12 +523,12 @@ const UpdateUserStatus = () => {
                                 defaultValue=""
                               >
                                 <option value="" disabled>
-                                  Select Delete
+                                  Select
                                 </option>
-                                <option value="SOFT_DELETE">Soft Delete</option>
+                                <option value="SOFT_DELETE">Soft</option>
                                 {userInfo?.role === "super_admin" && (
                                   <option value="PERMANENT_DELETE">
-                                    Permanent Delete
+                                    Permanent
                                   </option>
                                 )}
                               </select>
