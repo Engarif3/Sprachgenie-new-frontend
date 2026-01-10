@@ -36,14 +36,13 @@ const AuthButton = () => {
   const userInfo = getUserInfo();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    removeUser();
+  const handleLogout = async () => {
+    // ✅ Call logout API to clear httpOnly cookies
+    await removeUser();
     toast.success("Logged out successfully");
 
-    // Wrap navigation in startTransition to avoid Suspense error
-
     startTransition(() => {
-      navigate("/login"); // navigate to login page
+      navigate("/login");
     });
   };
 

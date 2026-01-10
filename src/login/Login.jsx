@@ -142,15 +142,19 @@ const Login = () => {
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   const handleLogin = async (formData) => {
-    // if (isSubmitting) return; // prevent duplicate calls
-
     setIsSubmitting(true);
     setError("");
     try {
       const res = await userLogin(formData);
-      if (res?.data?.accessToken) {
-        toast.success(res.message);
-        storeUserInfo({ accessToken: res?.data?.accessToken });
+      // ✅ Token now in httpOnly cookie (not in response body)
+      if (res?.success) {
+        toast.success(res.message || "Login successful");
+
+        // ✅ Fetch user info from /auth/me or use data from response
+        // Store user metadata (NOT token)
+        const userInfo = await fetchUserInfo();
+        storeUserInfo(userInfo);
+
         navigate("/");
       } else {
         setError(res?.message || "Login failed");
@@ -159,6 +163,20 @@ const Login = () => {
       setError(err?.message || "An error occurred");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // ✅ Fetch user info from a protected endpoint
+  const fetchUserInfo = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/auth/me`,
+        { credentials: "include" }
+      );
+      const data = await response.json();
+      return data?.data || null;
+    } catch {
+      return null;
     }
   };
 

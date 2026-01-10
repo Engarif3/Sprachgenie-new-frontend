@@ -7,22 +7,11 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  withCredentials: true,
+  withCredentials: true, // ✅ CRITICAL: Send httpOnly cookies automatically
 });
 
-// Request interceptor to add auth token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// ✅ NO Authorization header needed - cookies are sent automatically
+// Request interceptor removed - httpOnly cookies handle authentication
 
 // Response interceptor for error handling
 api.interceptors.response.use(
@@ -32,8 +21,7 @@ api.interceptors.response.use(
   (error) => {
     // Handle 401 Unauthorized - redirect to login
     if (error.response?.status === 401) {
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("user");
+      // ✅ Cookies cleared server-side, just redirect
       window.location.href = "/login";
       Swal.fire({
         icon: "warning",
