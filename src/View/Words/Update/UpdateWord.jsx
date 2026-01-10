@@ -53,14 +53,28 @@ const UpdateWord = () => {
   const [initialLoading, setInitialLoading] = useState(true);
   const [refetchTrigger, setRefetchTrigger] = useState(0);
 
-  // Fetch existing word data
+  // Fetch existing word data and all dropdown options in parallel
   useEffect(() => {
-    const fetchWordData = async () => {
+    const fetchAllData = async () => {
       try {
         setInitialLoading(true);
-        // Add timestamp to prevent caching
-        const response = await api.get(`/word/${id}?_t=${Date.now()}`);
-        const word = response.data.data;
+
+        // Fetch all data in parallel using Promise.all for faster loading
+        const [
+          wordResponse,
+          levelsResponse,
+          topicsResponse,
+          articlesResponse,
+          partOfSpeechResponse,
+        ] = await Promise.all([
+          api.get(`/word/${id}?_t=${Date.now()}`),
+          api.get("/levels"),
+          api.get("/topics"),
+          api.get("/articles"),
+          api.get("/part-of-speech"),
+        ]);
+
+        const word = wordResponse.data.data;
         setFormData({
           id: word.id,
           value: word.value,
@@ -79,38 +93,20 @@ const UpdateWord = () => {
           article: word.article,
           partOfSpeech: word.partOfSpeech,
         });
+
+        setLevels(levelsResponse.data);
+        setTopics(topicsResponse.data);
+        setArticles(articlesResponse.data);
+        setPartOfSpeeches(partOfSpeechResponse.data);
       } catch (error) {
         // Error handled - form will show validation errors
+        console.error("Error fetching data:", error);
       } finally {
         setInitialLoading(false);
       }
     };
 
-    const fetchLevels = async () => {
-      const response = await api.get("/levels");
-      setLevels(response.data);
-    };
-
-    const fetchTopics = async () => {
-      const response = await api.get("/topics");
-      setTopics(response.data);
-    };
-
-    const fetchArticles = async () => {
-      const response = await api.get("/articles");
-      setArticles(response.data);
-    };
-
-    const fetchPartOfSpeeches = async () => {
-      const response = await api.get("/part-of-speech");
-      setPartOfSpeeches(response.data);
-    };
-
-    fetchWordData();
-    fetchLevels();
-    fetchTopics();
-    fetchArticles();
-    fetchPartOfSpeeches();
+    fetchAllData();
   }, [id, refetchTrigger]);
 
   const handleInputChange = async (e) => {

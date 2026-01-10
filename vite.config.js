@@ -38,6 +38,8 @@ export default defineConfig({
           react: ["react", "react-dom", "react-router-dom"],
           // Split UI libraries
           ui: ["lucide-react", "daisyui"],
+          // Split SweetAlert2 (large library)
+          swal: ["sweetalert2"],
           // You can add other large deps if needed
         },
       },
