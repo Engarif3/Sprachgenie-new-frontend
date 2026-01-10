@@ -355,32 +355,33 @@ const UpdateUserStatus = () => {
                               </select>
                             </td>
                             <td className="p-1 text-center">
-                              <div className="flex flex-col gap-2">
-                                <button
-                                  onClick={() =>
-                                    handleStatusChange(user.id, "DELETED")
+                              <select
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (value === "SOFT_DELETE") {
+                                    handleStatusChange(user.id, "DELETED");
+                                  } else if (value === "PERMANENT_DELETE") {
+                                    handlePermanentDelete(
+                                      user.id,
+                                      user.name,
+                                      user.email
+                                    );
                                   }
-                                  className="px-2 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition text-xs"
-                                  title="Soft delete (recoverable)"
-                                >
-                                  Soft Delete
-                                </button>
+                                  e.target.value = ""; // Reset dropdown
+                                }}
+                                className="p-1 border rounded text-sm"
+                                defaultValue=""
+                              >
+                                <option value="" disabled>
+                                  Select
+                                </option>
+                                <option value="SOFT_DELETE">Soft</option>
                                 {userInfo?.role === "super_admin" && (
-                                  <button
-                                    onClick={() =>
-                                      handlePermanentDelete(
-                                        user.id,
-                                        user.name,
-                                        user.email
-                                      )
-                                    }
-                                    className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition text-xs hidden lg:block"
-                                    title="Permanently delete (irreversible)"
-                                  >
-                                    🗑️ Permanent
-                                  </button>
+                                  <option value="PERMANENT_DELETE">
+                                    Permanent
+                                  </option>
                                 )}
-                              </div>
+                              </select>
                             </td>
                             <td className="p-1 text-center hidden lg:table-cell text-slate-950">
                               <span className="bg-blue-200 px-1 rounded">
@@ -504,32 +505,33 @@ const UpdateUserStatus = () => {
                               </select>
                             </td>
                             <td className="p-1 text-center">
-                              <div className="flex flex-col gap-2">
-                                <button
-                                  onClick={() =>
-                                    handleStatusChange(user.id, "DELETED")
+                              <select
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (value === "SOFT_DELETE") {
+                                    handleStatusChange(user.id, "DELETED");
+                                  } else if (value === "PERMANENT_DELETE") {
+                                    handlePermanentDelete(
+                                      user.id,
+                                      user.name,
+                                      user.email
+                                    );
                                   }
-                                  className="px-2 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition text-xs"
-                                  title="Soft delete (recoverable)"
-                                >
-                                  Soft Delete
-                                </button>
+                                  e.target.value = ""; // Reset dropdown
+                                }}
+                                className="p-1 border rounded text-sm"
+                                defaultValue=""
+                              >
+                                <option value="" disabled>
+                                  Select Delete
+                                </option>
+                                <option value="SOFT_DELETE">Soft Delete</option>
                                 {userInfo?.role === "super_admin" && (
-                                  <button
-                                    onClick={() =>
-                                      handlePermanentDelete(
-                                        user.id,
-                                        user.name,
-                                        user.email
-                                      )
-                                    }
-                                    className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition text-xs hidden lg:block"
-                                    title="Permanently delete (irreversible)"
-                                  >
-                                    🗑️ Permanent
-                                  </button>
+                                  <option value="PERMANENT_DELETE">
+                                    Permanent Delete
+                                  </option>
                                 )}
-                              </div>
+                              </select>
                             </td>
                             <td className="p-1 text-center hidden lg:table-cell text-slate-950">
                               <span className="bg-blue-200 px-1 rounded">
