@@ -13,9 +13,7 @@ const ConversationTitleList = () => {
   const fetchConversations = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        "https://sprcahgenie-new-backend.vercel.app/api/v1/conversation/all"
-      );
+      const response = await api.get("/conversation/all");
       setConversations(response.data.data);
     } catch (error) {
       console.error("Error fetching conversations:", error);

@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
+import api from "../../axios";
 
 const PrefixList = () => {
   const { id: prefixTypeId } = useParams();
@@ -13,10 +14,8 @@ const PrefixList = () => {
   useEffect(() => {
     const fetchPrefixData = async () => {
       try {
-        const response = await fetch(
-          `https://sprcahgenie-new-backend.vercel.app/api/v1/prefix/prefix-type/${prefixTypeId}`
-        );
-        const data = await response.json();
+        const response = await api.get(`/prefix/prefix-type/${prefixTypeId}`);
+        const data = response.data;
         console.log(data.data);
 
         if (data.success) {

@@ -13,9 +13,7 @@ const PrefixTypeList = () => {
   const fetchPrefixTypes = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        "https://sprcahgenie-new-backend.vercel.app/api/v1/prefix/prefix-types"
-      );
+      const response = await api.get("/prefix/prefix-types");
       setPrefixTypes(response.data.data);
     } catch (error) {
       console.error("Error fetching Prefix Types:", error);

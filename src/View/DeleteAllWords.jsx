@@ -1,5 +1,6 @@
 import React from "react";
 import Swal from "sweetalert2";
+import api from "../axios";
 
 const DeleteAllWords = () => {
   const handleDeleteAllWords = async () => {
@@ -24,21 +25,16 @@ const DeleteAllWords = () => {
 
     if (result.isConfirmed) {
       try {
-        // const response = await fetch("http://localhost:3000/delete-all-words", {
-        const response = await fetch(
-          "https://sprcahgenie-new-backend.vercel.app/api/v1/delete-all-words",
-          {
-            method: "DELETE",
-          }
-        );
+        const response = await api.delete("/delete-all-words");
 
-        if (response.ok) {
+        if (response.data?.success) {
           Swal.fire("Deleted!", "All words have been deleted.", "success");
         } else {
-          const errorData = await response.json();
           Swal.fire(
             "Error!",
-            `Failed to delete words: ${errorData.error}`,
+            `Failed to delete words: ${
+              response.data?.message || "Unknown error"
+            }`,
             "error"
           );
         }

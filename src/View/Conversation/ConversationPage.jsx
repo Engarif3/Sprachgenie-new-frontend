@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useParams } from "react-router-dom";
 import Container from "../../utils/Container";
 import { FaUser } from "react-icons/fa";
 import Loader from "../../utils/Loader";
+import api from "../../axios";
 
 // Define colors for the speakers
 const speakerColors = ["#FF0000", "#008000", "#0000FF", "#FFA500", "#000000"];
@@ -15,10 +15,8 @@ const ConversationPage = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios
-      .get(
-        `https://sprcahgenie-new-backend.vercel.app/api/v1/conversation/${id}`
-      )
+    api
+      .get(`/conversation/${id}`)
       .then((response) => {
         if (response.data.data) {
           setConversation(response.data.data);

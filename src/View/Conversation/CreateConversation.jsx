@@ -60,10 +60,7 @@ const CreateConversation = () => {
         createdBy: userInfo.id,
       };
 
-      const response = await axios.post(
-        "https://sprcahgenie-new-backend.vercel.app/api/v1/conversation/create",
-        dataToSend
-      );
+      const response = await api.post("/conversation/create", dataToSend);
 
       if (response.data.success) {
         Swal.fire({
