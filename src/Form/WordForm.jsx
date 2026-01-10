@@ -144,7 +144,7 @@ const WordForm = () => {
 
       // Navigate to word list and force refresh with state
       setTimeout(() => {
-        navigate("/", { state: { forceRefresh: true } });
+        navigate("/words", { state: { forceRefresh: true } });
       }, 1600);
     } catch (error) {
       // catch (error) {
