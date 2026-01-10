@@ -137,8 +137,8 @@ const ConversationsList = () => {
       // Log the updated data after parsing
       console.log("Updated Data after parsing:", updatedData);
 
-      await axios.put(
-        `https://sprcahgenie-new-backend.vercel.app/api/v1/conversation/update/${editingConversation.id}`,
+      await api.put(
+        `/conversation/update/${editingConversation.id}`,
         updatedData
       );
       setConversations(
