@@ -142,10 +142,7 @@ const WordForm = () => {
         showConfirmButton: false,
       });
 
-      // Navigate to word list and force refresh with state
-      setTimeout(() => {
-        navigate("/words", { state: { forceRefresh: true } });
-      }, 1600);
+      // Stay on the same page after creating word
     } catch (error) {
       // catch (error) {
       //   Swal.fire({
