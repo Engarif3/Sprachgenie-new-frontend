@@ -108,6 +108,7 @@ const Register = () => {
               {...register("basicUser.name")}
               type="text"
               placeholder="Name"
+              autoComplete="name"
               className="w-full p-2 border rounded"
             />
             {errors.basicUser?.name && (
@@ -119,6 +120,7 @@ const Register = () => {
               {...register("basicUser.email")}
               type="email"
               placeholder="Email"
+              autoComplete="email"
               className="w-full p-2 border rounded"
             />
             {errors.basicUser?.email && (
@@ -131,6 +133,7 @@ const Register = () => {
                 {...register("password")}
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
+                autoComplete="new-password"
                 className="w-full p-2 border rounded"
               />
               <button
@@ -148,6 +151,7 @@ const Register = () => {
                 {...register("confirmPassword")}
                 type={showPassword ? "text" : "password"}
                 placeholder="Confirm Password"
+                autoComplete="new-password"
                 className="w-full p-2 border rounded"
               />
               <button

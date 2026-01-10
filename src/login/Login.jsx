@@ -231,6 +231,7 @@ const Login = () => {
             <label className="block text-sm font-medium">Email</label>
             <input
               type="email"
+              autoComplete="email"
               {...register("email")}
               className="w-full border p-2 rounded mt-1 text-black"
             />
@@ -246,6 +247,7 @@ const Login = () => {
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
                 {...register("password")}
                 className="w-full border p-2 rounded mt-1 text-black"
               />
