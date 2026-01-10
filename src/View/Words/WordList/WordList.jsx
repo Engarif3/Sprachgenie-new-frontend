@@ -139,6 +139,60 @@ const WordList = () => {
     lastUpdated: null,
   });
 
+  // Progressive loading: Load initial batch fast, then fetch all in background
+  const fetchInitialWords = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      // First, load just 100 words for fast initial render
+      const response = await api.get("/word/all?limit=100&page=1");
+
+      const initialCache = {
+        words: response.data.data.words || [],
+        levels: response.data.data.levels || [],
+        topics: (response.data.data.topics || []).sort((a, b) => a.id - b.id),
+        lastUpdated: Date.now(),
+        isPartial: true, // Flag to indicate this is not complete data
+      };
+      setCache(initialCache);
+      setLevels(initialCache.levels);
+      setTopics(initialCache.topics);
+      setFilteredTopics(initialCache.topics);
+      setIsLoading(false);
+
+      // Now fetch all words in the background and update cache
+      setTimeout(async () => {
+        try {
+          const fullResponse = await api.get("/word/all?all=true");
+          const fullCache = {
+            words: fullResponse.data.data.words || [],
+            levels: fullResponse.data.data.levels || [],
+            topics: (fullResponse.data.data.topics || []).sort(
+              (a, b) => a.id - b.id
+            ),
+            lastUpdated: Date.now(),
+            isPartial: false,
+          };
+
+          // Store in localStorage for future visits
+          setToStorage(CACHE_KEY, fullCache);
+
+          // Update state with full data
+          setCache(fullCache);
+          setLevels(fullCache.levels);
+          setTopics(fullCache.topics);
+          setFilteredTopics(fullCache.topics);
+
+          console.log("Background fetch complete: All words loaded and cached");
+        } catch (error) {
+          console.error("Background fetch failed:", error);
+        }
+      }, 100); // Small delay to ensure UI renders first
+    } catch (error) {
+      console.error("Initial fetch failed:", error);
+      setIsLoading(false);
+    }
+  }, []);
+
   const fetchAllWords = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -149,12 +203,15 @@ const WordList = () => {
         levels: response.data.data.levels || [],
         topics: (response.data.data.topics || []).sort((a, b) => a.id - b.id),
         lastUpdated: Date.now(),
+        isPartial: false,
       };
       setCache(newCache);
       setLevels(newCache.levels);
       setTopics(newCache.topics);
-      // NO NEED to call applyFilters here anymore
       setFilteredTopics(newCache.topics);
+
+      // Store in localStorage
+      setToStorage(CACHE_KEY, newCache);
     } catch (error) {
       // Error handled silently; users see empty list if fetch fails
     } finally {
@@ -164,9 +221,27 @@ const WordList = () => {
 
   // Load cache from storage on mount
   useEffect(() => {
-    // Always fetch fresh data (cache disabled for development)
-    fetchAllWords();
-  }, [fetchAllWords]);
+    // Check if we have cached data
+    const cachedData = getFromStorage(CACHE_KEY);
+
+    if (
+      cachedData &&
+      !cachedData.isPartial &&
+      Date.now() - cachedData.lastUpdated < CACHE_EXPIRY
+    ) {
+      // Use cached data if it's complete and not expired
+      console.log("Using cached data");
+      setCache(cachedData);
+      setLevels(cachedData.levels);
+      setTopics(cachedData.topics);
+      setFilteredTopics(cachedData.topics);
+      setIsLoading(false);
+    } else {
+      // No cache or expired - use progressive loading
+      console.log("Fetching fresh data with progressive loading");
+      fetchInitialWords();
+    }
+  }, [fetchInitialWords]);
 
   // Listen for cache invalidation from other tabs/components (MUST be after fetchAllWords definition)
   useEffect(() => {
@@ -174,14 +249,14 @@ const WordList = () => {
       if (e.key === CACHE_KEY && e.newValue === null) {
         // Cache was cleared, refetch data
         console.log("Cache cleared, refetching words...");
-        fetchAllWords();
+        fetchInitialWords();
       }
     };
 
     const handleCacheInvalidated = () => {
       // Cache was cleared in same tab, refetch data
       console.log("Cache invalidated, refetching words...");
-      fetchAllWords();
+      fetchInitialWords();
     };
 
     window.addEventListener("storage", handleStorageChange);
@@ -190,14 +265,14 @@ const WordList = () => {
       window.removeEventListener("storage", handleStorageChange);
       window.removeEventListener("cacheInvalidated", handleCacheInvalidated);
     };
-  }, [fetchAllWords]);
+  }, [fetchInitialWords]);
 
   // Effect to fetch data if cache is empty
   useEffect(() => {
-    if (cache.words.length === 0) {
-      fetchAllWords();
+    if (cache.words.length === 0 && !isLoading) {
+      fetchInitialWords();
     }
-  }, [fetchAllWords, cache.words.length]);
+  }, [fetchInitialWords, cache.words.length, isLoading]);
 
   // Force refresh when navigating from word creation
   useEffect(() => {
