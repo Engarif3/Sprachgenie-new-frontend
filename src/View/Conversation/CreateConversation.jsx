@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2"; // Ensure SweetAlert2 is imported
 import { getUserInfo } from "../../services/auth.services";
+import api from "../../axios";
 
 const CreateConversation = () => {
   const userInfo = getUserInfo() || {};

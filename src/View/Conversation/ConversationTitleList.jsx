@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
+import api from "../../axios";
 
 const ConversationTitleList = () => {
   const [conversations, setConversations] = useState([]);
