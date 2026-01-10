@@ -12,25 +12,28 @@ export const userLogin = async (loginData) => {
     }
   );
 
-  // Handle rate limit (429) or other non-JSON responses
-  if (res.status === 429) {
-    const errorText = await res.text();
-    return {
-      success: false,
-      message: errorText || "Too many login attempts, please try again later",
-    };
-  }
-
   // Check if response is JSON
   const contentType = res.headers.get("content-type");
-  if (!contentType || !contentType.includes("application/json")) {
-    const errorText = await res.text();
-    return {
-      success: false,
-      message: errorText || "An unexpected error occurred",
-    };
+  const isJson = contentType && contentType.includes("application/json");
+
+  // Handle rate limit (429) or other error responses
+  if (!res.ok) {
+    if (isJson) {
+      const errorData = await res.json();
+      return {
+        success: false,
+        message: errorData.message || "An error occurred",
+      };
+    } else {
+      const errorText = await res.text();
+      return {
+        success: false,
+        message: errorText || "An unexpected error occurred",
+      };
+    }
   }
 
+  // Parse successful response
   const loggedInInfo = await res.json();
   return loggedInInfo;
 };
