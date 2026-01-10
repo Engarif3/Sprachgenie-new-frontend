@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import Container from "../../utils/Container";
 import { getUserInfo } from "../../services/auth.services";
 import { useNavigate } from "react-router-dom";
-import { getFromLocalStorage } from "../../utils/local-storage";
-import { authKey } from "../../constants/authkey";
 import api from "../../axios";
 import { ScaleLoader } from "react-spinners";
 import { dateTimeFormatter } from "../../utils/formatDateTime";
@@ -307,9 +305,11 @@ const UpdateUserStatus = () => {
                           </th>
                           <th className="p-2 text-center">Email</th>
                           <th className="p-2 text-center">Role</th>
-                          <th className="p-2 text-center">Action</th>
+                          <th className="p-2 text-center">Status</th>
                           {userInfo?.role === "super_admin" && (
-                            <th className="p-2 text-center hidden lg:table-cell">Delete</th>
+                            <th className="p-2 text-center hidden lg:table-cell">
+                              Delete
+                            </th>
                           )}
                           <th className="p-2 text-center hidden lg:table-cell">
                             Created at <br />
@@ -353,7 +353,7 @@ const UpdateUserStatus = () => {
                               >
                                 <option value="ACTIVE">Active</option>
                                 <option value="BLOCKED">Blocked</option>
-                                <option value="DELETED">Soft Delete</option>
+                                <option value="DELETED">Deleted (Soft)</option>
                                 <option value="PENDING">Pending</option>
                               </select>
                             </td>
@@ -448,9 +448,11 @@ const UpdateUserStatus = () => {
                           </th>
                           <th className="p-2 text-center">Email</th>
                           <th className="p-2 text-center">Role</th>
-                          <th className="p-2 text-center">Action</th>
+                          <th className="p-2 text-center">Status</th>
                           {userInfo?.role === "super_admin" && (
-                            <th className="p-2 text-center hidden lg:table-cell">Delete</th>
+                            <th className="p-2 text-center hidden lg:table-cell">
+                              Delete
+                            </th>
                           )}
                           <th className="p-2 text-center hidden lg:table-cell">
                             Created at <br />
@@ -494,7 +496,7 @@ const UpdateUserStatus = () => {
                               >
                                 <option value="ACTIVE">Active</option>
                                 <option value="BLOCKED">Blocked</option>
-                                <option value="DELETED">Soft Delete</option>
+                                <option value="DELETED">Deleted (Soft)</option>
                                 <option value="PENDING">Pending</option>
                               </select>
                             </td>
