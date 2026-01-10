@@ -135,16 +135,15 @@ const UpdateUserStatus = () => {
   // Handle permanent delete
   const handlePermanentDelete = (userId, userName, userEmail) => {
     Swal.fire({
-      title: "⚠️ Permanent Delete Warning",
+      title: "Permanent Delete Warning",
       html: `
         <p class="text-lg mb-2">Are you sure you want to <strong class="text-red-600">permanently delete</strong> this user?</p>
+         <p class="text-red-600 font-bold mb-3"> This action CANNOT be undone!</p>
         <p class="mb-2"><strong>Name:</strong> ${userName}</p>
         <p class="mb-4"><strong>Email:</strong> ${userEmail}</p>
-        <p class="text-red-600 font-bold mb-3">⚠️ This action CANNOT be undone!</p>
-        <p class="text-sm text-gray-600 mb-3">All user data will be permanently removed from the database.</p>
         <p class="text-sm font-semibold mb-2">Type the user's email to confirm:</p>
       `,
-      icon: "warning",
+      // icon: "warning",
       input: "text",
       inputPlaceholder: "Enter user email",
       inputAttributes: {
@@ -309,7 +308,9 @@ const UpdateUserStatus = () => {
                           <th className="p-2 text-center">Email</th>
                           <th className="p-2 text-center">Role</th>
                           <th className="p-2 text-center">Action</th>
-                          <th className="p-2 text-center">Delete</th>
+                          <th className="p-2 text-center hidden lg:table-cell">
+                            Delete
+                          </th>
                           <th className="p-2 text-center hidden lg:table-cell">
                             Created at <br />
                             <span className="text-sm font-thin ">
@@ -356,7 +357,7 @@ const UpdateUserStatus = () => {
                                 <option value="PENDING">Pending</option>
                               </select>
                             </td>
-                            <td className="p-1 text-center">
+                            <td className="p-1 text-center hidden lg:table-cell">
                               <button
                                 onClick={() =>
                                   handlePermanentDelete(
@@ -446,7 +447,9 @@ const UpdateUserStatus = () => {
                           <th className="p-2 text-center">Email</th>
                           <th className="p-2 text-center">Role</th>
                           <th className="p-2 text-center">Action</th>
-                          <th className="p-2 text-center">Delete</th>
+                          <th className="p-2 text-center hidden lg:table-cell">
+                            Permanent Delete
+                          </th>
                           <th className="p-2 text-center hidden lg:table-cell">
                             Created at <br />
                             <span className="text-sm font-thin ">
@@ -493,7 +496,7 @@ const UpdateUserStatus = () => {
                                 <option value="PENDING">Pending</option>
                               </select>
                             </td>
-                            <td className="p-1 text-center">
+                            <td className="p-1 text-center hidden lg:table-cell">
                               <button
                                 onClick={() =>
                                   handlePermanentDelete(
