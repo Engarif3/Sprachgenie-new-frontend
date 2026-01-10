@@ -1,11 +1,11 @@
 import axios from "axios";
 
 const aiApi = axios.create({
-  //   baseURL: "http://localhost:5000",
-  baseURL: "https://sprachgenie-ai.vercel.app/api",
+  baseURL: import.meta.env.VITE_AI_API_URL || "http://localhost:5000",
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true, // ✅ CRITICAL: Send httpOnly cookies automatically
 });
 
 export default aiApi;

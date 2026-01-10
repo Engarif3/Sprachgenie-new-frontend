@@ -6,7 +6,7 @@ import React, {
   useMemo,
 } from "react";
 
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import Container from "../../../utils/Container";
 import Pagination from "../../../utils/Pagination";
@@ -31,6 +31,7 @@ const UNKNOWN_TOPIC_ID = 1;
 const RESTRICTED_LEVEL_ID = 6;
 
 const WordList = () => {
+  const location = useLocation();
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [selectedHistory, setSelectedHistory] = useState({
     creator: "",
@@ -108,28 +109,14 @@ const WordList = () => {
 
   const toggleFavorite = async (wordId) => {
     const isFavorite = favorites.includes(wordId);
-    const userId = userInfo.id;
 
     try {
       setLoadingFavorites((prev) => ({ ...prev, [wordId]: true }));
       if (isFavorite) {
-        await api.delete(`/favorite-words/${wordId}`, {
-          data: { userId, wordId },
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        await api.delete(`/favorite-words/${wordId}`);
         setFavorites((prev) => prev.filter((id) => id !== wordId));
       } else {
-        await api.post(
-          "/favorite-words",
-          { userId, wordId },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        await api.post("/favorite-words", { wordId });
         setFavorites((prev) => [...prev, wordId]);
       }
     } catch (error) {
@@ -151,52 +138,6 @@ const WordList = () => {
     topics: [],
     lastUpdated: null,
   });
-
-  // Load cache from storage on mount
-  useEffect(() => {
-    (async () => {
-      const savedCache = await getFromStorage(CACHE_KEY);
-      // if (savedCache && Date.now() - savedCache.lastUpdated < CACHE_EXPIRY) {
-      if (
-        savedCache &&
-        savedCache.words &&
-        savedCache.levels &&
-        savedCache.topics &&
-        Date.now() - savedCache.lastUpdated < CACHE_EXPIRY
-      ) {
-        setCache(savedCache);
-        setLevels(savedCache.levels);
-        const loadedTopics = savedCache.topics; // Get the loaded topics
-        setTopics(loadedTopics);
-        setFilteredTopics(loadedTopics);
-        // NO NEED to call applyFilters here, useMemo handles initial filter
-      }
-    })();
-  }, []);
-
-  // Save cache to storage with debouncing to prevent excessive writes
-  useEffect(() => {
-    if (!cache.lastUpdated) return;
-
-    // Clear existing timer
-    if (cacheDebounceTimer.current) {
-      clearTimeout(cacheDebounceTimer.current);
-    }
-
-    // Set new timer for debounced save (500ms)
-    cacheDebounceTimer.current = setTimeout(() => {
-      setToStorage(CACHE_KEY, cache);
-    }, 500);
-
-    return () => {
-      if (cacheDebounceTimer.current) {
-        clearTimeout(cacheDebounceTimer.current);
-      }
-    };
-  }, [cache.lastUpdated]);
-
-  // REMOVED: The old applyFilters useCallback.
-  // The filtering logic is now split into two useMemo blocks.
 
   const fetchAllWords = useCallback(async () => {
     setIsLoading(true);
@@ -221,12 +162,53 @@ const WordList = () => {
     }
   }, []);
 
+  // Load cache from storage on mount
+  useEffect(() => {
+    // Always fetch fresh data (cache disabled for development)
+    fetchAllWords();
+  }, [fetchAllWords]);
+
+  // Listen for cache invalidation from other tabs/components (MUST be after fetchAllWords definition)
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === CACHE_KEY && e.newValue === null) {
+        // Cache was cleared, refetch data
+        console.log("Cache cleared, refetching words...");
+        fetchAllWords();
+      }
+    };
+
+    const handleCacheInvalidated = () => {
+      // Cache was cleared in same tab, refetch data
+      console.log("Cache invalidated, refetching words...");
+      fetchAllWords();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("cacheInvalidated", handleCacheInvalidated);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("cacheInvalidated", handleCacheInvalidated);
+    };
+  }, [fetchAllWords]);
+
   // Effect to fetch data if cache is empty
   useEffect(() => {
     if (cache.words.length === 0) {
       fetchAllWords();
     }
   }, [fetchAllWords, cache.words.length]);
+
+  // Force refresh when navigating from word creation
+  useEffect(() => {
+    if (location.state?.forceRefresh) {
+      console.log("Force refresh triggered");
+      localStorage.removeItem(CACHE_KEY);
+      fetchAllWords();
+      // Clear the state to prevent re-fetching on subsequent renders
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, fetchAllWords]);
 
   const allFilteredWords = useMemo(() => {
     const wordsArray = cache.words;
@@ -458,11 +440,7 @@ const WordList = () => {
       }).then((result) => {
         if (result.isConfirmed) {
           api
-            .delete(`/word/delete/${wordId}`, {
-              headers: {
-                userid: userInfo.id,
-              },
-            })
+            .delete(`/word/delete/${wordId}`)
             .then(() => {
               // Update cache directly to avoid refetching all data
               setCache((prev) => ({

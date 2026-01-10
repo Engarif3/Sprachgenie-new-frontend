@@ -1,7 +1,5 @@
 import Swal from "sweetalert2";
 import { useEffect, useState } from "react";
-import { getFromLocalStorage } from "../utils/local-storage";
-import { authKey } from "../constants/authkey";
 import api from "../axios";
 import aiApi from "../AI_axios";
 import { ScaleLoader } from "react-spinners";
@@ -24,10 +22,7 @@ const ReportsByUsers = () => {
       const reportData = reportRes.data || [];
 
       // fetch all users
-      const freshToken = getFromLocalStorage(authKey);
-      const userRes = await api.get("/user", {
-        headers: { Authorization: `Bearer ${freshToken}` },
-      });
+      const userRes = await api.get("/user");
       const usersData = userRes.data.data;
 
       setReports(reportData);
@@ -92,22 +87,15 @@ const ReportsByUsers = () => {
       });
 
       setRegenerating(report.wordId);
-      const freshToken = getFromLocalStorage(authKey);
 
       // Step 4: Call the API
-      await aiApi.post(
-        "/paragraphs/regenerate",
-        {
-          userId: report.reports[0]?.userId,
-          wordId: report.wordId,
-          word: report.word,
-          level: report.level,
-          language: report.language,
-        },
-        {
-          headers: { Authorization: `Bearer ${freshToken}` },
-        }
-      );
+      await aiApi.post("/paragraphs/regenerate", {
+        userId: report.reports[0]?.userId,
+        wordId: report.wordId,
+        word: report.word,
+        level: report.level,
+        language: report.language,
+      });
 
       // Step 5: Update frontend state (mark as regenerated)
 
@@ -158,11 +146,7 @@ const ReportsByUsers = () => {
         didOpen: () => Swal.showLoading(),
       });
 
-      const freshToken = getFromLocalStorage(authKey);
-
-      await aiApi.delete("/paragraphs/delete-all-reports", {
-        headers: { Authorization: `Bearer ${freshToken}` },
-      });
+      await aiApi.delete("/paragraphs/delete-all-reports");
 
       setReports([]);
       Swal.close();
@@ -203,11 +187,7 @@ const ReportsByUsers = () => {
         didOpen: () => Swal.showLoading(),
       });
 
-      const freshToken = getFromLocalStorage(authKey);
-
-      await aiApi.delete("/paragraphs/delete-all-regenerated-reports", {
-        headers: { Authorization: `Bearer ${freshToken}` },
-      });
+      await aiApi.delete("/paragraphs/delete-all-regenerated-reports");
 
       // Remove regenerated reports from frontend state
       const updatedReports = reports

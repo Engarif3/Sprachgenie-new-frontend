@@ -36,10 +36,7 @@ const UserLimits = () => {
         setGlobalLimits(fetchedGlobalLimits);
 
         // 2️⃣ Fetch users
-        const freshToken = getFromLocalStorage(authKey);
-        const userRes = await api.get("/user", {
-          headers: { Authorization: `Bearer ${freshToken}` },
-        });
+        const userRes = await api.get("/user");
         const usersData = userRes.data.data;
 
         // 3️⃣ Merge user limits with normalized fallback

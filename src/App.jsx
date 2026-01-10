@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import NavBar from "./navbar/NavBar";
 import Footer from "./footer/Footer";
 import ScrollToTop from "./ScrollToTop";
@@ -7,9 +7,11 @@ import DarkVeil from "./View/Home/DarkVeil";
 import Loader from "./utils/Loader";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Swal from "sweetalert2";
+import { storeUserInfo, getUserInfo } from "./services/auth.services";
 
 const App = () => {
   const location = useLocation();
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   // Validate required environment variables on app load
   useEffect(() => {
@@ -34,6 +36,57 @@ const App = () => {
       });
     }
   }, []);
+
+  // Fetch user info on app load if cookie exists
+  useEffect(() => {
+    const initializeAuth = async () => {
+      // Skip if already have user info
+      if (getUserInfo()) {
+        setIsAuthLoading(false);
+        return;
+      }
+
+      // Skip fetch on public pages
+      if (location.pathname === "/login" || location.pathname === "/register") {
+        setIsAuthLoading(false);
+        return;
+      }
+
+      try {
+        // Try to fetch user info (cookie will be sent automatically)
+        const response = await fetch(
+          `${import.meta.env.VITE_BACKEND_API_URL}/auth/me`,
+          {
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data?.data) {
+            storeUserInfo(data.data);
+          }
+        }
+      } catch (error) {
+        // Silent fail - user will be redirected to login if needed
+        console.log("No active session");
+      } finally {
+        setIsAuthLoading(false);
+      }
+    };
+
+    initializeAuth();
+  }, [location.pathname]);
+
+  // Show loader while checking authentication
+  if (isAuthLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader />
+      </div>
+    );
+  }
 
   // const noHeaderFooter =
   //   location.pathname.includes("login") || location.pathname.includes("signup");

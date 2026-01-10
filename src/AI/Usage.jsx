@@ -32,12 +32,8 @@ const Usage = () => {
       } catch {}
 
       // Fetch active users with pagination
-      const token = getFromLocalStorage(authKey);
       const userRes = await api.get(
-        `/user?page=${page}&limit=${limit}&status=ACTIVE`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        `/user?page=${page}&limit=${limit}&status=ACTIVE`
       );
       const users = userRes.data.data || [];
       const total = userRes.data.meta?.total || users.length;

@@ -3,8 +3,6 @@ import Swal from "sweetalert2";
 import Container from "../../utils/Container";
 import { getUserInfo } from "../../services/auth.services";
 import { useNavigate } from "react-router-dom";
-import { getFromLocalStorage } from "../../utils/local-storage";
-import { authKey } from "../../constants/authkey";
 import api from "../../axios";
 import { ScaleLoader } from "react-spinners";
 import { dateTimeFormatter } from "../../utils/formatDateTime";
@@ -24,13 +22,10 @@ const UpdateBasicUserStatus = () => {
   const fetchUsers = async (page, status, limit = 50) => {
     try {
       setLoading(true);
-      const token = getFromLocalStorage(authKey);
-      if (!token) throw new Error("No token found");
 
       const statusParam = status === "ALL" ? "" : `&status=${status}`;
       const response = await api.get(
-        `/user?page=${page}&limit=${limit}&role=BASIC_USER${statusParam}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        `/user?page=${page}&limit=${limit}&role=BASIC_USER${statusParam}`
       );
 
       if (response.data.success && Array.isArray(response.data.data)) {
@@ -59,12 +54,6 @@ const UpdateBasicUserStatus = () => {
   }, [page, selectedStatus]);
 
   const handleStatusChange = (userId, newStatus) => {
-    const freshToken = getFromLocalStorage(authKey);
-    if (!freshToken) {
-      Swal.fire("Error", "No authorization token found", "error");
-      return;
-    }
-
     Swal.fire({
       text: `Change the status to ${newStatus}?`,
       showCancelButton: true,
@@ -73,11 +62,10 @@ const UpdateBasicUserStatus = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         api
-          .patch(
-            `/user/update-basicUser-status/${userId}`,
-            { status: newStatus, performedById: userInfo.id },
-            { headers: { Authorization: `Bearer ${freshToken}` } }
-          )
+          .patch(`/user/update-basicUser-status/${userId}`, {
+            status: newStatus,
+            performedById: userInfo.id,
+          })
           .then((response) => {
             if (response.data.success) {
               setBasicUsers((prevUsers) =>

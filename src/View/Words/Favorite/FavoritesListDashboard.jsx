@@ -174,9 +174,7 @@ const FavoritesListDashboard = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`/favorite-words/${wordId}`, {
-          data: { userId: userInfo.id },
-        });
+        await axios.delete(`/favorite-words/${wordId}`);
 
         setFavoriteWords((prev) => prev.filter((word) => word.id !== wordId));
 
@@ -239,9 +237,7 @@ const FavoritesListDashboard = () => {
     try {
       if (favorites.includes(wordId)) {
         // Remove favorite
-        await axios.delete(`/favorite-words/${wordId}`, {
-          data: { userId: userInfo.id },
-        });
+        await axios.delete(`/favorite-words/${wordId}`);
 
         const updatedFavorites = favoriteWords.filter((w) => w.id !== wordId);
         setFavorites(updatedFavorites.map((w) => w.id));
@@ -259,10 +255,7 @@ const FavoritesListDashboard = () => {
         });
       } else {
         // Add favorite
-        const response = await axios.post(`/favorite-words`, {
-          userId: userInfo.id,
-          wordId,
-        });
+        const response = await axios.post(`/favorite-words`, { wordId });
 
         if (response.data.success) {
           // Fetch updated favorites list

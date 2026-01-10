@@ -1,9 +1,9 @@
 //for admin
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Swal from "sweetalert2"; // Ensure SweetAlert2 is imported
 import { getUserInfo } from "../../services/auth.services";
 import { ScaleLoader } from "react-spinners";
+import api from "../../axios"; // Use configured axios instance
 
 const ConversationsList = () => {
   const [conversations, setConversations] = useState([]);
@@ -49,16 +49,9 @@ const ConversationsList = () => {
 
     if (result.isConfirmed) {
       try {
-        const response = await axios.delete(
-          `https://sprcahgenie-new-backend.vercel.app/api/v1/conversation/delete/${id}`,
-          {
-            headers: {
-              // Add authorization if required
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-            data: {}, // Some servers expect empty data for DELETE
-          }
-        );
+        const response = await api.delete(`/conversation/delete/${id}`, {
+          data: {}, // Some servers expect empty data for DELETE
+        });
 
         // Check for server's success criteria
         if (response.data.success) {

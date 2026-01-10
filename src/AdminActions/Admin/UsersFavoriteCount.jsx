@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Container from "../../utils/Container";
 import { getUserInfo } from "../../services/auth.services";
-import { getFromLocalStorage } from "../../utils/local-storage";
-import { authKey } from "../../constants/authkey";
 import api from "../../axios";
 import { useNavigate } from "react-router-dom";
 import { ScaleLoader } from "react-spinners";
@@ -25,21 +23,7 @@ const UsersFavoriteCount = () => {
 
     const fetchData = async () => {
       try {
-        const token = getFromLocalStorage(authKey);
-
-        if (!token) {
-          setError("No authentication token found");
-          setLoading(false);
-          return; // Stop execution here
-        }
-
-        const response = await api.get(
-          //   "http://localhost:5000/api/v1/users-favorite-count",
-          "/users-favorite-count",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await api.get("/users-favorite-count");
 
         if (response.data.success && Array.isArray(response.data.data)) {
           setUsers(response.data.data);

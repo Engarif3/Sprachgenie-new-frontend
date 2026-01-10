@@ -28,17 +28,14 @@ const UpdateUserStatus = () => {
 
   const userInfo = getUserInfo() || {};
   const navigate = useNavigate();
-  const token = getFromLocalStorage(authKey);
 
   // Fetch Admins
   const fetchAdmins = async (page = 1, limit = 50) => {
     try {
       setLoadingAdmins(true);
-      if (!token) throw new Error("No token found");
 
       const response = await api.get(
-        `/user?page=${page}&limit=${limit}&role=ADMIN`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        `/user?page=${page}&limit=${limit}&role=ADMIN`
       );
 
       if (response.data.success && Array.isArray(response.data.data)) {
@@ -61,12 +58,10 @@ const UpdateUserStatus = () => {
   const fetchBasicUsers = async (page = 1, status = "ALL", limit = 50) => {
     try {
       setLoadingUsers(true);
-      if (!token) throw new Error("No token found");
 
       const statusParam = status === "ALL" ? "" : `&status=${status}`;
       const response = await api.get(
-        `/user?page=${page}&limit=${limit}&role=BASIC_USER${statusParam}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        `/user?page=${page}&limit=${limit}&role=BASIC_USER${statusParam}`
       );
 
       if (response.data.success && Array.isArray(response.data.data)) {
@@ -96,11 +91,6 @@ const UpdateUserStatus = () => {
 
   // Handle status change
   const handleStatusChange = (userId, newStatus) => {
-    if (!token) {
-      Swal.fire("Error", "No authorization token found", "error");
-      return;
-    }
-
     Swal.fire({
       text: `Change the status to ${newStatus}?`,
       showCancelButton: true,
@@ -109,11 +99,10 @@ const UpdateUserStatus = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         api
-          .patch(
-            `/user/update-status/${userId}`,
-            { status: newStatus, performedById: userInfo.id },
-            { headers: { Authorization: `Bearer ${token}` } }
-          )
+          .patch(`/user/update-status/${userId}`, {
+            status: newStatus,
+            performedById: userInfo.id,
+          })
           .then((response) => {
             if (response.data.success) {
               setAdmins((prev) =>
@@ -145,11 +134,6 @@ const UpdateUserStatus = () => {
 
   // Handle role change
   const handleRoleChange = (userId, newRole) => {
-    if (!token) {
-      Swal.fire("Error", "No authorization token found", "error");
-      return;
-    }
-
     const newAssignedRole = newRole === "BASIC_USER" ? "Basic User" : "Admin";
 
     Swal.fire({
@@ -160,11 +144,10 @@ const UpdateUserStatus = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         api
-          .patch(
-            `/user/update-role/${userId}`,
-            { role: newRole, performedById: userInfo.id },
-            { headers: { Authorization: `Bearer ${token}` } }
-          )
+          .patch(`/user/update-role/${userId}`, {
+            role: newRole,
+            performedById: userInfo.id,
+          })
           .then((response) => {
             if (response.data.success) {
               const updatedUser = { ...response.data.data, role: newRole };
@@ -258,12 +241,12 @@ const UpdateUserStatus = () => {
                           <th className="p-2 text-center">Email</th>
                           <th className="p-2 text-center">Role</th>
                           <th className="p-2 text-center">Action</th>
-                           <th className="p-2 text-center hidden lg:table-cell">
-                        Created at <br />
-                        <span className="text-sm font-thin ">
-                          DD:MM:YYYY-HH:MM:SS
-                        </span>
-                      </th>
+                          <th className="p-2 text-center hidden lg:table-cell">
+                            Created at <br />
+                            <span className="text-sm font-thin ">
+                              DD:MM:YYYY-HH:MM:SS
+                            </span>
+                          </th>
                         </tr>
                       </thead>
                       <tbody>

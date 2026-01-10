@@ -146,20 +146,27 @@ const Login = () => {
     setError("");
     try {
       const res = await userLogin(formData);
+      console.log("Login response:", res); // Debug log
+
       // ✅ Token now in httpOnly cookie (not in response body)
       if (res?.success) {
         toast.success(res.message || "Login successful");
 
-        // ✅ Fetch user info from /auth/me or use data from response
-        // Store user metadata (NOT token)
+        // ✅ Fetch user info from /auth/me
         const userInfo = await fetchUserInfo();
-        storeUserInfo(userInfo);
+        console.log("User info:", userInfo); // Debug log
 
-        navigate("/");
+        if (userInfo) {
+          storeUserInfo(userInfo);
+          navigate("/");
+        } else {
+          setError("Failed to fetch user information");
+        }
       } else {
         setError(res?.message || "Login failed");
       }
     } catch (err) {
+      console.error("Login error:", err); // Debug log
       setError(err?.message || "An error occurred");
     } finally {
       setIsSubmitting(false);
@@ -169,13 +176,35 @@ const Login = () => {
   // ✅ Fetch user info from a protected endpoint
   const fetchUserInfo = async () => {
     try {
+      console.log(
+        "Fetching user info from:",
+        `${import.meta.env.VITE_BACKEND_API_URL}/auth/me`
+      );
       const response = await fetch(
         `${import.meta.env.VITE_BACKEND_API_URL}/auth/me`,
-        { credentials: "include" }
+        {
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
+
+      console.log("Response status:", response.status);
+      console.log("Response ok:", response.ok);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Failed to fetch user info:", response.status, errorText);
+        return null;
+      }
+
       const data = await response.json();
+      console.log("Fetched user data:", data); // Debug log
       return data?.data || null;
-    } catch {
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+      console.error("Error stack:", error.stack);
       return null;
     }
   };

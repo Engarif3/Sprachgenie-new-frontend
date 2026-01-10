@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "../axios";
 
 import { getUserInfo } from "../services/auth.services";
 
 const WordForm = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const [levels, setLevels] = useState([]);
   const [topics, setTopics] = useState([]);
   const [articles, setArticles] = useState([]);
@@ -130,15 +131,21 @@ const WordForm = () => {
       // });
       const response = await api.post("/word/create", newWordData);
       localStorage.removeItem("wordListCache");
+
+      setWordData(initialWordData); // Reset form state
+
       Swal.fire({
         title: "Created",
         text: "The word created successfully.",
         icon: "success",
-        timer: 1000,
+        timer: 1500,
         showConfirmButton: false,
       });
-      // navigate("/");
-      setWordData(initialWordData); // Reset form state
+
+      // Navigate to word list and force refresh with state
+      setTimeout(() => {
+        navigate("/", { state: { forceRefresh: true } });
+      }, 1600);
     } catch (error) {
       // catch (error) {
       //   Swal.fire({
