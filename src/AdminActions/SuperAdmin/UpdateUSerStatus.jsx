@@ -307,6 +307,7 @@ const UpdateUserStatus = () => {
                           </th>
                           <th className="p-2 text-center">Email</th>
                           <th className="p-2 text-center">Role</th>
+                          <th className="p-2 text-center">Action</th>
                           <th className="p-2 text-center">Delete</th>
                           <th className="p-2 text-center hidden lg:table-cell">
                             Created at <br />
@@ -346,28 +347,40 @@ const UpdateUserStatus = () => {
                                 onChange={(e) =>
                                   handleStatusChange(user.id, e.target.value)
                                 }
-                                className="p-1 border rounded"
+                                className="p-1 border rounded text-sm"
                               >
                                 <option value="ACTIVE">Active</option>
                                 <option value="BLOCKED">Blocked</option>
-                                <option value="DELETED">Deleted</option>
                                 <option value="PENDING">Pending</option>
                               </select>
                             </td>
-                            <td className="p-1 text-center hidden lg:table-cell">
-                              <button
-                                onClick={() =>
-                                  handlePermanentDelete(
-                                    user.id,
-                                    user.name,
-                                    user.email
-                                  )
-                                }
-                                className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition text-sm"
-                                title="Permanently delete user"
-                              >
-                                🗑️ Delete
-                              </button>
+                            <td className="p-1 text-center">
+                              <div className="flex flex-col gap-2">
+                                <button
+                                  onClick={() =>
+                                    handleStatusChange(user.id, "DELETED")
+                                  }
+                                  className="px-2 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition text-xs"
+                                  title="Soft delete (recoverable)"
+                                >
+                                  Soft Delete
+                                </button>
+                                {userInfo?.role === "super_admin" && (
+                                  <button
+                                    onClick={() =>
+                                      handlePermanentDelete(
+                                        user.id,
+                                        user.name,
+                                        user.email
+                                      )
+                                    }
+                                    className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition text-xs hidden lg:block"
+                                    title="Permanently delete (irreversible)"
+                                  >
+                                    🗑️ Permanent
+                                  </button>
+                                )}
+                              </div>
                             </td>
                             <td className="p-1 text-center hidden lg:table-cell text-slate-950">
                               <span className="bg-blue-200 px-1 rounded">
@@ -443,6 +456,7 @@ const UpdateUserStatus = () => {
                           </th>
                           <th className="p-2 text-center">Email</th>
                           <th className="p-2 text-center">Role</th>
+                          <th className="p-2 text-center">Action</th>
                           <th className="p-2 text-center">Delete</th>
                           <th className="p-2 text-center hidden lg:table-cell">
                             Created at <br />
@@ -482,28 +496,40 @@ const UpdateUserStatus = () => {
                                 onChange={(e) =>
                                   handleStatusChange(user.id, e.target.value)
                                 }
-                                className="p-1 border rounded"
+                                className="p-1 border rounded text-sm"
                               >
                                 <option value="ACTIVE">Active</option>
                                 <option value="BLOCKED">Blocked</option>
-                                <option value="DELETED">Deleted</option>
                                 <option value="PENDING">Pending</option>
                               </select>
                             </td>
-                            <td className="p-1 text-center hidden lg:table-cell">
-                              <button
-                                onClick={() =>
-                                  handlePermanentDelete(
-                                    user.id,
-                                    user.name,
-                                    user.email
-                                  )
-                                }
-                                className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition text-sm"
-                                title="Permanently delete user"
-                              >
-                                🗑️ Delete
-                              </button>
+                            <td className="p-1 text-center">
+                              <div className="flex flex-col gap-2">
+                                <button
+                                  onClick={() =>
+                                    handleStatusChange(user.id, "DELETED")
+                                  }
+                                  className="px-2 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition text-xs"
+                                  title="Soft delete (recoverable)"
+                                >
+                                  Soft Delete
+                                </button>
+                                {userInfo?.role === "super_admin" && (
+                                  <button
+                                    onClick={() =>
+                                      handlePermanentDelete(
+                                        user.id,
+                                        user.name,
+                                        user.email
+                                      )
+                                    }
+                                    className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition text-xs hidden lg:block"
+                                    title="Permanently delete (irreversible)"
+                                  >
+                                    🗑️ Permanent
+                                  </button>
+                                )}
+                              </div>
                             </td>
                             <td className="p-1 text-center hidden lg:table-cell text-slate-950">
                               <span className="bg-blue-200 px-1 rounded">
