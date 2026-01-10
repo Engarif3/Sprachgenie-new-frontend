@@ -143,8 +143,8 @@ const WordList = () => {
   const fetchInitialWords = useCallback(async () => {
     setIsLoading(true);
     try {
-      // First, load just 100 words for fast initial render
-      const response = await api.get("/word/all?limit=100&page=1");
+      // First, load just 50 words for fast initial render
+      const response = await api.get("/word/all?limit=50&page=1");
 
       const initialCache = {
         words: response.data.data.words || [],
