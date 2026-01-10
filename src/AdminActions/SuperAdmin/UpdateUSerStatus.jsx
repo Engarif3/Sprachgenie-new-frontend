@@ -308,7 +308,9 @@ const UpdateUserStatus = () => {
                           <th className="p-2 text-center">Email</th>
                           <th className="p-2 text-center">Role</th>
                           <th className="p-2 text-center">Action</th>
-                          <th className="p-2 text-center">Delete</th>
+                          {userInfo?.role === "super_admin" && (
+                            <th className="p-2 text-center hidden lg:table-cell">Delete</th>
+                          )}
                           <th className="p-2 text-center hidden lg:table-cell">
                             Created at <br />
                             <span className="text-sm font-thin ">
@@ -351,38 +353,27 @@ const UpdateUserStatus = () => {
                               >
                                 <option value="ACTIVE">Active</option>
                                 <option value="BLOCKED">Blocked</option>
+                                <option value="DELETED">Soft Delete</option>
                                 <option value="PENDING">Pending</option>
                               </select>
                             </td>
-                            <td className="p-1 text-center">
-                              <select
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  if (value === "SOFT_DELETE") {
-                                    handleStatusChange(user.id, "DELETED");
-                                  } else if (value === "PERMANENT_DELETE") {
+                            {userInfo?.role === "super_admin" && (
+                              <td className="p-1 text-center hidden lg:table-cell">
+                                <button
+                                  onClick={() =>
                                     handlePermanentDelete(
                                       user.id,
                                       user.name,
                                       user.email
-                                    );
+                                    )
                                   }
-                                  e.target.value = ""; // Reset dropdown
-                                }}
-                                className="p-1 border rounded text-sm"
-                                defaultValue=""
-                              >
-                                <option value="" disabled>
-                                  Select
-                                </option>
-                                <option value="SOFT_DELETE">Soft</option>
-                                {userInfo?.role === "super_admin" && (
-                                  <option value="PERMANENT_DELETE">
-                                    Permanent
-                                  </option>
-                                )}
-                              </select>
-                            </td>
+                                  className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition text-xs"
+                                  title="Permanently delete (irreversible)"
+                                >
+                                  🗑️ Permanent
+                                </button>
+                              </td>
+                            )}
                             <td className="p-1 text-center hidden lg:table-cell text-slate-950">
                               <span className="bg-blue-200 px-1 rounded">
                                 {
@@ -458,7 +449,9 @@ const UpdateUserStatus = () => {
                           <th className="p-2 text-center">Email</th>
                           <th className="p-2 text-center">Role</th>
                           <th className="p-2 text-center">Action</th>
-                          <th className="p-2 text-center">Delete</th>
+                          {userInfo?.role === "super_admin" && (
+                            <th className="p-2 text-center hidden lg:table-cell">Delete</th>
+                          )}
                           <th className="p-2 text-center hidden lg:table-cell">
                             Created at <br />
                             <span className="text-sm font-thin ">
@@ -501,38 +494,27 @@ const UpdateUserStatus = () => {
                               >
                                 <option value="ACTIVE">Active</option>
                                 <option value="BLOCKED">Blocked</option>
+                                <option value="DELETED">Soft Delete</option>
                                 <option value="PENDING">Pending</option>
                               </select>
                             </td>
-                            <td className="p-1 text-center">
-                              <select
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  if (value === "SOFT_DELETE") {
-                                    handleStatusChange(user.id, "DELETED");
-                                  } else if (value === "PERMANENT_DELETE") {
+                            {userInfo?.role === "super_admin" && (
+                              <td className="p-1 text-center hidden lg:table-cell">
+                                <button
+                                  onClick={() =>
                                     handlePermanentDelete(
                                       user.id,
                                       user.name,
                                       user.email
-                                    );
+                                    )
                                   }
-                                  e.target.value = ""; // Reset dropdown
-                                }}
-                                className="p-1 border rounded text-sm"
-                                defaultValue=""
-                              >
-                                <option value="" disabled>
-                                  Select
-                                </option>
-                                <option value="SOFT_DELETE">Soft</option>
-                                {userInfo?.role === "super_admin" && (
-                                  <option value="PERMANENT_DELETE">
-                                    Permanent
-                                  </option>
-                                )}
-                              </select>
-                            </td>
+                                  className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition text-xs"
+                                  title="Permanently delete (irreversible)"
+                                >
+                                  🗑️ Permanent
+                                </button>
+                              </td>
+                            )}
                             <td className="p-1 text-center hidden lg:table-cell text-slate-950">
                               <span className="bg-blue-200 px-1 rounded">
                                 {
