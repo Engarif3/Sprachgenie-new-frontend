@@ -132,6 +132,57 @@ const UpdateUserStatus = () => {
     });
   };
 
+  // Handle permanent delete
+  const handlePermanentDelete = (userId, userName, userEmail) => {
+    Swal.fire({
+      title: "⚠️ Permanent Delete Warning",
+      html: `
+        <p class="text-lg mb-2">Are you sure you want to <strong class="text-red-600">permanently delete</strong> this user?</p>
+        <p class="mb-2"><strong>Name:</strong> ${userName}</p>
+        <p class="mb-4"><strong>Email:</strong> ${userEmail}</p>
+        <p class="text-red-600 font-bold">⚠️ This action CANNOT be undone!</p>
+        <p class="text-sm text-gray-600 mt-2">All user data will be permanently removed from the database.</p>
+      `,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#dc2626",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Yes, Delete Permanently",
+      cancelButtonText: "Cancel",
+      focusCancel: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        api
+          .delete(`/user/permanent-delete/${userId}`)
+          .then((response) => {
+            if (response.data.success) {
+              // Remove from both lists
+              setAdmins((prev) => prev.filter((u) => u.id !== userId));
+              setBasicUsers((prev) => prev.filter((u) => u.id !== userId));
+
+              Swal.fire({
+                title: "Deleted!",
+                text: "User has been permanently deleted from the database.",
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false,
+              });
+            } else {
+              Swal.fire("Failed", "Failed to delete user", "error");
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+            Swal.fire(
+              "Error",
+              error.response?.data?.message || "Failed to delete user",
+              "error"
+            );
+          });
+      }
+    });
+  };
+
   // Handle role change
   const handleRoleChange = (userId, newRole) => {
     const newAssignedRole = newRole === "BASIC_USER" ? "Basic User" : "Admin";
@@ -241,6 +292,7 @@ const UpdateUserStatus = () => {
                           <th className="p-2 text-center">Email</th>
                           <th className="p-2 text-center">Role</th>
                           <th className="p-2 text-center">Action</th>
+                          <th className="p-2 text-center">Delete</th>
                           <th className="p-2 text-center hidden lg:table-cell">
                             Created at <br />
                             <span className="text-sm font-thin ">
@@ -286,6 +338,21 @@ const UpdateUserStatus = () => {
                                 <option value="DELETED">Deleted</option>
                                 <option value="PENDING">Pending</option>
                               </select>
+                            </td>
+                            <td className="p-1 text-center">
+                              <button
+                                onClick={() =>
+                                  handlePermanentDelete(
+                                    user.id,
+                                    user.name,
+                                    user.email
+                                  )
+                                }
+                                className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition text-sm"
+                                title="Permanently delete user"
+                              >
+                                🗑️ Delete
+                              </button>
                             </td>
                             <td className="p-1 text-center hidden lg:table-cell text-slate-950">
                               <span className="bg-blue-200 px-1 rounded">
@@ -362,6 +429,7 @@ const UpdateUserStatus = () => {
                           <th className="p-2 text-center">Email</th>
                           <th className="p-2 text-center">Role</th>
                           <th className="p-2 text-center">Action</th>
+                          <th className="p-2 text-center">Delete</th>
                           <th className="p-2 text-center hidden lg:table-cell">
                             Created at <br />
                             <span className="text-sm font-thin ">
@@ -407,6 +475,21 @@ const UpdateUserStatus = () => {
                                 <option value="DELETED">Deleted</option>
                                 <option value="PENDING">Pending</option>
                               </select>
+                            </td>
+                            <td className="p-1 text-center">
+                              <button
+                                onClick={() =>
+                                  handlePermanentDelete(
+                                    user.id,
+                                    user.name,
+                                    user.email
+                                  )
+                                }
+                                className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition text-sm"
+                                title="Permanently delete user"
+                              >
+                                🗑️ Delete
+                              </button>
                             </td>
                             <td className="p-1 text-center hidden lg:table-cell text-slate-950">
                               <span className="bg-blue-200 px-1 rounded">
