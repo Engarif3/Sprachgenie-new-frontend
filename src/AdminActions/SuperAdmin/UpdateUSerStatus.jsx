@@ -140,16 +140,33 @@ const UpdateUserStatus = () => {
         <p class="text-lg mb-2">Are you sure you want to <strong class="text-red-600">permanently delete</strong> this user?</p>
         <p class="mb-2"><strong>Name:</strong> ${userName}</p>
         <p class="mb-4"><strong>Email:</strong> ${userEmail}</p>
-        <p class="text-red-600 font-bold">⚠️ This action CANNOT be undone!</p>
-        <p class="text-sm text-gray-600 mt-2">All user data will be permanently removed from the database.</p>
+        <p class="text-red-600 font-bold mb-3">⚠️ This action CANNOT be undone!</p>
+        <p class="text-sm text-gray-600 mb-3">All user data will be permanently removed from the database.</p>
+        <p class="text-sm font-semibold mb-2">Type the user's email to confirm:</p>
       `,
       icon: "warning",
+      input: "text",
+      inputPlaceholder: "Enter user email",
+      inputAttributes: {
+        autocomplete: "off",
+      },
       showCancelButton: true,
       confirmButtonColor: "#dc2626",
       cancelButtonColor: "#6b7280",
       confirmButtonText: "Yes, Delete Permanently",
       cancelButtonText: "Cancel",
       focusCancel: true,
+      preConfirm: (inputValue) => {
+        if (!inputValue) {
+          Swal.showValidationMessage("Email is required");
+          return false;
+        }
+        if (inputValue.trim() !== userEmail) {
+          Swal.showValidationMessage("Email does not match");
+          return false;
+        }
+        return true;
+      },
     }).then((result) => {
       if (result.isConfirmed) {
         api
