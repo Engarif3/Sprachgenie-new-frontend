@@ -124,10 +124,9 @@ const FavoritesList = () => {
       const word = favoriteWords.find(
         (w) =>
           w.value === wordValue ||
-          (w.synonyms && w.synonyms.some((syn) => syn.value === wordValue)) ||
-          (w.antonyms && w.antonyms.some((ant) => ant.value === wordValue)) ||
-          (w.similarWords &&
-            w.similarWords.some((sim) => sim.value === wordValue))
+          (w.synonyms && w.synonyms.includes(wordValue)) ||
+          (w.antonyms && w.antonyms.includes(wordValue)) ||
+          (w.similarWords && w.similarWords.includes(wordValue))
       );
 
       if (!word) {
