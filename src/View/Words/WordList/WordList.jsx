@@ -449,14 +449,19 @@ const WordList = () => {
       const word = cache.words.find(
         (w) =>
           w.value === wordValue ||
-          (w.synonyms && w.synonyms.includes(wordValue))
-        // w.synonyms?.some((s) => s.value === wordValue)
+          (w.synonyms && w.synonyms.includes(wordValue)) ||
+          (w.antonyms && w.antonyms.includes(wordValue)) ||
+          (w.similarWords && w.similarWords.includes(wordValue))
       );
 
       if (word) {
         openModal(word);
       } else {
-        Swal.fire("Not Found", "The word or synonym doesn't exist.", "error");
+        Swal.fire(
+          "Not Found",
+          "The word doesn't exist in your word list.",
+          "error"
+        );
       }
     },
     [cache.words, openModal]
