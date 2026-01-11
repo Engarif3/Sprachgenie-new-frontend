@@ -1,4 +1,4 @@
-import { useRef, useCallback, useMemo, memo } from "react";
+import { useRef, useCallback, useMemo, memo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 import { pronounceWord } from "../../../utils/wordPronounciation";
@@ -75,6 +75,18 @@ const WordListModal = ({
   // Call hooks BEFORE any conditional returns
   useLockBodyScroll(!!selectedWord);
 
+  // Add escape key handler for better UX
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === "Escape" && selectedWord) {
+        closeModal();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [closeModal, selectedWord]);
+
   // Memoized callbacks (called unconditionally)
   const handlePronounceWord = useCallback(() => {
     pronounceWord(selectedWord?.value);
@@ -129,8 +141,18 @@ const WordListModal = ({
   // Now check if we should render
   if (!selectedWord) return null;
 
+  // Handle background click to close modal
+  const handleBackgroundClick = (e) => {
+    if (e.target === e.currentTarget) {
+      closeModal();
+    }
+  };
+
   return (
-    <div className="fixed z-50 inset-0 bg-black bg-opacity-50 flex justify-center items-center transition-opacity duration-300 ">
+    <div
+      className="fixed z-50 inset-0 bg-black bg-opacity-50 flex justify-center items-center transition-opacity duration-300 "
+      onClick={handleBackgroundClick}
+    >
       <div
         ref={modalRef}
         className="relative bg-white rounded-lg  max-w-4xl w-full mx-3  shadow-2xl transform transition-all duration-300 scale-105  border max-h-[90vh] overflow-y-auto "

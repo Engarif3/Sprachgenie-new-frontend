@@ -108,18 +108,27 @@ const WordList = () => {
   }, [userInfo?.id, userLoggedIn]);
 
   const toggleFavorite = async (wordId) => {
+    // Prevent concurrent requests to the same word
+    if (loadingFavorites[wordId]) return;
+
     const isFavorite = favorites.includes(wordId);
+    const previousState = favorites; // Store for rollback
 
     try {
       setLoadingFavorites((prev) => ({ ...prev, [wordId]: true }));
+
+      // Optimistic update - update UI immediately
       if (isFavorite) {
-        await api.delete(`/favorite-words/${wordId}`);
         setFavorites((prev) => prev.filter((id) => id !== wordId));
+        await api.delete(`/favorite-words/${wordId}`);
       } else {
-        await api.post("/favorite-words", { wordId });
         setFavorites((prev) => [...prev, wordId]);
+        await api.post("/favorite-words", { wordId });
       }
     } catch (error) {
+      // Rollback optimistic update on error
+      setFavorites(previousState);
+
       Swal.fire({
         icon: "error",
         title: "Favorite Update Failed",
@@ -272,7 +281,8 @@ const WordList = () => {
     if (cache.words.length === 0 && !isLoading) {
       fetchInitialWords();
     }
-  }, [fetchInitialWords, cache.words.length, isLoading]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cache.words.length, isLoading]);
 
   // Force refresh when navigating from word creation
   useEffect(() => {
@@ -399,6 +409,13 @@ const WordList = () => {
     setSearchValue(value);
   }, []);
 
+  // Create a Map for O(1) word lookup by ID (optimized from O(n) find)
+  const wordsByIdMap = useMemo(() => {
+    const map = new Map();
+    cache.words.forEach((word) => map.set(word.id, word));
+    return map;
+  }, [cache.words]);
+
   // Memoized modal handlers
   // const openModal = useCallback((word) => {
   //   setSelectedWord(word);
@@ -418,8 +435,8 @@ const WordList = () => {
 
   const selectedWord = useMemo(() => {
     if (!selectedWordId) return null;
-    return cache.words.find((w) => w.id === selectedWordId);
-  }, [selectedWordId, cache.words]);
+    return wordsByIdMap.get(selectedWordId) || null;
+  }, [selectedWordId, wordsByIdMap]);
 
   // =========================================
   // const closeModal = useCallback(() => {
