@@ -965,7 +965,7 @@ const WordList = () => {
               onChange={handleSearchInputChange}
               className="border rounded px-2 py-2 w-full pl-10"
               aria-label={
-                searchType === "word" ? "Search by word" : "Search by meaning"
+                searchType === "word" ? "Search by word" : "Search by meaning "
               }
             />
             <IoSearch
