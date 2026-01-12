@@ -1,9 +1,11 @@
-import React, {
+import {
   useState,
   useEffect,
   useRef,
   useCallback,
   useMemo,
+  lazy,
+  Suspense,
 } from "react";
 
 import { Link, useLocation } from "react-router-dom";
@@ -13,14 +15,16 @@ import Pagination from "../../../utils/Pagination";
 import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 import api from "../../../axios";
 import Loader from "../../../utils/Loader";
-import WordListModal from "../Modals/WordListModal";
-import HistoryModal from "../Modals/HistoryModal";
 import { getFromStorage, setToStorage } from "../../../utils/storage";
 import aiApi from "../../../AI_axios";
 import { IoSearch } from "react-icons/io5";
-import AIModal from "../Modals/AIModal";
 import useDebounce from "../../../hooks/useDebounce";
 import WordTableRow from "./WordTableRow";
+
+// Lazy load modals for better performance
+const WordListModal = lazy(() => import("../Modals/WordListModal"));
+const HistoryModal = lazy(() => import("../Modals/HistoryModal"));
+const AIModal = lazy(() => import("../Modals/AIModal"));
 
 // Cache key constants
 const CACHE_KEY = "wordListCache";
@@ -1134,14 +1138,16 @@ const WordList = () => {
       )}
 
       {selectedWord && (
-        <WordListModal
-          isOpen={isModalOpen}
-          closeModal={closeModal}
-          selectedWord={selectedWord}
-          favorites={favorites}
-          toggleFavorite={toggleFavorite}
-          loadingFavorites={loadingFavorites}
-        />
+        <Suspense fallback={<div />}>
+          <WordListModal
+            isOpen={isModalOpen}
+            closeModal={closeModal}
+            selectedWord={selectedWord}
+            favorites={favorites}
+            toggleFavorite={toggleFavorite}
+            loadingFavorites={loadingFavorites}
+          />
+        </Suspense>
       )}
 
       {/* Bottom pagination */}
@@ -1159,25 +1165,32 @@ const WordList = () => {
       />
 
       {/* ========= */}
-      <HistoryModal
-        isOpen={isHistoryModalOpen}
-        onClose={() => setIsHistoryModalOpen(false)}
-        creator={selectedHistory.creator}
-        modifiers={selectedHistory.modifiers}
-      />
+      {isHistoryModalOpen && (
+        <Suspense fallback={<div />}>
+          <HistoryModal
+            isOpen={isHistoryModalOpen}
+            onClose={() => setIsHistoryModalOpen(false)}
+            creator={selectedHistory.creator}
+            modifiers={selectedHistory.modifiers}
+          />
+        </Suspense>
+      )}
       {/* ========= */}
       {/* =======AI modal=============== */}
-
-      <AIModal
-        isOpen={isAIModalOpen}
-        aiWord={aiWord}
-        selectedParagraph={selectedParagraph}
-        onClose={() => setIsAIModalOpen(false)}
-      />
+      {isAIModalOpen && (
+        <Suspense fallback={<div />}>
+          <AIModal
+            isOpen={isAIModalOpen}
+            aiWord={aiWord}
+            selectedParagraph={selectedParagraph}
+            onClose={() => setIsAIModalOpen(false)}
+          />
+        </Suspense>
+      )}
 
       {/* ===================report========= */}
     </Container>
   );
 };
 
-export default React.memo(WordList);
+export default WordList;
