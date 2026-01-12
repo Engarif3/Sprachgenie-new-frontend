@@ -405,7 +405,7 @@ const WordList = () => {
 
   // Handlers remain the same, but simplified input handler
   const handleSearchInputChange = useCallback((event) => {
-    const value = event.target.value.trim(); // Remove both leading and trailing spaces
+    const value = event.target.value; // Allow spaces for multi-word searches
     setSearchValue(value);
   }, []);
 
