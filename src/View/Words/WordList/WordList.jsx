@@ -348,17 +348,21 @@ const WordList = () => {
 
       filtered = filtered.filter((word) => {
         if (searchType === "word") {
-          const lowerWord = lower;
-
           // Check both singular (value) and plural (pluralForm)
           const singular = word.value?.toLowerCase() || "";
           const plural = word.pluralForm?.toLowerCase() || "";
 
-          return singular.includes(lowerWord) || plural.includes(lowerWord);
+          return singular.includes(lower) || plural.includes(lower);
         }
 
         if (searchType === "meaning") {
-          return word.meaning?.join(" ").toLowerCase().includes(lower);
+          // Optimized: Check meanings without joining if possible
+          if (!word.meaning?.length) return false;
+
+          // For single word searches, check each meaning individually (faster)
+          return word.meaning.some((meaning) =>
+            meaning.toLowerCase().includes(lower)
+          );
         }
 
         return true;
