@@ -1026,7 +1026,7 @@ const WordList = () => {
       ) : (
         <div className="min-h-screen ">
           <div className="overflow-x-auto border-b border-gray-400 ">
-            <table className="w-full  border-collapse mt-2 ">
+            <table className="w-full table-fixed border-collapse mt-2 ">
               <thead>
                 <tr className="bg-stone-800 text-sm md:text-xl lg:text-xl text-white ">
                   <th className=" border-gray-400  py-2  text-sm md:text-lg lg:text-lg    text-center w-[5%] md:w-[3%] lg:w-[3%] rounded-tl-md">
