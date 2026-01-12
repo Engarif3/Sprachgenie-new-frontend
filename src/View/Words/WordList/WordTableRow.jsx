@@ -4,6 +4,12 @@ import { pronounceWord } from "../../../utils/wordPronounciation";
 import FavoriteButton from "../Modals/FavoriteButton";
 import { PuffLoader } from "react-spinners";
 
+// Helper function to capitalize only the first letter of the string
+const capitalizeFirstLetter = (str) => {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
 const WordTableRow = ({
   word,
   index,
@@ -35,7 +41,9 @@ const WordTableRow = ({
       </td>
 
       {/* Word value */}
-      <td className="border-l border-gray-400  p-2 capitalize border-dotted">
+      {/* Previous version with CSS capitalize - capitalizes every word */}
+      {/* <td className="border-l border-gray-400  p-2 capitalize border-dotted"> */}
+      <td className="border-l border-gray-400  p-2 border-dotted">
         <div className="flex justify-between">
           <span
             tabIndex={learningMode ? 0 : -1}
@@ -43,7 +51,9 @@ const WordTableRow = ({
             className="cursor-pointer p-0 md:p-2 lg:p-2 text-blue-500 text-sm md:text-lg lg:text-lg font-bold break-words max-w-[120px] md:max-w-full"
             onClick={() => openModal(word)}
           >
-            {word.value}
+            {/* Previous version - used CSS capitalize */}
+            {/* {word.value} */}
+            {capitalizeFirstLetter(word.value)}
           </span>
 
           <div className="flex gap-1 md:gap-4 lg:gap-4 ">
