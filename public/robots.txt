@@ -1,0 +1,6 @@
+# Allow all search engines to crawl everything
+User-agent: *
+Allow: /
+
+# Sitemap location (update with your actual domain)
+# Sitemap: https://yourwebsite.com/sitemap.xml

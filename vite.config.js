@@ -31,19 +31,29 @@ export default defineConfig({
     },
   },
   build: {
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
     rollupOptions: {
       output: {
         manualChunks: {
           // Split React and React Router into a separate chunk
           react: ["react", "react-dom", "react-router-dom"],
           // Split UI libraries
-          ui: ["lucide-react", "daisyui"],
+          ui: ["lucide-react"],
           // Split SweetAlert2 (large library)
           swal: ["sweetalert2"],
-          // You can add other large deps if needed
+          // Split GSAP and animation libraries
+          animations: ["gsap", "motion"],
+          // Split utilities
+          utils: ["axios", "idb", "pako"],
         },
       },
     },
-    // chunkSizeWarningLimit: 1500, // (optional) silence warning if chunks are still large
+    chunkSizeWarningLimit: 1000,
   },
 });
