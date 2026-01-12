@@ -1,3 +1,31 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Prevent layout shift */
+@layer base {
+  img,
+  video {
+    height: auto;
+  }
+
+  /* Hidden but accessible labels */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
+
+/* Improve color contrast */
+@layer utilities {
+  .text-contrast {
+    color: #1f2937;
+  }
+}

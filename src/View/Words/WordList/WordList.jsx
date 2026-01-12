@@ -952,7 +952,11 @@ const WordList = () => {
         <div className="w-full space-y-2">
           {/* Search input */}
           <div className="relative">
+            <label htmlFor="word-search" className="sr-only">
+              {searchType === "word" ? "Search by word" : "Search by meaning"}
+            </label>
             <input
+              id="word-search"
               type="text"
               placeholder={
                 searchType === "word" ? "Search by word" : "Search by meaning"
@@ -960,10 +964,14 @@ const WordList = () => {
               value={searchValue}
               onChange={handleSearchInputChange}
               className="border rounded px-2 py-2 w-full pl-10"
+              aria-label={
+                searchType === "word" ? "Search by word" : "Search by meaning"
+              }
             />
             <IoSearch
               className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
               size={22}
+              aria-hidden="true"
             />
           </div>
         </div>
@@ -973,10 +981,15 @@ const WordList = () => {
         {/* Level Select */}
         <div className="w-full">
           <div className="flex justify-center md:justify-start">
+            <label htmlFor="level-select" className="sr-only">
+              Filter by level
+            </label>
             <select
+              id="level-select"
               value={selectedLevel}
               onChange={handleLevelChange}
               className="border rounded px-4 py-2 w-full"
+              aria-label="Filter words by level"
             >
               <option value="">All Levels</option>
               {levelOptions}
@@ -987,10 +1000,15 @@ const WordList = () => {
         {/* Topic Select */}
         <div className="w-full ">
           <div className="flex flex-col md:flex-row items-center gap-2">
+            <label htmlFor="topic-select" className="sr-only">
+              Filter by topic
+            </label>
             <select
+              id="topic-select"
               value={selectedTopic}
               onChange={handleTopicChange}
               className="border rounded px-4 py-2 w-full  "
+              aria-label="Filter words by topic"
             >
               {/* <option value=""> `All Topics for {selectedLevel} Level`</option> */}
               <option value="">
