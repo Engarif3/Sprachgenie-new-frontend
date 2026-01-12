@@ -168,6 +168,9 @@ const WordList = () => {
       setFilteredTopics(initialCache.topics);
       setIsLoading(false);
 
+      // Store partial cache immediately so it persists on refresh
+      setToStorage(CACHE_KEY, initialCache);
+
       // Now fetch all words in the background and update cache
       setTimeout(async () => {
         try {
@@ -182,7 +185,7 @@ const WordList = () => {
             isPartial: false,
           };
 
-          // Store in localStorage for future visits
+          // Store full data in IndexedDB for future visits
           setToStorage(CACHE_KEY, fullCache);
 
           // Update state with full data
@@ -230,27 +233,83 @@ const WordList = () => {
 
   // Load cache from storage on mount
   useEffect(() => {
-    // Check if we have cached data
-    const cachedData = getFromStorage(CACHE_KEY);
+    const loadData = async () => {
+      // Check if we have cached data
+      const cachedData = await getFromStorage(CACHE_KEY);
 
-    if (
-      cachedData &&
-      !cachedData.isPartial &&
-      Date.now() - cachedData.lastUpdated < CACHE_EXPIRY
-    ) {
-      // Use cached data if it's complete and not expired
-      console.log("Using cached data");
-      setCache(cachedData);
-      setLevels(cachedData.levels);
-      setTopics(cachedData.topics);
-      setFilteredTopics(cachedData.topics);
-      setIsLoading(false);
-    } else {
-      // No cache or expired - use progressive loading
-      console.log("Fetching fresh data with progressive loading");
+      if (cachedData) {
+        const isExpired = Date.now() - cachedData.lastUpdated >= CACHE_EXPIRY;
+
+        if (!isExpired && !cachedData.isPartial) {
+          // Fresh complete cache - use it immediately
+          console.log("Using fresh cached data");
+          setCache(cachedData);
+          setLevels(cachedData.levels);
+          setTopics(cachedData.topics);
+          setFilteredTopics(cachedData.topics);
+          setIsLoading(false);
+          return;
+        }
+
+        if (isExpired && !cachedData.isPartial) {
+          // Stale but complete cache - show it immediately, then refresh in background
+          console.log("Using stale cache, refreshing in background");
+          setCache(cachedData);
+          setLevels(cachedData.levels);
+          setTopics(cachedData.topics);
+          setFilteredTopics(cachedData.topics);
+          setIsLoading(false);
+
+          // Refresh in background without blocking UI
+          setTimeout(() => fetchAllWords(), 100);
+          return;
+        }
+
+        if (cachedData.isPartial) {
+          // Partial cache - show it, then complete the fetch
+          console.log("Using partial cache, fetching remaining data");
+          setCache(cachedData);
+          setLevels(cachedData.levels);
+          setTopics(cachedData.topics);
+          setFilteredTopics(cachedData.topics);
+          setIsLoading(false);
+
+          // Fetch full data in background
+          setTimeout(async () => {
+            try {
+              const fullResponse = await api.get("/word/all?all=true");
+              const fullCache = {
+                words: fullResponse.data.data.words || [],
+                levels: fullResponse.data.data.levels || [],
+                topics: (fullResponse.data.data.topics || []).sort(
+                  (a, b) => a.id - b.id
+                ),
+                lastUpdated: Date.now(),
+                isPartial: false,
+              };
+              setToStorage(CACHE_KEY, fullCache);
+              setCache(fullCache);
+              setLevels(fullCache.levels);
+              setTopics(fullCache.topics);
+              setFilteredTopics(fullCache.topics);
+              console.log("Background fetch complete from partial cache");
+            } catch (error) {
+              console.error("Background fetch failed:", error);
+            }
+          }, 100);
+          return;
+        }
+      }
+
+      // No cache at all - use progressive loading
+      console.log(
+        "No cache found, fetching fresh data with progressive loading"
+      );
       fetchInitialWords();
-    }
-  }, [fetchInitialWords]);
+    };
+
+    loadData();
+  }, [fetchInitialWords, fetchAllWords]);
 
   // Listen for cache invalidation from other tabs/components (MUST be after fetchAllWords definition)
   useEffect(() => {
