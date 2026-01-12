@@ -2,6 +2,14 @@
   publish = "dist"
   command = "npm run build"
 
+# Domain redirect - redirect old Netlify subdomain to custom domain
+[[redirects]]
+  from = "https://sprach-genie.netlify.app/*"
+  to = "https://simplegerman.de/:splat"
+  status = 301
+  force = true
+
+# SPA fallback - must come after domain redirect
 [[redirects]]
   from = "/*"
   to = "/index.html"
