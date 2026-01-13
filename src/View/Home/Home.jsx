@@ -20,7 +20,7 @@ const Home = () => {
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.2, rootMargin: "50px" }
     );
 
     document.querySelectorAll("[data-animate]").forEach((el) => {
@@ -31,33 +31,37 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="bg-gray-950 min-h-screen">
+    <div className="bg-gray-950 min-h-screen -mt-2">
       {/* Hero Section */}
       <Container className="flex flex-col">
-        <div className="text-orange-600 text-xl md:text-2xl lg:text-2xl flex justify-center my-8 md:my-2 lg:my-2">
-          {!userLoggedIn && (
-            <div className="w-11/12 md:w-6/12 lg:w-6/12">
-              <Marquee gradient={false} speed={30}>
-                <p>
+        {!userLoggedIn && (
+          <div className="text-orange-600 text-xl md:text-2xl lg:text-2xl flex justify-center mb-2 overflow-hidden">
+            <div className="w-11/12 md:w-8/12 lg:w-6/12">
+              <Marquee
+                gradient={true}
+                gradientColor="#030712"
+                speed={50}
+                pauseOnHover={true}
+              >
+                <p className="mx-4">
                   ✨Log in to unleash AI-powered magic and step into the future
                   of learning!✨
                 </p>
               </Marquee>
             </div>
-          )}
-        </div>
-        <SplashCursor />
+          </div>
+        )}
         <CircularText
           text="PRACTICE*MAKES*PERFECT*"
           centerText1="Sprach"
           centerText2="Genie"
           onHover="speedUp"
-          spinDuration={20}
+          spinDuration={25}
           className="font-custom3"
         />
 
         {/* Hero Content */}
-        <div className="text-center py-16 px-4">
+        <div className="text-center py-8 px-4">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
             Master German with
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">
@@ -66,13 +70,13 @@ const Home = () => {
             </span>
             Learning
           </h1>
-          <p className="text-xl md:text-2xl text-gray-300 mb-10 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
             From vocabulary to conversations, grammar to stories - your complete
             German learning journey starts here
           </p>
 
           {/* Featured Vocabulary Access */}
-          <div className="mb-8">
+          <div className="mb-6">
             <Link
               to="/words"
               className="inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 text-white font-bold rounded-full hover:shadow-[0_0_30px_rgba(249,115,22,0.5)] hover:scale-105 transition-all duration-300 text-lg shadow-xl"
@@ -192,6 +196,54 @@ const Home = () => {
                 Test your knowledge with interactive quizzes that make learning
                 enjoyable
               </p>
+            </div>
+          </div>
+        </Container>
+      </div>
+
+      {/* Learning Resources Section */}
+      <div className="bg-gray-800/50 py-20">
+        <Container>
+          <div className="min-h-screen mb-12">
+            <h2 className="text-center text-4xl md:text-5xl font-bold text-white mb-4">
+              Explore Learning Resources
+            </h2>
+            <p className="text-center text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
+              Everything you need to master German in one place
+            </p>
+            <div className="flex justify-center items-center">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 lg:gap-8">
+                <HomeCard
+                  title="Vocabulary Library"
+                  text="Explore 4000+ words"
+                  link="/words"
+                />
+                <HomeCard
+                  title="Conversations"
+                  text="Conversations on various topics"
+                  link="/conversation-titles"
+                />
+                <HomeCard
+                  title="Words With Prefix"
+                  text="Learn some prefix+word"
+                  link="/prefix-types"
+                />
+                <HomeCard
+                  title="Learn Grammar"
+                  text="Learn grammar rules to become more perfect"
+                  link="/grammar"
+                />
+                <HomeCard
+                  title="German Stories"
+                  text="Enrich your vocabulary"
+                  link="/stories"
+                />
+                <HomeCard
+                  title="Play Quiz"
+                  text="Learn with fun with a friend or alone"
+                  link="/quiz"
+                />
+              </div>
             </div>
           </div>
         </Container>
@@ -336,54 +388,6 @@ const Home = () => {
                 Practice daily with AI-powered tools and watch your skills grow
                 exponentially
               </p>
-            </div>
-          </div>
-        </Container>
-      </div>
-
-      {/* Learning Resources Section */}
-      <div className="bg-gray-800/50 py-20">
-        <Container>
-          <div className="min-h-screen mb-12">
-            <h2 className="text-center text-4xl md:text-5xl font-bold text-white mb-4">
-              Explore Learning Resources
-            </h2>
-            <p className="text-center text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
-              Everything you need to master German in one place
-            </p>
-            <div className="flex justify-center items-center">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 lg:gap-8">
-                <HomeCard
-                  title="Vocabulary Library"
-                  text="Explore 4000+ words"
-                  link="/words"
-                />
-                <HomeCard
-                  title="Conversations"
-                  text="Conversations on various topics"
-                  link="/conversation-titles"
-                />
-                <HomeCard
-                  title="Words With Prefix"
-                  text="Learn some prefix+word"
-                  link="/prefix-types"
-                />
-                <HomeCard
-                  title="Learn Grammar"
-                  text="Learn grammar rules to become more perfect"
-                  link="/grammar"
-                />
-                <HomeCard
-                  title="German Stories"
-                  text="Enrich your vocabulary"
-                  link="/stories"
-                />
-                <HomeCard
-                  title="Play Quiz"
-                  text="Learn with fun with a friend or alone"
-                  link="/quiz"
-                />
-              </div>
             </div>
           </div>
         </Container>
@@ -549,7 +553,7 @@ const Home = () => {
       {/* CTA Section */}
       {!userLoggedIn && (
         <div
-          className="bg-gradient-to-r from-orange-500 to-pink-500 py-20"
+          className="bg-gradient-to-r from-gray-800 to-gray-900 py-20"
           id="cta"
           data-animate
         >
@@ -569,7 +573,7 @@ const Home = () => {
               </p>
               <Link
                 to="/register"
-                className="inline-block px-12 py-5 bg-white text-orange-600 font-bold rounded-full hover:shadow-2xl hover:scale-105 transition-all duration-300 text-xl"
+                className="inline-block px-12 py-5 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 hover:shadow-2xl hover:scale-105 transition-all duration-300 text-xl"
               >
                 Start Learning Now!
               </Link>

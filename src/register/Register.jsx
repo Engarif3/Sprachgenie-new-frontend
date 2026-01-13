@@ -88,6 +88,15 @@ const Register = () => {
       <div className="fixed inset-0 -z-10">
         <DarkVeil />
       </div>
+
+      {/* Home button */}
+      <Link
+        to="/"
+        className="fixed top-4 left-4 z-20 px-4 py-2 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-all duration-300 font-semibold"
+      >
+        ← Home
+      </Link>
+
       <div className="flex flex-col-reverse md:flex-row lg:flex-row gap-4 md:gap-8 lg:gap-8 items-center md:items-end  lg:items-end">
         <div className="w-full max-w-lg shadow-md rounded-lg p-6 text-center bg-stone-800">
           <h2 className="text-xl font-semibold text-white">Register</h2>
