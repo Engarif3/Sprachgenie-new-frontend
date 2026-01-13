@@ -106,6 +106,58 @@ const Home = () => {
         </div>
       </Container>
 
+      {/* Learning Resources Section */}
+      <div className="bg-gray-800/50 py-20">
+        <Container>
+          <div className="mb-12">
+            <h2 className="text-center text-4xl md:text-5xl font-bold text-white mb-4">
+              Explore Learning Resources
+            </h2>
+            <p className="text-center text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
+              Everything you need to master German in one place
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
+              <HomeCard
+                title="Vocabulary Library"
+                text="Master 4000+ German words with examples, audio, and contextual usage"
+                link="/words"
+                icon="📚"
+              />
+              <HomeCard
+                title="Conversations"
+                text="Practice real-world dialogues on diverse topics to build fluency"
+                link="/conversation-titles"
+                icon="💬"
+              />
+              <HomeCard
+                title="Words With Prefix"
+                text="Understand German word formation with prefix combinations"
+                link="/prefix-types"
+                icon="🔤"
+              />
+              <HomeCard
+                title="Learn Grammar"
+                text="Master German grammar rules with clear explanations and exercises"
+                link="/grammar"
+                icon="📖"
+              />
+              <HomeCard
+                title="German Stories"
+                text="Immerse yourself in engaging stories to enhance reading skills"
+                link="/stories"
+                icon="📗"
+              />
+              <HomeCard
+                title="Play Quiz"
+                text="Test your knowledge with interactive quizzes and challenges"
+                link="/quiz"
+                icon="🎮"
+              />
+            </div>
+          </div>
+        </Container>
+      </div>
+
       {/* Features Section */}
       <div className="bg-gray-800/50 py-20" id="features" data-animate>
         <Container>
@@ -196,54 +248,6 @@ const Home = () => {
                 Test your knowledge with interactive quizzes that make learning
                 enjoyable
               </p>
-            </div>
-          </div>
-        </Container>
-      </div>
-
-      {/* Learning Resources Section */}
-      <div className="bg-gray-800/50 py-20">
-        <Container>
-          <div className="min-h-screen mb-12">
-            <h2 className="text-center text-4xl md:text-5xl font-bold text-white mb-4">
-              Explore Learning Resources
-            </h2>
-            <p className="text-center text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
-              Everything you need to master German in one place
-            </p>
-            <div className="flex justify-center items-center">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 lg:gap-8">
-                <HomeCard
-                  title="Vocabulary Library"
-                  text="Explore 4000+ words"
-                  link="/words"
-                />
-                <HomeCard
-                  title="Conversations"
-                  text="Conversations on various topics"
-                  link="/conversation-titles"
-                />
-                <HomeCard
-                  title="Words With Prefix"
-                  text="Learn some prefix+word"
-                  link="/prefix-types"
-                />
-                <HomeCard
-                  title="Learn Grammar"
-                  text="Learn grammar rules to become more perfect"
-                  link="/grammar"
-                />
-                <HomeCard
-                  title="German Stories"
-                  text="Enrich your vocabulary"
-                  link="/stories"
-                />
-                <HomeCard
-                  title="Play Quiz"
-                  text="Learn with fun with a friend or alone"
-                  link="/quiz"
-                />
-              </div>
             </div>
           </div>
         </Container>

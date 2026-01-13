@@ -1,26 +1,27 @@
 import { Link } from "react-router-dom";
-// import TargetCursor from "./TargetCursor ";
 
-const HomeCard = ({ title, text, link }) => {
+const HomeCard = ({ title, text, link, icon }) => {
   return (
-    <>
-      {/* <TargetCursor spinDuration={2} hideDefaultCursor={true} /> */}
-      <Link
-        to={link}
-        // className=" bg-gradient-to-r from-gray-900 via-slate-700 to-slate-400 w-96 h-[12rem] shadow-xl flex justify-center items-center rounded-xl  transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 "
-        className="border-2 border-sky-800 rounded-2xl p-2 cursor-target"
-      >
-        {/* <div className=" bg-gradient-to-r from-gray-900 via-slate-700 to-slate-400 w-96 md:w-80  h-[12rem] shadow-xl flex justify-start items-center rounded-xl transition delay-150 duration-300 ease-in-out hover:-translate-y-1 hover:scale-105 will-change-transform"> */}
-        <div className=" bg-gradient-to-r from-slate-900 via-cyan-800 to-cyan-600 w-96 md:w-80  h-[12rem] shadow-xl flex justify-start items-center rounded-xl transition delay-150 duration-300 ease-in-out  will-change-transform hover:animate-pulse">
-          <div className="ml-12 h-24">
-            <h2 className="text-green-500 text-2xl font-bold capitalize">
-              {title}
-            </h2>
-            <p className=" text-white font-mono text-lg mr-4">{text}</p>
-          </div>
+    <Link
+      to={link}
+      className="block bg-gradient-to-br from-orange-600/20 via-gray-800 to-gray-900 border-2 border-orange-500/40 hover:border-orange-500 hover:shadow-[0_0_40px_rgba(249,115,22,0.4)] p-6 md:p-8 rounded-2xl transition-all duration-300 group cursor-pointer hover:-translate-y-2 hover:scale-105"
+    >
+      <div className="text-center">
+        <div className="text-5xl md:text-6xl mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-300 inline-block">
+          {icon}
         </div>
-      </Link>
-    </>
+        <h3 className="text-xl md:text-2xl font-bold text-white mb-3 md:mb-4 group-hover:text-orange-400 transition-colors duration-300">
+          {title}
+        </h3>
+        <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-3 md:mb-4 min-h-[3.5rem] md:min-h-[4rem]">
+          {text}
+        </p>
+        <div className="flex items-center justify-center gap-2 text-orange-500 font-semibold text-sm md:text-base group-hover:gap-4 transition-all duration-300">
+          <span>Explore Now</span>
+          <span className="text-xl md:text-2xl">→</span>
+        </div>
+      </div>
+    </Link>
   );
 };
 
