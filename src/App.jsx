@@ -68,10 +68,16 @@ const App = () => {
           if (data?.data) {
             storeUserInfo(data.data);
           }
+        } else if (response.status >= 500) {
+          // Server error - silently fail, don't block the app
+          console.error("Server error during auth check:", response.status);
+        } else {
+          // 4xx errors (unauthorized, etc.) - expected, continue without auth
+          console.log("No active session");
         }
       } catch (error) {
-        // Silent fail - user will be redirected to login if needed
-        console.log("No active session");
+        // Network error or other issues - silent fail
+        console.error("Auth check failed:", error.message);
       } finally {
         setIsAuthLoading(false);
       }
