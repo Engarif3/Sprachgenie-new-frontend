@@ -31,7 +31,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="bg-gray-950 min-h-screen -mt-2">
+    <div className="bg-gray-950 min-h-screen">
       {/* Hero Section */}
       <Container className="flex flex-col">
         {!userLoggedIn && (

@@ -276,7 +276,7 @@ const NavBar = () => {
         </div>
 
         {userLoggedIn && (
-          <p className="text-end mx-2 text-white mb-3 md:mb-0 lg:mb-0 mt-0 md:mt-4 lg:mt-4">
+          <p className="text-end mx-2 text-white mb-0">
             Welcome!{" "}
             <span className="font-semibold text-pink-600">
               {userInfo?.name}
