@@ -286,21 +286,47 @@ const Quiz = () => {
       return (
         <Container>
           <div className="p-4 text-white rounded min-h-screen flex flex-col justify-center items-center">
-            <h2 className="text-2xl font-bold mb-6 text-center">Choose Mode</h2>
-            <div className="flex gap-4">
+            {/* Header Section */}
+            <div className="text-center mb-12">
+              <div className="mb-4">
+                <span className="inline-block px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
+                  🎮 Test Your Knowledge
+                </span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 mb-4">
+                Choose Quiz Mode
+              </h2>
+              <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">
+                Test your German vocabulary knowledge with interactive quizzes
+              </p>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-6">
               <button
                 onClick={() =>
                   dispatch({ type: "SET_MODE", payload: "single" })
                 }
-                className="bg-blue-600 hover:bg-blue-700 p-2 rounded font-bold"
+                className="group relative bg-gradient-to-br from-gray-800/80 via-gray-900 to-black border-2 border-blue-500/50 hover:border-blue-500 p-8 rounded-2xl transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-[0_0_50px_rgba(59,130,246,0.5)] min-w-[250px]"
               >
-                Play Yourself
+                <div className="text-5xl mb-4">👤</div>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  Play Yourself
+                </h3>
+                <p className="text-gray-300">
+                  Challenge yourself and track your progress
+                </p>
               </button>
               <button
                 onClick={() => dispatch({ type: "SET_MODE", payload: "multi" })}
-                className="bg-green-600 hover:bg-green-700 p-2 rounded font-bold"
+                className="group relative bg-gradient-to-br from-gray-800/80 via-gray-900 to-black border-2 border-green-500/50 hover:border-green-500 p-8 rounded-2xl transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-[0_0_50px_rgba(34,197,94,0.5)] min-w-[250px]"
               >
-                Play with a Friend
+                <div className="text-5xl mb-4">👥</div>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  Play with a Friend
+                </h3>
+                <p className="text-gray-300">
+                  Compete with a friend in vocabulary battle
+                </p>
               </button>
             </div>
           </div>
@@ -405,115 +431,183 @@ const Quiz = () => {
 
   return (
     <Container>
-      <div className="p-2 bg-gray-800 text-white rounded min-h-screen flex flex-col items-center mt-4 mb-12">
-        <div className="w-full flex justify-between items-center">
-          <div className="text-sm bg-gray-700 px-2 py-1 rounded">
-            Difficulty:{" "}
-            <span className="font-bold">
-              {DIFFICULTY_LEVELS[difficulty].name}
-            </span>
-          </div>
-          <button
-            onClick={resetQuiz}
-            className="btn btn-sm btn-warning mb-4 mt-4"
-          >
-            Reset
-          </button>
-        </div>
-        <p className="text-sm italic text-pink-600 mb-2">Guess the meaning</p>
-        <h2 className="text-md font-bold mb-0 md:mb-12 text-center">
-          Word {currentIndex + 1} / {quizWords.length}
-        </h2>
-        <div className="text-xl md:text-3xl font-bold mb-4 text-orange-600 text-center">
-          <button
-            onClick={() =>
-              pronounceWord(
-                `${currentWord?.article?.name ?? ""} ${
-                  currentWord?.value ?? ""
-                }`.trim()
-              )
-            }
-            className="text-blue-500 hover:text-blue-700 mr-2"
-          >
-            🔊
-          </button>
-          <span className="text-white mr-2">
-            {currentWord?.article?.name || ""}
-          </span>
-          {currentWord?.value || "No word"}
-        </div>
-        <div className="h-40">
-          {showMeaning && (
-            <div className="text-yellow-300 text-center">
-              {(currentWord?.meaning && currentWord.meaning.join(", ")) ||
-                "No meaning"}
+      <div className="relative p-8 text-white rounded-2xl min-h-screen flex flex-col items-center mt-4 mb-12 bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+        {/* Background decoration */}
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-orange-500/5 rounded-2xl"></div>
+        <div className="absolute inset-0 backdrop-blur-3xl opacity-30 rounded-2xl"></div>
+
+        <div className="relative z-10 w-full max-w-6xl">
+          {/* Header with difficulty and reset */}
+          <div className="w-full flex justify-between items-center mb-8">
+            <div className="text-sm bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/50 px-4 py-2 rounded-full backdrop-blur-sm">
+              Difficulty:{" "}
+              <span className="font-bold text-blue-400">
+                {DIFFICULTY_LEVELS[difficulty].name}
+              </span>
             </div>
-          )}
-        </div>
-        <button
-          onClick={() => dispatch({ type: "SET_SHOW_MEANING", payload: true })}
-          className="btn btn-sm btn-primary rounded"
-        >
-          Reveal Meaning
-        </button>
-        <div className="flex justify-center w-10/12 md:w-8/12 gap-8 mt-6 p-4">
-          <div className="flex flex-col items-center gap-2 border rounded-md p-8 md:p-24">
-            <div className="font-bold">{player1}</div>
-            <div className="text-xl">{scores.player1}</div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => handleScore("player1", -1)}
-                disabled={usedScores.player1}
-                className={`bg-red-500 px-4 rounded ${
-                  usedScores.player1 ? "opacity-50" : ""
-                }`}
-              >
-                -
-              </button>
-              <button
-                onClick={() => handleScore("player1", 1)}
-                disabled={usedScores.player1}
-                className={`bg-green-500 px-4 rounded ${
-                  usedScores.player1 ? "opacity-50" : ""
-                }`}
-              >
-                +
-              </button>
+            <button
+              onClick={resetQuiz}
+              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 px-6 py-2 rounded-full font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-orange-500/50"
+            >
+              Reset Quiz
+            </button>
+          </div>
+
+          {/* Word counter */}
+          <div className="text-center mb-6">
+            <div className="inline-block px-6 py-2 bg-gradient-to-r from-gray-800/80 to-gray-900/80 border border-gray-700 rounded-full backdrop-blur-sm">
+              <span className="text-gray-300">Question</span>{" "}
+              <span className="font-bold text-white text-xl">
+                {currentIndex + 1}
+              </span>
+              <span className="text-gray-400"> of </span>
+              <span className="font-bold text-white text-xl">
+                {quizWords.length}
+              </span>
             </div>
           </div>
-          {mode === "multi" && (
-            <div className="flex flex-col items-center gap-2 border rounded-md p-8 md:p-24">
-              <div className="font-bold">{player2}</div>
-              <div className="text-xl">{scores.player2}</div>
-              <div className="flex gap-3">
+
+          {/* Instruction */}
+          <p className="text-center text-pink-400 italic mb-8 text-lg">
+            💡 Guess the meaning of the word
+          </p>
+
+          {/* Main word display */}
+          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-md border-2 border-purple-500/30 rounded-3xl p-12 mb-8 shadow-2xl hover:border-purple-500/50 transition-all duration-300">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-4 mb-6">
                 <button
-                  onClick={() => handleScore("player2", -1)}
-                  disabled={usedScores.player2}
-                  className={`bg-red-500 px-4 rounded ${
-                    usedScores.player2 ? "opacity-50" : ""
+                  onClick={() =>
+                    pronounceWord(
+                      `${currentWord?.article?.name ?? ""} ${
+                        currentWord?.value ?? ""
+                      }`.trim()
+                    )
+                  }
+                  className="text-5xl hover:scale-110 transition-transform duration-300 hover:drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]"
+                  title="Pronounce word"
+                >
+                  🔊
+                </button>
+                <div className="text-4xl md:text-6xl font-bold">
+                  <span className="text-orange-400 mr-3">
+                    {currentWord?.article?.name || ""}
+                  </span>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500">
+                    {currentWord?.value
+                      ? currentWord.value.charAt(0).toUpperCase() +
+                        currentWord.value.slice(1)
+                      : "No word"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Meaning reveal area */}
+              <div className="min-h-[120px] flex items-center justify-center">
+                {showMeaning ? (
+                  <div className="text-2xl text-yellow-300 font-semibold animate-fade-in bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-2xl px-8 py-4">
+                    {(currentWord?.meaning && currentWord.meaning.join(", ")) ||
+                      "No meaning"}
+                  </div>
+                ) : (
+                  <button
+                    onClick={() =>
+                      dispatch({ type: "SET_SHOW_MEANING", payload: true })
+                    }
+                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-blue-500/50"
+                  >
+                    🔍 Reveal Meaning
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Player score cards */}
+          <div className="flex justify-center gap-8 mb-8">
+            <div className="flex-1 max-w-sm bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-md border-2 border-blue-500/30 rounded-2xl p-8 shadow-xl hover:border-blue-500/50 transition-all duration-300">
+              <div className="text-center mb-4">
+                <div className="text-2xl font-bold text-blue-400 mb-2">
+                  {player1}
+                </div>
+                <div className="text-5xl font-bold text-white">
+                  {scores.player1}
+                </div>
+              </div>
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={() => handleScore("player1", -1)}
+                  disabled={usedScores.player1}
+                  className={`bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-8 py-3 rounded-full font-bold text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
+                    usedScores.player1
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:shadow-red-500/50"
                   }`}
                 >
-                  -
+                  ❌
                 </button>
                 <button
-                  onClick={() => handleScore("player2", 1)}
-                  disabled={usedScores.player2}
-                  className={`bg-green-500 px-4 rounded ${
-                    usedScores.player2 ? "opacity-50" : ""
+                  onClick={() => handleScore("player1", 1)}
+                  disabled={usedScores.player1}
+                  className={`bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-8 py-3 rounded-full font-bold text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
+                    usedScores.player1
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:shadow-green-500/50"
                   }`}
                 >
-                  +
+                  ✓
                 </button>
               </div>
             </div>
-          )}
+
+            {mode === "multi" && (
+              <div className="flex-1 max-w-sm bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-md border-2 border-purple-500/30 rounded-2xl p-8 shadow-xl hover:border-purple-500/50 transition-all duration-300">
+                <div className="text-center mb-4">
+                  <div className="text-2xl font-bold text-purple-400 mb-2">
+                    {player2}
+                  </div>
+                  <div className="text-5xl font-bold text-white">
+                    {scores.player2}
+                  </div>
+                </div>
+                <div className="flex justify-center gap-4">
+                  <button
+                    onClick={() => handleScore("player2", -1)}
+                    disabled={usedScores.player2}
+                    className={`bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-8 py-3 rounded-full font-bold text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
+                      usedScores.player2
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:shadow-red-500/50"
+                    }`}
+                  >
+                    ❌
+                  </button>
+                  <button
+                    onClick={() => handleScore("player2", 1)}
+                    disabled={usedScores.player2}
+                    className={`bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-8 py-3 rounded-full font-bold text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
+                      usedScores.player2
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:shadow-green-500/50"
+                    }`}
+                  >
+                    ✓
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Next button */}
+          <div className="text-center">
+            <button
+              onClick={nextWord}
+              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 px-12 py-4 rounded-full font-bold text-xl transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-cyan-500/50"
+            >
+              Next Word →
+            </button>
+          </div>
         </div>
-        <button
-          onClick={nextWord}
-          className="btn btn-sm btn-info mt-4 md:mt-12"
-        >
-          Next Word
-        </button>
       </div>
     </Container>
   );

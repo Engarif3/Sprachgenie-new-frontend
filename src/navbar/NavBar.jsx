@@ -69,7 +69,9 @@ const NavBar = () => {
   return (
     <div
       className={`w-full sticky top-0 z-50 ${
-        isHomePage ? "bg-gray-950 shadow-xl" : "bg-transparent"
+        isHomePage
+          ? "bg-gray-950 shadow-xl"
+          : "bg-gray-900/80 backdrop-blur-md shadow-lg"
       }`}
     >
       <Container>
