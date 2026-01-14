@@ -50,30 +50,62 @@ const ConversationPage = () => {
 
   return (
     <Container>
-      <div className="min-h-screen flex justify-center items-center ">
+      <div className="min-h-screen py-8">
         {loading ? (
-          <Loader loading={loading} />
+          <div className="flex justify-center items-center min-h-[50vh]">
+            <Loader loading={loading} />
+          </div>
         ) : (
-          <div className="mx-auto p-0 md:p-4 lg:p-4  mt-4 md:w-8/12 lg:w-8/12 ">
-            <div className="text-white mb-0 md:mb-4 lg:mb-4 text-center text-3xl font-bold font-custom5 ">
-              <h2>{conversation.topic}</h2>
+          <div className="max-w-4xl mx-auto px-4">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="mb-4">
+                <span className="inline-block px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
+                  💬 Conversation
+                </span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500">
+                {conversation.topic}
+              </h2>
             </div>
-            <div className="md:p-4 lg.p-4 rounded-lg shadow-md mb-12 bg-black">
-              {conversation.text.map((message, index) => (
-                <div key={index} className="text-lg my-4 px-2 ">
-                  <div className="flex flex-col md:flex-row lg.flex-row md:gap-4 lg:gap-4 ">
-                    <span
-                      className="text-xl font-semibold flex items-center gap-1 md:border lg.border bg-cyan-750 w-full md:w-1/12 lg:w-1/12 rounded-md p-1 "
-                      style={{ color: getSpeakerColor(message.speaker) }}
-                    >
-                      <FaUser /> {message.speaker}:
-                    </span>
-                    <p className="text-start w-full p-1 border border-cyan-700 rounded-md px-2 text-xl font-thin text-white ">
-                      {message.message}
-                    </p>
+
+            {/* Chat Messages */}
+            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-3xl p-6 md:p-8 border border-gray-700/50 shadow-2xl mb-12">
+              <div className="space-y-6">
+                {conversation.text.map((message, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-col md:flex-row gap-4 p-4 bg-gray-800/50 rounded-2xl border border-gray-700/50 hover:border-orange-500/50 transition-all duration-300 hover:shadow-lg group"
+                  >
+                    {/* Speaker Badge */}
+                    <div className="flex items-center gap-2 md:min-w-[120px]">
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
+                        style={{
+                          background: `linear-gradient(135deg, ${getSpeakerColor(
+                            message.speaker
+                          )}, ${getSpeakerColor(message.speaker)}dd)`,
+                        }}
+                      >
+                        <FaUser className="text-white text-lg" />
+                      </div>
+                      <span
+                        className="font-bold text-lg"
+                        style={{ color: getSpeakerColor(message.speaker) }}
+                      >
+                        {message.speaker}
+                      </span>
+                    </div>
+
+                    {/* Message Content */}
+                    <div className="flex-1 bg-gray-900/50 rounded-xl p-4 border border-gray-700/30 group-hover:border-gray-600/50 transition-all duration-300">
+                      <p className="text-white text-lg leading-relaxed">
+                        {message.message}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         )}

@@ -6,6 +6,7 @@ import Marquee from "react-fast-marquee";
 import { isLoggedIn } from "../../services/auth.services";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import Contact from "./Contact";
 
 const Home = () => {
   const userLoggedIn = isLoggedIn();
@@ -107,53 +108,84 @@ const Home = () => {
       </Container>
 
       {/* Learning Resources Section */}
-      <div className="bg-gray-800/50 py-20">
+      <div
+        className="relative bg-gradient-to-b from-gray-900 via-gray-800/50 to-gray-900 py-20 overflow-hidden"
+        id="resources"
+        data-animate
+      >
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-orange-500/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        </div>
+
         <Container>
-          <div className="mb-12">
-            <h2 className="text-center text-4xl md:text-5xl font-bold text-white mb-4">
+          <div
+            className={`mb-16 relative transition-all duration-1000 ${
+              visibleSections.has("resources")
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-10"
+            }`}
+          >
+            <div className="text-center mb-4">
+              <span className="inline-block px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm mb-6">
+                🚀 Your Learning Hub
+              </span>
+            </div>
+            <h2 className="text-center text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 mb-6">
               Explore Learning Resources
             </h2>
-            <p className="text-center text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
+            <p className="text-center text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
               Everything you need to master German in one place
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
-              <HomeCard
-                title="Vocabulary Library"
-                text="Master 4000+ German words with examples, audio, and contextual usage"
-                link="/words"
-                icon="📚"
-              />
-              <HomeCard
-                title="Conversations"
-                text="Practice real-world dialogues on diverse topics to build fluency"
-                link="/conversation-titles"
-                icon="💬"
-              />
-              <HomeCard
-                title="Words With Prefix"
-                text="Understand German word formation with prefix combinations"
-                link="/prefix-types"
-                icon="🔤"
-              />
-              <HomeCard
-                title="Learn Grammar"
-                text="Master German grammar rules with clear explanations and exercises"
-                link="/grammar"
-                icon="📖"
-              />
-              <HomeCard
-                title="German Stories"
-                text="Immerse yourself in engaging stories to enhance reading skills"
-                link="/stories"
-                icon="📗"
-              />
-              <HomeCard
-                title="Play Quiz"
-                text="Test your knowledge with interactive quizzes and challenges"
-                link="/quiz"
-                icon="🎮"
-              />
+            <div className="flex justify-center mt-6">
+              <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
             </div>
+          </div>
+
+          <div
+            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4 transition-all duration-1000 delay-300 ${
+              visibleSections.has("resources")
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-10"
+            }`}
+          >
+            <HomeCard
+              title="Vocabulary Library"
+              text="Master 4000+ German words with examples, audio, and contextual usage"
+              link="/words"
+              icon="📚"
+            />
+            <HomeCard
+              title="Conversations"
+              text="Practice real-world dialogues on diverse topics to build fluency"
+              link="/conversation-titles"
+              icon="💬"
+            />
+            <HomeCard
+              title="Words With Prefix"
+              text="Understand German word formation with prefix combinations"
+              link="/prefix-types"
+              icon="🔤"
+            />
+            <HomeCard
+              title="Learn Grammar"
+              text="Master German grammar rules with clear explanations and exercises"
+              link="/grammar"
+              icon="📖"
+            />
+            <HomeCard
+              title="German Stories"
+              text="Immerse yourself in engaging stories to enhance reading skills"
+              link="/stories"
+              icon="📗"
+            />
+            <HomeCard
+              title="Play Quiz"
+              text="Test your knowledge with interactive quizzes and challenges"
+              link="/quiz"
+              icon="🎮"
+            />
           </div>
         </Container>
       </div>
@@ -187,11 +219,11 @@ const Home = () => {
             <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-8 rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-gray-700">
               <div className="text-5xl mb-4">🤖</div>
               <h3 className="text-2xl font-bold text-white mb-3">
-                AI-Powered Learning
+                AI-Powered Content
               </h3>
               <p className="text-gray-300">
-                Personalized learning experience with advanced AI that adapts to
-                your pace and style
+                AI-generated example sentences and in-depth word explanations to
+                help you understand vocabulary in context
               </p>
             </div>
 
@@ -247,85 +279,6 @@ const Home = () => {
               <p className="text-gray-300">
                 Test your knowledge with interactive quizzes that make learning
                 enjoyable
-              </p>
-            </div>
-          </div>
-        </Container>
-      </div>
-
-      {/* Testimonials Section */}
-      <div className="py-20" id="testimonials" data-animate>
-        <Container>
-          <div
-            className={`text-center mb-16 transition-all duration-1000 ${
-              visibleSections.has("testimonials")
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-10"
-            }`}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              What Our Learners Say
-            </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Real experiences from our learning community
-            </p>
-          </div>
-
-          <div
-            className={`grid grid-cols-1 md:grid-cols-3 gap-8 px-4 transition-all duration-1000 delay-300 ${
-              visibleSections.has("testimonials")
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-10"
-            }`}
-          >
-            <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-8 rounded-2xl border border-gray-700">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                  S
-                </div>
-                <div className="ml-4">
-                  <h4 className="text-white font-bold">Sarah M.</h4>
-                  <div className="text-yellow-400">⭐⭐⭐⭐⭐</div>
-                </div>
-              </div>
-              <p className="text-gray-300 italic">
-                "The AI-powered learning is incredible! I've learned more in 2
-                months than I did in a year with other apps. The conversations
-                feature really helps build confidence."
-              </p>
-            </div>
-
-            <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-8 rounded-2xl border border-gray-700">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                  M
-                </div>
-                <div className="ml-4">
-                  <h4 className="text-white font-bold">Michael K.</h4>
-                  <div className="text-yellow-400">⭐⭐⭐⭐⭐</div>
-                </div>
-              </div>
-              <p className="text-gray-300 italic">
-                "Best language learning platform I've used! The vocabulary
-                library is huge and the stories make learning fun. Passed my B2
-                exam thanks to SprachGenie!"
-              </p>
-            </div>
-
-            <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-8 rounded-2xl border border-gray-700">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                  A
-                </div>
-                <div className="ml-4">
-                  <h4 className="text-white font-bold">Anna L.</h4>
-                  <div className="text-yellow-400">⭐⭐⭐⭐⭐</div>
-                </div>
-              </div>
-              <p className="text-gray-300 italic">
-                "Love the interactive approach! The grammar explanations are
-                clear, and the quizzes make practice enjoyable. Highly recommend
-                for serious learners."
               </p>
             </div>
           </div>
@@ -389,8 +342,8 @@ const Home = () => {
                 Learn & Practice
               </h3>
               <p className="text-gray-300 text-lg">
-                Practice daily with AI-powered tools and watch your skills grow
-                exponentially
+                Practice daily with AI-powered tools and build your German
+                skills consistently
               </p>
             </div>
           </div>
@@ -423,9 +376,9 @@ const Home = () => {
             </div>
             <div className="text-center">
               <div className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 mb-2">
-                100+
+                A1-B2
               </div>
-              <p className="text-gray-300 text-lg font-semibold">Stories</p>
+              <p className="text-gray-300 text-lg font-semibold">CEFR Levels</p>
             </div>
             <div className="text-center">
               <div className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 mb-2">
@@ -500,10 +453,13 @@ const Home = () => {
                 </span>
               </summary>
               <p className="text-gray-300 mt-4 leading-relaxed">
-                Our AI analyzes your learning patterns, strengths, and
-                weaknesses to create personalized content and recommendations.
-                It adapts to your pace, focusing on areas where you need
-                improvement while reinforcing what you've mastered.
+                SprachGenie uses OpenAI to enhance your learning experience. For
+                each vocabulary word, the AI can generate contextual example
+                sentences and provide in-depth explanations through the "Learn
+                More" feature. This helps you understand not just the
+                definition, but how the word is used in real German
+                conversations. You can also report any AI-generated content if
+                you notice inaccuracies, ensuring quality learning materials.
               </p>
             </details>
 
@@ -530,10 +486,10 @@ const Home = () => {
                 </span>
               </summary>
               <p className="text-gray-300 mt-4 leading-relaxed">
-                Learning speed varies by individual, but with consistent daily
-                practice (30-60 minutes), most learners reach conversational
-                fluency (B1-B2 level) within 6-12 months. Our AI helps optimize
-                your learning path for faster progress.
+                Learning speed varies by individual and depends on many factors
+                including prior language experience, study time, and
+                consistency. SprachGenie provides comprehensive materials for
+                A1-B2 levels to support your learning journey at your own pace.
               </p>
             </details>
 
@@ -585,6 +541,9 @@ const Home = () => {
           </Container>
         </div>
       )}
+
+      {/* Contact Section */}
+      <Contact />
     </div>
   );
 };
