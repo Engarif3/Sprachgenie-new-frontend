@@ -887,68 +887,83 @@ const WordList = () => {
 
   return (
     <Container>
-      <h2 className="text-3xl font-bold font-mono text-white my-2 text-center hidden md:block">
-        <div className="flex justify-start">
-          <Link to="/quiz" className="btn btn-sm btn-info">
-            Play Quiz
+      {/* Modern Header Section */}
+      <div className="text-center mb-8 mt-8">
+        <div className="flex justify-between items-center mb-6">
+          <Link
+            to="/quiz"
+            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/50"
+          >
+            🎮 Play Quiz
           </Link>
-        </div>
-        <p>Vocabulary Library</p> <br />
-        <p className="text-xs text-pink-600 ">
-          {" "}
           {userLoggedIn &&
-            (userInfo.role === "admin" || userInfo.role === "super_admin") &&
-            cache.words.length}
+            (userInfo.role === "admin" || userInfo.role === "super_admin") && (
+              <span className="text-sm text-pink-400 font-bold">
+                Total: {cache.words.length} words
+              </span>
+            )}
+        </div>
+        <div className="mb-4">
+          <span className="inline-block px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
+            📚 Learn Vocabulary
+          </span>
+        </div>
+        <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 mb-4">
+          Vocabulary Library
+        </h2>
+        <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          Explore and master German vocabulary with interactive learning tools
         </p>
-      </h2>
+        <div className="flex justify-center mt-6">
+          <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
+        </div>
+      </div>
 
       {/* =============radio buttons ========== */}
-      <div className="flex justify-between text-white">
-        <div className="flex gap-4 items-center -mb-3 md:mb-2 lg:mb-2">
-          <label className="flex items-center gap-1 cursor-pointer">
+      <div className="flex justify-between text-white mb-4 bg-gradient-to-r from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4">
+        <div className="flex gap-4 items-center">
+          <label className="flex items-center gap-2 cursor-pointer hover:text-blue-400 transition-colors">
             <input
               type="radio"
               name="searchType"
               value="word"
               checked={searchType === "word"}
               onChange={(e) => setSearchType(e.target.value)}
+              className="w-4 h-4 accent-blue-500"
             />
-            <span>By Word</span>
+            <span className="font-medium">By Word</span>
           </label>
 
-          <label className="flex items-center gap-1 cursor-pointer">
+          <label className="flex items-center gap-2 cursor-pointer hover:text-purple-400 transition-colors">
             <input
               type="radio"
               name="searchType"
               value="meaning"
               checked={searchType === "meaning"}
               onChange={(e) => setSearchType(e.target.value)}
+              className="w-4 h-4 accent-purple-500"
             />
-            <span>By Meaning</span>
+            <span className="font-medium">By Meaning</span>
           </label>
         </div>
         {/* ===============showing words by page ==================  */}
-        <div className="flex justify-end gap-2 -mb-3 md:mb-2 lg:mb-2">
-          <div className="w-full">
-            <div className="flex justify-end  mr-0 ">
-              {(searchValue || selectedLevel || selectedTopic) && (
-                <p
-                  onClick={handleResetFilters}
-                  className=" text-red-600 font-bold  underline cursor-pointer"
-                >
-                  Reset Filter
-                </p>
-              )}
-            </div>
-          </div>
+        <div className="flex items-center gap-4">
+          {(searchValue || selectedLevel || selectedTopic) && (
+            <button
+              onClick={handleResetFilters}
+              className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 hover:scale-105 shadow-lg"
+            >
+              Reset Filters
+            </button>
+          )}
           {/* ===============showing words by page ==================  */}
-          <p className="text-md text-info font-bold whitespace-nowrap md:ml-2 hidden md:block w-36 text-end">
+          <p className="text-md font-bold whitespace-nowrap hidden md:block px-4 py-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/50 rounded-full">
             {paginatedWords.length} words
           </p>
         </div>
       </div>
       {/* =============radio buttons ========== */}
-      <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 gap-4 mt-4 md:mt-0 ">
+      <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 gap-4 mb-6">
         <div className="w-full space-y-2">
           {/* Search input */}
           <div className="relative">
@@ -963,13 +978,13 @@ const WordList = () => {
               }
               value={searchValue}
               onChange={handleSearchInputChange}
-              className="border rounded px-2 py-2 w-full pl-10"
+              className="border border-gray-600 bg-gray-800/50 backdrop-blur-sm rounded-xl px-4 py-3 w-full pl-12 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all"
               aria-label={
                 searchType === "word" ? "Search by word" : "Search by meaning "
               }
             />
             <IoSearch
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-400"
               size={22}
               aria-hidden="true"
             />
@@ -988,7 +1003,7 @@ const WordList = () => {
               id="level-select"
               value={selectedLevel}
               onChange={handleLevelChange}
-              className="border rounded px-4 py-2 w-full"
+              className="border border-gray-600 bg-gray-800/50 backdrop-blur-sm rounded-xl px-4 py-3 w-full text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition-all"
               aria-label="Filter words by level"
             >
               <option value="">All Levels</option>
@@ -1007,7 +1022,7 @@ const WordList = () => {
               id="topic-select"
               value={selectedTopic}
               onChange={handleTopicChange}
-              className="border rounded px-4 py-2 w-full  "
+              className="border border-gray-600 bg-gray-800/50 backdrop-blur-sm rounded-xl px-4 py-3 w-full text-white focus:border-pink-500 focus:ring-2 focus:ring-pink-500/50 transition-all"
               aria-label="Filter words by topic"
             >
               {/* <option value=""> `All Topics for {selectedLevel} Level`</option> */}
@@ -1042,51 +1057,48 @@ const WordList = () => {
           <Loader loading={isLoading} />
         </div>
       ) : (
-        <div className="min-h-screen ">
-          <div className="overflow-x-auto border-b border-gray-400 ">
-            <table className="w-full border-collapse mt-2 ">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900/30 via-gray-800/20 to-black/30 rounded-2xl p-4">
+          <div className="overflow-x-auto border border-gray-700/50 rounded-2xl shadow-2xl">
+            <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-stone-800 text-sm md:text-xl lg:text-xl text-white ">
-                  <th className=" border-gray-400  py-2  text-sm md:text-lg lg:text-lg    text-center w-[5%] md:w-[3%] lg:w-[3%] rounded-tl-md">
+                <tr className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 text-sm md:text-xl lg:text-xl text-white">
+                  <th className="py-3 text-sm md:text-lg lg:text-lg text-center text-orange-400 font-bold w-[5%] md:w-[3%] lg:w-[3%] rounded-tl-xl border-b border-gray-700">
                     Article
                   </th>
-                  <th className="border-l  py-2 border-gray-400 border-dotted   text-center w-[15%] md:w-[10%] lg:w-[10%] ">
+                  <th className="border-l py-3 border-gray-700 border-dotted text-center text-blue-400 font-bold w-[15%] md:w-[10%] lg:w-[10%] border-b">
                     Word
                   </th>
 
-                  <th className="border-l  py-2 border-gray-400 border-dotted   text-center w-[10%] md:w-[25%] lg:w-[25%]">
+                  <th className="border-l py-3 border-gray-700 border-dotted text-center text-purple-400 font-bold w-[10%] md:w-[25%] lg:w-[25%] border-b">
                     Meaning
                   </th>
-                  <th className="border-l  py-2 border-gray-400 border-dotted  text-center hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                  <th className="border-l py-3 border-gray-700 border-dotted text-center text-cyan-400 font-bold hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b">
                     Synonym
                   </th>
-                  <th className="border-l  py-2 border-gray-400 border-dotted   text-center hidden lg:table-cell xl:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                  <th className="border-l py-3 border-gray-700 border-dotted text-center text-pink-400 font-bold hidden lg:table-cell xl:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b">
                     Antonym
                   </th>
-                  <th className="border-l  py-2 border-gray-400 border-dotted text-center hidden lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                  <th className="border-l py-3 border-gray-700 border-dotted text-center text-green-400 font-bold hidden lg:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b">
                     Word to Watch
                   </th>
                   <th
-                    className={`border-l border-dotted hidden md:table-cell lg:table-cell  py-2 border-gray-400 text-sm md:text-lg lg:text-lg    text-center  w-[3%] md:w-[3%] lg:w-[3%] ${
-                      userLoggedIn ? "" : "rounded-tr-md"
+                    className={`border-l border-dotted hidden md:table-cell lg:table-cell py-3 border-gray-700 text-sm md:text-lg lg:text-lg text-center text-yellow-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b ${
+                      userLoggedIn ? "" : "rounded-tr-xl"
                     }`}
                   >
                     Level
                   </th>
                   <th
-                    className={`border-l  py-2 border-dotted border-gray-400  text-center ${
+                    className={`border-l py-3 border-dotted border-gray-700 text-center text-indigo-400 font-bold border-b ${
                       showActionColumn ? "table-cell" : "hidden"
                     } `}
                   >
                     Action
                   </th>
                   {userLoggedIn && (
-                    // (userInfo.role === "basic_user" ||
-                    //   userInfo.role === "admin" ||
-                    //   userInfo.role === "super_admin") && (
                     <th
-                      className={`border-l border-dotted border-gray-400 text-sm md:text-lg lg:text-lg   py-2 text-center  w-[3%] md:w-[3%] lg:w-[3%] ${
-                        userInfo.role === "basic_user" ? "rounded-tr-md" : ""
+                      className={`border-l border-dotted border-gray-700 text-sm md:text-lg lg:text-lg py-3 text-center text-red-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b ${
+                        userInfo.role === "basic_user" ? "rounded-tr-xl" : ""
                       }`}
                     >
                       Fav
@@ -1097,9 +1109,9 @@ const WordList = () => {
                       userInfo.role === "admin") && (
                       <>
                         <th
-                          className={`border-l py-2 border-dotted hidden md:table-cell lg:table-cell border-gray-400 text-sm md:text-lg lg:text-lg  text-center   w-[3%] md:w-[3%] lg:w-[3%] ${
+                          className={`border-l py-3 border-dotted hidden md:table-cell lg:table-cell border-gray-700 text-sm md:text-lg lg:text-lg text-center text-teal-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b ${
                             userInfo.role !== "basic_user"
-                              ? "rounded-tr-md"
+                              ? "rounded-tr-xl"
                               : ""
                           }`}
                         >

@@ -4,8 +4,9 @@ import Container from "../utils/Container";
 import Swal from "sweetalert2";
 import AuthButton from "../components/UI/AuthButton/AuthButton";
 import { getUserInfo, isLoggedIn } from "../services/auth.services";
-import { FaBook, FaHome } from "react-icons/fa";
+import { FaBook, FaHome, FaSun, FaMoon } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
+import { useTheme } from "../context/ThemeContext";
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const NavBar = () => {
   const userInfo = getUserInfo() || {};
   const menuRef = useRef(null);
   const toggleRef = useRef(null);
+  const { theme, toggleTheme } = useTheme();
 
   // Close menu if clicked outside
   useEffect(() => {
@@ -90,16 +92,16 @@ const NavBar = () => {
               <Link
                 onClick={() => setIsMenuOpen(false)}
                 to="/"
-                className="btn btn-sm btn-warning flex items-center justify-center md:hidden lg:hidden"
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center md:hidden lg:hidden"
               >
-                Home
+                🏠 Home
               </Link>
             )}
 
             <button
               ref={toggleRef}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden btn btn-sm btn-warning"
+              className="md:hidden bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
             >
               {isMenuOpen ? "✕" : "☰"}
             </button>
@@ -109,15 +111,17 @@ const NavBar = () => {
             ref={menuRef}
             className={`${
               isMenuOpen ? "flex" : "hidden"
-            } md:flex flex-col md:flex-row rounded-lg items-center gap-3 md:gap-4 lg:gap-16 w-full md:w-auto px-4 mt-2 md:mt-0 absolute md:static top-full left-0 z-10 py-4 md:py-0 bg-stone-800 md:bg-transparent shadow-xl md:shadow-none`}
+            } md:flex flex-col md:flex-row rounded-xl items-center gap-3 md:gap-4 lg:gap-16 w-full md:w-auto px-4 mt-2 md:mt-0 absolute md:static top-full left-0 z-10 py-4 md:py-0 md:border-0`}
           >
             {location.pathname !== "/" && (
               <Link
                 to="/"
-                className="hidden md:flex items-center justify-center text-3xl text-orange-600 border-b-2 border-white rounded-md hover:scale-105 px-1"
+                className="hidden md:flex items-center justify-center border-b-2 border-white rounded-md hover:scale-105 hover:border-orange-400 px-1 transition-all duration-300"
               >
-                <FaHome />
-                <span className="ml-2 text-xl mt-2 text-white">Home</span>
+                <FaHome className="text-3xl text-orange-600 hover:text-orange-500 transition-colors" />
+                <span className="ml-2 text-xl mt-2 text-white hover:text-orange-400 transition-colors">
+                  Home
+                </span>
               </Link>
             )}
             {/* //for large screen */}
@@ -125,10 +129,15 @@ const NavBar = () => {
               <Link
                 onClick={() => setIsMenuOpen(false)}
                 to="/words"
-                className="hidden md:flex w-full md:w-auto border-b-2 border-white rounded-md hover:scale-105 px-1 mt-2"
+                className="hidden md:flex w-full md:w-auto items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-purple-400 px-1 mt-2 transition-all duration-300"
               >
-                <FaBook className="text-orange-500" size={20} />
-                <span className="ml-2 text-xl text-white">Vocabulary</span>
+                <FaBook
+                  className="text-orange-500 hover:text-purple-400 transition-colors"
+                  size={20}
+                />
+                <span className="ml-2 text-xl text-white hover:text-purple-400 transition-colors">
+                  Vocabulary
+                </span>
               </Link>
             )}
             {userLoggedIn && (
@@ -137,10 +146,13 @@ const NavBar = () => {
                 <Link
                   to="/dashboard"
                   onClick={() => setIsMenuOpen(false)}
-                  className="hidden md:flex items-center justify-center text-3xl text-orange-600 border-b-2 border-white rounded-md hover:scale-105 px-1"
+                  className="hidden md:flex items-center justify-center border-b-2 border-white rounded-md hover:scale-105 hover:border-blue-400 px-1 transition-all duration-300"
                 >
-                  <MdDashboard size={24} />
-                  <span className="ml-2 text-xl mt-2 text-white">
+                  <MdDashboard
+                    size={24}
+                    className="text-3xl text-orange-600 hover:text-blue-400 transition-colors"
+                  />
+                  <span className="ml-2 text-xl mt-2 text-white hover:text-blue-400 transition-colors">
                     Dashboard
                   </span>
                 </Link>
@@ -149,38 +161,37 @@ const NavBar = () => {
                 <Link
                   to="/dashboard"
                   onClick={() => setIsMenuOpen(false)}
-                  className=" btn btn-sm btn-info w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
+                  className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/50 flex justify-center items-center md:hidden lg:hidden"
                 >
-                  Dashboard
+                  📊 Dashboard
                 </Link>
                 <Link
                   to="/words"
                   onClick={() => setIsMenuOpen(false)}
-                  className=" btn btn-sm btn-info w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-purple-500/50 flex justify-center items-center md:hidden lg:hidden"
                 >
-                  Vocabulary
+                  📚 Vocabulary
                 </Link>
                 <Link
                   onClick={() => setIsMenuOpen(false)}
                   to="/favorites"
-                  // className="hidden md:block lg:block h-8 w-8 mt-1"
-                  className="flex md:hidden lg:hidden btn btn-sm btn-info  w-full md:w-auto text-center "
+                  className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/50 flex md:hidden lg:hidden justify-center items-center"
                 >
-                  Favorites
+                  ❤️ Favorites
                 </Link>
                 <Link
                   onClick={() => setIsMenuOpen(false)}
                   to="/favorites"
-                  className="hidden md:flex lg:flex items-center border-b-2 border-white rounded-md hover:scale-105 px-1"
+                  className="hidden md:flex lg:flex items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-red-400 px-1 transition-all duration-300"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 122.88 107.39"
-                    className="w-6 h-6 fill-red-600"
+                    className="w-6 h-6 fill-red-600 hover:fill-red-500 transition-colors"
                   >
                     <path d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z" />
                   </svg>
-                  <span className="ml-2 mt-2 text-xl text-white">
+                  <span className="ml-2 mt-2 text-xl text-white hover:text-red-400 transition-colors">
                     Favorites
                   </span>
                 </Link>
@@ -203,27 +214,27 @@ const NavBar = () => {
                     setIsMenuOpen(false);
                   }}
                   to="/create-word"
-                  className="btn btn-sm btn-info  w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
+                  className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-green-500/50 flex justify-center items-center md:hidden lg:hidden"
                 >
-                  Create Word
+                  📝 Create Word
                 </Link>
                 <Link
                   onClick={() => {
                     setIsMenuOpen(false);
                   }}
                   to="/create-conversation"
-                  className="btn btn-sm btn-info  w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
+                  className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-cyan-500/50 flex justify-center items-center md:hidden lg:hidden"
                 >
-                  Create Conv
+                  💬 Create Conv
                 </Link>
                 <Link
                   onClick={() => {
                     setIsMenuOpen(false);
                   }}
                   to="update-conversation"
-                  className="btn btn-sm btn-info w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden"
+                  className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-yellow-500/50 flex justify-center items-center md:hidden lg:hidden"
                 >
-                  Update Conv
+                  ✏️ Update Conv
                 </Link>
               </>
             )}
@@ -234,9 +245,9 @@ const NavBar = () => {
                     setIsMenuOpen(false);
                   }}
                   to="/update-basic-user-status"
-                  className="btn btn-sm btn-info w-full md:w-auto text-center text-slate-950 font-bold flex justify-center items-center md:hidden lg:hidden"
+                  className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-purple-500/50 flex justify-center items-center md:hidden lg:hidden"
                 >
-                  Users
+                  👥 Users
                 </Link>
               </>
             )}
@@ -247,9 +258,9 @@ const NavBar = () => {
                     setIsMenuOpen(false);
                   }}
                   to="/update-user-status"
-                  className="btn btn-sm btn-info w-full md:w-auto text-center text-slate-950 font-bold flex justify-center items-center md:hidden lg:hidden"
+                  className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-purple-500/50 flex justify-center items-center md:hidden lg:hidden"
                 >
-                  Users
+                  👥 Users
                 </Link>
               </>
             )}
@@ -266,14 +277,29 @@ const NavBar = () => {
                     handleCreateTopic();
                     setIsMenuOpen(false);
                   }}
-                  className="btn btn-sm btn-info  w-full md:w-auto text-center flex justify-center items-center md:hidden lg:hidden "
+                  className="bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-teal-500/50 flex justify-center items-center md:hidden lg:hidden"
                 >
-                  Create Topic
+                  📚 Create Topic
                 </Link>
               </>
             )}
             {/* <Link to="/login">Login</Link> */}
             <AuthButton></AuthButton>
+
+            {/* Theme Toggle Button */}
+            <div className="hidden">
+              <button
+                onClick={toggleTheme}
+                className="hidden md:flex bg-gray-800/50 hover:bg-gray-700/50 text-white p-2.5 rounded-full transition-all duration-300 hover:scale-110 border border-gray-700/50 hover:border-gray-600"
+                title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+              >
+                {theme === "light" ? (
+                  <FaMoon className="text-lg" />
+                ) : (
+                  <FaSun className="text-lg" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
 

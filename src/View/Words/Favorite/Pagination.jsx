@@ -54,14 +54,13 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
   return (
     <Container>
       {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-1 md:gap-2 lg:gap-2 mt-4 text-sky-800 ">
+        <div className="flex justify-center items-center gap-2 md:gap-3 lg:gap-3 my-6">
           <button
             onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
-            // className="px-2 md:px-4 lg:px-4 py-1 md:py-2 lg:py-2 bg-sky-500 rounded disabled:opacity-50 hover:bg-sky-400 transition-colors text-white font-semibold"
-            className="btn btn-sm border-none text-cyan-600"
+            className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold px-6 py-2.5 rounded-full transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg hover:shadow-blue-500/50"
           >
-            Prev
+            ← Prev
           </button>
 
           {/* Render Page Buttons and Ellipses */}
@@ -70,7 +69,7 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
               return (
                 <span
                   key={`ellipsis-${index}`}
-                  className="w-10 flex items-center justify-center px-2 py-1 md:py-2 lg:py-2 text-gray-500"
+                  className="w-10 flex items-center justify-center px-2 py-2 text-gray-400 text-xl font-bold"
                 >
                   ...
                 </span>
@@ -81,10 +80,10 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`w-10 flex items-center justify-center py-1 rounded transition-colors ${
+                className={`min-w-[40px] h-10 flex items-center justify-center px-3 py-2 rounded-full font-bold text-sm transition-all duration-300 shadow-md ${
                   currentPage === page
-                    ? "bg-cyan-600 text-white hover:bg-cyan-700"
-                    : "bg-gray-200 hover:bg-gray-300"
+                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white scale-110 shadow-lg shadow-purple-500/50"
+                    : "bg-gray-800/60 border-2 border-gray-700/50 text-gray-300 hover:bg-gray-700/80 hover:scale-105 hover:border-gray-600"
                 }`}
               >
                 {formatPageNumber(page)}
@@ -97,10 +96,9 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
               setCurrentPage((prev) => Math.min(totalPages, prev + 1))
             }
             disabled={currentPage === totalPages}
-            // className="px-2 md:px-4 lg:px-4 py-1 md:py-2 lg:py-2 bg-sky-500 rounded disabled:opacity-50 hover:bg-sky-400 transition-colors text-white font-semibold"
-            className="btn btn-sm border-none text-cyan-600"
+            className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold px-6 py-2.5 rounded-full transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg hover:shadow-cyan-500/50"
           >
-            Next
+            Next →
           </button>
         </div>
       )}

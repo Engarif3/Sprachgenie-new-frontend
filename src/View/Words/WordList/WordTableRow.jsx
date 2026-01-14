@@ -34,21 +34,26 @@ const WordTableRow = ({
   setIsHistoryModalOpen,
 }) => {
   return (
-    <tr key={word.id} className={index % 2 === 0 ? "bg-white " : "bg-gray-300"}>
+    <tr
+      key={word.id}
+      className={`transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-500/5 hover:to-purple-500/5 ${
+        index % 2 === 0 ? "bg-gray-800/40" : "bg-gray-900/40"
+      }`}
+    >
       {/* Article */}
-      <td className=" border-gray-400 p-0 md:p-2 lg:p-2 font-semibold text-orange-600 text-center text-sm md:text-lg lg:text-lg">
+      <td className="border border-gray-700 border-dotted p-2 md:p-3 lg:p-3 font-bold text-orange-400 text-center text-sm md:text-lg lg:text-lg">
         {word.article?.name}
       </td>
 
       {/* Word value */}
       {/* Previous version with CSS capitalize - capitalizes every word */}
       {/* <td className="border-l border-gray-400  p-2 capitalize border-dotted"> */}
-      <td className="border-l border-gray-400  p-2 border-dotted">
+      <td className="border border-gray-700 border-dotted p-2 md:p-3">
         <div className="flex justify-between">
           <span
             tabIndex={learningMode ? 0 : -1}
             ref={learningMode && index === currentIndex ? focusElement : null}
-            className="cursor-pointer p-0 md:p-2 lg:p-2 text-blue-500 text-sm md:text-lg lg:text-lg font-bold break-words max-w-[120px] md:max-w-full"
+            className="cursor-pointer p-0 md:p-2 lg:p-2 text-blue-400 hover:text-blue-300 text-sm md:text-lg lg:text-lg font-bold break-words max-w-[120px] md:max-w-full transition-colors duration-200"
             onClick={() => openModal(word)}
           >
             {/* Previous version - used CSS capitalize */}
@@ -59,7 +64,8 @@ const WordTableRow = ({
           <div className="flex gap-1 md:gap-4 lg:gap-4 ">
             <button
               onClick={() => pronounceWord(word.value)}
-              className=" text-blue-500 hover:text-blue-700 ml-0 md:ml-2 lg:ml-2 "
+              className="text-2xl hover:scale-110 transition-transform duration-200 hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]"
+              title="Pronounce word"
             >
               🔊
             </button>
@@ -67,7 +73,7 @@ const WordTableRow = ({
             {userLoggedIn && (
               <div
                 onClick={() => generateParagraph(word)}
-                className="relative border-2 bg-green-700 text-white italic px-2 py-1 text-sm rounded-full mt-4 h-6 w-6 cursor-pointer hover:scale-105 hover:bg-green-600 hover:text-white border-orange-500 "
+                className="relative border-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white italic px-2 py-1 text-xs font-bold rounded-full mt-4 h-6 w-6 cursor-pointer hover:scale-110 border-emerald-400 transition-all duration-200 shadow-lg hover:shadow-green-500/50"
                 disabled={loadingParagraphs[word.id]}
               >
                 {loadingParagraphs[word.id] && (
@@ -93,10 +99,10 @@ const WordTableRow = ({
 
       {/* Meaning */}
       <td
-        className={`border-l border-gray-400 border-dotted pl-1  p-0 md:p-2 lg:p-2 text-sm md:text-lg lg:text-lg ${
+        className={`border border-gray-700 border-dotted pl-1 p-2 md:p-3 lg:p-3 text-sm md:text-lg lg:text-lg ${
           learningMode && index === currentIndex
-            ? "bg-sky-700 text-white font-bold "
-            : "text-sky-950 font-serif"
+            ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold"
+            : "text-cyan-300 font-serif"
         }`}
         onClick={() => learningMode && revealMeaning(word.id)}
         tabIndex="0"
@@ -113,13 +119,13 @@ const WordTableRow = ({
       </td>
 
       {/* Synonyms */}
-      <td className="border-l border-gray-400 border-dotted p-2 text-blue-500  hidden md:table-cell ">
-        <div className="flex flex-wrap gap-1">
+      <td className="border border-gray-700 border-dotted p-2 md:p-3 text-blue-400 hidden md:table-cell">
+        <div className="flex flex-wrap gap-2">
           {word.synonyms?.map((synonym, idx) => (
             <span
               key={idx}
               onClick={() => openWordInModal(synonym.value)}
-              className="text-sm sm:text-base btn btn-sm btn-info"
+              className="text-xs sm:text-sm px-3 py-1 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/50 rounded-full hover:from-blue-500/30 hover:to-cyan-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
             >
               {synonym.value}
             </span>
@@ -128,13 +134,13 @@ const WordTableRow = ({
       </td>
 
       {/* Antonyms */}
-      <td className="border-l border-gray-400 border-dotted p-2 text-blue-500  hidden lg:table-cell xl:table-cell">
-        <div className="flex flex-wrap gap-1">
+      <td className="border border-gray-700 border-dotted p-2 md:p-3 text-blue-400 hidden lg:table-cell xl:table-cell">
+        <div className="flex flex-wrap gap-2">
           {word.antonyms?.map((antonym, idx) => (
             <span
               key={idx}
               onClick={() => openWordInModal(antonym.value)}
-              className="text-sm sm:text-base btn btn-sm btn-info "
+              className="text-xs sm:text-sm px-3 py-1 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 rounded-full hover:from-red-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
             >
               {antonym.value}
             </span>
@@ -143,13 +149,13 @@ const WordTableRow = ({
       </td>
 
       {/* Similar Words */}
-      <td className="border-l border-gray-400 border-dotted  p-2 text-blue-500  hidden lg:table-cell">
-        <div className="flex flex-wrap gap-1">
+      <td className="border border-gray-700 border-dotted p-2 md:p-3 text-blue-400 hidden lg:table-cell">
+        <div className="flex flex-wrap gap-2">
           {word.similarWords?.map((similarword, idx) => (
             <span
               key={idx}
               onClick={() => openWordInModal(similarword.value)}
-              className="text-sm sm:text-base btn btn-sm btn-info"
+              className="text-xs sm:text-sm px-3 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-full hover:from-purple-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
             >
               {similarword.value}
             </span>
@@ -158,26 +164,28 @@ const WordTableRow = ({
       </td>
 
       {/* Level */}
-      <td className="border-l border-r border-gray-400 border-dotted  p-2 hidden md:table-cell text-center">
-        <span className="text-base sm:text-lg ">{word.level?.level}</span>
+      <td className="border border-gray-700 border-dotted p-2 md:p-3 hidden md:table-cell text-center">
+        <span className="inline-block px-3 py-1 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-xs sm:text-sm">
+          {word.level?.level}
+        </span>
       </td>
 
       {/* Action */}
       <td
-        className={`border-l border-r border-gray-400  p-2 text-center ${
+        className={`border border-gray-700 border-dotted p-2 md:p-3 text-center ${
           showActionColumn ? "table-cell" : "hidden"
         } `}
       >
-        <div className="flex  gap-1 justify-center">
+        <div className="flex gap-2 justify-center">
           <Link
             to={`/edit-word/${word.id}`}
-            className="btn btn-sm btn-warning "
+            className="px-3 py-1 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 rounded-lg font-semibold text-white text-xs sm:text-sm transition-all duration-200 hover:scale-105 shadow-md"
           >
             Edit
           </Link>
           <button
             onClick={() => handleDelete(word.id, word.value)}
-            className="btn btn-sm btn-error"
+            className="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 rounded-lg font-semibold text-white text-xs sm:text-sm transition-all duration-200 hover:scale-105 shadow-md"
           >
             Delete
           </button>
@@ -186,7 +194,7 @@ const WordTableRow = ({
 
       {/* Favorite */}
       {userLoggedIn && (
-        <td className="border-l border-r border-gray-400 border-dotted p-0 md:p-1 lg:p-1 text-center ">
+        <td className="border border-gray-700 border-dotted p-2 md:p-3 text-center">
           <FavoriteButton
             isFavorite={favorites.includes(word.id)}
             loading={loadingFavorites[word.id]}
@@ -198,7 +206,7 @@ const WordTableRow = ({
       {/* History */}
       {userLoggedIn &&
         (userInfo.role === "super_admin" || userInfo.role === "admin") && (
-          <td className="border-l border-gray-400 border-dotted p-2 text-center hidden lg:table-cell">
+          <td className="border border-gray-700 border-dotted p-2 md:p-3 text-center hidden lg:table-cell">
             <button
               onClick={() => {
                 setSelectedHistory({

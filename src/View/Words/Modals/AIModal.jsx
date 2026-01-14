@@ -51,65 +51,62 @@ const AIModal = ({ isOpen, aiWord, selectedParagraph, onClose }) => {
   return (
     <>
       {/* AI Modal */}
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg shadow-lg p-6 w-full md:w-1/2 lg:w-1/2 max-h-[90vh] overflow-y-auto  px-1 md:px-4 lg:px-4 mx-2">
-          <h2 className="text-2xl md:text-5xl lg:text-5xl font-bold  text-center mb-2">
-            <span className="text-orange-600">
-              {" "}
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl shadow-2xl p-8 w-full md:w-2/3 lg:w-1/2 max-h-[90vh] overflow-y-auto mx-4 border-2 border-gray-700/50">
+          <h2 className="text-3xl md:text-5xl lg:text-5xl font-bold text-center mb-4">
+            <span className="text-orange-400 font-bold">
               {typeof aiWord?.article === "string"
                 ? aiWord.article
-                : aiWord?.article?.name || ""}{" "}
+                : aiWord?.article?.name || ""}
+            </span>{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 capitalize">
+              {aiWord?.value}
             </span>
-            <span className="text-slate-800 capitalize">{aiWord?.value}</span>
           </h2>
-          <div className="flex justify-center">
-            <p className="text-justify text-cyan-800 text-2xl mb-6  px-1 md:px-4 lg:px-4 mx-2">
-              {/* [{aiWord?.meaning || ""}] */}
-              <span className="text-pink-600 font-semibold text-3xl">[</span>
+          <div className="flex justify-center mb-6">
+            <p className="text-center text-cyan-300 text-xl md:text-2xl px-4 py-2 bg-cyan-500/10 rounded-2xl border border-cyan-500/30">
+              <span className="text-pink-400 font-bold text-2xl">[</span>
               {Array.isArray(aiWord?.meaning)
                 ? aiWord.meaning.join(", ")
                 : aiWord?.meaning || ""}
-              <span className="text-pink-600 font-semibold text-3xl">]</span>
+              <span className="text-pink-600 font-bold text-2xl">]</span>
             </p>
           </div>
 
-          <div className="whitespace-pre-line text-xl md:text-2xl lg:text-2xl  font-mono text-slate900 -md p-2">
-            <div>
-              {" "}
-              {aiWord?.aiMeanings?.length > 0 && (
-                <p className=" text-gray-700 text-lg ml-2">
-                  <strong className="text-green-700">Meanings (AI):</strong>{" "}
-                  {aiWord.aiMeanings.join(", ")}
+          <div className="space-y-4">
+            {aiWord?.aiMeanings?.length > 0 && (
+              <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 p-4 rounded-2xl border-2 border-green-400/50">
+                <p className="text-base md:text-lg">
+                  <strong className="text-green-400 font-semibold">
+                    🤖 AI Meanings:
+                  </strong>{" "}
+                  <span className="text-white font-medium">
+                    {aiWord.aiMeanings.join(", ")}
+                  </span>
                 </p>
-              )}
-            </div>
-            <div className="border border-cyan-600 rounded p-2">
-              <span> {selectedParagraph}</span>
-            </div>
-            <div className="hidden">
-              {aiWord?.sentences?.length > 0 && (
-                <span className="mt-4 text-left text-slate-700 ">
-                  {aiWord.sentences.map((s, i) => (
-                    <p key={i} className=" text-lg ml-2">
-                      <strong className="text-green-700">Sentences:</strong>
-                      {s}
-                    </p>
-                  ))}
-                </span>
-              )}
+              </div>
+            )}
+
+            <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 p-6 rounded-2xl border-2 border-blue-400/50">
+              <p className="text-white text-lg md:text-xl leading-relaxed whitespace-pre-line font-semibold">
+                {selectedParagraph}
+              </p>
             </div>
           </div>
 
-          <div className="mt-8 flex justify-between sticky bottom-0 mx-2">
+          <div className="mt-8 flex justify-between gap-4">
             <button
               onClick={() => setIsReportOpen(true)}
-              className="btn btn-sm btn-error "
+              className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 px-6 py-3 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/50"
             >
-              Report
+              🚨 Report Issue
             </button>
 
-            <button onClick={onClose} className="btn btn-sm btn-warning">
-              Close
+            <button
+              onClick={onClose}
+              className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 px-6 py-3 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg"
+            >
+              ✓ Close
             </button>
           </div>
         </div>
@@ -117,34 +114,36 @@ const AIModal = ({ isOpen, aiWord, selectedParagraph, onClose }) => {
 
       {/* Report Modal */}
       {isReportOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full md:w-1/3 mx-2">
-            <h2 className="text-xl font-bold mb-4 text-center">Report</h2>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gradient-to-br from-gray-50 via-white to-gray-100 rounded-3xl shadow-2xl p-8 w-full md:w-1/3 mx-4 border-2 border-gray-200/50">
+            <h2 className="text-2xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-pink-500">
+              🚨 Report Issue
+            </h2>
 
-            <p className="text-gray-600 text-sm mb-2">
-              Reason for reporting this AI generation. (optional)
+            <p className="text-gray-700 text-sm mb-4 bg-yellow-100 border border-yellow-300 rounded-xl p-3">
+              💡 Please describe the issue with this AI generation. (optional)
             </p>
             <textarea
               value={reportMessage}
               onChange={(e) => setReportMessage(e.target.value)}
-              className="w-full border rounded-md p-2 text-sm"
+              className="w-full border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 rounded-xl p-4 text-sm bg-white/50 backdrop-blur-sm transition-all"
               rows={4}
-              placeholder="Enter a message (optional)"
+              placeholder="Describe the problem here..."
             />
 
-            <div className="mt-4 flex justify-end space-x-2">
+            <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setIsReportOpen(false)}
-                className="btn btn-sm"
+                className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-md"
               >
                 Cancel
               </button>
               <button
                 onClick={handleReportSubmit}
                 disabled={reportLoading}
-                className="btn btn-sm btn-error"
+                className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 disabled:from-gray-400 disabled:to-gray-500 px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                {reportLoading ? "Submitting..." : "Submit"}
+                {reportLoading ? "⏳ Submitting..." : "✓ Submit Report"}
               </button>
             </div>
           </div>

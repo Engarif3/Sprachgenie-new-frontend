@@ -86,29 +86,36 @@ const PrefixList = () => {
             > */}
             <div
               key={word.id}
-              className={`flex justify-between items-center p-3 cursor-pointer bg-gray-200 hover:bg-gray-300 border ${
-                index !== words.length - 1
-                  ? "border-b border-dotted border-b-sky-400"
-                  : ""
+              className={`flex justify-between items-center p-3 cursor-pointer transition-all duration-300 border border-gray-700 border-dotted ${
+                index % 2 === 0
+                  ? "bg-gray-800/40 hover:bg-gray-800/60"
+                  : "bg-gray-900/40 hover:bg-gray-900/60"
               }`}
               onClick={() => toggleExpand(word.id)}
             >
               <div>
-                <span className="font-medium text-lg">{word.prefixWord}</span>
-                <span className=" ml-2">({word.meaning.join(", ")})</span>
+                <span className="font-bold text-lg text-blue-400">
+                  {word.prefixWord}
+                </span>
+                <span className="ml-2 text-purple-300">
+                  ({word.meaning.join(", ")})
+                </span>
               </div>
-              <button className="text-sky-700">
+              <button className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 hover:from-blue-500/40 hover:to-cyan-500/40 border border-blue-500/50 text-white px-3 py-2 rounded-full hover:scale-110 transition-all duration-300">
                 {expandedWords[word.id] ? <FaMinus /> : <FaPlus />}
               </button>
             </div>
             {expandedWords[word.id] && (
-              <div className="p-3 bg-gray-50 text-gray-700">
-                <button className="font-semibold capitalize btn btn-sm bg-gradient-to-r from-slate-900 via-cyan-800 to-cyan-600 text-white">
-                  Sentences
-                </button>
-                <ul className="list-disc list-inside  mt-1 space-y-1 ml-1 border-l-8 border-pink-600">
+              <div className="p-4 bg-gradient-to-br from-gray-800/60 via-gray-900/60 to-black/60 border border-gray-700 border-dotted text-white">
+                <div className="inline-block px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/50 rounded-full font-semibold text-green-400 mb-3">
+                  📝 Sentences
+                </div>
+                <ul className="space-y-2 ml-4 border-l-4 border-pink-500 pl-4">
                   {word.sentences.map((sentence, idx) => (
-                    <li key={idx} class="normal-case ml-2">
+                    <li
+                      key={idx}
+                      className="normal-case text-gray-200 leading-relaxed"
+                    >
                       {sentence}
                     </li>
                   ))}

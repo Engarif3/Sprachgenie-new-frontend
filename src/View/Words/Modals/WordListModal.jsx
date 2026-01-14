@@ -10,7 +10,7 @@ import { IoMdArrowDropright } from "react-icons/io";
 // Memoized sentence renderer component
 const SentenceRenderer = memo(({ sentence, index }) => {
   const trimmed = sentence.trim();
-  let className = "text-gray-600 list-disc text-md md:text-lg lg:text-lg";
+  let className = "text-gray-300 list-disc text-md md:text-lg lg:text-lg";
   let cleanSentence = sentence;
 
   // Determine styling and clean sentence
@@ -150,12 +150,12 @@ const WordListModal = ({
 
   return (
     <div
-      className="fixed z-50 inset-0 bg-black bg-opacity-50 flex justify-center items-center transition-opacity duration-300 "
+      className="fixed z-50 inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center transition-opacity duration-300"
       onClick={handleBackgroundClick}
     >
       <div
         ref={modalRef}
-        className="relative bg-white rounded-lg  max-w-4xl w-full mx-3  shadow-2xl transform transition-all duration-300 scale-105  border max-h-[90vh] overflow-y-auto "
+        className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl max-w-4xl w-full mx-3 shadow-2xl transform transition-all duration-300 border-2 border-gray-700/50 max-h-[90vh] overflow-y-auto"
       >
         {/* Favorite Toggle Button */}
 
@@ -167,20 +167,21 @@ const WordListModal = ({
             className="absolute top-2 right-2 "
           />
         )}
-        <p className=" text-sky-600 text-center  mt-8 md:mt-4 lg:mt-4">
-          <span className="text-orange-500 text-3xl font-bold">Topic:</span>{" "}
-          <span className="text-3xl font-bold">
-            {" "}
-            {selectedWord.topic?.name || ""}
+        <p className="text-center mt-8 md:mt-6 lg:mt-6">
+          <span className="inline-block px-4 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full">
+            <span className="text-orange-400 text-lg font-bold">Topic:</span>
+            <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-400 ml-2">
+              {selectedWord.topic?.name || ""}
+            </span>
           </span>
         </p>
-        <hr className="border-0 border-b border-cyan-800  border-dashed  mx-8  mt-2" />
-        <div className="flex justify-between items-center px-3 md:px-8 lg:px-8 mt-4">
-          <h3 className="text-xl font-semibold text-gray-800 text-center flex items-center gap-4">
+        <hr className="border-0 h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent mx-8 mt-4" />
+        <div className="flex justify-between items-center px-3 md:px-8 lg:px-8 mt-6">
+          <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 flex items-center gap-4">
             <span>Word Details</span>
             <button
               onClick={handlePronounceWord}
-              className="text-blue-600 hover:text-blue-800"
+              className="text-3xl hover:scale-110 transition-transform duration-200 hover:drop-shadow-[0_0_10px_rgba(59,130,246,0.8)]"
               title="Pronounce"
             >
               🔊
@@ -190,87 +191,91 @@ const WordListModal = ({
                 userInfo.role === "admin") && (
                 <Link
                   to={`/edit-word/${selectedWord.id}`}
-                  className="btn btn-sm btn-warning"
+                  className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 rounded-full font-semibold text-white text-sm transition-all duration-200 hover:scale-105 shadow-md"
                 >
-                  Edit
+                  ✏️ Edit
                 </Link>
               )}
           </h3>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6  mx-2 px-1  md:px-6 lg:px-6 ">
-          <div className="">
-            <p className="text-lg  text-gray-700">
-              <span className=" text-sky-600  font-medium">Word:</span>{" "}
-              <span className=" mr-2 font-semibold text-orange-600 text-center text-sm md:text-lg lg:text-lg">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mx-2 px-1 md:px-6 lg:px-6 mt-4">
+          <div className="space-y-3 bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm p-4 rounded-2xl border border-gray-700/30">
+            <p className="text-lg">
+              <span className="text-blue-400 font-semibold">Word:</span>{" "}
+              <span className="mr-2 font-bold text-orange-400 text-center text-lg md:text-xl">
                 {selectedWord.article?.name}
               </span>
-              <span className="capitalize text-rose-900 font-bold">
+              <span className="capitalize text-white font-bold text-xl">
                 {capitalizedWord}
               </span>
             </p>
-            <p className="text-lg text-gray-600">
-              <span className=" text-sky-600 font-medium">Meaning:</span>{" "}
-              <span className="text-md md:text-lg lg:text-lg">
-                {" "}
-                {meaningsList}{" "}
-              </span>
+            <p className="text-lg">
+              <span className="text-blue-400 font-semibold">Meaning:</span>{" "}
+              <span className="text-gray-300 font-medium">{meaningsList}</span>
             </p>
 
             {selectedWord.pluralForm && (
-              <p className="text-lg text-gray-600">
-                <span className=" text-sky-600 font-medium">Plural:</span>{" "}
+              <p className="text-lg">
+                <span className="text-blue-400 font-semibold">Plural:</span>{" "}
                 {selectedWord.pluralForm && (
                   <>
-                    <span className=" font-semibold text-orange-600 text-center text-sm md:text-lg lg:text-lg">
+                    <span className="font-bold text-orange-400 text-lg md:text-xl">
                       die
                     </span>{" "}
-                    {capitalizedPluralForm}
+                    <span className="text-white font-bold">
+                      {capitalizedPluralForm}
+                    </span>
                   </>
                 )}
               </p>
             )}
 
             {(selectedWord.synonyms?.length || 0) > 0 && (
-              <p className="text-lg text-gray-600">
-                <span className=" text-sky-600 font-medium capitalize">
+              <p className="text-lg">
+                <span className="text-blue-400 font-semibold capitalize">
                   Synonyms:
                 </span>{" "}
-                <span className="italic text-stone-950"> {synonymsList} </span>
+                <span className="text-gray-300 font-medium">
+                  {synonymsList}
+                </span>
               </p>
             )}
 
             {(selectedWord.antonyms?.length || 0) > 0 && (
-              <p className="text-lg text-gray-600">
-                <span className=" text-sky-600 font-medium capitalize">
+              <p className="text-lg">
+                <span className="text-blue-400 font-semibold capitalize">
                   Antonyms:
                 </span>{" "}
-                <span className="italic text-stone-950"> {antonymsList} </span>
+                <span className="text-gray-300 font-medium">
+                  {antonymsList}
+                </span>
               </p>
             )}
 
             {(selectedWord.similarWords?.length || 0) > 0 && (
-              <p className="text-lg text-gray-600 capitalize">
-                <span className=" text-sky-600 font-medium">
+              <p className="text-lg capitalize">
+                <span className="text-blue-400 font-semibold">
                   Word to Watch:
                 </span>{" "}
-                <span className="italic text-stone-950">
+                <span className="text-gray-300 font-medium">
                   {similarWordsList}
                 </span>
               </p>
             )}
 
-            <p className="text-lg text-gray-600">
-              <span className=" text-sky-600 font-medium">Level:</span>{" "}
-              <span className="text-xs bg-stone-950 rounded py-[1px] px-[3px] text-white font-semibold ">
-                {" "}
-                {selectedWord.level?.level || ""}{" "}
+            <p className="text-lg">
+              <span className="text-blue-400 font-semibold">Level:</span>{" "}
+              <span className="inline-block px-3 py-1 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-bold text-sm">
+                {selectedWord.level?.level || ""}
               </span>
             </p>
           </div>
-          <div className="text-lg text-gray-600">
-            <span className=" text-sky-600 font-medium">Sentences:</span>
+          <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm p-4 rounded-2xl border border-gray-700/30 ">
+            <p className="text-lg text-green-400 font-semibold mb-3">
+              📝 Sentences:
+            </p>
             {(selectedWord.sentences?.length || 0) > 0 ? (
-              <ul className=" space-y-2 list-disc">
+              <ul className="space-y-2 ">
                 {(selectedWord.sentences || []).map((sentence, index) => (
                   <SentenceRenderer
                     key={`${selectedWord.id}-${index}`}
@@ -280,17 +285,21 @@ const WordListModal = ({
                 ))}
               </ul>
             ) : (
-              <span className="text-gray-400">No sentences available.</span>
+              <span className="text-gray-400 italic">
+                No sentences available.
+              </span>
             )}
           </div>
         </div>
 
-        <div className="sticky bottom-0 right-2 flex justify-end pr-2  text-red-500">
-          <RiCloseCircleFill
+        <div className="sticky bottom-0 right-2 flex justify-end pr-4 pb-4 mt-6">
+          <button
             onClick={handleCloseModal}
-            size={40}
-            className="hover:text-rose-700 transition-transform duration-200 cursor-pointer"
-          />
+            className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 p-3 rounded-full transition-all duration-200 hover:scale-110 shadow-xl hover:shadow-red-500/50"
+            title="Close"
+          >
+            <RiCloseCircleFill size={28} className="text-white" />
+          </button>
         </div>
       </div>
     </div>

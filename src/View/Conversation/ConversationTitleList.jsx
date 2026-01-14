@@ -83,7 +83,7 @@ const ConversationTitleList = () => {
 
                   {/* View Button */}
                   <div className="flex items-center gap-2 text-orange-500 font-semibold text-sm group-hover:gap-3 transition-all duration-300">
-                    <span>Start Conversation</span>
+                    <span>Read the conversation</span>
                     <span className="text-lg transform group-hover:translate-x-1 transition-transform duration-300">
                       →
                     </span>

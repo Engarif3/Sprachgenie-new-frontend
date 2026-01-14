@@ -17,7 +17,7 @@ const DashboardLayout = () => {
     <Container>
       <div className="flex min-h-screen mb-12">
         <button
-          className="fixed md:hidden lg:hidden mt-[4px] left-2 z-50 bg-sky-600 text-white p-2 rounded-md"
+          className="fixed md:hidden lg:hidden mt-[4px] left-2 z-50 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white p-3 rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? "✖" : "☰"}
@@ -25,13 +25,15 @@ const DashboardLayout = () => {
 
         {/* Sidebar */}
         <aside
-          className={`fixed min-h-[80%] lg:static w-64 text-white flex flex-col rounded-md bg-stone-800 z-40 transform transition-transform duration-300
+          className={`fixed min-h-[80%] lg:static w-64 text-white flex flex-col rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-black border-2 border-gray-700/50 z-40 transform transition-transform duration-300 shadow-2xl
     ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
         >
-          <div className="py-2 text-2xl font-bold text-center text-sky-500">
-            Dashboard
+          <div className="py-4 text-2xl font-bold text-center">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+              🎯 Dashboard
+            </span>
           </div>
-          <hr className="border-0 border-b border-orange-600 mx-2" />
+          <hr className="border-0 h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent mx-4" />
 
           {/* Sidebar menu */}
           <nav className="flex-1 px-4 py-6 space-y-2">
@@ -39,50 +41,58 @@ const DashboardLayout = () => {
               to="/dashboard"
               end
               className={({ isActive }) =>
-                `block py-2 px-3 rounded hover:bg-cyan-700 ${
-                  isActive ? "bg-cyan-700 font-bold" : ""
+                `flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-300 ${
+                  isActive
+                    ? "bg-gradient-to-r from-blue-500 to-purple-500 font-bold shadow-lg shadow-blue-500/50"
+                    : "hover:bg-gray-800/50 hover:translate-x-1"
                 }`
               }
               onClick={() => setIsOpen(!isOpen)}
             >
-              Overview
+              <span className="text-xl">🏠</span> Overview
             </NavLink>
 
             <NavLink
               to="/dashboard/favorites-words"
               className={({ isActive }) =>
-                `block py-2 px-3 rounded hover:bg-cyan-700 ${
-                  isActive ? "bg-cyan-700 font-bold" : ""
+                `flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-300 ${
+                  isActive
+                    ? "bg-gradient-to-r from-pink-500 to-red-500 font-bold shadow-lg shadow-pink-500/50"
+                    : "hover:bg-gray-800/50 hover:translate-x-1"
                 }`
               }
               onClick={() => setIsOpen(!isOpen)}
             >
-              Favorites Words
+              <span className="text-xl">❤️</span> Favorites Words
             </NavLink>
 
             {role === "super_admin" && (
-              <div className=" ">
+              <div className="space-y-2">
                 <NavLink
                   to="/dashboard/update-user-status"
                   className={({ isActive }) =>
-                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
-                      isActive ? "bg-cyan-700 font-bold" : ""
+                    `flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-300 ${
+                      isActive
+                        ? "bg-gradient-to-r from-purple-500 to-pink-500 font-bold shadow-lg shadow-purple-500/50"
+                        : "hover:bg-gray-800/50 hover:translate-x-1"
                     }`
                   }
                   onClick={() => setIsOpen(!isOpen)}
                 >
-                  Manage Users
+                  <span className="text-xl">👥</span> Manage Users
                 </NavLink>
                 <NavLink
                   to="/dashboard/topic"
                   className={({ isActive }) =>
-                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
-                      isActive ? "bg-cyan-700 font-bold" : ""
+                    `flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-300 ${
+                      isActive
+                        ? "bg-gradient-to-r from-green-500 to-emerald-500 font-bold shadow-lg shadow-green-500/50"
+                        : "hover:bg-gray-800/50 hover:translate-x-1"
                     }`
                   }
                   onClick={() => setIsOpen(!isOpen)}
                 >
-                  Create Topic
+                  <span className="text-xl">📚</span> Create Topic
                 </NavLink>
               </div>
             )}
@@ -91,13 +101,15 @@ const DashboardLayout = () => {
               <NavLink
                 to="/dashboard/update-basic-user-status"
                 className={({ isActive }) =>
-                  `block py-2 px-3 rounded hover:bg-cyan-700 ${
-                    isActive ? "bg-cyan-700 font-bold" : ""
+                  `flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-300 ${
+                    isActive
+                      ? "bg-gradient-to-r from-purple-500 to-pink-500 font-bold shadow-lg shadow-purple-500/50"
+                      : "hover:bg-gray-800/50 hover:translate-x-1"
                   }`
                 }
                 onClick={() => setIsOpen(!isOpen)}
               >
-                Manage Users
+                <span className="text-xl">👥</span> Manage Users
               </NavLink>
             )}
 
@@ -106,99 +118,119 @@ const DashboardLayout = () => {
                 <NavLink
                   to="/dashboard/create-word"
                   className={({ isActive }) =>
-                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
-                      isActive ? "bg-cyan-700 font-bold" : ""
+                    `flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-300 ${
+                      isActive
+                        ? "bg-gradient-to-r from-blue-500 to-cyan-500 font-bold shadow-lg shadow-blue-500/50"
+                        : "hover:bg-gray-800/50 hover:translate-x-1"
                     }`
                   }
                   onClick={() => setIsOpen(!isOpen)}
                 >
-                  Create Word
+                  <span className="text-xl">📝</span> Create Word
                 </NavLink>
                 <NavLink
                   to="/dashboard/create-conversation"
                   className={({ isActive }) =>
-                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
-                      isActive ? "bg-cyan-700 font-bold" : ""
+                    `flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-300 ${
+                      isActive
+                        ? "bg-gradient-to-r from-green-500 to-emerald-500 font-bold shadow-lg shadow-green-500/50"
+                        : "hover:bg-gray-800/50 hover:translate-x-1"
                     }`
                   }
                   onClick={() => setIsOpen(!isOpen)}
                 >
-                  Create Conversation
+                  <span className="text-xl">💬</span> Create Conversation
                 </NavLink>
                 <NavLink
                   to="/dashboard/update-conversation"
                   className={({ isActive }) =>
-                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
-                      isActive ? "bg-cyan-700 font-bold" : ""
+                    `flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-300 ${
+                      isActive
+                        ? "bg-gradient-to-r from-yellow-500 to-orange-500 font-bold shadow-lg shadow-yellow-500/50"
+                        : "hover:bg-gray-800/50 hover:translate-x-1"
                     }`
                   }
                   onClick={() => setIsOpen(!isOpen)}
                 >
-                  Update Conversation
+                  <span className="text-xl">✏️</span> Update Conversation
                 </NavLink>
 
                 <NavLink
                   to="/dashboard/users-favorite-count"
                   className={({ isActive }) =>
-                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
-                      isActive ? "bg-cyan-700 font-bold" : ""
+                    `flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-300 ${
+                      isActive
+                        ? "bg-gradient-to-r from-orange-500 to-red-500 font-bold shadow-lg shadow-orange-500/50"
+                        : "hover:bg-gray-800/50 hover:translate-x-1"
                     }`
                   }
                   onClick={() => setIsOpen(!isOpen)}
                 >
-                  Favorites Count
+                  <span className="text-xl">📊</span> Favorites Count
                 </NavLink>
 
                 <NavLink
                   to="/dashboard/global-limits"
                   className={({ isActive }) =>
-                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
-                      isActive ? "bg-cyan-700 font-bold" : ""
+                    `flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-300 ${
+                      isActive
+                        ? "bg-gradient-to-r from-cyan-500 to-blue-500 font-bold shadow-lg shadow-cyan-500/50"
+                        : "hover:bg-gray-800/50 hover:translate-x-1"
                     }`
                   }
                   onClick={() => setIsOpen(!isOpen)}
                 >
-                  Global Limits
+                  <span className="text-xl">🌍</span> Global Limits
                 </NavLink>
                 <NavLink
                   to="/dashboard/user-limits"
                   className={({ isActive }) =>
-                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
-                      isActive ? "bg-cyan-700 font-bold" : ""
+                    `flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-300 ${
+                      isActive
+                        ? "bg-gradient-to-r from-indigo-500 to-purple-500 font-bold shadow-lg shadow-indigo-500/50"
+                        : "hover:bg-gray-800/50 hover:translate-x-1"
                     }`
                   }
                   onClick={() => setIsOpen(!isOpen)}
                 >
-                  User Limits
+                  <span className="text-xl">⚙️</span> User Limits
                 </NavLink>
                 <NavLink
                   to="/dashboard/get-usage"
                   className={({ isActive }) =>
-                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
-                      isActive ? "bg-cyan-700 font-bold" : ""
+                    `flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-300 ${
+                      isActive
+                        ? "bg-gradient-to-r from-teal-500 to-green-500 font-bold shadow-lg shadow-teal-500/50"
+                        : "hover:bg-gray-800/50 hover:translate-x-1"
                     }`
                   }
                   onClick={() => setIsOpen(!isOpen)}
                 >
-                  AI Usage By Users
+                  <span className="text-xl">🤖</span> AI Usage By Users
                 </NavLink>
                 <NavLink
                   to="/dashboard/get-reports"
                   className={({ isActive }) =>
-                    `block py-2 px-3 rounded hover:bg-cyan-700 ${
-                      isActive ? "bg-cyan-700 font-bold" : ""
+                    `flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-300 ${
+                      isActive
+                        ? "bg-gradient-to-r from-red-500 to-pink-500 font-bold shadow-lg shadow-red-500/50"
+                        : "hover:bg-gray-800/50 hover:translate-x-1"
                     }`
                   }
                   onClick={() => setIsOpen(!isOpen)}
                 >
-                  User Reports
+                  <span className="text-xl">📋</span> User Reports
                 </NavLink>
               </>
             )}
           </nav>
-          <hr className="border-0 border-b border-orange-600 mx-2" />
-          <div className="px-4 text-center text-sky-500 italic">
-            <p className="text-sm my-3"> {userInfo?.name}</p>
+          <hr className="border-0 h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent mx-4" />
+          <div className="px-4 text-center py-4">
+            <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-xl py-3">
+              <p className="text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                👤 {userInfo?.name}
+              </p>
+            </div>
           </div>
         </aside>
 

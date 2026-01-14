@@ -92,144 +92,259 @@ const Register = () => {
       {/* Home button */}
       <Link
         to="/"
-        className="fixed top-4 left-4 z-20 px-4 py-2 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-all duration-300 font-semibold"
+        className="fixed top-4 left-4 z-20 px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-full font-bold shadow-lg hover:scale-105 transition-all duration-300"
       >
-        ← Home
+        🏠 Home
       </Link>
 
-      <div className="flex flex-col-reverse md:flex-row lg:flex-row gap-4 md:gap-8 lg:gap-8 items-center md:items-end  lg:items-end">
-        <div className="w-full max-w-lg shadow-md rounded-lg p-6 text-center bg-stone-800">
-          <h2 className="text-xl font-semibold text-white">Register</h2>
+      <div className="flex flex-col-reverse md:flex-row lg:flex-row gap-6 md:gap-8 lg:gap-10 items-center md:items-end lg:items-end">
+        <div className="w-full max-w-lg shadow-2xl rounded-3xl p-8 text-center bg-gradient-to-br from-gray-800/90 via-gray-900/90 to-black/90 border-2 border-gray-700/50 backdrop-blur-sm">
+          <div className="mb-6">
+            <div className="inline-block p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-full mb-4">
+              <span className="text-4xl">✨</span>
+            </div>
+            <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400">
+              Create Account
+            </h2>
+            <p className="text-gray-400 text-sm mt-2">
+              Join us to start your German learning adventure
+            </p>
+          </div>
+
           {error && (
-            <p className="bg-red-500 text-white p-2 rounded mt-2">{error}</p>
+            <div className="bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 text-red-300 p-3 rounded-xl mb-4">
+              ⚠️ {error}
+            </div>
           )}
           {emailVerificationMessage && (
-            <p className="bg-yellow-500 text-white p-2 rounded mt-2">
-              {emailVerificationMessage}
-            </p>
+            <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/50 text-yellow-300 p-3 rounded-xl mb-4">
+              📧 {emailVerificationMessage}
+            </div>
           )}
           <form
             onSubmit={handleSubmit(handleRegister)}
-            className="mt-4 space-y-4"
+            className="mt-6 space-y-4"
           >
             {/* Name */}
-            <input
-              {...register("basicUser.name")}
-              type="text"
-              placeholder="Name"
-              autoComplete="name"
-              className="w-full p-2 border rounded"
-            />
-            {errors.basicUser?.name && (
-              <p className="text-red-500">{errors.basicUser.name.message}</p>
-            )}
+            <div className="text-left">
+              <label className="block text-sm font-semibold text-gray-300 mb-2">
+                👤 Name
+              </label>
+              <input
+                {...register("basicUser.name")}
+                type="text"
+                placeholder="Your full name"
+                autoComplete="name"
+                className="w-full bg-gray-700/50 border border-gray-600 focus:border-purple-500 p-3 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500/50 transition-all duration-300"
+              />
+              {errors.basicUser?.name && (
+                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                  ❌ {errors.basicUser.name.message}
+                </p>
+              )}
+            </div>
 
             {/* Email */}
-            <input
-              {...register("basicUser.email")}
-              type="email"
-              placeholder="Email"
-              autoComplete="email"
-              className="w-full p-2 border rounded"
-            />
-            {errors.basicUser?.email && (
-              <p className="text-red-500">{errors.basicUser.email.message}</p>
-            )}
+            <div className="text-left">
+              <label className="block text-sm font-semibold text-gray-300 mb-2">
+                📧 Email
+              </label>
+              <input
+                {...register("basicUser.email")}
+                type="email"
+                placeholder="your@email.com"
+                autoComplete="email"
+                className="w-full bg-gray-700/50 border border-gray-600 focus:border-purple-500 p-3 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500/50 transition-all duration-300"
+              />
+              {errors.basicUser?.email && (
+                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                  ❌ {errors.basicUser.email.message}
+                </p>
+              )}
+            </div>
 
             {/* Password */}
-            <div className="relative">
-              <input
-                {...register("password")}
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                autoComplete="new-password"
-                className="w-full p-2 border rounded"
-              />
-              <button
-                type="button"
-                onClick={togglePasswordVisibility}
-                className="absolute right-3 top-2.5 text-sm text-gray-500"
-              >
-                {showPassword ? "Hide" : "Show"}
-              </button>
+            <div className="text-left">
+              <label className="block text-sm font-semibold text-gray-300 mb-2">
+                🔑 Password
+              </label>
+              <div className="relative">
+                <input
+                  {...register("password")}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••••"
+                  autoComplete="new-password"
+                  className="w-full bg-gray-700/50 border border-gray-600 focus:border-purple-500 p-3 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500/50 transition-all duration-300"
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute inset-y-0 right-3 text-sm text-gray-400 hover:text-white font-semibold transition-colors duration-300"
+                >
+                  {showPassword ? "👁️" : "👁️‍🗨️"}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                  ❌ {errors.password.message}
+                </p>
+              )}
             </div>
 
             {/* Confirm Password */}
-            <div className="relative mt-2">
-              <input
-                {...register("confirmPassword")}
-                type={showPassword ? "text" : "password"}
-                placeholder="Confirm Password"
-                autoComplete="new-password"
-                className="w-full p-2 border rounded"
-              />
-              <button
-                type="button"
-                onClick={togglePasswordVisibility}
-                className="absolute right-3 top-2.5 text-sm text-gray-500"
-              >
-                {showPassword ? "Hide" : "Show"}
-              </button>
+            <div className="text-left">
+              <label className="block text-sm font-semibold text-gray-300 mb-2">
+                🔐 Confirm Password
+              </label>
+              <div className="relative">
+                <input
+                  {...register("confirmPassword")}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••••"
+                  autoComplete="new-password"
+                  className="w-full bg-gray-700/50 border border-gray-600 focus:border-purple-500 p-3 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500/50 transition-all duration-300"
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute inset-y-0 right-3 text-sm text-gray-400 hover:text-white font-semibold transition-colors duration-300"
+                >
+                  {showPassword ? "👁️" : "👁️‍🗨️"}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                  ❌ {errors.confirmPassword.message}
+                </p>
+              )}
             </div>
-            {errors.confirmPassword && (
-              <p className="text-red-500">{errors.confirmPassword.message}</p>
-            )}
-
-            {errors.password && (
-              <p className="text-red-500">{errors.password.message}</p>
-            )}
 
             {/* Submit */}
-            {/* <button
-              type="submit"
-              className="w-full bg-blue-600 text-white p-2 rounded mt-2"
-            >
-              Register
-            </button> */}
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full p-2 rounded mt-2 text-white ${
-                isSubmitting ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600"
+              className={`w-full p-3 rounded-xl font-bold text-white shadow-lg transition-all duration-300 ${
+                isSubmitting
+                  ? "bg-gray-600 cursor-not-allowed"
+                  : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 hover:scale-105"
               }`}
             >
-              {isSubmitting ? "Registering..." : "Register"}
+              {isSubmitting ? "🔄 Registering..." : "🚀 Register"}
             </button>
           </form>
 
-          <p className="mt-4 text-white">
-            Already have an account?
-            <Link to="/login" className="text-blue-700 font-semibold ml-1">
-              Login
-            </Link>
-          </p>
+          <div className="pt-4 border-t border-gray-700/50 mt-6">
+            <p className="text-sm text-gray-400">
+              Already have an account?
+              <Link
+                to="/login"
+                className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-500 hover:to-purple-500 font-bold ml-2 transition-all duration-300"
+              >
+                🔐 Login
+              </Link>
+            </p>
+          </div>
         </div>
 
         {/* Password checklist */}
-        <div className=" text-left  p-1 mb-12 rounded-md w-full md:w-10/12 lg:md:w-10/12  text-white text-sm">
-          <p className="text-center text-sky-500 underline underline-offset-2">
-            Password Instructions
-          </p>
-          <ul
-            className="steps steps-vertical  [&>.step::after]:w-5 [&>.step::after]:h-5
-  [&>.step]:[grid-template-columns:28px_1fr]
-  [&>.step]:min-h-[3rem]
-  [&>.step::before]:w-1"
-          >
-            <li className={`step ${rules.uppercase ? "step-primary" : ""}`}>
-              {rules.uppercase ? "✅" : "❌"} At least one uppercase letter
+        <div className="text-left p-6 mb-12 rounded-2xl w-full md:w-10/12 lg:w-10/12 bg-gradient-to-br from-gray-800/90 via-gray-900/90 to-black/90 border-2 border-gray-700/50 backdrop-blur-sm text-white text-sm shadow-2xl">
+          <div className="text-center mb-4">
+            <div className="inline-block px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-500/50 rounded-full">
+              <p className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 font-bold">
+                🔒 Password Requirements
+              </p>
+            </div>
+          </div>
+          <ul className="space-y-3">
+            <li
+              className={`flex items-center gap-3 p-2 rounded-lg transition-all duration-300 ${
+                rules.uppercase
+                  ? "bg-green-500/20 border border-green-500/50"
+                  : "bg-gray-700/30"
+              }`}
+            >
+              <span className="text-xl">{rules.uppercase ? "✅" : "❌"}</span>
+              <span
+                className={
+                  rules.uppercase
+                    ? "text-green-300 font-semibold"
+                    : "text-gray-400"
+                }
+              >
+                At least one uppercase letter
+              </span>
             </li>
-            <li className={`step ${rules.lowercase ? "step-primary" : ""}`}>
-              {rules.lowercase ? "✅" : "❌ "} At least one lowercase letter
+            <li
+              className={`flex items-center gap-3 p-2 rounded-lg transition-all duration-300 ${
+                rules.lowercase
+                  ? "bg-green-500/20 border border-green-500/50"
+                  : "bg-gray-700/30"
+              }`}
+            >
+              <span className="text-xl">{rules.lowercase ? "✅" : "❌"}</span>
+              <span
+                className={
+                  rules.lowercase
+                    ? "text-green-300 font-semibold"
+                    : "text-gray-400"
+                }
+              >
+                At least one lowercase letter
+              </span>
             </li>
-            <li className={`step ${rules.number ? "step-primary" : ""}`}>
-              {rules.number ? "✅" : "❌"} At least one number
+            <li
+              className={`flex items-center gap-3 p-2 rounded-lg transition-all duration-300 ${
+                rules.number
+                  ? "bg-green-500/20 border border-green-500/50"
+                  : "bg-gray-700/30"
+              }`}
+            >
+              <span className="text-xl">{rules.number ? "✅" : "❌"}</span>
+              <span
+                className={
+                  rules.number
+                    ? "text-green-300 font-semibold"
+                    : "text-gray-400"
+                }
+              >
+                At least one number
+              </span>
             </li>
-            <li className={`step ${rules.specialChar ? "step-primary" : ""}`}>
-              {rules.specialChar ? "✅" : "❌"} At least one special character
+            <li
+              className={`flex items-center gap-3 p-2 rounded-lg transition-all duration-300 ${
+                rules.specialChar
+                  ? "bg-green-500/20 border border-green-500/50"
+                  : "bg-gray-700/30"
+              }`}
+            >
+              <span className="text-xl">{rules.specialChar ? "✅" : "❌"}</span>
+              <span
+                className={
+                  rules.specialChar
+                    ? "text-green-300 font-semibold"
+                    : "text-gray-400"
+                }
+              >
+                At least one special character
+              </span>
             </li>
-            <li className={`step ${rules.length ? "step-primary" : ""}`}>
-              {rules.length ? "✅" : "❌"} Minimum 10 characters
+            <li
+              className={`flex items-center gap-3 p-2 rounded-lg transition-all duration-300 ${
+                rules.length
+                  ? "bg-green-500/20 border border-green-500/50"
+                  : "bg-gray-700/30"
+              }`}
+            >
+              <span className="text-xl">{rules.length ? "✅" : "❌"}</span>
+              <span
+                className={
+                  rules.length
+                    ? "text-green-300 font-semibold"
+                    : "text-gray-400"
+                }
+              >
+                Minimum 10 characters
+              </span>
             </li>
           </ul>
         </div>
