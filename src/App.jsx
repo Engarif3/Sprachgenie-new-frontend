@@ -68,12 +68,13 @@ const App = () => {
           if (data?.data) {
             storeUserInfo(data.data);
           }
+        } else if (response.status === 401 || response.status === 403) {
+          // Not logged in - expected, do not log error
         } else if (response.status >= 500) {
           // Server error - silently fail, don't block the app
           console.error("Server error during auth check:", response.status);
         } else {
-          // 4xx errors (unauthorized, etc.) - expected, continue without auth
-          console.log("No active session");
+          // Other errors (e.g., 4xx) - continue without auth
         }
       } catch (error) {
         // Network error or other issues - silent fail
