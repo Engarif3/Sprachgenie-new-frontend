@@ -1057,7 +1057,7 @@ const WordList = () => {
           <Loader loading={isLoading} />
         </div>
       ) : (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900/30 via-gray-800/20 to-black/30 rounded-2xl p-4">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900/30 via-gray-800/20 to-black/30 rounded-2xl p-1 md:p-4 lg:p-4">
           <div className="overflow-x-auto border border-gray-700/50 rounded-2xl shadow-2xl">
             <table className="w-full border-collapse">
               <thead>
