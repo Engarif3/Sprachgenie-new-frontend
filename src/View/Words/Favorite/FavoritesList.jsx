@@ -416,7 +416,7 @@ const FavoritesList = () => {
             totalPages={totalPages}
             setCurrentPage={setCurrentPage}
           />
-          <div className="min-h-screen bg-gradient-to-br from-gray-900/30 via-gray-800/20 to-black/30 rounded-2xl p-4">
+          <div className="min-h-screen bg-gradient-to-br from-gray-900/30 via-gray-800/20 to-black/30 rounded-2xl p-1 md:p-4">
             <div className="overflow-x-auto">
               {paginatedFavorites.length > 0 ? (
                 <>
@@ -428,7 +428,7 @@ const FavoritesList = () => {
                   </div>
 
                   <div className="border border-gray-700/50 rounded-2xl shadow-2xl overflow-hidden">
-                    <table className="w-full border-collapse">
+                    <table className="w-full border-collapse text-xs sm:text-sm md:text-base">
                       <thead>
                         <tr className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 text-sm md:text-xl lg:text-xl text-white">
                           <th className="py-3 text-sm md:text-lg lg:text-lg text-center text-orange-400 font-bold w-[5%] md:w-[3%] lg:w-[3%] rounded-tl-xl border-b border-gray-700">
