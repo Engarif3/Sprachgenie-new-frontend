@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import Container from "../../../utils/Container";
 import axios from "../../../axios";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -357,8 +358,7 @@ const FavoritesListDashboard = () => {
   //   ==============AI===============
 
   return (
-    // <Container>
-    <>
+    <Container>
       <div className="text-center mb-8">
         <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-red-400 to-orange-400 mb-3">
           ❤️ Favorite Words
@@ -579,7 +579,7 @@ const FavoritesListDashboard = () => {
       />
 
       {/* =================ai modal ===================== */}
-    </>
+    </Container>
   );
 };
 
