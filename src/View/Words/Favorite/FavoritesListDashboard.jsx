@@ -392,7 +392,7 @@ const FavoritesListDashboard = () => {
                   </span>
                 </div>
 
-                <table className="w-full border-collapse border-2 border-gray-700/50 bg-gradient-to-br from-gray-900/80 via-gray-800/60 to-black rounded-3xl overflow-hidden shadow-2xl">
+                <table className="w-full border-collapse border-2 border-gray-700/50 bg-gradient-to-br from-gray-900/80 via-gray-800/60 to-black rounded-3xl overflow-hidden shadow-2xl p-1 md:p-4">
                   <thead>
                     <tr className="bg-gradient-to-r from-gray-800 via-gray-900 to-black text-lg text-white border-b-2 border-gray-700/50">
                       <th className="p-3 text-center text-orange-400 font-bold rounded-tl-2xl">
@@ -437,7 +437,8 @@ const FavoritesListDashboard = () => {
                               className="cursor-pointer text-blue-400 hover:text-blue-300 text-sm md:text-lg lg:text-lg font-bold pl-1 md:pl-0 lg:pl-0 line-clamp-2 hover:line-clamp-none hover:max-w-full break-words max-w-[120px] md:max-w-full hover:scale-105 transition-all duration-300"
                               onClick={() => openModal(word)}
                             >
-                              {word.value}
+                              {word.value.charAt(0).toUpperCase() +
+                                word.value.slice(1)}
                             </span>
 
                             <div className="flex gap-1 md:gap-2 lg:gap-2">
