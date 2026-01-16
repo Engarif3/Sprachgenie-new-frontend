@@ -416,7 +416,7 @@ const FavoritesList = () => {
             totalPages={totalPages}
             setCurrentPage={setCurrentPage}
           />
-          <div className="min-h-screen bg-gradient-to-br from-gray-900/30 via-gray-800/20 to-black/30 rounded-2xl p-1 md:p-4">
+          <div className="min-h-screen bg-gradient-to-br from-gray-900/30 via-gray-800/20 to-black/30 rounded-2xl p-1 md:p-4 lg:p-4">
             <div className="overflow-x-auto">
               {paginatedFavorites.length > 0 ? (
                 <>
