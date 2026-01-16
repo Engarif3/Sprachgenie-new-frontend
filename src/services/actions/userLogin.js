@@ -35,5 +35,11 @@ export const userLogin = async (loginData) => {
 
   // Parse successful response
   const loggedInInfo = await res.json();
+  // Surface backend debug header to the caller for easier diagnostics
+  try {
+    loggedInInfo.authCookie = res.headers.get("X-Auth-Cookie");
+  } catch (e) {
+    // ignore header reading errors
+  }
   return loggedInInfo;
 };

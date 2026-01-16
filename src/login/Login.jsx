@@ -163,6 +163,12 @@ const Login = () => {
           navigate("/");
         } else {
           setError("Failed to fetch user information");
+          // Surface the login response debug header in diagnostics to help debugging
+          const lastAuthCookieHeader = res?.authCookie || null;
+          setDiagnostics((prev) => ({
+            ...(prev || {}),
+            loginAuthCookie: lastAuthCookieHeader,
+          }));
         }
       } else {
         setError(res?.message || "Login failed");
