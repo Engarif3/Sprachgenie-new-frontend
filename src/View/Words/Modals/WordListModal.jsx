@@ -16,12 +16,12 @@ const SentenceRenderer = memo(({ sentence, index }) => {
   // Determine styling and clean sentence
   if (trimmed.startsWith("##")) {
     className =
-      "font-semibold text-cyan-700 list-none w-full text-center underline capitalize ";
+      "font-semibold text-lg text-sky-600 list-none w-full text-center underline capitalize ";
     cleanSentence = sentence.replace(/^##\s*/, "");
   } else if (trimmed.startsWith("**")) {
-    className = "text-green-600 list-none text-sm first-letter:uppercase";
+    className = "text-slate-400 list-none text-m first-letter:uppercase";
     cleanSentence = sentence
-      .replace(/^\*\*\s*/, "-")
+      .replace(/^\*\*\s*/, "⭕")
       .replace(/\*\*$/, "")
       .trim();
   }
@@ -167,7 +167,7 @@ const WordListModal = ({
             className="absolute top-2 right-2 "
           />
         )}
-        <p className="text-center mt-8 md:mt-6 lg:mt-6">
+        <p className="text-center mt-8 md:mt-6 lg:mt-6 px-4 ">
           <span className="inline-block px-4 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full">
             <span className="text-orange-400 text-lg font-bold">Topic:</span>
             <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-400 ml-2">
@@ -199,7 +199,7 @@ const WordListModal = ({
           </h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mx-2 px-1 md:px-6 lg:px-6 mt-4">
-          <div className="space-y-3 bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm p-4 rounded-2xl border border-gray-700/30">
+          <div className="space-y-3 bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm p-2 md:p-4 lg:p-4 rounded-2xl border border-gray-700/30">
             <p className="text-lg">
               <span className="text-blue-400 font-semibold">Word:</span>{" "}
               <span className="mr-2 font-bold text-orange-400 text-center text-lg md:text-xl">
@@ -270,7 +270,7 @@ const WordListModal = ({
               </span>
             </p>
           </div>
-          <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm p-4 rounded-2xl border border-gray-700/30 ">
+          <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm p-2 md:p-4 lg:p-4 rounded-2xl border border-gray-700/30 ">
             <p className="text-lg text-green-400 font-semibold mb-3">
               📝 Sentences:
             </p>

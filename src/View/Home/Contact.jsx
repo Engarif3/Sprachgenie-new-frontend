@@ -67,7 +67,7 @@ const Contact = () => {
               📧 Get In Touch
             </span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-4">
             Contact Me
           </h2>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -120,7 +120,7 @@ const Contact = () => {
             <form
               ref={form}
               onSubmit={handleSubmit(onSubmit)}
-              className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-8 rounded-2xl border-2 border-gray-700 hover:border-orange-500/50 transition-all duration-300 space-y-6"
+              className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-8 rounded-2xl border-2 border-gray-700 hover:border-orange-500/50 transition-all duration-300 space-y-2"
             >
               <div>
                 <label className="text-white font-semibold mb-2 block">

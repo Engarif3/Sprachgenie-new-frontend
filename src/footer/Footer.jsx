@@ -11,25 +11,20 @@ import Container from "../utils/Container";
 
 const Footer = () => {
   return (
-    <div>
-      <footer className="relative footer p-6 md:p-8 lg:p-10 bg-gradient-to-br from-gray-900 via-gray-900 to-black text-white overflow-hidden border-t-2 border-gray-700/50">
-        {/* Animated background effect */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-700/20 via-transparent to-transparent"></div>
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-800 via-pink-900 to-purple-900"></div>
+    <div className="relative footer footer-center bg-gradient-to-br from-gray-900 via-gray-900 to-black">
+      <footer className="relative footer p-6 md:p-8 lg:p-10 b text-white overflow-hidden border-t-2 border-gray-700/50">
         <div className="relative z-10 w-full flex flex-col justify-center items-center md:block lg:block">
           <div className="mb-6 relative group">
             {/* <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 rounded-lg blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200 animate-tilt"></div> */}
             <p className="relative text-4xl md:text-5xl font-bold">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 ">
-                Sprach
-              </span>
-              <span className="text-white ">Genie</span>
+              <span className="text-orange-600 font-extrabold">Sprach</span>
+              <span className="text-white font-extrabold">Genie</span>
               {/* <HiSparkles className="inline ml-2 text-yellow-400 animate-pulse" /> */}
             </p>
           </div>
-          <div className="text-center md:text-left bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 rounded-xl p-4 backdrop-blur-sm">
-            <p className="text-gray-400 font-semibold text-sm mb-1 flex items-center gap-2">
-              <span className="text-pink-400">✨</span> Created By
+          <div className="text-center md:text-left ">
+            <p className="text-gray-400 font-semibold text-sm mb-1 text-center md:text-left md:text-left ">
+              <span className="text-pink-400"></span> Created By
             </p>
             <p className="text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400">
               Md Arifur Rahman
@@ -40,9 +35,9 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="relative z-10 flex flex-col md:flex-row justify-center md:justify-between lg:justify-between w-full gap-8">
-          <div>
-            <h3 className="mb-4 text-lg md:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 flex items-center gap-2">
+        <div className="relative z-10 flex flex-row  justify-center md:justify-between lg:justify-between w-full gap-8 mt-8">
+          <div className="flex flex-col justify-center ">
+            <h3 className="mb-4 text-lg md:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 ">
               🌐 Connect With Me
             </h3>
             <div className="flex gap-4 justify-center md:justify-start">
@@ -80,7 +75,7 @@ const Footer = () => {
           </div>
 
           <div className="hidden md:flex lg:flex justify-center items-center">
-            <div className="group bg-gradient-to-br from-gray-800/70 to-gray-900/70 border-2 border-gray-700/50 hover:border-cyan-500/50 rounded-2xl p-6 backdrop-blur-sm shadow-xl hover:shadow-cyan-500/20 transition-all duration-300 hover:scale-105">
+            <div className="">
               <div className="flex items-center gap-3 mb-3">
                 <div className="bg-gradient-to-r from-cyan-500/20 to-blue-500/20 p-2 rounded-full">
                   <FaMobile className="text-cyan-400" size={20} />
@@ -93,10 +88,10 @@ const Footer = () => {
                 <div className="bg-gradient-to-r from-pink-500/20 to-purple-500/20 p-2 rounded-full mt-1">
                   <FaMapMarkerAlt className="text-pink-400" size={16} />
                 </div>
-                <div>
+                <div className="ml-2 text-start">
                   <p className="font-semibold">Reichenhainer str.51</p>
                   <p>09126, Chemnitz</p>
-                  <p className="flex items-center gap-1 mt-1">
+                  <p className="flex items-center gap-1 ">
                     <span>Germany</span>
                     <span className="text-lg">🇩🇪</span>
                   </p>
@@ -106,17 +101,16 @@ const Footer = () => {
           </div>
         </div>
       </footer>
-      <footer className="relative footer footer-center p-6 bg-gradient-to-b from-black via-gray-950 to-black text-white overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-purple-900/10 via-transparent to-transparent"></div>
+      <footer className="relative footer footer-center  text-white overflow-hidden pb-8 ">
         <div className="relative z-10 max-w-3xl mx-auto">
-          <div className="flex items-center justify-center gap-2 mb-3">
+          <div className="flex items-center justify-center gap-2 ">
             <span className="text-2xl animate-pulse">©</span>
             <p className="text-gray-300 font-semibold">
               Copyright {new Date().getFullYear()} - All rights reserved.
             </p>
           </div>
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <FaEnvelope className="text-blue-400 animate-bounce" />
+          <div className="flex items-center justify-center gap-2 ">
+            <FaEnvelope className="text-blue-400 animate-bounce mt-2" />
             <a
               href="mailto:arif.aust.eng@gmail.com"
               className="text-sm text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 hover:from-blue-500 hover:to-cyan-500 font-bold transition-all duration-300"
@@ -124,7 +118,7 @@ const Footer = () => {
               arif.aust.eng@gmail.com
             </a>
           </div>
-          <div className="inline-block px-4 py-2 bg-gradient-to-r from-gray-800/50 to-gray-900/50 border border-gray-700/50 rounded-full mt-2">
+          <div className="inline-block px-4   mt-2">
             <p className="text-xs text-gray-400 flex items-center gap-2">
               <span className="text-yellow-400">💡</span>
               <span>Topic titles inspired by Telc A1–B2 books</span>

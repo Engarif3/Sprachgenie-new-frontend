@@ -92,7 +92,7 @@ const NavBar = () => {
               <Link
                 onClick={() => setIsMenuOpen(false)}
                 to="/"
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center md:hidden lg:hidden"
+                className="border border-sky-700 text-white font-bold px-2 py-1 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center md:hidden lg:hidden"
               >
                 🏠 Home
               </Link>
@@ -101,7 +101,7 @@ const NavBar = () => {
             <button
               ref={toggleRef}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
+              className="md:hidden   text-sky-400 text-2xl  font-bold px-2 py-0 rounded-lg   shadow-lg border border-sky-700"
             >
               {isMenuOpen ? "✕" : "☰"}
             </button>
@@ -161,21 +161,21 @@ const NavBar = () => {
                 <Link
                   to="/dashboard"
                   onClick={() => setIsMenuOpen(false)}
-                  className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/50 flex justify-center items-center md:hidden lg:hidden"
+                  className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg  flex justify-center items-center md:hidden lg:hidden"
                 >
                   📊 Dashboard
                 </Link>
                 <Link
                   to="/words"
                   onClick={() => setIsMenuOpen(false)}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-purple-500/50 flex justify-center items-center md:hidden lg:hidden"
+                  className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg flex justify-center items-center md:hidden lg:hidden"
                 >
                   📚 Vocabulary
                 </Link>
                 <Link
                   onClick={() => setIsMenuOpen(false)}
                   to="/favorites"
-                  className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/50 flex md:hidden lg:hidden justify-center items-center"
+                  className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg  flex md:hidden lg:hidden justify-center items-center"
                 >
                   ❤️ Favorites
                 </Link>
@@ -214,7 +214,7 @@ const NavBar = () => {
                     setIsMenuOpen(false);
                   }}
                   to="/create-word"
-                  className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-green-500/50 flex justify-center items-center md:hidden lg:hidden"
+                  className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg flex justify-center items-center md:hidden lg:hidden"
                 >
                   📝 Create Word
                 </Link>
@@ -223,7 +223,7 @@ const NavBar = () => {
                     setIsMenuOpen(false);
                   }}
                   to="/create-conversation"
-                  className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-cyan-500/50 flex justify-center items-center md:hidden lg:hidden"
+                  className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-cyan-500/50 flex justify-center items-center md:hidden lg:hidden"
                 >
                   💬 Create Conv
                 </Link>
@@ -232,7 +232,7 @@ const NavBar = () => {
                     setIsMenuOpen(false);
                   }}
                   to="update-conversation"
-                  className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-yellow-500/50 flex justify-center items-center md:hidden lg:hidden"
+                  className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-yellow-500/50 flex justify-center items-center md:hidden lg:hidden"
                 >
                   ✏️ Update Conv
                 </Link>

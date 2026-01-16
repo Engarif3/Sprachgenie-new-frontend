@@ -80,7 +80,7 @@ const Home = () => {
           <div className="mb-6">
             <Link
               to="/words"
-              className="inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 text-white font-bold rounded-full hover:shadow-[0_0_30px_rgba(249,115,22,0.5)] hover:scale-105 transition-all duration-300 text-lg shadow-xl"
+              className="inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-orange-900 via-pink-900 to-purple-900 text-white font-bold rounded-full hover:shadow-[0_0_30px_rgba(249,115,22,0.5)] hover:scale-105 transition-all duration-300 text-lg shadow-xl"
             >
               <span className="text-2xl">📚</span>
               <span>Explore 4000+ Vocabulary Words</span>
@@ -92,7 +92,7 @@ const Home = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link
                 to="/register"
-                className="px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold rounded-full hover:shadow-2xl hover:scale-105 transition-all duration-300 text-lg"
+                className="px-8 py-4 bg-gradient-to-r from-red-500 to-blue-900 text-white font-bold rounded-full hover:shadow-2xl hover:scale-105 transition-all duration-300 text-lg"
               >
                 Get Started Free
               </Link>
@@ -132,7 +132,7 @@ const Home = () => {
                 🚀 Your Learning Hub
               </span>
             </div>
-            <h2 className="text-center text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 mb-6">
+            <h2 className="text-center text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-8">
               Explore Learning Resources
             </h2>
             <p className="text-center text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
@@ -533,7 +533,7 @@ const Home = () => {
               </p>
               <Link
                 to="/register"
-                className="inline-block px-12 py-5 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 hover:shadow-2xl hover:scale-105 transition-all duration-300 text-xl"
+                className="inline-block px-12 py-5 bg-pink-700 text-white font-bold rounded-full hover:bg-pink-600 hover:shadow-2xl hover:scale-105 transition-all duration-300 text-xl"
               >
                 Start Learning Now!
               </Link>
