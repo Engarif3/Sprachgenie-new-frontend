@@ -181,7 +181,7 @@ const WordListModal = ({
             <span>Word Details</span>
             <button
               onClick={handlePronounceWord}
-              className="text-3xl hover:scale-110 transition-transform duration-200 hover:drop-shadow-[0_0_10px_rgba(59,130,246,0.8)]"
+              className="text-3xl hover:scale-110  hover:text-indigo-400"
               title="Pronounce"
             >
               🔊
