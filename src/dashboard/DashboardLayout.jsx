@@ -17,7 +17,7 @@ const DashboardLayout = () => {
     <Container>
       <div className="flex min-h-screen mb-12">
         <button
-          className="fixed md:hidden lg:hidden mt-[4px] left-2 z-50 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white p-3 rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
+          className="fixed md:hidden lg:hidden mt-[0px] left-1 z-50 bg-orange-700  text-white px-2 py-1 rounded-md shadow-lg transition-all duration-300 text-md "
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? "✖" : "☰"}

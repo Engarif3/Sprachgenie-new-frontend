@@ -36,7 +36,7 @@ const Home = () => {
       {/* Hero Section */}
       <Container className="flex flex-col">
         {!userLoggedIn && (
-          <div className="text-orange-600 text-xl md:text-2xl lg:text-2xl flex justify-center mb-2 overflow-hidden">
+          <div className="text-orange-600 text-xl md:text-2xl lg:text-2xl flex justify-center mb-2 md:mb-12 lg:mb-12 overflow-hidden">
             <div className="w-11/12 md:w-8/12 lg:w-6/12">
               <Marquee
                 gradient={true}
@@ -62,7 +62,7 @@ const Home = () => {
         />
 
         {/* Hero Content */}
-        <div className="text-center py-8 px-4">
+        <div className="text-center pt-8 pb-[80px] px-4">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
             Master German with
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">
@@ -104,6 +104,25 @@ const Home = () => {
               </Link>
             </div>
           )}
+          {/* Scroll Hint */}
+          <div className="md:hidden absolute  left-1/2 -translate-x-1/2 flex flex-col items-center text-white/80 pointer-events-none mb-2">
+            <span className="text-xs font-bold tracking-widest uppercase mt-8">
+              Scroll to explore more
+            </span>
+            <svg
+              className="w-5 h-5 animate-bounce mt-2 font-bolder text-orange-600"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="4"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
         </div>
       </Container>
 

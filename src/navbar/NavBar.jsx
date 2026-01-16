@@ -77,7 +77,7 @@ const NavBar = () => {
       }`}
     >
       <Container>
-        <div className="flex flex-wrap justify-between items-center py-4 px-2 text-lg font-semibold relative">
+        <div className="flex flex-wrap justify-between items-center py-4 px-2 text-lg font-semibold relative bg">
           {/* Title and Hamburger Menu */}
           <div className="flex justify-between items-center w-full md:w-auto px-4">
             <Link
@@ -101,7 +101,7 @@ const NavBar = () => {
             <button
               ref={toggleRef}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden   text-sky-400 text-2xl  font-bold px-2 py-0 rounded-lg   shadow-lg border border-sky-700"
+              className="md:hidden   text-sky-400 text-2xl  font-bold px-2 py-0 rounded-lg   shadow-lg border border-sky-700 "
             >
               {isMenuOpen ? "✕" : "☰"}
             </button>
@@ -111,7 +111,7 @@ const NavBar = () => {
             ref={menuRef}
             className={`${
               isMenuOpen ? "flex" : "hidden"
-            } md:flex flex-col md:flex-row rounded-xl items-center gap-3 md:gap-4 lg:gap-16 w-full md:w-auto px-4 mt-2 md:mt-0 absolute md:static top-full left-0 z-10 py-4 md:py-0 md:border-0`}
+            } md:flex flex-col md:flex-row rounded-xl items-center gap-3 md:gap-4 lg:gap-16 w-full md:w-auto px-4 mt-2 md:mt-0 absolute md:static top-full left-0 z-10 py-4 md:py-0 md:border-0 bg-slate-400 bg-opacity-90 md:bg-transparent lg:bg-transparent`}
           >
             {location.pathname !== "/" && (
               <Link
@@ -245,7 +245,7 @@ const NavBar = () => {
                     setIsMenuOpen(false);
                   }}
                   to="/update-basic-user-status"
-                  className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-purple-500/50 flex justify-center items-center md:hidden lg:hidden"
+                  className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg  flex justify-center items-center md:hidden lg:hidden"
                 >
                   👥 Users
                 </Link>
@@ -258,7 +258,7 @@ const NavBar = () => {
                     setIsMenuOpen(false);
                   }}
                   to="/update-user-status"
-                  className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-purple-500/50 flex justify-center items-center md:hidden lg:hidden"
+                  className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg  flex justify-center items-center md:hidden lg:hidden"
                 >
                   👥 Users
                 </Link>
@@ -277,12 +277,13 @@ const NavBar = () => {
                     handleCreateTopic();
                     setIsMenuOpen(false);
                   }}
-                  className="bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-teal-500/50 flex justify-center items-center md:hidden lg:hidden"
+                  className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg flex justify-center items-center md:hidden lg:hidden"
                 >
                   📚 Create Topic
                 </Link>
               </>
             )}
+
             {/* <Link to="/login">Login</Link> */}
             <AuthButton></AuthButton>
 
