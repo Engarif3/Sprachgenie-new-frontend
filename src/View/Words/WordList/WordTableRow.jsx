@@ -125,7 +125,7 @@ const WordTableRow = ({
             <span
               key={idx}
               onClick={() => openWordInModal(synonym.value)}
-              className="text-xs sm:text-sm px-3 py-1 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/50 rounded-full hover:from-blue-500/30 hover:to-cyan-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
+              className="text-md  px-3 py-1 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/50 rounded-full hover:from-blue-500/30 hover:to-cyan-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
             >
               {synonym.value}
             </span>
@@ -140,7 +140,7 @@ const WordTableRow = ({
             <span
               key={idx}
               onClick={() => openWordInModal(antonym.value)}
-              className="text-xs sm:text-sm px-3 py-1 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 rounded-full hover:from-red-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
+              className="text-md  px-3 py-1 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 rounded-full hover:from-red-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
             >
               {antonym.value}
             </span>
@@ -155,7 +155,7 @@ const WordTableRow = ({
             <span
               key={idx}
               onClick={() => openWordInModal(similarword.value)}
-              className="text-xs sm:text-sm px-3 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-full hover:from-purple-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
+              className="text-md  px-3 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-full hover:from-purple-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
             >
               {similarword.value}
             </span>

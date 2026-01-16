@@ -431,14 +431,14 @@ const Quiz = () => {
 
   return (
     <Container>
-      <div className="relative p-8 text-white rounded-2xl min-h-screen flex flex-col items-center mt-4 mb-12 bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+      <div className="relative p-4 md:p-8 text-white rounded-2xl min-h-screen flex flex-col items-center mt-4 mb-12 bg-gradient-to-br from-gray-900 via-gray-800 to-black">
         {/* Background decoration */}
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-orange-500/5 rounded-2xl"></div>
         <div className="absolute inset-0 backdrop-blur-3xl opacity-30 rounded-2xl"></div>
 
         <div className="relative z-10 w-full max-w-6xl">
           {/* Header with difficulty and reset */}
-          <div className="w-full flex justify-between items-center mb-8">
+          <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-4 mb-6 md:mb-8">
             <div className="text-sm bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/50 px-4 py-2 rounded-full backdrop-blur-sm">
               Difficulty:{" "}
               <span className="font-bold text-blue-400">
@@ -447,7 +447,7 @@ const Quiz = () => {
             </div>
             <button
               onClick={resetQuiz}
-              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 px-6 py-2 rounded-full font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-orange-500/50"
+              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 px-4 md:px-6 py-2 rounded-full font-semibold text-sm md:text-base transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-orange-500/50"
             >
               Reset Quiz
             </button>
@@ -473,9 +473,9 @@ const Quiz = () => {
           </p>
 
           {/* Main word display */}
-          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-md border-2 border-purple-500/30 rounded-3xl p-12 mb-8 shadow-2xl hover:border-purple-500/50 transition-all duration-300">
+          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-md border-2 border-purple-500/30 rounded-3xl p-6 md:p-12 mb-8 shadow-2xl hover:border-purple-500/50 transition-all duration-300">
             <div className="text-center">
-              <div className="flex items-center justify-center gap-4 mb-6">
+              <div className="flex items-center justify-center gap-2 md:gap-4 mb-4 md:mb-6">
                 <button
                   onClick={() =>
                     pronounceWord(
@@ -484,13 +484,13 @@ const Quiz = () => {
                       }`.trim()
                     )
                   }
-                  className="text-5xl hover:scale-110 transition-transform duration-300 hover:drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]"
+                  className="text-3xl md:text-5xl hover:scale-110 transition-transform duration-300 hover:drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]"
                   title="Pronounce word"
                 >
                   🔊
                 </button>
-                <div className="text-4xl md:text-6xl font-bold">
-                  <span className="text-orange-400 mr-3">
+                <div className="text-2xl md:text-4xl lg:text-6xl font-bold">
+                  <span className="text-orange-400 mr-2 md:mr-3">
                     {currentWord?.article?.name || ""}
                   </span>
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500">
@@ -524,21 +524,21 @@ const Quiz = () => {
           </div>
 
           {/* Player score cards */}
-          <div className="flex justify-center gap-8 mb-8">
-            <div className="flex-1 max-w-sm bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-md border-2 border-blue-500/30 rounded-2xl p-8 shadow-xl hover:border-blue-500/50 transition-all duration-300">
+          <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-8 mb-8">
+            <div className="w-full md:flex-1 md:max-w-sm bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-md border-2 border-blue-500/30 rounded-2xl p-4 md:p-8 shadow-xl hover:border-blue-500/50 transition-all duration-300">
               <div className="text-center mb-4">
-                <div className="text-2xl font-bold text-blue-400 mb-2">
+                <div className="text-lg md:text-2xl font-bold text-blue-400 mb-2">
                   {player1}
                 </div>
-                <div className="text-5xl font-bold text-white">
+                <div className="text-3xl md:text-5xl font-bold text-white">
                   {scores.player1}
                 </div>
               </div>
-              <div className="flex justify-center gap-4">
+              <div className="flex justify-center gap-2 md:gap-4">
                 <button
                   onClick={() => handleScore("player1", -1)}
                   disabled={usedScores.player1}
-                  className={`bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-8 py-3 rounded-full font-bold text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
+                  className={`bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-4 md:px-8 py-2 md:py-3 rounded-full font-bold text-lg md:text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
                     usedScores.player1
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:shadow-red-500/50"
@@ -549,7 +549,7 @@ const Quiz = () => {
                 <button
                   onClick={() => handleScore("player1", 1)}
                   disabled={usedScores.player1}
-                  className={`bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-8 py-3 rounded-full font-bold text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
+                  className={`bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-4 md:px-8 py-2 md:py-3 rounded-full font-bold text-lg md:text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
                     usedScores.player1
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:shadow-green-500/50"
@@ -561,20 +561,20 @@ const Quiz = () => {
             </div>
 
             {mode === "multi" && (
-              <div className="flex-1 max-w-sm bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-md border-2 border-purple-500/30 rounded-2xl p-8 shadow-xl hover:border-purple-500/50 transition-all duration-300">
+              <div className="w-full md:flex-1 md:max-w-sm bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-md border-2 border-purple-500/30 rounded-2xl p-4 md:p-8 shadow-xl hover:border-purple-500/50 transition-all duration-300">
                 <div className="text-center mb-4">
-                  <div className="text-2xl font-bold text-purple-400 mb-2">
+                  <div className="text-lg md:text-2xl font-bold text-purple-400 mb-2">
                     {player2}
                   </div>
-                  <div className="text-5xl font-bold text-white">
+                  <div className="text-3xl md:text-5xl font-bold text-white">
                     {scores.player2}
                   </div>
                 </div>
-                <div className="flex justify-center gap-4">
+                <div className="flex justify-center gap-2 md:gap-4">
                   <button
                     onClick={() => handleScore("player2", -1)}
                     disabled={usedScores.player2}
-                    className={`bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-8 py-3 rounded-full font-bold text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
+                    className={`bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-4 md:px-8 py-2 md:py-3 rounded-full font-bold text-lg md:text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
                       usedScores.player2
                         ? "opacity-50 cursor-not-allowed"
                         : "hover:shadow-red-500/50"
@@ -585,7 +585,7 @@ const Quiz = () => {
                   <button
                     onClick={() => handleScore("player2", 1)}
                     disabled={usedScores.player2}
-                    className={`bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-8 py-3 rounded-full font-bold text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
+                    className={`bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-4 md:px-8 py-2 md:py-3 rounded-full font-bold text-lg md:text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
                       usedScores.player2
                         ? "opacity-50 cursor-not-allowed"
                         : "hover:shadow-green-500/50"
@@ -602,7 +602,7 @@ const Quiz = () => {
           <div className="text-center">
             <button
               onClick={nextWord}
-              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 px-12 py-4 rounded-full font-bold text-xl transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-cyan-500/50"
+              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 px-8 md:px-12 py-3 md:py-4 rounded-full font-bold text-lg md:text-xl transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-cyan-500/50"
             >
               Next Word →
             </button>
