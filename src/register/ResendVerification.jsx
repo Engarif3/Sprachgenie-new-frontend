@@ -11,11 +11,13 @@ const ResendVerification = () => {
   const handleResendVerification = async () => {
     try {
       const response = await api.post("/auth/resend-verification", { email });
-      setMessage(response.data);
+      // Response shape: { success: boolean, message: string }
+      setMessage(response.data?.message || "Check your email.");
       setError(null);
     } catch (err) {
+      const apiMessage = err?.response?.data?.message;
       setError(
-        err.response.data ||
+        apiMessage ||
           "An error occurred while resending the verification email."
       );
       setMessage(null);
@@ -46,10 +48,10 @@ const ResendVerification = () => {
             Send
           </button>
         </p>
-        <p className="mt-4 text-red-600 font-semibold">
-          {message && <p className="text-green-700">{message}</p>}
-          {error && <p>{error}</p>}
-        </p>
+        <div className="mt-4">
+          {message && <p className="text-green-700 font-semibold">{message}</p>}
+          {error && <p className="text-red-600 font-semibold">{error}</p>}
+        </div>
       </div>
     </div>
   );
