@@ -129,8 +129,6 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // Diagnostics for debugging fetch failures (HTTP status, body, cookie visibility)
-  const [diagnostics, setDiagnostics] = useState(null);
 
   const {
     register,
@@ -148,7 +146,6 @@ const Login = () => {
     setError("");
     try {
       const res = await userLogin(formData);
-      console.log("Login response:", res); // Debug log
 
       // ✅ Token now in httpOnly cookie (not in response body)
       if (res?.success) {
@@ -156,42 +153,26 @@ const Login = () => {
 
         // ✅ Fetch user info from /auth/me
         const userInfo = await fetchUserInfo();
-        console.log("User info:", userInfo); // Debug log
 
         if (userInfo) {
           storeUserInfo(userInfo);
           navigate("/");
         } else {
           setError("Failed to fetch user information");
-          // Surface the login response debug header in diagnostics to help debugging
-          const lastAuthCookieHeader = res?.authCookie || null;
-          setDiagnostics((prev) => ({
-            ...(prev || {}),
-            loginAuthCookie: lastAuthCookieHeader,
-          }));
         }
       } else {
         setError(res?.message || "Login failed");
       }
     } catch (err) {
-      console.error("Login error:", err); // Debug log
       setError(err?.message || "An error occurred");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // ✅ Fetch user info from a protected endpoint (with diagnostics)
+  // Fetch user info from a protected endpoint
   const fetchUserInfo = async () => {
     try {
-      console.log(
-        "Fetching user info from:",
-        `${import.meta.env.VITE_BACKEND_API_URL}/auth/me`
-      );
-
-      // Clear prior diagnostics
-      setDiagnostics(null);
-
       const response = await fetch(
         `${import.meta.env.VITE_BACKEND_API_URL}/auth/me`,
         {
@@ -202,40 +183,13 @@ const Login = () => {
         }
       );
 
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
-
-      const cookiesVisible =
-        typeof document !== "undefined" ? document.cookie : "";
-
       if (!response.ok) {
-        const errorText = await response.text();
-        const diag = {
-          status: response.status,
-          statusText: response.statusText,
-          body: errorText,
-          cookiesVisible,
-          note: "httpOnly cookies are not visible to JavaScript. If Set-Cookie is present, check Network → Response headers for Set-Cookie.",
-        };
-        console.error("Failed to fetch user info:", diag);
-        setDiagnostics(diag);
         return null;
       }
 
       const data = await response.json();
-      console.log("Fetched user data:", data); // Debug log
-
-      // Clear diagnostics on success
-      setDiagnostics(null);
       return data?.data || null;
     } catch (error) {
-      const diag = {
-        error: error?.message || String(error),
-        stack: error?.stack,
-        cookiesVisible: typeof document !== "undefined" ? document.cookie : "",
-      };
-      console.error("Error fetching user info:", diag);
-      setDiagnostics(diag);
       return null;
     }
   };
@@ -272,39 +226,6 @@ const Login = () => {
         {error && (
           <div className="bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 text-red-300 text-sm p-3 rounded-xl mb-4">
             ⚠️ {error}
-          </div>
-        )}
-
-        {diagnostics && (
-          <div className="mt-3 text-left text-sm text-gray-300 bg-black/20 p-3 rounded-xl mb-4">
-            <div className="font-semibold mb-1">Diagnostics</div>
-            {diagnostics.status && (
-              <div className="mb-1">
-                Status: {diagnostics.status} {diagnostics.statusText || ""}
-              </div>
-            )}
-            {diagnostics.body && (
-              <div className="mb-1">
-                Body:{" "}
-                <pre className="whitespace-pre-wrap">{diagnostics.body}</pre>
-              </div>
-            )}
-            {diagnostics.error && (
-              <div className="mb-1">Error: {diagnostics.error}</div>
-            )}
-            <div className="mb-1">
-              Cookies visible to JS:{" "}
-              {diagnostics.cookiesVisible ? (
-                diagnostics.cookiesVisible
-              ) : (
-                <em>None</em>
-              )}
-            </div>
-            <div className="text-xs text-gray-400 mt-1">
-              Note: httpOnly cookies are not visible to JavaScript. To confirm
-              cookie delivery, open DevTools → Network → select the login
-              request → check Response headers for <code>Set-Cookie</code>.
-            </div>
           </div>
         )}
 

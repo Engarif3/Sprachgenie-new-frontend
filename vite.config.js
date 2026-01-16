@@ -23,15 +23,6 @@ import tailwindcss from "tailwindcss";
 export default defineConfig({
   server: {
     port: 5173,
-    proxy: {
-      // Proxy API calls to the backend during development so cookies are same-origin
-      // This avoids cross-site cookie restrictions in browsers (including incognito)
-      "/api": {
-        target: "http://localhost:5000",
-        changeOrigin: true,
-        secure: false,
-      },
-    },
   },
   plugins: [react()],
   css: {
