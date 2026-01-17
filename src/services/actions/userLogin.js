@@ -16,19 +16,31 @@ export const userLogin = async (loginData) => {
   const contentType = res.headers.get("content-type");
   const isJson = contentType && contentType.includes("application/json");
 
+  // Read Retry-After header if present
+  const retryAfterHeader =
+    res.headers.get("retry-after") || res.headers.get("Retry-After");
+  const retryAfter = retryAfterHeader
+    ? parseInt(retryAfterHeader, 10)
+    : undefined;
+
   // Handle rate limit (429) or other error responses
   if (!res.ok) {
+    const status = res.status;
     if (isJson) {
       const errorData = await res.json();
       return {
         success: false,
+        status,
         message: errorData.message || "An error occurred",
+        retryAfter,
       };
     } else {
       const errorText = await res.text();
       return {
         success: false,
+        status,
         message: errorText || "An unexpected error occurred",
+        retryAfter,
       };
     }
   }

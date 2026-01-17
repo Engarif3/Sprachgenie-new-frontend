@@ -114,7 +114,7 @@
 
 // export default Login;
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { validationSchema } from "./validation";
@@ -129,8 +129,23 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loginCooldown, setLoginCooldown] = useState(0);
   // Synchronous ref to prevent rapid double submissions
   const submittingRef = useRef(false);
+
+  useEffect(() => {
+    if (loginCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setLoginCooldown((c) => {
+        if (c <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return c - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [loginCooldown]);
 
   const {
     register,
@@ -168,6 +183,17 @@ const Login = () => {
         }
       } else {
         setError(res?.message || "Login failed");
+
+        // Set short cooldown on wrong credentials to prevent rapid repeated clicks
+        if (res?.status === 401) {
+          setLoginCooldown(5); // 5 seconds
+        }
+
+        // If server returned rate limit info, use it
+        if (res?.status === 429) {
+          const secs = res?.retryAfter || 60;
+          setLoginCooldown(secs);
+        }
       }
     } catch (err) {
       setError(err?.message || "An error occurred");
@@ -293,9 +319,9 @@ const Login = () => {
 
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || loginCooldown > 0}
             className={`w-full flex justify-center items-center gap-2 py-3 rounded-xl font-bold text-white shadow-lg transition-all duration-300 ${
-              isSubmitting
+              isSubmitting || loginCooldown > 0
                 ? "bg-gray-600 cursor-not-allowed"
                 : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 hover:scale-105"
             }`}
@@ -322,7 +348,11 @@ const Login = () => {
                 ></path>
               </svg>
             )}
-            {isSubmitting ? "🔄 Logging in..." : "🚀 Login"}
+            {isSubmitting
+              ? "🔄 Logging in..."
+              : loginCooldown > 0
+              ? `⏳ Try again in ${loginCooldown}s`
+              : "🚀 Login"}
           </button>
 
           <div className="pt-4 border-t border-gray-700/50">
