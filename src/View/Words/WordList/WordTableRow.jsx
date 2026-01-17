@@ -206,7 +206,7 @@ const WordTableRow = ({
       {/* History */}
       {userLoggedIn &&
         (userInfo.role === "super_admin" || userInfo.role === "admin") && (
-          <td className="border border-gray-700 border-dotted p-2 md:p-3 text-center hidden lg:table-cell">
+          <td className="border border-gray-700 border-dotted p-2 md:p-3 text-center hidden md:table-cell lg:table-cell">
             <button
               onClick={() => {
                 setSelectedHistory({
