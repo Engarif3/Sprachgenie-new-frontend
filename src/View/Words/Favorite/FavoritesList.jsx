@@ -126,14 +126,14 @@ const FavoritesList = () => {
           w.value === wordValue ||
           (w.synonyms && w.synonyms.includes(wordValue)) ||
           (w.antonyms && w.antonyms.includes(wordValue)) ||
-          (w.similarWords && w.similarWords.includes(wordValue))
+          (w.similarWords && w.similarWords.includes(wordValue)),
       );
 
       if (!word) {
         Swal.fire(
           "Not Found",
           "The word or synonym/antonym/similar word doesn't exist.",
-          "error"
+          "error",
         );
         return;
       }
@@ -155,38 +155,38 @@ const FavoritesList = () => {
       const clickedWord = isParent
         ? word
         : isSynonym
-        ? word.synonyms.find((syn) => syn.value === wordValue)
-        : isAntonym
-        ? word.antonyms.find((ant) => ant.value === wordValue)
-        : word.similarWords.find((sim) => sim.value === wordValue);
+          ? word.synonyms.find((syn) => syn.value === wordValue)
+          : isAntonym
+            ? word.antonyms.find((ant) => ant.value === wordValue)
+            : word.similarWords.find((sim) => sim.value === wordValue);
 
       const enrichedSynonyms = isParent
         ? word.synonyms || []
         : isSynonym
-        ? [
-            { value: word.value }, // original favorite word included here
-            ...word.synonyms.filter((syn) => syn.value !== wordValue),
-          ]
-        : [];
+          ? [
+              { value: word.value }, // original favorite word included here
+              ...word.synonyms.filter((syn) => syn.value !== wordValue),
+            ]
+          : [];
 
       const enrichedAntonyms = isParent
         ? word.antonyms || []
         : isSynonym
-        ? word.antonyms || []
-        : isAntonym
-        ? [{ value: word.value }, ...(word.synonyms || [])].filter(
-            (entry) => entry.value !== wordValue
-          )
-        : [];
+          ? word.antonyms || []
+          : isAntonym
+            ? [{ value: word.value }, ...(word.synonyms || [])].filter(
+                (entry) => entry.value !== wordValue,
+              )
+            : [];
 
       const enrichedSimilarWords = isParent
         ? word.similarWords || []
         : isSimilar
-        ? [
-            { value: word.value },
-            ...word.similarWords.filter((sim) => sim.value !== wordValue),
-          ]
-        : [];
+          ? [
+              { value: word.value },
+              ...word.similarWords.filter((sim) => sim.value !== wordValue),
+            ]
+          : [];
 
       const enriched = {
         ...word,
@@ -205,7 +205,7 @@ const FavoritesList = () => {
 
       openModal(enriched);
     },
-    [favoriteWords]
+    [favoriteWords],
   );
 
   const handleRemoveFavorite = async (wordId) => {
@@ -320,7 +320,7 @@ const FavoritesList = () => {
       Swal.fire(
         "Not Logged In",
         "You must be logged in to generate paragraphs",
-        "warning"
+        "warning",
       );
       return;
     }
@@ -387,7 +387,7 @@ const FavoritesList = () => {
 
   const paginatedFavorites = favoriteWords.slice(
     (currentPage - 1) * 40,
-    currentPage * 40
+    currentPage * 40,
   );
 
   return (
@@ -536,7 +536,7 @@ const FavoritesList = () => {
                                     onClick={() =>
                                       openWordInModal(antonym.value)
                                     }
-                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-red-500/20 to-pink-500/20 hover:from-red-500/40 hover:to-pink-500/40 border border-red-500/50 rounded-full text-red-300 text-xs sm:text-sm font-semibold cursor-pointer transition-all duration-300 hover:scale-105 shadow-md hover:shadow-red-500/50"
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-red-500/20 to-pink-500/20 hover:from-red-500/40 hover:to-pink-500/40 border border-red-500/50 rounded-full text-red-300 md font-semibold cursor-pointer transition-all duration-300 hover:scale-105 shadow-md hover:shadow-red-500/50"
                                   >
                                     {antonym.value}
                                   </span>
@@ -556,7 +556,7 @@ const FavoritesList = () => {
                                     >
                                       {similarWord.value}
                                     </span>
-                                  )
+                                  ),
                                 )}
                               </div>
                             </td>

@@ -21,7 +21,7 @@ const Home = () => {
           }
         });
       },
-      { threshold: 0.2, rootMargin: "50px" }
+      { threshold: 0.2, rootMargin: "50px" },
     );
 
     document.querySelectorAll("[data-animate]").forEach((el) => {
@@ -408,27 +408,28 @@ const Home = () => {
             }`}
           >
             <div className="text-center">
-              <div className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 mb-2">
+              <div className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-3">
                 4000+
               </div>
               <p className="text-gray-300 text-lg font-semibold">Words</p>
             </div>
             <div className="text-center">
-              <div className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 mb-2">
-                50+
+              <div className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-3">
+                {/* 50+ */}
+                Practical
               </div>
               <p className="text-gray-300 text-lg font-semibold">
                 Conversation Topics
               </p>
             </div>
             <div className="text-center">
-              <div className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 mb-2">
+              <div className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 mb-2">
                 A1-B2
               </div>
               <p className="text-gray-300 text-lg font-semibold">CEFR Levels</p>
             </div>
             <div className="text-center">
-              <div className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 mb-2">
+              <div className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-3">
                 AI
               </div>
               <p className="text-gray-300 text-lg font-semibold">Powered</p>
