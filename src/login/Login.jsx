@@ -114,7 +114,7 @@
 
 // export default Login;
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { validationSchema } from "./validation";
@@ -129,6 +129,8 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Synchronous ref to prevent rapid double submissions
+  const submittingRef = useRef(false);
 
   const {
     register,
@@ -142,6 +144,10 @@ const Login = () => {
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   const handleLogin = async (formData) => {
+    // Prevent rapid double-submissions synchronously
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+
     setIsSubmitting(true);
     setError("");
     try {
@@ -167,6 +173,7 @@ const Login = () => {
       setError(err?.message || "An error occurred");
     } finally {
       setIsSubmitting(false);
+      submittingRef.current = false;
     }
   };
 
