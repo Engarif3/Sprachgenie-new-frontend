@@ -52,6 +52,34 @@
     }
   }
 
+  /* Rotate-only animation promoted to the compositor for smoothness */
+  @keyframes rotateOnly {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-rotate-only {
+    animation: rotateOnly 5s linear infinite;
+    will-change: transform;
+    transform-origin: 50% 50%;
+    backface-visibility: hidden;
+  }
+
+  /* Centered wrapper to separate translate from rotate */
+  .centered-wrap {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 140%;
+    aspect-ratio: 1/1;
+    /* smaller area keeps the glow closer to the button */
+  }
+
   @keyframes tilt {
     0%,
     50%,

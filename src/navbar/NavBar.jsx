@@ -77,7 +77,12 @@ const NavBar = () => {
       }`}
     >
       <Container>
-        <div className="flex flex-wrap justify-between items-center py-4 px-2 text-lg font-semibold relative bg">
+        {isHomePage && <div className="h-2 -mt-2 bg-gray-950" />}
+        <div
+          className={`flex flex-wrap justify-between items-center py-3 px-2 text-lg font-semibold relative border-b border-slate-800  mt-2 ${
+            isHomePage ? "bg-gray-950" : "bg-transparent"
+          }`}
+        >
           {/* Title and Hamburger Menu */}
           <div className="flex justify-between items-center w-full md:w-auto px-4">
             <Link
@@ -119,7 +124,7 @@ const NavBar = () => {
                 className="hidden md:flex items-center justify-center border-b-2 border-white rounded-md hover:scale-105 hover:border-orange-400 px-1 transition-all duration-300"
               >
                 <FaHome className="text-3xl text-orange-600 hover:text-orange-500 transition-colors" />
-                <span className="ml-2 text-xl mt-2 text-white hover:text-orange-400 transition-colors">
+                <span className="ml-2 text-xl mt-0 text-white hover:text-orange-400 transition-colors">
                   Home
                 </span>
               </Link>
@@ -129,13 +134,13 @@ const NavBar = () => {
               <Link
                 onClick={() => setIsMenuOpen(false)}
                 to="/words"
-                className="hidden md:flex w-full md:w-auto items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-purple-400 px-1 mt-2 transition-all duration-300"
+                className="hidden md:flex w-full md:w-auto items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-purple-400 px-1 mt-0 transition-all duration-300"
               >
                 <FaBook
                   className="text-orange-500 hover:text-purple-400 transition-colors"
                   size={20}
                 />
-                <span className="ml-2 text-xl text-white hover:text-purple-400 transition-colors">
+                <span className="ml-2 text-xl text-white hover:text-purple-400 transition-colors ">
                   Vocabulary
                 </span>
               </Link>
@@ -152,7 +157,7 @@ const NavBar = () => {
                     size={24}
                     className="text-3xl text-orange-600 hover:text-blue-400 transition-colors"
                   />
-                  <span className="ml-2 text-xl mt-2 text-white hover:text-blue-400 transition-colors">
+                  <span className="ml-2 text-xl mt-0 text-white hover:text-blue-400 transition-colors">
                     Dashboard
                   </span>
                 </Link>
@@ -191,7 +196,7 @@ const NavBar = () => {
                   >
                     <path d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z" />
                   </svg>
-                  <span className="ml-2 mt-2 text-xl text-white hover:text-red-400 transition-colors">
+                  <span className="ml-2 mt-0 text-xl text-white hover:text-red-400 transition-colors">
                     Favorites
                   </span>
                 </Link>
@@ -288,11 +293,12 @@ const NavBar = () => {
             <AuthButton></AuthButton>
 
             {/* Theme Toggle Button */}
-            <div className="hidden">
+            <div className="">
               <button
-                onClick={toggleTheme}
+                // onClick={toggleTheme}
                 className="hidden md:flex bg-gray-800/50 hover:bg-gray-700/50 text-white p-2.5 rounded-full transition-all duration-300 hover:scale-110 border border-gray-700/50 hover:border-gray-600"
-                title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+                // title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+                title={`Light mode Coming  soon`}
               >
                 {theme === "light" ? (
                   <FaMoon className="text-lg" />
@@ -305,9 +311,9 @@ const NavBar = () => {
         </div>
 
         {userLoggedIn && (
-          <p className="text-end mx-2 text-white mb-0">
+          <p className="text-end mx-2 text-white py-4">
             Welcome!{" "}
-            <span className="font-semibold text-pink-600">
+            <span className="font-semibold text-pink-600 ">
               {userInfo?.name}
             </span>
           </p>

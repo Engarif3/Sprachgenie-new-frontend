@@ -1,5 +1,6 @@
 import axios from "axios";
 import Swal from "sweetalert2";
+import { toast } from "sonner";
 
 const api = axios.create({
   baseURL:
@@ -40,6 +41,22 @@ api.interceptors.response.use(
           error.response?.data?.message ||
           "You don't have permission for this action",
       });
+    }
+
+    // Handle 429 Too Many Requests - show a non-blocking toast instead of modal
+    if (error.response?.status === 429) {
+      const message =
+        error.response?.data?.message ||
+        "Too many requests. Please try again later.";
+      const retryAfter =
+        error.response?.data?.retryAfter ||
+        error.response?.headers?.["retry-after"] ||
+        null;
+      // Show a brief toast instead of blocking modal
+      toast.error(message);
+      // Attach retry info so component can use it
+      error.retryAfter = retryAfter ? parseInt(retryAfter, 10) : null;
+      return Promise.reject(error);
     }
 
     // Handle 404 Not Found

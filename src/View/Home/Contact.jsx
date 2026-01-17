@@ -120,7 +120,7 @@ const Contact = () => {
             <form
               ref={form}
               onSubmit={handleSubmit(onSubmit)}
-              className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-8 rounded-2xl border-2 border-gray-700 hover:border-orange-500/50 transition-all duration-300 space-y-2"
+              className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-8 rounded-2xl border-2 border-gray-700 hover:border-orange-500/50 transition-all duration-300 space-y-9"
             >
               <div>
                 <label className="text-white font-semibold mb-2 block">

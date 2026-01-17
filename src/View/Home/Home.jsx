@@ -36,7 +36,7 @@ const Home = () => {
       {/* Hero Section */}
       <Container className="flex flex-col">
         {!userLoggedIn && (
-          <div className="text-orange-600 text-xl md:text-2xl lg:text-2xl flex justify-center mb-2 md:mb-12 lg:mb-12 overflow-hidden">
+          <div className="text-orange-600 text-xl md:text-2xl lg:text-2xl flex justify-center py-8 md:mb-12 lg:mb-12 overflow-hidden">
             <div className="w-11/12 md:w-8/12 lg:w-6/12">
               <Marquee
                 gradient={true}
@@ -62,7 +62,7 @@ const Home = () => {
         />
 
         {/* Hero Content */}
-        <div className="text-center pt-8 pb-[80px] px-4">
+        <div className="text-center pt-16 pb-[280px] px-4">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
             Master German with
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">
@@ -77,15 +77,43 @@ const Home = () => {
           </p>
 
           {/* Featured Vocabulary Access */}
-          <div className="mb-6">
-            <Link
+          <div className="mt-16 mb-6">
+            {/* <Link
               to="/words"
-              className="inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-orange-900 via-pink-900 to-purple-900 text-white font-bold rounded-full hover:shadow-[0_0_30px_rgba(249,115,22,0.5)] hover:scale-105 transition-all duration-300 text-lg shadow-xl"
+              className="inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-orange-900 via-pink-900 to-purple-900 text-white font-bold rounded-full hover:shadow-[0_0_30px_rgba(249,115,22,0.5)] hover:scale-105 transition-all duration-300 text-lg shadow-xl "
             >
               <span className="text-2xl">📚</span>
               <span>Explore 4000+ Vocabulary Words</span>
               <span className="text-xl">→</span>
+            </Link> */}
+            {/* ================== */}
+            <Link
+              to="/words"
+              className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full px-12 py-5 bg-slate-950 text-white font-bold transition-all duration-300 hover:scale-105"
+            >
+              {/* 1. The Full-Border Spark Layer */}
+              <span className="absolute inset-0 block rounded-full">
+                <span className="absolute aspect-square w-[200%] animate-rotate bg-[conic-gradient(from_0deg,transparent_0_340deg,white_360deg)] [left:50%] [top:50%] [transform-origin:0_0] blur-sm" />
+              </span>
+
+              {/* 2. The Thick Glow Effect (Extra layer for "thickness") */}
+              <span className="absolute inset-0 block rounded-full">
+                <span className="absolute aspect-square w-[200%] animate-rotate bg-[conic-gradient(from_0deg,transparent_0_340deg,rgba(255,255,255,0.8)_360deg)] [left:50%] [top:50%] [transform-origin:0_0] blur-xl opacity-50" />
+              </span>
+
+              {/* 3. The Center Background (Covers the middle of the spark) */}
+              <span className="absolute inset-[3px] rounded-full bg-gradient-to-r from-orange-900 via-pink-900 to-purple-900" />
+
+              {/* 4. Content */}
+              <span className="relative z-10 flex items-center gap-3 text-lg">
+                <span className="text-2xl">📚</span>
+                <span>Explore 4000+ Vocabulary Words</span>
+                <span className="text-xl group-hover:translate-x-1 transition-transform">
+                  →
+                </span>
+              </span>
             </Link>
+            {/* ================== */}
           </div>
 
           {!userLoggedIn && (
@@ -105,8 +133,8 @@ const Home = () => {
             </div>
           )}
           {/* Scroll Hint */}
-          <div className="md:hidden absolute  left-1/2 -translate-x-1/2 flex flex-col items-center text-white/80 pointer-events-none mb-2">
-            <span className="text-xs font-bold tracking-widest uppercase mt-8">
+          <div className=" absolute  left-1/2 -translate-x-1/2 flex flex-col items-center text-white/80 pointer-events-none mb-2">
+            <span className="text-xs font-bold tracking-widest uppercase mt-20">
               Scroll to explore more
             </span>
             <svg
@@ -512,7 +540,7 @@ const Home = () => {
               </p>
             </details>
 
-            <details className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-700 group">
+            {/* <details className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-700 group">
               <summary className="text-xl font-bold text-white cursor-pointer list-none flex items-center justify-between">
                 <span>Can I get a certificate?</span>
                 <span className="text-orange-500 text-2xl group-open:rotate-180 transition-transform">
@@ -524,7 +552,7 @@ const Home = () => {
                 our comprehensive learning system prepares you excellently for
                 recognized exams like Goethe-Zertifikat, TestDaF, and TELC.
               </p>
-            </details>
+            </details> */}
           </div>
         </Container>
       </div>
