@@ -85,14 +85,14 @@ const FavoritesListDashboard = () => {
           (w.synonyms && w.synonyms.some((syn) => syn.value === wordValue)) ||
           (w.antonyms && w.antonyms.some((ant) => ant.value === wordValue)) ||
           (w.similarWords &&
-            w.similarWords.some((sim) => sim.value === wordValue))
+            w.similarWords.some((sim) => sim.value === wordValue)),
       );
 
       if (!word) {
         Swal.fire(
           "Not Found",
           "The word or synonym/antonym/similar word doesn't exist.",
-          "error"
+          "error",
         );
         return;
       }
@@ -114,38 +114,38 @@ const FavoritesListDashboard = () => {
       const clickedWord = isParent
         ? word
         : isSynonym
-        ? word.synonyms.find((syn) => syn.value === wordValue)
-        : isAntonym
-        ? word.antonyms.find((ant) => ant.value === wordValue)
-        : word.similarWords.find((sim) => sim.value === wordValue);
+          ? word.synonyms.find((syn) => syn.value === wordValue)
+          : isAntonym
+            ? word.antonyms.find((ant) => ant.value === wordValue)
+            : word.similarWords.find((sim) => sim.value === wordValue);
 
       const enrichedSynonyms = isParent
         ? word.synonyms || []
         : isSynonym
-        ? [
-            { value: word.value }, // original favorite word included here
-            ...word.synonyms.filter((syn) => syn.value !== wordValue),
-          ]
-        : [];
+          ? [
+              { value: word.value }, // original favorite word included here
+              ...word.synonyms.filter((syn) => syn.value !== wordValue),
+            ]
+          : [];
 
       const enrichedAntonyms = isParent
         ? word.antonyms || []
         : isSynonym
-        ? word.antonyms || []
-        : isAntonym
-        ? [{ value: word.value }, ...(word.synonyms || [])].filter(
-            (entry) => entry.value !== wordValue
-          )
-        : [];
+          ? word.antonyms || []
+          : isAntonym
+            ? [{ value: word.value }, ...(word.synonyms || [])].filter(
+                (entry) => entry.value !== wordValue,
+              )
+            : [];
 
       const enrichedSimilarWords = isParent
         ? word.similarWords || []
         : isSimilar
-        ? [
-            { value: word.value },
-            ...word.similarWords.filter((sim) => sim.value !== wordValue),
-          ]
-        : [];
+          ? [
+              { value: word.value },
+              ...word.similarWords.filter((sim) => sim.value !== wordValue),
+            ]
+          : [];
 
       const enriched = {
         ...clickedWord,
@@ -159,7 +159,7 @@ const FavoritesListDashboard = () => {
 
       openModal(enriched);
     },
-    [favoriteWords]
+    [favoriteWords],
   );
 
   const handleRemoveFavorite = async (wordId) => {
@@ -210,7 +210,7 @@ const FavoritesListDashboard = () => {
 
   const paginatedFavorites = favoriteWords.slice(
     (currentPage - 1) * 40,
-    currentPage * 40
+    currentPage * 40,
   );
 
   //favorites in modal
@@ -290,7 +290,7 @@ const FavoritesListDashboard = () => {
       Swal.fire(
         "Not Logged In",
         "You must be logged in to generate paragraphs",
-        "warning"
+        "warning",
       );
       return;
     }
@@ -482,7 +482,7 @@ const FavoritesListDashboard = () => {
                               <span
                                 key={index}
                                 onClick={() => openWordInModal(synonym.value)}
-                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/40 hover:to-purple-500/40 border border-blue-500/50 rounded-full text-blue-300 text-xs sm:text-sm font-semibold cursor-pointer transition-all duration-300 hover:scale-105 shadow-md hover:shadow-blue-500/50"
+                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/40 hover:to-purple-500/40 border border-blue-500/50 rounded-full text-blue-300 text-md font-semibold cursor-pointer transition-all duration-300 hover:scale-105 shadow-md hover:shadow-blue-500/50"
                               >
                                 {synonym.value}
                               </span>
@@ -496,7 +496,7 @@ const FavoritesListDashboard = () => {
                               <span
                                 key={index}
                                 onClick={() => openWordInModal(antonym.value)}
-                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-red-500/20 to-pink-500/20 hover:from-red-500/40 hover:to-pink-500/40 border border-red-500/50 rounded-full text-red-300 text-xs sm:text-sm font-semibold cursor-pointer transition-all duration-300 hover:scale-105 shadow-md hover:shadow-red-500/50"
+                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-red-500/20 to-pink-500/20 hover:from-red-500/40 hover:to-pink-500/40 border border-red-500/50 rounded-full text-red-300 text-md font-semibold cursor-pointer transition-all duration-300 hover:scale-105 shadow-md hover:shadow-red-500/50"
                               >
                                 {antonym.value}
                               </span>
@@ -511,7 +511,7 @@ const FavoritesListDashboard = () => {
                                 onClick={() =>
                                   openWordInModal(similarWord.value)
                                 }
-                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 hover:from-purple-500/40 hover:to-pink-500/40 border border-purple-500/50 rounded-full text-purple-300 text-xs sm:text-sm font-semibold cursor-pointer transition-all duration-300 hover:scale-105 shadow-md hover:shadow-purple-500/50"
+                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 hover:from-purple-500/40 hover:to-pink-500/40 border border-purple-500/50 rounded-full text-purple-300 text-md font-semibold cursor-pointer transition-all duration-300 hover:scale-105 shadow-md hover:shadow-purple-500/50"
                               >
                                 {similarWord.value}
                               </span>

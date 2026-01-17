@@ -520,7 +520,7 @@ const FavoritesList = () => {
                                     onClick={() =>
                                       openWordInModal(synonym.value)
                                     }
-                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/40 hover:to-purple-500/40 border border-blue-500/50 rounded-full text-blue-300 text-xs sm:text-sm font-semibold cursor-pointer transition-all duration-300 hover:scale-105 shadow-md hover:shadow-blue-500/50"
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/40 hover:to-purple-500/40 border border-blue-500/50 rounded-full text-blue-300 text-md font-semibold cursor-pointer transition-all duration-300 hover:scale-105 shadow-md hover:shadow-blue-500/50"
                                   >
                                     {synonym.value}
                                   </span>
@@ -536,7 +536,7 @@ const FavoritesList = () => {
                                     onClick={() =>
                                       openWordInModal(antonym.value)
                                     }
-                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-red-500/20 to-pink-500/20 hover:from-red-500/40 hover:to-pink-500/40 border border-red-500/50 rounded-full text-red-300 md font-semibold cursor-pointer transition-all duration-300 hover:scale-105 shadow-md hover:shadow-red-500/50"
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-red-500/20 to-pink-500/20 hover:from-red-500/40 hover:to-pink-500/40 border border-red-500/50 rounded-full text-red-300 text-md font-semibold cursor-pointer transition-all duration-300 hover:scale-105 shadow-md hover:shadow-red-500/50"
                                   >
                                     {antonym.value}
                                   </span>
@@ -552,7 +552,7 @@ const FavoritesList = () => {
                                       onClick={() =>
                                         openWordInModal(similarWord.value)
                                       }
-                                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 hover:from-purple-500/40 hover:to-pink-500/40 border border-purple-500/50 rounded-full text-purple-300 text-xs sm:text-sm font-semibold cursor-pointer transition-all duration-300 hover:scale-105 shadow-md hover:shadow-purple-500/50"
+                                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 hover:from-purple-500/40 hover:to-pink-500/40 border border-purple-500/50 rounded-full text-purple-300 text-md font-semibold cursor-pointer transition-all duration-300 hover:scale-105 shadow-md hover:shadow-purple-500/50"
                                     >
                                       {similarWord.value}
                                     </span>
