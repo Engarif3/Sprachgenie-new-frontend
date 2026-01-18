@@ -85,6 +85,8 @@ export default function DarkVeil({
   const ref = useRef(null);
   useEffect(() => {
     const canvas = ref.current;
+    if (!canvas) return; // Guard against null canvas
+
     const parent = canvas.parentElement;
 
     const renderer = new Renderer({
@@ -141,6 +143,10 @@ export default function DarkVeil({
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("resize", resize);
+      // Properly dispose of WebGL resources
+      if (mesh) mesh.destroy();
+      if (program) program.destroy();
+      if (renderer) renderer.destroy();
     };
   }, [
     hueShift,
