@@ -88,6 +88,7 @@ export default function DarkVeil({
     if (!canvas) return; // Guard against null canvas
 
     const parent = canvas.parentElement;
+    if (!parent) return; // Guard against canvas not in DOM
 
     const renderer = new Renderer({
       dpr: Math.min(window.devicePixelRatio, 2),
