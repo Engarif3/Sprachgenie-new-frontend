@@ -145,9 +145,9 @@ export default function DarkVeil({
       cancelAnimationFrame(frame);
       window.removeEventListener("resize", resize);
       // Properly dispose of WebGL resources
-      if (mesh) mesh.destroy();
-      if (program) program.destroy();
-      if (renderer) renderer.destroy();
+      if (renderer && typeof renderer.destroy === "function") {
+        renderer.destroy();
+      }
     };
   }, [
     hueShift,
