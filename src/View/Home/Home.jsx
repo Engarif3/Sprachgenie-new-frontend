@@ -254,6 +254,9 @@ const Home = () => {
               Powered by cutting-edge AI to make your German learning journey
               efficient and enjoyable
             </p>
+            <div className="flex justify-center mt-6">
+              <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
+            </div>
           </div>
 
           <div
@@ -348,6 +351,9 @@ const Home = () => {
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Start your journey in three simple steps
             </p>
+            <div className="flex justify-center mt-6">
+              <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
+            </div>
           </div>
 
           <div
@@ -454,6 +460,9 @@ const Home = () => {
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Everything you need to know about SprachGenie
             </p>
+            <div className="flex justify-center mt-6">
+              <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
+            </div>
           </div>
 
           <div
