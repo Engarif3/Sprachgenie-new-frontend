@@ -69,7 +69,7 @@ const WordList = () => {
 
   const isAdmin = useMemo(
     () => ["admin", "super_admin"].includes(userInfo.role),
-    [userInfo.role]
+    [userInfo.role],
   );
 
   const [favorites, setFavorites] = useState([]);
@@ -183,7 +183,7 @@ const WordList = () => {
             words: fullResponse.data.data.words || [],
             levels: fullResponse.data.data.levels || [],
             topics: (fullResponse.data.data.topics || []).sort(
-              (a, b) => a.id - b.id
+              (a, b) => a.id - b.id,
             ),
             lastUpdated: Date.now(),
             isPartial: false,
@@ -286,7 +286,7 @@ const WordList = () => {
                 words: fullResponse.data.data.words || [],
                 levels: fullResponse.data.data.levels || [],
                 topics: (fullResponse.data.data.topics || []).sort(
-                  (a, b) => a.id - b.id
+                  (a, b) => a.id - b.id,
                 ),
                 lastUpdated: Date.now(),
                 isPartial: false,
@@ -307,7 +307,7 @@ const WordList = () => {
 
       // No cache at all - use progressive loading
       console.log(
-        "No cache found, fetching fresh data with progressive loading"
+        "No cache found, fetching fresh data with progressive loading",
       );
       fetchInitialWords();
     };
@@ -424,7 +424,7 @@ const WordList = () => {
 
           // For single word searches, check each meaning individually (faster)
           return word.meaning.some((meaning) =>
-            meaning.toLowerCase().includes(lower)
+            meaning.toLowerCase().includes(lower),
           );
         }
 
@@ -466,7 +466,7 @@ const WordList = () => {
     if (showAllData) return allFilteredWords;
     return allFilteredWords.slice(
       (currentPage - 1) * WORDS_PER_PAGE,
-      currentPage * WORDS_PER_PAGE
+      currentPage * WORDS_PER_PAGE,
     );
   }, [allFilteredWords, currentPage, showAllData]);
 
@@ -518,7 +518,7 @@ const WordList = () => {
           w.value === wordValue ||
           (w.synonyms && w.synonyms.includes(wordValue)) ||
           (w.antonyms && w.antonyms.includes(wordValue)) ||
-          (w.similarWords && w.similarWords.includes(wordValue))
+          (w.similarWords && w.similarWords.includes(wordValue)),
       );
 
       if (word) {
@@ -527,11 +527,11 @@ const WordList = () => {
         Swal.fire(
           "Not Found",
           "The word doesn't exist in your word list.",
-          "error"
+          "error",
         );
       }
     },
-    [cache.words, openModal]
+    [cache.words, openModal],
   );
 
   const levelToTopicsMap = useMemo(() => {
@@ -561,12 +561,12 @@ const WordList = () => {
       } else {
         const topicNamesForLevel = levelToTopicsMap.get(selected) || new Set();
         const matchedTopics = topics.filter((topic) =>
-          topicNamesForLevel.has(topic.name)
+          topicNamesForLevel.has(topic.name),
         );
         setFilteredTopics(matchedTopics);
       }
     },
-    [topics, levelToTopicsMap]
+    [topics, levelToTopicsMap],
   );
 
   useEffect(() => {
@@ -626,7 +626,7 @@ const WordList = () => {
         }
       });
     },
-    [userInfo.id, setCache]
+    [userInfo.id, setCache],
   );
 
   //learning mode
@@ -639,7 +639,7 @@ const WordList = () => {
     setRevealedWords((prev) =>
       prev.includes(wordId)
         ? prev.filter((id) => id !== wordId)
-        : [...prev, wordId]
+        : [...prev, wordId],
     );
   }, []);
 
@@ -662,7 +662,7 @@ const WordList = () => {
         }
       }
     },
-    [paginatedWords, revealMeaning]
+    [paginatedWords, revealMeaning],
   );
 
   // Focus management
@@ -694,7 +694,7 @@ const WordList = () => {
         }
         return true;
       }),
-    [levels, isAdmin]
+    [levels, isAdmin],
   );
 
   const levelOptions = useMemo(
@@ -708,7 +708,7 @@ const WordList = () => {
           {level.level}
         </option>
       )),
-    [allowedLevels]
+    [allowedLevels],
   );
 
   // Update the toggleView function
@@ -754,7 +754,7 @@ const WordList = () => {
             className="bg-gray-700 text-gray-400 text-center border-t border-gray-500 cursor-default"
           >
             -------------------------------------
-          </option>
+          </option>,
         );
       }
 
@@ -766,7 +766,7 @@ const WordList = () => {
         optionsWithSeparators.push(
           <option key={topic.id} value={topic.name} className={baseClass}>
             {displayLevel} ➡️ {topic.name}
-          </option>
+          </option>,
         );
         return;
       }
@@ -775,7 +775,7 @@ const WordList = () => {
       optionsWithSeparators.push(
         <option key={topic.id} value={topic.name} className={baseClass}>
           {levelName} {level ? " ➡️" : ""} {topic.name}
-        </option>
+        </option>,
       );
     });
 
@@ -788,7 +788,7 @@ const WordList = () => {
           className="bg-gray-700 h-4 cursor-default"
         >
           &nbsp;
-        </option>
+        </option>,
       );
     }
 
@@ -807,7 +807,7 @@ const WordList = () => {
       Swal.fire(
         "Not Logged In",
         "You must be logged in to generate paragraphs",
-        "warning"
+        "warning",
       );
       return;
     }
@@ -836,7 +836,7 @@ const WordList = () => {
         },
         {
           signal: abortController.signal,
-        }
+        },
       );
 
       const aiMeanings = response.data.meanings || [];
@@ -1057,13 +1057,13 @@ const WordList = () => {
           <Loader loading={isLoading} />
         </div>
       ) : (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900/30 via-gray-800/20 to-black/30 rounded-2xl p-1 md:p-4 lg:p-4">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900/30 via-gray-800/20 to-black/30 rounded-2xl p-0 md:p-4 lg:p-4">
           <div className="overflow-x-auto border border-gray-700/50 rounded-2xl shadow-2xl">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 text-sm md:text-xl lg:text-xl text-white">
                   <th className="py-3 text-sm md:text-lg lg:text-lg text-center text-orange-400 font-bold w-[5%] md:w-[3%] lg:w-[3%] rounded-tl-xl border-b border-gray-700">
-                    Article
+                    Art.
                   </th>
                   <th className="border-l py-3 border-gray-700 border-dotted text-center text-blue-400 font-bold w-[15%] md:w-[10%] lg:w-[10%] border-b">
                     Word

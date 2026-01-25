@@ -204,16 +204,10 @@ const Home = () => {
               icon="📚"
             />
             <HomeCard
-              title="Conversations"
-              text="Practice real-world dialogues on diverse topics to build fluency"
-              link="/conversation-titles"
-              icon="💬"
-            />
-            <HomeCard
-              title="Words With Prefix"
-              text="Understand German word formation with prefix combinations"
-              link="/prefix-types"
-              icon="🔤"
+              title="German Stories"
+              text="Immerse yourself in engaging stories to enhance reading skills"
+              link="/stories"
+              icon="📗"
             />
             <HomeCard
               title="Learn Grammar"
@@ -222,10 +216,17 @@ const Home = () => {
               icon="📖"
             />
             <HomeCard
-              title="German Stories"
-              text="Immerse yourself in engaging stories to enhance reading skills"
-              link="/stories"
-              icon="📗"
+              title="Words With Prefix"
+              text="Understand German word formation with prefix combinations"
+              link="/prefix-types"
+              icon="🔤"
+            />
+
+            <HomeCard
+              title="Conversations"
+              text="Practice real-world dialogues on diverse topics to build fluency"
+              link="/conversation-titles"
+              icon="💬"
             />
             <HomeCard
               title="Play Quiz"

@@ -41,19 +41,19 @@ const WordTableRow = ({
       }`}
     >
       {/* Article */}
-      <td className="border border-gray-700 border-dotted p-2 md:p-3 lg:p-3 font-bold text-orange-400 text-center text-sm md:text-lg lg:text-lg">
+      <td className="border border-gray-700 border-dotted p-1 md:p-3 lg:p-3 font-bold text-orange-400 text-center text-xs md:text-lg lg:text-lg">
         {word.article?.name}
       </td>
 
       {/* Word value */}
       {/* Previous version with CSS capitalize - capitalizes every word */}
       {/* <td className="border-l border-gray-400  p-2 capitalize border-dotted"> */}
-      <td className="border border-gray-700 border-dotted p-2 md:p-3">
+      <td className="border border-gray-700 border-dotted p-1 md:p-3">
         <div className="flex justify-between">
           <span
             tabIndex={learningMode ? 0 : -1}
             ref={learningMode && index === currentIndex ? focusElement : null}
-            className="cursor-pointer p-0 md:p-2 lg:p-2 text-blue-400 hover:text-blue-300 text-sm md:text-lg lg:text-lg font-bold break-words max-w-[120px] md:max-w-full transition-colors duration-200"
+            className="cursor-pointer p-0 md:p-2 lg:p-2 text-blue-400 hover:text-blue-300 text-sm md:text-lg lg:text-lg font-semibold md:font-bold lg:font-bold break-words max-w-[120px] md:max-w-full transition-colors duration-200"
             onClick={() => openModal(word)}
           >
             {/* Previous version - used CSS capitalize */}
@@ -64,7 +64,7 @@ const WordTableRow = ({
           <div className="flex gap-1 md:gap-4 lg:gap-4 ">
             <button
               onClick={() => pronounceWord(word.value)}
-              className="text-2xl hover:scale-110 transition-transform duration-200 hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]"
+              className="text-md md:text-2xl lg:text-2xl hover:scale-110 transition-transform duration-200 hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]"
               title="Pronounce word"
             >
               🔊
@@ -73,7 +73,7 @@ const WordTableRow = ({
             {userLoggedIn && (
               <div
                 onClick={() => generateParagraph(word)}
-                className="relative border-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white italic px-2 py-1 text-xs font-bold rounded-full mt-4 h-6 w-6 cursor-pointer hover:scale-110 border-emerald-400 transition-all duration-200 shadow-lg hover:shadow-green-500/50"
+                className="relative border-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white italic px-2 py-1 text-xs font-semibold md:font-bold lg:font-bold rounded-full mt-4 h-6 w-6 cursor-pointer hover:scale-110 border-emerald-400 transition-all duration-200 shadow-lg hover:shadow-green-500/50"
                 disabled={loadingParagraphs[word.id]}
               >
                 {loadingParagraphs[word.id] && (
@@ -99,7 +99,7 @@ const WordTableRow = ({
 
       {/* Meaning */}
       <td
-        className={`border border-gray-700 border-dotted pl-1 p-2 md:p-3 lg:p-3 text-sm md:text-lg lg:text-lg ${
+        className={`border border-gray-700 border-dotted pl-1 p-0 md:p-3 lg:p-3 text-sm md:text-lg lg:text-lg ${
           learningMode && index === currentIndex
             ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold"
             : "text-cyan-300 font-serif"
@@ -194,7 +194,7 @@ const WordTableRow = ({
 
       {/* Favorite */}
       {userLoggedIn && (
-        <td className="border border-gray-700 border-dotted p-2 md:p-3 text-center">
+        <td className="border border-gray-700 border-dotted p-0 md:p-3 text-center">
           <FavoriteButton
             isFavorite={favorites.includes(word.id)}
             loading={loadingFavorites[word.id]}
