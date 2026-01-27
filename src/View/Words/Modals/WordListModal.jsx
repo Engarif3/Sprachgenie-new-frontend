@@ -6,6 +6,7 @@ import FavoriteButton from "./FavoriteButton";
 import { RiCloseCircleFill } from "react-icons/ri";
 import { useLockBodyScroll } from "./ModalScrolling";
 import { IoMdArrowDropright } from "react-icons/io";
+import { FcSpeaker } from "react-icons/fc";
 
 // Memoized sentence renderer component
 const SentenceRenderer = memo(({ sentence, index }) => {
@@ -46,8 +47,10 @@ const SentenceRenderer = memo(({ sentence, index }) => {
             className="text-blue-600 hover:text-blue-800 mr-1 md:mr-0 lg:mr-0"
             title="Pronounce"
           >
-            🔊
+            {/* 🔊 */}
+            <FcSpeaker size={20} className="mt-0 md:mt-1 lg:mt-1 " />
           </button>
+          {/* <span className="hidden md:inline lg:inline"> */}
           <span className="hidden md:inline lg:inline">
             <IoMdArrowDropright className="text-pink-600 mt-1" size={20} />
           </span>
