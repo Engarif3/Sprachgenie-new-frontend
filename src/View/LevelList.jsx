@@ -1,7 +1,20 @@
 import React, { useState, useEffect } from "react";
+import { Navigate } from "react-router-dom";
 import axios from "../axios";
+import { getUserInfo, isLoggedIn } from "../services/auth.services";
 
 const LevelList = () => {
+  const userLoggedIn = isLoggedIn();
+  const userInfo = getUserInfo() || {};
+
+  // Security check: Only allow admin/super_admin users
+  if (
+    !userLoggedIn ||
+    !userInfo.id ||
+    (userInfo.role !== "admin" && userInfo.role !== "super_admin")
+  ) {
+    return <Navigate to="/" replace />;
+  }
   const [levels, setLevels] = useState([]);
   const [editingLevel, setEditingLevel] = useState();
   const [newLevelName, setNewLevelName] = useState("");
@@ -29,7 +42,7 @@ const LevelList = () => {
         level: newLevelName,
       });
       setLevels(
-        levels.map((level) => (level.id === id ? response.data.level : level))
+        levels.map((level) => (level.id === id ? response.data.level : level)),
       );
       setEditingLevel(null);
       setNewLevelName("");

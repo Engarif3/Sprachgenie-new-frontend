@@ -32,7 +32,6 @@ const UpdateUserStatus = () => {
 
   const [activeTab, setActiveTab] = useState("users");
 
-  const userInfo = getUserInfo() || {};
   const navigate = useNavigate();
 
   // Fetch Admins

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 import { ScaleLoader } from "react-spinners";
 import Swal from "sweetalert2";
 import { getFromLocalStorage } from "../utils/local-storage";
@@ -6,8 +7,20 @@ import { authKey } from "../constants/authkey";
 import api from "../axios";
 import aiApi from "../AI_axios";
 import Pagination from "../AdminActions/AdminPaginationForUsers";
+import { getUserInfo, isLoggedIn } from "../services/auth.services";
 
 const Usage = () => {
+  const userLoggedIn = isLoggedIn();
+  const userInfo = getUserInfo() || {};
+
+  // Security check: Only allow admin/super_admin users
+  if (
+    !userLoggedIn ||
+    !userInfo.id ||
+    (userInfo.role !== "admin" && userInfo.role !== "super_admin")
+  ) {
+    return <Navigate to="/" replace />;
+  }
   const [usageData, setUsageData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -33,7 +46,7 @@ const Usage = () => {
 
       // Fetch active users with pagination
       const userRes = await api.get(
-        `/user?page=${page}&limit=${limit}&status=ACTIVE`
+        `/user?page=${page}&limit=${limit}&status=ACTIVE`,
       );
       const users = userRes.data.data || [];
       const total = userRes.data.meta?.total || users.length;

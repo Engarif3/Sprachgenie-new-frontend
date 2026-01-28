@@ -1,11 +1,22 @@
 import { useState } from "react";
+import { Navigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2"; // Ensure SweetAlert2 is imported
-import { getUserInfo } from "../../services/auth.services";
+import { getUserInfo, isLoggedIn } from "../../services/auth.services";
 import api from "../../axios";
 
 const CreateConversation = () => {
+  const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo() || {};
+
+  // Security check: Only allow admin/super_admin users
+  if (
+    !userLoggedIn ||
+    !userInfo.id ||
+    (userInfo.role !== "admin" && userInfo.role !== "super_admin")
+  ) {
+    return <Navigate to="/" replace />;
+  }
   const [formData, setFormData] = useState({
     topic: "",
     levelId: 1, // Default level A1
@@ -76,7 +87,7 @@ const CreateConversation = () => {
         });
       } else {
         throw new Error(
-          response.data.message || "Failed to create conversation."
+          response.data.message || "Failed to create conversation.",
         );
       }
     } catch (error) {

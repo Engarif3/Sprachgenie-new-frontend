@@ -28,7 +28,6 @@ const UpdateBasicUserStatus = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const userInfo = getUserInfo() || {};
   const navigate = useNavigate();
 
   const fetchUsers = async (page, status, limit = 50) => {

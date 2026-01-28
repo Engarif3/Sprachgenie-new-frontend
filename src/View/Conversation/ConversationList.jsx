@@ -1,16 +1,27 @@
 //for admin
 import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2"; // Ensure SweetAlert2 is imported
-import { getUserInfo } from "../../services/auth.services";
+import { getUserInfo, isLoggedIn } from "../../services/auth.services";
 import { ScaleLoader } from "react-spinners";
 import api from "../../axios"; // Use configured axios instance
 
 const ConversationsList = () => {
+  const userLoggedIn = isLoggedIn();
+  const userInfo = getUserInfo() || {};
+
+  // Security check: Only allow admin/super_admin users
+  if (
+    !userLoggedIn ||
+    !userInfo.id ||
+    (userInfo.role !== "admin" && userInfo.role !== "super_admin")
+  ) {
+    return <Navigate to="/" replace />;
+  }
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingConversation, setEditingConversation] = useState(null);
   const [formData, setFormData] = useState({});
-  const userInfo = getUserInfo() || {};
   // Levels mapping
   const levels = [
     { value: 1, label: "A1" },
@@ -140,14 +151,14 @@ const ConversationsList = () => {
 
       await api.put(
         `/conversation/update/${editingConversation.id}`,
-        updatedData
+        updatedData,
       );
       setConversations(
         conversations.map((conv) =>
           conv.id === editingConversation.id
             ? { ...conv, ...updatedData }
-            : conv
-        )
+            : conv,
+        ),
       );
       closeEditModal();
       Swal.fire({

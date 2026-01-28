@@ -1,10 +1,23 @@
 import Swal from "sweetalert2";
 import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 import api from "../axios";
 import aiApi from "../AI_axios";
 import { ScaleLoader } from "react-spinners";
+import { getUserInfo, isLoggedIn } from "../services/auth.services";
 
 const ReportsByUsers = () => {
+  const userLoggedIn = isLoggedIn();
+  const userInfo = getUserInfo() || {};
+
+  // Security check: Only allow admin/super_admin users
+  if (
+    !userLoggedIn ||
+    !userInfo.id ||
+    (userInfo.role !== "admin" && userInfo.role !== "super_admin")
+  ) {
+    return <Navigate to="/" replace />;
+  }
   const [reports, setReports] = useState([]);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -101,8 +114,10 @@ const ReportsByUsers = () => {
 
       setReports((prev) =>
         prev.map((r) =>
-          r.wordId === report.wordId ? { ...r, regenerationRequired: false } : r
-        )
+          r.wordId === report.wordId
+            ? { ...r, regenerationRequired: false }
+            : r,
+        ),
       );
 
       // Step 6: Close loading and show success
@@ -193,7 +208,7 @@ const ReportsByUsers = () => {
       const updatedReports = reports
         .map((r) => {
           const filteredReports = r.reports.filter(
-            (rep) => r.regenerationRequired !== false // keep reports that are not regenerated
+            (rep) => r.regenerationRequired !== false, // keep reports that are not regenerated
           );
           return {
             ...r,
@@ -355,8 +370,8 @@ const ReportsByUsers = () => {
                     {regenerating === r.wordId
                       ? "Regenerating..."
                       : r.regenerationRequired === false
-                      ? "Generated"
-                      : "Re-generate"}
+                        ? "Generated"
+                        : "Re-generate"}
                   </button>
                 </td>
               </tr>

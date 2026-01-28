@@ -1,12 +1,25 @@
 import { useState, useEffect } from "react";
+import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import aiApi from "../AI_axios";
 import { ScaleLoader } from "react-spinners";
 import { getFromLocalStorage } from "../utils/local-storage";
 import { authKey } from "../constants/authkey";
 import api from "../axios";
+import { getUserInfo, isLoggedIn } from "../services/auth.services";
 
 const UserLimits = () => {
+  const userLoggedIn = isLoggedIn();
+  const userInfo = getUserInfo() || {};
+
+  // Security check: Only allow admin/super_admin users
+  if (
+    !userLoggedIn ||
+    !userInfo.id ||
+    (userInfo.role !== "admin" && userInfo.role !== "super_admin")
+  ) {
+    return <Navigate to="/" replace />;
+  }
   const [users, setUsers] = useState([]);
   const [globalLimits, setGlobalLimits] = useState({
     dailyLimit: 10,
@@ -66,7 +79,7 @@ const UserLimits = () => {
                 yearlyLimit: fetchedGlobalLimits.yearlyLimit,
               };
             }
-          })
+          }),
         );
 
         setUsers(usersWithLimits);
@@ -97,7 +110,7 @@ const UserLimits = () => {
 
       // Update local state immediately
       setUsers((prev) =>
-        prev.map((u) => (u.id === userId ? { ...u, ...globalLimits } : u))
+        prev.map((u) => (u.id === userId ? { ...u, ...globalLimits } : u)),
       );
 
       Swal.fire({
@@ -139,13 +152,13 @@ const UserLimits = () => {
               dailyLimit: globalLimits.dailyLimit,
               monthlyLimit: globalLimits.monthlyLimit,
               yearlyLimit: globalLimits.yearlyLimit,
-            }))
+            })),
           );
 
           Swal.fire(
             "Reset!",
             "All users' limits were reset to global.",
-            "success"
+            "success",
           );
         } catch (err) {
           console.error(err);
@@ -159,7 +172,7 @@ const UserLimits = () => {
 
   const handleLimitChange = (userId, field, value) => {
     setUsers((prev) =>
-      prev.map((u) => (u.id === userId ? { ...u, [field]: value } : u))
+      prev.map((u) => (u.id === userId ? { ...u, [field]: value } : u)),
     );
   };
 
