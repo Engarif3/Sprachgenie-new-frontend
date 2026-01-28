@@ -938,38 +938,38 @@ const WordList = () => {
     <Container>
       {/* Modern Header Section */}
       <div className="text-center mb-8 mt-8">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 ml-2">
           <Link
             to="/quiz"
-            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/50"
+            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-2 md:px-6 lg:px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/50"
           >
             🎮 Play Quiz
           </Link>
           {userLoggedIn &&
             (userInfo.role === "admin" || userInfo.role === "super_admin") && (
-              <span className="text-sm text-pink-400 font-bold">
+              <span className="text-sm text-pink-400 font-bold mr-2">
                 Total: {cache.words.length} words
               </span>
             )}
         </div>
         <div className="mb-4">
-          <span className="inline-block px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
+          <span className="hidden md:inline-block lg:inline-block px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
             📚 Learn Vocabulary
           </span>
         </div>
         <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-4">
           Vocabulary Library
         </h2>
-        <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+        <p className="text-xl text-gray-300 max-w-2xl mx-auto hidden md:inline-block lg:inline-block">
           Explore and master German vocabulary with interactive learning tools
         </p>
-        <div className="flex justify-center mt-6">
+        <div className="hidden md:flex lg:flex justify-center mt-6">
           <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
         </div>
       </div>
 
       {/* =============radio buttons ========== */}
-      <div className="flex justify-between text-white mb-4 bg-gradient-to-r from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4">
+      <div className="flex justify-between text-white mb-4 bg-gradient-to-r from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4 mx-0 md:mx-2 lg:mx-2">
         <div className="flex gap-4 items-center">
           <label className="flex items-center gap-2 cursor-pointer hover:text-blue-400 transition-colors">
             <input
@@ -1012,7 +1012,7 @@ const WordList = () => {
         </div>
       </div>
       {/* =============radio buttons ========== */}
-      <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 gap-4 mb-6 mx-0 md:mx-2 lg:mx-2">
         <div className="w-full space-y-2">
           {/* Search input */}
           <div className="relative">
@@ -1043,7 +1043,7 @@ const WordList = () => {
         {/* =====select search type======== */}
 
         {/* Level Select */}
-        <div className="w-full">
+        <div className="w-full ">
           <div className="flex justify-center md:justify-start">
             <label htmlFor="level-select" className="sr-only">
               Filter by level

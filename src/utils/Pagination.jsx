@@ -65,7 +65,7 @@ const Pagination = ({
             {showAction ? "🔒" : "⚙️"}
           </button>
         )}
-        <p className="text-lg text-info font-bold whitespace-nowrap md:ml-2 block md:hidden">
+        <p className="text-lg text-info font-bold whitespace-nowrap ml-2 block md:hidden">
           {totalWords} words
         </p>
         <div>
