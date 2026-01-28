@@ -36,7 +36,7 @@ const WordTableRow = ({
   return (
     <tr
       key={word.id}
-      className={`transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-500/5 hover:to-purple-500/5 ${
+      className={`transition-colors duration-200 hover:bg-gradient-to-r hover:from-blue-500/5 hover:to-purple-500/5 ${
         index % 2 === 0 ? "bg-gray-800/40" : "bg-gray-900/40"
       }`}
     >
@@ -125,7 +125,7 @@ const WordTableRow = ({
             <span
               key={idx}
               onClick={() => openWordInModal(synonym.value)}
-              className="text-md  px-3 py-1 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/50 rounded-full hover:from-blue-500/30 hover:to-cyan-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
+              className="text-md px-3 py-1 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/50 rounded-full hover:from-blue-500/30 hover:to-cyan-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
             >
               {synonym.value}
             </span>
@@ -179,13 +179,13 @@ const WordTableRow = ({
         <div className="flex gap-2 justify-center">
           <Link
             to={`/edit-word/${word.id}`}
-            className="px-3 py-1 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 rounded-lg font-semibold text-white text-xs sm:text-sm transition-all duration-200 hover:scale-105 shadow-md"
+            className="px-3 py-1 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 rounded-lg font-semibold text-white text-xs sm:text-sm transition-colors duration-200 hover:scale-105 shadow-md"
           >
             Edit
           </Link>
           <button
             onClick={() => handleDelete(word.id, word.value)}
-            className="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 rounded-lg font-semibold text-white text-xs sm:text-sm transition-all duration-200 hover:scale-105 shadow-md"
+            className="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 rounded-lg font-semibold text-white text-xs sm:text-sm transition-colors duration-200 hover:scale-105 shadow-md"
           >
             Delete
           </button>
