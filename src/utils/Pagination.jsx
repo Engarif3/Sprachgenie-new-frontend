@@ -22,7 +22,7 @@ const Pagination = ({
         {!learningMode && (
           <button
             onClick={toggleLearningMode}
-            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-purple-500/50"
+            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-2 md:px-6 lg:px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-purple-500/50 ml-2"
           >
             🎯 Enable Learning Mode
           </button>
@@ -30,7 +30,7 @@ const Pagination = ({
         {learningMode && (
           <button
             onClick={toggleLearningMode}
-            className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/50"
+            className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 px-2 md:px-6 lg:px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/50 ml-2"
           >
             ❌ Disable Learning Mode
           </button>
@@ -93,12 +93,12 @@ const Pagination = ({
                 onClick={() => {
                   setTimeout(() => {
                     setCurrentPage((prevPage) =>
-                      Math.min(prevPage + 1, totalPages)
+                      Math.min(prevPage + 1, totalPages),
                     );
                   }, 300);
                 }}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed rounded-full font-semibold text-white text-sm transition-all duration-300 hover:scale-105 shadow-md disabled:opacity-50 disabled:hover:scale-100"
+                className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed rounded-full font-semibold text-white text-sm transition-all duration-300 hover:scale-105 shadow-md disabled:opacity-50 disabled:hover:scale-100 mr-2"
               >
                 Next →
               </button>

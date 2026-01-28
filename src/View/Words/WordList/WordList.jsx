@@ -81,9 +81,7 @@ const WordList = () => {
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   // 	=========AI ===============
 
-  // Increase debounce for mobile devices to reduce expensive filtering
-  const isMobile = window.innerWidth < 768;
-  const debouncedSearchValue = useDebounce(searchValue, isMobile ? 500 : 300);
+  const debouncedSearchValue = useDebounce(searchValue, 300);
   const cacheDebounceTimer = useRef(null);
   const aiAbortControllers = useRef(new Map());
 
@@ -363,16 +361,13 @@ const WordList = () => {
   const allFilteredWords = useMemo(() => {
     const wordsArray = cache.words;
     let filtered = wordsArray.filter((word) => word.value?.trim());
-
-    // On mobile, use simpler normalization for better performance
-    const isMobile = window.innerWidth < 768;
+    // Normalize strings for alphabetical sorting:
+    // - remove parenthetical content (e.g. "(fast) alle" -> " alle")
+    // - strip remaining punctuation/extra characters
+    // - collapse spaces and lowercase for consistent comparison
     const normalizeForSort = (str) => {
       if (!str) return "";
       try {
-        if (isMobile) {
-          // Simpler normalization on mobile
-          return String(str).toLowerCase().trim();
-        }
         return String(str)
           .replace(/\(.*?\)/g, "")
           .replace(/[^\p{L}\p{N}\s-]/gu, " ")
@@ -485,16 +480,9 @@ const WordList = () => {
         return compareNormalized(x.value, y.value);
       });
     } else {
-      // Sort alphabetically - use simpler sorting on mobile for performance
-      if (isMobile) {
-        filtered.sort((x, y) =>
-          (x.value || "").localeCompare(y.value || "", "de", {
-            sensitivity: "base",
-          }),
-        );
-      } else {
-        filtered.sort((x, y) => compareNormalized(x.value, y.value));
-      }
+      // Sort alphabetically by normalized word value so entries starting
+      // with punctuation or parentheses don't float to the top.
+      filtered.sort((x, y) => compareNormalized(x.value, y.value));
     }
 
     return filtered;
