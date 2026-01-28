@@ -1,13 +1,23 @@
 import { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import Container from "../../../utils/Container";
 import api from "../../../axios";
-import { getUserInfo } from "../../../services/auth.services";
+import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 
 const UpdateWord = () => {
   const { id } = useParams();
+  const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo() || {};
+
+  // Security check: Only allow admin/super_admin users
+  if (
+    !userLoggedIn ||
+    !userInfo.id ||
+    (userInfo.role !== "admin" && userInfo.role !== "super_admin")
+  ) {
+    return <Navigate to="/" replace />;
+  }
   const [suggestions, setSuggestions] = useState({
     synonyms: [],
     antonyms: [],
@@ -143,7 +153,7 @@ const UpdateWord = () => {
       if (value.length >= 2) {
         try {
           const res = await fetch(
-            `/words/suggestions?query=${value}&type=${name}`
+            `/words/suggestions?query=${value}&type=${name}`,
           );
           const contentType = res.headers.get("Content-Type");
           if (contentType && contentType.includes("application/json")) {
@@ -232,31 +242,31 @@ const UpdateWord = () => {
         inputData.meaning
           .split(",")
           .map((item) => item.trim())
-          .filter((item) => item !== "")
+          .filter((item) => item !== ""),
       ),
       sentences: formData.sentences.concat(
         inputData.sentences
           .split("|")
           .map((item) => item.trim())
-          .filter((item) => item !== "")
+          .filter((item) => item !== ""),
       ),
       synonyms: formData.synonyms.concat(
         inputData.synonyms
           .split(",")
           .map((item) => item.trim())
-          .filter((item) => item !== "")
+          .filter((item) => item !== ""),
       ),
       antonyms: formData.antonyms.concat(
         inputData.antonyms
           .split(",")
           .map((item) => item.trim())
-          .filter((item) => item !== "")
+          .filter((item) => item !== ""),
       ),
       similarWords: formData.similarWords.concat(
         inputData.similarWords
           .split(",")
           .map((item) => item.trim())
-          .filter((item) => item !== "")
+          .filter((item) => item !== ""),
       ),
     };
 
@@ -274,7 +284,7 @@ const UpdateWord = () => {
       try {
         const response = await api.put(
           `/word/update/${formData.id}`,
-          dataToSend
+          dataToSend,
         );
         setMessage(response.data.message);
         setInputData({

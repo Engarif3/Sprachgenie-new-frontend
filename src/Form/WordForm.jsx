@@ -1,17 +1,23 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "../axios";
 
-import { getUserInfo } from "../services/auth.services";
+import { getUserInfo, isLoggedIn } from "../services/auth.services";
 
 const WordForm = () => {
   const navigate = useNavigate();
-  const [levels, setLevels] = useState([]);
-  const [topics, setTopics] = useState([]);
-  const [articles, setArticles] = useState([]);
-  const [partsOfSpeech, setPartsOfSpeech] = useState([]);
+  const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo() || {};
+
+  // Security check: Only allow admin/super_admin users
+  if (
+    !userLoggedIn ||
+    !userInfo.id ||
+    (userInfo.role !== "admin" && userInfo.role !== "super_admin")
+  ) {
+    return <Navigate to="/" replace />;
+  }
 
   const [wordData, setWordData] = useState({
     value: "",

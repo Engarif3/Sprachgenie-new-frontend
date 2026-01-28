@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import Container from "../../utils/Container";
-import { getUserInfo } from "../../services/auth.services";
+import { getUserInfo, isLoggedIn } from "../../services/auth.services";
 import { useNavigate } from "react-router-dom";
 import api from "../../axios";
 import { ScaleLoader } from "react-spinners";
@@ -9,6 +10,17 @@ import { dateTimeFormatter } from "../../utils/formatDateTime";
 import Pagination from "../AdminPaginationForUsers";
 
 const UpdateBasicUserStatus = () => {
+  const userLoggedIn = isLoggedIn();
+  const userInfo = getUserInfo() || {};
+
+  // Security check: Only allow admin/super_admin users
+  if (
+    !userLoggedIn ||
+    !userInfo.id ||
+    (userInfo.role !== "admin" && userInfo.role !== "super_admin")
+  ) {
+    return <Navigate to="/" replace />;
+  }
   const [basicUsers, setBasicUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,7 +37,7 @@ const UpdateBasicUserStatus = () => {
 
       const statusParam = status === "ALL" ? "" : `&status=${status}`;
       const response = await api.get(
-        `/user?page=${page}&limit=${limit}&role=BASIC_USER${statusParam}`
+        `/user?page=${page}&limit=${limit}&role=BASIC_USER${statusParam}`,
       );
 
       if (response.data.success && Array.isArray(response.data.data)) {
@@ -70,8 +82,8 @@ const UpdateBasicUserStatus = () => {
             if (response.data.success) {
               setBasicUsers((prevUsers) =>
                 prevUsers.map((user) =>
-                  user.id === userId ? { ...user, status: newStatus } : user
-                )
+                  user.id === userId ? { ...user, status: newStatus } : user,
+                ),
               );
               Swal.fire({
                 title: "Success",

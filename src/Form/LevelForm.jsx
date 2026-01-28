@@ -1,8 +1,21 @@
 import React, { useState } from "react";
+import { Navigate } from "react-router-dom";
 import axios from "../axios"; // Adjust the axios import if needed
 import Container from "../utils/Container";
+import { getUserInfo, isLoggedIn } from "../services/auth.services";
 
 const LevelForm = () => {
+  const userLoggedIn = isLoggedIn();
+  const userInfo = getUserInfo() || {};
+
+  // Security check: Only allow admin/super_admin users
+  if (
+    !userLoggedIn ||
+    !userInfo.id ||
+    (userInfo.role !== "admin" && userInfo.role !== "super_admin")
+  ) {
+    return <Navigate to="/" replace />;
+  }
   const [levelData, setLevelData] = useState({
     levelName: "", // Update to levelName
   });

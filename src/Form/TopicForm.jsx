@@ -72,10 +72,23 @@
 // export default TopicForm;
 
 import React, { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 import axios from "../axios";
 import Container from "../utils/Container";
+import { getUserInfo, isLoggedIn } from "../services/auth.services";
 
 const TopicForm = () => {
+  const userLoggedIn = isLoggedIn();
+  const userInfo = getUserInfo() || {};
+
+  // Security check: Only allow admin/super_admin users
+  if (
+    !userLoggedIn ||
+    !userInfo.id ||
+    (userInfo.role !== "admin" && userInfo.role !== "super_admin")
+  ) {
+    return <Navigate to="/" replace />;
+  }
   const [topicData, setTopicData] = useState({
     name: "",
     levelId: "", // add levelId field
@@ -130,7 +143,9 @@ const TopicForm = () => {
   return (
     <Container>
       <div className="min-h-screen ">
-       <h2 className="text-white text-3xl font-semibold mt-8 mb-6 text-center" >Create a Topic</h2>
+        <h2 className="text-white text-3xl font-semibold mt-8 mb-6 text-center">
+          Create a Topic
+        </h2>
         <form
           onSubmit={handleSubmit}
           className="space-y-4 p-4 bg-stone-800 rounded-md text-white "

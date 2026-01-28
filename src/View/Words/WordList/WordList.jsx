@@ -432,9 +432,58 @@ const WordList = () => {
       });
     }
 
-    // Sort alphabetically by normalized word value so entries starting
-    // with punctuation or parentheses don't float to the top.
-    filtered.sort((x, y) => compareNormalized(x.value, y.value));
+    // Sort by relevance when searching, otherwise alphabetically
+    if (debouncedSearchValue.trim().length > 0) {
+      const query = debouncedSearchValue.trim().toLowerCase();
+
+      filtered.sort((x, y) => {
+        const getRelevanceScore = (word) => {
+          const singular = word.value?.toLowerCase() || "";
+          const plural = word.pluralForm?.toLowerCase() || "";
+
+          // Check exact matches
+          if (singular === query || plural === query) return 100;
+
+          // Check starts with
+          if (singular.startsWith(query) || plural.startsWith(query)) return 50;
+
+          // Check contains
+          if (singular.includes(query) || plural.includes(query)) return 10;
+
+          // If meaning search
+          if (
+            searchType === "meaning" &&
+            word.meaning?.some((m) => m.toLowerCase() === query)
+          )
+            return 100;
+          if (
+            searchType === "meaning" &&
+            word.meaning?.some((m) => m.toLowerCase().startsWith(query))
+          )
+            return 50;
+          if (
+            searchType === "meaning" &&
+            word.meaning?.some((m) => m.toLowerCase().includes(query))
+          )
+            return 10;
+
+          return 0;
+        };
+
+        const scoreX = getRelevanceScore(x);
+        const scoreY = getRelevanceScore(y);
+
+        // Higher score first
+        if (scoreX !== scoreY) return scoreY - scoreX;
+
+        // If same score, sort alphabetically
+        return compareNormalized(x.value, y.value);
+      });
+    } else {
+      // Sort alphabetically by normalized word value so entries starting
+      // with punctuation or parentheses don't float to the top.
+      filtered.sort((x, y) => compareNormalized(x.value, y.value));
+    }
 
     return filtered;
   }, [

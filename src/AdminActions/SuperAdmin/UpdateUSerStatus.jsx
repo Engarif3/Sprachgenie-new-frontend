@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
+import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import Container from "../../utils/Container";
-import { getUserInfo } from "../../services/auth.services";
+import { getUserInfo, isLoggedIn } from "../../services/auth.services";
 import { useNavigate } from "react-router-dom";
 import api from "../../axios";
 import { ScaleLoader } from "react-spinners";
@@ -9,6 +10,13 @@ import { dateTimeFormatter } from "../../utils/formatDateTime";
 import Pagination from "../AdminPaginationForUsers";
 
 const UpdateUserStatus = () => {
+  const userLoggedIn = isLoggedIn();
+  const userInfo = getUserInfo() || {};
+
+  // Security check: Only allow super_admin users
+  if (!userLoggedIn || !userInfo.id || userInfo.role !== "super_admin") {
+    return <Navigate to="/" replace />;
+  }
   const [admins, setAdmins] = useState([]);
   const [basicUsers, setBasicUsers] = useState([]);
   const [loadingAdmins, setLoadingAdmins] = useState(true);
@@ -33,7 +41,7 @@ const UpdateUserStatus = () => {
       setLoadingAdmins(true);
 
       const response = await api.get(
-        `/user?page=${page}&limit=${limit}&role=ADMIN`
+        `/user?page=${page}&limit=${limit}&role=ADMIN`,
       );
 
       if (response.data.success && Array.isArray(response.data.data)) {
@@ -59,7 +67,7 @@ const UpdateUserStatus = () => {
 
       const statusParam = status === "ALL" ? "" : `&status=${status}`;
       const response = await api.get(
-        `/user?page=${page}&limit=${limit}&role=BASIC_USER${statusParam}`
+        `/user?page=${page}&limit=${limit}&role=BASIC_USER${statusParam}`,
       );
 
       if (response.data.success && Array.isArray(response.data.data)) {
@@ -105,13 +113,13 @@ const UpdateUserStatus = () => {
             if (response.data.success) {
               setAdmins((prev) =>
                 prev.map((u) =>
-                  u.id === userId ? { ...u, status: newStatus } : u
-                )
+                  u.id === userId ? { ...u, status: newStatus } : u,
+                ),
               );
               setBasicUsers((prev) =>
                 prev.map((u) =>
-                  u.id === userId ? { ...u, status: newStatus } : u
-                )
+                  u.id === userId ? { ...u, status: newStatus } : u,
+                ),
               );
 
               Swal.fire({
@@ -190,7 +198,7 @@ const UpdateUserStatus = () => {
             Swal.fire(
               "Error",
               error.response?.data?.message || "Failed to delete user",
-              "error"
+              "error",
             );
           });
       }
@@ -364,7 +372,7 @@ const UpdateUserStatus = () => {
                                     handlePermanentDelete(
                                       user.id,
                                       user.name,
-                                      user.email
+                                      user.email,
                                     )
                                   }
                                   className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition text-xs"
@@ -378,7 +386,7 @@ const UpdateUserStatus = () => {
                               <span className="bg-blue-200 px-1 rounded">
                                 {
                                   dateTimeFormatter(user.createdAt).split(
-                                    " - "
+                                    " - ",
                                   )[0]
                                 }
                               </span>{" "}
@@ -386,7 +394,7 @@ const UpdateUserStatus = () => {
                               <span className="bg-green-200 px-1 rounded">
                                 {
                                   dateTimeFormatter(user.createdAt).split(
-                                    " - "
+                                    " - ",
                                   )[1]
                                 }
                               </span>
@@ -507,7 +515,7 @@ const UpdateUserStatus = () => {
                                     handlePermanentDelete(
                                       user.id,
                                       user.name,
-                                      user.email
+                                      user.email,
                                     )
                                   }
                                   className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition text-xs"
@@ -521,7 +529,7 @@ const UpdateUserStatus = () => {
                               <span className="bg-blue-200 px-1 rounded">
                                 {
                                   dateTimeFormatter(user.createdAt).split(
-                                    " - "
+                                    " - ",
                                   )[0]
                                 }
                               </span>{" "}
@@ -529,7 +537,7 @@ const UpdateUserStatus = () => {
                               <span className="bg-green-200 px-1 rounded">
                                 {
                                   dateTimeFormatter(user.createdAt).split(
-                                    " - "
+                                    " - ",
                                   )[1]
                                 }
                               </span>

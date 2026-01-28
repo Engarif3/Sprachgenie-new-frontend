@@ -1,7 +1,20 @@
 import React, { useState } from "react";
+import { Navigate } from "react-router-dom";
 import axios from "../axios";
+import { getUserInfo, isLoggedIn } from "../services/auth.services";
 
 const PartOfSpeechForm = () => {
+  const userLoggedIn = isLoggedIn();
+  const userInfo = getUserInfo() || {};
+
+  // Security check: Only allow admin/super_admin users
+  if (
+    !userLoggedIn ||
+    !userInfo.id ||
+    (userInfo.role !== "admin" && userInfo.role !== "super_admin")
+  ) {
+    return <Navigate to="/" replace />;
+  }
   const [posData, setPosData] = useState({
     name: "",
   });
