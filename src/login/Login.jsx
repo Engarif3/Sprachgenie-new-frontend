@@ -366,6 +366,15 @@ const Login = () => {
                 ✨ Register Now
               </Link>
             </p>
+            <p className="text-sm text-gray-400 mt-2">
+              Need support?
+              <Link
+                to="/#contact"
+                className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-400 hover:from-green-500 hover:to-blue-500 font-bold ml-2 transition-all duration-300"
+              >
+                📞 Contact Us
+              </Link>
+            </p>
           </div>
         </form>
       </div>

@@ -59,9 +59,9 @@ const VerifyEmail = () => {
                 Your email has been successfully verified. You can now log in to
                 your account.
               </p>
-              <p className="text-gray-300 text-sm">
+              {/* <p className="text-gray-300 text-sm">
                 Redirecting to login page...
-              </p>
+              </p> */}
               <Link
                 to="/login"
                 className="font-semibold text-lg btn btn-primary mt-4"
