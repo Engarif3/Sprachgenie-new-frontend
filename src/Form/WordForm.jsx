@@ -33,6 +33,10 @@ const WordForm = () => {
     similarWords: "",
   });
   const [loading, setLoading] = useState(true); // Loading state
+  const [levels, setLevels] = useState([]);
+  const [topics, setTopics] = useState([]);
+  const [articles, setArticles] = useState([]);
+  const [partsOfSpeech, setPartsOfSpeech] = useState([]);
   const initialWordData = {
     value: "",
     meaning: "",

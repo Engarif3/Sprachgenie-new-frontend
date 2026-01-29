@@ -23,7 +23,7 @@ const App = () => {
     ];
 
     const missingVars = requiredEnvVars.filter(
-      (varName) => !import.meta.env[varName]
+      (varName) => !import.meta.env[varName],
     );
 
     if (missingVars.length > 0) {
@@ -31,7 +31,7 @@ const App = () => {
         icon: "error",
         title: "Configuration Error",
         text: `Missing required environment variables: ${missingVars.join(
-          ", "
+          ", ",
         )}`,
         allowOutsideClick: false,
       });
@@ -47,11 +47,11 @@ const App = () => {
         return;
       }
 
-      // Skip fetch on public pages
-      if (location.pathname === "/login" || location.pathname === "/register") {
-        setIsAuthLoading(false);
-        return;
-      }
+      // Don't skip auth check on login/register pages - we need to know if user is already logged in
+      // if (location.pathname === "/login" || location.pathname === "/register") {
+      //   setIsAuthLoading(false);
+      //   return;
+      // }
 
       try {
         // Try to fetch user info (cookie will be sent automatically)
@@ -60,7 +60,7 @@ const App = () => {
           {
             credentials: "include",
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
 
         if (response.ok) {
@@ -99,7 +99,7 @@ const App = () => {
   // const noHeaderFooter =
   //   location.pathname.includes("login") || location.pathname.includes("signup");
   const noHeaderFooter = ["/login", "/register"].some((p) =>
-    location.pathname.startsWith(p)
+    location.pathname.startsWith(p),
   );
 
   return (

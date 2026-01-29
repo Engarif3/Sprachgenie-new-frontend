@@ -2,7 +2,7 @@ import { lazy, Suspense } from "react";
 import App from "../App";
 import { createBrowserRouter } from "react-router-dom";
 import Loader from "../utils/Loader";
-import ProtectedRoute from "./ProtectedRoute";
+import ProtectedRoute, { PublicRoute } from "./ProtectedRoute";
 
 // Lazy-loaded pages
 const Home = lazy(() => import("../View/Home/Home"));
@@ -20,20 +20,20 @@ const PartOfSpeechForm = lazy(() => import("../Form/PartOfSpeechForm"));
 const LevelList = lazy(() => import("../View/LevelList"));
 const UpdateWord = lazy(() => import("../View/Words/Update/UpdateWord"));
 const WordForm = lazy(() => import("../Form/WordForm"));
-const FavoritesList = lazy(() =>
-  import("../View/Words/Favorite/FavoritesList")
+const FavoritesList = lazy(
+  () => import("../View/Words/Favorite/FavoritesList"),
 );
-const ConversationsList = lazy(() =>
-  import("../View/Conversation/ConversationList")
+const ConversationsList = lazy(
+  () => import("../View/Conversation/ConversationList"),
 );
-const CreateConversation = lazy(() =>
-  import("../View/Conversation/CreateConversation")
+const CreateConversation = lazy(
+  () => import("../View/Conversation/CreateConversation"),
 );
-const ConversationTitleList = lazy(() =>
-  import("../View/Conversation/ConversationTitleList")
+const ConversationTitleList = lazy(
+  () => import("../View/Conversation/ConversationTitleList"),
 );
-const ConversationPage = lazy(() =>
-  import("../View/Conversation/ConversationPage")
+const ConversationPage = lazy(
+  () => import("../View/Conversation/ConversationPage"),
 );
 const PrefixTypeList = lazy(() => import("../View/Prefix/PrefixTypeList"));
 const PrefixList = lazy(() => import("../View/Prefix/PrefixList"));
@@ -41,23 +41,23 @@ const Grammar = lazy(() => import("../View/Grammar/Grammar"));
 const Clauses = lazy(() => import("../View/Grammar/Clauses/Clauses"));
 const Clause = lazy(() => import("../View/Grammar/Clauses/Clause"));
 const GrammarTopic = lazy(() => import("../View/Grammar/GrammarTopic"));
-const UpdateBasicUserStatus = lazy(() =>
-  import("../AdminActions/Admin/UpdateBasicUserStatus")
+const UpdateBasicUserStatus = lazy(
+  () => import("../AdminActions/Admin/UpdateBasicUserStatus"),
 );
-const UpdateUserStatus = lazy(() =>
-  import("../AdminActions/SuperAdmin/UpdateUSerStatus")
+const UpdateUserStatus = lazy(
+  () => import("../AdminActions/SuperAdmin/UpdateUSerStatus"),
 );
-const PerfectAndPastForm = lazy(() =>
-  import("../View/Grammar/PerfectAndPastForm/PerfectAndPastForm")
+const PerfectAndPastForm = lazy(
+  () => import("../View/Grammar/PerfectAndPastForm/PerfectAndPastForm"),
 );
 const Stories = lazy(() => import("../View/Stories/Stories"));
-const UsersFavoriteCount = lazy(() =>
-  import("../AdminActions/Admin/UsersFavoriteCount")
+const UsersFavoriteCount = lazy(
+  () => import("../AdminActions/Admin/UsersFavoriteCount"),
 );
 const DashboardLayout = lazy(() => import("../dashboard/DashboardLayout"));
 const DashboardHome = lazy(() => import("../dashboard/DashboardHome"));
-const FavoritesListDashboard = lazy(() =>
-  import("../View/Words/Favorite/FavoritesListDashboard")
+const FavoritesListDashboard = lazy(
+  () => import("../View/Words/Favorite/FavoritesListDashboard"),
 );
 const Backend = lazy(() => import("../Backend/Backend"));
 
@@ -231,11 +231,39 @@ export const router = createBrowserRouter([
       },
     ],
   },
-  { path: "/login", element: <LoginWithSuspense /> },
-  { path: "/register", element: <RegisterWithSuspense /> },
+  {
+    path: "/login",
+    element: (
+      <PublicRoute>
+        <LoginWithSuspense />
+      </PublicRoute>
+    ),
+  },
+  {
+    path: "/register",
+    element: (
+      <PublicRoute>
+        <RegisterWithSuspense />
+      </PublicRoute>
+    ),
+  },
   { path: "/verify-email", element: <VerifyEmailWithSuspense /> },
   { path: "/resend-verification", element: <ResendVerificationWithSuspense /> },
-  { path: "/forgot-password", element: <ForgotPasswordWithSuspense /> },
-  { path: "/reset-password", element: <ResetPasswordWithSuspense /> },
+  {
+    path: "/forgot-password",
+    element: (
+      <PublicRoute>
+        <ForgotPasswordWithSuspense />
+      </PublicRoute>
+    ),
+  },
+  {
+    path: "/reset-password",
+    element: (
+      <PublicRoute>
+        <ResetPasswordWithSuspense />
+      </PublicRoute>
+    ),
+  },
   { path: "/backend", element: <BackendWithSuspense /> },
 ]);

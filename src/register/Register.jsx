@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { modifyPayload } from "../utils/modifyPayload";
@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { defaultValues, validationSchema } from "./validation";
 import DarkVeil from "../View/Home/DarkVeil";
+import { IoEye, IoEyeOff } from "react-icons/io5";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -92,23 +93,23 @@ const Register = () => {
       {/* Home button */}
       <Link
         to="/"
-        className="fixed top-4 left-4 z-20 px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-full font-bold shadow-lg hover:scale-105 transition-all duration-300"
+        className="fixed top-4 left-4 z-20 px-2 py-1 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-full font-bold shadow-lg hover:scale-105 transition-all duration-300"
       >
         🏠 Home
       </Link>
 
-      <div className="flex flex-col-reverse md:flex-row lg:flex-row gap-6 md:gap-8 lg:gap-10 items-center md:items-end lg:items-end">
+      <div className="flex flex-col-reverse md:flex-row lg:flex-row gap-0 md:gap-8 lg:gap-10 items-center md:items-end lg:items-end mt-8  w-full md:max-w-4xl lg:max-w-4xl">
         <div className="w-full max-w-lg shadow-2xl rounded-3xl p-8 text-center bg-gradient-to-br from-gray-800/90 via-gray-900/90 to-black/90 border-2 border-gray-700/50 backdrop-blur-sm">
-          <div className="mb-6">
-            <div className="inline-block p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-full mb-4">
+          <div className="mb-6 ">
+            {/* <div className="inline-block p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-full mb-4">
               <span className="text-4xl">✨</span>
-            </div>
-            <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400">
+            </div> */}
+            <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 ">
               Create Account
             </h2>
-            <p className="text-gray-400 text-sm mt-2">
+            {/* <p className="text-gray-400 text-sm mt-2">
               Join us to start your German learning adventure
-            </p>
+            </p> */}
           </div>
 
           {error && (
@@ -127,7 +128,7 @@ const Register = () => {
           >
             {/* Name */}
             <div className="text-left">
-              <label className="block text-sm font-semibold text-gray-300 mb-2">
+              <label className="block text-sm font-semibold text-gray-300 mb-2 ">
                 👤 Name
               </label>
               <input
@@ -179,9 +180,9 @@ const Register = () => {
                 <button
                   type="button"
                   onClick={togglePasswordVisibility}
-                  className="absolute inset-y-0 right-3 text-sm text-gray-400 hover:text-white font-semibold transition-colors duration-300"
+                  className="absolute inset-y-0 right-3 flex items-center justify-center w-8 h-8 text-gray-400 hover:text-white hover:bg-gray-600/50 rounded-lg transition-all duration-300 mt-2"
                 >
-                  {showPassword ? "👁️" : "👁️‍🗨️"}
+                  {showPassword ? <IoEyeOff size={24} /> : <IoEye size={24} />}
                 </button>
               </div>
               {errors.password && (
@@ -207,9 +208,9 @@ const Register = () => {
                 <button
                   type="button"
                   onClick={togglePasswordVisibility}
-                  className="absolute inset-y-0 right-3 text-sm text-gray-400 hover:text-white font-semibold transition-colors duration-300"
+                  className="absolute inset-y-0 right-3 flex items-center justify-center w-8 h-8 text-gray-400 hover:text-white hover:bg-gray-600/50 rounded-lg transition-all duration-300 mt-2"
                 >
-                  {showPassword ? "👁️" : "👁️‍🗨️"}
+                  {showPassword ? <IoEyeOff size={24} /> : <IoEye size={24} />}
                 </button>
               </div>
               {errors.confirmPassword && (
@@ -241,6 +242,15 @@ const Register = () => {
                 className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-500 hover:to-purple-500 font-bold ml-2 transition-all duration-300"
               >
                 🔐 Login
+              </Link>
+            </p>
+            <p className="text-sm text-gray-400 mt-2">
+              Need support?
+              <Link
+                to="/#contact"
+                className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-400 hover:from-green-500 hover:to-blue-500 font-bold ml-2 transition-all duration-300"
+              >
+                📞 Contact Us
               </Link>
             </p>
           </div>

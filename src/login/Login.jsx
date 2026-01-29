@@ -123,6 +123,7 @@ import { useForm } from "react-hook-form";
 import { userLogin } from "../services/actions/userLogin";
 import { storeUserInfo } from "../services/auth.services";
 import DarkVeil from "../View/Home/DarkVeil";
+import { IoEye, IoEyeOff } from "react-icons/io5";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -213,7 +214,7 @@ const Login = () => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -228,7 +229,7 @@ const Login = () => {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center">
+    <div className="relative min-h-screen flex items-center justify-center px-3">
       {/* DarkVeil fullscreen background */}
       <div className="fixed inset-0 -z-10">
         <DarkVeil />
@@ -237,7 +238,7 @@ const Login = () => {
       {/* Home button */}
       <Link
         to="/"
-        className="fixed top-4 left-4 z-20 px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-full font-bold shadow-lg hover:scale-105 transition-all duration-300"
+        className="fixed top-4 left-4 z-20 px-2 py-1 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-full font-bold shadow-lg hover:scale-105 transition-all duration-300 "
       >
         🏠 Home
       </Link>
@@ -296,9 +297,9 @@ const Login = () => {
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
-                className="absolute inset-y-0 right-3 text-sm text-gray-400 hover:text-white font-semibold transition-colors duration-300"
+                className="absolute inset-y-0 right-3 flex items-center justify-center w-8 h-8 text-gray-400 hover:text-white hover:bg-gray-600/50 rounded-lg transition-all duration-300 mt-2"
               >
-                {showPassword ? "👁️" : "👁️‍🗨️"}
+                {showPassword ? <IoEyeOff size={24} /> : <IoEye size={24} />}
               </button>
             </div>
             {errors.password && (
@@ -351,8 +352,8 @@ const Login = () => {
             {isSubmitting
               ? "🔄 Logging in..."
               : loginCooldown > 0
-              ? `⏳ Try again in ${loginCooldown}s`
-              : "🚀 Login"}
+                ? `⏳ Try again in ${loginCooldown}s`
+                : "🚀 Login"}
           </button>
 
           <div className="pt-4 border-t border-gray-700/50">
