@@ -4,11 +4,12 @@ import { Navigate } from "react-router-dom";
 import api from "../axios";
 import aiApi from "../AI_axios";
 import { ScaleLoader } from "react-spinners";
-import { getUserInfo, isLoggedIn } from "../services/auth.services";
+import { isLoggedIn } from "../services/auth.services";
+import { getUserInfo as getAuthUserInfo } from "../services/auth.services";
 
 const ReportsByUsers = () => {
   const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo() || {};
+  const userInfo = getAuthUserInfo() || {};
 
   // Security check: Only allow admin/super_admin users
   if (
