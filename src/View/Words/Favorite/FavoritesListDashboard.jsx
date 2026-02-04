@@ -343,8 +343,20 @@ const FavoritesListDashboard = () => {
       setIsAIModalOpen(true);
     } catch (error) {
       const errorMessage = error.response?.data?.error || error.message;
-      if (error.response?.status === 403) {
+      const isLimitError = error.response?.status === 403;
+      const isServiceError =
+        error.response?.status === 500 ||
+        error.response?.status === 429 ||
+        error.response?.data?.details?.includes("exceeded");
+
+      if (isLimitError) {
         Swal.fire("Limit Reached", errorMessage, "warning");
+      } else if (isServiceError) {
+        Swal.fire(
+          "Service Unavailable",
+          "AI service at this moment not available. Will be available soon.",
+          "info",
+        );
       } else {
         Swal.fire("Error", "Failed to generate paragraph", "error");
       }

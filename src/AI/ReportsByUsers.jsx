@@ -133,11 +133,30 @@ const ReportsByUsers = () => {
     } catch (err) {
       console.error("Error regenerating:", err);
       Swal.close();
-      Swal.fire({
-        icon: "error",
-        title: "Oops!",
-        text: "Failed to re-generate word. Please try again.",
-      });
+
+      // Check if it's a limit or service error
+      const isLimitError =
+        err.response?.status === 403 ||
+        err.response?.data?.error?.includes("limit");
+      const isServiceError =
+        err.response?.status === 500 ||
+        err.response?.status === 429 ||
+        err.response?.data?.details?.includes("exceeded") ||
+        err.response?.data?.details?.includes("not available");
+
+      if (isLimitError || isServiceError) {
+        Swal.fire({
+          icon: "info",
+          title: "Service Unavailable",
+          text: "AI service at this moment not available. Will be available soon.",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: "Failed to re-generate word. Please try again.",
+        });
+      }
     } finally {
       setRegenerating(null);
     }
