@@ -49,19 +49,63 @@ const ReportsByUsers = () => {
     }
   };
 
+  const [userCache, setUserCache] = useState({});
+
   useEffect(() => {
     fetchReportsAndUsers();
   }, []);
 
-  const getUserInfo = (userId) => {
-    const user = users.find((u) => u.id === userId);
-    if (!user) return userId;
+  // Component to handle async user info fetching
+  const UserInfoDisplay = ({ userId }) => {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+      const fetchUserInfo = async () => {
+        // Check if already in users list
+        let foundUser = users.find((u) => u.id === userId);
+
+        // Check if in cache
+        if (!foundUser && userCache[userId]) {
+          foundUser = userCache[userId];
+        }
+
+        // Fetch on-demand if not found
+        if (!foundUser) {
+          try {
+            const res = await api.get(`/user/${userId}`);
+            if (res.data.data) {
+              foundUser = res.data.data;
+              setUserCache((prev) => ({ ...prev, [userId]: foundUser }));
+            }
+          } catch (err) {
+            console.error(`Could not fetch user ${userId}:`, err);
+          }
+        }
+
+        setUser(foundUser);
+        setLoading(false);
+      };
+
+      fetchUserInfo();
+    }, [userId, users, userCache]);
+
+    if (loading) {
+      return <span className="text-gray-400 text-sm">Loading...</span>;
+    }
+
+    if (!user) {
+      return (
+        <div className="text-gray-500 text-sm">
+          <span className="italic">{userId.substring(0, 8)}...</span>
+        </div>
+      );
+    }
 
     return (
       <div className="flex justify-between gap-1">
         <span>
           <strong>{user.name || "Unknown"}</strong>
-          {/* <span>- {user.email || "No email"} </span> */}
         </span>
         <button
           onClick={() => setSelectedUser(user)}
@@ -71,6 +115,10 @@ const ReportsByUsers = () => {
         </button>
       </div>
     );
+  };
+
+  const getUserInfo = (userId) => {
+    return <UserInfoDisplay userId={userId} />;
   };
 
   // Re-generate handler
