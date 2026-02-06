@@ -46,7 +46,6 @@ const App = () => {
         setIsAuthLoading(false);
         return;
       }
-
       // Don't skip auth check on login/register pages - we need to know if user is already logged in
       // if (location.pathname === "/login" || location.pathname === "/register") {
       //   setIsAuthLoading(false);
