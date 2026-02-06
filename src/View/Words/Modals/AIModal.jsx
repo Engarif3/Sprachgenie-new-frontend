@@ -34,7 +34,7 @@ const AIModal = ({ isOpen, aiWord, selectedParagraph, onClose }) => {
       Swal.fire(
         "Reported",
         response.data.message || "Report submitted",
-        "success"
+        "success",
       );
 
       setIsReportOpen(false);
@@ -52,9 +52,9 @@ const AIModal = ({ isOpen, aiWord, selectedParagraph, onClose }) => {
     <>
       {/* AI Modal */}
       <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-        <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl shadow-2xl p-8 w-full md:w-2/3 lg:w-1/2 max-h-[90vh] overflow-y-auto mx-4 border-2 border-gray-700/50">
+        <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl shadow-2xl p-1 md:p-8 lg:p-8 w-full md:w-2/3 lg:w-1/2 max-h-[90vh] overflow-y-auto mx-1 border-2 border-gray-700/50">
           <h2 className="text-3xl md:text-5xl lg:text-5xl font-bold text-center mb-4">
-            <span className="text-orange-400 font-bold">
+            <span className="text-sky-400 font-bold">
               {typeof aiWord?.article === "string"
                 ? aiWord.article
                 : aiWord?.article?.name || ""}
@@ -63,19 +63,19 @@ const AIModal = ({ isOpen, aiWord, selectedParagraph, onClose }) => {
               {aiWord?.value}
             </span>
           </h2>
-          <div className="flex justify-center mb-6">
-            <p className="text-center text-cyan-300 text-xl md:text-2xl px-4 py-2 bg-cyan-500/10 rounded-2xl border border-cyan-500/30">
-              <span className="text-pink-400 font-bold text-2xl">[</span>
+          <div className="flex justify-center mb-6 ">
+            <p className="text-center text-cyan-300 text-md px-4 py-2 bg-cyan-500/10 rounded-2xl border border-cyan-500/30">
+              {/* <span className="text-pink-400 font-bold text-md">[</span> */}
               {Array.isArray(aiWord?.meaning)
                 ? aiWord.meaning.join(", ")
                 : aiWord?.meaning || ""}
-              <span className="text-pink-600 font-bold text-2xl">]</span>
+              {/* <span className="text-pink-600 font-bold text-2xl">]</span> */}
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-4 ">
             {aiWord?.aiMeanings?.length > 0 && (
-              <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 p-4 rounded-2xl border-2 border-green-400/50">
+              <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 p-2 md:p-4 lg:p-4 rounded-2xl border-2 border-green-400/50">
                 <p className="text-base md:text-lg">
                   <strong className="text-green-400 font-semibold">
                     🤖 AI Meanings:
@@ -87,8 +87,8 @@ const AIModal = ({ isOpen, aiWord, selectedParagraph, onClose }) => {
               </div>
             )}
 
-            <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 p-6 rounded-2xl border-2 border-blue-400/50">
-              <p className="text-white text-lg md:text-xl leading-relaxed whitespace-pre-line font-semibold">
+            <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 p-2 md:p-6 lg:p-6 rounded-2xl border-2 border-blue-400/50">
+              <p className="text-white text-xl leading-relaxed whitespace-pre-line ">
                 {selectedParagraph}
               </p>
             </div>
