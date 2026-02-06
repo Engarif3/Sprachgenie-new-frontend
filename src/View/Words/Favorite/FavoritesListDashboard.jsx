@@ -348,15 +348,17 @@ const FavoritesListDashboard = () => {
         errorMessage?.toLowerCase().includes("limit") ||
         errorMessage?.toLowerCase().includes("exceeded");
       const isServiceError =
-        (error.response?.status === 500 || error.response?.status === 429) &&
+        (error.response?.status === 500 ||
+          error.response?.status === 429 ||
+          error.response?.status === 503) &&
         !isLimitError;
 
       if (isLimitError) {
         Swal.fire("Limit Reached", errorMessage, "warning");
       } else if (isServiceError) {
         Swal.fire(
-          "Service Unavailable",
-          "AI service at this moment not available. Will be available soon.",
+          "Service Temporarily Unavailable",
+          errorMessage || "AI service is busy. Please try again in a moment.",
           "info",
         );
       } else {

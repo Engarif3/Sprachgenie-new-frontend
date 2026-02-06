@@ -26,14 +26,14 @@ const DashboardLayout = () => {
   }
 
   const navItemClass = (isActive) =>
-    `flex items-center gap-2 py-2 px-3 rounded-lg text-sm transition-all duration-300 ${
+    `flex items-center gap-2 py-3 px-4 rounded-lg text-base md:text-lg transition-all duration-300 font-medium ${
       isActive
-        ? "bg-gradient-to-r from-blue-500 to-purple-500 font-bold shadow-lg"
-        : "hover:bg-gray-800/50"
+        ? "bg-gradient-to-r from-blue-500 to-purple-500 font-bold shadow-lg scale-105"
+        : "hover:bg-gray-800/50 hover:scale-102"
     }`;
 
   const sectionHeaderClass =
-    "flex items-center justify-between py-2 px-3 hover:bg-gray-800/50 rounded-lg cursor-pointer text-sm font-semibold";
+    "flex items-center justify-between py-3 px-4 hover:bg-gray-800/50 rounded-lg cursor-pointer text-base md:text-lg font-bold transition-all duration-300";
 
   return (
     <Container>
@@ -51,7 +51,7 @@ const DashboardLayout = () => {
             isOpen ? "translate-x-0" : "-translate-x-full"
           } lg:translate-x-0`}
         >
-          <div className="py-3 text-2xl font-bold text-center sticky top-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+          <div className="py-4 text-3xl md:text-4xl font-black text-center sticky top-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black">
             🎯
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
               Dashboard

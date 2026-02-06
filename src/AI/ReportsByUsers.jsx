@@ -189,7 +189,9 @@ const ReportsByUsers = () => {
         errorMessage?.toLowerCase().includes("limit") ||
         errorMessage?.toLowerCase().includes("exceeded");
       const isServiceError =
-        (err.response?.status === 500 || err.response?.status === 429) &&
+        (err.response?.status === 500 ||
+          err.response?.status === 429 ||
+          err.response?.status === 503) &&
         !isLimitError;
 
       if (isLimitError) {
@@ -201,8 +203,9 @@ const ReportsByUsers = () => {
       } else if (isServiceError) {
         Swal.fire({
           icon: "info",
-          title: "Service Unavailable",
-          text: "AI service at this moment not available. Will be available soon.",
+          title: "Service Temporarily Unavailable",
+          text:
+            errorMessage || "AI service is busy. Please try again in a moment.",
         });
       } else {
         Swal.fire({
