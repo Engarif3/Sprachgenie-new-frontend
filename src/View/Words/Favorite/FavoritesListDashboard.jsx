@@ -343,11 +343,13 @@ const FavoritesListDashboard = () => {
       setIsAIModalOpen(true);
     } catch (error) {
       const errorMessage = error.response?.data?.error || error.message;
-      const isLimitError = error.response?.status === 403;
+      const isLimitError =
+        error.response?.status === 403 ||
+        errorMessage?.toLowerCase().includes("limit") ||
+        errorMessage?.toLowerCase().includes("exceeded");
       const isServiceError =
-        error.response?.status === 500 ||
-        error.response?.status === 429 ||
-        error.response?.data?.details?.includes("exceeded");
+        (error.response?.status === 500 || error.response?.status === 429) &&
+        !isLimitError;
 
       if (isLimitError) {
         Swal.fire("Limit Reached", errorMessage, "warning");

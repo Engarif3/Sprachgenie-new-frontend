@@ -183,16 +183,22 @@ const ReportsByUsers = () => {
       Swal.close();
 
       // Check if it's a limit or service error
+      const errorMessage = err.response?.data?.error || err.message;
       const isLimitError =
         err.response?.status === 403 ||
-        err.response?.data?.error?.includes("limit");
+        errorMessage?.toLowerCase().includes("limit") ||
+        errorMessage?.toLowerCase().includes("exceeded");
       const isServiceError =
-        err.response?.status === 500 ||
-        err.response?.status === 429 ||
-        err.response?.data?.details?.includes("exceeded") ||
-        err.response?.data?.details?.includes("not available");
+        (err.response?.status === 500 || err.response?.status === 429) &&
+        !isLimitError;
 
-      if (isLimitError || isServiceError) {
+      if (isLimitError) {
+        Swal.fire({
+          icon: "warning",
+          title: "Limit Reached",
+          text: errorMessage || "You have exceeded your daily/monthly limit",
+        });
+      } else if (isServiceError) {
         Swal.fire({
           icon: "info",
           title: "Service Unavailable",
