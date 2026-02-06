@@ -70,7 +70,7 @@ const ReportsByUsers = () => {
           foundUser = userCache[userId];
         }
 
-        // Fetch on-demand if not found
+        // Fetch on-demand if not found (checks backend user table and related tables)
         if (!foundUser) {
           try {
             const res = await api.get(`/user/${userId}`);
