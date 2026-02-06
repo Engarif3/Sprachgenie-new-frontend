@@ -80,7 +80,7 @@ const Pagination = ({
                 disabled={currentPage === 1}
                 className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed rounded-full font-semibold text-white text-sm transition-all duration-300 hover:scale-105 shadow-md disabled:opacity-50 disabled:hover:scale-100"
               >
-                ← Prev
+                Prev
               </button>
               <span className="px-4 py-2 bg-gradient-to-r from-gray-800/80 to-gray-900/80 border border-gray-700 rounded-full text-white font-semibold text-sm backdrop-blur-sm">
                 <span className="hidden sm:inline">Page </span>
@@ -100,7 +100,7 @@ const Pagination = ({
                 disabled={currentPage === totalPages}
                 className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed rounded-full font-semibold text-white text-sm transition-all duration-300 hover:scale-105 shadow-md disabled:opacity-50 disabled:hover:scale-100 mr-2"
               >
-                Next →
+                Next
               </button>
             </div>
           )}

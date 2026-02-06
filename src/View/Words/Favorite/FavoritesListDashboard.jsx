@@ -375,8 +375,8 @@ const FavoritesListDashboard = () => {
         <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-red-400 to-orange-400 mb-3">
           ❤️ Favorite Words
         </h2>
-        <div className="inline-block px-6 py-2 bg-gradient-to-r from-pink-500/20 to-red-500/20 border border-pink-500/50 rounded-full">
-          <span className="text-2xl font-bold text-white">
+        <div className="inline-block px-4 py-1 bg-gradient-to-r from-pink-500/20 to-red-500/20 border border-pink-500/50 rounded-full">
+          <span className="text-sm md:text-2xl lg:text-2xl font-bold text-white">
             {favoriteWords.length}
           </span>
           <span className="text-gray-300 ml-2">words saved</span>

@@ -25,6 +25,7 @@ const Usage = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [showUserId, setShowUserId] = useState(false);
   const limit = 50;
 
   const fetchUsage = async (page = 1) => {
@@ -112,10 +113,19 @@ const Usage = () => {
       </h2>
 
       <div className="overflow-x-auto">
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={() => setShowUserId(!showUserId)}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            {showUserId ? "🔒 Hide ID" : "👁️ Show ID"}
+          </button>
+        </div>
+
         <table className="min-w-full table-auto border">
           <thead>
             <tr className="bg-cyan-700 text-white">
-              <th className="p-2 text-center">User ID</th>
+              {showUserId && <th className="p-2 text-center">User ID</th>}
               <th className="p-2 text-center">Name</th>
               <th className="p-2 text-center">Email</th>
               <th className="p-2 text-center">Status</th>
@@ -136,7 +146,7 @@ const Usage = () => {
                 key={u.userId}
                 className="border-b odd:bg-white even:bg-gray-100"
               >
-                <td className="p-2 text-center">{u.userId}</td>
+                {showUserId && <td className="p-2 text-center">{u.userId}</td>}
                 <td className="p-2 text-center">{u.name}</td>
                 <td className="p-2 text-center">{u.email}</td>
                 <td className="p-2 text-center">{u.status}</td>

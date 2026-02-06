@@ -28,6 +28,7 @@ const UserLimits = () => {
   });
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
+  const [showUserId, setShowUserId] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,9 +49,11 @@ const UserLimits = () => {
 
         setGlobalLimits(fetchedGlobalLimits);
 
-        // 2️⃣ Fetch users
+        // 2️⃣ Fetch users - exclude only pending users
         const userRes = await api.get("/user");
-        const usersData = userRes.data.data;
+        const usersData = userRes.data.data.filter(
+          (user) => user.status && user.status.toLowerCase() !== "pending",
+        );
 
         // 3️⃣ Merge user limits with normalized fallback
         const usersWithLimits = await Promise.all(
@@ -238,7 +241,13 @@ const UserLimits = () => {
         </span>
       </p>
       <div className="overflow-x-auto">
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-between items-center mb-4">
+          <button
+            onClick={() => setShowUserId(!showUserId)}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            {showUserId ? "🔒 Hide ID" : "👁️ Show ID"}
+          </button>
           <button
             onClick={handleResetAllToGlobal}
             className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
@@ -250,7 +259,7 @@ const UserLimits = () => {
         <table className="min-w-full table-auto border">
           <thead>
             <tr className="bg-cyan-700 text-white">
-              <th className="p-2 text-center">ID</th>
+              {showUserId && <th className="p-2 text-center">ID</th>}
               <th className="p-2 text-center">Name</th>
               <th className="p-2 text-center">Email</th>
               <th className="p-2 text-center">Daily Limit</th>
@@ -265,7 +274,7 @@ const UserLimits = () => {
                 key={user.id}
                 className="border-b odd:bg-white even:bg-gray-100"
               >
-                <td className="p-2 text-center">{user.id}</td>
+                {showUserId && <td className="p-2 text-center">{user.id}</td>}
                 <td className="p-2 text-center">{user.name}</td>
                 <td className="p-2 text-center">{user.email}</td>
 

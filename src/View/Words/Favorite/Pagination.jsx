@@ -60,7 +60,7 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
             disabled={currentPage === 1}
             className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold px-2 py-1 text-xs sm:px-4 sm:py-2 sm:text-sm md:px-6 md:py-2.5 md:text-base rounded-full transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg hover:shadow-blue-500/50"
           >
-            ← Prev
+            Prev
           </button>
 
           {/* Render Page Buttons and Ellipses */}
@@ -69,7 +69,7 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
               return (
                 <span
                   key={`ellipsis-${index}`}
-                  className="w-6 sm:w-8 md:w-10 flex items-center justify-center px-1 sm:px-2 py-1 sm:py-2 text-gray-400 text-base sm:text-lg md:text-xl font-bold"
+                  className="w-1 sm:w-8 md:w-10 flex items-center justify-center px-1 sm:px-2 py-1 sm:py-2 text-gray-400 text-base sm:text-lg md:text-xl font-bold"
                 >
                   ...
                 </span>
@@ -80,7 +80,7 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`min-w-[28px] h-8 sm:min-w-[36px] sm:h-9 md:min-w-[40px] md:h-10 flex items-center justify-center px-2 py-1 sm:px-3 sm:py-2 rounded-full font-bold text-xs sm:text-sm md:text-base transition-all duration-300 shadow-md ${
+                className={`min-w-[28px] h-6 sm:min-w-[36px] sm:h-9 md:min-w-[40px] md:h-10 flex items-center justify-center px-1 py-1 sm:px-3 sm:py-2 rounded-full font-bold text-xs sm:text-sm md:text-base transition-all duration-300 shadow-md ${
                   currentPage === page
                     ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white scale-110 shadow-lg shadow-purple-500/50"
                     : "bg-gray-800/60 border-2 border-gray-700/50 text-gray-300 hover:bg-gray-700/80 hover:scale-105 hover:border-gray-600"
@@ -98,7 +98,7 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
             disabled={currentPage === totalPages}
             className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold px-2 py-1 text-xs sm:px-4 sm:py-2 sm:text-sm md:px-6 md:py-2.5 md:text-base rounded-full transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg hover:shadow-cyan-500/50"
           >
-            Next →
+            Next
           </button>
         </div>
       )}
