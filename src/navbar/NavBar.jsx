@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import Container from "../utils/Container";
 import Swal from "sweetalert2";
 import AuthButton from "../components/UI/AuthButton/AuthButton";
 import { getUserInfo, isLoggedIn } from "../services/auth.services";
 import { FaBook, FaHome, FaSun, FaMoon } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
 import { useTheme } from "../context/ThemeContext";
+import Container from "../utils/Container";
 
 const NavBar = () => {
   const navigate = useNavigate();
