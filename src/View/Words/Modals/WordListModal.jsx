@@ -6,12 +6,14 @@ import FavoriteButton from "./FavoriteButton";
 import { RiCloseCircleFill } from "react-icons/ri";
 import { useLockBodyScroll } from "./ModalScrolling";
 import { IoMdArrowDropright } from "react-icons/io";
-import { FcSpeaker } from "react-icons/fc";
+// import { FcSpeaker } from "react-icons/fc";
+// import { HiSpeakerWave } from "react-icons/hi2";
 
 // Memoized sentence renderer component
 const SentenceRenderer = memo(({ sentence, index }) => {
   const trimmed = sentence.trim();
-  let className = "text-gray-300 list-disc text-sm md:text-lg lg:text-lg";
+  let className =
+    "text-slate-300 text-sm md:text-lg lg:text-lg italic mt-1 md:mt-0 lg:mt-0 ";
   let cleanSentence = sentence;
 
   // Determine styling and clean sentence
@@ -21,9 +23,10 @@ const SentenceRenderer = memo(({ sentence, index }) => {
     cleanSentence = sentence.replace(/^##\s*/, "");
   } else if (trimmed.startsWith("**")) {
     className =
-      "text-slate-400 list-none text-sm md:text-lg lg:text-lg first-letter:uppercase pl-1";
+      "text-gray-400 list-none text-sm md:text-lg lg:text-lg first-letter:uppercase pl-1 font-normal";
     cleanSentence = sentence
-      .replace(/^\*\*\s*/, "⭕ ")
+      // .replace(/^\*\*\s*/, "⭕ ")
+      .replace(/^\*\*\s*/, "🟣 ")
       .replace(/\*\*$/, "")
       .trim();
   }
@@ -48,7 +51,13 @@ const SentenceRenderer = memo(({ sentence, index }) => {
             title="Pronounce"
           >
             {/* 🔊 */}
-            <FcSpeaker size={20} className="mt-0 md:mt-1 lg:mt-1 " />
+            {/* <FcSpeaker size={20} className="mt-0 md:mt-1 lg:mt-1 " /> */}
+            {/* <HiSpeakerWave
+              size={20}
+              // color="green"
+              className="mt-0 md:mt-1 lg:mt-1 text-cyan-500"
+            /> */}
+            <span className="text-xl ">🔊</span>
           </button>
           {/* <span className="hidden md:inline lg:inline"> */}
           <span className="hidden md:inline lg:inline">
@@ -123,18 +132,31 @@ const WordListModal = ({
     );
   }, [selectedWord?.pluralForm]);
 
-  // Memoized derived lists
+  // Memoized derived lists with articles (as arrays for styled rendering)
   const synonymsList = useMemo(() => {
-    return (selectedWord?.synonyms || [])?.map((s) => s.value).join(", ") || "";
+    return (
+      (selectedWord?.synonyms || [])?.map((s) => ({
+        article: s.article?.name || null,
+        value: s.value,
+      })) || []
+    );
   }, [selectedWord?.synonyms]);
 
   const antonymsList = useMemo(() => {
-    return (selectedWord?.antonyms || [])?.map((a) => a.value).join(", ") || "";
+    return (
+      (selectedWord?.antonyms || [])?.map((a) => ({
+        article: a.article?.name || null,
+        value: a.value,
+      })) || []
+    );
   }, [selectedWord?.antonyms]);
 
   const similarWordsList = useMemo(() => {
     return (
-      (selectedWord?.similarWords || [])?.map((sw) => sw.value).join(", ") || ""
+      (selectedWord?.similarWords || [])?.map((sw) => ({
+        article: sw.article?.name || null,
+        value: sw.value,
+      })) || []
     );
   }, [selectedWord?.similarWords]);
 
@@ -215,7 +237,9 @@ const WordListModal = ({
             </p>
             <p className="text-sm md:text-lg lg:text-lg">
               <span className="text-blue-400 font-semibold">Meaning:</span>{" "}
-              <span className="text-gray-300 font-medium">{meaningsList}</span>
+              <span className="text-cyan-500  tracking-wide font-medium italic">
+                {meaningsList}
+              </span>
             </p>
 
             {selectedWord.pluralForm && (
@@ -239,8 +263,18 @@ const WordListModal = ({
                 <span className="text-blue-400 font-semibold capitalize">
                   Synonyms:
                 </span>{" "}
-                <span className="text-gray-300 font-medium">
-                  {synonymsList}
+                <span className="text-gray-300 font-medium italic">
+                  {synonymsList.map((item, idx) => (
+                    <span key={idx}>
+                      {item.article && (
+                        <span className="text-orange-400 font-bold">
+                          {item.article}{" "}
+                        </span>
+                      )}
+                      <span>{item.value}</span>
+                      {idx < synonymsList.length - 1 && ", "}
+                    </span>
+                  ))}
                 </span>
               </p>
             )}
@@ -250,8 +284,18 @@ const WordListModal = ({
                 <span className="text-blue-400 font-semibold capitalize">
                   Antonyms:
                 </span>{" "}
-                <span className="text-gray-300 font-medium">
-                  {antonymsList}
+                <span className="text-gray-300 font-medium italic">
+                  {antonymsList.map((item, idx) => (
+                    <span key={idx}>
+                      {item.article && (
+                        <span className="text-orange-400 font-bold">
+                          {item.article}{" "}
+                        </span>
+                      )}
+                      <span>{item.value}</span>
+                      {idx < antonymsList.length - 1 && ", "}
+                    </span>
+                  ))}
                 </span>
               </p>
             )}
@@ -261,8 +305,18 @@ const WordListModal = ({
                 <span className="text-blue-400 font-semibold">
                   Word to Watch:
                 </span>{" "}
-                <span className="text-gray-300 font-medium">
-                  {similarWordsList}
+                <span className="text-gray-300 font-medium italic">
+                  {similarWordsList.map((item, idx) => (
+                    <span key={idx}>
+                      {item.article && (
+                        <span className="text-orange-400 font-bold">
+                          {item.article}{" "}
+                        </span>
+                      )}
+                      <span>{item.value}</span>
+                      {idx < similarWordsList.length - 1 && ", "}
+                    </span>
+                  ))}
                 </span>
               </p>
             )}
@@ -274,7 +328,7 @@ const WordListModal = ({
               </span>
             </p>
           </div>
-          <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm p-2 md:p-4 lg:p-4 rounded-2xl border border-gray-700/30 ">
+          <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm p-2 md:p-3 lg:p-3 rounded-2xl border border-gray-700/30 ">
             <p className="text-md md:text-lg lg:text-lg text-green-400 font-semibold mb-3">
               📝 Sentences:
             </p>
