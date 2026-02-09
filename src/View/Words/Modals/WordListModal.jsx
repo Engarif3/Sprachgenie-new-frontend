@@ -7,13 +7,13 @@ import { RiCloseCircleFill } from "react-icons/ri";
 import { useLockBodyScroll } from "./ModalScrolling";
 import { IoMdArrowDropright } from "react-icons/io";
 // import { FcSpeaker } from "react-icons/fc";
-// import { HiSpeakerWave } from "react-icons/hi2";
+import { HiSpeakerWave } from "react-icons/hi2";
 
 // Memoized sentence renderer component
 const SentenceRenderer = memo(({ sentence, index }) => {
   const trimmed = sentence.trim();
-  let className =
-    "text-slate-300 text-sm md:text-lg lg:text-lg italic mt-1 md:mt-0 lg:mt-0 ";
+  let className = "text-slate-300 text-sm md:text-lg lg:text-lg  ";
+  // "text-slate-300 text-sm md:text-lg lg:text-lg italic mt-1 md:mt-0 lg:mt-0 ";
   let cleanSentence = sentence;
 
   // Determine styling and clean sentence
@@ -52,12 +52,12 @@ const SentenceRenderer = memo(({ sentence, index }) => {
           >
             {/* 🔊 */}
             {/* <FcSpeaker size={20} className="mt-0 md:mt-1 lg:mt-1 " /> */}
-            {/* <HiSpeakerWave
+            <HiSpeakerWave
               size={20}
               // color="green"
-              className="mt-0 md:mt-1 lg:mt-1 text-cyan-500"
-            /> */}
-            <span className="text-xl ">🔊</span>
+              className="mt-0 md:mt-1 lg:mt-1 text-cyan-500 block md:hidden lg:hidden"
+            />
+            <span className="text-xl hidden md:block lg:block">🔊</span>
           </button>
           {/* <span className="hidden md:inline lg:inline"> */}
           <span className="hidden md:inline lg:inline">
