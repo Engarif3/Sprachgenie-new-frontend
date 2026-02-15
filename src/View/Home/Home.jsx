@@ -83,7 +83,7 @@ const Home = () => {
               className="inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-orange-900 via-pink-900 to-purple-900 text-white font-bold rounded-full hover:shadow-[0_0_30px_rgba(249,115,22,0.5)] hover:scale-105 transition-all duration-300 text-lg shadow-xl "
             >
               <span className="text-2xl">📚</span>
-              <span>Explore 4000+ Vocabulary Words</span>
+              <span>Explore 4500+ Vocabulary Words</span>
               <span className="text-xl">→</span>
             </Link> */}
             {/* ================== */}
@@ -107,7 +107,7 @@ const Home = () => {
               {/* 4. Content */}
               <span className="relative z-10 flex items-center gap-3 text-lg">
                 <span className="text-2xl">📚</span>
-                <span>Explore 4000+ Vocabulary Words</span>
+                <span>Explore 4500+ Vocabulary Words</span>
                 <span className="text-xl group-hover:translate-x-1 transition-transform">
                   →
                 </span>
@@ -199,7 +199,7 @@ const Home = () => {
           >
             <HomeCard
               title="Vocabulary Library"
-              text="Master 4000+ German words with examples, audio, and contextual usage"
+              text="Master 4500+ German words with examples, audio, and contextual usage"
               link="/words"
               icon="📚"
             />
@@ -281,7 +281,7 @@ const Home = () => {
             <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-8 rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-gray-700">
               <div className="text-5xl mb-4">📚</div>
               <h3 className="text-2xl font-bold text-white mb-3">
-                4000+ Words
+                4500+ Words
               </h3>
               <p className="text-gray-300">
                 Comprehensive vocabulary library with examples, audio, and
@@ -416,7 +416,7 @@ const Home = () => {
           >
             <div className="text-center">
               <div className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-3">
-                4000+
+                4500+
               </div>
               <p className="text-gray-300 text-lg font-semibold">Words</p>
             </div>
