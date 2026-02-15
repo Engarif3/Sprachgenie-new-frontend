@@ -985,7 +985,7 @@ const WordList = () => {
       </div>
 
       {/* =============radio buttons ========== */}
-      <div className="flex justify-between text-white mb-4 bg-gradient-to-r from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4 mx-0 md:mx-2 lg:mx-2">
+      <div className="flex justify-between text-white mb-4 bg-gradient-to-r from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-2 px-4 mx-0 md:mx-2 lg:mx-2">
         <div className="flex gap-4 items-center">
           <label className="flex items-center gap-2 cursor-pointer hover:text-blue-400 transition-colors">
             <input
