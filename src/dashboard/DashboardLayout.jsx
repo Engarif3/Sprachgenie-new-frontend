@@ -287,9 +287,9 @@ const DashboardLayout = () => {
           {/* Sidebar Footer */}
           <div className="sticky bottom-0 px-4 py-4 bg-gradient-to-t from-gray-950 to-gray-950/50 border-t border-gray-800/50 backdrop-blur-md">
             <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-lg py-3 px-3 hover:border-blue-500/50 transition-colors duration-300">
-              <p className="text-xs font-semibold text-gray-300 mb-1">
+              {/* <p className="text-xs font-semibold text-gray-300 mb-1">
                 User Profile
-              </p>
+              </p> */}
               <p className="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 truncate">
                 {userInfo?.name || "User"}
               </p>
