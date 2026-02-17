@@ -1,9 +1,206 @@
 import { useState, useEffect } from "react";
 import { Link, useParams, Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { FaChevronCircleUp, FaChevronCircleDown } from "react-icons/fa";
 import Container from "../../../utils/Container";
 import api from "../../../axios";
 import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+// Draggable Item Component
+const DraggableItem = ({
+  id,
+  item,
+  index,
+  field,
+  editingField,
+  editValue,
+  onEdit,
+  onRemove,
+  onSaveEdit,
+  onCancelEdit,
+  setEditValue,
+  onAddAbove,
+  onAddBelow,
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: id });
+
+  const [isSelected, setIsSelected] = useState(false);
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  const isEditing =
+    editingField?.type === field && editingField?.index === index;
+
+  const handleItemClick = () => {
+    setIsSelected(!isSelected);
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      onClick={handleItemClick}
+      className={`flex items-center justify-between p-3 rounded-lg mb-2 shadow-sm transition-all ${
+        isDragging
+          ? "shadow-lg scale-105 bg-blue-400"
+          : isSelected
+            ? "bg-blue-300 shadow-md"
+            : "bg-slate-300"
+      }`}
+    >
+      {isEditing ? (
+        <div className="flex flex-col md:flex-row justify-between w-full gap-2">
+          <input
+            type="text"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            className="w-full p-2 border border-gray-400 rounded"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSaveEdit(field, index);
+              }}
+              className="btn btn-sm btn-success"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onCancelEdit();
+              }}
+              className="btn btn-sm btn-ghost"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between w-full gap-2">
+          <div
+            className="flex-1 break-words font-medium cursor-grab active:cursor-grabbing"
+            {...attributes}
+            {...listeners}
+          >
+            {item}
+          </div>
+          <div className="flex justify-end gap-2 flex-shrink-0">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onAddAbove(field, index);
+              }}
+              className="hover:scale-110 transition-transform"
+              title="Add above"
+            >
+              <FaChevronCircleUp
+                size={24}
+                className="text-slate-700 hover:text-orange-500 transition-colors"
+              />
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onAddBelow(field, index);
+              }}
+              className="hover:scale-110 transition-transform"
+              title="Add below"
+            >
+              <FaChevronCircleDown
+                size={24}
+                className="text-slate-700 hover:text-orange-500 transition-colors"
+              />
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onEdit(field, index, item);
+              }}
+              className="btn btn-sm btn-info gap-1"
+              title="Edit"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onRemove(field, index);
+              }}
+              className="btn btn-sm btn-error gap-1"
+              title="Remove"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const UpdateWord = () => {
   const { id } = useParams();
@@ -62,6 +259,140 @@ const UpdateWord = () => {
   const [message, setMessage] = useState("");
   const [initialLoading, setInitialLoading] = useState(true);
   const [refetchTrigger, setRefetchTrigger] = useState(0);
+  const [addingAt, setAddingAt] = useState(null); // { index: number, position: 'above' | 'below', field: string }
+  const [newItemValue, setNewItemValue] = useState("");
+
+  // Setup DnD Kit sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      distance: 8,
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  // Handle drag end
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    // Extract field and indices from IDs
+    const [activeField, activeIndex] = active.id.split("-");
+    const [overField, overIndex] = over.id.split("-");
+
+    if (activeField !== overField) {
+      return; // Can't drag between different fields
+    }
+
+    const field = activeField;
+    const oldIndex = parseInt(activeIndex, 10);
+    const newIndex = parseInt(overIndex, 10);
+
+    // Update the array
+    const updatedArray = arrayMove(formData[field], oldIndex, newIndex);
+
+    // Show confirmation dialog
+    const result = await Swal.fire({
+      title: "Reorder?",
+      text: `Position ${oldIndex + 1} → ${newIndex + 1}`,
+      // icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+      reverseButtons: true,
+    });
+
+    if (!result.isConfirmed) {
+      return; // User cancelled the reorder
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      [field]: updatedArray,
+    }));
+
+    // Save to backend
+    setLoading(true);
+    try {
+      await api.put(`/word/update/${formData.id}`, {
+        ...formData,
+        [field]: updatedArray,
+      });
+
+      Swal.fire({
+        title: "Reordered!",
+        text: "Items reordered successfully.",
+        timer: 500,
+        showConfirmButton: false,
+        icon: "success",
+      });
+
+      setRefetchTrigger((prev) => prev + 1);
+    } catch (error) {
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to reorder. Please try again.",
+        icon: "error",
+      });
+      // Revert on error
+      setRefetchTrigger((prev) => prev + 1);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddItem = async (field, index, position) => {
+    if (!newItemValue.trim()) {
+      Swal.fire({
+        title: "Error",
+        text: "Please enter a value",
+        icon: "error",
+      });
+      return;
+    }
+
+    const updatedArray = [...formData[field]];
+    const insertIndex = position === "above" ? index : index + 1;
+    updatedArray.splice(insertIndex, 0, newItemValue.trim());
+
+    setFormData((prev) => ({
+      ...prev,
+      [field]: updatedArray,
+    }));
+
+    // Save to backend
+    setLoading(true);
+    try {
+      await api.put(`/word/update/${formData.id}`, {
+        ...formData,
+        [field]: updatedArray,
+      });
+
+      Swal.fire({
+        title: "Added!",
+        text: "New item added successfully.",
+        timer: 500,
+        showConfirmButton: false,
+        icon: "success",
+      });
+
+      setAddingAt(null);
+      setNewItemValue("");
+      setRefetchTrigger((prev) => prev + 1);
+    } catch (error) {
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to add item. Please try again.",
+        icon: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Fetch existing word data and all dropdown options in parallel
   useEffect(() => {
@@ -210,6 +541,65 @@ const UpdateWord = () => {
         Swal.fire({
           title: "Removed!",
           text: "The item has been removed successfully.",
+          timer: 500,
+          showConfirmButton: false,
+          icon: "success",
+        });
+
+        // Trigger refetch by incrementing counter
+        setRefetchTrigger((prev) => prev + 1);
+      } catch (error) {
+        Swal.fire({
+          title: "Error!",
+          text: "Failed to update the backend. Please try again.",
+          icon: "error",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleClearAllSentences = async () => {
+    const result = await Swal.fire({
+      title: "Clear all sentences?",
+      text: 'Type "ok" (case insensitive) to confirm this action. This cannot be undone.',
+      input: "text",
+      inputPlaceholder: 'Type "ok" to confirm',
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+      confirmButtonText: "Clear All",
+      reverseButtons: true,
+      preConfirm: (value) => {
+        if (value && value.toLowerCase() === "ok") {
+          return true;
+        } else {
+          Swal.showValidationMessage('Please type "ok" to confirm');
+          return false;
+        }
+      },
+    });
+
+    if (result.isConfirmed) {
+      setLoading(true);
+      const emptyArray = [];
+
+      // Update the state
+      setFormData((prev) => ({
+        ...prev,
+        sentences: emptyArray,
+      }));
+
+      try {
+        // Send the updated data to the backend
+        const response = await api.put(`/word/update/${formData.id}`, {
+          ...formData,
+          sentences: emptyArray,
+        });
+
+        Swal.fire({
+          title: "Cleared!",
+          text: "All sentences have been removed.",
           timer: 500,
           showConfirmButton: false,
           icon: "success",
@@ -385,7 +775,7 @@ const UpdateWord = () => {
               </label> */}
 
               <input
-                key={`word-value-${formData.id}-${formData.value}`}
+                key={`word-value-${formData.id}`}
                 type="text"
                 name="value"
                 value={formData.value}
@@ -412,75 +802,172 @@ const UpdateWord = () => {
                     placeholder="Enter meanings"
                   />
                   <div className="mt-2">
-                    {formData.meaning.map((item, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between bg-slate-300 p-2 rounded-lg mb-2 shadow-sm"
-                      >
-                        {editingField?.type === "meaning" &&
-                        editingField?.index === index ? (
-                          <div className="flex flex-col md:flex-row justify-between  w-full">
-                            <input
-                              type="text"
-                              value={editValue}
-                              onChange={(e) => setEditValue(e.target.value)}
-                              className="w-full p-2 mr-2 border border-gray-400 rounded"
-                            />
-                            <div className=" flex justify-end gap-2 ml-4 mt-1 md:mt-0">
-                              <button
-                                type="button"
-                                onClick={() => handleSaveEdit("meaning", index)}
-                                className="btn btn-sm btn-success mr-1"
-                              >
-                                Save
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setEditingField(null)}
-                                className="btn btn-sm btn-ghost"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col md:flex-row justify-between  w-full">
-                            <li>{item}</li>
-                            <div className=" flex justify-end gap-2 ml-4 mt-1 md:mt-0">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setEditingField({ type: "meaning", index });
-                                  setEditValue(item);
-                                }}
-                                className="btn btn-sm btn-info"
-                              >
-                                Edit
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleRemoveItem("meaning", index)
-                                }
-                                className="btn btn-sm btn-error"
-                              >
-                                Remove
-                              </button>
-                            </div>
-                          </div>
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <SortableContext
+                        items={formData.meaning.map(
+                          (_, index) => `meaning-${index}`,
                         )}
-                      </div>
-                    ))}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        {formData.meaning.map((item, index) => (
+                          <div key={index}>
+                            {addingAt?.field === "meaning" &&
+                              addingAt?.position === "above" &&
+                              addingAt?.index === index && (
+                                <div className="flex gap-2 mt-2 mb-2 p-2 bg-green-100 rounded-lg">
+                                  <input
+                                    type="text"
+                                    placeholder="Add above..."
+                                    value={newItemValue}
+                                    onChange={(e) =>
+                                      setNewItemValue(e.target.value)
+                                    }
+                                    onKeyPress={(e) => {
+                                      if (e.key === "Enter") {
+                                        handleAddItem(
+                                          "meaning",
+                                          addingAt.index,
+                                          "above",
+                                        );
+                                      }
+                                    }}
+                                    className="flex-1 p-2 border border-gray-300 rounded"
+                                    autoFocus
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleAddItem(
+                                        "meaning",
+                                        addingAt.index,
+                                        "above",
+                                      )
+                                    }
+                                    className="btn btn-sm btn-success"
+                                  >
+                                    Add
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setAddingAt(null);
+                                      setNewItemValue("");
+                                    }}
+                                    className="btn btn-sm btn-ghost"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              )}
+                            <DraggableItem
+                              key={`item-${index}`}
+                              id={`meaning-${index}`}
+                              item={item}
+                              index={index}
+                              field="meaning"
+                              editingField={editingField}
+                              editValue={editValue}
+                              onEdit={(field, idx, val) => {
+                                setEditingField({ type: field, index: idx });
+                                setEditValue(val);
+                              }}
+                              onRemove={handleRemoveItem}
+                              onSaveEdit={handleSaveEdit}
+                              onCancelEdit={() => setEditingField(null)}
+                              setEditValue={setEditValue}
+                              onAddAbove={(field, idx) =>
+                                setAddingAt({
+                                  field,
+                                  index: idx,
+                                  position: "above",
+                                })
+                              }
+                              onAddBelow={(field, idx) =>
+                                setAddingAt({
+                                  field,
+                                  index: idx,
+                                  position: "below",
+                                })
+                              }
+                            />
+                            {addingAt?.field === "meaning" &&
+                              addingAt?.position === "below" &&
+                              addingAt?.index === index && (
+                                <div className="flex gap-2 mt-2 mb-2 p-2 bg-green-100 rounded-lg">
+                                  <input
+                                    type="text"
+                                    placeholder="Add below..."
+                                    value={newItemValue}
+                                    onChange={(e) =>
+                                      setNewItemValue(e.target.value)
+                                    }
+                                    onKeyPress={(e) => {
+                                      if (e.key === "Enter") {
+                                        handleAddItem(
+                                          "meaning",
+                                          addingAt.index,
+                                          "below",
+                                        );
+                                      }
+                                    }}
+                                    className="flex-1 p-2 border border-gray-300 rounded"
+                                    autoFocus
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleAddItem(
+                                        "meaning",
+                                        addingAt.index,
+                                        "below",
+                                      )
+                                    }
+                                    className="btn btn-sm btn-success"
+                                  >
+                                    Add
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setAddingAt(null);
+                                      setNewItemValue("");
+                                    }}
+                                    className="btn btn-sm btn-ghost"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              )}
+                          </div>
+                        ))}
+                      </SortableContext>
+                    </DndContext>
                   </div>
                 </div>
 
                 {/* Sentences Section */}
                 <div>
-                  <label className="block  mb-2 text-white">
-                    <span className="font-medium text-lg">Sentences</span> (for
-                    multiple input use "|". eg. sentence A. | Sentence B.)
-                  </label>
-                  {/* <div className="border border-slate-300 p-1 rounded-lg"> */}
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-white">
+                      <span className="font-medium text-lg">Sentences</span>{" "}
+                      (for multiple input use "|". eg. sentence A. | Sentence
+                      B.)
+                    </label>
+                    {formData.sentences.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleClearAllSentences}
+                        disabled={loading}
+                        className="btn btn-error btn-sm"
+                      >
+                        Clear All
+                      </button>
+                    )}
+                  </div>
                   <input
                     type="text"
                     name="sentences"
@@ -490,71 +977,151 @@ const UpdateWord = () => {
                     placeholder="Sentence A. SentenceB."
                   />
                   <div className="mt-2">
-                    {formData.sentences.map((item, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between bg-slate-300 p-2 rounded-lg mb-2 shadow-sm"
-                      >
-                        {editingField?.type === "sentences" &&
-                        editingField?.index === index ? (
-                          <div className="flex flex-col md:flex-row justify-between  w-full">
-                            <input
-                              type="text"
-                              value={editValue}
-                              onChange={(e) => setEditValue(e.target.value)}
-                              className="w-full p-2 mr-2 border border-gray-400 rounded"
-                            />
-                            <div className=" flex justify-end gap-2 ml-4 mt-1 md:mt-0">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleSaveEdit("sentences", index)
-                                }
-                                className="btn btn-sm btn-success mr-1"
-                              >
-                                Save
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setEditingField(null)}
-                                className="btn btn-sm btn-error"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col md:flex-row justify-between  w-full">
-                            <li className="">{item}</li>
-
-                            <div className=" flex justify-end gap-2 ml-4 mt-1 md:mt-0">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setEditingField({ type: "sentences", index });
-                                  setEditValue(item);
-                                }}
-                                className="btn btn-sm btn-info"
-                              >
-                                Edit
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleRemoveItem("sentences", index)
-                                }
-                                className="btn btn-sm btn-error"
-                              >
-                                Remove
-                              </button>
-                            </div>
-                          </div>
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <SortableContext
+                        items={formData.sentences.map(
+                          (_, index) => `sentences-${index}`,
                         )}
-                      </div>
-                    ))}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        {formData.sentences.map((item, index) => (
+                          <div key={index}>
+                            {addingAt?.field === "sentences" &&
+                              addingAt?.position === "above" &&
+                              addingAt?.index === index && (
+                                <div className="flex gap-2 mt-2 mb-2 p-2 bg-green-100 rounded-lg">
+                                  <input
+                                    type="text"
+                                    placeholder="Add above..."
+                                    value={newItemValue}
+                                    onChange={(e) =>
+                                      setNewItemValue(e.target.value)
+                                    }
+                                    onKeyPress={(e) => {
+                                      if (e.key === "Enter") {
+                                        handleAddItem(
+                                          "sentences",
+                                          addingAt.index,
+                                          "above",
+                                        );
+                                      }
+                                    }}
+                                    className="flex-1 p-2 border border-gray-300 rounded"
+                                    autoFocus
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleAddItem(
+                                        "sentences",
+                                        addingAt.index,
+                                        "above",
+                                      )
+                                    }
+                                    className="btn btn-sm btn-success"
+                                  >
+                                    Add
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setAddingAt(null);
+                                      setNewItemValue("");
+                                    }}
+                                    className="btn btn-sm btn-ghost"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              )}
+                            <DraggableItem
+                              key={`item-${index}`}
+                              id={`sentences-${index}`}
+                              item={item}
+                              index={index}
+                              field="sentences"
+                              editingField={editingField}
+                              editValue={editValue}
+                              onEdit={(field, idx, val) => {
+                                setEditingField({ type: field, index: idx });
+                                setEditValue(val);
+                              }}
+                              onRemove={handleRemoveItem}
+                              onSaveEdit={handleSaveEdit}
+                              onCancelEdit={() => setEditingField(null)}
+                              setEditValue={setEditValue}
+                              onAddAbove={(field, idx) =>
+                                setAddingAt({
+                                  field,
+                                  index: idx,
+                                  position: "above",
+                                })
+                              }
+                              onAddBelow={(field, idx) =>
+                                setAddingAt({
+                                  field,
+                                  index: idx,
+                                  position: "below",
+                                })
+                              }
+                            />
+                            {addingAt?.field === "sentences" &&
+                              addingAt?.position === "below" &&
+                              addingAt?.index === index && (
+                                <div className="flex gap-2 mt-2 mb-2 p-2 bg-green-100 rounded-lg">
+                                  <input
+                                    type="text"
+                                    placeholder="Add below..."
+                                    value={newItemValue}
+                                    onChange={(e) =>
+                                      setNewItemValue(e.target.value)
+                                    }
+                                    onKeyPress={(e) => {
+                                      if (e.key === "Enter") {
+                                        handleAddItem(
+                                          "sentences",
+                                          addingAt.index,
+                                          "below",
+                                        );
+                                      }
+                                    }}
+                                    className="flex-1 p-2 border border-gray-300 rounded"
+                                    autoFocus
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleAddItem(
+                                        "sentences",
+                                        addingAt.index,
+                                        "below",
+                                      )
+                                    }
+                                    className="btn btn-sm btn-success"
+                                  >
+                                    Add
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setAddingAt(null);
+                                      setNewItemValue("");
+                                    }}
+                                    className="btn btn-sm btn-ghost"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              )}
+                          </div>
+                        ))}
+                      </SortableContext>
+                    </DndContext>
                   </div>
-
-                  {/* </div> */}
                 </div>
 
                 <div>
