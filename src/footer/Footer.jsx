@@ -6,13 +6,11 @@ import {
   FaEnvelope,
   FaMapMarkerAlt,
 } from "react-icons/fa";
-import { HiSparkles } from "react-icons/hi";
-import Container from "../utils/Container";
 
 const Footer = () => {
   return (
     <div className="relative footer footer-center bg-gradient-to-br from-gray-900 via-gray-900 to-black">
-      <footer className="relative footer p-6 md:p-8 lg:p-10 b text-white overflow-hidden border-t-2 border-gray-700/50">
+      <footer className="relative footer p-6 md:p-8 lg:p-10 text-white overflow-hidden border-t-2 border-gray-700/50">
         <div className="relative z-10 w-full flex flex-col justify-center items-center md:block lg:block">
           <div className="mb-6 relative group">
             {/* <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 rounded-lg blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200 animate-tilt"></div> */}
@@ -23,7 +21,7 @@ const Footer = () => {
             </p>
           </div>
           <div className="text-center md:text-left ">
-            <p className="text-gray-400 font-semibold text-sm mb-1 text-center md:text-left md:text-left ">
+            <p className="text-gray-400 font-semibold text-sm mb-1 text-center md:text-left lg::text-left ">
               <span className="text-pink-400"></span> Created By
             </p>
             <p className="text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400">
