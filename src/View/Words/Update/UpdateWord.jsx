@@ -784,7 +784,6 @@ const UpdateWord = () => {
                 placeholder="Enter the word"
               />
             </div>
-
             <div className="w-full  flex flex-col md:flex-row lg:flex-row justify-center items-center mt-8  ">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 justify-center items-start  gap-4 w-full md:w-8/12 p-1  md:p-8 lg:p-8 rounded-lg bg-stone-800">
                 {/* Meanings Section */}

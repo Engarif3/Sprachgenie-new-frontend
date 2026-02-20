@@ -52,7 +52,6 @@ const WordList = () => {
   const [topics, setTopics] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [showAllData, setShowAllData] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [learningMode, setLearningMode] = useState(false);
   const [revealedWords, setRevealedWords] = useState([]);
@@ -236,85 +235,168 @@ const WordList = () => {
   }, []);
 
   // Load cache from storage on mount
+  // useEffect(() => {
+  //   const loadData = async () => {
+  //     // Check if we have cached data
+  //     const cachedData = await getFromStorage(CACHE_KEY);
+
+  //     if (cachedData) {
+  //       const isExpired = Date.now() - cachedData.lastUpdated >= CACHE_EXPIRY;
+
+  //       if (!isExpired && !cachedData.isPartial) {
+  //         // Fresh complete cache - use it immediately
+  //         console.log("Using fresh cached data");
+  //         setCache(cachedData);
+  //         setLevels(cachedData.levels);
+  //         setTopics(cachedData.topics);
+  //         setFilteredTopics(cachedData.topics);
+  //         setIsLoading(false);
+  //         return;
+  //       }
+
+  //       if (isExpired && !cachedData.isPartial) {
+  //         // Stale but complete cache - show it immediately, then refresh in background
+  //         console.log("Using stale cache, refreshing in background");
+  //         setCache(cachedData);
+  //         setLevels(cachedData.levels);
+  //         setTopics(cachedData.topics);
+  //         setFilteredTopics(cachedData.topics);
+  //         setIsLoading(false);
+
+  //         // Refresh in background without blocking UI
+  //         setTimeout(() => fetchAllWords(), 100);
+  //         return;
+  //       }
+
+  //       if (cachedData.isPartial) {
+  //         // Partial cache - show it, then complete the fetch
+  //         console.log("Using partial cache, fetching remaining data");
+  //         setCache(cachedData);
+  //         setLevels(cachedData.levels);
+  //         setTopics(cachedData.topics);
+  //         setFilteredTopics(cachedData.topics);
+  //         setIsLoading(false);
+
+  //         // Fetch full data in background
+  //         setTimeout(async () => {
+  //           try {
+  //             const fullResponse = await api.get("/word/all?all=true");
+  //             const fullCache = {
+  //               words: fullResponse.data.data.words || [],
+  //               levels: fullResponse.data.data.levels || [],
+  //               topics: (fullResponse.data.data.topics || []).sort(
+  //                 (a, b) => a.id - b.id,
+  //               ),
+  //               lastUpdated: Date.now(),
+  //               isPartial: false,
+  //             };
+  //             setToStorage(CACHE_KEY, fullCache);
+  //             setCache(fullCache);
+  //             setLevels(fullCache.levels);
+  //             setTopics(fullCache.topics);
+  //             setFilteredTopics(fullCache.topics);
+  //             console.log("Background fetch complete from partial cache");
+  //           } catch (error) {
+  //             console.error("Background fetch failed:", error);
+  //           }
+  //         }, 100);
+  //         return;
+  //       }
+  //     }
+
+  //     // No cache at all - use progressive loading
+  //     console.log(
+  //       "No cache found, fetching fresh data with progressive loading",
+  //     );
+  //     fetchInitialWords();
+  //   };
+
+  //   loadData();
+  // }, [fetchInitialWords, fetchAllWords]);
+  // ====================================================================
   useEffect(() => {
     const loadData = async () => {
-      // Check if we have cached data
-      const cachedData = await getFromStorage(CACHE_KEY);
+      try {
+        // Attempt to get cached data
+        const cachedData = await getFromStorage(CACHE_KEY);
 
-      if (cachedData) {
-        const isExpired = Date.now() - cachedData.lastUpdated >= CACHE_EXPIRY;
+        if (cachedData) {
+          const isExpired = Date.now() - cachedData.lastUpdated >= CACHE_EXPIRY;
 
-        if (!isExpired && !cachedData.isPartial) {
-          // Fresh complete cache - use it immediately
-          console.log("Using fresh cached data");
-          setCache(cachedData);
-          setLevels(cachedData.levels);
-          setTopics(cachedData.topics);
-          setFilteredTopics(cachedData.topics);
-          setIsLoading(false);
-          return;
+          if (!isExpired && !cachedData.isPartial) {
+            // Fresh complete cache - use it immediately
+            console.log("Using fresh cached data");
+            setCache(cachedData);
+            setLevels(cachedData.levels);
+            setTopics(cachedData.topics);
+            setFilteredTopics(cachedData.topics);
+            setIsLoading(false);
+            return;
+          }
+
+          if (isExpired && !cachedData.isPartial) {
+            console.log("Using stale cache, refreshing in background");
+            setCache(cachedData);
+            setLevels(cachedData.levels);
+            setTopics(cachedData.topics);
+            setFilteredTopics(cachedData.topics);
+            setIsLoading(false);
+
+            setTimeout(() => fetchAllWords(), 100);
+            return;
+          }
+
+          if (cachedData.isPartial) {
+            console.log("Using partial cache, fetching remaining data");
+            setCache(cachedData);
+            setLevels(cachedData.levels);
+            setTopics(cachedData.topics);
+            setFilteredTopics(cachedData.topics);
+            setIsLoading(false);
+
+            setTimeout(async () => {
+              try {
+                const fullResponse = await api.get("/word/all?all=true");
+                const fullCache = {
+                  words: fullResponse.data.data.words || [],
+                  levels: fullResponse.data.data.levels || [],
+                  topics: (fullResponse.data.data.topics || []).sort(
+                    (a, b) => a.id - b.id,
+                  ),
+                  lastUpdated: Date.now(),
+                  isPartial: false,
+                };
+                setToStorage(CACHE_KEY, fullCache);
+                setCache(fullCache);
+                setLevels(fullCache.levels);
+                setTopics(fullCache.topics);
+                setFilteredTopics(fullCache.topics);
+                console.log("Background fetch complete from partial cache");
+              } catch (error) {
+                console.error("Background fetch failed:", error);
+              }
+            }, 100);
+            return;
+          }
         }
 
-        if (isExpired && !cachedData.isPartial) {
-          // Stale but complete cache - show it immediately, then refresh in background
-          console.log("Using stale cache, refreshing in background");
-          setCache(cachedData);
-          setLevels(cachedData.levels);
-          setTopics(cachedData.topics);
-          setFilteredTopics(cachedData.topics);
-          setIsLoading(false);
-
-          // Refresh in background without blocking UI
-          setTimeout(() => fetchAllWords(), 100);
-          return;
-        }
-
-        if (cachedData.isPartial) {
-          // Partial cache - show it, then complete the fetch
-          console.log("Using partial cache, fetching remaining data");
-          setCache(cachedData);
-          setLevels(cachedData.levels);
-          setTopics(cachedData.topics);
-          setFilteredTopics(cachedData.topics);
-          setIsLoading(false);
-
-          // Fetch full data in background
-          setTimeout(async () => {
-            try {
-              const fullResponse = await api.get("/word/all?all=true");
-              const fullCache = {
-                words: fullResponse.data.data.words || [],
-                levels: fullResponse.data.data.levels || [],
-                topics: (fullResponse.data.data.topics || []).sort(
-                  (a, b) => a.id - b.id,
-                ),
-                lastUpdated: Date.now(),
-                isPartial: false,
-              };
-              setToStorage(CACHE_KEY, fullCache);
-              setCache(fullCache);
-              setLevels(fullCache.levels);
-              setTopics(fullCache.topics);
-              setFilteredTopics(fullCache.topics);
-              console.log("Background fetch complete from partial cache");
-            } catch (error) {
-              console.error("Background fetch failed:", error);
-            }
-          }, 100);
-          return;
-        }
+        // No cache at all - progressive fetch
+        console.log(
+          "No cache found, fetching fresh data with progressive loading",
+        );
+        fetchInitialWords();
+      } catch (err) {
+        // <-- Catch any errors from getFromStorage
+        console.error("Failed to load cached data:", err);
+        // Proceed to fetch fresh data anyway
+        fetchInitialWords();
       }
-
-      // No cache at all - use progressive loading
-      console.log(
-        "No cache found, fetching fresh data with progressive loading",
-      );
-      fetchInitialWords();
     };
 
     loadData();
   }, [fetchInitialWords, fetchAllWords]);
 
+  // ====================================================================
   // Listen for cache invalidation from other tabs/components (MUST be after fetchAllWords definition)
   useEffect(() => {
     const handleStorageChange = (e) => {
@@ -497,27 +579,17 @@ const WordList = () => {
 
   useEffect(() => {
     const totalWords = allFilteredWords.length;
-    let newTotalPages = 1;
-
-    if (!showAllData) {
-      newTotalPages = Math.ceil(totalWords / WORDS_PER_PAGE);
-      if (newTotalPages === 0) newTotalPages = 1;
-    }
-
+    const newTotalPages = Math.max(1, Math.ceil(totalWords / WORDS_PER_PAGE));
     setTotalPages(newTotalPages);
-    if (currentPage > newTotalPages) {
-      setCurrentPage(newTotalPages);
-    }
-  }, [allFilteredWords.length, showAllData, currentPage]);
+  }, [allFilteredWords.length]);
 
   // The useMemo for paginatedWords can then be simplified to:
   const paginatedWords = useMemo(() => {
-    if (showAllData) return allFilteredWords;
     return allFilteredWords.slice(
       (currentPage - 1) * WORDS_PER_PAGE,
       currentPage * WORDS_PER_PAGE,
     );
-  }, [allFilteredWords, currentPage, showAllData]);
+  }, [allFilteredWords, currentPage]);
 
   // Handlers remain the same, but simplified input handler
   const handleSearchInputChange = useCallback((event) => {
@@ -844,11 +916,6 @@ const WordList = () => {
     return optionsWithSeparators;
   }, [sortedTopicData, selectedLevel]);
 
-  const toggleView = useCallback(() => {
-    setShowAllData((prev) => !prev);
-    setCurrentPage(1); // Reset page on view change
-  }, []); // Dependencies are removed because useMemo handles the re-filtering
-
   // 	==============AI===============
 
   const generateParagraph = async (word) => {
@@ -946,9 +1013,12 @@ const WordList = () => {
     setSelectedLevel("");
     setSelectedTopic("");
     setCurrentPage(1);
-    setShowAllData(false);
     setFilteredTopics(topics); // Reset filtered topics back to the full list
   }, [topics]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchValue, selectedLevel, selectedTopic]);
 
   return (
     <Container>
@@ -1107,8 +1177,6 @@ const WordList = () => {
         currentPage={currentPage}
         totalPages={totalPages}
         setCurrentPage={setCurrentPage}
-        showAllData={showAllData}
-        toggleView={toggleView}
         toggleLearningMode={toggleLearningMode}
         learningMode={learningMode}
         setAction={setShowActionColumn}
@@ -1250,8 +1318,6 @@ const WordList = () => {
         currentPage={currentPage}
         totalPages={totalPages}
         setCurrentPage={setCurrentPage}
-        showAllData={showAllData}
-        toggleView={toggleView}
         toggleLearningMode={toggleLearningMode}
         learningMode={learningMode}
         setAction={setShowActionColumn}
