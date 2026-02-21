@@ -56,6 +56,7 @@ const UsersFavoriteCount = lazy(
 );
 const DashboardLayout = lazy(() => import("../dashboard/DashboardLayout"));
 const DashboardHome = lazy(() => import("../dashboard/DashboardHome"));
+const AdminVisitorsPage = lazy(() => import("../dashboard/AdminVisitorsPage"));
 const FavoritesListDashboard = lazy(
   () => import("../View/Words/Favorite/FavoritesListDashboard"),
 );
@@ -116,6 +117,7 @@ const StoriesWithSuspense = withSuspense(Stories);
 const UsersFavoriteCountWithSuspense = withSuspense(UsersFavoriteCount);
 const DashboardLayoutWithSuspense = withSuspense(DashboardLayout);
 const DashboardHomeWithSuspense = withSuspense(DashboardHome);
+const AdminVisitorsPageWithSuspense = withSuspense(AdminVisitorsPage);
 const FavoritesListDashboardWithSuspense = withSuspense(FavoritesListDashboard);
 const BackendWithSuspense = withSuspense(Backend);
 const GlobalLimitsWithSuspense = withSuspense(GlobalLimits);
@@ -198,6 +200,10 @@ export const router = createBrowserRouter([
         ),
         children: [
           { index: true, element: <DashboardHomeWithSuspense /> },
+          {
+            path: "visitors",
+            element: <AdminVisitorsPageWithSuspense />,
+          },
           {
             path: "favorites-words",
             element: <FavoritesListDashboardWithSuspense />,

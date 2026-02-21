@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 const HEALTH_ENDPOINTS = [
   { name: "API Server", url: "/api/health" },
   { name: "Database", url: "/api/db-health" },
@@ -11,11 +12,6 @@ const AdminSystemStatus = () => {
   const [uptimeUrl, setUptimeUrl] = useState("");
   const [uniqueVisitors, setUniqueVisitors] = useState(0);
   const [visitorsLoading, setVisitorsLoading] = useState(true);
-  const [visitorsByLocation, setVisitorsByLocation] = useState([]);
-  const [locationLoading, setLocationLoading] = useState(true);
-  const [locationPage, setLocationPage] = useState(1);
-  const [locationHasMore, setLocationHasMore] = useState(false);
-  const [locationTotal, setLocationTotal] = useState(0);
   const [analytics, setAnalytics] = useState({
     summary: { daily: 0, weekly: 0, monthly: 0, yearly: 0, total: 0 },
     last30Days: {},
@@ -35,27 +31,6 @@ const AdminSystemStatus = () => {
       console.error("Failed to fetch unique visitors:", error);
     } finally {
       setVisitorsLoading(false);
-    }
-  };
-
-  const fetchVisitorsByLocation = async (page = 1) => {
-    setLocationLoading(true);
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/visitors/by-location?page=${page}&limit=3`,
-      );
-      if (res.ok) {
-        const data = await res.json();
-        // Replace data with new page (don't append)
-        setVisitorsByLocation(data.data?.locations || []);
-        setLocationTotal(data.data?.totalLocations || 0);
-        setLocationHasMore(data.data?.hasMore || false);
-        setLocationPage(page);
-      }
-    } catch (error) {
-      console.error("Failed to fetch visitors by location:", error);
-    } finally {
-      setLocationLoading(false);
     }
   };
 
@@ -98,7 +73,6 @@ const AdminSystemStatus = () => {
     }
 
     fetchUniqueVisitors();
-    fetchVisitorsByLocation(1);
     fetchAnalytics();
   }, []);
 
@@ -384,7 +358,7 @@ const AdminSystemStatus = () => {
                     className="w-full h-12 mt-1 bg-gradient-to-t from-blue-600 to-blue-400 rounded flex items-end justify-center p-1"
                     style={{ height: Math.max(12 + numCount * 2, 12) }}
                   >
-                    <span className="text-xs text-white font-semibold">
+                    <span className="text-md text-white font-semibold mb-4">
                       {count}
                     </span>
                   </div>
@@ -395,7 +369,7 @@ const AdminSystemStatus = () => {
         </div>
       </div>
 
-      {/* Visitors by Location */}
+      {/* Visitors by Location - Link to Dedicated Page */}
       <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -403,100 +377,20 @@ const AdminSystemStatus = () => {
               🌍 Visitors by Location
             </h2>
             <p className="text-xs text-gray-400 mt-1">
-              {locationTotal} total locations
+              Full visitor analytics and detailed location breakdown
             </p>
           </div>
-          <button
-            onClick={() => {
-              setLocationLoading(true);
-              setLocationPage(1);
-              fetchVisitorsByLocation(1);
-            }}
-            disabled={locationLoading}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors text-sm"
-          >
-            {locationLoading ? "Refreshing..." : "🔄 Refresh"}
-          </button>
         </div>
-        {locationLoading ? (
-          <p className="text-gray-400">Loading location data...</p>
-        ) : visitorsByLocation.length === 0 ? (
-          <p className="text-gray-400">No visitor data available yet</p>
-        ) : (
-          <div className="space-y-4">
-            {visitorsByLocation.map((location, idx) => (
-              <div
-                key={idx}
-                className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg"
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">
-                      📍 {location.country || "Unknown"},{" "}
-                      {location.city || "Unknown"}
-                    </h3>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {location.count}{" "}
-                      {location.count === 1 ? "visitor" : "visitors"}
-                    </p>
-                  </div>
-                  {location.latitude && location.longitude && (
-                    <a
-                      href={`https://www.google.com/maps?q=${location.latitude},${location.longitude}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 text-sm"
-                    >
-                      View Map ↗
-                    </a>
-                  )}
-                </div>
-                <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {location.visitors.map((visitor, vIdx) => (
-                    <div
-                      key={vIdx}
-                      className="p-2 bg-gray-900/50 rounded text-xs text-gray-300"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-mono text-gray-400">
-                            {visitor.ipAddress}
-                          </p>
-                          <p className="text-gray-500 mt-1">
-                            {visitor.browser} • {visitor.device}
-                          </p>
-                        </div>
-                        <p className="text-gray-500 text-right">
-                          {new Date(visitor.visitedAt).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-            {/* Pagination Controls */}
-            <div className="flex items-center justify-between mt-4 p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
-              <button
-                onClick={() => fetchVisitorsByLocation(locationPage - 1)}
-                disabled={locationLoading || locationPage === 1}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors"
-              >
-                ← Previous
-              </button>
-              <span className="text-gray-300 font-medium">
-                Page {locationPage} • {locationTotal} total locations
-              </span>
-              <button
-                onClick={() => fetchVisitorsByLocation(locationPage + 1)}
-                disabled={locationLoading || !locationHasMore}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors"
-              >
-                Next →
-              </button>
-            </div>
-          </div>
-        )}
+        <p className="text-gray-400 mb-4">
+          View detailed visitor information grouped by location with pagination,
+          IP addresses, browser and device information.
+        </p>
+        <Link
+          to="/dashboard/visitors"
+          className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+        >
+          Open Visitors Dashboard →
+        </Link>
       </div>
 
       {/* Analytics Section */}
