@@ -39,22 +39,15 @@ const AdminSystemStatus = () => {
   };
 
   const fetchVisitorsByLocation = async (page = 1) => {
+    setLocationLoading(true);
     try {
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_API_URL}/visitors/by-location?page=${page}&limit=3`,
       );
       if (res.ok) {
         const data = await res.json();
-        if (page === 1) {
-          // First page, replace all data
-          setVisitorsByLocation(data.data?.locations || []);
-        } else {
-          // Append to existing data
-          setVisitorsByLocation((prev) => [
-            ...prev,
-            ...(data.data?.locations || []),
-          ]);
-        }
+        // Replace data with new page (don't append)
+        setVisitorsByLocation(data.data?.locations || []);
         setLocationTotal(data.data?.totalLocations || 0);
         setLocationHasMore(data.data?.hasMore || false);
         setLocationPage(page);
@@ -482,18 +475,26 @@ const AdminSystemStatus = () => {
                 </div>
               </div>
             ))}
-            {locationHasMore && (
+            {/* Pagination Controls */}
+            <div className="flex items-center justify-between mt-4 p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
               <button
-                onClick={() => {
-                  setLocationLoading(true);
-                  fetchVisitorsByLocation(locationPage + 1);
-                }}
-                disabled={locationLoading}
-                className="w-full px-4 py-3 bg-gray-800 hover:bg-gray-700 disabled:bg-gray-700 text-white rounded-lg font-medium transition-colors"
+                onClick={() => fetchVisitorsByLocation(locationPage - 1)}
+                disabled={locationLoading || locationPage === 1}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors"
               >
-                {locationLoading ? "Loading..." : "📄 Load More Locations"}
+                ← Previous
               </button>
-            )}
+              <span className="text-gray-300 font-medium">
+                Page {locationPage} • {locationTotal} total locations
+              </span>
+              <button
+                onClick={() => fetchVisitorsByLocation(locationPage + 1)}
+                disabled={locationLoading || !locationHasMore}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+              >
+                Next →
+              </button>
+            </div>
           </div>
         )}
       </div>
