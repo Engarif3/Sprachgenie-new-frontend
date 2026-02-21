@@ -41,7 +41,7 @@ const AdminSystemStatus = () => {
     // Fetch unique visitors count
     const fetchUniqueVisitors = async () => {
       try {
-        const res = await fetch("/api/visitors/unique-count");
+        const res = await fetch("/api/v1/visitors/unique-count");
         if (res.ok) {
           const data = await res.json();
           setUniqueVisitors(data.data?.uniqueCount || 0);
@@ -66,10 +66,10 @@ const AdminSystemStatus = () => {
   const handleRefreshVisitors = async () => {
     setVisitorsLoading(true);
     try {
-      const res = await fetch("/api/visitors/unique-count");
+      const res = await fetch("/api/v1/visitors/unique-count");
       if (res.ok) {
         const data = await res.json();
-        setUniqueVisitors(data.data.uniqueCount || 0);
+        setUniqueVisitors(data.data?.uniqueCount || 0);
       }
     } catch (error) {
       console.error("Failed to refresh visitor count:", error);
