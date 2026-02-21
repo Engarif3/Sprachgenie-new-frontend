@@ -181,7 +181,7 @@ const WordListModal = ({
     >
       <div
         ref={modalRef}
-        className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl max-w-4xl w-full mx-3 shadow-2xl transform transition-all duration-300 border-2 border-gray-700/50 max-h-[90vh] overflow-y-auto"
+        className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl max-w-6xl w-full mx-3 shadow-2xl transform transition-all duration-300 border-2 border-gray-700/50 max-h-[90vh] overflow-y-auto"
       >
         {/* Favorite Toggle Button */}
 
@@ -202,7 +202,7 @@ const WordListModal = ({
           </span>
         </p>
         <hr className="border-0 h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent mx-8 mt-4" />
-        <div className="flex justify-between items-center px-3 md:px-8 lg:px-8 mt-6 ml-1">
+        <div className="flex justify-between items-center px-3 md:px-8 lg:px-8 mt-6 ml-1 ">
           <h3 className="text-lg md:text-2xl lg:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 flex items-center gap-4">
             <span>Word Details</span>
             <button
@@ -224,7 +224,7 @@ const WordListModal = ({
               )}
           </h3>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mx-1 md:mx-2 lg:mx-2 px-1 md:px-6 lg:px-6 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-3 mx-1 md:mx-1 lg:mx-1 px-1 md:px-2 lg:px-2 mt-4 ">
           <div className="space-y-3 bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm p-2 md:p-4 lg:p-4 rounded-2xl border border-gray-700/30">
             <p className="text-sm md:text-lg lg:text-lg">
               <span className="text-blue-400 font-semibold">Word:</span>{" "}
@@ -350,13 +350,13 @@ const WordListModal = ({
           </div>
         </div>
 
-        <div className="sticky bottom-0 right-2 flex justify-end pr-2 pb-2 mt-6">
+        <div className="sticky bottom-0 right-2 flex justify-end pr-2 pb-3 mt-6">
           <button
             onClick={handleCloseModal}
             className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 p-1 rounded-full transition-all duration-200 hover:scale-110 shadow-xl hover:shadow-red-500/50"
             title="Close"
           >
-            <RiCloseCircleFill size={28} className="text-white" />
+            <RiCloseCircleFill size={28} className="text-white " />
           </button>
         </div>
       </div>
