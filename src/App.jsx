@@ -42,13 +42,10 @@ const App = () => {
   useEffect(() => {
     const trackVisitor = async () => {
       try {
-        await fetch(
-          `${import.meta.env.VITE_BACKEND_API_URL}/api/v1/visitors/track`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/visitors/track`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
       } catch (error) {
         console.error("Failed to track visitor:", error);
       }
