@@ -26,6 +26,10 @@ const FavoritesListDashboard = () => {
   const userInfo = getUserInfo();
   const [favorites, setFavorites] = useState([]);
   const [loadingFavorites, setLoadingFavorites] = useState({});
+  const [deleteConfirmation, setDeleteConfirmation] = useState({
+    show: false,
+    inputValue: "",
+  });
 
   // =================ai===========================
   const [aiWord, setAiWord] = useState(null);
@@ -195,6 +199,36 @@ const FavoritesListDashboard = () => {
           showConfirmButton: false,
         });
       }
+    }
+  };
+
+  const handleDeleteAllFavorites = async () => {
+    if (deleteConfirmation.inputValue !== "ok") {
+      Swal.fire("Error", "Please type 'ok' to confirm deletion", "error");
+      return;
+    }
+
+    try {
+      await axios.delete(`/favorite-words/delete-all/${userInfo.id}`);
+      setFavoriteWords([]);
+      setFavorites([]);
+      setDeleteConfirmation({ show: false, inputValue: "" });
+
+      Swal.fire({
+        title: "Deleted!",
+        text: "All favorite words have been removed.",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to delete all favorites.",
+        icon: "error",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     }
   };
 
@@ -379,11 +413,23 @@ const FavoritesListDashboard = () => {
         <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-red-400 to-orange-400 mb-3">
           ❤️ Favorite Words
         </h2>
-        <div className="inline-block px-4 py-1 bg-gradient-to-r from-pink-500/20 to-red-500/20 border border-pink-500/50 rounded-full">
-          <span className="text-sm md:text-2xl lg:text-2xl font-bold text-white">
-            {favoriteWords.length}
-          </span>
-          <span className="text-gray-300 ml-2">words saved</span>
+        <div className="inline-flex gap-4 items-center">
+          <div className="inline-block px-4 py-1 bg-gradient-to-r from-pink-500/20 to-red-500/20 border border-pink-500/50 rounded-full">
+            <span className="text-sm md:text-2xl lg:text-2xl font-bold text-white">
+              {favoriteWords.length}
+            </span>
+            <span className="text-gray-300 ml-2">words saved</span>
+          </div>
+          {favoriteWords.length > 0 && (
+            <button
+              onClick={() =>
+                setDeleteConfirmation({ show: true, inputValue: "" })
+              }
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full font-bold transition-colors"
+            >
+              🗑️ Delete All
+            </button>
+          )}
         </div>
       </div>
 
@@ -603,6 +649,63 @@ const FavoritesListDashboard = () => {
         selectedParagraph={selectedParagraph}
         onClose={() => setIsAIModalOpen(false)}
       />
+
+      {/* Delete All Favorites Confirmation Modal */}
+      {deleteConfirmation.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-900 border border-red-600 rounded-lg p-8 max-w-md w-full mx-4">
+            <h2 className="text-2xl font-bold text-red-400 mb-4">
+              ⚠️ Confirm Deletion
+            </h2>
+            <p className="text-gray-300 mb-6">
+              Are you sure you want to delete ALL favorite words? This action
+              cannot be undone.
+            </p>
+            <div className="mb-6">
+              <label className="block text-gray-400 text-sm mb-2">
+                Type "ok" to confirm:
+              </label>
+              <input
+                type="text"
+                value={deleteConfirmation.inputValue}
+                onChange={(e) =>
+                  setDeleteConfirmation({
+                    ...deleteConfirmation,
+                    inputValue: e.target.value,
+                  })
+                }
+                placeholder="Type 'ok' to confirm"
+                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-red-500"
+                onKeyPress={(e) => {
+                  if (
+                    e.key === "Enter" &&
+                    deleteConfirmation.inputValue === "ok"
+                  ) {
+                    handleDeleteAllFavorites();
+                  }
+                }}
+              />
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() =>
+                  setDeleteConfirmation({ show: false, inputValue: "" })
+                }
+                className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAllFavorites}
+                disabled={deleteConfirmation.inputValue !== "ok"}
+                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-800 text-white rounded-lg font-medium transition-colors"
+              >
+                Delete All
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* =================ai modal ===================== */}
     </Container>
