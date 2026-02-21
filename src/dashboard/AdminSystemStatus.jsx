@@ -13,6 +13,9 @@ const AdminSystemStatus = () => {
   const [visitorsLoading, setVisitorsLoading] = useState(true);
   const [visitorsByLocation, setVisitorsByLocation] = useState([]);
   const [locationLoading, setLocationLoading] = useState(true);
+  const [locationPage, setLocationPage] = useState(1);
+  const [locationHasMore, setLocationHasMore] = useState(false);
+  const [locationTotal, setLocationTotal] = useState(0);
   const [analytics, setAnalytics] = useState({
     summary: { daily: 0, weekly: 0, monthly: 0, yearly: 0, total: 0 },
     last30Days: {},
@@ -59,14 +62,26 @@ const AdminSystemStatus = () => {
     };
 
     // Fetch visitors by location
-    const fetchVisitorsByLocation = async () => {
+    const fetchVisitorsByLocation = async (page = 1) => {
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_API_URL}/visitors/by-location`,
+          `${import.meta.env.VITE_BACKEND_API_URL}/visitors/by-location?page=${page}&limit=20`,
         );
         if (res.ok) {
           const data = await res.json();
-          setVisitorsByLocation(data.data?.locations || []);
+          if (page === 1) {
+            // First page, replace all data
+            setVisitorsByLocation(data.data?.locations || []);
+          } else {
+            // Append to existing data
+            setVisitorsByLocation((prev) => [
+              ...prev,
+              ...(data.data?.locations || []),
+            ]);
+          }
+          setLocationTotal(data.data?.totalLocations || 0);
+          setLocationHasMore(data.data?.hasMore || false);
+          setLocationPage(page);
         }
       } catch (error) {
         console.error("Failed to fetch visitors by location:", error);
@@ -93,7 +108,7 @@ const AdminSystemStatus = () => {
     };
 
     fetchUniqueVisitors();
-    fetchVisitorsByLocation();
+    fetchVisitorsByLocation(1);
     fetchAnalytics();
   }, []);
 
@@ -393,24 +408,19 @@ const AdminSystemStatus = () => {
       {/* Visitors by Location */}
       <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-white">
-            🌍 Visitors by Location
-          </h2>
+          <div>
+            <h2 className="text-2xl font-bold text-white">
+              🌍 Visitors by Location
+            </h2>
+            <p className="text-xs text-gray-400 mt-1">
+              {locationTotal} total locations
+            </p>
+          </div>
           <button
             onClick={() => {
               setLocationLoading(true);
-              fetch(
-                `${import.meta.env.VITE_BACKEND_API_URL}/visitors/by-location`,
-              )
-                .then((res) => res.json())
-                .then((data) => {
-                  setVisitorsByLocation(data.data?.locations || []);
-                  setLocationLoading(false);
-                })
-                .catch((err) => {
-                  console.error("Failed:", err);
-                  setLocationLoading(false);
-                });
+              setLocationPage(1);
+              fetchVisitorsByLocation(1);
             }}
             disabled={locationLoading}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors text-sm"
@@ -475,6 +485,18 @@ const AdminSystemStatus = () => {
                 </div>
               </div>
             ))}
+            {locationHasMore && (
+              <button
+                onClick={() => {
+                  setLocationLoading(true);
+                  fetchVisitorsByLocation(locationPage + 1);
+                }}
+                disabled={locationLoading}
+                className="w-full px-4 py-3 bg-gray-800 hover:bg-gray-700 disabled:bg-gray-700 text-white rounded-lg font-medium transition-colors"
+              >
+                {locationLoading ? "Loading..." : "📄 Load More Locations"}
+              </button>
+            )}
           </div>
         )}
       </div>
