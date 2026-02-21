@@ -1,8 +1,4 @@
 import React, { useEffect, useState } from "react";
-
-// Health check endpoints will be defined in component state
-
-// Example: Health check endpoints (replace with your real endpoints)
 const HEALTH_ENDPOINTS = [
   { name: "API Server", url: "/api/health" },
   { name: "Database", url: "/api/db-health" },
@@ -15,6 +11,13 @@ const AdminSystemStatus = () => {
   const [uptimeUrl, setUptimeUrl] = useState("");
   const [uniqueVisitors, setUniqueVisitors] = useState(0);
   const [visitorsLoading, setVisitorsLoading] = useState(true);
+  const [visitorsByLocation, setVisitorsByLocation] = useState([]);
+  const [locationLoading, setLocationLoading] = useState(true);
+  const [analytics, setAnalytics] = useState({
+    summary: { daily: 0, weekly: 0, monthly: 0, yearly: 0, total: 0 },
+    last30Days: {},
+  });
+  const [analyticsLoading, setAnalyticsLoading] = useState(true);
 
   useEffect(() => {
     const fetchHealth = async () => {
@@ -54,7 +57,44 @@ const AdminSystemStatus = () => {
         setVisitorsLoading(false);
       }
     };
+
+    // Fetch visitors by location
+    const fetchVisitorsByLocation = async () => {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_API_URL}/visitors/by-location`,
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setVisitorsByLocation(data.data?.locations || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch visitors by location:", error);
+      } finally {
+        setLocationLoading(false);
+      }
+    };
+
+    // Fetch visitor analytics (daily, weekly, monthly, yearly)
+    const fetchAnalytics = async () => {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_API_URL}/visitors/analytics`,
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setAnalytics(data.data || {});
+        }
+      } catch (error) {
+        console.error("Failed to fetch analytics:", error);
+      } finally {
+        setAnalyticsLoading(false);
+      }
+    };
+
     fetchUniqueVisitors();
+    fetchVisitorsByLocation();
+    fetchAnalytics();
   }, []);
 
   const handleSaveUptimeUrl = () => {
@@ -252,6 +292,189 @@ const AdminSystemStatus = () => {
                 ℹ️ Updates on page reload or manual refresh
               </p>
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* Visitor Analytics */}
+      <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-4xl mx-auto">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-bold text-white">
+            📊 Visitor Analytics
+          </h2>
+          <button
+            onClick={() => {
+              setAnalyticsLoading(true);
+              fetch(
+                `${import.meta.env.VITE_BACKEND_API_URL}/visitors/analytics`,
+              )
+                .then((res) => res.json())
+                .then((data) => {
+                  setAnalytics(data.data || {});
+                  setAnalyticsLoading(false);
+                })
+                .catch((err) => {
+                  console.error("Failed:", err);
+                  setAnalyticsLoading(false);
+                });
+            }}
+            disabled={analyticsLoading}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors text-sm"
+          >
+            {analyticsLoading ? "Refreshing..." : "🔄 Refresh"}
+          </button>
+        </div>
+        {analyticsLoading ? (
+          <p className="text-gray-400">Loading analytics...</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="p-4 bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-blue-500/30 rounded-lg">
+              <p className="text-gray-400 text-xs font-medium mb-2">Today</p>
+              <p className="text-3xl font-bold text-blue-400">
+                {analytics.summary?.daily || 0}
+              </p>
+            </div>
+            <div className="p-4 bg-gradient-to-br from-green-500/20 to-green-600/10 border border-green-500/30 rounded-lg">
+              <p className="text-gray-400 text-xs font-medium mb-2">
+                This Week
+              </p>
+              <p className="text-3xl font-bold text-green-400">
+                {analytics.summary?.weekly || 0}
+              </p>
+            </div>
+            <div className="p-4 bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 border border-yellow-500/30 rounded-lg">
+              <p className="text-gray-400 text-xs font-medium mb-2">
+                This Month
+              </p>
+              <p className="text-3xl font-bold text-yellow-400">
+                {analytics.summary?.monthly || 0}
+              </p>
+            </div>
+            <div className="p-4 bg-gradient-to-br from-purple-500/20 to-purple-600/10 border border-purple-500/30 rounded-lg">
+              <p className="text-gray-400 text-xs font-medium mb-2">
+                This Year
+              </p>
+              <p className="text-3xl font-bold text-purple-400">
+                {analytics.summary?.yearly || 0}
+              </p>
+            </div>
+          </div>
+        )}
+        <div className="mt-4 p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+          <p className="text-gray-300 text-sm font-medium mb-3">
+            Last 30 Days Breakdown
+          </p>
+          <div className="grid grid-cols-7 gap-2">
+            {Object.entries(analytics.last30Days || {}).map(([date, count]) => {
+              const numCount = Number(count) || 0;
+              return (
+                <div key={date} className="flex flex-col items-center">
+                  <p className="text-xs text-gray-500">
+                    {new Date(date).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </p>
+                  <div
+                    className="w-full h-12 mt-1 bg-gradient-to-t from-blue-600 to-blue-400 rounded flex items-end justify-center p-1"
+                    style={{ height: Math.max(12 + numCount * 2, 12) }}
+                  >
+                    <span className="text-xs text-white font-semibold">
+                      {count}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Visitors by Location */}
+      <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-4xl mx-auto">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-bold text-white">
+            🌍 Visitors by Location
+          </h2>
+          <button
+            onClick={() => {
+              setLocationLoading(true);
+              fetch(
+                `${import.meta.env.VITE_BACKEND_API_URL}/visitors/by-location`,
+              )
+                .then((res) => res.json())
+                .then((data) => {
+                  setVisitorsByLocation(data.data?.locations || []);
+                  setLocationLoading(false);
+                })
+                .catch((err) => {
+                  console.error("Failed:", err);
+                  setLocationLoading(false);
+                });
+            }}
+            disabled={locationLoading}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors text-sm"
+          >
+            {locationLoading ? "Refreshing..." : "🔄 Refresh"}
+          </button>
+        </div>
+        {locationLoading ? (
+          <p className="text-gray-400">Loading location data...</p>
+        ) : visitorsByLocation.length === 0 ? (
+          <p className="text-gray-400">No visitor data available yet</p>
+        ) : (
+          <div className="space-y-4">
+            {visitorsByLocation.map((location, idx) => (
+              <div
+                key={idx}
+                className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg"
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">
+                      📍 {location.country || "Unknown"},{" "}
+                      {location.city || "Unknown"}
+                    </h3>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {location.count}{" "}
+                      {location.count === 1 ? "visitor" : "visitors"}
+                    </p>
+                  </div>
+                  {location.latitude && location.longitude && (
+                    <a
+                      href={`https://www.google.com/maps?q=${location.latitude},${location.longitude}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 hover:text-blue-300 text-sm"
+                    >
+                      View Map ↗
+                    </a>
+                  )}
+                </div>
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {location.visitors.map((visitor, vIdx) => (
+                    <div
+                      key={vIdx}
+                      className="p-2 bg-gray-900/50 rounded text-xs text-gray-300"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-mono text-gray-400">
+                            {visitor.ipAddress}
+                          </p>
+                          <p className="text-gray-500 mt-1">
+                            {visitor.browser} • {visitor.device}
+                          </p>
+                        </div>
+                        <p className="text-gray-500 text-right">
+                          {new Date(visitor.visitedAt).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
