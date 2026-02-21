@@ -65,7 +65,7 @@ const AdminSystemStatus = () => {
     const fetchVisitorsByLocation = async (page = 1) => {
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_API_URL}/visitors/by-location?page=${page}&limit=20`,
+          `${import.meta.env.VITE_BACKEND_API_URL}/visitors/by-location?page=${page}&limit=3`,
         );
         if (res.ok) {
           const data = await res.json();
