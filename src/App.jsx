@@ -38,6 +38,21 @@ const App = () => {
     }
   }, []);
 
+  // Track visitor on app load
+  useEffect(() => {
+    const trackVisitor = async () => {
+      try {
+        await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/visitors/track`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+      } catch (error) {
+        console.error("Failed to track visitor:", error);
+      }
+    };
+    trackVisitor();
+  }, []);
+
   // Fetch user info on app load if cookie exists
   useEffect(() => {
     const initializeAuth = async () => {
