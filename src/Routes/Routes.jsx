@@ -128,6 +128,11 @@ const TranslatorWithSuspense = withSuspense(Translator);
 
 //Quiz
 const QuizWithSuspense = withSuspense(Quiz);
+
+// System Status
+const SystemStatusPage = lazy(() => import("../dashboard/SystemStatusPage"));
+const SystemStatusPageWithSuspense = withSuspense(SystemStatusPage);
+
 // Router
 export const router = createBrowserRouter([
   {
@@ -227,6 +232,7 @@ export const router = createBrowserRouter([
           { path: "user-limits", element: <UserLimitsWithSuspense /> },
           { path: "get-usage", element: <UsageWithSuspense /> },
           { path: "get-reports", element: <ReportsByUsersWithSuspense /> },
+          { path: "system-status", element: <SystemStatusPageWithSuspense /> },
         ],
       },
     ],

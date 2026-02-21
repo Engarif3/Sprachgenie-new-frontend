@@ -280,6 +280,19 @@ const DashboardLayout = () => {
                     </NavLink>
                   </div>
                 )}
+
+                {/* System Status Section */}
+                <div className="my-4 px-2">
+                  <div className="h-px bg-gradient-to-r from-gray-700/0 via-gray-700/50 to-gray-700/0" />
+                </div>
+                <NavLink
+                  to="/dashboard/system-status"
+                  className={({ isActive }) => navItemClass(isActive)}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <span>🖥️</span>
+                  <span>System Status</span>
+                </NavLink>
               </>
             )}
           </nav>
