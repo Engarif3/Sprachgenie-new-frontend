@@ -22,6 +22,66 @@ const AdminSystemStatus = () => {
   });
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
 
+  const fetchUniqueVisitors = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/visitors/unique-count`,
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setUniqueVisitors(data.data?.uniqueCount || 0);
+      }
+    } catch (error) {
+      console.error("Failed to fetch unique visitors:", error);
+    } finally {
+      setVisitorsLoading(false);
+    }
+  };
+
+  const fetchVisitorsByLocation = async (page = 1) => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/visitors/by-location?page=${page}&limit=3`,
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (page === 1) {
+          // First page, replace all data
+          setVisitorsByLocation(data.data?.locations || []);
+        } else {
+          // Append to existing data
+          setVisitorsByLocation((prev) => [
+            ...prev,
+            ...(data.data?.locations || []),
+          ]);
+        }
+        setLocationTotal(data.data?.totalLocations || 0);
+        setLocationHasMore(data.data?.hasMore || false);
+        setLocationPage(page);
+      }
+    } catch (error) {
+      console.error("Failed to fetch visitors by location:", error);
+    } finally {
+      setLocationLoading(false);
+    }
+  };
+
+  const fetchAnalytics = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/visitors/analytics`,
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setAnalytics(data.data || {});
+      }
+    } catch (error) {
+      console.error("Failed to fetch analytics:", error);
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
+
   useEffect(() => {
     const fetchHealth = async () => {
       const results = {};
@@ -43,69 +103,6 @@ const AdminSystemStatus = () => {
     if (savedUrl) {
       setUptimeUrl(savedUrl);
     }
-
-    // Fetch unique visitors count
-    const fetchUniqueVisitors = async () => {
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_API_URL}/visitors/unique-count`,
-        );
-        if (res.ok) {
-          const data = await res.json();
-          setUniqueVisitors(data.data?.uniqueCount || 0);
-        }
-      } catch (error) {
-        console.error("Failed to fetch unique visitors:", error);
-      } finally {
-        setVisitorsLoading(false);
-      }
-    };
-
-    // Fetch visitors by location
-    const fetchVisitorsByLocation = async (page = 1) => {
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_API_URL}/visitors/by-location?page=${page}&limit=3`,
-        );
-        if (res.ok) {
-          const data = await res.json();
-          if (page === 1) {
-            // First page, replace all data
-            setVisitorsByLocation(data.data?.locations || []);
-          } else {
-            // Append to existing data
-            setVisitorsByLocation((prev) => [
-              ...prev,
-              ...(data.data?.locations || []),
-            ]);
-          }
-          setLocationTotal(data.data?.totalLocations || 0);
-          setLocationHasMore(data.data?.hasMore || false);
-          setLocationPage(page);
-        }
-      } catch (error) {
-        console.error("Failed to fetch visitors by location:", error);
-      } finally {
-        setLocationLoading(false);
-      }
-    };
-
-    // Fetch visitor analytics (daily, weekly, monthly, yearly)
-    const fetchAnalytics = async () => {
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_API_URL}/visitors/analytics`,
-        );
-        if (res.ok) {
-          const data = await res.json();
-          setAnalytics(data.data || {});
-        }
-      } catch (error) {
-        console.error("Failed to fetch analytics:", error);
-      } finally {
-        setAnalyticsLoading(false);
-      }
-    };
 
     fetchUniqueVisitors();
     fetchVisitorsByLocation(1);
