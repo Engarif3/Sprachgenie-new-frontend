@@ -25,6 +25,16 @@ const AdminSystemStatus = () => {
   });
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
 
+  // New monitoring states
+  const [healthMetrics, setHealthMetrics] = useState({});
+  const [databaseStats, setDatabaseStats] = useState(null);
+  const [systemStats, setSystemStats] = useState(null);
+  const [rateLimitStatus, setRateLimitStatus] = useState(null);
+  const [errorLogs, setErrorLogs] = useState([]);
+  const [activityLogs, setActivityLogs] = useState([]);
+  const [alertHistory, setAlertHistory] = useState([]);
+  const [metricsLoading, setMetricsLoading] = useState(true);
+
   const fetchUniqueVisitors = async () => {
     try {
       const res = await fetch(
@@ -57,6 +67,107 @@ const AdminSystemStatus = () => {
     }
   };
 
+  // New monitoring fetch functions
+  const fetchHealthMetrics = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/health-metrics`,
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setHealthMetrics(data.data || {});
+      }
+    } catch (error) {
+      console.error("Failed to fetch health metrics:", error);
+    }
+  };
+
+  const fetchDatabaseStats = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/database-stats`,
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setDatabaseStats(data.data || {});
+      }
+    } catch (error) {
+      console.error("Failed to fetch database stats:", error);
+    }
+  };
+
+  const fetchSystemStats = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/system-stats`,
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setSystemStats(data.data || {});
+      }
+    } catch (error) {
+      console.error("Failed to fetch system stats:", error);
+    }
+  };
+
+  const fetchRateLimitStatus = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/rate-limit-status`,
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setRateLimitStatus(data.data || {});
+      }
+    } catch (error) {
+      console.error("Failed to fetch rate limit status:", error);
+    }
+  };
+
+  const fetchErrorLogs = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/error-logs`,
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setErrorLogs(data.data?.recent || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch error logs:", error);
+    }
+  };
+
+  const fetchActivityLogs = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/activity-logs?limit=20`,
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setActivityLogs(data.data?.recent || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch activity logs:", error);
+    }
+  };
+
+  const fetchAlertHistory = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/alert-history?limit=20`,
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setAlertHistory(data.data?.recent || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch alert history:", error);
+    } finally {
+      setMetricsLoading(false);
+    }
+  };
+
   useEffect(() => {
     const fetchHealth = async () => {
       const results = {};
@@ -72,10 +183,25 @@ const AdminSystemStatus = () => {
       setHealthTimestamp(new Date());
       setLoading(false);
     };
+
+    const fetchAllMonitoringData = async () => {
+      fetchHealthMetrics();
+      fetchDatabaseStats();
+      fetchSystemStats();
+      fetchRateLimitStatus();
+      fetchErrorLogs();
+      fetchActivityLogs();
+      fetchAlertHistory();
+    };
+
     fetchHealth();
+    fetchAllMonitoringData();
 
     // Refresh health checks every 30 seconds
     const healthInterval = setInterval(fetchHealth, 30000);
+
+    // Refresh monitoring data every 60 seconds
+    const monitoringInterval = setInterval(fetchAllMonitoringData, 60000);
 
     // Load saved UptimeRobot URL from localStorage
     const savedUrl = localStorage.getItem("uptimeRobotStatusUrl");
@@ -86,8 +212,11 @@ const AdminSystemStatus = () => {
     fetchUniqueVisitors();
     fetchAnalytics();
 
-    // Cleanup interval on unmount
-    return () => clearInterval(healthInterval);
+    // Cleanup intervals on unmount
+    return () => {
+      clearInterval(healthInterval);
+      clearInterval(monitoringInterval);
+    };
   }, []);
 
   const handleSaveUptimeUrl = () => {
@@ -472,6 +601,290 @@ const AdminSystemStatus = () => {
             </a>
           </div>
         </div>
+      </div>
+
+      {/* Response Time Metrics */}
+      <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-4xl mx-auto mt-6">
+        <h2 className="text-2xl font-bold text-white mb-4">
+          ⏱️ Response Time Metrics
+        </h2>
+        {metricsLoading ? (
+          <p className="text-gray-400">Loading metrics...</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+              <p className="text-gray-300 text-sm font-medium mb-2">
+                API Server
+              </p>
+              <p className="text-2xl font-bold text-blue-400">
+                {healthMetrics.apiServer?.responseTime || "N/A"}
+              </p>
+            </div>
+            <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
+              <p className="text-gray-300 text-sm font-medium mb-2">Database</p>
+              <p className="text-2xl font-bold text-green-400">
+                {healthMetrics.database?.responseTime || "N/A"}
+              </p>
+            </div>
+            <div className="p-4 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+              <p className="text-gray-300 text-sm font-medium mb-2">
+                Auth Service
+              </p>
+              <p className="text-2xl font-bold text-purple-400">
+                {healthMetrics.authService?.responseTime || "N/A"}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Database Statistics */}
+      <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-4xl mx-auto mt-6">
+        <h2 className="text-2xl font-bold text-white mb-4">
+          🗄️ Database Statistics
+        </h2>
+        {databaseStats ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+                <p className="text-gray-400 text-sm mb-2">Record Counts</p>
+                <div className="space-y-2">
+                  <p className="text-gray-300">
+                    <span className="text-blue-400 font-bold">
+                      {databaseStats.recordCounts?.users || 0}
+                    </span>{" "}
+                    Users
+                  </p>
+                  <p className="text-gray-300">
+                    <span className="text-green-400 font-bold">
+                      {databaseStats.recordCounts?.words || 0}
+                    </span>{" "}
+                    Words
+                  </p>
+                </div>
+              </div>
+              <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+                <p className="text-gray-400 text-sm mb-2">Performance</p>
+                <p className="text-gray-300">
+                  Query Time:{" "}
+                  <span className="text-yellow-400 font-bold">
+                    {databaseStats.performance?.queryTime}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <p className="text-gray-400">Loading database stats...</p>
+        )}
+      </div>
+
+      {/* System Resource Usage */}
+      <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-4xl mx-auto mt-6">
+        <h2 className="text-2xl font-bold text-white mb-4">
+          💻 System Resource Usage
+        </h2>
+        {systemStats ? (
+          <div className="space-y-4">
+            <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+              <p className="text-gray-400 text-sm font-medium mb-3">
+                Memory Usage
+              </p>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-300">
+                    Usage: {systemStats.memory?.usagePercent}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-700 rounded-full h-2">
+                  <div
+                    className={`h-2 rounded-full ${
+                      parseFloat(systemStats.memory?.usagePercent) > 80
+                        ? "bg-red-500"
+                        : parseFloat(systemStats.memory?.usagePercent) > 60
+                          ? "bg-yellow-500"
+                          : "bg-green-500"
+                    }`}
+                    style={{
+                      width: `${parseFloat(systemStats.memory?.usagePercent)}%`,
+                    }}
+                  />
+                </div>
+                <p className="text-gray-400 text-xs">
+                  {systemStats.memory?.used} / {systemStats.memory?.total}
+                </p>
+              </div>
+            </div>
+            <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+              <p className="text-gray-400 text-sm font-medium mb-3">
+                CPU Information
+              </p>
+              <div className="space-y-2">
+                <p className="text-gray-300">
+                  <span className="text-blue-400 font-bold">
+                    {systemStats.cpu?.cores}
+                  </span>{" "}
+                  Cores - {systemStats.cpu?.model}
+                </p>
+                <p className="text-gray-300">
+                  Load Average (1/5/15 min):{" "}
+                  <span className="font-mono text-green-400">
+                    {systemStats.cpu?.loadAverage?.["1min"]} /{" "}
+                    {systemStats.cpu?.loadAverage?.["5min"]} /{" "}
+                    {systemStats.cpu?.loadAverage?.["15min"]}
+                  </span>
+                </p>
+              </div>
+            </div>
+            <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+              <p className="text-gray-300">
+                Server Uptime:{" "}
+                <span className="text-purple-400 font-bold">
+                  {systemStats.uptime}
+                </span>
+              </p>
+            </div>
+          </div>
+        ) : (
+          <p className="text-gray-400">Loading system stats...</p>
+        )}
+      </div>
+
+      {/* Rate Limiting Status */}
+      <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-4xl mx-auto mt-6">
+        <h2 className="text-2xl font-bold text-white mb-4">
+          🔄 Rate Limiting Status
+        </h2>
+        {rateLimitStatus ? (
+          <div className="space-y-3">
+            <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
+              <p className="text-green-300 font-medium">
+                ✅ Rate Limiting Enabled
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="p-3 bg-gray-800/50 border border-gray-700 rounded-lg">
+                <p className="text-gray-400 text-xs mb-1">Global Limit</p>
+                <p className="text-gray-300 text-sm">
+                  {rateLimitStatus.limits?.globalLimit}
+                </p>
+              </div>
+              <div className="p-3 bg-gray-800/50 border border-gray-700 rounded-lg">
+                <p className="text-gray-400 text-xs mb-1">Per User Limit</p>
+                <p className="text-gray-300 text-sm">
+                  {rateLimitStatus.limits?.perUserLimit}
+                </p>
+              </div>
+              <div className="p-3 bg-gray-800/50 border border-gray-700 rounded-lg">
+                <p className="text-gray-400 text-xs mb-1">Per IP Limit</p>
+                <p className="text-gray-300 text-sm">
+                  {rateLimitStatus.limits?.perIPLimit}
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <p className="text-gray-400">Loading rate limit status...</p>
+        )}
+      </div>
+
+      {/* Alert History */}
+      <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-4xl mx-auto mt-6">
+        <h2 className="text-2xl font-bold text-white mb-4">🚨 Alert History</h2>
+        {alertHistory.length > 0 ? (
+          <div className="space-y-2 max-h-64 overflow-y-auto">
+            {alertHistory.map((alert, idx) => (
+              <div
+                key={idx}
+                className={`p-3 rounded-lg border ${
+                  alert.severity === "high"
+                    ? "bg-red-500/10 border-red-500/30"
+                    : alert.severity === "medium"
+                      ? "bg-yellow-500/10 border-yellow-500/30"
+                      : "bg-blue-500/10 border-blue-500/30"
+                }`}
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-gray-300 font-medium text-sm">
+                      {alert.type}
+                    </p>
+                    <p className="text-gray-400 text-xs">{alert.message}</p>
+                  </div>
+                  <span className="text-xs text-gray-500">
+                    {new Date(alert.timestamp).toLocaleTimeString()}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-400">No alerts recorded</p>
+        )}
+      </div>
+
+      {/* Error Logs */}
+      <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-4xl mx-auto mt-6">
+        <h2 className="text-2xl font-bold text-white mb-4">
+          ❌ Recent Error Logs
+        </h2>
+        {errorLogs.length > 0 ? (
+          <div className="space-y-2 max-h-64 overflow-y-auto">
+            {errorLogs.map((log, idx) => (
+              <div
+                key={idx}
+                className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-red-300 font-medium text-sm">
+                      {log.service}
+                    </p>
+                    <p className="text-gray-400 text-xs font-mono">
+                      {log.error}
+                    </p>
+                  </div>
+                  <span className="text-xs text-gray-500">
+                    {new Date(log.timestamp).toLocaleTimeString()}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-400">No errors recorded</p>
+        )}
+      </div>
+
+      {/* Activity Logs */}
+      <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-4xl mx-auto mt-6">
+        <h2 className="text-2xl font-bold text-white mb-4">
+          📝 Recent Activity
+        </h2>
+        {activityLogs.length > 0 ? (
+          <div className="space-y-2 max-h-64 overflow-y-auto">
+            {activityLogs.map((log, idx) => (
+              <div
+                key={idx}
+                className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg text-sm"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-blue-300 font-medium">{log.action}</p>
+                    <p className="text-gray-400 text-xs">
+                      {JSON.stringify(log.details).substring(0, 100)}...
+                    </p>
+                  </div>
+                  <span className="text-xs text-gray-500 whitespace-nowrap">
+                    {new Date(log.timestamp).toLocaleTimeString()}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-400">No activity recorded</p>
+        )}
       </div>
 
       {/* SSL Certificate Status */}
