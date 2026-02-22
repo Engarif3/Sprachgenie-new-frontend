@@ -1,4 +1,4 @@
-import { useRef, useCallback, useMemo, memo, useEffect } from "react";
+import { useRef, useCallback, useMemo, memo, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 import { pronounceWord } from "../../../utils/wordPronounciation";
@@ -7,68 +7,78 @@ import { RiCloseCircleFill } from "react-icons/ri";
 import { useLockBodyScroll } from "./ModalScrolling";
 import { IoMdArrowDropright } from "react-icons/io";
 import { HiSpeakerWave } from "react-icons/hi2";
-import Translator from "../../../Translate/Translator";
 
 // Memoized sentence renderer component
-const SentenceRenderer = memo(({ sentence, index }) => {
-  const trimmed = sentence.trim();
-  let className = "text-slate-300 text-sm md:text-lg lg:text-lg  ";
-  // "text-slate-300 text-sm md:text-lg lg:text-lg italic mt-1 md:mt-0 lg:mt-0 ";
-  let cleanSentence = sentence;
+const SentenceRenderer = memo(
+  ({ sentence, index, onTranslate, translation, isLoading }) => {
+    const trimmed = sentence.trim();
+    let className = "text-slate-300 text-sm md:text-lg lg:text-lg  ";
+    let cleanSentence = sentence;
 
-  // Determine styling and clean sentence
-  if (trimmed.startsWith("##")) {
-    className =
-      "font-semibold text-md md:text-lg lg:text-lg text-sky-600 list-none w-full text-center underline capitalize ";
-    cleanSentence = sentence.replace(/^##\s*/, "");
-  } else if (trimmed.startsWith("**")) {
-    className =
-      "text-gray-400 list-none text-sm md:text-lg lg:text-lg first-letter:uppercase pl-1 font-normal";
-    cleanSentence = sentence
-      // .replace(/^\*\*\s*/, "⭕ ")
-      .replace(/^\*\*\s*/, "🟣 ")
-      .replace(/\*\*$/, "")
-      .trim();
-  }
-
-  const showSpeakerButton =
-    !trimmed.startsWith("##") && !trimmed.startsWith("**");
-
-  // Always call useCallback - hooks must be called unconditionally
-  const handlePronounce = useCallback(() => {
-    if (showSpeakerButton) {
-      pronounceWord(cleanSentence);
+    // Determine styling and clean sentence
+    if (trimmed.startsWith("##")) {
+      className =
+        "font-semibold text-md md:text-lg lg:text-lg text-sky-600 list-none w-full text-center underline capitalize ";
+      cleanSentence = sentence.replace(/^##\s*/, "");
+    } else if (trimmed.startsWith("**")) {
+      className =
+        "text-gray-400 list-none text-sm md:text-lg lg:text-lg first-letter:uppercase pl-1 font-normal";
+      cleanSentence = sentence
+        .replace(/^\*\*\s*/, "🟣 ")
+        .replace(/\*\*$/, "")
+        .trim();
     }
-  }, [cleanSentence, showSpeakerButton]);
 
-  return (
-    <div className="text-gray-600 flex items-start">
-      {showSpeakerButton && (
-        <span className="flex items-start">
-          <button
-            onClick={handlePronounce}
-            className="text-blue-600 hover:text-blue-800 mr-1 md:mr-0 lg:mr-0"
-            title="Pronounce"
-          >
-            {/* 🔊 */}
-            {/* <FcSpeaker size={20} className="mt-0 md:mt-1 lg:mt-1 " /> */}
-            <HiSpeakerWave
-              size={20}
-              // color="green"
-              className="mt-0 md:mt-1 lg:mt-1 text-cyan-500 block md:hidden lg:hidden"
-            />
-            <span className="text-xl hidden md:block lg:block">🔊</span>
-          </button>
-          {/* <span className="hidden md:inline lg:inline"> */}
-          <span className="hidden md:inline lg:inline">
-            <IoMdArrowDropright className="text-pink-600 mt-1" size={20} />
-          </span>
-        </span>
-      )}
-      <span className={className}>{cleanSentence}</span>
-    </div>
-  );
-});
+    const showSpeakerButton =
+      !trimmed.startsWith("##") && !trimmed.startsWith("**");
+
+    const handlePronounce = useCallback(() => {
+      if (showSpeakerButton) {
+        pronounceWord(cleanSentence);
+      }
+    }, [cleanSentence, showSpeakerButton]);
+
+    return (
+      <div>
+        <div className="text-gray-600 flex items-start gap-2">
+          {showSpeakerButton && (
+            <span className="flex items-start flex-shrink-0">
+              <button
+                onClick={handlePronounce}
+                className="text-blue-600 hover:text-blue-800 mr-1 md:mr-0 lg:mr-0"
+                title="Pronounce"
+              >
+                <HiSpeakerWave
+                  size={20}
+                  className="mt-0 md:mt-1 lg:mt-1 text-cyan-500 block md:hidden lg:hidden"
+                />
+                <span className="text-xl hidden md:block lg:block">🔊</span>
+              </button>
+              <span className="hidden md:inline lg:inline">
+                <IoMdArrowDropright className="text-pink-600 mt-1" size={20} />
+              </span>
+            </span>
+          )}
+          <span className={className}>{cleanSentence}</span>
+          {showSpeakerButton && (
+            <button
+              onClick={() => onTranslate(cleanSentence)}
+              className="text-green-600 hover:text-green-800 text-xs md:text-sm font-medium flex-shrink-0"
+              disabled={isLoading}
+            >
+              {isLoading ? "..." : "Tr"}
+            </button>
+          )}
+        </div>
+        {translation && (
+          <p className="text-gray-500 ml-6 mt-1 italic text-xs md:text-sm">
+            {translation}
+          </p>
+        )}
+      </div>
+    );
+  },
+);
 
 SentenceRenderer.displayName = "SentenceRenderer";
 
@@ -85,8 +95,61 @@ const WordListModal = ({
   const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo();
 
+  // Translation state
+  const [translations, setTranslations] = useState({});
+  const [loadingTranslations, setLoadingTranslations] = useState({});
+
   // Call hooks BEFORE any conditional returns
   useLockBodyScroll(!!selectedWord);
+
+  // Translate sentence handler
+  const translateSentence = useCallback(
+    async (sentence) => {
+      if (translations[sentence]) return; // avoid re-translation
+
+      setLoadingTranslations((prev) => ({ ...prev, [sentence]: true }));
+
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_API_URL}/translate`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              text: sentence,
+              source: "de",
+              target: "en",
+            }),
+          },
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          console.error("Translation API error:", data);
+          throw new Error(data.error || "Translation failed");
+        }
+
+        if (!data.data?.translated) {
+          throw new Error("No translation received");
+        }
+
+        setTranslations((prev) => ({
+          ...prev,
+          [sentence]: data.data.translated,
+        }));
+      } catch (err) {
+        console.error("Translation failed:", err);
+        setTranslations((prev) => ({
+          ...prev,
+          [sentence]: `❌ ${err.message}`,
+        }));
+      } finally {
+        setLoadingTranslations((prev) => ({ ...prev, [sentence]: false }));
+      }
+    },
+    [translations],
+  );
 
   // Add escape key handler for better UX
   useEffect(() => {
@@ -339,6 +402,9 @@ const WordListModal = ({
                     key={`${selectedWord.id}-${index}`}
                     sentence={sentence}
                     index={index}
+                    onTranslate={translateSentence}
+                    translation={translations[sentence]}
+                    isLoading={loadingTranslations[sentence]}
                   />
                 ))}
               </ul>
@@ -349,18 +415,6 @@ const WordListModal = ({
             )}
           </div>
         </div>
-
-        {/* Translation Section */}
-        {(selectedWord.sentences?.length || 0) > 0 && (
-          <div className="mt-6 px-3 md:px-8 lg:px-8 pb-6">
-            <h3 className="text-lg md:text-xl lg:text-xl font-bold text-blue-400 mb-4 flex items-center gap-2">
-              <span>🌐 Translations</span>
-            </h3>
-            <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm p-4 rounded-2xl border border-gray-700/30">
-              <Translator sentences={selectedWord.sentences || []} />
-            </div>
-          </div>
-        )}
 
         <div className="sticky bottom-0 right-2 flex justify-end pr-2 pb-3 mt-6">
           <button
