@@ -754,15 +754,18 @@ const AdminSystemStatus = () => {
                         <div className="w-full bg-gray-700 rounded-full h-2">
                           <div
                             className={`h-2 rounded-full ${
-                              parseFloat(systemStats.memory?.usagePercent) > 80
+                              (parseFloat(systemStats.memory?.used) / 512) *
+                                100 >
+                              80
                                 ? "bg-red-500"
-                                : parseFloat(systemStats.memory?.usagePercent) >
+                                : (parseFloat(systemStats.memory?.used) / 512) *
+                                      100 >
                                     60
                                   ? "bg-yellow-500"
                                   : "bg-green-500"
                             }`}
                             style={{
-                              width: `${parseFloat(systemStats.memory?.usagePercent)}%`,
+                              width: `${(parseFloat(systemStats.memory?.used) / 512) * 100}%`,
                             }}
                           />
                         </div>
