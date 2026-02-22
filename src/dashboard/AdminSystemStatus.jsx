@@ -698,37 +698,35 @@ const AdminSystemStatus = () => {
         </h2>
         {systemStats ? (
           <div className="space-y-4">
-            {!systemStats.vercel && (
-              <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
-                <p className="text-gray-400 text-sm font-medium mb-3">
-                  Memory Usage
-                </p>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-gray-300">
-                      Usage: {systemStats.memory?.usagePercent}
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-700 rounded-full h-2">
-                    <div
-                      className={`h-2 rounded-full ${
-                        parseFloat(systemStats.memory?.usagePercent) > 80
-                          ? "bg-red-500"
-                          : parseFloat(systemStats.memory?.usagePercent) > 60
-                            ? "bg-yellow-500"
-                            : "bg-green-500"
-                      }`}
-                      style={{
-                        width: `${parseFloat(systemStats.memory?.usagePercent)}%`,
-                      }}
-                    />
-                  </div>
-                  <p className="text-gray-400 text-xs">
-                    {systemStats.memory?.used} / {systemStats.memory?.total}
-                  </p>
+            <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+              <p className="text-gray-400 text-sm font-medium mb-3">
+                Server Memory Usage (System-Level)
+              </p>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-300">
+                    Usage: {systemStats.memory?.usagePercent}
+                  </span>
                 </div>
+                <div className="w-full bg-gray-700 rounded-full h-2">
+                  <div
+                    className={`h-2 rounded-full ${
+                      parseFloat(systemStats.memory?.usagePercent) > 80
+                        ? "bg-red-500"
+                        : parseFloat(systemStats.memory?.usagePercent) > 60
+                          ? "bg-yellow-500"
+                          : "bg-green-500"
+                    }`}
+                    style={{
+                      width: `${parseFloat(systemStats.memory?.usagePercent)}%`,
+                    }}
+                  />
+                </div>
+                <p className="text-gray-400 text-xs">
+                  {systemStats.memory?.used} / {systemStats.memory?.total}
+                </p>
               </div>
-            )}
+            </div>
             <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
               <p className="text-gray-400 text-sm font-medium mb-3">
                 {systemStats.vercel
@@ -748,7 +746,7 @@ const AdminSystemStatus = () => {
                       </div>
                       <div>
                         <p className="text-gray-400 text-xs mb-1">
-                          Memory Limit
+                          Memory Limit (Vercel)
                         </p>
                         <p className="text-gray-300 font-mono text-sm">
                           {systemStats.vercel.memoryLimit}
@@ -778,12 +776,36 @@ const AdminSystemStatus = () => {
                 ) : (
                   // Traditional server metrics
                   <div className="space-y-4">
-                    <p className="text-gray-300">
-                      <span className="text-blue-400 font-bold">
-                        {systemStats.cpu?.cores}
-                      </span>{" "}
-                      Cores - {systemStats.cpu?.model}
-                    </p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <p className="text-gray-400 text-xs mb-1">CPU Cores</p>
+                        <p className="text-gray-300 font-mono text-sm">
+                          {systemStats.cpu?.cores}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-400 text-xs mb-1">CPU Model</p>
+                        <p className="text-gray-300 font-mono text-sm">
+                          {systemStats.cpu?.model}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-400 text-xs mb-1">
+                          Memory Used
+                        </p>
+                        <p className="text-blue-400 font-mono text-sm">
+                          {systemStats.memory?.used}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-400 text-xs mb-1">
+                          Memory Total
+                        </p>
+                        <p className="text-blue-400 font-mono text-sm">
+                          {systemStats.memory?.total}
+                        </p>
+                      </div>
+                    </div>
 
                     {/* Load Average Visualization */}
                     <div className="space-y-3">
