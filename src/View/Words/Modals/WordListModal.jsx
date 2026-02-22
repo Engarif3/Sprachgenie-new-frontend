@@ -7,6 +7,7 @@ import { RiCloseCircleFill } from "react-icons/ri";
 import { useLockBodyScroll } from "./ModalScrolling";
 import { IoMdArrowDropright } from "react-icons/io";
 import { HiSpeakerWave } from "react-icons/hi2";
+import { MdOutlineDoubleArrow } from "react-icons/md";
 
 // Memoized sentence renderer component
 const SentenceRenderer = memo(
@@ -63,16 +64,21 @@ const SentenceRenderer = memo(
           {showSpeakerButton && (
             <button
               onClick={() => onTranslate(cleanSentence)}
-              className="text-green-600 hover:text-green-800 text-xs md:text-sm font-medium flex-shrink-0"
+              className="text-slate-200 hover:text-white text-xs md:text-sm  flex-shrink-0  h-5 w-5 rounded-full bg-sky-700 font-semibold mt-0 md:mt-1 lg:mt-1 hover:border"
               disabled={isLoading}
             >
               {isLoading ? "..." : "Tr"}
             </button>
           )}
         </div>
+
         {translation && (
-          <p className="text-gray-500 ml-6 mt-1 italic text-xs md:text-sm">
-            {translation}
+          <p className="text-sky-500 ml-6 mt-1 italic text-xs md:text-sm flex items-center gap-2">
+            <MdOutlineDoubleArrow
+              size={16}
+              className="flex-shrink-0 text-pink-600   ml-0 md:ml-1 lg:ml-1"
+            />
+            <span>{translation}</span>
           </p>
         )}
       </div>
