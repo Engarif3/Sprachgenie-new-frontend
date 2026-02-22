@@ -72,21 +72,28 @@ const Translator = ({ sentences }) => {
     setLoading((prev) => ({ ...prev, [sentence]: true }));
 
     try {
-      const res = await fetch("https://libretranslate.de/translate", {
-        method: "POST",
-        body: JSON.stringify({
-          q: sentence,
-          source: "de",
-          target: "en",
-          format: "text",
-        }),
-        headers: { "Content-Type": "application/json" },
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_API_URL}/translate`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            text: sentence,
+            source: "de",
+            target: "en",
+          }),
+        },
+      );
 
       if (!res.ok) throw new Error("Translation API error");
 
       const data = await res.json();
-      setTranslations((prev) => ({ ...prev, [sentence]: data.translatedText }));
+      setTranslations((prev) => ({
+        ...prev,
+        [sentence]: data.data?.translated || "Translation unavailable",
+      }));
     } catch (err) {
       console.error("Translation failed:", err);
       setTranslations((prev) => ({
