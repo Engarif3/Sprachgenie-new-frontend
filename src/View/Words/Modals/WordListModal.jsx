@@ -6,8 +6,8 @@ import FavoriteButton from "./FavoriteButton";
 import { RiCloseCircleFill } from "react-icons/ri";
 import { useLockBodyScroll } from "./ModalScrolling";
 import { IoMdArrowDropright } from "react-icons/io";
-// import { FcSpeaker } from "react-icons/fc";
 import { HiSpeakerWave } from "react-icons/hi2";
+import Translator from "../../../Translate/Translator";
 
 // Memoized sentence renderer component
 const SentenceRenderer = memo(({ sentence, index }) => {
@@ -349,6 +349,18 @@ const WordListModal = ({
             )}
           </div>
         </div>
+
+        {/* Translation Section */}
+        {(selectedWord.sentences?.length || 0) > 0 && (
+          <div className="mt-6 px-3 md:px-8 lg:px-8 pb-6">
+            <h3 className="text-lg md:text-xl lg:text-xl font-bold text-blue-400 mb-4 flex items-center gap-2">
+              <span>🌐 Translations</span>
+            </h3>
+            <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm p-4 rounded-2xl border border-gray-700/30">
+              <Translator sentences={selectedWord.sentences || []} />
+            </div>
+          </div>
+        )}
 
         <div className="sticky bottom-0 right-2 flex justify-end pr-2 pb-3 mt-6">
           <button
