@@ -1,11 +1,4 @@
-import {
-  FaLinkedinIn,
-  FaWhatsapp,
-  FaFacebook,
-  FaMobile,
-  FaEnvelope,
-  FaMapMarkerAlt,
-} from "react-icons/fa";
+import { FaLinkedinIn, FaFacebook, FaEnvelope } from "react-icons/fa";
 
 const Footer = () => {
   return (
@@ -51,10 +44,10 @@ const Footer = () => {
               </a>
               <a
                 target="_blank"
-                href=" https://wa.me/+4915203555728"
-                className="group relative bg-gradient-to-r from-green-500/20 to-green-600/20 hover:from-green-500 hover:to-green-600 border border-green-500/50 hover:border-green-400 p-4 rounded-full transition-all duration-300 hover:scale-125 hover:rotate-12 shadow-lg hover:shadow-green-500/50"
+                href="mailto:arif.aust.eng@gmail.com"
+                className="group relative bg-gradient-to-r from-orange-500/20 to-orange-600/20 hover:from-orange-500 hover:to-orange-600 border border-orange-500/50 hover:border-orange-400 p-4 rounded-full transition-all duration-300 hover:scale-125 hover:rotate-12 shadow-lg hover:shadow-orange-500/50"
               >
-                <FaWhatsapp
+                <FaEnvelope
                   className="text-white group-hover:animate-bounce"
                   size={24}
                 />
@@ -73,28 +66,13 @@ const Footer = () => {
           </div>
 
           <div className="hidden md:flex lg:flex justify-center items-center">
-            <div className="">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="bg-gradient-to-r from-cyan-500/20 to-blue-500/20 p-2 rounded-full">
-                  <FaMobile className="text-cyan-400" size={20} />
-                </div>
-                <span className="font-bold text-white text-lg">
-                  +49-15203555728
-                </span>
-              </div>
-              <div className="flex items-start gap-3 text-gray-300 text-sm ">
-                <div className="bg-gradient-to-r from-pink-500/20 to-purple-500/20 p-2 rounded-full mt-1">
-                  <FaMapMarkerAlt className="text-pink-400" size={16} />
-                </div>
-                <div className="ml-2 text-start">
-                  <p className="font-semibold">Reichenhainer str.51</p>
-                  <p>09126, Chemnitz</p>
-                  <p className="flex items-center gap-1 ">
-                    <span>Germany</span>
-                    <span className="text-lg">🇩🇪</span>
-                  </p>
-                </div>
-              </div>
+            <div>
+              <p className="text-gray-400 text-sm font-semibold mb-3">
+                📍 Based in Chemnitz, Germany 🇩🇪
+              </p>
+              <p className="text-xs text-gray-500 text-center">
+                Full Stack Developer | German Learning Platform Builder
+              </p>
             </div>
           </div>
         </div>
