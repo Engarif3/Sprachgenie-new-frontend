@@ -732,101 +732,131 @@ const AdminSystemStatus = () => {
                 CPU Information
               </p>
               <div className="space-y-4">
-                <p className="text-gray-300">
-                  <span className="text-blue-400 font-bold">
-                    {systemStats.cpu?.cores}
-                  </span>{" "}
-                  Cores - {systemStats.cpu?.model}
-                </p>
+                <div>
+                  <p className="text-gray-300">
+                    <span className="text-blue-400 font-bold">
+                      {systemStats.cpu?.cores}
+                    </span>{" "}
+                    Cores - {systemStats.cpu?.model}
+                  </p>
+                  {systemStats.environment && (
+                    <p className="text-gray-400 text-xs mt-2">
+                      Environment:{" "}
+                      <span className="text-blue-300 font-medium">
+                        {systemStats.environment}
+                      </span>
+                    </p>
+                  )}
+                </div>
 
                 {/* Load Average Visualization */}
                 <div className="space-y-3">
-                  <p className="text-gray-300 font-medium text-sm">
-                    Load Average (1/5/15 min)
-                  </p>
+                  {systemStats.cpu?.loadAverage?.["1min"]?.includes("N/A") ? (
+                    <div className="p-3 bg-blue-500/10 border border-blue-500/50 rounded-lg">
+                      <p className="text-blue-300 text-sm font-medium mb-2">
+                        ℹ️ Serverless Environment (Vercel)
+                      </p>
+                      <p className="text-blue-200 text-xs">
+                        Load average is not applicable in serverless
+                        environments. Monitor memory usage and response times
+                        instead.
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-gray-300 font-medium text-sm">
+                        Load Average (1/5/15 min)
+                      </p>
 
-                  {/* 1 Min */}
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-gray-400">1 min</span>
-                      <span className="font-mono text-gray-300">
-                        {systemStats.cpu?.loadAverage?.["1min"]}
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-700 rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full ${
-                          parseFloat(systemStats.cpu?.loadAverage?.["1min"]) > 2
-                            ? "bg-red-500"
-                            : parseFloat(
-                                  systemStats.cpu?.loadAverage?.["1min"],
-                                ) > 1
-                              ? "bg-yellow-500"
-                              : "bg-green-500"
-                        }`}
-                        style={{
-                          width: `${Math.min(parseFloat(systemStats.cpu?.loadAverage?.["1min"]) * 33, 100)}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
+                      {/* 1 Min */}
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-400">1 min</span>
+                          <span className="font-mono text-gray-300">
+                            {systemStats.cpu?.loadAverage?.["1min"]}
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full ${
+                              parseFloat(
+                                systemStats.cpu?.loadAverage?.["1min"],
+                              ) > 2
+                                ? "bg-red-500"
+                                : parseFloat(
+                                      systemStats.cpu?.loadAverage?.["1min"],
+                                    ) > 1
+                                  ? "bg-yellow-500"
+                                  : "bg-green-500"
+                            }`}
+                            style={{
+                              width: `${Math.min(parseFloat(systemStats.cpu?.loadAverage?.["1min"]) * 33, 100)}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
 
-                  {/* 5 Min */}
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-gray-400">5 min</span>
-                      <span className="font-mono text-gray-300">
-                        {systemStats.cpu?.loadAverage?.["5min"]}
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-700 rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full ${
-                          parseFloat(systemStats.cpu?.loadAverage?.["5min"]) > 2
-                            ? "bg-red-500"
-                            : parseFloat(
-                                  systemStats.cpu?.loadAverage?.["5min"],
-                                ) > 1
-                              ? "bg-yellow-500"
-                              : "bg-green-500"
-                        }`}
-                        style={{
-                          width: `${Math.min(parseFloat(systemStats.cpu?.loadAverage?.["5min"]) * 33, 100)}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
+                      {/* 5 Min */}
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-400">5 min</span>
+                          <span className="font-mono text-gray-300">
+                            {systemStats.cpu?.loadAverage?.["5min"]}
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full ${
+                              parseFloat(
+                                systemStats.cpu?.loadAverage?.["5min"],
+                              ) > 2
+                                ? "bg-red-500"
+                                : parseFloat(
+                                      systemStats.cpu?.loadAverage?.["5min"],
+                                    ) > 1
+                                  ? "bg-yellow-500"
+                                  : "bg-green-500"
+                            }`}
+                            style={{
+                              width: `${Math.min(parseFloat(systemStats.cpu?.loadAverage?.["5min"]) * 33, 100)}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
 
-                  {/* 15 Min */}
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-gray-400">15 min</span>
-                      <span className="font-mono text-gray-300">
-                        {systemStats.cpu?.loadAverage?.["15min"]}
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-700 rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full ${
-                          parseFloat(systemStats.cpu?.loadAverage?.["15min"]) >
-                          2
-                            ? "bg-red-500"
-                            : parseFloat(
-                                  systemStats.cpu?.loadAverage?.["15min"],
-                                ) > 1
-                              ? "bg-yellow-500"
-                              : "bg-green-500"
-                        }`}
-                        style={{
-                          width: `${Math.min(parseFloat(systemStats.cpu?.loadAverage?.["15min"]) * 33, 100)}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
+                      {/* 15 Min */}
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-gray-400">15 min</span>
+                          <span className="font-mono text-gray-300">
+                            {systemStats.cpu?.loadAverage?.["15min"]}
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full ${
+                              parseFloat(
+                                systemStats.cpu?.loadAverage?.["15min"],
+                              ) > 2
+                                ? "bg-red-500"
+                                : parseFloat(
+                                      systemStats.cpu?.loadAverage?.["15min"],
+                                    ) > 1
+                                  ? "bg-yellow-500"
+                                  : "bg-green-500"
+                            }`}
+                            style={{
+                              width: `${Math.min(parseFloat(systemStats.cpu?.loadAverage?.["15min"]) * 33, 100)}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
 
-                  <p className="text-gray-400 text-xs pt-2 border-t border-gray-700">
-                    💡 Green = Healthy | Yellow = Moderate | Red = High load
-                  </p>
+                      <p className="text-gray-400 text-xs pt-2 border-t border-gray-700">
+                        💡 Green = Healthy | Yellow = Moderate | Red = High load
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
