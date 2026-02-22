@@ -87,18 +87,27 @@ const Translator = ({ sentences }) => {
         },
       );
 
-      if (!res.ok) throw new Error("Translation API error");
-
       const data = await res.json();
+
+      if (!res.ok) {
+        console.error("Translation API error:", data);
+        throw new Error(data.error || "Translation API error");
+      }
+
+      if (!data.data?.translated) {
+        console.error("No translation in response:", data);
+        throw new Error("No translation received");
+      }
+
       setTranslations((prev) => ({
         ...prev,
-        [sentence]: data.data?.translated || "Translation unavailable",
+        [sentence]: data.data.translated,
       }));
     } catch (err) {
       console.error("Translation failed:", err);
       setTranslations((prev) => ({
         ...prev,
-        [sentence]: "Translation unavailable",
+        [sentence]: `❌ ${err.message}`,
       }));
     } finally {
       setLoading((prev) => ({ ...prev, [sentence]: false }));
