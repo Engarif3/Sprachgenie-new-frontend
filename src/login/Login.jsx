@@ -314,7 +314,7 @@ const Login = () => {
               to="/forgot-password"
               className="text-sm text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-400 hover:from-orange-500 hover:to-pink-500 font-semibold transition-all duration-300"
             >
-              🤔 Forgot Password?
+              Forgot Password?
             </Link>
           </div>
 
@@ -353,7 +353,7 @@ const Login = () => {
               ? "🔄 Logging in..."
               : loginCooldown > 0
                 ? `⏳ Try again in ${loginCooldown}s`
-                : "🚀 Login"}
+                : " Login"}
           </button>
 
           <div className="pt-4 border-t border-gray-700/50">
@@ -363,7 +363,7 @@ const Login = () => {
                 to="/register"
                 className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-500 hover:to-purple-500 font-bold ml-2 transition-all duration-300"
               >
-                ✨ Register Now
+                Register Now
               </Link>
             </p>
             <p className="text-sm text-gray-400 mt-2">
