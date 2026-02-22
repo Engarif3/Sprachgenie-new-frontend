@@ -4,11 +4,11 @@ const HEALTH_ENDPOINTS = [
   { name: "API Server", url: `${import.meta.env.VITE_BACKEND_API_URL}/health` },
   {
     name: "Database",
-    url: `${import.meta.env.VITE_BACKEND_API_URL}/api/db-health`,
+    url: `${import.meta.env.VITE_BACKEND_API_URL}/db-health`,
   },
   {
     name: "Auth Service",
-    url: `${import.meta.env.VITE_BACKEND_API_URL}/api/auth-health`,
+    url: `${import.meta.env.VITE_BACKEND_API_URL}/auth-health`,
   },
 ];
 
