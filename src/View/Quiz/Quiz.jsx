@@ -209,6 +209,9 @@ const Quiz = () => {
         title: "Finished!",
         icon: "success",
         html: `Your Score: <b>${newScore} / ${quizWords.length}</b>`,
+        confirmButtonText: "Back to Home",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
       });
       dispatch({ type: "SET_QUIZ_STARTED", payload: false });
       localStorage.removeItem(QUIZ_STORAGE_KEY);
@@ -234,7 +237,7 @@ const Quiz = () => {
   if (loading) {
     return (
       <Container>
-        <div className="p-4 bg-gray-800 text-white rounded min-h-screen flex justify-center items-center">
+        <div className="p-4 bg-gray-800 text-white rounded min-h-screen flex justify-center items-center ">
           <p>Loading Quiz Data....</p>
         </div>
       </Container>
@@ -243,17 +246,17 @@ const Quiz = () => {
 
   if (!quizStarted) {
     return (
-      <Container>
-        <div className="relative p-4 md:p-8 text-white rounded-2xl min-h-screen flex flex-col justify-center items-center mt-4 mb-12 bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+      <div className=" flex justify-center p-2">
+        <div className="relative  p-4 md:p-8 text-white rounded-2xl min-h-screen flex flex-col justify-center items-center  mb-4 bg-gradient-to-br from-gray-900 via-gray-800 to-black  w-full md:w-8/12 lg:w-8/12">
           {/* Background decoration */}
           <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-orange-500/5 rounded-2xl"></div>
-          <div className="absolute inset-0 backdrop-blur-3xl opacity-30 rounded-2xl"></div>
+          <div className="absolute inset-0 backdrop-blur-3xl opacity-30 rounded-2xl "></div>
 
-          <div className="relative z-10 w-full max-w-2xl px-4">
+          <div className="relative z-10 w-full max-w-2xl px-4 ">
             {/* Main Title */}
-            <div className="text-center mb-12">
-              <h1 className="text-4xl md:text-6xl font-bold mb-2 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent pb-8">
-                🎯 Quiz
+            <div className="text-center mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
+                Quiz
               </h1>
               <p className="text-gray-300 text-lg md:text-xl ">
                 Test your vocabulary and improve your German skills
@@ -261,9 +264,9 @@ const Quiz = () => {
             </div>
 
             {/* Difficulty Selection */}
-            <div className="mb-10">
-              <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-blue-400">
-                📚 Select Your Level
+            <div className="mb-8">
+              <h2 className="text-2xl  font-bold text-center mb-6 text-blue-400">
+                Select Your Level
               </h2>
 
               <div className="flex flex-col gap-4">
@@ -276,13 +279,13 @@ const Quiz = () => {
                         payload: parseInt(level),
                       })
                     }
-                    className={`group relative p-6 rounded-2xl transition-all duration-300 overflow-hidden ${
+                    className={`group relative p-2 rounded-2xl   transition-all duration-300 overflow-hidden ${
                       difficulty === parseInt(level)
                         ? "bg-gradient-to-r from-blue-600 to-purple-600 border-2 border-blue-400 shadow-lg shadow-blue-500/50 scale-105"
-                        : "bg-gradient-to-br from-gray-800/60 to-gray-900/60 border-2 border-gray-700/30 hover:border-gray-600/50 hover:bg-gray-800/80"
+                        : "bg-gradient-to-br from-gray-800/60 to-gray-900/60 border-2 border-cyan-700 hover:border-blue-500 hover:bg-gray-800/80"
                     }`}
                   >
-                    <div className="flex items-start justify-between">
+                    <div className="flex items-start justify-between ">
                       <div className="text-left">
                         <div className="font-bold text-lg md:text-xl mb-2">
                           {level === "1"
@@ -307,12 +310,10 @@ const Quiz = () => {
             </div>
 
             {/* Stats Card */}
-            <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-md border-2 border-blue-500/30 rounded-2xl p-6 mb-10 shadow-xl hover:border-blue-500/50 transition-all duration-300">
+            <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-md border-2 border-blue-500/30 rounded-2xl p-2 mb-4 shadow-xl hover:border-blue-500/50 transition-all duration-300">
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
-                  <div className="text-gray-400 text-sm mb-2">
-                    📊 Quiz Length
-                  </div>
+                  <div className="text-gray-400 text-sm mb-2">Quiz Length</div>
                   <div className="text-3xl font-bold text-blue-400">
                     {QUIZ_LENGTH}
                   </div>
@@ -346,7 +347,7 @@ const Quiz = () => {
                 }`}
               >
                 <span className="relative z-10 flex items-center justify-center gap-3">
-                  🚀 Start Quiz
+                  Start Quiz
                 </span>
               </button>
 
@@ -360,29 +361,29 @@ const Quiz = () => {
             {/* Info Footer */}
             <div className="mt-12 text-center">
               <div className="text-gray-400 text-sm space-y-2">
-                <p>✨ Challenge yourself with German vocabulary</p>
+                <p>Challenge yourself with German vocabulary</p>
                 <p>⏱️ No time limit, take your time!</p>
                 <p>📈 Track your progress and improve your skills</p>
               </div>
             </div>
           </div>
         </div>
-      </Container>
+      </div>
     );
   }
 
   const currentWord = quizWords[currentIndex];
 
   return (
-    <Container>
-      <div className="relative p-4 md:p-8 text-white rounded-2xl min-h-screen flex flex-col items-center mt-4 mb-12 bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <div className="flex justify-center p-2">
+      <div className="relative p-4 md:p-8 text-white rounded-2xl min-h-screen flex flex-col items-center mt-4 mb-12 bg-gradient-to-br from-gray-900 via-gray-800 to-black w-full md:w-8/12 lg:w-8/12">
         {/* Background decoration */}
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-orange-500/5 rounded-2xl"></div>
         <div className="absolute inset-0 backdrop-blur-3xl opacity-30 rounded-2xl"></div>
 
         <div className="relative z-10 w-full max-w-6xl">
           {/* Header with difficulty and reset */}
-          <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-4 mb-6 md:mb-8">
+          <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
             <div className="text-sm bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/50 px-4 py-2 rounded-full backdrop-blur-sm">
               Difficulty:{" "}
               <span className="font-bold text-blue-400">
@@ -398,7 +399,7 @@ const Quiz = () => {
           </div>
 
           {/* Word counter */}
-          <div className="text-center mb-6">
+          <div className="text-center mb-3">
             <div className="inline-block px-6 py-2 bg-gradient-to-r from-gray-800/80 to-gray-900/80 border border-gray-700 rounded-full backdrop-blur-sm">
               <span className="text-gray-300">Question</span>{" "}
               <span className="font-bold text-white text-xl">
@@ -417,7 +418,7 @@ const Quiz = () => {
           </p>
 
           {/* Main word display */}
-          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-md border-2 border-purple-500/30 rounded-3xl p-6 md:p-12 mb-8 shadow-2xl hover:border-purple-500/50 transition-all duration-300">
+          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-md border-2 border-purple-500/30 rounded-3xl p-6 md:p-6 mb-6 shadow-2xl hover:border-purple-500/50 transition-all duration-300">
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 md:gap-4 mb-4 md:mb-6">
                 <button
@@ -433,8 +434,8 @@ const Quiz = () => {
                 >
                   🔊
                 </button>
-                <div className="text-2xl md:text-4xl lg:text-6xl font-bold">
-                  <span className="text-orange-400 mr-2 md:mr-3">
+                <div className="text-2xl md:text-5xl lg:text-5xl font-bold">
+                  <span className="text-sky-500 italic mr-2 md:mr-3">
                     {currentWord?.article?.name || ""}
                   </span>
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500">
@@ -449,7 +450,7 @@ const Quiz = () => {
               {/* Meaning reveal area */}
               <div className="min-h-[120px] flex items-center justify-center">
                 {showMeaning ? (
-                  <div className="text-2xl text-yellow-300 font-semibold animate-fade-in bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-2xl px-8 py-4">
+                  <div className="text-xl text-yellow-300 font-semibold animate-fade-in bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-2xl px-8 py-4">
                     {(currentWord?.meaning && currentWord.meaning.join(", ")) ||
                       "No meaning"}
                   </div>
@@ -478,7 +479,7 @@ const Quiz = () => {
                   {score}
                 </div>
               </div>
-              <div className="flex justify-center gap-2 md:gap-4">
+              <div className="flex justify-center gap-8 md:gap-12 mt-8">
                 <button
                   onClick={() => handleScoreAndNext(false)}
                   disabled={usedScore}
@@ -488,7 +489,7 @@ const Quiz = () => {
                       : "hover:shadow-red-500/50"
                   }`}
                 >
-                  ❌
+                  <span className="text-white"> X</span>
                 </button>
                 <button
                   onClick={() => handleScoreAndNext(true)}
@@ -506,7 +507,7 @@ const Quiz = () => {
           </div>
         </div>
       </div>
-    </Container>
+    </div>
   );
 };
 

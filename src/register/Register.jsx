@@ -102,7 +102,7 @@ const Register = () => {
         <div className="w-full max-w-lg shadow-2xl rounded-3xl p-8 text-center bg-gradient-to-br from-gray-800/90 via-gray-900/90 to-black/90 border-2 border-gray-700/50 backdrop-blur-sm">
           <div className="mb-6 ">
             {/* <div className="inline-block p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-full mb-4">
-              <span className="text-4xl">✨</span>
+              <span className="text-4xl">""</span>
             </div> */}
             <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 ">
               Create Account
@@ -230,7 +230,7 @@ const Register = () => {
                   : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 hover:scale-105"
               }`}
             >
-              {isSubmitting ? "🔄 Registering..." : "🚀 Register"}
+              {isSubmitting ? "🔄 Registering..." : " Register"}
             </button>
           </form>
 
