@@ -729,41 +729,62 @@ const AdminSystemStatus = () => {
             </div>
             <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
               <p className="text-gray-400 text-sm font-medium mb-3">
-                CPU Information
+                {systemStats.vercel
+                  ? "⚡ Vercel Serverless Metrics"
+                  : "CPU Information"}
               </p>
               <div className="space-y-4">
-                <div>
-                  <p className="text-gray-300">
-                    <span className="text-blue-400 font-bold">
-                      {systemStats.cpu?.cores}
-                    </span>{" "}
-                    Cores - {systemStats.cpu?.model}
-                  </p>
-                  {systemStats.environment && (
-                    <p className="text-gray-400 text-xs mt-2">
-                      Environment:{" "}
-                      <span className="text-blue-300 font-medium">
-                        {systemStats.environment}
-                      </span>
-                    </p>
-                  )}
-                </div>
-
-                {/* Load Average Visualization */}
-                <div className="space-y-3">
-                  {systemStats.cpu?.loadAverage?.["1min"]?.includes("N/A") ? (
+                {systemStats.vercel ? (
+                  // Vercel-specific metrics
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <p className="text-gray-400 text-xs mb-1">Runtime</p>
+                        <p className="text-gray-300 font-mono text-sm">
+                          {systemStats.vercel.runtime}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-400 text-xs mb-1">
+                          Memory Limit
+                        </p>
+                        <p className="text-gray-300 font-mono text-sm">
+                          {systemStats.vercel.memoryLimit}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-400 text-xs mb-1">
+                          Environment
+                        </p>
+                        <p className="text-green-400 text-sm font-medium">
+                          {systemStats.vercel.environment_type}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-400 text-xs mb-1">Uptime</p>
+                        <p className="text-blue-400 text-sm font-medium">
+                          {systemStats.vercel.functionUptime}
+                        </p>
+                      </div>
+                    </div>
                     <div className="p-3 bg-blue-500/10 border border-blue-500/50 rounded-lg">
-                      <p className="text-blue-300 text-sm font-medium mb-2">
-                        ℹ️ Serverless Environment (Vercel)
-                      </p>
                       <p className="text-blue-200 text-xs">
-                        Load average is not applicable in serverless
-                        environments. Monitor memory usage and response times
-                        instead.
+                        {systemStats.vercel.note}
                       </p>
                     </div>
-                  ) : (
-                    <>
+                  </div>
+                ) : (
+                  // Traditional server metrics
+                  <div className="space-y-4">
+                    <p className="text-gray-300">
+                      <span className="text-blue-400 font-bold">
+                        {systemStats.cpu?.cores}
+                      </span>{" "}
+                      Cores - {systemStats.cpu?.model}
+                    </p>
+
+                    {/* Load Average Visualization */}
+                    <div className="space-y-3">
                       <p className="text-gray-300 font-medium text-sm">
                         Load Average (1/5/15 min)
                       </p>
@@ -855,9 +876,9 @@ const AdminSystemStatus = () => {
                       <p className="text-gray-400 text-xs pt-2 border-t border-gray-700">
                         💡 Green = Healthy | Yellow = Moderate | Red = High load
                       </p>
-                    </>
-                  )}
-                </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
