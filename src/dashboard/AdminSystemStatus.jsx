@@ -562,56 +562,6 @@ const AdminSystemStatus = () => {
         </Link>
       </div>
 
-      {/* Analytics Summary */}
-      <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-4xl mx-auto">
-        <h2 className="text-2xl font-bold text-white mb-6">
-          📊 Analytics Summary
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="p-4 bg-gradient-to-br from-blue-500/20 to-blue-600/10 border border-blue-500/30 rounded-lg">
-            <p className="text-gray-400 text-xs font-medium mb-2">
-              Total Visitors
-            </p>
-            <p className="text-3xl font-bold text-blue-400">
-              {analytics.summary?.total || 0}
-            </p>
-          </div>
-          <div className="p-4 bg-gradient-to-br from-green-500/20 to-green-600/10 border border-green-500/30 rounded-lg">
-            <p className="text-gray-400 text-xs font-medium mb-2">This Month</p>
-            <p className="text-3xl font-bold text-green-400">
-              {analytics.summary?.monthly || 0}
-            </p>
-          </div>
-          <div className="p-4 bg-gradient-to-br from-purple-500/20 to-purple-600/10 border border-purple-500/30 rounded-lg">
-            <p className="text-gray-400 text-xs font-medium mb-2">This Week</p>
-            <p className="text-3xl font-bold text-purple-400">
-              {analytics.summary?.weekly || 0}
-            </p>
-          </div>
-          <div className="p-4 bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 border border-yellow-500/30 rounded-lg">
-            <p className="text-gray-400 text-xs font-medium mb-2">Today</p>
-            <p className="text-3xl font-bold text-yellow-400">
-              {analytics.summary?.daily || 0}
-            </p>
-          </div>
-        </div>
-        <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
-          <p className="text-gray-400 text-sm font-medium mb-3">
-            Unique Visitors (by IP)
-          </p>
-          <div className="flex items-baseline justify-between">
-            <p className="text-4xl font-bold text-cyan-400">{uniqueVisitors}</p>
-            <button
-              onClick={handleRefreshVisitors}
-              disabled={visitorsLoading}
-              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded text-sm transition-colors"
-            >
-              {visitorsLoading ? "..." : "Refresh"}
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* Response Time Metrics */}
       <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-4xl mx-auto mt-6">
         <h2 className="text-2xl font-bold text-white mb-4">
