@@ -136,146 +136,163 @@ const SystemStatusPage = lazy(() => import("../dashboard/SystemStatusPage"));
 const SystemStatusPageWithSuspense = withSuspense(SystemStatusPage);
 
 // Router
-export const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-    children: [
-      { path: "/", element: <HomeWithSuspense /> },
-      { path: "/words", element: <WordListWithSuspense /> },
-      { path: "/create-word", element: <WordFormWithSuspense /> },
-      { path: "/level", element: <LevelFormWithSuspense /> },
-      { path: "/topic", element: <TopicFormWithSuspense /> },
-      { path: "/article", element: <ArticleFormWithSuspense /> },
-      { path: "/part-of-Speech", element: <PartOfSpeechFormWithSuspense /> },
-      { path: "/level-list", element: <LevelListWithSuspense /> },
-      { path: "/edit-word/:id", element: <UpdateWordWithSuspense /> },
-      { path: "/favorites", element: <FavoritesListWithSuspense /> },
-      {
-        path: "/conversation-titles",
-        element: <ConversationTitleListWithSuspense />,
-      },
-      { path: "/conversation/:id", element: <ConversationPageWithSuspense /> },
-      {
-        path: "/update-conversation",
-        element: <ConversationsListWithSuspense />,
-      },
-      {
-        path: "/create-conversation",
-        element: <CreateConversationWithSuspense />,
-      },
-      { path: "/prefix-types", element: <PrefixTypeListWithSuspense /> },
-      { path: "/prefix-list/:id", element: <PrefixListWithSuspense /> },
-      { path: "/grammar", element: <GrammarWithSuspense /> },
-      { path: "/grammar/:id", element: <GrammarTopicWithSuspense /> },
-      { path: "/clauses", element: <ClausesWithSuspense /> },
-      { path: "/clause/:id", element: <ClauseWithSuspense /> },
-      { path: "/stories", element: <StoriesWithSuspense /> },
-      {
-        path: "/update-user-status",
-        element: <UpdateUserStatusWithSuspense />,
-      },
-      {
-        path: "/update-basic-user-status",
-        element: <UpdateBasicUserStatusWithSuspense />,
-      },
-      {
-        path: "/users-favorite-count",
-        element: <UsersFavoriteCountWithSuspense />,
-      },
-      { path: "/past-perfect", element: <PerfectAndPastFormWithSuspense /> },
-      //translator
-      { path: "/translator", element: <TranslatorWithSuspense /> },
+export const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <App />,
+      children: [
+        { path: "/", element: <HomeWithSuspense /> },
+        { path: "/words", element: <WordListWithSuspense /> },
+        { path: "/create-word", element: <WordFormWithSuspense /> },
+        { path: "/level", element: <LevelFormWithSuspense /> },
+        { path: "/topic", element: <TopicFormWithSuspense /> },
+        { path: "/article", element: <ArticleFormWithSuspense /> },
+        { path: "/part-of-Speech", element: <PartOfSpeechFormWithSuspense /> },
+        { path: "/level-list", element: <LevelListWithSuspense /> },
+        { path: "/edit-word/:id", element: <UpdateWordWithSuspense /> },
+        { path: "/favorites", element: <FavoritesListWithSuspense /> },
+        {
+          path: "/conversation-titles",
+          element: <ConversationTitleListWithSuspense />,
+        },
+        {
+          path: "/conversation/:id",
+          element: <ConversationPageWithSuspense />,
+        },
+        {
+          path: "/update-conversation",
+          element: <ConversationsListWithSuspense />,
+        },
+        {
+          path: "/create-conversation",
+          element: <CreateConversationWithSuspense />,
+        },
+        { path: "/prefix-types", element: <PrefixTypeListWithSuspense /> },
+        { path: "/prefix-list/:id", element: <PrefixListWithSuspense /> },
+        { path: "/grammar", element: <GrammarWithSuspense /> },
+        { path: "/grammar/:id", element: <GrammarTopicWithSuspense /> },
+        { path: "/clauses", element: <ClausesWithSuspense /> },
+        { path: "/clause/:id", element: <ClauseWithSuspense /> },
+        { path: "/stories", element: <StoriesWithSuspense /> },
+        {
+          path: "/update-user-status",
+          element: <UpdateUserStatusWithSuspense />,
+        },
+        {
+          path: "/update-basic-user-status",
+          element: <UpdateBasicUserStatusWithSuspense />,
+        },
+        {
+          path: "/users-favorite-count",
+          element: <UsersFavoriteCountWithSuspense />,
+        },
+        { path: "/past-perfect", element: <PerfectAndPastFormWithSuspense /> },
+        //translator
+        { path: "/translator", element: <TranslatorWithSuspense /> },
 
-      //Quiz
-      { path: "/quiz", element: <QuizWithSuspense /> },
+        //Quiz
+        { path: "/quiz", element: <QuizWithSuspense /> },
 
-      {
-        path: "/dashboard",
-        // element: <DashboardLayoutWithSuspense />,
-        element: (
-          <ProtectedRoute>
-            <DashboardLayoutWithSuspense />
-          </ProtectedRoute>
-        ),
-        children: [
-          { index: true, element: <DashboardHomeWithSuspense /> },
-          {
-            path: "visitors",
-            element: <AdminVisitorsPageWithSuspense />,
-          },
-          {
-            path: "favorites-words",
-            element: <FavoritesListDashboardWithSuspense />,
-          },
-          {
-            path: "update-user-status",
-            element: <UpdateUserStatusWithSuspense />,
-          },
-          {
-            path: "update-basic-user-status",
-            element: <UpdateBasicUserStatusWithSuspense />,
-          },
-          { path: "topic", element: <TopicFormWithSuspense /> },
-          { path: "create-word", element: <WordFormWithSuspense /> },
-          {
-            path: "create-conversation",
-            element: <CreateConversationWithSuspense />,
-          },
-          {
-            path: "update-conversation",
-            element: <ConversationsListWithSuspense />,
-          },
-          {
-            path: "conversation/:id",
-            element: <ConversationPageWithSuspense />,
-          },
-          {
-            path: "users-favorite-count",
-            element: <UsersFavoriteCountWithSuspense />,
-          },
-          { path: "global-limits", element: <GlobalLimitsWithSuspense /> },
-          { path: "user-limits", element: <UserLimitsWithSuspense /> },
-          { path: "get-usage", element: <UsageWithSuspense /> },
-          { path: "get-reports", element: <ReportsByUsersWithSuspense /> },
-          { path: "system-status", element: <SystemStatusPageWithSuspense /> },
-        ],
-      },
-    ],
-  },
+        {
+          path: "/dashboard",
+          // element: <DashboardLayoutWithSuspense />,
+          element: (
+            <ProtectedRoute>
+              <DashboardLayoutWithSuspense />
+            </ProtectedRoute>
+          ),
+          children: [
+            { index: true, element: <DashboardHomeWithSuspense /> },
+            {
+              path: "visitors",
+              element: <AdminVisitorsPageWithSuspense />,
+            },
+            {
+              path: "favorites-words",
+              element: <FavoritesListDashboardWithSuspense />,
+            },
+            {
+              path: "update-user-status",
+              element: <UpdateUserStatusWithSuspense />,
+            },
+            {
+              path: "update-basic-user-status",
+              element: <UpdateBasicUserStatusWithSuspense />,
+            },
+            { path: "topic", element: <TopicFormWithSuspense /> },
+            { path: "create-word", element: <WordFormWithSuspense /> },
+            {
+              path: "create-conversation",
+              element: <CreateConversationWithSuspense />,
+            },
+            {
+              path: "update-conversation",
+              element: <ConversationsListWithSuspense />,
+            },
+            {
+              path: "conversation/:id",
+              element: <ConversationPageWithSuspense />,
+            },
+            {
+              path: "users-favorite-count",
+              element: <UsersFavoriteCountWithSuspense />,
+            },
+            { path: "global-limits", element: <GlobalLimitsWithSuspense /> },
+            { path: "user-limits", element: <UserLimitsWithSuspense /> },
+            { path: "get-usage", element: <UsageWithSuspense /> },
+            { path: "get-reports", element: <ReportsByUsersWithSuspense /> },
+            {
+              path: "system-status",
+              element: <SystemStatusPageWithSuspense />,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      path: "/login",
+      element: (
+        <PublicRoute>
+          <LoginWithSuspense />
+        </PublicRoute>
+      ),
+    },
+    {
+      path: "/register",
+      element: (
+        <PublicRoute>
+          <RegisterWithSuspense />
+        </PublicRoute>
+      ),
+    },
+    { path: "/verify-email", element: <VerifyEmailWithSuspense /> },
+    {
+      path: "/resend-verification",
+      element: <ResendVerificationWithSuspense />,
+    },
+    {
+      path: "/forgot-password",
+      element: (
+        <PublicRoute>
+          <ForgotPasswordWithSuspense />
+        </PublicRoute>
+      ),
+    },
+    {
+      path: "/reset-password",
+      element: (
+        <PublicRoute>
+          <ResetPasswordWithSuspense />
+        </PublicRoute>
+      ),
+    },
+    { path: "/backend", element: <BackendWithSuspense /> },
+  ],
   {
-    path: "/login",
-    element: (
-      <PublicRoute>
-        <LoginWithSuspense />
-      </PublicRoute>
-    ),
+    future: {
+      v7_startTransition: true,
+      v7_relativeSplatPath: true,
+    },
   },
-  {
-    path: "/register",
-    element: (
-      <PublicRoute>
-        <RegisterWithSuspense />
-      </PublicRoute>
-    ),
-  },
-  { path: "/verify-email", element: <VerifyEmailWithSuspense /> },
-  { path: "/resend-verification", element: <ResendVerificationWithSuspense /> },
-  {
-    path: "/forgot-password",
-    element: (
-      <PublicRoute>
-        <ForgotPasswordWithSuspense />
-      </PublicRoute>
-    ),
-  },
-  {
-    path: "/reset-password",
-    element: (
-      <PublicRoute>
-        <ResetPasswordWithSuspense />
-      </PublicRoute>
-    ),
-  },
-  { path: "/backend", element: <BackendWithSuspense /> },
-]);
+);

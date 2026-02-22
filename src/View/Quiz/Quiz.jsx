@@ -60,11 +60,11 @@ const filterWordsByDifficulty = (words, difficulty) => {
   switch (difficulty) {
     case 1:
       return words.filter(
-        (word) => word.level?.id === 1 || word.level?.id === 2
+        (word) => word.level?.id === 1 || word.level?.id === 2,
       );
     case 2:
       return words.filter(
-        (word) => word.level?.id === 3 || word.level?.id === 4
+        (word) => word.level?.id === 3 || word.level?.id === 4,
       );
     case 3:
       return words.filter((word) => [1, 2, 3, 4, 6].includes(word.level?.id));
@@ -75,31 +75,22 @@ const filterWordsByDifficulty = (words, difficulty) => {
 
 const Quiz = () => {
   const initialState = {
-    mode: "",
     difficulty: 1,
-    player1: "",
-    player2: "",
     words: [],
     allWords: [],
     quizWords: [],
     currentIndex: 0,
     showMeaning: false,
-    scores: { player1: 0, player2: 0 },
+    score: 0,
     quizStarted: false,
     loading: true,
-    usedScores: { player1: false, player2: false },
+    usedScore: false,
   };
 
   const quizReducer = (state, action) => {
     switch (action.type) {
-      case "SET_MODE":
-        return { ...state, mode: action.payload };
       case "SET_DIFFICULTY":
         return { ...state, difficulty: action.payload };
-      case "SET_PLAYER1":
-        return { ...state, player1: action.payload };
-      case "SET_PLAYER2":
-        return { ...state, player2: action.payload };
       case "SET_WORDS":
         return { ...state, words: action.payload };
       case "SET_ALL_WORDS":
@@ -110,14 +101,14 @@ const Quiz = () => {
         return { ...state, currentIndex: action.payload };
       case "SET_SHOW_MEANING":
         return { ...state, showMeaning: action.payload };
-      case "SET_SCORES":
-        return { ...state, scores: action.payload };
+      case "SET_SCORE":
+        return { ...state, score: action.payload };
       case "SET_QUIZ_STARTED":
         return { ...state, quizStarted: action.payload };
       case "SET_LOADING":
         return { ...state, loading: action.payload };
-      case "SET_USED_SCORES":
-        return { ...state, usedScores: action.payload };
+      case "SET_USED_SCORE":
+        return { ...state, usedScore: action.payload };
       case "RESET_QUIZ":
         return initialState;
       case "LOAD_STATE":
@@ -131,19 +122,16 @@ const Quiz = () => {
 
   // Destructure for cleaner JSX
   const {
-    mode,
     difficulty,
-    player1,
-    player2,
     words,
     allWords,
     quizWords,
     currentIndex,
     showMeaning,
-    scores,
+    score,
     quizStarted,
     loading,
-    usedScores,
+    usedScore,
   } = state;
 
   useEffect(() => {
@@ -154,7 +142,7 @@ const Quiz = () => {
         dispatch({ type: "SET_ALL_WORDS", payload: data.words || [] });
         const initialFiltered = filterWordsByDifficulty(
           data.words || [],
-          difficulty
+          difficulty,
         );
         dispatch({ type: "SET_WORDS", payload: initialFiltered });
 
@@ -181,74 +169,46 @@ const Quiz = () => {
   useEffect(() => {
     if (quizStarted) {
       const save = {
-        mode,
         difficulty,
-        player1,
-        player2,
         quizWords,
         currentIndex,
-        scores,
+        score,
         quizStarted,
       };
       localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(save));
     }
-  }, [
-    mode,
-    difficulty,
-    player1,
-    player2,
-    quizWords,
-    currentIndex,
-    scores,
-    quizStarted,
-  ]);
+  }, [difficulty, quizWords, currentIndex, score, quizStarted]);
 
   const startQuiz = () => {
-    const actualP1 = mode === "single" ? "YOU" : player1;
     const shuffled = [...words].sort(() => 0.5 - Math.random());
     const selected = shuffled.slice(0, Math.min(QUIZ_LENGTH, words.length));
 
-    dispatch({ type: "SET_PLAYER1", payload: actualP1 });
     dispatch({ type: "SET_QUIZ_WORDS", payload: selected });
     dispatch({ type: "SET_CURRENT_INDEX", payload: 0 });
-    dispatch({ type: "SET_SCORES", payload: { player1: 0, player2: 0 } });
+    dispatch({ type: "SET_SCORE", payload: 0 });
     dispatch({ type: "SET_SHOW_MEANING", payload: false });
     dispatch({ type: "SET_QUIZ_STARTED", payload: true });
   };
 
-  const handleScore = (player, delta) => {
-    if (usedScores[player]) return;
+  const handleScore = (delta) => {
+    if (usedScore) return;
     dispatch({
-      type: "SET_SCORES",
-      payload: { ...scores, [player]: (scores[player] || 0) + delta },
+      type: "SET_SCORE",
+      payload: Math.max(0, score + delta),
     });
-    dispatch({
-      type: "SET_USED_SCORES",
-      payload: { ...usedScores, [player]: true },
-    });
+    dispatch({ type: "SET_USED_SCORE", payload: true });
   };
 
   const nextWord = () => {
     if (currentIndex + 1 < quizWords.length) {
       dispatch({ type: "SET_CURRENT_INDEX", payload: currentIndex + 1 });
       dispatch({ type: "SET_SHOW_MEANING", payload: false });
-      dispatch({
-        type: "SET_USED_SCORES",
-        payload: { player1: false, player2: false },
-      });
+      dispatch({ type: "SET_USED_SCORE", payload: false });
     } else {
-      const winner =
-        mode === "single"
-          ? `${player1}: ${scores.player1}`
-          : scores.player1 === scores.player2
-          ? "Tie"
-          : scores.player1 > scores.player2
-          ? player1
-          : player2;
       Swal.fire({
         title: "Finished!",
         icon: "success",
-        html: `Winner/Score: <b>${winner}</b>`,
+        html: `Your Score: <b>${score} / ${quizWords.length}</b>`,
       });
       dispatch({ type: "SET_QUIZ_STARTED", payload: false });
       localStorage.removeItem(QUIZ_STORAGE_KEY);
@@ -282,58 +242,6 @@ const Quiz = () => {
   }
 
   if (!quizStarted) {
-    if (!mode) {
-      return (
-        <Container>
-          <div className="p-4 text-white rounded min-h-screen flex flex-col justify-center items-center">
-            {/* Header Section */}
-            <div className="text-center mb-12">
-              <div className="mb-4">
-                <span className="inline-block px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
-                  🎮 Test Your Knowledge
-                </span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-4">
-                Choose Quiz Mode
-              </h2>
-              <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">
-                Test your German vocabulary knowledge with interactive quizzes
-              </p>
-            </div>
-
-            <div className="flex flex-col md:flex-row gap-6">
-              <button
-                onClick={() =>
-                  dispatch({ type: "SET_MODE", payload: "single" })
-                }
-                className="group relative bg-gradient-to-br from-gray-800/80 via-gray-900 to-black border-2 border-blue-500/50 hover:border-blue-500 p-8 rounded-2xl transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-[0_0_50px_rgba(59,130,246,0.5)] min-w-[250px]"
-              >
-                <div className="text-5xl mb-4">👤</div>
-                <h3 className="text-2xl font-bold text-white mb-2">
-                  Play Yourself
-                </h3>
-                <p className="text-gray-300">
-                  Challenge yourself and track your progress
-                </p>
-              </button>
-              <button
-                onClick={() => dispatch({ type: "SET_MODE", payload: "multi" })}
-                className="group relative bg-gradient-to-br from-gray-800/80 via-gray-900 to-black border-2 border-green-500/50 hover:border-green-500 p-8 rounded-2xl transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-[0_0_50px_rgba(34,197,94,0.5)] min-w-[250px]"
-              >
-                <div className="text-5xl mb-4">👥</div>
-                <h3 className="text-2xl font-bold text-white mb-2">
-                  Play with a Friend
-                </h3>
-                <p className="text-gray-300">
-                  Compete with a friend in vocabulary battle
-                </p>
-              </button>
-            </div>
-          </div>
-        </Container>
-      );
-    }
-
     return (
       <Container>
         <div className="p-4 text-white rounded min-h-screen flex flex-col justify-center items-center">
@@ -373,53 +281,13 @@ const Quiz = () => {
               Available words: {words.length}
             </p>
           </div>
-          <div className="flex flex-col gap-2 mb-4 w-full max-w-sm">
-            {mode === "multi" ? (
-              <>
-                <input
-                  type="text"
-                  placeholder="Player 1"
-                  value={player1}
-                  onChange={(e) =>
-                    dispatch({ type: "SET_PLAYER1", payload: e.target.value })
-                  }
-                  className="p-2 rounded text-black"
-                />
-                <input
-                  type="text"
-                  placeholder="Player 2"
-                  value={player2}
-                  onChange={(e) =>
-                    dispatch({ type: "SET_PLAYER2", payload: e.target.value })
-                  }
-                  className="p-2 rounded text-black"
-                />
-              </>
-            ) : (
-              <div className="text-center p-4 bg-gray-700 rounded">
-                <p>
-                  Playing as: <strong>YOU</strong>
-                </p>
-              </div>
-            )}
-          </div>
           <div className="flex gap-4">
             <button
-              disabled={
-                mode === "multi"
-                  ? !player1 || !player2 || words.length === 0
-                  : words.length === 0
-              }
+              disabled={words.length === 0}
               onClick={startQuiz}
               className="bg-blue-600 hover:bg-blue-700 p-2 rounded font-bold disabled:opacity-50"
             >
               Start Quiz
-            </button>
-            <button
-              onClick={() => dispatch({ type: "SET_MODE", payload: "" })}
-              className="bg-red-600 hover:bg-red-700 p-2 rounded font-bold"
-            >
-              Back
             </button>
           </div>
         </div>
@@ -481,7 +349,7 @@ const Quiz = () => {
                     pronounceWord(
                       `${currentWord?.article?.name ?? ""} ${
                         currentWord?.value ?? ""
-                      }`.trim()
+                      }`.trim(),
                     )
                   }
                   className="text-3xl md:text-5xl hover:scale-110 transition-transform duration-300 hover:drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]"
@@ -523,23 +391,23 @@ const Quiz = () => {
             </div>
           </div>
 
-          {/* Player score cards */}
+          {/* Player score card */}
           <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-8 mb-8">
             <div className="w-full md:flex-1 md:max-w-sm bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-md border-2 border-blue-500/30 rounded-2xl p-4 md:p-8 shadow-xl hover:border-blue-500/50 transition-all duration-300">
               <div className="text-center mb-4">
                 <div className="text-lg md:text-2xl font-bold text-blue-400 mb-2">
-                  {player1}
+                  YOUR SCORE
                 </div>
                 <div className="text-3xl md:text-5xl font-bold text-white">
-                  {scores.player1}
+                  {score}
                 </div>
               </div>
               <div className="flex justify-center gap-2 md:gap-4">
                 <button
-                  onClick={() => handleScore("player1", -1)}
-                  disabled={usedScores.player1}
+                  onClick={() => handleScore(-1)}
+                  disabled={usedScore}
                   className={`bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-4 md:px-8 py-2 md:py-3 rounded-full font-bold text-lg md:text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
-                    usedScores.player1
+                    usedScore
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:shadow-red-500/50"
                   }`}
@@ -547,10 +415,10 @@ const Quiz = () => {
                   ❌
                 </button>
                 <button
-                  onClick={() => handleScore("player1", 1)}
-                  disabled={usedScores.player1}
+                  onClick={() => handleScore(1)}
+                  disabled={usedScore}
                   className={`bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-4 md:px-8 py-2 md:py-3 rounded-full font-bold text-lg md:text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
-                    usedScores.player1
+                    usedScore
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:shadow-green-500/50"
                   }`}
@@ -559,43 +427,6 @@ const Quiz = () => {
                 </button>
               </div>
             </div>
-
-            {mode === "multi" && (
-              <div className="w-full md:flex-1 md:max-w-sm bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-md border-2 border-purple-500/30 rounded-2xl p-4 md:p-8 shadow-xl hover:border-purple-500/50 transition-all duration-300">
-                <div className="text-center mb-4">
-                  <div className="text-lg md:text-2xl font-bold text-purple-400 mb-2">
-                    {player2}
-                  </div>
-                  <div className="text-3xl md:text-5xl font-bold text-white">
-                    {scores.player2}
-                  </div>
-                </div>
-                <div className="flex justify-center gap-2 md:gap-4">
-                  <button
-                    onClick={() => handleScore("player2", -1)}
-                    disabled={usedScores.player2}
-                    className={`bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-4 md:px-8 py-2 md:py-3 rounded-full font-bold text-lg md:text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
-                      usedScores.player2
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:shadow-red-500/50"
-                    }`}
-                  >
-                    ❌
-                  </button>
-                  <button
-                    onClick={() => handleScore("player2", 1)}
-                    disabled={usedScores.player2}
-                    className={`bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-4 md:px-8 py-2 md:py-3 rounded-full font-bold text-lg md:text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
-                      usedScores.player2
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:shadow-green-500/50"
-                    }`}
-                  >
-                    ✓
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Next button */}
