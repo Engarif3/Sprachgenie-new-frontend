@@ -748,8 +748,26 @@ const AdminSystemStatus = () => {
                         <p className="text-gray-400 text-xs mb-1">
                           Memory Limit (Vercel)
                         </p>
-                        <p className="text-gray-300 font-mono text-sm">
+                        <p className="text-gray-300 font-mono text-sm mb-2">
                           {systemStats.vercel.memoryLimit}
+                        </p>
+                        <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full ${
+                              parseFloat(systemStats.memory?.usagePercent) > 80
+                                ? "bg-red-500"
+                                : parseFloat(systemStats.memory?.usagePercent) >
+                                    60
+                                  ? "bg-yellow-500"
+                                  : "bg-green-500"
+                            }`}
+                            style={{
+                              width: `${parseFloat(systemStats.memory?.usagePercent)}%`,
+                            }}
+                          />
+                        </div>
+                        <p className="text-gray-400 text-xs mt-1">
+                          {systemStats.memory?.used} used
                         </p>
                       </div>
                       <div>
