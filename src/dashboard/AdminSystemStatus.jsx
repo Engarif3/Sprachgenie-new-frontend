@@ -698,35 +698,37 @@ const AdminSystemStatus = () => {
         </h2>
         {systemStats ? (
           <div className="space-y-4">
-            <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
-              <p className="text-gray-400 text-sm font-medium mb-3">
-                Memory Usage
-              </p>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-300">
-                    Usage: {systemStats.memory?.usagePercent}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
-                  <div
-                    className={`h-2 rounded-full ${
-                      parseFloat(systemStats.memory?.usagePercent) > 80
-                        ? "bg-red-500"
-                        : parseFloat(systemStats.memory?.usagePercent) > 60
-                          ? "bg-yellow-500"
-                          : "bg-green-500"
-                    }`}
-                    style={{
-                      width: `${parseFloat(systemStats.memory?.usagePercent)}%`,
-                    }}
-                  />
-                </div>
-                <p className="text-gray-400 text-xs">
-                  {systemStats.memory?.used} / {systemStats.memory?.total}
+            {!systemStats.vercel && (
+              <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+                <p className="text-gray-400 text-sm font-medium mb-3">
+                  Memory Usage
                 </p>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-300">
+                      Usage: {systemStats.memory?.usagePercent}
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-700 rounded-full h-2">
+                    <div
+                      className={`h-2 rounded-full ${
+                        parseFloat(systemStats.memory?.usagePercent) > 80
+                          ? "bg-red-500"
+                          : parseFloat(systemStats.memory?.usagePercent) > 60
+                            ? "bg-yellow-500"
+                            : "bg-green-500"
+                      }`}
+                      style={{
+                        width: `${parseFloat(systemStats.memory?.usagePercent)}%`,
+                      }}
+                    />
+                  </div>
+                  <p className="text-gray-400 text-xs">
+                    {systemStats.memory?.used} / {systemStats.memory?.total}
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
             <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
               <p className="text-gray-400 text-sm font-medium mb-3">
                 {systemStats.vercel
@@ -881,14 +883,16 @@ const AdminSystemStatus = () => {
                 )}
               </div>
             </div>
-            <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
-              <p className="text-gray-300">
-                Server Uptime:{" "}
-                <span className="text-purple-400 font-bold">
-                  {systemStats.uptime}
-                </span>
-              </p>
-            </div>
+            {!systemStats.vercel && (
+              <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+                <p className="text-gray-300">
+                  Server Uptime:{" "}
+                  <span className="text-purple-400 font-bold">
+                    {systemStats.uptime}
+                  </span>
+                </p>
+              </div>
+            )}
           </div>
         ) : (
           <p className="text-gray-400">Loading system stats...</p>
