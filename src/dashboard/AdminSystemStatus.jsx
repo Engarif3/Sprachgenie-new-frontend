@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 const HEALTH_ENDPOINTS = [
-  { name: "API Server", url: "/api/health" },
-  { name: "Database", url: "/api/db-health" },
-  { name: "Auth Service", url: "/api/auth-health" },
+  { name: "API Server", url: `${import.meta.env.VITE_BACKEND_API_URL}/health` },
+  {
+    name: "Database",
+    url: `${import.meta.env.VITE_BACKEND_API_URL}/api/db-health`,
+  },
+  {
+    name: "Auth Service",
+    url: `${import.meta.env.VITE_BACKEND_API_URL}/api/auth-health`,
+  },
 ];
 
 const AdminSystemStatus = () => {
   const [health, setHealth] = useState({});
+  const [healthTimestamp, setHealthTimestamp] = useState(null);
   const [loading, setLoading] = useState(true);
   const [uptimeUrl, setUptimeUrl] = useState("");
   const [uniqueVisitors, setUniqueVisitors] = useState(0);
@@ -62,9 +69,13 @@ const AdminSystemStatus = () => {
         }
       }
       setHealth(results);
+      setHealthTimestamp(new Date());
       setLoading(false);
     };
     fetchHealth();
+
+    // Refresh health checks every 30 seconds
+    const healthInterval = setInterval(fetchHealth, 30000);
 
     // Load saved UptimeRobot URL from localStorage
     const savedUrl = localStorage.getItem("uptimeRobotStatusUrl");
@@ -74,6 +85,9 @@ const AdminSystemStatus = () => {
 
     fetchUniqueVisitors();
     fetchAnalytics();
+
+    // Cleanup interval on unmount
+    return () => clearInterval(healthInterval);
   }, []);
 
   const handleSaveUptimeUrl = () => {
@@ -223,7 +237,10 @@ const AdminSystemStatus = () => {
                   {health[ep.name]}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  Last checked: {new Date().toLocaleTimeString()}
+                  Last checked:{" "}
+                  {healthTimestamp
+                    ? healthTimestamp.toLocaleTimeString()
+                    : "N/A"}
                 </p>
               </div>
             ))}
