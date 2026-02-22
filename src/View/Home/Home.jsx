@@ -36,7 +36,7 @@ const Home = () => {
       {/* Hero Section */}
       <Container className="flex flex-col">
         {!userLoggedIn && (
-          <div className="text-orange-600 text-xl md:text-2xl lg:text-2xl flex justify-center py-8 md:mb-12 lg:mb-12 overflow-hidden">
+          <div className="text-orange-600 text-lg md:text-2xl lg:text-2xl flex justify-center py-8 md:mb-8 lg:mb-8 overflow-hidden">
             <div className="w-11/12 md:w-8/12 lg:w-6/12">
               <Marquee
                 gradient={true}
@@ -44,9 +44,9 @@ const Home = () => {
                 speed={50}
                 pauseOnHover={true}
               >
-                <p className="mx-4">
-                  ✨Log in to unleash AI-powered magic and step into the future
-                  of learning!✨
+                <p className="mx-4 italic">
+                  <span className="text-cyan-500 font-bold"> Log in</span> to
+                  unleash AI-powered magic and step into the future of learning!
                 </p>
               </Marquee>
             </div>
@@ -62,7 +62,7 @@ const Home = () => {
         />
 
         {/* Hero Content */}
-        <div className="text-center pt-16 pb-[280px] px-4">
+        <div className="text-center pt-6 pb-[280px] px-4">
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
             Master German with
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">
@@ -80,7 +80,7 @@ const Home = () => {
           {!userLoggedIn && (
             <div className="mb-16 max-w-4xl mx-auto">
               <p className="text-lg text-orange-400 font-semibold mb-8">
-                ✨ Features You'll Unlock When You Log In
+                Features You'll Unlock When You Log In
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
@@ -112,14 +112,14 @@ const Home = () => {
                   <div className="text-2xl mb-2">📊</div>
                   <p className="text-white font-semibold">Personal Dashboard</p>
                   <p className="text-gray-400 text-sm">
-                    Track your progress and achievements
+                    All features in one place
                   </p>
                 </div>
                 <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
-                  <div className="text-2xl mb-2">🎯</div>
+                  <div className="text-2xl mb-2">📈</div>
                   <p className="text-white font-semibold">Progress Tracking</p>
                   <p className="text-gray-400 text-sm">
-                    Monitor your learning journey in detail
+                    Track your progress and achievements
                   </p>
                 </div>
                 <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
@@ -233,7 +233,7 @@ const Home = () => {
           >
             <div className="text-center mb-4">
               <span className="inline-block px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm mb-6">
-                🚀 Your Learning Hub
+                Your Learning Hub
               </span>
             </div>
             <h2 className="text-center text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-8">
@@ -369,7 +369,7 @@ const Home = () => {
             </div>
 
             <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-8 rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-gray-700">
-              <div className="text-5xl mb-4">🎯</div>
+              <div className="text-5xl mb-4"></div>
               <h3 className="text-2xl font-bold text-white mb-3">
                 Grammar Mastery
               </h3>
