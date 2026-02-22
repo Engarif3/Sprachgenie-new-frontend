@@ -8,6 +8,8 @@ import { useLockBodyScroll } from "./ModalScrolling";
 import { IoMdArrowDropright } from "react-icons/io";
 import { HiSpeakerWave } from "react-icons/hi2";
 import { MdOutlineDoubleArrow } from "react-icons/md";
+import { SiGoogletranslate } from "react-icons/si";
+import { FaSpinner } from "react-icons/fa";
 
 // Memoized sentence renderer component
 const SentenceRenderer = memo(
@@ -64,10 +66,18 @@ const SentenceRenderer = memo(
           {showSpeakerButton && (
             <button
               onClick={() => onTranslate(cleanSentence)}
-              className="text-slate-200 hover:text-white text-xs md:text-sm  flex-shrink-0  h-5 w-5 rounded-full bg-sky-700 font-semibold mt-0 md:mt-1 lg:mt-1 hover:border"
+              className=" flex-shrink-0 flex items-center justify-center mt-0 md:mt-1 lg:mt-1 hover:scale-110 transition-transform"
               disabled={isLoading}
+              title="Translate"
             >
-              {isLoading ? "..." : "Tr"}
+              {isLoading ? (
+                <FaSpinner size={16} className="animate-spin" />
+              ) : (
+                <SiGoogletranslate
+                  size={16}
+                  className="text-sky-500 hover:text-green-500"
+                />
+              )}
             </button>
           )}
         </div>
