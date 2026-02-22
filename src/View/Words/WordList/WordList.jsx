@@ -235,84 +235,6 @@ const WordList = () => {
   }, []);
 
   // Load cache from storage on mount
-  // useEffect(() => {
-  //   const loadData = async () => {
-  //     // Check if we have cached data
-  //     const cachedData = await getFromStorage(CACHE_KEY);
-
-  //     if (cachedData) {
-  //       const isExpired = Date.now() - cachedData.lastUpdated >= CACHE_EXPIRY;
-
-  //       if (!isExpired && !cachedData.isPartial) {
-  //         // Fresh complete cache - use it immediately
-  //         console.log("Using fresh cached data");
-  //         setCache(cachedData);
-  //         setLevels(cachedData.levels);
-  //         setTopics(cachedData.topics);
-  //         setFilteredTopics(cachedData.topics);
-  //         setIsLoading(false);
-  //         return;
-  //       }
-
-  //       if (isExpired && !cachedData.isPartial) {
-  //         // Stale but complete cache - show it immediately, then refresh in background
-  //         console.log("Using stale cache, refreshing in background");
-  //         setCache(cachedData);
-  //         setLevels(cachedData.levels);
-  //         setTopics(cachedData.topics);
-  //         setFilteredTopics(cachedData.topics);
-  //         setIsLoading(false);
-
-  //         // Refresh in background without blocking UI
-  //         setTimeout(() => fetchAllWords(), 100);
-  //         return;
-  //       }
-
-  //       if (cachedData.isPartial) {
-  //         // Partial cache - show it, then complete the fetch
-  //         console.log("Using partial cache, fetching remaining data");
-  //         setCache(cachedData);
-  //         setLevels(cachedData.levels);
-  //         setTopics(cachedData.topics);
-  //         setFilteredTopics(cachedData.topics);
-  //         setIsLoading(false);
-
-  //         // Fetch full data in background
-  //         setTimeout(async () => {
-  //           try {
-  //             const fullResponse = await api.get("/word/all?all=true");
-  //             const fullCache = {
-  //               words: fullResponse.data.data.words || [],
-  //               levels: fullResponse.data.data.levels || [],
-  //               topics: (fullResponse.data.data.topics || []).sort(
-  //                 (a, b) => a.id - b.id,
-  //               ),
-  //               lastUpdated: Date.now(),
-  //               isPartial: false,
-  //             };
-  //             setToStorage(CACHE_KEY, fullCache);
-  //             setCache(fullCache);
-  //             setLevels(fullCache.levels);
-  //             setTopics(fullCache.topics);
-  //             setFilteredTopics(fullCache.topics);
-  //             console.log("Background fetch complete from partial cache");
-  //           } catch (error) {
-  //             console.error("Background fetch failed:", error);
-  //           }
-  //         }, 100);
-  //         return;
-  //       }
-  //     }
-
-  //     // No cache at all - use progressive loading
-  //     console.log(
-  //       "No cache found, fetching fresh data with progressive loading",
-  //     );
-  //     fetchInitialWords();
-  //   };
-
-  //   loadData();
-  // }, [fetchInitialWords, fetchAllWords]);
   // ====================================================================
   useEffect(() => {
     const loadData = async () => {
@@ -1228,15 +1150,13 @@ const WordList = () => {
                   >
                     Action
                   </th>
-                  {userLoggedIn && (
-                    <th
-                      className={`border-l border-dotted border-gray-700 text-sm md:text-lg lg:text-lg py-3 text-center text-red-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b ${
-                        userInfo.role === "basic_user" ? "rounded-tr-xl" : ""
-                      }`}
-                    >
-                      Fav
-                    </th>
-                  )}
+                  <th
+                    className={`border-l border-dotted border-gray-700 text-sm md:text-lg lg:text-lg py-3 text-center text-red-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b ${
+                      !userLoggedIn ? "rounded-tr-xl" : ""
+                    }`}
+                  >
+                    ❤️
+                  </th>
                   {userLoggedIn &&
                     (userInfo.role === "super_admin" ||
                       userInfo.role === "admin") && (

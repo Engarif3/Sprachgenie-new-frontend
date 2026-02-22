@@ -71,10 +71,67 @@ const Home = () => {
             </span>
             Learning
           </h1>
-          <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto">
             From vocabulary to conversations, grammar to stories - your complete
             German learning journey starts here
           </p>
+
+          {/* Benefits Section */}
+          {!userLoggedIn && (
+            <div className="mb-16 max-w-4xl mx-auto">
+              <p className="text-lg text-orange-400 font-semibold mb-8">
+                ✨ Features You'll Unlock When You Log In
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
+                  <div className="text-2xl mb-2">❤️</div>
+                  <p className="text-white font-semibold">Favorite Words</p>
+                  <p className="text-gray-400 text-sm">
+                    Save words to your personal collection
+                  </p>
+                </div>
+                <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
+                  <div className="text-2xl mb-2">🤖</div>
+                  <p className="text-white font-semibold">
+                    AI-Powered Learning
+                  </p>
+                  <p className="text-gray-400 text-sm">
+                    Personalized lessons adapted to your level
+                  </p>
+                </div>
+                <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
+                  <div className="text-2xl mb-2">🌐</div>
+                  <p className="text-white font-semibold">
+                    Translation Features
+                  </p>
+                  <p className="text-gray-400 text-sm">
+                    Instant German to English translation
+                  </p>
+                </div>
+                <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
+                  <div className="text-2xl mb-2">📊</div>
+                  <p className="text-white font-semibold">Personal Dashboard</p>
+                  <p className="text-gray-400 text-sm">
+                    Track your progress and achievements
+                  </p>
+                </div>
+                <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
+                  <div className="text-2xl mb-2">🎯</div>
+                  <p className="text-white font-semibold">Progress Tracking</p>
+                  <p className="text-gray-400 text-sm">
+                    Monitor your learning journey in detail
+                  </p>
+                </div>
+                <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
+                  <div className="text-2xl mb-2">⚡</div>
+                  <p className="text-white font-semibold">Much More</p>
+                  <p className="text-gray-400 text-sm">
+                    Exclusive features to boost your learning
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Featured Vocabulary Access */}
           <div className="mt-16 mb-6">

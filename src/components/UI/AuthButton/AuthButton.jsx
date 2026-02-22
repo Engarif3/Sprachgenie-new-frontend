@@ -37,7 +37,7 @@ const AuthButton = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    // ✅ Call logout API to clear httpOnly cookies
+    //  Call logout API to clear httpOnly cookies
     await removeUser();
     toast.success("Logged out successfully");
 

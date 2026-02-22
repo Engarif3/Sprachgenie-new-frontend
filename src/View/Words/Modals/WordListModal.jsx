@@ -1,5 +1,6 @@
 import { useRef, useCallback, useMemo, memo, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
 import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 import { pronounceWord } from "../../../utils/wordPronounciation";
 import FavoriteButton from "./FavoriteButton";
@@ -13,7 +14,7 @@ import { FaSpinner } from "react-icons/fa";
 
 // Memoized sentence renderer component
 const SentenceRenderer = memo(
-  ({ sentence, index, onTranslate, translation, isLoading }) => {
+  ({ sentence, index, onTranslate, translation, isLoading, userLoggedIn }) => {
     const trimmed = sentence.trim();
     let className = "text-slate-300 text-sm md:text-lg lg:text-lg  ";
     let cleanSentence = sentence;
@@ -41,6 +42,22 @@ const SentenceRenderer = memo(
       }
     }, [cleanSentence, showSpeakerButton]);
 
+    const handleTranslateLocked = () => {
+      Swal.fire({
+        icon: "info",
+        title: "Login to enjoy this feature",
+        text: "Sign in to use the translation feature",
+        confirmButtonText: "Go to Login",
+        confirmButtonColor: "#123456",
+        showCancelButton: true,
+        cancelButtonText: "Cancel",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = "/login";
+        }
+      });
+    };
+
     return (
       <div>
         <div className="text-gray-600 flex items-start gap-2">
@@ -63,7 +80,7 @@ const SentenceRenderer = memo(
             </span>
           )}
           <span className={className}>{cleanSentence}</span>
-          {showSpeakerButton && (
+          {showSpeakerButton && userLoggedIn && (
             <button
               onClick={() => onTranslate(cleanSentence)}
               className=" flex-shrink-0 flex items-center justify-center mt-0 md:mt-1 lg:mt-1 hover:scale-110 transition-transform"
@@ -78,6 +95,15 @@ const SentenceRenderer = memo(
                   className="text-sky-500 hover:text-green-500"
                 />
               )}
+            </button>
+          )}
+          {showSpeakerButton && !userLoggedIn && (
+            <button
+              onClick={handleTranslateLocked}
+              className="flex-shrink-0 flex items-center justify-center mt-0 md:mt-1 lg:mt-1 text-gray-300 cursor-pointer hover:text-gray-200 transition-colors"
+              title="Sign in to use translation feature"
+            >
+              <SiGoogletranslate size={16} />
             </button>
           )}
         </div>
@@ -421,6 +447,7 @@ const WordListModal = ({
                     onTranslate={translateSentence}
                     translation={translations[sentence]}
                     isLoading={loadingTranslations[sentence]}
+                    userLoggedIn={userLoggedIn}
                   />
                 ))}
               </ul>

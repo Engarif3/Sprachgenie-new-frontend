@@ -1,5 +1,6 @@
 import React, { useCallback } from "react";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
 import { pronounceWord } from "../../../utils/wordPronounciation";
 import FavoriteButton from "../Modals/FavoriteButton";
 import { PuffLoader } from "react-spinners";
@@ -33,6 +34,38 @@ const WordTableRow = ({
   setSelectedHistory,
   setIsHistoryModalOpen,
 }) => {
+  const handleFavoriteLocked = () => {
+    Swal.fire({
+      icon: "info",
+      title: "Login to enjoy this feature",
+      text: "Sign in to add words to your favorites",
+      confirmButtonText: "Go to Login",
+      confirmButtonColor: "#123456",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = "/login";
+      }
+    });
+  };
+
+  const handleAIGenerationLocked = () => {
+    Swal.fire({
+      icon: "info",
+      title: "Login to enjoy this feature",
+      text: "Sign in to generate AI-powered paragraphs",
+      confirmButtonText: "Go to Login",
+      confirmButtonColor: "#123456",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = "/login";
+      }
+    });
+  };
+
   return (
     <tr
       key={word.id}
@@ -70,7 +103,7 @@ const WordTableRow = ({
               🔊
             </button>
 
-            {userLoggedIn && (
+            {userLoggedIn ? (
               <div
                 onClick={() => generateParagraph(word)}
                 className="relative border-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white italic px-2 py-1 text-xs font-semibold md:font-bold lg:font-bold rounded-full mt-4 h-6 w-6 cursor-pointer hover:scale-110 border-emerald-400 transition-all duration-200 shadow-lg hover:shadow-green-500/50"
@@ -89,6 +122,16 @@ const WordTableRow = ({
                       : "flex items-center justify-center relative bottom-1"
                   }`}
                 >
+                  ai
+                </span>
+              </div>
+            ) : (
+              <div
+                onClick={handleAIGenerationLocked}
+                className="relative border-2 bg-gradient-to-r from-gray-500 to-gray-500 text-gray-100 italic px-2 py-1 text-xs font-semibold md:font-bold lg:font-bold rounded-full mt-4 h-6 w-6 cursor-pointer border-gray-400 hover:from-gray-400 hover:to-gray-400 transition-all duration-200"
+                title="Sign in to generate paragraphs"
+              >
+                <span className="flex items-center justify-center relative bottom-1">
                   ai
                 </span>
               </div>
@@ -193,15 +236,38 @@ const WordTableRow = ({
       </td>
 
       {/* Favorite */}
-      {userLoggedIn && (
-        <td className="border border-gray-700 border-dotted p-0 md:p-3 text-center">
+      <td className="border border-gray-700 border-dotted p-0 md:p-3 text-center">
+        {userLoggedIn ? (
           <FavoriteButton
             isFavorite={favorites.includes(word.id)}
             loading={loadingFavorites[word.id]}
             onClick={() => toggleFavorite(word.id)}
           />
-        </td>
-      )}
+        ) : (
+          <button
+            onClick={handleFavoriteLocked}
+            className="p-1 rounded-full cursor-pointer transition-opacity hover:opacity-80"
+            title="Sign in to add favorites"
+          >
+            <svg
+              className="w-4 h-4 md:w-6 md:h-6 text-gray-300"
+              viewBox="-3 -3 128 114"
+            >
+              <path
+                style={{
+                  fill: "none",
+                  stroke: "currentColor",
+                  strokeWidth: "3",
+                  strokeLinecap: "round",
+                  strokeLinejoin: "round",
+                  strokeMiterlimit: "10",
+                }}
+                d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z"
+              />
+            </svg>
+          </button>
+        )}
+      </td>
 
       {/* History */}
       {userLoggedIn &&
