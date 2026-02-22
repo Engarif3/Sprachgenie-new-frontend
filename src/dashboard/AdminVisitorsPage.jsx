@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 
 const AdminVisitorsPage = () => {
   const [visitorsByLocation, setVisitorsByLocation] = useState([]);
@@ -36,7 +37,7 @@ const AdminVisitorsPage = () => {
 
   const handleDeleteAll = async () => {
     if (deleteConfirmation.inputValue !== "ok") {
-      alert("Please type 'ok' to confirm deletion");
+      Swal.fire("Error", "Please type 'ok' to confirm deletion", "error");
       return;
     }
 
@@ -46,26 +47,32 @@ const AdminVisitorsPage = () => {
         { method: "DELETE" },
       );
       if (res.ok) {
-        alert("All visitors deleted successfully!");
         setDeleteConfirmation({
           show: false,
           type: "",
           data: null,
           inputValue: "",
         });
+        Swal.fire({
+          title: "Deleted!",
+          text: "All visitors have been removed.",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        });
         fetchVisitorsByLocation(1);
       } else {
-        alert("Failed to delete visitors");
+        Swal.fire("Error", "Failed to delete visitors", "error");
       }
     } catch (error) {
       console.error("Delete error:", error);
-      alert("Error deleting visitors");
+      Swal.fire("Error", "Error deleting visitors", "error");
     }
   };
 
   const handleDeleteLocation = async (country, city) => {
     if (deleteConfirmation.inputValue !== "ok") {
-      alert("Please type 'ok' to confirm deletion");
+      Swal.fire("Error", "Please type 'ok' to confirm deletion", "error");
       return;
     }
 
@@ -79,26 +86,32 @@ const AdminVisitorsPage = () => {
         },
       );
       if (res.ok) {
-        alert(`Deleted all visitors from ${country}, ${city}`);
         setDeleteConfirmation({
           show: false,
           type: "",
           data: null,
           inputValue: "",
         });
+        Swal.fire({
+          title: "Deleted!",
+          text: `All visitors from ${country}, ${city} have been removed.`,
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        });
         fetchVisitorsByLocation(1);
       } else {
-        alert("Failed to delete location visitors");
+        Swal.fire("Error", "Failed to delete location visitors", "error");
       }
     } catch (error) {
       console.error("Delete error:", error);
-      alert("Error deleting location visitors");
+      Swal.fire("Error", "Error deleting location visitors", "error");
     }
   };
 
   const handleDeleteVisitor = async (ipAddress) => {
     if (deleteConfirmation.inputValue !== "ok") {
-      alert("Please type 'ok' to confirm deletion");
+      Swal.fire("Error", "Please type 'ok' to confirm deletion", "error");
       return;
     }
 
@@ -112,20 +125,26 @@ const AdminVisitorsPage = () => {
         },
       );
       if (res.ok) {
-        alert(`Deleted visitor ${ipAddress}`);
         setDeleteConfirmation({
           show: false,
           type: "",
           data: null,
           inputValue: "",
         });
+        Swal.fire({
+          title: "Deleted!",
+          text: `Visitor ${ipAddress} has been removed.`,
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        });
         fetchVisitorsByLocation(1);
       } else {
-        alert("Failed to delete visitor");
+        Swal.fire("Error", "Failed to delete visitor", "error");
       }
     } catch (error) {
       console.error("Delete error:", error);
-      alert("Error deleting visitor");
+      Swal.fire("Error", "Error deleting visitor", "error");
     }
   };
 
