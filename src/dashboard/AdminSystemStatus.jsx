@@ -606,30 +606,83 @@ const AdminSystemStatus = () => {
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
-                <p className="text-gray-400 text-sm mb-2">Record Counts</p>
-                <div className="space-y-2">
-                  <p className="text-gray-300">
-                    <span className="text-blue-400 font-bold">
-                      {databaseStats.recordCounts?.users || 0}
-                    </span>{" "}
-                    Users
-                  </p>
-                  <p className="text-gray-300">
-                    <span className="text-green-400 font-bold">
-                      {databaseStats.recordCounts?.words || 0}
-                    </span>{" "}
-                    Words
-                  </p>
+                <p className="text-gray-400 text-sm mb-3 font-medium">
+                  Record Counts
+                </p>
+                <div className="space-y-4">
+                  {/* Users Count */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-300 text-sm">Users</span>
+                      <span className="text-blue-400 font-bold">
+                        {databaseStats.recordCounts?.users || 0}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div
+                        className="h-2 rounded-full bg-blue-500"
+                        style={{
+                          width: `${Math.min(((databaseStats.recordCounts?.users || 0) / 100) * 100, 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Words Count */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-300 text-sm">Words</span>
+                      <span className="text-green-400 font-bold">
+                        {databaseStats.recordCounts?.words || 0}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div
+                        className="h-2 rounded-full bg-green-500"
+                        style={{
+                          width: `${Math.min(((databaseStats.recordCounts?.words || 0) / 5000) * 100, 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
-                <p className="text-gray-400 text-sm mb-2">Performance</p>
-                <p className="text-gray-300">
-                  Query Time:{" "}
-                  <span className="text-yellow-400 font-bold">
-                    {databaseStats.performance?.queryTime}
-                  </span>
+                <p className="text-gray-400 text-sm mb-3 font-medium">
+                  Performance
                 </p>
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-300 text-sm">Query Time</span>
+                      <span className="text-yellow-400 font-bold">
+                        {databaseStats.performance?.queryTime}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full ${
+                          parseInt(databaseStats.performance?.queryTime || 0) >
+                          100
+                            ? "bg-red-500"
+                            : parseInt(
+                                  databaseStats.performance?.queryTime || 0,
+                                ) > 50
+                              ? "bg-yellow-500"
+                              : "bg-green-500"
+                        }`}
+                        style={{
+                          width: `${Math.min((parseInt(databaseStats.performance?.queryTime || 0) / 200) * 100, 100)}%`,
+                        }}
+                      />
+                    </div>
+                    <p className="text-gray-400 text-xs">
+                      {parseInt(databaseStats.performance?.queryTime || 0) > 100
+                        ? "⚠️ High latency"
+                        : "✅ Good performance"}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -678,21 +731,103 @@ const AdminSystemStatus = () => {
               <p className="text-gray-400 text-sm font-medium mb-3">
                 CPU Information
               </p>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <p className="text-gray-300">
                   <span className="text-blue-400 font-bold">
                     {systemStats.cpu?.cores}
                   </span>{" "}
                   Cores - {systemStats.cpu?.model}
                 </p>
-                <p className="text-gray-300">
-                  Load Average (1/5/15 min):{" "}
-                  <span className="font-mono text-green-400">
-                    {systemStats.cpu?.loadAverage?.["1min"]} /{" "}
-                    {systemStats.cpu?.loadAverage?.["5min"]} /{" "}
-                    {systemStats.cpu?.loadAverage?.["15min"]}
-                  </span>
-                </p>
+
+                {/* Load Average Visualization */}
+                <div className="space-y-3">
+                  <p className="text-gray-300 font-medium text-sm">
+                    Load Average (1/5/15 min)
+                  </p>
+
+                  {/* 1 Min */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-400">1 min</span>
+                      <span className="font-mono text-gray-300">
+                        {systemStats.cpu?.loadAverage?.["1min"]}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full ${
+                          parseFloat(systemStats.cpu?.loadAverage?.["1min"]) > 2
+                            ? "bg-red-500"
+                            : parseFloat(
+                                  systemStats.cpu?.loadAverage?.["1min"],
+                                ) > 1
+                              ? "bg-yellow-500"
+                              : "bg-green-500"
+                        }`}
+                        style={{
+                          width: `${Math.min(parseFloat(systemStats.cpu?.loadAverage?.["1min"]) * 33, 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* 5 Min */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-400">5 min</span>
+                      <span className="font-mono text-gray-300">
+                        {systemStats.cpu?.loadAverage?.["5min"]}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full ${
+                          parseFloat(systemStats.cpu?.loadAverage?.["5min"]) > 2
+                            ? "bg-red-500"
+                            : parseFloat(
+                                  systemStats.cpu?.loadAverage?.["5min"],
+                                ) > 1
+                              ? "bg-yellow-500"
+                              : "bg-green-500"
+                        }`}
+                        style={{
+                          width: `${Math.min(parseFloat(systemStats.cpu?.loadAverage?.["5min"]) * 33, 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* 15 Min */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-400">15 min</span>
+                      <span className="font-mono text-gray-300">
+                        {systemStats.cpu?.loadAverage?.["15min"]}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full ${
+                          parseFloat(systemStats.cpu?.loadAverage?.["15min"]) >
+                          2
+                            ? "bg-red-500"
+                            : parseFloat(
+                                  systemStats.cpu?.loadAverage?.["15min"],
+                                ) > 1
+                              ? "bg-yellow-500"
+                              : "bg-green-500"
+                        }`}
+                        style={{
+                          width: `${Math.min(parseFloat(systemStats.cpu?.loadAverage?.["15min"]) * 33, 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <p className="text-gray-400 text-xs pt-2 border-t border-gray-700">
+                    💡 Green = Healthy | Yellow = Moderate | Red = High load
+                  </p>
+                </div>
               </div>
             </div>
             <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
@@ -757,30 +892,70 @@ const AdminSystemStatus = () => {
 
             {/* Per IP and Per User Limits */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="p-3 bg-gray-800/50 border border-gray-700 rounded-lg">
-                <p className="text-gray-400 text-xs font-medium mb-2">
+              <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+                <p className="text-gray-400 text-sm font-medium mb-3">
                   Per IP Limit
                 </p>
-                <div className="space-y-1">
+                <div className="space-y-3">
                   <p className="text-gray-300 text-sm">
                     {rateLimitStatus.perIP?.limit}
                   </p>
-                  <p className="text-gray-400 text-xs">
-                    Tracking {rateLimitStatus.perIP?.activeTracking} IPs
-                  </p>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-400 text-xs">Active IPs</span>
+                      <span className="text-blue-400 font-bold text-sm">
+                        {rateLimitStatus.perIP?.activeTracking}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-700 rounded-full h-2.5">
+                      <div
+                        className={`h-2.5 rounded-full ${
+                          (rateLimitStatus.perIP?.activeTracking || 0) > 50
+                            ? "bg-red-500"
+                            : (rateLimitStatus.perIP?.activeTracking || 0) > 20
+                              ? "bg-yellow-500"
+                              : "bg-blue-500"
+                        }`}
+                        style={{
+                          width: `${Math.min((rateLimitStatus.perIP?.activeTracking || 0) * 2, 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="p-3 bg-gray-800/50 border border-gray-700 rounded-lg">
-                <p className="text-gray-400 text-xs font-medium mb-2">
+              <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+                <p className="text-gray-400 text-sm font-medium mb-3">
                   Per User Limit
                 </p>
-                <div className="space-y-1">
+                <div className="space-y-3">
                   <p className="text-gray-300 text-sm">
                     {rateLimitStatus.perUser?.limit}
                   </p>
-                  <p className="text-gray-400 text-xs">
-                    Tracking {rateLimitStatus.perUser?.activeTracking} users
-                  </p>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-400 text-xs">
+                        Active Users
+                      </span>
+                      <span className="text-purple-400 font-bold text-sm">
+                        {rateLimitStatus.perUser?.activeTracking}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-700 rounded-full h-2.5">
+                      <div
+                        className={`h-2.5 rounded-full ${
+                          (rateLimitStatus.perUser?.activeTracking || 0) > 20
+                            ? "bg-red-500"
+                            : (rateLimitStatus.perUser?.activeTracking || 0) > 5
+                              ? "bg-yellow-500"
+                              : "bg-purple-500"
+                        }`}
+                        style={{
+                          width: `${Math.min((rateLimitStatus.perUser?.activeTracking || 0) * 5, 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
