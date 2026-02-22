@@ -190,16 +190,16 @@ const Quiz = () => {
     dispatch({ type: "SET_QUIZ_STARTED", payload: true });
   };
 
-  const handleScore = (delta) => {
+  const handleScoreAndNext = (delta) => {
     if (usedScore) return;
+
+    const newScore = Math.max(0, score + delta);
     dispatch({
       type: "SET_SCORE",
-      payload: Math.max(0, score + delta),
+      payload: newScore,
     });
-    dispatch({ type: "SET_USED_SCORE", payload: true });
-  };
 
-  const nextWord = () => {
+    // Move to next word or finish quiz
     if (currentIndex + 1 < quizWords.length) {
       dispatch({ type: "SET_CURRENT_INDEX", payload: currentIndex + 1 });
       dispatch({ type: "SET_SHOW_MEANING", payload: false });
@@ -208,7 +208,7 @@ const Quiz = () => {
       Swal.fire({
         title: "Finished!",
         icon: "success",
-        html: `Your Score: <b>${score} / ${quizWords.length}</b>`,
+        html: `Your Score: <b>${newScore} / ${quizWords.length}</b>`,
       });
       dispatch({ type: "SET_QUIZ_STARTED", payload: false });
       localStorage.removeItem(QUIZ_STORAGE_KEY);
@@ -404,7 +404,7 @@ const Quiz = () => {
               </div>
               <div className="flex justify-center gap-2 md:gap-4">
                 <button
-                  onClick={() => handleScore(-1)}
+                  onClick={() => handleScoreAndNext(-1)}
                   disabled={usedScore}
                   className={`bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-4 md:px-8 py-2 md:py-3 rounded-full font-bold text-lg md:text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
                     usedScore
@@ -415,7 +415,7 @@ const Quiz = () => {
                   ❌
                 </button>
                 <button
-                  onClick={() => handleScore(1)}
+                  onClick={() => handleScoreAndNext(1)}
                   disabled={usedScore}
                   className={`bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-4 md:px-8 py-2 md:py-3 rounded-full font-bold text-lg md:text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
                     usedScore
@@ -427,16 +427,6 @@ const Quiz = () => {
                 </button>
               </div>
             </div>
-          </div>
-
-          {/* Next button */}
-          <div className="text-center">
-            <button
-              onClick={nextWord}
-              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 px-8 md:px-12 py-3 md:py-4 rounded-full font-bold text-lg md:text-xl transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-cyan-500/50"
-            >
-              Next Word →
-            </button>
           </div>
         </div>
       </div>
