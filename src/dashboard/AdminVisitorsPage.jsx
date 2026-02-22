@@ -7,6 +7,7 @@ const AdminVisitorsPage = () => {
   const [locationPage, setLocationPage] = useState(1);
   const [locationHasMore, setLocationHasMore] = useState(false);
   const [locationTotal, setLocationTotal] = useState(0);
+  const [visitorPages, setVisitorPages] = useState({}); // Track page for each location
   const [deleteConfirmation, setDeleteConfirmation] = useState({
     show: false,
     type: "", // "all", "location", "visitor"
@@ -148,6 +149,35 @@ const AdminVisitorsPage = () => {
     }
   };
 
+  // Helper function to get location key
+  const getLocationKey = (country, city) =>
+    `${country || "Unknown"}, ${city || "Unknown"}`;
+
+  // Handle pagination for visitors within a location
+  const handleVisitorPageChange = (country, city, newPage) => {
+    const key = getLocationKey(country, city);
+    setVisitorPages({
+      ...visitorPages,
+      [key]: newPage,
+    });
+  };
+
+  // Get paginated visitors for a location
+  const getPaginatedVisitors = (location) => {
+    const key = getLocationKey(location.country, location.city);
+    const currentPage = visitorPages[key] || 1;
+    const itemsPerPage = 10;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return {
+      visitors: location.visitors.slice(startIndex, endIndex),
+      currentPage,
+      totalPages: Math.ceil(location.visitors.length / itemsPerPage),
+      hasMore: endIndex < location.visitors.length,
+      hasPrev: currentPage > 1,
+    };
+  };
+
   useEffect(() => {
     fetchVisitorsByLocation(1);
   }, []);
@@ -276,39 +306,88 @@ const AdminVisitorsPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {location.visitors.map((visitor, vIdx) => (
-                        <tr
-                          key={vIdx}
-                          className="border-b border-gray-700 hover:bg-gray-800/50 transition-colors"
-                        >
-                          <td className="px-4 py-3 font-mono text-gray-400">
-                            {visitor.ipAddress}
-                          </td>
-                          <td className="px-4 py-3">{visitor.browser}</td>
-                          <td className="px-4 py-3">{visitor.device}</td>
-                          <td className="px-4 py-3">
-                            {new Date(visitor.visitedAt).toLocaleString()}
-                          </td>
-                          <td className="px-4 py-3">
-                            <button
-                              onClick={() =>
-                                setDeleteConfirmation({
-                                  show: true,
-                                  type: "visitor",
-                                  data: { ipAddress: visitor.ipAddress },
-                                  inputValue: "",
-                                })
-                              }
-                              className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded transition-colors"
-                            >
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                      {(() => {
+                        const paginationData = getPaginatedVisitors(location);
+                        return paginationData.visitors.map((visitor, vIdx) => (
+                          <tr
+                            key={vIdx}
+                            className="border-b border-gray-700 hover:bg-gray-800/50 transition-colors"
+                          >
+                            <td className="px-4 py-3 font-mono text-gray-400">
+                              {visitor.ipAddress}
+                            </td>
+                            <td className="px-4 py-3">{visitor.browser}</td>
+                            <td className="px-4 py-3">{visitor.device}</td>
+                            <td className="px-4 py-3">
+                              {new Date(visitor.visitedAt).toLocaleString()}
+                            </td>
+                            <td className="px-4 py-3">
+                              <button
+                                onClick={() =>
+                                  setDeleteConfirmation({
+                                    show: true,
+                                    type: "visitor",
+                                    data: { ipAddress: visitor.ipAddress },
+                                    inputValue: "",
+                                  })
+                                }
+                                className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded transition-colors"
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ));
+                      })()}
                     </tbody>
                   </table>
                 </div>
+
+                {/* Visitor Pagination */}
+                {(() => {
+                  const paginationData = getPaginatedVisitors(location);
+                  return location.visitors.length > 10 ? (
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-700">
+                      <button
+                        onClick={() =>
+                          handleVisitorPageChange(
+                            location.country,
+                            location.city,
+                            paginationData.currentPage - 1,
+                          )
+                        }
+                        disabled={!paginationData.hasPrev}
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors text-sm"
+                      >
+                        ← Previous
+                      </button>
+                      <span className="text-gray-300 text-sm font-medium">
+                        Page{" "}
+                        <span className="text-blue-400 font-bold">
+                          {paginationData.currentPage}
+                        </span>{" "}
+                        of{" "}
+                        <span className="text-blue-400 font-bold">
+                          {paginationData.totalPages}
+                        </span>{" "}
+                        ({location.visitors.length} total)
+                      </span>
+                      <button
+                        onClick={() =>
+                          handleVisitorPageChange(
+                            location.country,
+                            location.city,
+                            paginationData.currentPage + 1,
+                          )
+                        }
+                        disabled={!paginationData.hasMore}
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors text-sm"
+                      >
+                        Next →
+                      </button>
+                    </div>
+                  ) : null;
+                })()}
               </div>
             ))}
 
@@ -355,7 +434,8 @@ const AdminVisitorsPage = () => {
             </p>
             <div className="mb-6">
               <label className="block text-gray-400 text-sm mb-2">
-                Type "ok" to confirm:
+                Type "{deleteConfirmation.type === "all" ? "confirm" : "ok"}" to
+                confirm:
               </label>
               <input
                 type="text"
@@ -366,12 +446,18 @@ const AdminVisitorsPage = () => {
                     inputValue: e.target.value,
                   })
                 }
-                placeholder="Type 'ok' to confirm"
+                placeholder={
+                  deleteConfirmation.type === "all"
+                    ? "Type 'confirm' to confirm"
+                    : "Type 'ok' to confirm"
+                }
                 className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-red-500"
                 onKeyPress={(e) => {
+                  const requiredInput =
+                    deleteConfirmation.type === "all" ? "confirm" : "ok";
                   if (
                     e.key === "Enter" &&
-                    deleteConfirmation.inputValue === "ok"
+                    deleteConfirmation.inputValue === requiredInput
                   ) {
                     if (deleteConfirmation.type === "all") {
                       handleDeleteAll();
@@ -414,7 +500,10 @@ const AdminVisitorsPage = () => {
                     handleDeleteVisitor(deleteConfirmation.data.ipAddress);
                   }
                 }}
-                disabled={deleteConfirmation.inputValue !== "ok"}
+                disabled={
+                  deleteConfirmation.inputValue !==
+                  (deleteConfirmation.type === "all" ? "confirm" : "ok")
+                }
                 className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-800 text-white rounded-lg font-medium transition-colors"
               >
                 Delete

@@ -343,28 +343,51 @@ const AdminSystemStatus = () => {
           <p className="text-gray-300 text-sm font-medium mb-3">
             Last 30 Days Breakdown
           </p>
-          <div className="grid grid-cols-7 gap-2">
-            {Object.entries(analytics.last30Days || {}).map(([date, count]) => {
-              const numCount = Number(count) || 0;
-              return (
-                <div key={date} className="flex flex-col items-center">
-                  <p className="text-xs text-gray-500">
-                    {new Date(date).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </p>
-                  <div
-                    className="w-full h-12 mt-1 bg-gradient-to-t from-blue-600 to-blue-400 rounded flex items-end justify-center p-1"
-                    style={{ height: Math.max(12 + numCount * 2, 12) }}
-                  >
-                    <span className="text-md text-white font-semibold mb-4">
-                      {count}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="overflow-x-auto">
+            <div
+              className="grid gap-2"
+              style={{
+                gridTemplateColumns: "repeat(auto-fit, minmax(40px, 1fr))",
+              }}
+            >
+              {(() => {
+                const entries = Object.entries(analytics.last30Days || {});
+                const maxCount = Math.max(
+                  ...entries.map(([, count]) => Number(count) || 0),
+                  1,
+                );
+
+                return entries.map(([date, count]) => {
+                  const numCount = Number(count) || 0;
+                  const heightPercent = (numCount / maxCount) * 100;
+
+                  return (
+                    <div
+                      key={date}
+                      className="flex flex-col items-center justify-end gap-1"
+                    >
+                      <span className="text-xs text-white font-semibold h-5 flex items-center">
+                        {numCount > 0 ? numCount : ""}
+                      </span>
+                      <div
+                        className="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t transition-all hover:from-blue-500 hover:to-blue-300"
+                        style={{
+                          minHeight: "8px",
+                          height: `${Math.max(heightPercent, 8)}px`,
+                        }}
+                        title={`${new Date(date).toLocaleDateString()}: ${numCount} visitors`}
+                      />
+                      <p className="text-xs text-gray-400 text-center whitespace-nowrap">
+                        {new Date(date).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </p>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
           </div>
         </div>
       </div>
