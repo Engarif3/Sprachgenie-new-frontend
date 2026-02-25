@@ -2,44 +2,16 @@ import React, { useState, useEffect } from "react";
 import api from "../../axios";
 import stories from "./stories.json";
 import Container from "../../utils/Container";
-import { pronounceWord } from "../../utils/wordPronounciation";
 
 // Import Google Font - Roboto for clean, professional look (like Todaii)
 import "@fontsource/roboto";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 
-// Modal component for word meaning
-const Modal = ({ word, meaning, onClose }) => {
-  return (
-    // <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-10">
-    <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-10">
-      <div className="px-4 py-2 rounded-lg shadow-lg md:w-1/5 bg-white">
-        <h3 className="text-2xl font-bold text-pink-600 font-mono text-center flex items-center justify-center gap-2">
-          {word}
-          <button
-            onClick={() => pronounceWord(word)}
-            className="text-blue-600 hover:text-blue-800"
-            title="Pronounce"
-          >
-            🔊
-          </button>
-        </h3>
-        <hr />
-        <p className="text-xl text-cyan-700 mb-2">{meaning}</p>
-        <div className="flex justify-end">
-          <button onClick={onClose} className="btn btn-sm btn-warning">
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
+// Modal component removed (vocabulary colorization disabled)
 
 const Stories = () => {
-  const [selectedWord, setSelectedWord] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  // Modal state removed
   const [allStories, setAllStories] = useState(stories);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -68,8 +40,6 @@ const Stories = () => {
           description: {
             text: story.description,
           },
-          passage_vocabulary: story.passageVocabulary || [],
-          vocabulary: story.vocabulary || [],
         }));
 
         setAllStories(transformedStories);
@@ -91,14 +61,7 @@ const Stories = () => {
     }
   };
 
-  const openModal = (word, meaning) => {
-    setSelectedWord({ word, meaning });
-    setModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalOpen(false);
-  };
+  // Modal functionality removed (no longer needed)
 
   // Helper function to intelligently split text into paragraphs
   const splitIntoParagraphs = (text) => {
@@ -138,35 +101,6 @@ const Stories = () => {
     });
 
     return paragraphs.filter((p) => p.trim().length > 0);
-  };
-
-  const underlineText = (text, passage_vocabulary) => {
-    const words = text.split(" ");
-    const processedWords = new Set();
-
-    return words.map((word, index) => {
-      const cleanWord = word.toLowerCase().replace(/[^\wäöüß]/g, "");
-      const matchedWord = passage_vocabulary.find(
-        (item) =>
-          cleanWord === item.word.toLowerCase() &&
-          !processedWords.has(cleanWord),
-      );
-
-      if (matchedWord) {
-        processedWords.add(cleanWord);
-        return (
-          <span
-            key={index}
-            className="cursor-pointer text-orange-500 hover:text-orange-400 font-medium transition-colors"
-            onClick={() => openModal(matchedWord.word, matchedWord.meaning)}
-          >
-            {word}{" "}
-          </span>
-        );
-      }
-
-      return word + " ";
-    });
   };
 
   return (
@@ -211,82 +145,44 @@ const Stories = () => {
         )}
 
         <div className="text-2xl text-white p-2 md:p-4">
-          {allStories.map(
-            (
-              { title, image, description, vocabulary, passage_vocabulary },
-              index,
-            ) => (
-              <div
-                key={index}
-                className={`mb-12 ${
-                  index === allStories.length - 1
-                    ? ""
-                    : "border-b border-dotted"
-                } border-cyan-950 p-1 md:p-4 flex justify-center items-center flex-col mt-4`}
-              >
-                {/* Title */}
-                <h2 className="text-xl md:text-3xl lg:text-3xl text-center font-bold mb-4 md:mb-12 lg:mb-12">
-                  {title}
-                </h2>
+          {allStories.map(({ title, image, description }, index) => (
+            <div
+              key={index}
+              className={`mb-12 ${
+                index === allStories.length - 1 ? "" : "border-b border-dotted"
+              } border-cyan-950 p-1 md:p-4 flex justify-center items-center flex-col mt-4`}
+            >
+              {/* Title */}
+              <h2 className="text-xl md:text-3xl lg:text-3xl text-center font-bold mb-4 md:mb-12 lg:mb-12">
+                {title}
+              </h2>
 
-                {/* Image */}
-                {image && (
-                  <img
-                    src={image}
-                    alt={title}
-                    className="mb-4 w-96 md:w-6/12 h-auto object-cover rounded-lg "
-                  />
-                )}
+              {/* Image */}
+              {image && (
+                <img
+                  src={image}
+                  alt={title}
+                  className="mb-4 w-96 md:w-6/12 h-auto object-cover rounded-lg "
+                />
+              )}
 
-                {/* Description */}
-                <div className="[font-family:'Roboto',sans-serif] text-base md:text-lg lg:text-lg leading-8 text-gray-200 text-justify mb-2 md:mb-8 lg:mb-8 w-full md:w-8/12 bg-gradient-to-br from-gray-900/70 to-gray-800/50 backdrop-blur-md border border-gray-700/50 p-2 md:p-8 rounded-2xl shadow-2xl font-normal">
-                  {splitIntoParagraphs(description.text).map(
-                    (paragraph, idx) => (
-                      <p key={idx} className="mb-6">
-                        {underlineText(paragraph, passage_vocabulary)}
-                      </p>
-                    ),
-                  )}
-                </div>
-
-                {/* Vocabulary List */}
-                <div className="text-lg w-11/12 md:w-8/12 my-12 ">
-                  <h3 className="font-bold mb-2 uppercase">Vocabulary</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
-                    {vocabulary.map((item, index) => (
-                      <div
-                        key={index}
-                        className="flex items-between gap-2 justify-start p-3 bg-gray-800/40 backdrop-blur-sm border border-gray-700/40 rounded-xl shadow-lg hover:border-orange-500/40 transition-all duration-300"
-                      >
-                        <div className="text-orange-500 font-bold flex justify-between">
-                          <span> {item.word}</span>
-                          <div
-                            onClick={() => pronounceWord(item.word)}
-                            className=" text-blue-600 hover:text-blue-800 ml-2 cursor-pointer"
-                            title="Pronounce"
-                          >
-                            🔊
-                          </div>
-                        </div>
-                        <span className="  text-white">{item.meaning}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              {/* Description */}
+              <div className="[font-family:'Roboto',sans-serif] text-base md:text-lg lg:text-lg leading-8 text-gray-200 text-justify mb-2 md:mb-8 lg:mb-8 w-full md:w-8/12 bg-gradient-to-br from-gray-900/70 to-gray-800/50 backdrop-blur-md border border-gray-700/50 p-2 md:p-8 rounded-2xl shadow-2xl font-normal">
+                {splitIntoParagraphs(description.text).map((paragraph, idx) => (
+                  <p key={idx} className="mb-6">
+                    {paragraph}
+                  </p>
+                ))}
               </div>
-            ),
-          )}
+
+              {/* Vocabulary list removed - focus on story flow */}
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Modal */}
-      {modalOpen && (
-        <Modal
-          word={selectedWord.word}
-          meaning={selectedWord.meaning}
-          onClose={closeModal}
-        />
-      )}
+      {/* Modal removed - no vocabulary colorization */}
     </div>
   );
 };
