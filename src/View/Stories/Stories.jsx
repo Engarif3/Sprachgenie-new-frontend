@@ -225,7 +225,9 @@ const Stories = () => {
                 } border-cyan-950 p-1 md:p-4 flex justify-center items-center flex-col mt-4`}
               >
                 {/* Title */}
-                <h2 className="text-3xl font-bold mb-12">{title}</h2>
+                <h2 className="text-xl md:text-3xl lg:text-3xl text-center font-bold mb-4 md:mb-12 lg:mb-12">
+                  {title}
+                </h2>
 
                 {/* Image */}
                 {image && (
@@ -237,7 +239,7 @@ const Stories = () => {
                 )}
 
                 {/* Description */}
-                <div className="[font-family:'Roboto',sans-serif] text-base md:text-lg lg:text-lg leading-8 text-gray-200 text-justify mb-8 w-11/12 md:w-8/12 bg-gradient-to-br from-gray-900/70 to-gray-800/50 backdrop-blur-md border border-gray-700/50 p-4 md:p-8 rounded-2xl shadow-2xl font-normal">
+                <div className="[font-family:'Roboto',sans-serif] text-base md:text-lg lg:text-lg leading-8 text-gray-200 text-justify mb-2 md:mb-8 lg:mb-8 w-full md:w-8/12 bg-gradient-to-br from-gray-900/70 to-gray-800/50 backdrop-blur-md border border-gray-700/50 p-2 md:p-8 rounded-2xl shadow-2xl font-normal">
                   {splitIntoParagraphs(description.text).map(
                     (paragraph, idx) => (
                       <p key={idx} className="mb-6">
