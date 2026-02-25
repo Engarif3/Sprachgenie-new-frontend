@@ -206,7 +206,7 @@ const Stories = () => {
                 )}
 
                 {/* Description */}
-                <div className="[font-family:'Roboto',sans-serif] text-base md:text-lg lg:text-lg leading-8 text-gray-200 text-justify mb-2 md:mb-8 lg:mb-8 w-full md:w-8/12 bg-gradient-to-br from-gray-900/70 to-gray-800/50 backdrop-blur-md border border-gray-700/50 p-2 md:p-8 rounded-2xl shadow-2xl font-normal">
+                <div className="[font-family:'Roboto',sans-serif] text-xl md:text-xl lg:text-xl leading-8 text-gray-200 text-justify mb-2 md:mb-8 lg:mb-8 w-full md:w-8/12 bg-gradient-to-br from-gray-900/70 to-gray-800/50 backdrop-blur-md border border-gray-700/50 p-2 md:p-8 rounded-2xl shadow-2xl font-normal">
                   {splitIntoParagraphs(description.text).map(
                     (paragraph, idx) => (
                       <p key={idx} className="mb-6">
@@ -233,15 +233,19 @@ const Stories = () => {
                             utterance.lang = "de-DE";
                             window.speechSynthesis.speak(utterance);
                           }}
-                          className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white rounded-full transition-colors"
+                          className="flex-shrink-0 w-8 h-8 flex items-center justify-center  text-white rounded-full transition-colors"
                           title={`Pronounce: ${item.word}`}
                         >
                           🔊
                         </button>
-                        <div className="text-orange-500 font-bold">
+                        <div className="text-sky-400 font-bold">
                           {item.word}
                         </div>
-                        <span className="text-white">{item.meaning}</span>
+                        <p className="text-white">
+                          {" "}
+                          <span className="text-orange-600"> → </span>{" "}
+                          {item.meaning}
+                        </p>
                       </div>
                     ))}
                   </div>
