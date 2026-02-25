@@ -72,9 +72,44 @@ const Stories = () => {
     }
 
     // If no paragraph breaks, intelligently split by sentences
-    // Match sentences: ends with . ! ? followed by space and capital letter
-    const sentenceRegex = /[^.!?]*[.!?]+(?=\s+[A-ZÄÖÜ]|\s*$)/g;
-    const sentences = text.match(sentenceRegex) || [];
+    // Detect sentences but skip periods after digits (dates like "1. Mai", "21. Juni")
+    const sentences = [];
+    let currentSentence = "";
+
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      currentSentence += char;
+
+      // Check if this is a sentence ending (. ! ?)
+      if (
+        (char === "." || char === "!" || char === "?") &&
+        i + 1 < text.length
+      ) {
+        const prevChar = text[i - 1];
+        const nextChar = text[i + 1];
+        const charAfterSpace = text[i + 2];
+
+        // Skip if period follows a digit (dates like "1. Mai")
+        const isDateFormat = /\d/.test(prevChar);
+
+        // If followed by space and capital letter AND not a date format, it's a sentence end
+        if (
+          !isDateFormat &&
+          nextChar === " " &&
+          charAfterSpace &&
+          /[A-ZÄÖÜ]/.test(charAfterSpace)
+        ) {
+          sentences.push(currentSentence.trim());
+          currentSentence = "";
+          i += 1; // Skip the space
+        }
+      }
+    }
+
+    // Add any remaining text as final sentence
+    if (currentSentence.trim()) {
+      sentences.push(currentSentence.trim());
+    }
 
     if (sentences.length < 4) {
       // If fewer than 4 sentences, return as single paragraph
@@ -87,7 +122,7 @@ const Stories = () => {
     const sentencesPerParagraph = Math.ceil(sentences.length / 4);
 
     sentences.forEach((sentence, idx) => {
-      currentParagraph += sentence.trim();
+      currentParagraph += sentence;
       if (
         (idx + 1) % sentencesPerParagraph === 0 ||
         idx === sentences.length - 1
