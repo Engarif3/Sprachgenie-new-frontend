@@ -6,9 +6,10 @@ const api = axios.create({
   baseURL:
     import.meta.env.VITE_BACKEND_API_URL ||
     "https://api.simplegerman.de/api/v1",
-  headers: {
-    "Content-Type": "application/json",
-  },
+  // Don't set default Content-Type header
+  // Let axios/browser automatically set it based on data type:
+  // - JSON objects → application/json
+  // - FormData → multipart/form-data
   withCredentials: true, // ✅ CRITICAL: Send httpOnly cookies automatically
 });
 
@@ -19,6 +20,13 @@ api.interceptors.request.use(
     if (token && token !== "null") {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // If data is FormData, don't set Content-Type header
+    // Let the browser handle it automatically with the correct boundary
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
+    }
+
     return config;
   },
   (error) => {
