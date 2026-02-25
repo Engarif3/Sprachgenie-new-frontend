@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import api from "../../axios";
 import stories from "./stories.json";
 import Container from "../../utils/Container";
 import { pronounceWord } from "../../utils/wordPronounciation";
@@ -32,10 +33,58 @@ const Modal = ({ word, meaning, onClose }) => {
 };
 
 const Stories = () => {
-  // const { title, image, description, passage_vocabulary, vocabulary } =
-  //   stories[0]; // Access first story in array
   const [selectedWord, setSelectedWord] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [allStories, setAllStories] = useState(stories);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch stories from API on component mount
+  useEffect(() => {
+    fetchStories();
+  }, []);
+
+  const fetchStories = async () => {
+    try {
+      setLoading(true);
+
+      const response = await api.get(`/stories/all`);
+
+      if (
+        response.data &&
+        response.data.data &&
+        response.data.data.length > 0
+      ) {
+        // Transform API response to match the expected format
+        const transformedStories = response.data.data.map((story) => ({
+          id: story.id,
+          title: story.title,
+          image: story.image || "/images/default-story.webp",
+          description: {
+            text: story.description,
+          },
+          passage_vocabulary: story.passageVocabulary || [],
+          vocabulary: story.vocabulary || [],
+        }));
+
+        setAllStories(transformedStories);
+        setError(null);
+      } else {
+        // If no stories from API, use static stories
+        setAllStories(stories);
+      }
+    } catch (err) {
+      console.log(
+        "Info: Using static stories (API may be unavailable):",
+        err.message,
+      );
+      // Fallback to static stories if API fails
+      setAllStories(stories);
+      setError(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const openModal = (word, meaning) => {
     setSelectedWord({ word, meaning });
@@ -55,7 +104,7 @@ const Stories = () => {
       const matchedWord = passage_vocabulary.find(
         (item) =>
           cleanWord === item.word.toLowerCase() &&
-          !processedWords.has(cleanWord)
+          !processedWords.has(cleanWord),
       );
 
       if (matchedWord) {
@@ -96,27 +145,51 @@ const Stories = () => {
           </div>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-12">
+            <p className="text-gray-300 text-lg">Loading stories...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="text-center py-12 px-4">
+            <p className="text-red-400 text-lg">{error}</p>
+            <button
+              onClick={fetchStories}
+              className="mt-4 px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
         <div className="text-2xl text-white p-1 md:p-4">
-          {stories.map(
+          {allStories.map(
             (
               { title, image, description, vocabulary, passage_vocabulary },
-              index
+              index,
             ) => (
               <div
                 key={index}
                 className={`mb-12 ${
-                  index === stories.length - 1 ? "" : "border-b border-dotted"
+                  index === allStories.length - 1
+                    ? ""
+                    : "border-b border-dotted"
                 } border-cyan-950 p-1 md:p-4 flex justify-center items-center flex-col mt-4`}
               >
                 {/* Title */}
                 <h2 className="text-3xl font-bold mb-12">{title}</h2>
 
                 {/* Image */}
-                <img
-                  src={image}
-                  alt={title}
-                  className="mb-4 w-96 md:w-6/12 h-auto object-cover rounded-lg "
-                />
+                {image && (
+                  <img
+                    src={image}
+                    alt={title}
+                    className="mb-4 w-96 md:w-6/12 h-auto object-cover rounded-lg "
+                  />
+                )}
 
                 {/* Description */}
                 <p className="text-xl md:text-2xl lg:text-2xl text-white text-justify mb-6 w-full md:w-8/12 bg-gray-900/60 backdrop-blur-sm border border-gray-700/30 p-6 rounded-2xl shadow-xl">
@@ -148,7 +221,7 @@ const Stories = () => {
                   </div>
                 </div>
               </div>
-            )
+            ),
           )}
         </div>
       </div>

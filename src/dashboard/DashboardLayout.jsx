@@ -66,7 +66,7 @@ const DashboardLayout = () => {
           <div className="sticky top-0 bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950/50 px-6 py-5 border-b border-gray-800/50 backdrop-blur-md">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                <span className="text-lg font-bold">🎯</span>
+                <span className="text-lg font-bold"></span>
               </div>
               <div>
                 <h2 className="text-lg font-bold text-white">Dashboard</h2>
@@ -197,6 +197,14 @@ const DashboardLayout = () => {
                     >
                       <span>➕</span>
                       <span>Create Word</span>
+                    </NavLink>
+                    <NavLink
+                      to="/dashboard/generate-story"
+                      className={({ isActive }) => navItemClass(isActive)}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>📖</span>
+                      <span>Generate Story</span>
                     </NavLink>
                     <NavLink
                       to="/dashboard/create-conversation"

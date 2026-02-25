@@ -12,8 +12,19 @@ const api = axios.create({
   withCredentials: true, // ✅ CRITICAL: Send httpOnly cookies automatically
 });
 
-// ✅ NO Authorization header needed - cookies are sent automatically
-// Request interceptor removed - httpOnly cookies handle authentication
+// ✅ Request interceptor: Add auth token from localStorage as fallback if cookies don't work
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token && token !== "null") {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
 
 // Response interceptor for error handling
 api.interceptors.response.use(
@@ -75,7 +86,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

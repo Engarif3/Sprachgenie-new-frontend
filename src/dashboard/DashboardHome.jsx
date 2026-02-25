@@ -31,7 +31,23 @@ const DashboardHome = () => {
       admin: true,
     },
     {
-      icon: "👥",
+      icon: "�",
+      title: "Generate Story",
+      description: "Create AI-powered German stories",
+      link: "/dashboard/generate-story",
+      gradient: "from-orange-500 to-red-500",
+      admin: true,
+    },
+    {
+      icon: "🎯",
+      title: "Manage Stories",
+      description: "View, publish, and delete stories",
+      link: "/dashboard/stories-management",
+      gradient: "from-indigo-500 to-purple-500",
+      admin: true,
+    },
+    {
+      icon: "�👥",
       title: "Manage Users",
       description: "Control user access and permissions",
       link:
@@ -91,7 +107,7 @@ const DashboardHome = () => {
             }{" "}
             Tools
           </p>
-          <span className="text-2xl">🚀</span>
+          <span className="text-2xl"></span>
         </div>
       </div>
 

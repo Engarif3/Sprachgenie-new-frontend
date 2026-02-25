@@ -47,6 +47,12 @@ const UpdateBasicUserStatus = lazy(
 const UpdateUserStatus = lazy(
   () => import("../AdminActions/SuperAdmin/UpdateUSerStatus"),
 );
+const GenerateStory = lazy(
+  () => import("../AdminActions/SuperAdmin/GenerateStory"),
+);
+const StoriesManagement = lazy(
+  () => import("../AdminActions/SuperAdmin/StoriesManagement"),
+);
 const PerfectAndPastForm = lazy(
   () => import("../View/Grammar/PerfectAndPastForm/PerfectAndPastForm"),
 );
@@ -112,6 +118,8 @@ const ClauseWithSuspense = withSuspense(Clause);
 const GrammarTopicWithSuspense = withSuspense(GrammarTopic);
 const UpdateBasicUserStatusWithSuspense = withSuspense(UpdateBasicUserStatus);
 const UpdateUserStatusWithSuspense = withSuspense(UpdateUserStatus);
+const GenerateStoryWithSuspense = withSuspense(GenerateStory);
+const StoriesManagementWithSuspense = withSuspense(StoriesManagement);
 const PerfectAndPastFormWithSuspense = withSuspense(PerfectAndPastForm);
 const StoriesWithSuspense = withSuspense(Stories);
 const UsersFavoriteCountWithSuspense = withSuspense(UsersFavoriteCount);
@@ -222,6 +230,14 @@ export const router = createBrowserRouter(
             },
             { path: "topic", element: <TopicFormWithSuspense /> },
             { path: "create-word", element: <WordFormWithSuspense /> },
+            {
+              path: "generate-story",
+              element: <GenerateStoryWithSuspense />,
+            },
+            {
+              path: "stories-management",
+              element: <StoriesManagementWithSuspense />,
+            },
             {
               path: "create-conversation",
               element: <CreateConversationWithSuspense />,
