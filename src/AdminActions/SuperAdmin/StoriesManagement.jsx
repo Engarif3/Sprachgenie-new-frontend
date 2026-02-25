@@ -235,10 +235,11 @@ const StoriesManagement = () => {
       if (data && data.data) {
         const generatedStory = data.data;
 
-        // Update the story with new content
+        // Update the story with new content INCLUDING vocabulary
         await api.put(`/stories/${regenerateStoryId}/update`, {
           title: generatedStory.title,
           description: generatedStory.description,
+          vocabulary: generatedStory.vocabulary || [],
         });
 
         setSuccess("Story regenerated successfully!");
