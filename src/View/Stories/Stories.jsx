@@ -223,8 +223,21 @@ const Stories = () => {
                     {vocabulary.map((item, index) => (
                       <div
                         key={index}
-                        className="flex items-between gap-2 justify-start p-3 bg-gray-800/40 backdrop-blur-sm border border-gray-700/40 rounded-xl shadow-lg hover:border-orange-500/40 transition-all duration-300"
+                        className="flex items-center gap-2 justify-start p-3 bg-gray-800/40 backdrop-blur-sm border border-gray-700/40 rounded-xl shadow-lg hover:border-orange-500/40 transition-all duration-300"
                       >
+                        <button
+                          onClick={() => {
+                            const utterance = new SpeechSynthesisUtterance(
+                              item.word,
+                            );
+                            utterance.lang = "de-DE";
+                            window.speechSynthesis.speak(utterance);
+                          }}
+                          className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white rounded-full transition-colors"
+                          title={`Pronounce: ${item.word}`}
+                        >
+                          🔊
+                        </button>
                         <div className="text-orange-500 font-bold">
                           {item.word}
                         </div>
