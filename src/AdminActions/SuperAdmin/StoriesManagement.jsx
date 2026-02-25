@@ -12,6 +12,9 @@ const StoriesManagement = () => {
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editLoading, setEditLoading] = useState(false);
+  const [editImage, setEditImage] = useState(null);
+  const [editImagePreview, setEditImagePreview] = useState(null);
+  const [uploadingEditImage, setUploadingEditImage] = useState(false);
   const [regenerateModal, setRegenerateModal] = useState(false);
   const [regenerateStoryId, setRegenerateStoryId] = useState(null);
   const [regeneratePrompt, setRegeneratePrompt] = useState("");
@@ -95,12 +98,16 @@ const StoriesManagement = () => {
     setEditingStoryId(story.id);
     setEditTitle(story.title);
     setEditDescription(story.description);
+    setEditImagePreview(story.image || null);
+    setEditImage(null);
   };
 
   const closeEditModal = () => {
     setEditingStoryId(null);
     setEditTitle("");
     setEditDescription("");
+    setEditImage(null);
+    setEditImagePreview(null);
   };
 
   const handleSaveEdit = async () => {
@@ -111,10 +118,17 @@ const StoriesManagement = () => {
 
     setEditLoading(true);
     try {
+      // First update the story details
       await api.put(`/stories/${editingStoryId}/update`, {
         title: editTitle.trim(),
         description: editDescription.trim(),
       });
+
+      // If there's a new image, upload it
+      if (editImage) {
+        await handleUploadEditImage(editingStoryId);
+      }
+
       setSuccess("Story updated successfully!");
       closeEditModal();
       fetchStories();
@@ -125,6 +139,36 @@ const StoriesManagement = () => {
       setTimeout(() => setError(""), 3000);
     } finally {
       setEditLoading(false);
+    }
+  };
+
+  const handleImageInputChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Preview the image
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setEditImagePreview(event.target.result);
+      setEditImage(file);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleUploadEditImage = async (storyId) => {
+    if (!editImage) return;
+
+    setUploadingEditImage(true);
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append("image", editImage);
+
+      await api.post(`/stories/${storyId}/upload-image`, formDataToSend);
+    } catch (err) {
+      console.error("Error uploading image:", err);
+      throw new Error("Failed to upload image");
+    } finally {
+      setUploadingEditImage(false);
     }
   };
 
@@ -374,7 +418,7 @@ const StoriesManagement = () => {
         {/* Edit Modal */}
         {editingStoryId && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-gray-800 rounded-lg p-8 max-w-2xl w-full border border-gray-700">
+            <div className="bg-gray-800 rounded-lg p-8 max-w-2xl w-full border border-gray-700 max-h-[90vh] overflow-y-auto">
               <h2 className="text-2xl font-bold text-white mb-6">Edit Story</h2>
 
               {/* Title Input */}
@@ -405,9 +449,52 @@ const StoriesManagement = () => {
                 />
               </div>
 
+              {/* Image Upload Section */}
+              <div className="mb-6 bg-gray-700/50 p-4 rounded-lg border border-gray-600">
+                <h4 className="text-white font-semibold mb-3">
+                  📸 Story Image
+                </h4>
+                {editImagePreview ? (
+                  <div className="space-y-3">
+                    <img
+                      src={editImagePreview}
+                      alt="Preview"
+                      className="w-full max-h-48 object-cover rounded-lg"
+                    />
+                    <div className="flex gap-2">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageInputChange}
+                        disabled={uploadingEditImage}
+                        className="flex-1 text-sm text-gray-300 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-orange-500 file:text-white hover:file:bg-orange-600 disabled:opacity-50"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditImagePreview(null);
+                          setEditImage(null);
+                        }}
+                        className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageInputChange}
+                    disabled={uploadingEditImage}
+                    className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-orange-500 file:text-white hover:file:bg-orange-600 disabled:opacity-50"
+                  />
+                )}
+              </div>
+
               {/* Error Message */}
               {error && (
-                <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg text-red-200">
+                <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg text-red-200 text-sm">
                   {error}
                 </div>
               )}
@@ -416,14 +503,18 @@ const StoriesManagement = () => {
               <div className="flex gap-3">
                 <button
                   onClick={handleSaveEdit}
-                  disabled={editLoading}
+                  disabled={editLoading || uploadingEditImage}
                   className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg disabled:opacity-50 transition"
                 >
-                  {editLoading ? "Saving..." : "✅ Save Changes"}
+                  {editLoading
+                    ? "Saving..."
+                    : uploadingEditImage
+                      ? "Uploading image..."
+                      : "✅ Save Changes"}
                 </button>
                 <button
                   onClick={closeEditModal}
-                  disabled={editLoading}
+                  disabled={editLoading || uploadingEditImage}
                   className="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg disabled:opacity-50 transition"
                 >
                   ❌ Cancel

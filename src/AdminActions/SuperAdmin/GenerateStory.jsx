@@ -190,11 +190,8 @@ const GenerateStory = () => {
       const response = await api.post(
         `/stories/${id}/upload-image`,
         formDataToSend,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
+        // Don't set Content-Type header - let axios/browser handle it automatically
+        // This ensures the multipart/form-data boundary is set correctly
       );
 
       console.log("Image uploaded successfully:", response.data);
@@ -202,6 +199,7 @@ const GenerateStory = () => {
       setUploadingImage(false);
     } catch (err) {
       console.error("Error uploading image:", err);
+      console.error("Full error response:", err.response);
       setError(
         err.response?.data?.message || err.message || "Failed to upload image",
       );
