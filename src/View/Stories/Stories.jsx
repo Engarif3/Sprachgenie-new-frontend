@@ -4,6 +4,11 @@ import stories from "./stories.json";
 import Container from "../../utils/Container";
 import { pronounceWord } from "../../utils/wordPronounciation";
 
+// Import Google Font - Roboto for clean, professional look (like Todaii)
+import "@fontsource/roboto";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+
 // Modal component for word meaning
 const Modal = ({ word, meaning, onClose }) => {
   return (
@@ -95,6 +100,46 @@ const Stories = () => {
     setModalOpen(false);
   };
 
+  // Helper function to intelligently split text into paragraphs
+  const splitIntoParagraphs = (text) => {
+    // First check if text already has paragraph breaks
+    if (text.includes("\n\n")) {
+      return text.split(/\n\n+/).filter((p) => p.trim().length > 0);
+    }
+
+    // If no paragraph breaks, intelligently split by sentences
+    // Match sentences: ends with . ! ? followed by space and capital letter
+    const sentenceRegex = /[^.!?]*[.!?]+(?=\s+[A-ZÄÖÜ]|\s*$)/g;
+    const sentences = text.match(sentenceRegex) || [];
+
+    if (sentences.length < 4) {
+      // If fewer than 4 sentences, return as single paragraph
+      return text.trim().length > 0 ? [text.trim()] : [];
+    }
+
+    // Group sentences into paragraphs (roughly 4-5 sentences per paragraph)
+    const paragraphs = [];
+    let currentParagraph = "";
+    const sentencesPerParagraph = Math.ceil(sentences.length / 4);
+
+    sentences.forEach((sentence, idx) => {
+      currentParagraph += sentence.trim();
+      if (
+        (idx + 1) % sentencesPerParagraph === 0 ||
+        idx === sentences.length - 1
+      ) {
+        if (currentParagraph.trim()) {
+          paragraphs.push(currentParagraph.trim());
+        }
+        currentParagraph = "";
+      } else {
+        currentParagraph += " ";
+      }
+    });
+
+    return paragraphs.filter((p) => p.trim().length > 0);
+  };
+
   const underlineText = (text, passage_vocabulary) => {
     const words = text.split(" ");
     const processedWords = new Set();
@@ -112,7 +157,7 @@ const Stories = () => {
         return (
           <span
             key={index}
-            className="cursor-pointer border-b text-orange-500"
+            className="cursor-pointer text-orange-500 hover:text-orange-400 font-medium transition-colors"
             onClick={() => openModal(matchedWord.word, matchedWord.meaning)}
           >
             {word}{" "}
@@ -125,8 +170,8 @@ const Stories = () => {
   };
 
   return (
-    <Container>
-      <div className="min-h-screen p-4 bg-gradient-to-br from-gray-900/50 via-gray-800/30 to-black/50">
+    <div>
+      <div className="min-h-screen p-1 md:p-4 lg:4 bg-gradient-to-br from-gray-900/50 via-gray-800/30 to-black/50">
         {/* Header Section */}
         <div className="text-center mb-12 mt-8">
           <div className="mb-4">
@@ -165,7 +210,7 @@ const Stories = () => {
           </div>
         )}
 
-        <div className="text-2xl text-white p-1 md:p-4">
+        <div className="text-2xl text-white p-2 md:p-4">
           {allStories.map(
             (
               { title, image, description, vocabulary, passage_vocabulary },
@@ -192,12 +237,18 @@ const Stories = () => {
                 )}
 
                 {/* Description */}
-                <p className="text-xl md:text-2xl lg:text-2xl text-white text-justify mb-6 w-full md:w-8/12 bg-gray-900/60 backdrop-blur-sm border border-gray-700/30 p-6 rounded-2xl shadow-xl">
-                  {underlineText(description.text, passage_vocabulary)}
-                </p>
+                <div className="[font-family:'Roboto',sans-serif] text-base md:text-lg lg:text-lg leading-8 text-gray-200 text-justify mb-8 w-11/12 md:w-8/12 bg-gradient-to-br from-gray-900/70 to-gray-800/50 backdrop-blur-md border border-gray-700/50 p-4 md:p-8 rounded-2xl shadow-2xl font-normal">
+                  {splitIntoParagraphs(description.text).map(
+                    (paragraph, idx) => (
+                      <p key={idx} className="mb-6">
+                        {underlineText(paragraph, passage_vocabulary)}
+                      </p>
+                    ),
+                  )}
+                </div>
 
                 {/* Vocabulary List */}
-                <div className="text-lg w-full md:w-8/12 my-12 ">
+                <div className="text-lg w-11/12 md:w-8/12 my-12 ">
                   <h3 className="font-bold mb-2 uppercase">Vocabulary</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
                     {vocabulary.map((item, index) => (
@@ -234,7 +285,7 @@ const Stories = () => {
           onClose={closeModal}
         />
       )}
-    </Container>
+    </div>
   );
 };
 

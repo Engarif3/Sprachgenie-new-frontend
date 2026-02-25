@@ -12,6 +12,11 @@ const StoriesManagement = () => {
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editLoading, setEditLoading] = useState(false);
+  const [regenerateModal, setRegenerateModal] = useState(false);
+  const [regenerateStoryId, setRegenerateStoryId] = useState(null);
+  const [regeneratePrompt, setRegeneratePrompt] = useState("");
+  const [regenerateLevel, setRegenerateLevel] = useState("A2");
+  const [regenerateLoading, setRegenerateLoading] = useState(false);
 
   useEffect(() => {
     fetchStories();
@@ -120,6 +125,66 @@ const StoriesManagement = () => {
       setTimeout(() => setError(""), 3000);
     } finally {
       setEditLoading(false);
+    }
+  };
+
+  const openRegenerateModal = (story) => {
+    setRegenerateStoryId(story.id);
+    setRegenerateLevel(story.level?.level || "A2");
+    setRegeneratePrompt("");
+    setRegenerateModal(true);
+  };
+
+  const closeRegenerateModal = () => {
+    setRegenerateModal(false);
+    setRegenerateStoryId(null);
+    setRegeneratePrompt("");
+  };
+
+  const handleRegenerate = async () => {
+    if (!regeneratePrompt.trim()) {
+      setError("Please enter a prompt for regeneration");
+      return;
+    }
+
+    setRegenerateLoading(true);
+    try {
+      // Call AI service to regenerate story
+      const aiResponse = await fetch(
+        `${import.meta.env.VITE_AI_API_URL}/stories/generate`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt: regeneratePrompt.trim(),
+            level: regenerateLevel,
+          }),
+        },
+      );
+
+      if (!aiResponse.ok) throw new Error("AI service error");
+      const data = await aiResponse.json();
+
+      if (data && data.data) {
+        const generatedStory = data.data;
+
+        // Update the story with new content
+        await api.put(`/stories/${regenerateStoryId}/update`, {
+          title: generatedStory.title,
+          description: generatedStory.description,
+        });
+
+        setSuccess("Story regenerated successfully!");
+        closeRegenerateModal();
+        fetchStories();
+        setTimeout(() => setSuccess(""), 3000);
+      }
+    } catch (err) {
+      console.error("Error regenerating story:", err);
+      setError("Failed to regenerate story");
+      setTimeout(() => setError(""), 3000);
+    } finally {
+      setRegenerateLoading(false);
     }
   };
 
@@ -264,31 +329,38 @@ const StoriesManagement = () => {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <button
                       onClick={() => openEditModal(story)}
-                      className="flex-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded transition"
+                      className="flex-1 min-w-[100px] px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded transition"
                     >
                       ✏️ Edit
+                    </button>
+                    <button
+                      onClick={() => openRegenerateModal(story)}
+                      className="flex-1 min-w-[100px] px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold rounded transition"
+                      title="Regenerate with new prompt"
+                    >
+                      🔄 Regenerate
                     </button>
                     {!story.isPublished ? (
                       <button
                         onClick={() => handlePublish(story.id)}
-                        className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded transition"
+                        className="flex-1 min-w-[100px] px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded transition"
                       >
                         Publish
                       </button>
                     ) : (
                       <button
                         onClick={() => handleUnpublish(story.id)}
-                        className="flex-1 px-3 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-semibold rounded transition"
+                        className="flex-1 min-w-[100px] px-3 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-semibold rounded transition"
                       >
                         Unpublish
                       </button>
                     )}
                     <button
                       onClick={() => handleDelete(story.id)}
-                      className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded transition"
+                      className="flex-1 min-w-[100px] px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded transition"
                     >
                       Delete
                     </button>
@@ -352,6 +424,66 @@ const StoriesManagement = () => {
                 <button
                   onClick={closeEditModal}
                   disabled={editLoading}
+                  className="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg disabled:opacity-50 transition"
+                >
+                  ❌ Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Regenerate Modal */}
+        {regenerateModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-gray-800 rounded-lg p-8 max-w-2xl w-full border border-gray-700">
+              <h2 className="text-2xl font-bold text-white mb-6">
+                🔄 Regenerate Story
+              </h2>
+
+              {/* Level Selection */}
+              <div className="mb-6">
+                <label className="block text-white font-semibold mb-2">
+                  Language Level
+                </label>
+                <select
+                  value={regenerateLevel}
+                  onChange={(e) => setRegenerateLevel(e.target.value)}
+                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                >
+                  <option value="A1">A1 - Beginner</option>
+                  <option value="A2">A2 - Elementary</option>
+                  <option value="B1">B1 - Intermediate</option>
+                  <option value="B2">B2 - Upper Intermediate</option>
+                </select>
+              </div>
+
+              {/* Prompt Input */}
+              <div className="mb-6">
+                <label className="block text-white font-semibold mb-2">
+                  New Prompt
+                </label>
+                <textarea
+                  value={regeneratePrompt}
+                  onChange={(e) => setRegeneratePrompt(e.target.value)}
+                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 resize-none"
+                  placeholder="Enter a new prompt or topic for story regeneration..."
+                  rows="4"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4">
+                <button
+                  onClick={handleRegenerate}
+                  disabled={regenerateLoading}
+                  className="flex-1 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg disabled:opacity-50 transition"
+                >
+                  {regenerateLoading ? "Regenerating..." : "🔄 Regenerate"}
+                </button>
+                <button
+                  onClick={closeRegenerateModal}
+                  disabled={regenerateLoading}
                   className="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg disabled:opacity-50 transition"
                 >
                   ❌ Cancel
