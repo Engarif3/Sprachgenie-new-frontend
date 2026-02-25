@@ -84,7 +84,7 @@ const GenerateStory = () => {
     try {
       // First, generate the story using the AI service
       const aiServiceUrl =
-        import.meta.env.VITE_AI_SERVICE_URL || "http://localhost:5000";
+        import.meta.env.VITE_AI_API_URL || "http://localhost:5000";
 
       // Get the level name
       const selectedLevel = levels.find(
