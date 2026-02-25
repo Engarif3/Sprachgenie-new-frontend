@@ -117,6 +117,7 @@ const StoriesManagement = () => {
     }
 
     setEditLoading(true);
+    setError(""); // Clear previous errors
     try {
       // First update the story details
       await api.put(`/stories/${editingStoryId}/update`, {
@@ -135,7 +136,9 @@ const StoriesManagement = () => {
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
       console.error("Error updating story:", err);
-      setError("Failed to update story");
+      const errorMsg =
+        err.response?.data?.message || err.message || "Failed to update story";
+      setError(errorMsg);
       setTimeout(() => setError(""), 3000);
     } finally {
       setEditLoading(false);
@@ -163,10 +166,30 @@ const StoriesManagement = () => {
       const formDataToSend = new FormData();
       formDataToSend.append("image", editImage);
 
-      await api.post(`/stories/${storyId}/upload-image`, formDataToSend);
+      console.log("Uploading image for story:", storyId);
+      console.log("File details:", {
+        name: editImage.name,
+        size: editImage.size,
+        type: editImage.type,
+      });
+
+      // Don't set Content-Type header - let axios/browser handle it automatically
+      // This ensures the multipart/form-data boundary is set correctly
+      const response = await api.post(
+        `/stories/${storyId}/upload-image`,
+        formDataToSend,
+      );
+
+      console.log("Image uploaded successfully:", response.data);
     } catch (err) {
       console.error("Error uploading image:", err);
-      throw new Error("Failed to upload image");
+      console.error("Full error response:", err.response?.data);
+      const errorMsg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        "Failed to upload image";
+      throw new Error(errorMsg);
     } finally {
       setUploadingEditImage(false);
     }
