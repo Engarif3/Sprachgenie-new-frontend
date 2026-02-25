@@ -99,7 +99,7 @@ const GenerateStory = () => {
       });
 
       const aiResponse = await axios.post(
-        `${aiServiceUrl}/stories/generate`,
+        `${aiServiceUrl}/paragraphs/generate`,
         {
           prompt: formData.prompt,
           level: levelName,
