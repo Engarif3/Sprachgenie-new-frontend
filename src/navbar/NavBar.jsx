@@ -302,7 +302,7 @@ const NavBar = () => {
             {/* Language Toggle Button with SVG Flags */}
             <button
               onClick={toggleLanguage}
-              className=" flex items-center justify-center gap-1 bg-teal-900 hover:bg-gray-700/50 px-2 py-1 rounded-full transition-all duration-300 hover:scale-110 border border-gray-700/50 hover:border-gray-600"
+              className=" flex items-center justify-center gap-1 bg-teal-900 hover:bg-gray-700/50 px-2 py-1 rounded-full transition-all duration-300 hover:scale-110 border border-gray-700/50 hover:border-gray-600 "
               title={`Switch to ${language === "en" ? "Deutsch" : "English"}`}
             >
               <img
