@@ -9,6 +9,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import Swal from "sweetalert2";
 import { storeUserInfo, getUserInfo } from "./services/auth.services";
 import { ThemeProvider } from "./context/ThemeContext";
+import { LanguageProvider } from "./context/LanguageContext";
 
 const App = () => {
   const location = useLocation();
@@ -118,28 +119,30 @@ const App = () => {
 
   return (
     <ThemeProvider>
-      <ErrorBoundary>
-        <div className="relative min-h-screen">
-          {/* DarkVeil fullscreen background */}
-          <div className="fixed inset-0 -z-10">
-            <DarkVeil />
+      <LanguageProvider>
+        <ErrorBoundary>
+          <div className="relative min-h-screen">
+            {/* DarkVeil fullscreen background */}
+            <div className="fixed inset-0 -z-10">
+              <DarkVeil />
+            </div>
+
+            <ScrollToTop />
+
+            {!noHeaderFooter && <NavBar />}
+
+            {/* Suspense here so lazy-loaded routes work */}
+            <Suspense
+              fallback={<div className="p-8 text-center">Loading...</div>}
+            >
+              {/* <Suspense fallback={<Loader></Loader>}> */}
+              <Outlet />
+            </Suspense>
+
+            {!noHeaderFooter && <Footer />}
           </div>
-
-          <ScrollToTop />
-
-          {!noHeaderFooter && <NavBar />}
-
-          {/* Suspense here so lazy-loaded routes work */}
-          <Suspense
-            fallback={<div className="p-8 text-center">Loading...</div>}
-          >
-            {/* <Suspense fallback={<Loader></Loader>}> */}
-            <Outlet />
-          </Suspense>
-
-          {!noHeaderFooter && <Footer />}
-        </div>
-      </ErrorBoundary>
+        </ErrorBoundary>
+      </LanguageProvider>
     </ThemeProvider>
   );
 };

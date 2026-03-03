@@ -5,8 +5,13 @@ import AuthButton from "../components/UI/AuthButton/AuthButton";
 import { getUserInfo, isLoggedIn } from "../services/auth.services";
 import { FaBook, FaHome, FaSun, FaMoon } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
+import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
+import { getTranslation } from "../constants/translations";
 import Container from "../utils/Container";
+import ENFlag from "../assets/EN.svg";
+import DEFlag from "../assets/DE.svg";
 
 const NavBar = () => {
   const navigate = useNavigate();
@@ -17,6 +22,8 @@ const NavBar = () => {
   const menuRef = useRef(null);
   const toggleRef = useRef(null);
   const { theme, toggleTheme } = useTheme();
+  const { language, toggleLanguage } = useLanguage();
+  const t = (key) => getTranslation(key, language);
 
   // Close menu if clicked outside
   useEffect(() => {
@@ -77,7 +84,7 @@ const NavBar = () => {
       }`}
     >
       <Container>
-        {isHomePage && <div className="h-2 -mt-2 bg-gray-950" />}
+        {isHomePage && <div className="h-1 -mt-2 bg-gray-950" />}
         <div
           className={`flex flex-wrap justify-between items-center py-3 px-2 text-lg font-semibold relative border-b border-slate-800  mt-2 ${
             isHomePage ? "bg-gray-950" : "bg-transparent"
@@ -290,10 +297,39 @@ const NavBar = () => {
             )}
 
             {/* <Link to="/login">Login</Link> */}
-            <AuthButton></AuthButton>
+            {/* <AuthButton></AuthButton> */}
+
+            {/* Language Toggle Button with SVG Flags */}
+            <button
+              onClick={toggleLanguage}
+              className=" flex items-center justify-center gap-1 bg-teal-900 hover:bg-gray-700/50 px-2 py-1 rounded-full transition-all duration-300 hover:scale-110 border border-gray-700/50 hover:border-gray-600"
+              title={`Switch to ${language === "en" ? "Deutsch" : "English"}`}
+            >
+              <img
+                src={ENFlag}
+                alt="English"
+                className={`w-5 h-2.9 transition-all  duration-300 ${language === "en" ? "opacity-100 scale-110" : "opacity-50"}`}
+              />
+              {language === "en" ? (
+                <PiToggleLeftFill
+                  className="text-2xl text-sky-500 w-8 mt-[2px]"
+                  size={22}
+                />
+              ) : (
+                <PiToggleRightFill
+                  className="text-2xl text-sky-500 w-8 mt-[2px]"
+                  size={22}
+                />
+              )}
+              <img
+                src={DEFlag}
+                alt="Deutsch"
+                className={`w-5 h-3.5 transition-all duration-300 ${language === "de" ? "opacity-100 scale-110" : "opacity-50"}`}
+              />
+            </button>
 
             {/* Theme Toggle Button */}
-            <div className="">
+            <div>
               <button
                 // onClick={toggleTheme}
                 className="hidden md:flex bg-gray-800/50 hover:bg-gray-700/50 text-white p-2.5 rounded-full transition-all duration-300 hover:scale-110 border border-gray-700/50 hover:border-gray-600"
@@ -307,6 +343,9 @@ const NavBar = () => {
                 )}
               </button>
             </div>
+
+            {/* <Link to="/login">Login</Link> */}
+            <AuthButton></AuthButton>
           </div>
         </div>
 

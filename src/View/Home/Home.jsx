@@ -7,10 +7,14 @@ import { isLoggedIn } from "../../services/auth.services";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Contact from "./Contact";
+import { useLanguage } from "../../context/LanguageContext";
+import { getTranslation } from "../../constants/translations";
 
 const Home = () => {
   const userLoggedIn = isLoggedIn();
   const [visibleSections, setVisibleSections] = useState(new Set());
+  const { language } = useLanguage();
+  const t = (key) => getTranslation(key, language);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -45,8 +49,10 @@ const Home = () => {
                 pauseOnHover={true}
               >
                 <p className="mx-4 italic">
-                  <span className="text-cyan-500 font-bold"> Log in</span> to
-                  unleash AI-powered magic and step into the future of learning!
+                  <span className="text-cyan-500 font-bold">
+                    {t("loginToUnlock")}
+                  </span>{" "}
+                  {t("bannerMessage")}
                 </p>
               </Marquee>
             </div>
@@ -64,70 +70,73 @@ const Home = () => {
         {/* Hero Content */}
         <div className="text-center pt-6 pb-[280px] px-4">
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-            Master German with
+            {t("heroTitle")}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">
               {" "}
-              AI-Powered{" "}
+              {t("heroTitleHighlight")}{" "}
             </span>
-            Learning
+            {t("heroTitleEnd")}
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto">
-            From vocabulary to conversations, grammar to stories - your complete
-            German learning journey starts here
+            {t("heroDescription")}
           </p>
 
           {/* Benefits Section */}
           {!userLoggedIn && (
             <div className="mb-16 max-w-4xl mx-auto">
               <p className="text-lg text-orange-400 font-semibold mb-8">
-                Features You'll Unlock When You Log In
+                {t("featuresUnlocked")}
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
                   <div className="text-2xl mb-2">❤️</div>
-                  <p className="text-white font-semibold">Favorite Words</p>
+                  <p className="text-white font-semibold">
+                    {t("favoriteWords")}
+                  </p>
                   <p className="text-gray-400 text-sm">
-                    Save words to your personal collection
+                    {t("favoriteWordsDesc")}
                   </p>
                 </div>
                 <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
                   <div className="text-2xl mb-2">🤖</div>
                   <p className="text-white font-semibold">
-                    AI-Powered Learning
+                    {t("aiPoweredLearning")}
                   </p>
                   <p className="text-gray-400 text-sm">
-                    Personalized lessons adapted to your level
+                    {t("aiPoweredLearningDesc")}
                   </p>
                 </div>
                 <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
                   <div className="text-2xl mb-2">🌐</div>
                   <p className="text-white font-semibold">
-                    Translation Features
+                    {t("translationFeatures")}
                   </p>
                   <p className="text-gray-400 text-sm">
-                    Instant German to English translation
+                    {t("translationFeaturesDesc")}
                   </p>
                 </div>
                 <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
                   <div className="text-2xl mb-2">📊</div>
-                  <p className="text-white font-semibold">Personal Dashboard</p>
+                  <p className="text-white font-semibold">
+                    {t("personalDashboard")}
+                  </p>
                   <p className="text-gray-400 text-sm">
-                    All features in one place
+                    {t("personalDashboardDesc")}
                   </p>
                 </div>
                 <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
                   <div className="text-2xl mb-2">📈</div>
-                  <p className="text-white font-semibold">Progress Tracking</p>
+                  <p className="text-white font-semibold">
+                    {t("progressTracking")}
+                  </p>
                   <p className="text-gray-400 text-sm">
-                    Track your progress and achievements
+                    {t("progressTrackingDesc")}
                   </p>
                 </div>
                 <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
                   <div className="text-2xl mb-2">⚡</div>
-                  <p className="text-white font-semibold">Much More</p>
-                  <p className="text-gray-400 text-sm">
-                    Exclusive features to boost your learning
-                  </p>
+                  <p className="text-white font-semibold">{t("muchMore")}</p>
+                  <p className="text-gray-400 text-sm">{t("muchMoreDesc")}</p>
                 </div>
               </div>
             </div>
@@ -164,7 +173,7 @@ const Home = () => {
               {/* 4. Content */}
               <span className="relative z-10 flex items-center gap-3 text-lg">
                 <span className="text-2xl">📚</span>
-                <span>Explore 4500+ Vocabulary Words</span>
+                <span>{t("exploreVocabulary")}</span>
                 <span className="text-xl group-hover:translate-x-1 transition-transform">
                   →
                 </span>
@@ -179,13 +188,13 @@ const Home = () => {
                 to="/register"
                 className="px-8 py-4 bg-gradient-to-r from-red-500 to-blue-900 text-white font-bold rounded-full hover:shadow-2xl hover:scale-105 transition-all duration-300 text-lg"
               >
-                Get Started Free
+                {t("startLearning")}
               </Link>
               <Link
                 to="/login"
                 className="px-8 py-4 bg-transparent border-2 border-orange-500 text-orange-500 font-bold rounded-full hover:bg-orange-500 hover:text-white transition-all duration-300 text-lg"
               >
-                Sign In
+                {t("login")}
               </Link>
             </div>
           )}
@@ -237,7 +246,7 @@ const Home = () => {
               </span>
             </div>
             <h2 className="text-center text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-8">
-              Explore Learning Resources
+              {t("howItWorks")}
             </h2>
             <p className="text-center text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
               Everything you need to master German in one place
@@ -404,7 +413,7 @@ const Home = () => {
             }`}
           >
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              How It Works
+              {t("howItWorks")}
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Start your journey in three simple steps
@@ -650,7 +659,7 @@ const Home = () => {
                 to="/register"
                 className="inline-block px-12 py-5 bg-pink-700 text-white font-bold rounded-full hover:bg-pink-600 hover:shadow-2xl hover:scale-105 transition-all duration-300 text-xl"
               >
-                Start Learning Now!
+                {t("startLearning")}
               </Link>
             </div>
           </Container>
