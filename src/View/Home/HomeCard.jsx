@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const HomeCard = ({ title, text, link, icon }) => {
+  const { t } = useTranslation("home");
+
   return (
     <Link
       to={link}
@@ -31,7 +34,7 @@ const HomeCard = ({ title, text, link, icon }) => {
 
         {/* CTA Button */}
         <div className="inline-flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-orange-600 to-pink-600 group-hover:from-orange-500 group-hover:to-pink-500 text-white font-semibold text-sm md:text-base rounded-full group-hover:gap-4 transition-all duration-300 shadow-lg group-hover:shadow-[0_0_20px_rgba(249,115,22,0.6)]">
-          <span>Explore Now</span>
+          <span>{t("exploreNow")}</span>
           <span className="text-lg md:text-xl transform group-hover:translate-x-1 transition-transform duration-300">
             →
           </span>

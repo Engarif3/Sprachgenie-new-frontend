@@ -3,8 +3,10 @@ import { useForm } from "react-hook-form";
 import emailjs from "@emailjs/browser";
 import Swal from "sweetalert2";
 import Container from "../../utils/Container";
+import { useTranslation } from "react-i18next";
 
 const Contact = () => {
+  const { t } = useTranslation("home");
   const form = useRef();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -64,14 +66,14 @@ const Contact = () => {
         <div className="text-center mb-16">
           <div className="mb-4">
             <span className="inline-block px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
-              📧 Get In Touch
+              📧 {t("getInTouch")}
             </span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-4">
-            Contact Me
+            {t("contactMe")}
           </h2>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Have questions or feedback? I'd love to hear from you!
+            {t("contactQuestion")}
           </p>
           <div className="flex justify-center mt-6">
             <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
@@ -86,11 +88,9 @@ const Contact = () => {
                 <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-2xl">
                   ✉️
                 </div>
-                <h3 className="text-2xl font-bold text-white">Email</h3>
+                <h3 className="text-2xl font-bold text-white">{t("email")}</h3>
               </div>
-              <p className="text-gray-300 text-lg">
-                Drop me a message and I'll respond as soon as possible.
-              </p>
+              <p className="text-gray-300 text-lg">{t("dropMessage")}</p>
             </div>
 
             <div className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-8 rounded-2xl border border-gray-700 hover:border-orange-500/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(249,115,22,0.2)]">
@@ -98,11 +98,11 @@ const Contact = () => {
                 <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-2xl">
                   💡
                 </div>
-                <h3 className="text-2xl font-bold text-white">Feedback</h3>
+                <h3 className="text-2xl font-bold text-white">
+                  {t("feedback")}
+                </h3>
               </div>
-              <p className="text-gray-300 text-lg">
-                Your feedback helps improve SprachGenie for everyone!
-              </p>
+              <p className="text-gray-300 text-lg">{t("feedbackDesc")}</p>
             </div>
 
             <div className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-8 rounded-2xl border border-gray-700 hover:border-orange-500/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(249,115,22,0.2)]">
@@ -110,11 +110,11 @@ const Contact = () => {
                 <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-2xl">
                   🤝
                 </div>
-                <h3 className="text-2xl font-bold text-white">Collaborate</h3>
+                <h3 className="text-2xl font-bold text-white">
+                  {t("collaborate")}
+                </h3>
               </div>
-              <p className="text-gray-300 text-lg">
-                Interested in collaboration? Let's build something amazing!
-              </p>
+              <p className="text-gray-300 text-lg">{t("collaborateDesc")}</p>
             </div>
           </div>
 
@@ -127,15 +127,15 @@ const Contact = () => {
             >
               <div>
                 <label className="text-white font-semibold mb-2 block">
-                  Your Name
+                  {t("yourName")}
                 </label>
                 <input
                   className={`w-full bg-gray-700/50 border-2 ${
                     errors.name ? "border-red-500" : "border-gray-600"
                   } rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none transition-all duration-300`}
                   type="text"
-                  placeholder="Enter your name"
-                  {...register("name", { required: "Name is required" })}
+                  placeholder={t("enterYourName")}
+                  {...register("name", { required: t("nameRequired") })}
                 />
                 {errors.name && (
                   <p className="text-red-400 text-sm mt-1">
@@ -146,19 +146,19 @@ const Contact = () => {
 
               <div>
                 <label className="text-white font-semibold mb-2 block">
-                  Your Email
+                  {t("yourEmail")}
                 </label>
                 <input
                   className={`w-full bg-gray-700/50 border-2 ${
                     errors.email ? "border-red-500" : "border-gray-600"
                   } rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none transition-all duration-300`}
                   type="email"
-                  placeholder="your.email@example.com"
+                  placeholder={t("yourEmailPlaceholder")}
                   {...register("email", {
-                    required: "Email is required",
+                    required: t("emailRequired"),
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address",
+                      message: t("invalidEmail"),
                     },
                   })}
                 />
@@ -171,18 +171,18 @@ const Contact = () => {
 
               <div>
                 <label className="text-white font-semibold mb-2 block">
-                  Your Message
+                  {t("yourMessage")}
                 </label>
                 <textarea
                   className={`w-full bg-gray-700/50 border-2 ${
                     errors.message ? "border-red-500" : "border-gray-600"
                   } rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none transition-all duration-300 min-h-[150px] resize-y`}
-                  placeholder="Enter your message..."
+                  placeholder={t("enterYourMessage")}
                   {...register("message", {
-                    required: "Message is required",
+                    required: t("messageRequired"),
                     minLength: {
                       value: 10,
-                      message: "Message must be at least 10 characters",
+                      message: t("messageMinLength"),
                     },
                   })}
                 ></textarea>
@@ -222,10 +222,10 @@ const Contact = () => {
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       ></path>
                     </svg>
-                    Sending...
+                    {t("sending")}
                   </span>
                 ) : (
-                  "Send Message"
+                  t("sendMessage")
                 )}
               </button>
             </form>

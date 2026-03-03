@@ -7,14 +7,12 @@ import { isLoggedIn } from "../../services/auth.services";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Contact from "./Contact";
-import { useLanguage } from "../../context/LanguageContext";
-import { getTranslation } from "../../constants/translations";
+import { useTranslation } from "react-i18next";
 
 const Home = () => {
   const userLoggedIn = isLoggedIn();
   const [visibleSections, setVisibleSections] = useState(new Set());
-  const { language } = useLanguage();
-  const t = (key) => getTranslation(key, language);
+  const { t } = useTranslation("home");
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -242,14 +240,14 @@ const Home = () => {
           >
             <div className="text-center mb-4">
               <span className="inline-block px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm mb-6">
-                Your Learning Hub
+                {t("learningHub")}
               </span>
             </div>
             <h2 className="text-center text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-8">
               {t("howItWorks")}
             </h2>
             <p className="text-center text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Everything you need to master German in one place
+              {t("everythingYouNeed")}
             </p>
             <div className="flex justify-center mt-6">
               <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
@@ -264,39 +262,39 @@ const Home = () => {
             }`}
           >
             <HomeCard
-              title="Vocabulary Library"
-              text="Master 4500+ German words with examples, audio, and contextual usage"
+              title={t("vocabCardTitle")}
+              text={t("vocabCardDesc")}
               link="/words"
               icon="📚"
             />
             <HomeCard
-              title="German Stories"
-              text="Immerse yourself in engaging stories to enhance reading skills"
+              title={t("storiesCardTitle")}
+              text={t("storiesCardDesc")}
               link="/stories"
               icon="📗"
             />
             <HomeCard
-              title="Learn Grammar"
-              text="Master German grammar rules with clear explanations and exercises"
+              title={t("grammarCardTitle")}
+              text={t("grammarCardDesc")}
               link="/grammar"
               icon="📖"
             />
             <HomeCard
-              title="Words With Prefix"
-              text="Understand German word formation with prefix combinations"
+              title={t("prefixCardTitle")}
+              text={t("prefixCardDesc")}
               link="/prefix-types"
               icon="🔤"
             />
 
             <HomeCard
-              title="Conversations"
-              text="Practice real-world dialogues on diverse topics to build fluency"
+              title={t("conversationCardTitle")}
+              text={t("conversationCardDesc")}
               link="/conversation-titles"
               icon="💬"
             />
             <HomeCard
-              title="Play Quiz"
-              text="Test your knowledge with interactive quizzes and challenges"
+              title={t("quizCardTitle")}
+              text={t("quizCardDesc")}
               link="/quiz"
               icon="🎮"
             />
@@ -315,11 +313,10 @@ const Home = () => {
             }`}
           >
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Why Choose SprachGenie?
+              {t("whyChooseSprachGenie")}
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Powered by cutting-edge AI to make your German learning journey
-              efficient and enjoyable
+              {t("poweredByAI")}
             </p>
             <div className="flex justify-center mt-6">
               <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
@@ -336,67 +333,49 @@ const Home = () => {
             <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-8 rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-gray-700">
               <div className="text-5xl mb-4">🤖</div>
               <h3 className="text-2xl font-bold text-white mb-3">
-                AI-Powered Content
+                {t("aiPoweredContent")}
               </h3>
-              <p className="text-gray-300">
-                AI-generated example sentences and in-depth word explanations to
-                help you understand vocabulary in context
-              </p>
+              <p className="text-gray-300">{t("aiContentDesc")}</p>
             </div>
 
             <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-8 rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-gray-700">
               <div className="text-5xl mb-4">📚</div>
               <h3 className="text-2xl font-bold text-white mb-3">
-                4500+ Words
+                {t("wordsLibrary")}
               </h3>
-              <p className="text-gray-300">
-                Comprehensive vocabulary library with examples, audio, and
-                contextual usage
-              </p>
+              <p className="text-gray-300">{t("wordsLibraryDesc")}</p>
             </div>
 
             <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-8 rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-gray-700">
               <div className="text-5xl mb-4">💬</div>
               <h3 className="text-2xl font-bold text-white mb-3">
-                Real Conversations
+                {t("realConversations")}
               </h3>
-              <p className="text-gray-300">
-                Practice with realistic dialogues on various topics to build
-                confidence
-              </p>
+              <p className="text-gray-300">{t("realConversationsDesc")}</p>
             </div>
 
             <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-8 rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-gray-700">
               <div className="text-5xl mb-4">📖</div>
               <h3 className="text-2xl font-bold text-white mb-3">
-                Interactive Stories
+                {t("interactiveStories")}
               </h3>
-              <p className="text-gray-300">
-                Immerse yourself in engaging German stories that enhance your
-                reading skills
-              </p>
+              <p className="text-gray-300">{t("interactiveStoriesDesc")}</p>
             </div>
 
             <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-8 rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-gray-700">
               <div className="text-5xl mb-4"></div>
               <h3 className="text-2xl font-bold text-white mb-3">
-                Grammar Mastery
+                {t("grammarMastery")}
               </h3>
-              <p className="text-gray-300">
-                Master German grammar with clear explanations and practical
-                exercises
-              </p>
+              <p className="text-gray-300">{t("grammarMasteryDesc")}</p>
             </div>
 
             <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-8 rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-gray-700">
               <div className="text-5xl mb-4">🎮</div>
               <h3 className="text-2xl font-bold text-white mb-3">
-                Fun Quizzes
+                {t("funQuizzes")}
               </h3>
-              <p className="text-gray-300">
-                Test your knowledge with interactive quizzes that make learning
-                enjoyable
-              </p>
+              <p className="text-gray-300">{t("funQuizzesDesc")}</p>
             </div>
           </div>
         </Container>
@@ -416,13 +395,13 @@ const Home = () => {
               {t("howItWorks")}
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Start your journey in three simple steps
+              {t("startYourJourneySteps")}
             </p>
             <div className="flex justify-center mt-6">
               <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
             </div>
           </div>
-
+          {t("startJourneySteps")}
           <div
             className={`grid grid-cols-1 md:grid-cols-3 gap-8 px-4 transition-all duration-1000 delay-300 ${
               visibleSections.has("how-it-works")
@@ -434,11 +413,10 @@ const Home = () => {
               <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-3xl font-bold text-white mx-auto mb-6 shadow-lg shadow-orange-500/50">
                 1
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Sign Up</h3>
-              <p className="text-gray-300 text-lg">
-                Create your free account in seconds and start your personalized
-                learning journey
-              </p>
+              <h3 className="text-2xl font-bold text-white mb-4">
+                {t("signUp")}
+              </h3>
+              <p className="text-gray-300 text-lg">{t("signUpDesc")}</p>
             </div>
 
             <div className="text-center">
@@ -446,10 +424,10 @@ const Home = () => {
                 2
               </div>
               <h3 className="text-2xl font-bold text-white mb-4">
-                Choose Your Path
+                {t("chooseYourPath")}
               </h3>
               <p className="text-gray-300 text-lg">
-                Select from vocabulary, grammar, stories, or conversations based
+                {t("chooseYourPathDesc")}
                 on your goals
               </p>
             </div>
@@ -459,10 +437,10 @@ const Home = () => {
                 3
               </div>
               <h3 className="text-2xl font-bold text-white mb-4">
-                Learn & Practice
+                {t("learnAndPractice")}
               </h3>
               <p className="text-gray-300 text-lg">
-                Practice daily with AI-powered tools and build your German
+                {t("learnAndPracticeDesc")}
                 skills consistently
               </p>
             </div>
@@ -482,30 +460,35 @@ const Home = () => {
           >
             <div className="text-center">
               <div className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-3">
-                4500+
+                {t("wordCount")}
               </div>
-              <p className="text-gray-300 text-lg font-semibold">Words</p>
+              <p className="text-gray-300 text-lg font-semibold">
+                {t("words")}
+              </p>
             </div>
             <div className="text-center">
               <div className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-3">
-                {/* 50+ */}
-                Practical
+                {t("practicalConversations")}
               </div>
               <p className="text-gray-300 text-lg font-semibold">
-                Conversation Topics
+                {t("conversationTopics")}
               </p>
             </div>
             <div className="text-center">
               <div className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 mb-2">
-                A1-B2
+                {t("cefrLevels")}
               </div>
-              <p className="text-gray-300 text-lg font-semibold">CEFR Levels</p>
+              <p className="text-gray-300 text-lg font-semibold">
+                {t("cefrLabel")}
+              </p>
             </div>
             <div className="text-center">
               <div className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-3">
-                AI
+                {t("aiPowered")}
               </div>
-              <p className="text-gray-300 text-lg font-semibold">Powered</p>
+              <p className="text-gray-300 text-lg font-semibold">
+                {t("powered")}
+              </p>
             </div>
           </div>
         </Container>
@@ -522,10 +505,10 @@ const Home = () => {
             }`}
           >
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Frequently Asked Questions
+              {t("frequentlyAskedQuestions")}
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Everything you need to know about SprachGenie
+              {t("everythingYouNeedToKnow")}
             </p>
             <div className="flex justify-center mt-6">
               <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
@@ -541,79 +524,61 @@ const Home = () => {
           >
             <details className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-700 group">
               <summary className="text-xl font-bold text-white cursor-pointer list-none flex items-center justify-between">
-                <span>Is SprachGenie free?</span>
+                <span>{t("isFree")}</span>
                 <span className="text-orange-500 text-2xl group-open:rotate-180 transition-transform">
                   ▼
                 </span>
               </summary>
               <p className="text-gray-300 mt-4 leading-relaxed">
-                Yes! SprachGenie is completely free to use. Access thousands of
-                words, conversations, grammar lessons, stories, and AI-powered
-                learning features at no cost.
+                {t("isFreeAnswer")}
               </p>
             </details>
 
             <details className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-700 group">
               <summary className="text-xl font-bold text-white cursor-pointer list-none flex items-center justify-between">
-                <span>What German levels does SprachGenie cover?</span>
+                <span>{t("levelsQuestion")}</span>
                 <span className="text-orange-500 text-2xl group-open:rotate-180 transition-transform">
                   ▼
                 </span>
               </summary>
               <p className="text-gray-300 mt-4 leading-relaxed">
-                SprachGenie currently covers A1 (beginner) to B2
-                (upper-intermediate) levels. C1 and C2 (advanced) levels are
-                coming soon! Our content is carefully curated to match CEFR
-                standards, making it perfect for learners at any stage of their
-                journey.
+                {t("levelsAnswer")}
               </p>
             </details>
 
             <details className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-700 group">
               <summary className="text-xl font-bold text-white cursor-pointer list-none flex items-center justify-between">
-                <span>How does the AI-powered learning work?</span>
+                <span>{t("aiQuestion")}</span>
                 <span className="text-orange-500 text-2xl group-open:rotate-180 transition-transform">
                   ▼
                 </span>
               </summary>
               <p className="text-gray-300 mt-4 leading-relaxed">
-                SprachGenie uses OpenAI to enhance your learning experience. For
-                each vocabulary word, the AI can generate contextual example
-                sentences and provide in-depth explanations through the "Learn
-                More" feature. This helps you understand not just the
-                definition, but how the word is used in real German
-                conversations. You can also report any AI-generated content if
-                you notice inaccuracies, ensuring quality learning materials.
+                {t("aiAnswer")}
               </p>
             </details>
 
             <details className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-700 group">
               <summary className="text-xl font-bold text-white cursor-pointer list-none flex items-center justify-between">
-                <span>Can I use SprachGenie offline?</span>
+                <span>{t("offlineQuestion")}</span>
                 <span className="text-orange-500 text-2xl group-open:rotate-180 transition-transform">
                   ▼
                 </span>
               </summary>
               <p className="text-gray-300 mt-4 leading-relaxed">
-                Currently, SprachGenie requires an internet connection to access
-                AI-powered features and sync your progress. However, we're
-                working on offline mode for downloaded content in future
-                updates.
+                {t("offlineAnswer")}
               </p>
             </details>
 
             <details className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-700 group">
               <summary className="text-xl font-bold text-white cursor-pointer list-none flex items-center justify-between">
-                <span>How long does it take to become fluent?</span>
+                <span>{t("fluencyQuestion")}</span>
                 <span className="text-orange-500 text-2xl group-open:rotate-180 transition-transform">
                   ▼
                 </span>
               </summary>
               <p className="text-gray-300 mt-4 leading-relaxed">
-                Learning speed varies by individual and depends on many factors
-                including prior language experience, study time, and
-                consistency. SprachGenie provides comprehensive materials for
-                A1-B2 levels to support your learning journey at your own pace.
+                {t("fluencyAnswer")}
               </p>
             </details>
 
@@ -650,10 +615,10 @@ const Home = () => {
               }`}
             >
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                Ready to Master German?
+                {t("readyToMaster")}
               </h2>
               <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto">
-                Start your free learning journey today with AI-powered tools
+                {t("startYourFreeJourney")}
               </p>
               <Link
                 to="/register"

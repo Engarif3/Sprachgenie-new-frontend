@@ -1,0 +1,34 @@
+{
+  "navbar": {
+    "home": "Startseite",
+    "vocabulary": "Vokabeln",
+    "dashboard": "Dashboard",
+    "favorites": "Favoriten",
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "profile": "Profil",
+    "language": "Sprache",
+    "german": "Deutsch",
+    "english": "English",
+    "createTopic": "Thema erstellen"
+  },
+  "footer": {
+    "allRightsReserved": "Alle Rechte vorbehalten",
+    "company": "Unternehmen",
+    "about": "Über",
+    "terms": "Nutzungsbedingungen",
+    "privacy": "Datenschutz",
+    "support": "Unterstützung",
+    "contact": "Kontakt"
+  },
+  "contact": {
+    "getInTouch": "Kontaktiere uns",
+    "contactForm": "Kontakt",
+    "email": "E-Mail",
+    "message": "Nachricht",
+    "send": "Senden",
+    "sendingMessage": "Nachricht wird gesendet...",
+    "messageSent": "Nachricht erfolgreich versendet!",
+    "tryAgain": "Versuche es erneut"
+  }
+}

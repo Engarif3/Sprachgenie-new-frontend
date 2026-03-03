@@ -31,8 +31,10 @@ import { toast } from "sonner";
 import { getUserInfo, removeUser } from "../../../services/auth.services";
 import { Link, useNavigate } from "react-router-dom";
 import { startTransition } from "react";
+import { useTranslation } from "react-i18next";
 
 const AuthButton = () => {
+  const { t } = useTranslation("common");
   const userInfo = getUserInfo();
   const navigate = useNavigate();
 
@@ -50,11 +52,11 @@ const AuthButton = () => {
     <>
       {userInfo?.id ? (
         <button onClick={handleLogout} className="btn btn-sm btn-error">
-          Logout
+          {t("navbar.logout")}
         </button>
       ) : (
         <Link className="btn btn-sm btn-primary" to="/login">
-          Login
+          {t("navbar.login")}
         </Link>
       )}
     </>

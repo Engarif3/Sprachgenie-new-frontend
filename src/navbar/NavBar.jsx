@@ -8,12 +8,13 @@ import { MdDashboard } from "react-icons/md";
 import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
-import { getTranslation } from "../constants/translations";
+import { useTranslation } from "react-i18next";
 import Container from "../utils/Container";
 import ENFlag from "../assets/EN.svg";
 import DEFlag from "../assets/DE.svg";
 
 const NavBar = () => {
+  const { t } = useTranslation("common");
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -23,7 +24,6 @@ const NavBar = () => {
   const toggleRef = useRef(null);
   const { theme, toggleTheme } = useTheme();
   const { language, toggleLanguage } = useLanguage();
-  const t = (key) => getTranslation(key, language);
 
   // Close menu if clicked outside
   useEffect(() => {
@@ -106,7 +106,7 @@ const NavBar = () => {
                 to="/"
                 className="border border-sky-700 text-white font-bold px-2 py-1 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center md:hidden lg:hidden"
               >
-                🏠 Home
+                🏠 {t("navbar.home")}
               </Link>
             )}
 
@@ -132,7 +132,7 @@ const NavBar = () => {
               >
                 <FaHome className="text-3xl text-orange-600 hover:text-orange-500 transition-colors" />
                 <span className="ml-2 text-xl mt-0 text-white hover:text-orange-400 transition-colors">
-                  Home
+                  {t("navbar.home")}
                 </span>
               </Link>
             )}
@@ -148,7 +148,7 @@ const NavBar = () => {
                   size={20}
                 />
                 <span className="ml-2 text-xl text-white hover:text-purple-400 transition-colors ">
-                  Vocabulary
+                  {t("navbar.vocabulary")}
                 </span>
               </Link>
             )}
@@ -165,7 +165,7 @@ const NavBar = () => {
                     className="text-3xl text-orange-600 hover:text-blue-400 transition-colors"
                   />
                   <span className="ml-2 text-xl mt-0 text-white hover:text-blue-400 transition-colors">
-                    Dashboard
+                    {t("navbar.dashboard")}
                   </span>
                 </Link>
                 {/* ====mobile=== */}
@@ -175,21 +175,21 @@ const NavBar = () => {
                   onClick={() => setIsMenuOpen(false)}
                   className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg  flex justify-center items-center md:hidden lg:hidden"
                 >
-                  📊 Dashboard
+                  📊 {t("navbar.dashboard")}
                 </Link>
                 <Link
                   to="/words"
                   onClick={() => setIsMenuOpen(false)}
                   className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg flex justify-center items-center md:hidden lg:hidden"
                 >
-                  📚 Vocabulary
+                  📚 {t("navbar.vocabulary")}
                 </Link>
                 <Link
                   onClick={() => setIsMenuOpen(false)}
                   to="/favorites"
                   className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg  flex md:hidden lg:hidden justify-center items-center"
                 >
-                  ❤️ Favorites
+                  ❤️ {t("navbar.favorites")}
                 </Link>
                 <Link
                   onClick={() => setIsMenuOpen(false)}
@@ -204,7 +204,7 @@ const NavBar = () => {
                     <path d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z" />
                   </svg>
                   <span className="ml-2 mt-0 text-xl text-white hover:text-red-400 transition-colors">
-                    Favorites
+                    {t("navbar.favorites")}
                   </span>
                 </Link>
               </>
@@ -291,7 +291,7 @@ const NavBar = () => {
                   }}
                   className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg flex justify-center items-center md:hidden lg:hidden"
                 >
-                  📚 Create Topic
+                  📚 {t("navbar.createTopic")}
                 </Link>
               </>
             )}

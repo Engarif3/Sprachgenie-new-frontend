@@ -1,29 +1,31 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext } from "react";
+import { useTranslation } from "react-i18next";
 
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-  const [language, setLanguage] = useState(() => {
-    return localStorage.getItem("language") || "en";
-  });
-
-  useEffect(() => {
-    localStorage.setItem("language", language);
-  }, [language]);
+  const { i18n } = useTranslation();
 
   const toggleLanguage = () => {
-    setLanguage((prevLanguage) => (prevLanguage === "en" ? "de" : "en"));
+    const newLang = i18n.language === "en" ? "de" : "en";
+    i18n.changeLanguage(newLang);
+    localStorage.setItem("language", newLang);
   };
 
   const setLanguageTo = (lang) => {
     if (lang === "en" || lang === "de") {
-      setLanguage(lang);
+      i18n.changeLanguage(lang);
+      localStorage.setItem("language", lang);
     }
   };
 
   return (
     <LanguageContext.Provider
-      value={{ language, toggleLanguage, setLanguageTo }}
+      value={{
+        language: i18n.language,
+        toggleLanguage,
+        setLanguageTo,
+      }}
     >
       {children}
     </LanguageContext.Provider>

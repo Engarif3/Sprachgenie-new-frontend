@@ -1,3 +1,4 @@
+import "./i18n"; // Initialize i18n first
 import { Outlet, useLocation } from "react-router-dom";
 import { Suspense, useEffect, useState } from "react";
 import NavBar from "./navbar/NavBar";
