@@ -103,7 +103,7 @@ const NavBar = () => {
                 <Link
                   onClick={() => setIsMenuOpen(false)}
                   to="/"
-                  className="border border-sky-700 text-black dark:text-white font-bold px-2 py-1 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center md:hidden lg:hidden"
+                  className="border border-sky-700 text-white font-bold px-2 py-1 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center md:hidden lg:hidden"
                 >
                   🏠 {t("navbar.home")}
                 </Link>
