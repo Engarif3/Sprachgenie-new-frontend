@@ -312,7 +312,11 @@ const NavBar = () => {
                 <img
                   src={ENFlag}
                   alt="English"
-                  className={`w-5 h-2.9 transition-all  duration-300 animate-pulse ${language === "en" ? "opacity-100 scale-110" : "opacity-50"}`}
+                  className={`h-2.9 w-5 transition-all duration-300 ${
+                    language === "en"
+                      ? "scale-110 opacity-100 brightness-125 saturate-150 drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]"
+                      : "opacity-40 saturate-75"
+                  }`}
                 />
                 {language === "en" ? (
                   <PiToggleLeftFill
@@ -328,7 +332,11 @@ const NavBar = () => {
                 <img
                   src={DEFlag}
                   alt="Deutsch"
-                  className={`w-5 h-3.5 transition-all duration-300 animate-pulse ${language === "de" ? "opacity-100 scale-110" : "opacity-50"}`}
+                  className={`h-3.5 w-5 transition-all duration-300 ${
+                    language === "de"
+                      ? "scale-110 opacity-100 brightness-125 saturate-150 drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]"
+                      : "opacity-40 saturate-75"
+                  }`}
                 />
               </button>
 
