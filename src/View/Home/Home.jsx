@@ -81,7 +81,7 @@ const Home = () => {
         />
 
         {/* Hero Content */}
-        <div className="text-center pt-6 pb-[280px] px-4">
+        <div className="text-center pt-6 pb-24 md:pb-[280px] px-4">
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-800 dark:text-white mb-6 leading-tight">
             {t("heroTitle")}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">
@@ -90,7 +90,7 @@ const Home = () => {
             </span>
             {t("heroTitleEnd")}
           </h1>
-          <p className="text-xl md:text-2xl text-gray-800 dark:text-gray-300 mb-12 max-w-3xl mx-auto">
+          <p className="text-sm md:text-2xl text-gray-800 dark:text-gray-300 mb-12 max-w-3xl mx-auto">
             {t("heroDescription")}
           </p>
 
@@ -100,10 +100,10 @@ const Home = () => {
               <p className="text-lg text-cyan-500 dark:text-cyan-400 font-semibold mb-8">
                 {t("featuresUnlocked")}
               </p>
-              <div className="flex flex-wrap justify-center gap-8">
+              <div className="flex flex-wrap justify-center gap-1 md:gap-8 lg:gap-8">
                 {isMobile ? (
                   <div
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
                   >
                     ❤️ {t("favoriteWords")}
                   </div>
@@ -124,7 +124,7 @@ const Home = () => {
                 )}
                 {isMobile ? (
                   <div
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
                   >
                     🤖 {t("aiPoweredLearning")}
                   </div>
@@ -145,7 +145,7 @@ const Home = () => {
                 )}
                 {isMobile ? (
                   <div
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
                   >
                     🌐 {t("translationFeatures")}
                   </div>
@@ -166,7 +166,7 @@ const Home = () => {
                 )}
                 {isMobile ? (
                   <div
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
                   >
                     📊 {t("personalDashboard")}
                   </div>
@@ -187,7 +187,7 @@ const Home = () => {
                 )}
                 {isMobile ? (
                   <div
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
                   >
                     📈 {t("progressTracking")}
                   </div>
@@ -208,7 +208,7 @@ const Home = () => {
                 )}
                 {isMobile ? (
                   <div
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
                   >
                     ⚡ {t("muchMore")}
                   </div>
