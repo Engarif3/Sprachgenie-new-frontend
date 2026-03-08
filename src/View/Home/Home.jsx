@@ -686,7 +686,7 @@ const Home = () => {
         {/* TITLE inside Container (safe) */}
         <Container>
           <div
-            className={`text-center mb-16 transition-all duration-1000 ${
+            className={`text-center mb-1 transition-all duration-1000 ${
               visibleSections.has("features") ? "opacity-100" : "opacity-0"
             }`}
           >
@@ -809,7 +809,7 @@ const Home = () => {
       </div>
 
       {/* How It Works Section */}
-      <div className="py-20" id="how-it-works" data-animate>
+      <div className="pb-20" id="how-it-works" data-animate>
         <Container>
           <div
             className={`text-center mb-16 transition-all duration-1000 ${

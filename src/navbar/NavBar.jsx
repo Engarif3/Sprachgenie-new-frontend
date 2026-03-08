@@ -344,16 +344,15 @@ const NavBar = () => {
               <div>
                 <button
                   onClick={toggleTheme}
-                  className="flex p-1 rounded-full transition-all duration-300 hover:scale-110 border
-                hover:bg-blue-200  border-red-400 
-               bg-gray-800 hover:bg-gray-700/50 text-white
+                  className="flex p-1 rounded-full transition-all duration-300  border
+               bg-cyan-900 hover:bg-gray-700/50 text-white
                border-gray-700/50 "
                   title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
                 >
                   {theme === "light" ? (
-                    <FaMoon className="text-lg  text-yellow-500" />
+                    <FaMoon className="text-lg  text-yellow-500 hover:scale-110" />
                   ) : (
-                    <FaSun className="text-lg " />
+                    <FaSun className="text-lg hover:scale-110 " />
                   )}
                 </button>
               </div>
