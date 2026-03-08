@@ -2,6 +2,7 @@ import Container from "../../utils/Container";
 import HomeCard from "./HomeCard";
 import CircularText from "./CircularText";
 import SplashCursor from "./SplashCursor";
+import SplitText from "./SplitText";
 import Marquee from "react-fast-marquee";
 import { isLoggedIn } from "../../services/auth.services";
 import { Link } from "react-router-dom";
@@ -15,6 +16,16 @@ const Home = () => {
   const [visibleSections, setVisibleSections] = useState(new Set());
   const { t } = useTranslation("home");
   const { theme } = useTheme();
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -89,100 +100,139 @@ const Home = () => {
               <p className="text-lg text-cyan-500 dark:text-cyan-400 font-semibold mb-8">
                 {t("featuresUnlocked")}
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
-                  <div className="text-2xl mb-2">❤️</div>
-                  <p
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold`}
+              <div className="flex flex-wrap justify-center gap-8">
+                {isMobile ? (
+                  <div
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
                   >
-                    {t("favoriteWords")}
-                  </p>
-                  <p
-                    className={`${theme === "dark" ? "text-gray-400" : "text-black"} text-sm`}
+                    ❤️ {t("favoriteWords")}
+                  </div>
+                ) : (
+                  <SplitText
+                    text={`❤️ ${t("favoriteWords")}`}
+                    delay={20}
+                    duration={0.6}
+                    ease="power3.out"
+                    splitType="chars"
+                    from={{ opacity: 0, y: 20 }}
+                    to={{ opacity: 1, y: 0 }}
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                    threshold={0.1}
+                    rootMargin="-100px"
+                    initialDelay={0}
+                  />
+                )}
+                {isMobile ? (
+                  <div
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
                   >
-                    {t("favoriteWordsDesc")}
-                  </p>
-                </div>
-                <div className="border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
-                  <div className="text-2xl mb-2">🤖</div>
-                  <p
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold`}
+                    🤖 {t("aiPoweredLearning")}
+                  </div>
+                ) : (
+                  <SplitText
+                    text={`🤖 ${t("aiPoweredLearning")}`}
+                    delay={20}
+                    duration={0.6}
+                    ease="power3.out"
+                    splitType="chars"
+                    from={{ opacity: 0, y: 20 }}
+                    to={{ opacity: 1, y: 0 }}
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                    threshold={0.1}
+                    rootMargin="-100px"
+                    initialDelay={600}
+                  />
+                )}
+                {isMobile ? (
+                  <div
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
                   >
-                    {t("aiPoweredLearning")}
-                  </p>
-                  <p
-                    className={`${theme === "dark" ? "text-gray-400" : "text-black"} text-sm`}
+                    🌐 {t("translationFeatures")}
+                  </div>
+                ) : (
+                  <SplitText
+                    text={`🌐 ${t("translationFeatures")}`}
+                    delay={20}
+                    duration={0.6}
+                    ease="power3.out"
+                    splitType="chars"
+                    from={{ opacity: 0, y: 20 }}
+                    to={{ opacity: 1, y: 0 }}
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                    threshold={0.1}
+                    rootMargin="-100px"
+                    initialDelay={1200}
+                  />
+                )}
+                {isMobile ? (
+                  <div
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
                   >
-                    {t("aiPoweredLearningDesc")}
-                  </p>
-                </div>
-                <div className="border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
-                  <div className="text-2xl mb-2">🌐</div>
-                  <p
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold`}
+                    📊 {t("personalDashboard")}
+                  </div>
+                ) : (
+                  <SplitText
+                    text={`📊 ${t("personalDashboard")}`}
+                    delay={20}
+                    duration={0.6}
+                    ease="power3.out"
+                    splitType="chars"
+                    from={{ opacity: 0, y: 20 }}
+                    to={{ opacity: 1, y: 0 }}
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                    threshold={0.1}
+                    rootMargin="-100px"
+                    initialDelay={1800}
+                  />
+                )}
+                {isMobile ? (
+                  <div
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
                   >
-                    {t("translationFeatures")}
-                  </p>
-                  <p
-                    className={`${theme === "dark" ? "text-gray-400" : "text-black"} text-sm`}
+                    📈 {t("progressTracking")}
+                  </div>
+                ) : (
+                  <SplitText
+                    text={`📈 ${t("progressTracking")}`}
+                    delay={20}
+                    duration={0.6}
+                    ease="power3.out"
+                    splitType="chars"
+                    from={{ opacity: 0, y: 20 }}
+                    to={{ opacity: 1, y: 0 }}
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                    threshold={0.1}
+                    rootMargin="-100px"
+                    initialDelay={2400}
+                  />
+                )}
+                {isMobile ? (
+                  <div
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
                   >
-                    {t("translationFeaturesDesc")}
-                  </p>
-                </div>
-                <div className="border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
-                  <div className="text-2xl mb-2">📊</div>
-                  <p
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold`}
-                  >
-                    {t("personalDashboard")}
-                  </p>
-                  <p
-                    className={`${theme === "dark" ? "text-gray-400" : "text-black"} text-sm`}
-                  >
-                    {t("personalDashboardDesc")}
-                  </p>
-                </div>
-                <div className="border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
-                  <div className="text-2xl mb-2">📈</div>
-                  <p
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold`}
-                  >
-                    {t("progressTracking")}
-                  </p>
-                  <p
-                    className={`${theme === "dark" ? "text-gray-400" : "text-black"} text-sm`}
-                  >
-                    {t("progressTrackingDesc")}
-                  </p>
-                </div>
-                <div className="border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
-                  <div className="text-2xl mb-2">⚡</div>
-                  <p
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold`}
-                  >
-                    {t("muchMore")}
-                  </p>
-                  <p
-                    className={`${theme === "dark" ? "text-gray-400" : "text-black"} text-sm`}
-                  >
-                    {t("muchMoreDesc")}
-                  </p>
-                </div>
+                    ⚡ {t("muchMore")}
+                  </div>
+                ) : (
+                  <SplitText
+                    text={`⚡ ${t("muchMore")}`}
+                    delay={20}
+                    duration={0.6}
+                    ease="power3.out"
+                    splitType="chars"
+                    from={{ opacity: 0, y: 20 }}
+                    to={{ opacity: 1, y: 0 }}
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                    threshold={0.1}
+                    rootMargin="-100px"
+                    initialDelay={3000}
+                  />
+                )}
               </div>
             </div>
           )}
 
           {/* Featured Vocabulary Access */}
           <div className="mt-16 mb-6">
-            {/* <Link
-              to="/words"
-              className="inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-orange-900 via-pink-900 to-purple-900 text-white font-bold rounded-full hover:shadow-[0_0_30px_rgba(249,115,22,0.5)] hover:scale-105 transition-all duration-300 text-lg shadow-xl "
-            >
-              <span className="text-2xl">📚</span>
-              <span>Explore 4500+ Vocabulary Words</span>
-              <span className="text-xl">→</span>
-            </Link> */}
-            {/* ================== */}
             <Link
               to="/words"
               className="group relative inline-flex items-center gap-3 overflow-hidden rounded-full px-12 py-5 bg-slate-950 text-white font-bold transition-all duration-300 hover:scale-105"

@@ -16,6 +16,7 @@
     "@emailjs/browser": "^4.4.1",
     "@fontsource/lora": "^5.2.8",
     "@fontsource/roboto": "^5.2.10",
+    "@gsap/react": "^2.1.2",
     "@headlessui/react": "^2.2.7",
     "@hookform/resolvers": "^4.1.0",
     "@reduxjs/toolkit": "^2.5.1",
