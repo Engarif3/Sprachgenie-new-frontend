@@ -141,7 +141,7 @@ const Stories = () => {
 
   return (
     <div>
-      <div className="min-h-screen p-1 md:p-4 lg:4 bg-gradient-to-br from-gray-900/50 via-gray-800/30 to-black/50">
+      <div className="min-h-screen p-1 md:p-4 lg:4 dark:bg-gradient-to-br from-gray-900/50 via-gray-800/30 to-black/50">
         {/* Header Section */}
         <div className="text-center mb-12 mt-8">
           <div className="mb-4">
@@ -152,7 +152,7 @@ const Stories = () => {
           <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-4">
             German Stories
           </h2>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-4">
+          <p className="text-xl dark:text-gray-300 max-w-2xl mx-auto mb-4">
             Immerse yourself in engaging stories to enhance reading skills
           </p>
           <div className="flex justify-center mb-8">
@@ -173,14 +173,14 @@ const Stories = () => {
             <p className="text-red-400 text-lg">{error}</p>
             <button
               onClick={fetchStories}
-              className="mt-4 px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
+              className="mt-4 px-6 py-2 bg-orange-500 hover:bg-orange-600 dark:dark:text-white rounded-lg transition-colors"
             >
               Retry
             </button>
           </div>
         )}
 
-        <div className="text-2xl text-white p-2 md:p-4">
+        <div className="text-2xl dark:dark:text-white p-2 md:p-4">
           {allStories.map(
             ({ title, image, description, vocabulary }, index) => (
               <div
@@ -206,7 +206,7 @@ const Stories = () => {
                 )}
 
                 {/* Description */}
-                <div className="[font-family:'Roboto',sans-serif] text-xl md:text-xl lg:text-xl leading-8 text-gray-200 text-justify mb-2 md:mb-8 lg:mb-8 w-full md:w-8/12 bg-gradient-to-br from-gray-900/70 to-gray-800/50 backdrop-blur-md border border-gray-700/50 p-2 md:p-8 rounded-2xl shadow-2xl font-normal">
+                <div className="[font-family:'Roboto',sans-serif] text-xl md:text-xl lg:text-xl leading-8  dark:text-gray-200 text-justify mb-2 md:mb-8 lg:mb-8 w-full md:w-8/12 dark:bg-gradient-to-br from-gray-900/70 to-gray-800/50 backdrop-blur-md border border-gray-700/50 p-2 md:p-8 rounded-2xl shadow-2xl font-normal">
                   {splitIntoParagraphs(description.text).map(
                     (paragraph, idx) => (
                       <p key={idx} className="mb-6">
@@ -223,7 +223,7 @@ const Stories = () => {
                     {vocabulary.map((item, index) => (
                       <div
                         key={index}
-                        className="flex items-center gap-2 justify-start p-3 bg-gray-800/40 backdrop-blur-sm border border-gray-700/40 rounded-xl shadow-lg hover:border-orange-500/40 transition-all duration-300"
+                        className="flex items-center gap-2 justify-start p-3 dark.bg-gray-800/40 backdrop-blur-sm border border-gray-700/40 rounded-xl shadow-lg hover:border-orange-500/40 transition-all duration-300"
                       >
                         <button
                           onClick={() => {
@@ -233,7 +233,7 @@ const Stories = () => {
                             utterance.lang = "de-DE";
                             window.speechSynthesis.speak(utterance);
                           }}
-                          className="flex-shrink-0 w-8 h-8 flex items-center justify-center  text-white rounded-full transition-colors"
+                          className="flex-shrink-0 w-8 h-8 flex items-center justify-center  dark:dark:text-white rounded-full transition-colors"
                           title={`Pronounce: ${item.word}`}
                         >
                           🔊
@@ -241,7 +241,7 @@ const Stories = () => {
                         <div className="text-sky-400 font-bold">
                           {item.word}
                         </div>
-                        <p className="text-white">
+                        <p className="dark:dark:text-white">
                           {" "}
                           <span className="text-orange-600"> → </span>{" "}
                           {item.meaning}

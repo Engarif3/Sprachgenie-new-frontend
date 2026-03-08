@@ -4,17 +4,19 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("theme") || "dark";
+    const stored = localStorage.getItem("theme");
+    if (stored) return stored;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
   });
 
   useEffect(() => {
     const root = document.documentElement;
     if (theme === "light") {
-      root.classList.add("light-mode");
-      root.classList.remove("dark-mode");
+      root.classList.remove("dark");
     } else {
-      root.classList.add("dark-mode");
-      root.classList.remove("light-mode");
+      root.classList.add("dark");
     }
     localStorage.setItem("theme", theme);
   }, [theme]);

@@ -22,6 +22,7 @@
   "progressTrackingDesc": "Track your progress and achievements",
   "muchMore": "Much More",
   "muchMoreDesc": "Exclusive features to boost your learning",
+  "learningResources": "Learning Resources",
   "howItWorks": "How It Works",
   "stepOne": "Select a topic and difficulty level",
   "stepTwo": "AI generates personalized learning materials",
@@ -107,5 +108,7 @@
   "conversationCardDesc": "Practice real-world dialogues on diverse topics to build fluency",
   "quizCardTitle": "Play Quiz",
   "quizCardDesc": "Test your knowledge with interactive quizzes and challenges",
-  "exploreNow": "Explore Now"
+  "exploreNow": "Explore Now",
+  "scrollToExplore": "Scroll to explore more",
+  "welcome": "Welcome!"
 }

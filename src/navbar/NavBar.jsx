@@ -76,18 +76,16 @@ const NavBar = () => {
   const isHomePage = location.pathname === "/";
 
   return (
-    <div
-      className={`w-full sticky top-0 z-50 ${
-        isHomePage
-          ? "bg-gray-950 shadow-xl"
-          : "bg-gray-900/80 backdrop-blur-md shadow-lg"
-      }`}
-    >
+    <div className="w-full sticky top-0 z-50 bg-gray-800 dark:bg-transparent ">
       <Container>
-        {isHomePage && <div className="h-1 -mt-2 bg-gray-950" />}
+        {isHomePage && (
+          <div className="h-1 -mt-2 bg-gray-800 dark:bg-gray-950 " />
+        )}
         <div
           className={`flex flex-wrap justify-between items-center py-3 px-2 text-lg font-semibold relative border-b border-slate-800  mt-2 ${
-            isHomePage ? "bg-gray-950" : "bg-transparent"
+            isHomePage
+              ? "bg-gray-800 dark:bg-gray-950"
+              : "bg-gray-800 dark:bg-gray-950"
           }`}
         >
           {/* Title and Hamburger Menu */}
@@ -97,14 +95,14 @@ const NavBar = () => {
               to="/"
             >
               <span className="text-orange-600 font-extrabold">Sprach</span>
-              <span className="text-white font-extrabold">Genie</span>
+              <span className="text-sky-500 font-extrabold">Genie</span>
             </Link>
 
             {location.pathname !== "/" && (
               <Link
                 onClick={() => setIsMenuOpen(false)}
                 to="/"
-                className="border border-sky-700 text-white font-bold px-2 py-1 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center md:hidden lg:hidden"
+                className="border border-sky-700 text-black dark:text-white font-bold px-2 py-1 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center md:hidden lg:hidden"
               >
                 🏠 {t("navbar.home")}
               </Link>
@@ -128,10 +126,14 @@ const NavBar = () => {
             {location.pathname !== "/" && (
               <Link
                 to="/"
-                className="hidden md:flex items-center justify-center border-b-2 border-white rounded-md hover:scale-105 hover:border-orange-400 px-1 transition-all duration-300"
+                className="hidden md:flex items-center justify-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 transition-all duration-300"
               >
-                <FaHome className="text-3xl text-orange-600 hover:text-orange-500 transition-colors" />
-                <span className="ml-2 text-xl mt-0 text-white hover:text-orange-400 transition-colors">
+                <FaHome className="text-3xl text-orange-600 hover:text-sky-400 transition-colors" />
+                <span
+                  className={
+                    "ml-2 text-xl text-white hover:text-sky-400 transition-colors"
+                  }
+                >
                   {t("navbar.home")}
                 </span>
               </Link>
@@ -141,13 +143,13 @@ const NavBar = () => {
               <Link
                 onClick={() => setIsMenuOpen(false)}
                 to="/words"
-                className="hidden md:flex w-full md:w-auto items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-purple-400 px-1 mt-0 transition-all duration-300"
+                className="hidden md:flex w-full md:w-auto items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 mt-0 transition-all duration-300"
               >
                 <FaBook
-                  className="text-orange-500 hover:text-purple-400 transition-colors"
+                  className="text-orange-500 hover:text-sky-400 transition-colors"
                   size={20}
                 />
-                <span className="ml-2 text-xl text-white hover:text-purple-400 transition-colors ">
+                <span className="ml-2 text-xl text-white hover:text-sky-400 transition-colors">
                   {t("navbar.vocabulary")}
                 </span>
               </Link>
@@ -158,13 +160,13 @@ const NavBar = () => {
                 <Link
                   to="/dashboard"
                   onClick={() => setIsMenuOpen(false)}
-                  className="hidden md:flex items-center justify-center border-b-2 border-white rounded-md hover:scale-105 hover:border-blue-400 px-1 transition-all duration-300"
+                  className="hidden md:flex items-center justify-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 transition-all duration-300"
                 >
                   <MdDashboard
                     size={24}
-                    className="text-3xl text-orange-600 hover:text-blue-400 transition-colors"
+                    className="text-3xl text-orange-600 hover:text-sky-400 transition-colors"
                   />
-                  <span className="ml-2 text-xl mt-0 text-white hover:text-blue-400 transition-colors">
+                  <span className="ml-2 text-xl text-white hover:text-sky-400 transition-colors">
                     {t("navbar.dashboard")}
                   </span>
                 </Link>
@@ -194,7 +196,7 @@ const NavBar = () => {
                 <Link
                   onClick={() => setIsMenuOpen(false)}
                   to="/favorites"
-                  className="hidden md:flex lg:flex items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-red-400 px-1 transition-all duration-300"
+                  className="hidden md:flex lg:flex items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 transition-all duration-300"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -203,7 +205,7 @@ const NavBar = () => {
                   >
                     <path d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z" />
                   </svg>
-                  <span className="ml-2 mt-0 text-xl text-white hover:text-red-400 transition-colors">
+                  <span className="ml-2 text-xl text-white hover:text-sky-400 transition-colors">
                     {t("navbar.favorites")}
                   </span>
                 </Link>
@@ -331,10 +333,12 @@ const NavBar = () => {
             {/* Theme Toggle Button */}
             <div>
               <button
-                // onClick={toggleTheme}
-                className="hidden md:flex bg-gray-800/50 hover:bg-gray-700/50 text-white p-2.5 rounded-full transition-all duration-300 hover:scale-110 border border-gray-700/50 hover:border-gray-600"
-                // title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-                title={`Light mode Coming  soon`}
+                onClick={toggleTheme}
+                className="hidden md:flex p-1 rounded-full transition-all duration-300 hover:scale-110 border
+               bg-blue-100 hover:bg-blue-200 text-blue-600 border-blue-300 hover:border-blue-400
+               dark:bg-gray-800/50 dark:hover:bg-gray-700/50 dark:text-white
+               dark:border-gray-700/50 dark:hover:border-gray-600"
+                title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
               >
                 {theme === "light" ? (
                   <FaMoon className="text-lg" />
@@ -349,15 +353,25 @@ const NavBar = () => {
           </div>
         </div>
 
-        {userLoggedIn && (
+        {/* {userLoggedIn && (
           <p className="text-end mx-2 text-white py-4">
             Welcome!{" "}
             <span className="font-semibold text-pink-600 ">
               {userInfo?.name}
             </span>
           </p>
-        )}
+        )} */}
       </Container>
+      <div className="bg-gray-50 dark:bg-transparent">
+        {userLoggedIn && (
+          <p className="text-end mr-24 text-black dark:text-white py-4 ">
+            {t("welcome")}{" "}
+            <span className="font-semibold text-pink-600 ">
+              {userInfo?.name}
+            </span>
+          </p>
+        )}
+      </div>
     </div>
   );
 };

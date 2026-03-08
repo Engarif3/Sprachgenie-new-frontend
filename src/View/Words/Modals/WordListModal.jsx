@@ -286,7 +286,7 @@ const WordListModal = ({
     >
       <div
         ref={modalRef}
-        className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl max-w-6xl w-full mx-3 shadow-2xl transform transition-all duration-300 border-2 border-gray-700/50 max-h-[90vh] overflow-y-auto"
+        className="relative  bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl max-w-6xl w-full mx-3 shadow-2xl transform transition-all duration-300 dark:border-2 border-gray-700/50 max-h-[90vh] overflow-y-auto"
       >
         {/* Favorite Toggle Button */}
 
@@ -336,7 +336,7 @@ const WordListModal = ({
               <span className="mr-2 font-bold text-orange-400 text-center text-md md:text-xl lg:text-xl">
                 {selectedWord.article?.name}
               </span>
-              <span className="capitalize text-white font-bold text-sm md:text-xl lg:text-xl">
+              <span className="capitalize dark:text-white font-bold text-sm md:text-xl lg:text-xl">
                 {capitalizedWord}
               </span>
             </p>
@@ -355,7 +355,7 @@ const WordListModal = ({
                     <span className="font-bold text-orange-400 text-md md:text-xl lg:text-xl">
                       die
                     </span>{" "}
-                    <span className="text-white font-bold">
+                    <span className="dark:text-white font-bold">
                       {capitalizedPluralForm}
                     </span>
                   </>
@@ -368,7 +368,7 @@ const WordListModal = ({
                 <span className="text-blue-400 font-semibold capitalize">
                   Synonyms:
                 </span>{" "}
-                <span className="text-gray-300 font-medium italic">
+                <span className=" dark:text-gray-400 font-medium italic">
                   {synonymsList.map((item, idx) => (
                     <span key={idx}>
                       {item.article && (
@@ -389,7 +389,7 @@ const WordListModal = ({
                 <span className="text-blue-400 font-semibold capitalize">
                   Antonyms:
                 </span>{" "}
-                <span className="text-gray-300 font-medium italic">
+                <span className=" dark:text-gray-400 font-medium italic">
                   {antonymsList.map((item, idx) => (
                     <span key={idx}>
                       {item.article && (
@@ -410,7 +410,7 @@ const WordListModal = ({
                 <span className="text-blue-400 font-semibold">
                   Word to Watch:
                 </span>{" "}
-                <span className="text-gray-300 font-medium italic">
+                <span className=" font-medium italic">
                   {similarWordsList.map((item, idx) => (
                     <span key={idx}>
                       {item.article && (

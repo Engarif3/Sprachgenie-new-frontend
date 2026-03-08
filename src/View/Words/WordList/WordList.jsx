@@ -945,7 +945,7 @@ const WordList = () => {
   return (
     <Container>
       {/* Modern Header Section */}
-      <div className="text-center mb-8 mt-8">
+      <div className="text-center mb-8 mt-8 ">
         <div className="flex justify-between items-center mb-6 ml-2">
           <Link
             to="/quiz"
@@ -968,7 +968,7 @@ const WordList = () => {
         <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-4">
           Vocabulary Library
         </h2>
-        <p className="text-xl text-gray-300 max-w-2xl mx-auto hidden md:inline-block lg:inline-block">
+        <p className="text-xl text-gray-950 dark:text-gray-300 max-w-2xl mx-auto hidden md:inline-block lg:inline-block">
           Explore and master German vocabulary with interactive learning tools
         </p>
         <div className="hidden md:flex lg:flex justify-center mt-6">
@@ -977,7 +977,7 @@ const WordList = () => {
       </div>
 
       {/* =============radio buttons ========== */}
-      <div className="flex justify-between text-white mb-4 bg-gradient-to-r from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-2 px-4 mx-0 md:mx-2 lg:mx-2">
+      <div className="flex justify-between  dark:text-white mb-4 dark:bg-gradient-to-r from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-2 px-4 mx-0 md:mx-2 lg:mx-2">
         <div className="flex gap-4 items-center">
           <label className="flex items-center gap-2 cursor-pointer hover:text-blue-400 transition-colors">
             <input
@@ -1014,7 +1014,7 @@ const WordList = () => {
             </button>
           )}
           {/* ===============showing words by page ==================  */}
-          <p className="text-md font-bold whitespace-nowrap hidden md:block px-4 py-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/50 rounded-full">
+          <p className="text-md font-bold whitespace-nowrap hidden md:block px-4 py-1 bg-cyan-600 dark:bg-gradient-to-r from-blue-500/20 to-purple-500/20 border dark:border-blue-500/50 rounded-full text-white">
             {paginatedWords.length} words
           </p>
         </div>
@@ -1035,7 +1035,7 @@ const WordList = () => {
               }
               value={searchValue}
               onChange={handleSearchInputChange}
-              className="border border-gray-600 bg-gray-800/50 backdrop-blur-sm rounded-xl px-4 py-3 w-full pl-12 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all"
+              className="border border-gray-600 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl px-4 py-3 w-full pl-12 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all"
               aria-label={
                 searchType === "word" ? "Search by word" : "Search by meaning "
               }
@@ -1060,7 +1060,7 @@ const WordList = () => {
               id="level-select"
               value={selectedLevel}
               onChange={handleLevelChange}
-              className="border border-gray-600 bg-gray-800/50 backdrop-blur-sm rounded-xl px-4 py-3 w-full text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition-all"
+              className="border border-gray-600 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl px-4 py-3 w-full dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition-all"
               aria-label="Filter words by level"
             >
               <option value="">All Levels</option>
@@ -1079,7 +1079,7 @@ const WordList = () => {
               id="topic-select"
               value={selectedTopic}
               onChange={handleTopicChange}
-              className="border border-gray-600 bg-gray-800/50 backdrop-blur-sm rounded-xl px-4 py-3 w-full text-white focus:border-pink-500 focus:ring-2 focus:ring-pink-500/50 transition-all"
+              className="border border-gray-600 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl px-4 py-3 w-full dark:text-white focus:border-pink-500 focus:ring-2 focus:ring-pink-500/50 transition-all"
               aria-label="Filter words by topic"
             >
               {/* <option value=""> `All Topics for {selectedLevel} Level`</option> */}
@@ -1112,12 +1112,12 @@ const WordList = () => {
           <Loader loading={isLoading} />
         </div>
       ) : (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900/30 via-gray-800/20 to-black/30 rounded-2xl p-0 md:p-4 lg:p-4">
+        <div className="min-h-screen dark:bg-gradient-to-br from-gray-900/30 via-gray-800/20 to-black/30 rounded-2xl p-0 md:p-1 lg:p-1">
           <div className="overflow-x-auto border border-gray-700/50 rounded-2xl shadow-2xl">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 text-sm md:text-xl lg:text-xl text-white">
-                  <th className="py-3 text-sm md:text-lg lg:text-lg text-center text-orange-400 font-bold w-[5%] md:w-[3%] lg:w-[3%] rounded-tl-xl border-b border-gray-700">
+                <tr className="bg-slate-900 dark:bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 text-sm md:text-xl lg:text-xl text-white">
+                  <th className="py-3 text-sm md:text-lg lg:text-lg text-center text-orange-400 font-bold w-[5%] md:w-[3%] lg:w-[3%] rounded-tl-xl border-l border-gray-700">
                     Art.
                   </th>
                   <th className="border-l py-3 border-gray-700 border-dotted text-center text-blue-400 font-bold w-[15%] md:w-[10%] lg:w-[10%] border-b">
@@ -1136,11 +1136,7 @@ const WordList = () => {
                   <th className="border-l py-3 border-gray-700 border-dotted text-center text-green-400 font-bold hidden lg:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b">
                     Word to Watch
                   </th>
-                  <th
-                    className={`border-l border-dotted hidden md:table-cell lg:table-cell py-3 border-gray-700 text-sm md:text-lg lg:text-lg text-center text-yellow-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b ${
-                      userLoggedIn ? "" : "rounded-tr-xl"
-                    }`}
-                  >
+                  <th className="border-l border-dotted hidden md:table-cell lg:table-cell py-3 border-gray-700 text-sm md:text-lg lg:text-lg text-center text-yellow-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b">
                     Level
                   </th>
                   <th

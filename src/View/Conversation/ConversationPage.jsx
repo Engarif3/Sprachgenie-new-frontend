@@ -6,7 +6,7 @@ import Loader from "../../utils/Loader";
 import api from "../../axios";
 
 // Define colors for the speakers
-const speakerColors = ["#FF0000", "#008000", "#0000FF", "#FFA500", "#000000"];
+const speakerColors = ["#2E86DE", "#A29BFE", "#00B894", "#FDCB6E", "#E17055"];
 
 const ConversationPage = () => {
   const { id } = useParams(); // Get conversation ID from the URL
@@ -70,12 +70,12 @@ const ConversationPage = () => {
             </div>
 
             {/* Chat Messages */}
-            <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-3xl p-6 md:p-8 border border-gray-700/50 shadow-2xl mb-12">
+            <div className="dark:bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-3xl p-6 md:p-8 border border-gray-700/50 shadow-2xl mb-12">
               <div className="space-y-6">
                 {conversation.text.map((message, index) => (
                   <div
                     key={index}
-                    className="flex flex-col md:flex-row gap-4 p-4 bg-gray-800/50 rounded-2xl border border-gray-700/50 hover:border-orange-500/50 transition-all duration-300 hover:shadow-lg group"
+                    className="flex flex-col md:flex-row gap-4 p-4 dark:bg-gray-800/50 rounded-2xl border border-gray-700/50 hover:border-orange-500/50 transition-all duration-300 hover:shadow-lg group"
                   >
                     {/* Speaker Badge */}
                     <div className="flex items-center gap-2 md:min-w-[120px]">
@@ -83,7 +83,7 @@ const ConversationPage = () => {
                         className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
                         style={{
                           background: `linear-gradient(135deg, ${getSpeakerColor(
-                            message.speaker
+                            message.speaker,
                           )}, ${getSpeakerColor(message.speaker)}dd)`,
                         }}
                       >
@@ -98,7 +98,7 @@ const ConversationPage = () => {
                     </div>
 
                     {/* Message Content */}
-                    <div className="flex-1 bg-gray-900/50 rounded-xl p-4 border border-gray-700/30 group-hover:border-gray-600/50 transition-all duration-300">
+                    <div className="flex-1 bg-gray-600 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-700/30 group-hover:border-gray-600/50 transition-all duration-300">
                       <p className="text-white text-lg leading-relaxed">
                         {message.message}
                       </p>

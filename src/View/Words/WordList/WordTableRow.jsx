@@ -70,7 +70,7 @@ const WordTableRow = ({
     <tr
       key={word.id}
       className={`transition-colors duration-200 hover:bg-gradient-to-r hover:from-blue-500/5 hover:to-purple-500/5 ${
-        index % 2 === 0 ? "bg-gray-800/40" : "bg-gray-900/40"
+        index % 2 === 0 ? " dark:bg-gray-800/40" : "dark:bg-gray-900/40"
       }`}
     >
       {/* Article */}
@@ -86,7 +86,7 @@ const WordTableRow = ({
           <span
             tabIndex={learningMode ? 0 : -1}
             ref={learningMode && index === currentIndex ? focusElement : null}
-            className="cursor-pointer p-0 md:p-2 lg:p-2 text-blue-400 hover:text-blue-300 text-sm md:text-lg lg:text-lg font-semibold md:font-bold lg:font-bold break-words max-w-[120px] md:max-w-full transition-colors duration-200"
+            className="cursor-pointer p-0 md:p-2 lg:p-2 text-blue-600 dark:text-blue-400 hover:text-blue-300 text-sm md:text-lg lg:text-lg font-semibold md:font-bold lg:font-bold break-words max-w-[120px] md:max-w-full transition-colors duration-200"
             onClick={() => openModal(word)}
           >
             {/* Previous version - used CSS capitalize */}
@@ -145,7 +145,7 @@ const WordTableRow = ({
         className={`border border-gray-700 border-dotted pl-1 p-0 md:p-3 lg:p-3 text-sm md:text-lg lg:text-lg ${
           learningMode && index === currentIndex
             ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold"
-            : "text-cyan-300 font-serif"
+            : "text-cyan-500 dark:text-cyan-300 font-serif"
         }`}
         onClick={() => learningMode && revealMeaning(word.id)}
         tabIndex="0"
@@ -162,7 +162,7 @@ const WordTableRow = ({
       </td>
 
       {/* Synonyms */}
-      <td className="border border-gray-700 border-dotted p-2 md:p-3 text-blue-400 hidden md:table-cell">
+      <td className="border border-gray-700 border-dotted p-2 md:p-3 text-blue-600 dark:text-blue-300 hidden md:table-cell">
         <div className="flex flex-wrap gap-2">
           {word.synonyms?.map((synonym, idx) => (
             <span
@@ -177,7 +177,7 @@ const WordTableRow = ({
       </td>
 
       {/* Antonyms */}
-      <td className="border border-gray-700 border-dotted p-2 md:p-3 text-blue-400 hidden lg:table-cell xl:table-cell">
+      <td className="border border-gray-700 border-dotted p-2 md:p-3 text-red-600 dark:text-red-300 hidden lg:table-cell xl:table-cell">
         <div className="flex flex-wrap gap-2">
           {word.antonyms?.map((antonym, idx) => (
             <span

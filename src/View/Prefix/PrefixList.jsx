@@ -88,33 +88,33 @@ const PrefixList = () => {
               key={word.id}
               className={`flex justify-between items-center p-3 cursor-pointer transition-all duration-300 border border-gray-700 border-dotted ${
                 index % 2 === 0
-                  ? "bg-gray-800/40 hover:bg-gray-800/60"
-                  : "bg-gray-900/40 hover:bg-gray-900/60"
+                  ? " dark:bg-gray-800/40 hover:bg-gray-800/60"
+                  : "dark:bg-gray-900/40 hover:bg-gray-900/60"
               }`}
               onClick={() => toggleExpand(word.id)}
             >
               <div>
-                <span className="font-bold text-lg text-blue-400">
+                <span className="font-bold text-lg text-blue-600 dark:text-blue-400">
                   {word.prefixWord}
                 </span>
-                <span className="ml-2 text-purple-300">
+                <span className="ml-2 text-purple-600 dark:text-purple-300">
                   ({word.meaning.join(", ")})
                 </span>
               </div>
-              <button className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 hover:from-blue-500/40 hover:to-cyan-500/40 border border-blue-500/50 text-white px-3 py-2 rounded-full hover:scale-110 transition-all duration-300">
+              <button className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 hover:from-blue-500/40 hover:to-cyan-500/40 border border-blue-500/50 dark:text-white px-3 py-2 rounded-full hover:scale-110 transition-all duration-300">
                 {expandedWords[word.id] ? <FaMinus /> : <FaPlus />}
               </button>
             </div>
             {expandedWords[word.id] && (
-              <div className="p-4 bg-gradient-to-br from-gray-800/60 via-gray-900/60 to-black/60 border border-gray-700 border-dotted text-white">
-                <div className="inline-block px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/50 rounded-full font-semibold text-green-400 mb-3">
+              <div className="p-4 dark:bg-gradient-to-br from-gray-800/60 via-gray-900/60 to-black/60 border border-gray-700 border-dotted text-white">
+                <div className="inline-block px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/50 rounded-full font-semibold text-green-600 dark:text-green-400 mb-3">
                   📝 Sentences
                 </div>
                 <ul className="space-y-2 ml-4 border-l-4 border-pink-500 pl-4">
                   {word.sentences.map((sentence, idx) => (
                     <li
                       key={idx}
-                      className="normal-case text-gray-200 leading-relaxed"
+                      className="normal-case text-black dark:text-gray-200 leading-relaxed"
                     >
                       {sentence}
                     </li>
@@ -164,7 +164,7 @@ const PrefixList = () => {
                 </div>
               </div>
             </div>
-          )
+          ),
         )}
       </div>
     </Container>

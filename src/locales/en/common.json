@@ -30,5 +30,6 @@
     "sendingMessage": "Sending message...",
     "messageSent": "Message sent successfully!",
     "tryAgain": "Try again"
-  }
+  },
+  "welcome": "Welcome!"
 }

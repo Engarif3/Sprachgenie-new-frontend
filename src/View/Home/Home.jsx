@@ -8,11 +8,13 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Contact from "./Contact";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "../../context/ThemeContext";
 
 const Home = () => {
   const userLoggedIn = isLoggedIn();
   const [visibleSections, setVisibleSections] = useState(new Set());
   const { t } = useTranslation("home");
+  const { theme } = useTheme();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -34,19 +36,21 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="bg-gray-950 min-h-screen">
+    // <div className="bg-gray-950 min-h-screen">
+    // <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50 dark:bg-transparent">
       {/* Hero Section */}
       <Container className="flex flex-col">
         {!userLoggedIn && (
-          <div className="text-orange-600 text-lg md:text-2xl lg:text-2xl flex justify-center py-8 md:mb-8 lg:mb-8 overflow-hidden">
-            <div className="w-11/12 md:w-8/12 lg:w-6/12">
+          <div className="text-orange-600 text-lg md:text-2xl lg:text-2xl flex justify-center py-8 md:mb-8 lg:mb-8 overflow-hidden ">
+            <div className="w-11/12 md:w-7/12 lg:w-7/12">
               <Marquee
                 gradient={true}
-                gradientColor="#030712"
+                gradientColor={theme === "light" ? "" : ""}
                 speed={50}
                 pauseOnHover={true}
               >
-                <p className="mx-4 italic">
+                <p className="mx-4 italic text-gray-950 dark:text-orange-600 ">
                   <span className="text-cyan-500 font-bold">
                     {t("loginToUnlock")}
                   </span>{" "}
@@ -57,7 +61,7 @@ const Home = () => {
           </div>
         )}
         <CircularText
-          text="PRACTICE*MAKES*PERFECT*"
+          text="PRACTICE *MAKES *PERFECT *"
           centerText1="Sprach"
           centerText2="Genie"
           onHover="speedUp"
@@ -67,7 +71,7 @@ const Home = () => {
 
         {/* Hero Content */}
         <div className="text-center pt-6 pb-[280px] px-4">
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-800 dark:text-white mb-6 leading-tight">
             {t("heroTitle")}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">
               {" "}
@@ -75,66 +79,94 @@ const Home = () => {
             </span>
             {t("heroTitleEnd")}
           </h1>
-          <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl text-gray-800 dark:text-gray-300 mb-12 max-w-3xl mx-auto">
             {t("heroDescription")}
           </p>
 
           {/* Benefits Section */}
           {!userLoggedIn && (
             <div className="mb-16 max-w-4xl mx-auto">
-              <p className="text-lg text-orange-400 font-semibold mb-8">
+              <p className="text-lg text-cyan-500 dark:text-cyan-400 font-semibold mb-8">
                 {t("featuresUnlocked")}
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
+                <div className="border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
                   <div className="text-2xl mb-2">❤️</div>
-                  <p className="text-white font-semibold">
+                  <p
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold`}
+                  >
                     {t("favoriteWords")}
                   </p>
-                  <p className="text-gray-400 text-sm">
+                  <p
+                    className={`${theme === "dark" ? "text-gray-400" : "text-black"} text-sm`}
+                  >
                     {t("favoriteWordsDesc")}
                   </p>
                 </div>
-                <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
+                <div className="border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
                   <div className="text-2xl mb-2">🤖</div>
-                  <p className="text-white font-semibold">
+                  <p
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold`}
+                  >
                     {t("aiPoweredLearning")}
                   </p>
-                  <p className="text-gray-400 text-sm">
+                  <p
+                    className={`${theme === "dark" ? "text-gray-400" : "text-black"} text-sm`}
+                  >
                     {t("aiPoweredLearningDesc")}
                   </p>
                 </div>
-                <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
+                <div className="border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
                   <div className="text-2xl mb-2">🌐</div>
-                  <p className="text-white font-semibold">
+                  <p
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold`}
+                  >
                     {t("translationFeatures")}
                   </p>
-                  <p className="text-gray-400 text-sm">
+                  <p
+                    className={`${theme === "dark" ? "text-gray-400" : "text-black"} text-sm`}
+                  >
                     {t("translationFeaturesDesc")}
                   </p>
                 </div>
-                <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
+                <div className="border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
                   <div className="text-2xl mb-2">📊</div>
-                  <p className="text-white font-semibold">
+                  <p
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold`}
+                  >
                     {t("personalDashboard")}
                   </p>
-                  <p className="text-gray-400 text-sm">
+                  <p
+                    className={`${theme === "dark" ? "text-gray-400" : "text-black"} text-sm`}
+                  >
                     {t("personalDashboardDesc")}
                   </p>
                 </div>
-                <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
+                <div className="border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
                   <div className="text-2xl mb-2">📈</div>
-                  <p className="text-white font-semibold">
+                  <p
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold`}
+                  >
                     {t("progressTracking")}
                   </p>
-                  <p className="text-gray-400 text-sm">
+                  <p
+                    className={`${theme === "dark" ? "text-gray-400" : "text-black"} text-sm`}
+                  >
                     {t("progressTrackingDesc")}
                   </p>
                 </div>
-                <div className="bg-gray-900/60 backdrop-blur border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
+                <div className="border border-orange-500/30 rounded-lg p-4 hover:border-orange-500/60 transition-all">
                   <div className="text-2xl mb-2">⚡</div>
-                  <p className="text-white font-semibold">{t("muchMore")}</p>
-                  <p className="text-gray-400 text-sm">{t("muchMoreDesc")}</p>
+                  <p
+                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold`}
+                  >
+                    {t("muchMore")}
+                  </p>
+                  <p
+                    className={`${theme === "dark" ? "text-gray-400" : "text-black"} text-sm`}
+                  >
+                    {t("muchMoreDesc")}
+                  </p>
                 </div>
               </div>
             </div>
@@ -157,22 +189,38 @@ const Home = () => {
             >
               {/* 1. The Full-Border Spark Layer */}
               <span className="absolute inset-0 block rounded-full">
-                <span className="absolute aspect-square w-[200%] animate-rotate bg-[conic-gradient(from_0deg,transparent_0_340deg,white_360deg)] [left:50%] [top:50%] [transform-origin:0_0] blur-sm" />
+                <span
+                  className="absolute aspect-square w-[200%] animate-rotate [left:50%] [top:50%] [transform-origin:0_0] blur-sm"
+                  style={{
+                    backgroundImage:
+                      theme === "light"
+                        ? "conic-gradient(from 0deg, transparent 0deg 340deg, #4b5563 360deg)"
+                        : "conic-gradient(from 0deg, transparent 0deg 340deg, white 360deg)",
+                  }}
+                />
               </span>
 
               {/* 2. The Thick Glow Effect (Extra layer for "thickness") */}
               <span className="absolute inset-0 block rounded-full">
-                <span className="absolute aspect-square w-[200%] animate-rotate bg-[conic-gradient(from_0deg,transparent_0_340deg,rgba(255,255,255,0.8)_360deg)] [left:50%] [top:50%] [transform-origin:0_0] blur-xl opacity-50" />
+                <span
+                  className="absolute aspect-square w-[200%] animate-rotate [left:50%] [top:50%] [transform-origin:0_0] blur-xl opacity-50"
+                  style={{
+                    backgroundImage:
+                      theme === "light"
+                        ? "conic-gradient(from 0deg, transparent 0deg 340deg, rgba(75, 85, 99, 0.8) 360deg)"
+                        : "conic-gradient(from 0deg, transparent 0deg 340deg, rgba(255,255,255,0.8) 360deg)",
+                  }}
+                />
               </span>
 
               {/* 3. The Center Background (Covers the middle of the spark) */}
               <span className="absolute inset-[3px] rounded-full bg-gradient-to-r from-orange-900 via-pink-900 to-purple-900" />
 
               {/* 4. Content */}
-              <span className="relative z-10 flex items-center gap-3 text-lg">
+              <span className="relative z-10 flex items-center gap-3 text-lg text-white">
                 <span className="text-2xl">📚</span>
-                <span>{t("exploreVocabulary")}</span>
-                <span className="text-xl group-hover:translate-x-1 transition-transform">
+                <span className="text-white">{t("exploreVocabulary")}</span>
+                <span className="text-xl group-hover:translate-x-1 transition-transform text-white">
                   →
                 </span>
               </span>
@@ -190,16 +238,16 @@ const Home = () => {
               </Link>
               <Link
                 to="/login"
-                className="px-8 py-4 bg-transparent border-2 border-orange-500 text-orange-500 font-bold rounded-full hover:bg-orange-500 hover:text-white transition-all duration-300 text-lg"
+                className={`px-8 py-4 bg-transparent border-2 border-orange-500 ${theme === "dark" ? "text-white" : "text-black"} font-bold rounded-full hover:bg-orange-500 hover:text-white transition-all duration-300 text-lg`}
               >
                 {t("login")}
               </Link>
             </div>
           )}
           {/* Scroll Hint */}
-          <div className=" absolute  left-1/2 -translate-x-1/2 flex flex-col items-center text-white/80 pointer-events-none mb-2">
+          <div className=" absolute  left-1/2 -translate-x-1/2 flex flex-col items-center text-gray-800 dark:text-white/80 pointer-events-none mb-2">
             <span className="text-xs font-bold tracking-widest uppercase mt-20">
-              Scroll to explore more
+              {t("scrollToExplore")}
             </span>
             <svg
               className="w-5 h-5 animate-bounce mt-2 font-bolder text-orange-600"
@@ -220,7 +268,7 @@ const Home = () => {
 
       {/* Learning Resources Section */}
       <div
-        className="relative bg-gradient-to-b from-gray-900 via-gray-800/50 to-gray-900 py-20 overflow-hidden"
+        className="relative py-20 overflow-hidden"
         id="resources"
         data-animate
       >
@@ -243,10 +291,10 @@ const Home = () => {
                 {t("learningHub")}
               </span>
             </div>
-            <h2 className="text-center text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-8">
-              {t("howItWorks")}
+            <h2 className="text-center text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 dark:text-white pb-8">
+              {t("learningResources")}
             </h2>
-            <p className="text-center text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-center text-xl md:text-2xl text-gray-950 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
               {t("everythingYouNeed")}
             </p>
             <div className="flex justify-center mt-6">
@@ -302,8 +350,8 @@ const Home = () => {
         </Container>
       </div>
 
-      {/* Features Section */}
-      <div className="bg-gray-800/50 py-20" id="features" data-animate>
+      {/* Why Choose SprachGenie? */}
+      <div className="py-20" id="features" data-animate>
         <Container>
           <div
             className={`text-center mb-16 transition-all duration-1000 ${
@@ -312,10 +360,10 @@ const Home = () => {
                 : "opacity-0 translate-y-10"
             }`}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 dark:text-white pb-8">
               {t("whyChooseSprachGenie")}
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-950 dark:text-gray-300 max-w-2xl mx-auto">
               {t("poweredByAI")}
             </p>
             <div className="flex justify-center mt-6">
@@ -335,7 +383,7 @@ const Home = () => {
               <h3 className="text-2xl font-bold text-white mb-3">
                 {t("aiPoweredContent")}
               </h3>
-              <p className="text-gray-300">{t("aiContentDesc")}</p>
+              <p className="text-white">{t("aiContentDesc")}</p>
             </div>
 
             <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-8 rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-gray-700">
@@ -343,7 +391,7 @@ const Home = () => {
               <h3 className="text-2xl font-bold text-white mb-3">
                 {t("wordsLibrary")}
               </h3>
-              <p className="text-gray-300">{t("wordsLibraryDesc")}</p>
+              <p className="text-white">{t("wordsLibraryDesc")}</p>
             </div>
 
             <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-8 rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-gray-700">
@@ -351,7 +399,7 @@ const Home = () => {
               <h3 className="text-2xl font-bold text-white mb-3">
                 {t("realConversations")}
               </h3>
-              <p className="text-gray-300">{t("realConversationsDesc")}</p>
+              <p className="text-white">{t("realConversationsDesc")}</p>
             </div>
 
             <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-8 rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-gray-700">
@@ -359,7 +407,7 @@ const Home = () => {
               <h3 className="text-2xl font-bold text-white mb-3">
                 {t("interactiveStories")}
               </h3>
-              <p className="text-gray-300">{t("interactiveStoriesDesc")}</p>
+              <p className="text-white">{t("interactiveStoriesDesc")}</p>
             </div>
 
             <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-8 rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-gray-700">
@@ -367,7 +415,7 @@ const Home = () => {
               <h3 className="text-2xl font-bold text-white mb-3">
                 {t("grammarMastery")}
               </h3>
-              <p className="text-gray-300">{t("grammarMasteryDesc")}</p>
+              <p className="text-white">{t("grammarMasteryDesc")}</p>
             </div>
 
             <div className="bg-gradient-to-br from-gray-700 to-gray-800 p-8 rounded-2xl hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-gray-700">
@@ -375,14 +423,14 @@ const Home = () => {
               <h3 className="text-2xl font-bold text-white mb-3">
                 {t("funQuizzes")}
               </h3>
-              <p className="text-gray-300">{t("funQuizzesDesc")}</p>
+              <p className="text-white">{t("funQuizzesDesc")}</p>
             </div>
           </div>
         </Container>
       </div>
 
       {/* How It Works Section */}
-      <div className="py-20 bg-gray-800/30" id="how-it-works" data-animate>
+      <div className="py-20" id="how-it-works" data-animate>
         <Container>
           <div
             className={`text-center mb-16 transition-all duration-1000 ${
@@ -391,17 +439,17 @@ const Home = () => {
                 : "opacity-0 translate-y-10"
             }`}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 dark:text-white pb-8 ">
               {t("howItWorks")}
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-950 dark:text-gray-300 max-w-2xl mx-auto">
               {t("startYourJourneySteps")}
             </p>
             <div className="flex justify-center mt-6">
               <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
             </div>
           </div>
-          {t("startJourneySteps")}
+
           <div
             className={`grid grid-cols-1 md:grid-cols-3 gap-8 px-4 transition-all duration-1000 delay-300 ${
               visibleSections.has("how-it-works")
@@ -413,20 +461,30 @@ const Home = () => {
               <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-3xl font-bold text-white mx-auto mb-6 shadow-lg shadow-orange-500/50">
                 1
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">
+              <h3
+                className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-black"} mb-4`}
+              >
                 {t("signUp")}
               </h3>
-              <p className="text-gray-300 text-lg">{t("signUpDesc")}</p>
+              <p
+                className={`${theme === "dark" ? "text-white" : "text-black"} text-lg`}
+              >
+                {t("signUpDesc")}
+              </p>
             </div>
 
             <div className="text-center">
               <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-3xl font-bold text-white mx-auto mb-6 shadow-lg shadow-orange-500/50">
                 2
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">
+              <h3
+                className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-black"} mb-4`}
+              >
                 {t("chooseYourPath")}
               </h3>
-              <p className="text-gray-300 text-lg">
+              <p
+                className={`${theme === "dark" ? "text-white" : "text-black"} text-lg`}
+              >
                 {t("chooseYourPathDesc")}
                 on your goals
               </p>
@@ -436,10 +494,14 @@ const Home = () => {
               <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-3xl font-bold text-white mx-auto mb-6 shadow-lg shadow-orange-500/50">
                 3
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">
+              <h3
+                className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-black"} mb-4`}
+              >
                 {t("learnAndPractice")}
               </h3>
-              <p className="text-gray-300 text-lg">
+              <p
+                className={`${theme === "dark" ? "text-white" : "text-black"} text-lg`}
+              >
                 {t("learnAndPracticeDesc")}
                 skills consistently
               </p>
@@ -449,7 +511,11 @@ const Home = () => {
       </div>
 
       {/* Stats Section */}
-      <div className="py-20" id="stats" data-animate>
+      <div
+        className="bg-gradient-to-r from-gray-800 to-gray-900 py-20 mx-8"
+        id="stats"
+        data-animate
+      >
         <Container>
           <div
             className={`grid grid-cols-2 md:grid-cols-4 gap-8 px-4 transition-all duration-1000 ${
@@ -462,7 +528,7 @@ const Home = () => {
               <div className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-3">
                 {t("wordCount")}
               </div>
-              <p className="text-gray-300 text-lg font-semibold">
+              <p className="text-white dark:text-gray-300 text-lg font-semibold">
                 {t("words")}
               </p>
             </div>
@@ -470,7 +536,7 @@ const Home = () => {
               <div className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-3">
                 {t("practicalConversations")}
               </div>
-              <p className="text-gray-300 text-lg font-semibold">
+              <p className="text-white dark:text-gray-300 text-lg font-semibold">
                 {t("conversationTopics")}
               </p>
             </div>
@@ -478,7 +544,7 @@ const Home = () => {
               <div className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 mb-2">
                 {t("cefrLevels")}
               </div>
-              <p className="text-gray-300 text-lg font-semibold">
+              <p className="text-white dark:text-gray-300 text-lg font-semibold">
                 {t("cefrLabel")}
               </p>
             </div>
@@ -486,7 +552,7 @@ const Home = () => {
               <div className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-3">
                 {t("aiPowered")}
               </div>
-              <p className="text-gray-300 text-lg font-semibold">
+              <p className="text-white dark:text-gray-300 text-lg font-semibold">
                 {t("powered")}
               </p>
             </div>
@@ -495,7 +561,7 @@ const Home = () => {
       </div>
 
       {/* FAQ Section */}
-      <div className="bg-gray-800/50 py-20" id="faq" data-animate>
+      <div className=" py-20" id="faq" data-animate>
         <Container>
           <div
             className={`text-center mb-16 transition-all duration-1000 ${
@@ -504,10 +570,10 @@ const Home = () => {
                 : "opacity-0 translate-y-10"
             }`}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 dark:text-white pb-8">
               {t("frequentlyAskedQuestions")}
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-950 dark:text-gray-300 max-w-2xl mx-auto">
               {t("everythingYouNeedToKnow")}
             </p>
             <div className="flex justify-center mt-6">
@@ -525,7 +591,7 @@ const Home = () => {
             <details className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-700 group">
               <summary className="text-xl font-bold text-white cursor-pointer list-none flex items-center justify-between">
                 <span>{t("isFree")}</span>
-                <span className="text-orange-500 text-2xl group-open:rotate-180 transition-transform">
+                <span className="text-cyan-500 text-2xl group-open:rotate-180 transition-transform">
                   ▼
                 </span>
               </summary>
@@ -537,7 +603,7 @@ const Home = () => {
             <details className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-700 group">
               <summary className="text-xl font-bold text-white cursor-pointer list-none flex items-center justify-between">
                 <span>{t("levelsQuestion")}</span>
-                <span className="text-orange-500 text-2xl group-open:rotate-180 transition-transform">
+                <span className="text-cyan-500  text-2xl group-open:rotate-180 transition-transform">
                   ▼
                 </span>
               </summary>
@@ -549,7 +615,7 @@ const Home = () => {
             <details className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-700 group">
               <summary className="text-xl font-bold text-white cursor-pointer list-none flex items-center justify-between">
                 <span>{t("aiQuestion")}</span>
-                <span className="text-orange-500 text-2xl group-open:rotate-180 transition-transform">
+                <span className="text-cyan-500 text-2xl group-open:rotate-180 transition-transform">
                   ▼
                 </span>
               </summary>
@@ -561,7 +627,7 @@ const Home = () => {
             <details className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-700 group">
               <summary className="text-xl font-bold text-white cursor-pointer list-none flex items-center justify-between">
                 <span>{t("offlineQuestion")}</span>
-                <span className="text-orange-500 text-2xl group-open:rotate-180 transition-transform">
+                <span className="text-cyan-500 text-2xl group-open:rotate-180 transition-transform">
                   ▼
                 </span>
               </summary>
@@ -573,7 +639,7 @@ const Home = () => {
             <details className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-700 group">
               <summary className="text-xl font-bold text-white cursor-pointer list-none flex items-center justify-between">
                 <span>{t("fluencyQuestion")}</span>
-                <span className="text-orange-500 text-2xl group-open:rotate-180 transition-transform">
+                <span className="text-cyan-500 text-2xl group-open:rotate-180 transition-transform">
                   ▼
                 </span>
               </summary>
@@ -602,7 +668,7 @@ const Home = () => {
       {/* CTA Section */}
       {!userLoggedIn && (
         <div
-          className="bg-gradient-to-r from-gray-800 to-gray-900 py-20"
+          className="bg-gradient-to-r from-gray-800 to-gray-900 py-20 mx-8"
           id="cta"
           data-animate
         >

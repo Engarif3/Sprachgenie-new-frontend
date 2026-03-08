@@ -30,5 +30,6 @@
     "sendingMessage": "Nachricht wird gesendet...",
     "messageSent": "Nachricht erfolgreich versendet!",
     "tryAgain": "Versuche es erneut"
-  }
+  },
+  "welcome": "Willkommen!"
 }

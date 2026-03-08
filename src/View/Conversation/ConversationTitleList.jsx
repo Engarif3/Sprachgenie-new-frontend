@@ -39,7 +39,7 @@ const ConversationTitleList = () => {
           <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-4">
             Conversation Topics
           </h2>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl dark:text-gray-300 max-w-2xl mx-auto">
             Select a topic to practice real-world German dialogues
           </p>
           <div className="flex justify-center mt-6">

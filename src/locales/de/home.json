@@ -22,6 +22,7 @@
   "progressTrackingDesc": "Verfolge deinen Fortschritt und deine Erfolge",
   "muchMore": "Noch viel mehr",
   "muchMoreDesc": "Exklusive Funktionen zur Verbesserung deines Lernens",
+  "learningResources": "Lernressourcen",
   "howItWorks": "So funktioniert es",
   "stepOne": "Wähle ein Thema und Schwierigkeitsstufe",
   "stepTwo": "KI generiert personalisierte Lernmaterialien",
@@ -107,5 +108,7 @@
   "conversationCardDesc": "Übe realistische Dialoge zu verschiedenen Themen, um deine Sprachflüssigkeit zu verbessern",
   "quizCardTitle": "Quiz spielen",
   "quizCardDesc": "Teste dein Wissen mit interaktiven Quiz und Herausforderungen",
-  "exploreNow": "Jetzt erkunden"
+  "exploreNow": "Jetzt erkunden",
+  "scrollToExplore": "Scrolle, um mehr zu erkunden",
+  "welcome": "Willkommen!"
 }

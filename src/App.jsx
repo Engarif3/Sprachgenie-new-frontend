@@ -122,9 +122,10 @@ const App = () => {
     <ThemeProvider>
       <LanguageProvider>
         <ErrorBoundary>
-          <div className="relative min-h-screen">
+          {/* <div className="relative min-h-screen "> */}
+          <div className="relative min-h-screen bg-gray-50 dark:bg-transparent">
             {/* DarkVeil fullscreen background */}
-            <div className="fixed inset-0 -z-10">
+            <div className="fixed inset-0 -z-10  hidden dark:block">
               <DarkVeil />
             </div>
 

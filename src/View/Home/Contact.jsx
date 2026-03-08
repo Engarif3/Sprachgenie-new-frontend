@@ -61,7 +61,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="bg-gray-800/30 py-20" id="contact">
+    <div className=" py-20" id="contact">
       <Container>
         <div className="text-center mb-16">
           <div className="mb-4">
@@ -69,10 +69,10 @@ const Contact = () => {
               📧 {t("getInTouch")}
             </span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 dark:text-white pb-8">
             {t("contactMe")}
           </h2>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-950 dark:text-gray-300 max-w-2xl mx-auto">
             {t("contactQuestion")}
           </p>
           <div className="flex justify-center mt-6">

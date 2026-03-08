@@ -24,11 +24,11 @@ const HomeCard = ({ title, text, link, icon }) => {
           </div>
         </div>
 
-        <h3 className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300 group-hover:from-orange-400 group-hover:to-pink-400 mb-3 md:mb-4 transition-all duration-300">
+        <h3 className="text-xl md:text-2xl font-bold text-white mb-3 md:mb-4 transition-all duration-300">
           {title}
         </h3>
 
-        <p className="text-gray-400 group-hover:text-gray-300 text-base md:text-lg leading-relaxed mb-4 md:mb-6 min-h-[3.5rem] md:min-h-[4rem] transition-colors duration-300">
+        <p className="text-white text-base md:text-lg leading-relaxed mb-4 md:mb-6 min-h-[3.5rem] md:min-h-[4rem] transition-colors duration-300">
           {text}
         </p>
 

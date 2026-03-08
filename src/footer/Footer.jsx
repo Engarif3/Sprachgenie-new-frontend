@@ -1,6 +1,8 @@
 import { FaLinkedinIn, FaFacebook, FaEnvelope } from "react-icons/fa";
+import { useTheme } from "../context/ThemeContext";
 
 const Footer = () => {
+  const { theme } = useTheme();
   return (
     <div className="relative footer footer-center bg-gradient-to-br from-gray-900 via-gray-900 to-black">
       <footer className="relative footer p-6 md:p-8 lg:p-10 text-white overflow-hidden border-t-2 border-gray-700/50">
@@ -9,12 +11,14 @@ const Footer = () => {
             {/* <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 rounded-lg blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200 animate-tilt"></div> */}
             <p className="relative text-4xl md:text-5xl font-bold">
               <span className="text-orange-600 font-extrabold">Sprach</span>
-              <span className="text-white font-extrabold">Genie</span>
+              <span className="text-sky-500 font-extrabold">Genie</span>
               {/* <HiSparkles className="inline ml-2 text-yellow-400 animate-pulse" /> */}
             </p>
           </div>
           <div className="text-center md:text-left ">
-            <p className="text-gray-400 font-semibold text-sm mb-1 text-center md:text-left lg::text-left ">
+            <p
+              className={`${theme === "dark" ? "text-gray-400" : "text-black"} font-semibold text-sm mb-1 text-center md:text-left lg::text-left `}
+            >
               <span className="text-pink-400"></span> Created By
             </p>
             <p className="text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400">
@@ -26,7 +30,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="relative z-10 flex flex-row  justify-center md:justify-between lg:justify-between w-full gap-8 mt-8">
+        <div className="relative z-10 flex flex-row   justify-center md:justify-between lg:justify-between w-full gap-8 mt-8">
           <div className="flex flex-col justify-center ">
             <h3 className="mb-4 text-lg md:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 ">
               🌐 Connect With Me
@@ -67,21 +71,25 @@ const Footer = () => {
 
           <div className="hidden md:flex lg:flex justify-center items-center">
             <div>
-              <p className="text-gray-400 text-sm font-semibold mb-3">
+              <p className="text-white dark:text-gray-400 text-sm font-semibold mb-3">
                 📍 Based in Chemnitz, Germany 🇩🇪
               </p>
-              <p className="text-xs text-gray-500 text-center">
+              <p
+                className={`text-xs ${theme === "dark" ? "text-gray-500" : "text-white"} text-center`}
+              >
                 Full Stack Developer | German Learning Platform Builder
               </p>
             </div>
           </div>
         </div>
       </footer>
-      <footer className="relative footer footer-center  text-white overflow-hidden pb-8 ">
+      <footer className="relative footer footer-center   text-white overflow-hidden pb-8 ">
         <div className="relative z-10 max-w-3xl mx-auto">
           <div className="flex items-center justify-center gap-2 ">
             <span className="text-2xl animate-pulse">©</span>
-            <p className="text-gray-300 font-semibold">
+            <p
+              className={`${theme === "dark" ? "text-gray-300" : "text-white"} font-semibold`}
+            >
               Copyright {new Date().getFullYear()} - All rights reserved.
             </p>
           </div>
@@ -95,7 +103,9 @@ const Footer = () => {
             </a>
           </div>
           <div className="inline-block px-4   mt-2">
-            <p className="text-xs text-gray-400 flex items-center gap-2">
+            <p
+              className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-white"} flex items-center gap-2`}
+            >
               <span className="text-yellow-400">💡</span>
               <span>Topic titles inspired by Telc A1–B2 books</span>
             </p>

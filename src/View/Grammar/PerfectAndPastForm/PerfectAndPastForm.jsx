@@ -28,7 +28,7 @@
 //             <div className="hidden md:block overflow-x-auto">
 //               <table className="min-w-full rounded-lg shadow-md">
 //                 <thead>
-//                   <tr className="bg-cyan-700 text-white">
+//                   <tr className="bg-cyan-700 dark:text-white">
 //                     <th className="py-2 px-4 text-start">Verb (Präsens)</th>
 //                     <th className="py-2 px-4 text-start">Präteritum</th>
 //                     <th className="py-2 px-4 text-start">Perfekt</th>
@@ -43,7 +43,7 @@
 //                   {group.verbs.map((verb, verbIndex) => (
 //                     <tr
 //                       key={`${groupIndex}-${verbIndex}`}
-//                       className="border-b text-slate-950 odd:bg-white even:bg-gray-300 hover:bg-gray-700 hover:text-white"
+//                       className="border-b text-slate-950 odd:bg-white even:bg-gray-300 hover:bg-gray-700 hover:dark:text-white"
 //                     >
 //                       <td className="py-2 px-4 text-start font-bold">
 //                         {verb.Präsens}
@@ -131,7 +131,7 @@ const PerfectAndPastForm = () => {
   return (
     <Container>
       <div className="mx-auto mt-16 mb-24 p-1">
-        <h2 className="text-3xl font-bold font-mono text-white my-5 text-center">
+        <h2 className="text-3xl font-bold font-mono dark:text-white my-5 text-center">
           Starke und unregelmäßige Verben
           <br />({totalPraesens})
         </h2>
@@ -160,7 +160,7 @@ const PerfectAndPastForm = () => {
 
           return (
             <div key={groupIndex} className="mb-10">
-              <h2 className="text-xl font-bold mb-4 text-white">
+              <h2 className="text-xl font-bold mb-4 dark:text-white">
                 {group.name}{" "}
                 <span className="text-orange-600">
                   ({filteredVerbs.length})
@@ -171,7 +171,7 @@ const PerfectAndPastForm = () => {
               <div className="hidden md:block overflow-x-auto">
                 <table className="min-w-full rounded-lg shadow-md">
                   <thead>
-                    <tr className="bg-cyan-700 text-white">
+                    <tr className="bg-cyan-700 dark:text-white">
                       <th className="py-2 px-4 text-start">Verb (Präsens)</th>
                       <th className="py-2 px-4 text-start">Präteritum</th>
                       <th className="py-2 px-4 text-start">Perfekt</th>
