@@ -686,7 +686,7 @@ const Home = () => {
         {/* TITLE inside Container (safe) */}
         <Container>
           <div
-            className={`text-center mb-1 transition-all duration-1000 ${
+            className={`text-center mb-16 md:mb-1 lg:mb-1 transition-all duration-1000 ${
               visibleSections.has("features") ? "opacity-100" : "opacity-0"
             }`}
           >
