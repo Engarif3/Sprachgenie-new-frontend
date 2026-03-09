@@ -13,43 +13,14 @@ import AuthHomeLink from "../components/auth/AuthHomeLink";
 const SECURITY_NOTICE_COPY = {
   en: {
     title: "Security And Privacy Notice",
-    body: "To protect accounts and reduce fraud, we record limited signup metadata such as your IP address, browser, device type, and approximate location derived from your network. If you explicitly allow browser location access, we may also attach your precise device coordinates to improve security accuracy. This data is access-restricted to authorized admins and kept only for a limited retention period.",
+    body: "To protect accounts and reduce fraud, we record limited signup metadata such as your IP address, browser, device type, and approximate location derived from your network. This data is access-restricted to authorized admins and kept only for a limited retention period.",
     toggleLabel: "German",
   },
   de: {
     title: "Sicherheits- und Datenschutzhinweis",
-    body: "Zum Schutz von Konten und zur Reduzierung von Missbrauch erfassen wir bei der Registrierung begrenzte Metadaten wie Ihre IP-Adresse, Ihren Browser, den Gerätetyp und einen ungefähren Standort, der aus Ihrem Netzwerk abgeleitet wird. Wenn Sie den Browser-Standortzugriff ausdrücklich erlauben, können wir zusätzlich Ihre präziseren Gerätekoordinaten zur Verbesserung der Sicherheitsgenauigkeit speichern. Diese Daten sind nur für autorisierte Administratoren zugänglich und werden nur für einen begrenzten Aufbewahrungszeitraum gespeichert.",
+    body: "Zum Schutz von Konten und zur Reduzierung von Missbrauch erfassen wir bei der Registrierung begrenzte Metadaten wie Ihre IP-Adresse, Ihren Browser, den Gerätetyp und einen ungefähren Standort, der aus Ihrem Netzwerk abgeleitet wird. Diese Daten sind nur für autorisierte Administratoren zugänglich und werden nur für einen begrenzten Aufbewahrungszeitraum gespeichert.",
     toggleLabel: "English",
   },
-};
-
-const getLocationStatusLabel = (status) => {
-  switch (status) {
-    case "ready":
-      return "Precise location attached";
-    case "requesting":
-      return "Requesting location";
-    case "denied":
-      return "Permission denied";
-    case "unsupported":
-      return "Unsupported";
-    case "error":
-      return "Location unavailable";
-    default:
-      return "Approximate location only";
-  }
-};
-
-const formatLocationAccuracy = (accuracy) => {
-  if (typeof accuracy !== "number" || Number.isNaN(accuracy)) {
-    return null;
-  }
-
-  if (accuracy >= 1000) {
-    return `about ${(accuracy / 1000).toFixed(1)} km accuracy`;
-  }
-
-  return `about ${Math.round(accuracy)} m accuracy`;
 };
 
 const Register = () => {
@@ -60,87 +31,9 @@ const Register = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isNoticeOpen, setIsNoticeOpen] = useState(false);
   const [noticeLanguage, setNoticeLanguage] = useState("en");
-  const [isRequestingLocation, setIsRequestingLocation] = useState(false);
-  const [locationStatus, setLocationStatus] = useState("idle");
-  const [locationMessage, setLocationMessage] = useState(
-    "Optional. Attach your current device location for a more accurate security signal.",
-  );
-  const [preciseLocation, setPreciseLocation] = useState(null);
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
   const activeNotice = SECURITY_NOTICE_COPY[noticeLanguage];
-
-  const clearPreciseLocation = () => {
-    setPreciseLocation(null);
-    setLocationStatus("idle");
-    setLocationMessage(
-      "Optional. Attach your current device location for a more accurate security signal.",
-    );
-  };
-
-  const requestPreciseLocation = () => {
-    if (!navigator.geolocation) {
-      setLocationStatus("unsupported");
-      setLocationMessage(
-        "This browser does not support precise location sharing.",
-      );
-      return;
-    }
-
-    setIsRequestingLocation(true);
-    setLocationStatus("requesting");
-    setLocationMessage("Requesting precise location from your browser...");
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const nextLocation = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy:
-            typeof position.coords.accuracy === "number"
-              ? position.coords.accuracy
-              : null,
-          capturedAt: new Date().toISOString(),
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
-        };
-
-        setPreciseLocation(nextLocation);
-        setLocationStatus("ready");
-        setLocationMessage(
-          formatLocationAccuracy(nextLocation.accuracy)
-            ? `Precise location attached with ${formatLocationAccuracy(nextLocation.accuracy)}.`
-            : "Precise location attached to this registration.",
-        );
-        setIsRequestingLocation(false);
-      },
-      (geoError) => {
-        let nextMessage = "Unable to get your current location.";
-        let nextStatus = "error";
-
-        if (geoError.code === geoError.PERMISSION_DENIED) {
-          nextStatus = "denied";
-          nextMessage =
-            "Location permission was denied. Registration will continue with approximate network location only.";
-        } else if (geoError.code === geoError.TIMEOUT) {
-          nextMessage =
-            "Location lookup timed out. You can try again or continue with approximate network location only.";
-        } else if (geoError.code === geoError.POSITION_UNAVAILABLE) {
-          nextMessage =
-            "Your device could not determine a precise location right now.";
-        }
-
-        setPreciseLocation(null);
-        setLocationStatus(nextStatus);
-        setLocationMessage(nextMessage);
-        setIsRequestingLocation(false);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 0,
-      },
-    );
-  };
 
   useEffect(() => {
     if (!isNoticeOpen) {
@@ -179,18 +72,7 @@ const Register = () => {
     setIsSubmitting(true); // disable button immediately
     setError("");
 
-    const submissionData = {
-      ...formData,
-      ...(preciseLocation
-        ? {
-            registrationMetadata: {
-              browserGeolocation: preciseLocation,
-            },
-          }
-        : {}),
-    };
-
-    const data = modifyPayload(submissionData);
+    const data = modifyPayload(formData);
 
     try {
       const res = await registerUser(data);
@@ -377,8 +259,7 @@ const Register = () => {
                 <span>
                   I understand that SprachGenie collects this limited security
                   metadata during registration for abuse prevention and account
-                  protection, including any optional precise location I choose
-                  to share.
+                  protection.
                 </span>
                 <button
                   type="button"
@@ -400,56 +281,6 @@ const Register = () => {
                 ❌ {errors.privacyAcknowledged.message}
               </p>
             )}
-
-            <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-4 text-left">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <p className="text-sm font-semibold text-cyan-100">
-                    Precise Location For Better Security Accuracy
-                  </p>
-                  <p className="mt-1 text-xs leading-6 text-gray-300">
-                    Optional. If you allow browser location access, SprachGenie
-                    can attach your current device coordinates to this signup.
-                    This is usually more accurate than IP-based location.
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={requestPreciseLocation}
-                    disabled={isRequestingLocation}
-                    className="rounded-xl border border-cyan-400/40 bg-cyan-500/10 px-4 py-2 text-xs font-semibold text-cyan-100 transition-all duration-300 hover:border-cyan-300 hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {isRequestingLocation
-                      ? "Locating..."
-                      : preciseLocation
-                        ? "Update Location"
-                        : "Use Current Location"}
-                  </button>
-                  {preciseLocation && (
-                    <button
-                      type="button"
-                      onClick={clearPreciseLocation}
-                      className="rounded-xl border border-gray-600 bg-gray-800/70 px-4 py-2 text-xs font-semibold text-gray-200 transition-all duration-300 hover:border-gray-500 hover:bg-gray-700/70"
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-              </div>
-              <div className="mt-3 rounded-xl border border-gray-700/60 bg-black/20 px-3 py-2 text-xs leading-6 text-gray-300">
-                <span className="mb-1 inline-flex rounded-full border border-cyan-500/20 bg-cyan-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-cyan-200">
-                  {getLocationStatusLabel(locationStatus)}
-                </span>
-                {locationMessage}
-                {preciseLocation?.capturedAt && (
-                  <span className="block text-gray-400">
-                    Captured at{" "}
-                    {new Date(preciseLocation.capturedAt).toLocaleString()}.
-                  </span>
-                )}
-              </div>
-            </div>
 
             {/* Submit */}
             <button
