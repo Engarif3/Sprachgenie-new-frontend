@@ -53,6 +53,7 @@ export const validationSchema = z
       message:
         "Please confirm that you understand the security and privacy notice.",
     }),
+    optionalPreciseLocationConsent: z.boolean().optional(),
     basicUser: UserValidationSchema,
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -65,6 +66,7 @@ export const defaultValues = {
   password: "",
   confirmPassword: "",
   privacyAcknowledged: false,
+  optionalPreciseLocationConsent: true,
   basicUser: {
     name: "",
     email: "",

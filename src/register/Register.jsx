@@ -10,17 +10,60 @@ import DarkVeil from "../View/Home/DarkVeil";
 import { IoBookOutline, IoClose, IoEye, IoEyeOff } from "react-icons/io5";
 import AuthHomeLink from "../components/auth/AuthHomeLink";
 
-const SECURITY_NOTICE_COPY = {
-  en: {
-    title: "Security And Privacy Notice",
-    body: "To protect accounts and reduce fraud, we record limited signup metadata such as your IP address, browser, device type, and approximate location derived from your network. This data is access-restricted to authorized admins and kept only for a limited retention period.",
-    toggleLabel: "German",
+const NOTICE_COPY = {
+  security: {
+    en: {
+      title: "Security And Privacy Notice",
+      body: "To protect accounts and reduce fraud, we record limited signup metadata such as your IP address, browser, device type, and approximate location derived from your network. This data is access-restricted to authorized admins and kept only for a limited retention period.",
+      toggleLabel: "German",
+    },
+    de: {
+      title: "Sicherheits- und Datenschutzhinweis",
+      body: "Zum Schutz von Konten und zur Reduzierung von Missbrauch erfassen wir bei der Registrierung begrenzte Metadaten wie Ihre IP-Adresse, Ihren Browser, den Gerätetyp und einen ungefähren Standort, der aus Ihrem Netzwerk abgeleitet wird. Diese Daten sind nur für autorisierte Administratoren zugänglich und werden nur für einen begrenzten Aufbewahrungszeitraum gespeichert.",
+      toggleLabel: "English",
+    },
   },
-  de: {
-    title: "Sicherheits- und Datenschutzhinweis",
-    body: "Zum Schutz von Konten und zur Reduzierung von Missbrauch erfassen wir bei der Registrierung begrenzte Metadaten wie Ihre IP-Adresse, Ihren Browser, den Gerätetyp und einen ungefähren Standort, der aus Ihrem Netzwerk abgeleitet wird. Diese Daten sind nur für autorisierte Administratoren zugänglich und werden nur für einen begrenzten Aufbewahrungszeitraum gespeichert.",
-    toggleLabel: "English",
+  location: {
+    en: {
+      title: "Optional Precise Location",
+      body: "This option is enabled by default. If it stays enabled, SprachGenie may ask your browser for your current device location during signup to improve security accuracy. If you deny permission or your browser cannot provide a location, registration still continues with approximate network-based location only.",
+      toggleLabel: "German",
+    },
+    de: {
+      title: "Optionale genaue Standortfreigabe",
+      body: "Diese Option ist standardmäßig aktiviert. Wenn sie aktiviert bleibt, kann SprachGenie Ihren Browser während der Registrierung nach Ihrem aktuellen Gerätestandort fragen, um die Sicherheitsgenauigkeit zu verbessern. Wenn Sie die Berechtigung ablehnen oder Ihr Browser keinen Standort liefern kann, wird die Registrierung dennoch nur mit einem ungefähren netzbasierten Standort fortgesetzt.",
+      toggleLabel: "English",
+    },
   },
+};
+
+const requestPreciseLocationForSignup = async () => {
+  if (!navigator.geolocation) {
+    return null;
+  }
+
+  return new Promise((resolve) => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy:
+            typeof position.coords.accuracy === "number"
+              ? position.coords.accuracy
+              : null,
+          capturedAt: new Date().toISOString(),
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
+        });
+      },
+      () => resolve(null),
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0,
+      },
+    );
+  });
 };
 
 const Register = () => {
@@ -30,10 +73,11 @@ const Register = () => {
   const [emailVerificationMessage, setEmailVerificationMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isNoticeOpen, setIsNoticeOpen] = useState(false);
+  const [noticeType, setNoticeType] = useState("security");
   const [noticeLanguage, setNoticeLanguage] = useState("en");
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
-  const activeNotice = SECURITY_NOTICE_COPY[noticeLanguage];
+  const activeNotice = NOTICE_COPY[noticeType][noticeLanguage];
 
   useEffect(() => {
     if (!isNoticeOpen) {
@@ -72,7 +116,23 @@ const Register = () => {
     setIsSubmitting(true); // disable button immediately
     setError("");
 
-    const data = modifyPayload(formData);
+    const { optionalPreciseLocationConsent, ...restFormData } = formData;
+    const preciseLocation = optionalPreciseLocationConsent
+      ? await requestPreciseLocationForSignup()
+      : null;
+
+    const submissionData = {
+      ...restFormData,
+      ...(preciseLocation
+        ? {
+            registrationMetadata: {
+              browserGeolocation: preciseLocation,
+            },
+          }
+        : {}),
+    };
+
+    const data = modifyPayload(submissionData);
 
     try {
       const res = await registerUser(data);
@@ -261,6 +321,7 @@ const Register = () => {
                   type="button"
                   onClick={(event) => {
                     event.preventDefault();
+                    setNoticeType("security");
                     setNoticeLanguage("en");
                     setIsNoticeOpen(true);
                   }}
@@ -277,6 +338,31 @@ const Register = () => {
                 ❌ {errors.privacyAcknowledged.message}
               </p>
             )}
+
+            <label className="flex items-start gap-3 rounded-2xl border border-gray-700/60 bg-gray-900/40 p-4 text-left transition-all duration-300 hover:border-cyan-500/40">
+              <input
+                {...register("optionalPreciseLocationConsent")}
+                type="checkbox"
+                className="mt-1 h-4 w-4 rounded border-gray-500 bg-gray-800 text-cyan-500 focus:ring-2 focus:ring-cyan-500/40"
+              />
+              <span className="flex min-w-0 flex-1 items-start justify-between gap-3 text-sm leading-6 text-gray-300">
+                <span>Optional precise location check.</span>
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setNoticeType("location");
+                    setNoticeLanguage("en");
+                    setIsNoticeOpen(true);
+                  }}
+                  className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-cyan-500/40 bg-cyan-500/10 text-cyan-200 transition-all duration-300 hover:border-cyan-400 hover:bg-cyan-500/20 hover:text-white"
+                  aria-label="Open optional precise location notice"
+                  title="Open optional precise location notice"
+                >
+                  <IoBookOutline size={18} />
+                </button>
+              </span>
+            </label>
 
             {/* Submit */}
             <button
