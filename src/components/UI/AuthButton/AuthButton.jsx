@@ -47,7 +47,7 @@ const AuthButton = ({
   const buttonBaseClass =
     "inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-semibold tracking-wide transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-0";
   const loginButtonClass = `${buttonBaseClass} border-sky-500/60 bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-lg shadow-sky-900/30 hover:from-sky-400 hover:to-blue-500 focus:ring-sky-400/60`;
-  const logoutButtonClass = `${buttonBaseClass} border-rose-500/35 bg-rose-500/5 text-rose-100 shadow-sm shadow-rose-900/20 backdrop-blur-sm hover:border-rose-500 hover:bg-rose-600 hover:text-white hover:shadow-lg hover:shadow-rose-900/30 focus:ring-rose-400/50`;
+  const logoutButtonClass = `${buttonBaseClass} border-rose-500/45 bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-lg shadow-rose-950/30 hover:from-rose-500 hover:to-red-500 hover:shadow-xl hover:shadow-rose-950/40 focus:ring-rose-400/50`;
 
   const handleLogout = async () => {
     const result = await Swal.fire({
@@ -74,7 +74,7 @@ const AuthButton = ({
     onLogoutComplete?.();
 
     startTransition(() => {
-      navigate("/login");
+      navigate("/");
     });
   };
 

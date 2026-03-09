@@ -28,44 +28,42 @@ const NavBar = () => {
   const { t } = useTranslation("common");
   const navigate = useNavigate();
   const location = useLocation();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isVisitorMenuOpen, setIsVisitorMenuOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const { userInfo: authUserInfo, isLoggedIn: userLoggedIn } = useAuth();
   const userInfo = authUserInfo || {};
-  const menuRef = useRef(null);
-  const toggleRef = useRef(null);
   const desktopProfileMenuRef = useRef(null);
   const desktopProfileToggleRef = useRef(null);
   const mobileProfileMenuRef = useRef(null);
   const mobileProfileToggleRef = useRef(null);
+  const mobileVisitorMenuRef = useRef(null);
+  const mobileVisitorToggleRef = useRef(null);
   const { theme, toggleTheme } = useTheme();
   const { language, toggleLanguage } = useLanguage();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target) &&
-        toggleRef.current &&
-        !toggleRef.current.contains(event.target)
-      ) {
-        setIsMenuOpen(false);
-      }
-
       const clickedDesktopProfile =
         desktopProfileMenuRef.current?.contains(event.target) ||
         desktopProfileToggleRef.current?.contains(event.target);
       const clickedMobileProfile =
         mobileProfileMenuRef.current?.contains(event.target) ||
         mobileProfileToggleRef.current?.contains(event.target);
+      const clickedVisitorMenu =
+        mobileVisitorMenuRef.current?.contains(event.target) ||
+        mobileVisitorToggleRef.current?.contains(event.target);
 
       if (!clickedDesktopProfile && !clickedMobileProfile) {
         setIsProfileMenuOpen(false);
       }
+
+      if (!clickedVisitorMenu) {
+        setIsVisitorMenuOpen(false);
+      }
     };
 
-    if (isMenuOpen || isProfileMenuOpen) {
+    if (isProfileMenuOpen || isVisitorMenuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -74,11 +72,11 @@ const NavBar = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isMenuOpen, isProfileMenuOpen]);
+  }, [isProfileMenuOpen, isVisitorMenuOpen]);
 
   useEffect(() => {
-    setIsMenuOpen(false);
     setIsProfileMenuOpen(false);
+    setIsVisitorMenuOpen(false);
   }, [location.pathname]);
 
   const handleCreateTopic = () => {
@@ -105,8 +103,10 @@ const NavBar = () => {
   };
 
   const isHomePage = location.pathname === "/";
+  const mobileQuickActionClass =
+    "group flex h-10 w-10 items-center justify-center rounded-xl border border-slate-700/80 bg-slate-900/80 text-slate-100 shadow-[0_10px_24px_rgba(15,23,42,0.35)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-sky-400/60 hover:bg-sky-500/12 hover:text-sky-100 hover:shadow-[0_14px_30px_rgba(14,165,233,0.18)] focus:outline-none focus:ring-2 focus:ring-sky-400/40";
 
-  const renderProfileMenu = (menuRef) => (
+  const renderProfileMenu = (menuRef, isMobile = false) => (
     <div
       ref={menuRef}
       className="absolute right-0 top-14 z-30 w-56 overflow-hidden rounded-2xl border border-sky-800/60 bg-gray-900/95 p-2 shadow-2xl backdrop-blur-sm"
@@ -133,6 +133,16 @@ const NavBar = () => {
         >
           👤 Profile
         </Link>
+        {isMobile &&
+          (userInfo.role === "super_admin" || userInfo.role === "admin") && (
+            <Link
+              to="/create-word"
+              onClick={() => setIsProfileMenuOpen(false)}
+              className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
+            >
+              📝 Create Word
+            </Link>
+          )}
         <button
           type="button"
           onClick={() => {
@@ -143,8 +153,134 @@ const NavBar = () => {
         >
           🔗 Share with Friends
         </button>
+        {isMobile && (
+          <div className="mt-1 flex items-center justify-between rounded-xl border border-slate-700/70 px-3 py-2">
+            <button
+              onClick={() => {
+                toggleLanguage();
+                setIsProfileMenuOpen(false);
+              }}
+              className="flex items-center justify-center gap-1 bg-teal-900 hover:bg-gray-700/50 px-2 py-1 rounded-full transition-all duration-300 hover:scale-110 border border-gray-700/50 hover:border-gray-600"
+              title={`Switch to ${language === "en" ? "Deutsch" : "English"}`}
+            >
+              <img
+                src={ENFlag}
+                alt="English"
+                className={`h-2.9 w-5 transition-all duration-300 ${
+                  language === "en"
+                    ? "scale-110 opacity-100 brightness-125 saturate-150 drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]"
+                    : "opacity-40 saturate-75"
+                }`}
+              />
+              {language === "en" ? (
+                <PiToggleLeftFill
+                  className="text-2xl text-sky-500 w-8 mt-[2px]"
+                  size={22}
+                />
+              ) : (
+                <PiToggleRightFill
+                  className="text-2xl text-sky-500 w-8 mt-[2px]"
+                  size={22}
+                />
+              )}
+              <img
+                src={DEFlag}
+                alt="Deutsch"
+                className={`h-3.5 w-5 transition-all duration-300 ${
+                  language === "de"
+                    ? "scale-110 opacity-100 brightness-125 saturate-150 drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]"
+                    : "opacity-40 saturate-75"
+                }`}
+              />
+            </button>
+
+            <button
+              onClick={() => {
+                toggleTheme();
+                setIsProfileMenuOpen(false);
+              }}
+              className="flex p-1 rounded-full transition-all duration-300 border bg-cyan-900 hover:bg-gray-700/50 text-white border-gray-700/50"
+              title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+            >
+              {theme === "light" ? (
+                <FaMoon className="text-lg text-yellow-500 hover:scale-110" />
+              ) : (
+                <FaSun className="text-lg hover:scale-110" />
+              )}
+            </button>
+          </div>
+        )}
         <div className="mt-1 flex justify-end border-t border-slate-700/70 pt-2">
           <AuthButton onLogoutComplete={() => setIsProfileMenuOpen(false)} />
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderVisitorMenu = () => (
+    <div
+      ref={mobileVisitorMenuRef}
+      className="absolute right-0 top-14 z-30 w-56 overflow-hidden rounded-2xl border border-sky-800/60 bg-gray-900/95 p-2 shadow-2xl backdrop-blur-sm"
+    >
+      <div className="flex flex-col gap-1">
+        <div className="mt-1 flex items-center justify-between rounded-xl border border-slate-700/70 px-3 py-2">
+          <button
+            onClick={() => {
+              toggleLanguage();
+              setIsVisitorMenuOpen(false);
+            }}
+            className="flex items-center justify-center gap-1 bg-teal-900 hover:bg-gray-700/50 px-2 py-1 rounded-full transition-all duration-300 hover:scale-110 border border-gray-700/50 hover:border-gray-600"
+            title={`Switch to ${language === "en" ? "Deutsch" : "English"}`}
+          >
+            <img
+              src={ENFlag}
+              alt="English"
+              className={`h-2.9 w-5 transition-all duration-300 ${
+                language === "en"
+                  ? "scale-110 opacity-100 brightness-125 saturate-150 drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]"
+                  : "opacity-40 saturate-75"
+              }`}
+            />
+            {language === "en" ? (
+              <PiToggleLeftFill
+                className="text-2xl text-sky-500 w-8 mt-[2px]"
+                size={22}
+              />
+            ) : (
+              <PiToggleRightFill
+                className="text-2xl text-sky-500 w-8 mt-[2px]"
+                size={22}
+              />
+            )}
+            <img
+              src={DEFlag}
+              alt="Deutsch"
+              className={`h-3.5 w-5 transition-all duration-300 ${
+                language === "de"
+                  ? "scale-110 opacity-100 brightness-125 saturate-150 drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]"
+                  : "opacity-40 saturate-75"
+              }`}
+            />
+          </button>
+
+          <button
+            onClick={() => {
+              toggleTheme();
+              setIsVisitorMenuOpen(false);
+            }}
+            className="flex p-1 rounded-full transition-all duration-300 border bg-cyan-900 hover:bg-gray-700/50 text-white border-gray-700/50"
+            title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+          >
+            {theme === "light" ? (
+              <FaMoon className="text-lg text-yellow-500 hover:scale-110" />
+            ) : (
+              <FaSun className="text-lg hover:scale-110" />
+            )}
+          </button>
+        </div>
+
+        <div className="mt-1 flex justify-end border-t border-slate-700/70 pt-2">
+          <AuthButton forceLoggedOutView />
         </div>
       </div>
     </div>
@@ -164,7 +300,7 @@ const NavBar = () => {
                 : "bg-gray-800 dark:bg-gray-950"
             }`}
           >
-            {/* Title and Hamburger Menu */}
+            {/* Title and Mobile Actions */}
             <div className="flex min-w-0 flex-1 items-center justify-between gap-2 px-2 md:w-auto md:flex-none md:px-4">
               <Link
                 className="mb-1 whitespace-nowrap text-2xl transition-transform hover:scale-105 sm:text-3xl"
@@ -176,15 +312,31 @@ const NavBar = () => {
 
               <div className="ml-auto flex items-center md:hidden">
                 <div className="mr-3 flex items-center gap-3">
+                  {location.pathname !== "/words" && (
+                    <Link
+                      to="/words"
+                      className={mobileQuickActionClass}
+                      aria-label={t("navbar.vocabulary")}
+                      title={t("navbar.vocabulary")}
+                    >
+                      <FaBook
+                        className="text-[15px] text-sky-300 transition-colors duration-300 group-hover:text-sky-100"
+                        size={15}
+                      />
+                    </Link>
+                  )}
+
                   {location.pathname !== "/" && (
                     <Link
-                      onClick={() => setIsMenuOpen(false)}
                       to="/"
-                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-sky-700 text-lg text-white shadow-lg transition-all duration-300 hover:scale-105"
+                      className={mobileQuickActionClass}
                       aria-label={t("navbar.home")}
                       title={t("navbar.home")}
                     >
-                      <FaHome className="text-sky-400" size={16} />
+                      <FaHome
+                        className="text-[15px] text-sky-300 transition-colors duration-300 group-hover:text-sky-100"
+                        size={15}
+                      />
                     </Link>
                   )}
 
@@ -213,32 +365,36 @@ const NavBar = () => {
                       </button>
 
                       {isProfileMenuOpen &&
-                        renderProfileMenu(mobileProfileMenuRef)}
+                        renderProfileMenu(mobileProfileMenuRef, true)}
+                    </div>
+                  )}
+
+                  {!userLoggedIn && (
+                    <div className="relative">
+                      <button
+                        ref={mobileVisitorToggleRef}
+                        type="button"
+                        onClick={() =>
+                          setIsVisitorMenuOpen((current) => !current)
+                        }
+                        className="rounded-lg border border-sky-700 px-2 py-0 text-2xl font-bold text-sky-400 shadow-lg"
+                        aria-label={
+                          isVisitorMenuOpen
+                            ? "Close visitor menu"
+                            : "Open visitor menu"
+                        }
+                      >
+                        {isVisitorMenuOpen ? "✕" : "☰"}
+                      </button>
+
+                      {isVisitorMenuOpen && renderVisitorMenu()}
                     </div>
                   )}
                 </div>
-
-                <button
-                  ref={toggleRef}
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="rounded-lg border border-sky-700 px-2 py-0 text-2xl font-bold text-sky-400 shadow-lg md:hidden"
-                  aria-label={
-                    isMenuOpen
-                      ? "Close navigation menu"
-                      : "Open navigation menu"
-                  }
-                >
-                  {isMenuOpen ? "✕" : "☰"}
-                </button>
               </div>
             </div>
             {/* Navigation Links */}
-            <div
-              ref={menuRef}
-              className={`${
-                isMenuOpen ? "flex" : "hidden"
-              } md:flex flex-col md:flex-row rounded-xl items-center gap-3 md:gap-4 lg:gap-16 w-full md:w-auto px-4 mt-2 md:mt-0 absolute md:static top-full left-0 z-10 py-4 md:py-0 md:border-0 bg-slate-400 bg-opacity-90 md:bg-transparent lg:bg-transparent`}
-            >
+            <div className="hidden md:flex md:flex-row rounded-xl items-center gap-3 md:gap-4 lg:gap-16 w-full md:w-auto px-4 mt-2 md:mt-0 md:static md:py-0 md:border-0 md:bg-transparent">
               {location.pathname !== "/" && (
                 <Link
                   to="/"
@@ -257,7 +413,6 @@ const NavBar = () => {
               {/* //for large screen */}
               {location.pathname !== "/words" && (
                 <Link
-                  onClick={() => setIsMenuOpen(false)}
                   to="/words"
                   className="group hidden md:flex w-full md:w-auto items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 mt-0 transition-all duration-300"
                 >
@@ -273,21 +428,6 @@ const NavBar = () => {
               {userLoggedIn && (
                 <>
                   <Link
-                    to="/words"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg flex justify-center items-center md:hidden lg:hidden"
-                  >
-                    📚 {t("navbar.vocabulary")}
-                  </Link>
-                  <Link
-                    onClick={() => setIsMenuOpen(false)}
-                    to="/favorites"
-                    className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg  flex md:hidden lg:hidden justify-center items-center "
-                  >
-                    ❤️ {t("navbar.favorites")}
-                  </Link>
-                  <Link
-                    onClick={() => setIsMenuOpen(false)}
                     to="/favorites"
                     className="group hidden md:flex lg:flex items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 transition-all duration-300"
                   >
@@ -312,88 +452,6 @@ const NavBar = () => {
               Words List
             </Link>
           )} */}
-
-              {/* ============  mobile*/}
-              {(userInfo.role === "super_admin" ||
-                userInfo.role === "admin") && (
-                <>
-                  <Link
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                    }}
-                    to="/create-word"
-                    className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg flex justify-center items-center md:hidden lg:hidden"
-                  >
-                    📝 Create Word
-                  </Link>
-                  <Link
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                    }}
-                    to="/create-conversation"
-                    className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-cyan-500/50 flex justify-center items-center md:hidden lg:hidden"
-                  >
-                    💬 Create Conv
-                  </Link>
-                  <Link
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                    }}
-                    to="update-conversation"
-                    className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-yellow-500/50 flex justify-center items-center md:hidden lg:hidden"
-                  >
-                    ✏️ Update Conv
-                  </Link>
-                </>
-              )}
-              {userInfo.role === "admin" && (
-                <>
-                  <Link
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                    }}
-                    to="/update-basic-user-status"
-                    className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg  flex justify-center items-center md:hidden lg:hidden"
-                  >
-                    👥 Users
-                  </Link>
-                </>
-              )}
-              {userInfo.role === "super_admin" && (
-                <>
-                  <Link
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                    }}
-                    to="/update-user-status"
-                    className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg  flex justify-center items-center md:hidden lg:hidden"
-                  >
-                    👥 Users
-                  </Link>
-                </>
-              )}
-              {userLoggedIn && userInfo.role === "super_admin" && (
-                <>
-                  {/* <button
-                onClick={() => handleDeleteAll()}
-                className="btn btn-sm btn-warning  hidden "
-              >
-                Delete All
-              </button> */}
-                  <Link
-                    onClick={() => {
-                      handleCreateTopic();
-                      setIsMenuOpen(false);
-                    }}
-                    className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg flex justify-center items-center md:hidden lg:hidden"
-                  >
-                    📚 {t("navbar.createTopic")}
-                  </Link>
-                </>
-              )}
-
-              {/* <Link to="/login">Login</Link> */}
-              {/* <AuthButton></AuthButton> */}
 
               {/* Language Toggle Button with SVG Flags */}
               <button
@@ -475,7 +533,7 @@ const NavBar = () => {
                     </button>
 
                     {isProfileMenuOpen &&
-                      renderProfileMenu(desktopProfileMenuRef)}
+                      renderProfileMenu(desktopProfileMenuRef, false)}
                   </>
                 )}
                 <AuthButton hideWhenLoggedIn={userLoggedIn} />
