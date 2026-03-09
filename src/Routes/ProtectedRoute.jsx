@@ -2,6 +2,11 @@ import { Navigate } from "react-router-dom";
 import { getUserInfo } from "../services/auth.services";
 import { useState, useEffect } from "react";
 
+const normalizeRole = (role) =>
+  String(role || "")
+    .trim()
+    .toLowerCase();
+
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const userInfo = getUserInfo();
 
@@ -12,7 +17,9 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   if (
     Array.isArray(allowedRoles) &&
     allowedRoles.length > 0 &&
-    !allowedRoles.includes(userInfo.role)
+    !allowedRoles
+      .map((role) => normalizeRole(role))
+      .includes(normalizeRole(userInfo.role))
   ) {
     return <Navigate to="/dashboard" replace />;
   }
