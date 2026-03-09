@@ -13,6 +13,18 @@ import { ScaleLoader } from "react-spinners";
 import { dateTimeFormatter } from "../../utils/formatDateTime";
 import Pagination from "../AdminPaginationForUsers";
 
+const formatRoleLabel = (role) => {
+  if (!role) {
+    return "User";
+  }
+
+  return role
+    .split("_")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+};
+
 const UpdateUserStatus = () => {
   const { userInfo: authUserInfo, isLoggedIn: userLoggedIn } = useAuth();
   const userInfo = authUserInfo || {};
@@ -114,8 +126,8 @@ const UpdateUserStatus = () => {
     if (refreshedUser.role === "admin") {
       await Swal.fire({
         icon: "info",
-        title: "Permissions updated",
-        text: "You are now an admin. Redirecting to your dashboard tools.",
+        title: `You are promoted to ${formatRoleLabel(refreshedUser.role)}`,
+        text: "Redirecting you to the admin management page.",
       });
       navigate("/dashboard/update-basic-user-status", { replace: true });
       return true;
@@ -124,8 +136,8 @@ const UpdateUserStatus = () => {
     if (refreshedUser.role !== "super_admin") {
       await Swal.fire({
         icon: "info",
-        title: "Logged out",
-        text: "Your admin access was removed. Please sign in again.",
+        title: `You are demoted to ${formatRoleLabel(refreshedUser.role)}`,
+        text: "Your higher-level admin access was removed. Please sign in again.",
       });
       await removeUser();
       navigate("/login", { replace: true });

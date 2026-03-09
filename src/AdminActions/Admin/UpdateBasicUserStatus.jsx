@@ -13,6 +13,18 @@ import { ScaleLoader } from "react-spinners";
 import { dateTimeFormatter } from "../../utils/formatDateTime";
 import Pagination from "../AdminPaginationForUsers";
 
+const formatRoleLabel = (role) => {
+  if (!role) {
+    return "User";
+  }
+
+  return role
+    .split("_")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+};
+
 const UpdateBasicUserStatus = () => {
   const { userInfo: authUserInfo, isLoggedIn: userLoggedIn } = useAuth();
   const userInfo = authUserInfo || {};
@@ -82,8 +94,8 @@ const UpdateBasicUserStatus = () => {
     if (refreshedUser.role === "super_admin") {
       await Swal.fire({
         icon: "info",
-        title: "Permissions updated",
-        text: "You are now a super admin. Redirecting to your dashboard tools.",
+        title: `You are promoted to ${formatRoleLabel(refreshedUser.role)}`,
+        text: "Redirecting you to the super admin management page.",
       });
       navigate("/dashboard/update-user-status", { replace: true });
       return true;
@@ -92,7 +104,7 @@ const UpdateBasicUserStatus = () => {
     if (refreshedUser.role !== "admin") {
       await Swal.fire({
         icon: "info",
-        title: "Logged out",
+        title: `You are demoted to ${formatRoleLabel(refreshedUser.role)}`,
         text: "Your admin access was removed. Please sign in again.",
       });
       await removeUser();
