@@ -1,6 +1,8 @@
 import api from "../axios";
 import { useSyncExternalStore } from "react";
 
+const FORCED_LOGOUT_NOTICE_KEY = "forcedLogoutNotice";
+
 // ✅ NO localStorage needed - tokens in httpOnly cookies
 // User info will come from API calls, not from decoding client-side tokens
 
@@ -46,6 +48,41 @@ export const clearUserInfo = () => {
   setCachedUserInfo(null);
 };
 
+export const queueForcedLogoutNotice = ({
+  title = "Logged out",
+  text = "Your session is no longer valid. Please sign in again.",
+  icon = "info",
+} = {}) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.sessionStorage.setItem(
+    FORCED_LOGOUT_NOTICE_KEY,
+    JSON.stringify({ title, text, icon }),
+  );
+};
+
+export const consumeForcedLogoutNotice = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const rawNotice = window.sessionStorage.getItem(FORCED_LOGOUT_NOTICE_KEY);
+
+  if (!rawNotice) {
+    return null;
+  }
+
+  window.sessionStorage.removeItem(FORCED_LOGOUT_NOTICE_KEY);
+
+  try {
+    return JSON.parse(rawNotice);
+  } catch (error) {
+    return null;
+  }
+};
+
 export const useAuth = () => {
   const userInfo = useSyncExternalStore(
     subscribeToAuthStore,
@@ -77,6 +114,14 @@ export const syncCurrentUser = async ({ preserveOnFailure = true } = {}) => {
     }
 
     if (response.status === 401 || response.status === 403) {
+      if (cachedUserInfo) {
+        queueForcedLogoutNotice({
+          title: "Logged out",
+          text: "Your account access changed. Please sign in again.",
+          icon: "info",
+        });
+      }
+
       clearUserInfo();
       return null;
     }

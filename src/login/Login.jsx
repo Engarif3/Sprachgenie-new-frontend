@@ -121,10 +121,14 @@ import { validationSchema } from "./validation";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { userLogin } from "../services/actions/userLogin";
-import { syncCurrentUser } from "../services/auth.services";
+import {
+  consumeForcedLogoutNotice,
+  syncCurrentUser,
+} from "../services/auth.services";
 import DarkVeil from "../View/Home/DarkVeil";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import AuthHomeLink from "../components/auth/AuthHomeLink";
+import Swal from "sweetalert2";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -148,6 +152,23 @@ const Login = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, [loginCooldown]);
+
+  useEffect(() => {
+    const forcedLogoutNotice = consumeForcedLogoutNotice();
+
+    if (!forcedLogoutNotice) {
+      return;
+    }
+
+    Swal.fire({
+      icon: forcedLogoutNotice.icon || "info",
+      title: forcedLogoutNotice.title || "Logged out",
+      text:
+        forcedLogoutNotice.text ||
+        "Your session is no longer valid. Please sign in again.",
+      confirmButtonText: "OK",
+    });
+  }, []);
 
   const {
     register,

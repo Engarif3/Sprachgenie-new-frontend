@@ -1,6 +1,10 @@
 import axios from "axios";
 import Swal from "sweetalert2";
 import { toast } from "sonner";
+import {
+  clearUserInfo,
+  queueForcedLogoutNotice,
+} from "./services/auth.services";
 
 const api = axios.create({
   baseURL:
@@ -42,13 +46,15 @@ api.interceptors.response.use(
   (error) => {
     // Handle 401 Unauthorized - redirect to login
     if (error.response?.status === 401) {
-      // ✅ Cookies cleared server-side, just redirect
-      window.location.href = "/login";
-      Swal.fire({
+      queueForcedLogoutNotice({
         icon: "warning",
-        title: "Session Expired",
-        text: "Please log in again",
+        title: "Logged out",
+        text:
+          error.response?.data?.message ||
+          "Your access changed or your session expired. Please log in again.",
       });
+      clearUserInfo();
+      window.location.href = "/login";
     }
 
     // Handle 403 Forbidden

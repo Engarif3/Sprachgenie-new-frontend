@@ -6,7 +6,7 @@ const ProtectedRoute = ({ children }) => {
   const userInfo = getUserInfo();
 
   if (!userInfo) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;
