@@ -124,6 +124,7 @@ import { userLogin } from "../services/actions/userLogin";
 import { storeUserInfo } from "../services/auth.services";
 import DarkVeil from "../View/Home/DarkVeil";
 import { IoEye, IoEyeOff } from "react-icons/io5";
+import AuthHomeLink from "../components/auth/AuthHomeLink";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -235,13 +236,7 @@ const Login = () => {
         <DarkVeil />
       </div>
 
-      {/* Home button */}
-      <Link
-        to="/"
-        className="fixed top-4 left-4 z-20 px-2 py-1 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-full font-bold shadow-lg hover:scale-105 transition-all duration-300 "
-      >
-        🏠 Home
-      </Link>
+      <AuthHomeLink />
 
       {/* Login form */}
       <div className="w-full max-w-md text-white p-8 rounded-3xl shadow-2xl text-center z-10 bg-gradient-to-br from-gray-800/90 via-gray-900/90 to-black/90 border-2 border-gray-700/50 backdrop-blur-sm">

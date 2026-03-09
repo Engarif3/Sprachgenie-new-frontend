@@ -1,5 +1,22 @@
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import api from "../axios";
+
+const getVisitorLocationSourceLabel = (source) => {
+  switch (source) {
+    case "vercel-headers":
+      return "Edge/provider IP metadata";
+    case "cloudflare-headers":
+      return "Cloudflare IP metadata";
+    case "ipwhois-fallback":
+      return "IP geolocation fallback";
+    default:
+      return source || "Unknown source";
+  }
+};
+
+const getRequiredConfirmationText = (type) =>
+  type === "all" ? "confirm" : "ok";
 
 const AdminVisitorsPage = () => {
   const [visitorsByLocation, setVisitorsByLocation] = useState([]);
@@ -18,17 +35,12 @@ const AdminVisitorsPage = () => {
   const fetchVisitorsByLocation = async (page = 1) => {
     setLocationLoading(true);
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/visitors/by-location?page=${page}&limit=20`,
-      );
-      if (res.ok) {
-        const data = await res.json();
-        // Replace data with new page (don't append)
-        setVisitorsByLocation(data.data?.locations || []);
-        setLocationTotal(data.data?.totalLocations || 0);
-        setLocationHasMore(data.data?.hasMore || false);
-        setLocationPage(page);
-      }
+      const res = await api.get(`/visitors/by-location?page=${page}&limit=20`);
+      const data = res.data;
+      setVisitorsByLocation(data.data?.locations || []);
+      setLocationTotal(data.data?.totalLocations || 0);
+      setLocationHasMore(data.data?.hasMore || false);
+      setLocationPage(page);
     } catch (error) {
       console.error("Failed to fetch visitors by location:", error);
     } finally {
@@ -37,17 +49,20 @@ const AdminVisitorsPage = () => {
   };
 
   const handleDeleteAll = async () => {
-    if (deleteConfirmation.inputValue !== "ok") {
-      Swal.fire("Error", "Please type 'ok' to confirm deletion", "error");
+    const requiredInput = getRequiredConfirmationText(deleteConfirmation.type);
+
+    if (deleteConfirmation.inputValue !== requiredInput) {
+      Swal.fire(
+        "Error",
+        `Please type '${requiredInput}' to confirm deletion`,
+        "error",
+      );
       return;
     }
 
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/visitors/delete-all`,
-        { method: "DELETE" },
-      );
-      if (res.ok) {
+      await api.delete(`/visitors/delete-all`);
+      {
         setDeleteConfirmation({
           show: false,
           type: "",
@@ -62,8 +77,6 @@ const AdminVisitorsPage = () => {
           showConfirmButton: false,
         });
         fetchVisitorsByLocation(1);
-      } else {
-        Swal.fire("Error", "Failed to delete visitors", "error");
       }
     } catch (error) {
       console.error("Delete error:", error);
@@ -72,21 +85,22 @@ const AdminVisitorsPage = () => {
   };
 
   const handleDeleteLocation = async (country, city) => {
-    if (deleteConfirmation.inputValue !== "ok") {
-      Swal.fire("Error", "Please type 'ok' to confirm deletion", "error");
+    const requiredInput = getRequiredConfirmationText(deleteConfirmation.type);
+
+    if (deleteConfirmation.inputValue !== requiredInput) {
+      Swal.fire(
+        "Error",
+        `Please type '${requiredInput}' to confirm deletion`,
+        "error",
+      );
       return;
     }
 
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/visitors/delete-by-location`,
-        {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ country, city }),
-        },
-      );
-      if (res.ok) {
+      await api.delete(`/visitors/delete-by-location`, {
+        data: { country, city },
+      });
+      {
         setDeleteConfirmation({
           show: false,
           type: "",
@@ -101,8 +115,6 @@ const AdminVisitorsPage = () => {
           showConfirmButton: false,
         });
         fetchVisitorsByLocation(1);
-      } else {
-        Swal.fire("Error", "Failed to delete location visitors", "error");
       }
     } catch (error) {
       console.error("Delete error:", error);
@@ -111,21 +123,22 @@ const AdminVisitorsPage = () => {
   };
 
   const handleDeleteVisitor = async (ipAddress) => {
-    if (deleteConfirmation.inputValue !== "ok") {
-      Swal.fire("Error", "Please type 'ok' to confirm deletion", "error");
+    const requiredInput = getRequiredConfirmationText(deleteConfirmation.type);
+
+    if (deleteConfirmation.inputValue !== requiredInput) {
+      Swal.fire(
+        "Error",
+        `Please type '${requiredInput}' to confirm deletion`,
+        "error",
+      );
       return;
     }
 
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/visitors/delete-by-ip`,
-        {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ipAddress }),
-        },
-      );
-      if (res.ok) {
+      await api.delete(`/visitors/delete-by-ip`, {
+        data: { ipAddress },
+      });
+      {
         setDeleteConfirmation({
           show: false,
           type: "",
@@ -140,8 +153,6 @@ const AdminVisitorsPage = () => {
           showConfirmButton: false,
         });
         fetchVisitorsByLocation(1);
-      } else {
-        Swal.fire("Error", "Failed to delete visitor", "error");
       }
     } catch (error) {
       console.error("Delete error:", error);
@@ -252,6 +263,21 @@ const AdminVisitorsPage = () => {
                       {location.count}{" "}
                       {location.count === 1 ? "visitor" : "visitors"}
                     </p>
+                    <p className="text-xs text-gray-500 mt-2 leading-6">
+                      Approximate IP-based location via{" "}
+                      {getVisitorLocationSourceLabel(location.source)}.
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2 text-xs text-gray-300">
+                      <span className="rounded-full border border-gray-700 px-3 py-1">
+                        Region: {location.region || "Unknown"}
+                      </span>
+                      <span className="rounded-full border border-gray-700 px-3 py-1">
+                        Timezone: {location.timezone || "Unknown"}
+                      </span>
+                      <span className="rounded-full border border-gray-700 px-3 py-1">
+                        Total visits: {location.visitCount}
+                      </span>
+                    </div>
                   </div>
                   <div className="flex gap-2">
                     {location.latitude && location.longitude && (
@@ -298,6 +324,12 @@ const AdminVisitorsPage = () => {
                           Device
                         </th>
                         <th className="px-4 py-3 text-left font-semibold">
+                          OS
+                        </th>
+                        <th className="px-4 py-3 text-left font-semibold">
+                          Visits
+                        </th>
+                        <th className="px-4 py-3 text-left font-semibold">
                           Visited At
                         </th>
                         <th className="px-4 py-3 text-left font-semibold">
@@ -317,7 +349,11 @@ const AdminVisitorsPage = () => {
                               {visitor.ipAddress}
                             </td>
                             <td className="px-4 py-3">{visitor.browser}</td>
-                            <td className="px-4 py-3">{visitor.device}</td>
+                            <td className="px-4 py-3">{visitor.deviceType}</td>
+                            <td className="px-4 py-3">
+                              {visitor.operatingSystem}
+                            </td>
+                            <td className="px-4 py-3">{visitor.visitCount}</td>
                             <td className="px-4 py-3">
                               {new Date(visitor.visitedAt).toLocaleString()}
                             </td>
@@ -433,45 +469,50 @@ const AdminVisitorsPage = () => {
                 `Are you sure you want to delete visitor ${deleteConfirmation.data?.ipAddress}? This action cannot be undone.`}
             </p>
             <div className="mb-6">
-              <label className="block text-gray-400 text-sm mb-2">
-                Type "{deleteConfirmation.type === "all" ? "confirm" : "ok"}" to
-                confirm:
-              </label>
-              <input
-                type="text"
-                value={deleteConfirmation.inputValue}
-                onChange={(e) =>
-                  setDeleteConfirmation({
-                    ...deleteConfirmation,
-                    inputValue: e.target.value,
-                  })
-                }
-                placeholder={
-                  deleteConfirmation.type === "all"
-                    ? "Type 'confirm' to confirm"
-                    : "Type 'ok' to confirm"
-                }
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-red-500"
-                onKeyPress={(e) => {
-                  const requiredInput =
-                    deleteConfirmation.type === "all" ? "confirm" : "ok";
-                  if (
-                    e.key === "Enter" &&
-                    deleteConfirmation.inputValue === requiredInput
-                  ) {
-                    if (deleteConfirmation.type === "all") {
-                      handleDeleteAll();
-                    } else if (deleteConfirmation.type === "location") {
-                      handleDeleteLocation(
-                        deleteConfirmation.data.country,
-                        deleteConfirmation.data.city,
-                      );
-                    } else if (deleteConfirmation.type === "visitor") {
-                      handleDeleteVisitor(deleteConfirmation.data.ipAddress);
-                    }
-                  }
-                }}
-              />
+              {(() => {
+                const requiredInput = getRequiredConfirmationText(
+                  deleteConfirmation.type,
+                );
+
+                return (
+                  <>
+                    <label className="block text-gray-400 text-sm mb-2">
+                      Type "{requiredInput}" to confirm:
+                    </label>
+                    <input
+                      type="text"
+                      value={deleteConfirmation.inputValue}
+                      onChange={(e) =>
+                        setDeleteConfirmation({
+                          ...deleteConfirmation,
+                          inputValue: e.target.value,
+                        })
+                      }
+                      placeholder={`Type '${requiredInput}' to confirm`}
+                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-red-500"
+                      onKeyPress={(e) => {
+                        if (
+                          e.key === "Enter" &&
+                          deleteConfirmation.inputValue === requiredInput
+                        ) {
+                          if (deleteConfirmation.type === "all") {
+                            handleDeleteAll();
+                          } else if (deleteConfirmation.type === "location") {
+                            handleDeleteLocation(
+                              deleteConfirmation.data.country,
+                              deleteConfirmation.data.city,
+                            );
+                          } else if (deleteConfirmation.type === "visitor") {
+                            handleDeleteVisitor(
+                              deleteConfirmation.data.ipAddress,
+                            );
+                          }
+                        }
+                      }}
+                    />
+                  </>
+                );
+              })()}
             </div>
             <div className="flex gap-3">
               <button
@@ -502,7 +543,7 @@ const AdminVisitorsPage = () => {
                 }}
                 disabled={
                   deleteConfirmation.inputValue !==
-                  (deleteConfirmation.type === "all" ? "confirm" : "ok")
+                  getRequiredConfirmationText(deleteConfirmation.type)
                 }
                 className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-800 text-white rounded-lg font-medium transition-colors"
               >

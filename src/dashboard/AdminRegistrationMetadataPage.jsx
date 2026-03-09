@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
+import "leaflet/dist/leaflet.css";
+import { CircleMarker, MapContainer, Popup, TileLayer } from "react-leaflet";
+import { useMap } from "react-leaflet/hooks";
 import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "../axios";
 import { getUserInfo } from "../services/auth.services";
+
+const GEOCODING_ENDPOINT = "https://nominatim.openstreetmap.org/search";
 
 const buildQueryParams = (filters, page) => {
   const params = {
@@ -35,6 +40,172 @@ const formatLocation = (record) => {
   return parts.length > 0 ? parts.join(", ") : "Unknown";
 };
 
+const buildLocationQuery = (record) => {
+  const location = formatLocation(record);
+  return location === "Unknown" ? "" : location;
+};
+
+const getLocationSourceLabel = (source) => {
+  switch (source) {
+    case "vercel-headers":
+      return "Edge/provider IP metadata";
+    case "cloudflare-headers":
+      return "Cloudflare IP metadata";
+    case "ipwhois-fallback":
+      return "IP geolocation fallback";
+    case "browser-geolocation":
+      return "Browser geolocation";
+    default:
+      return source || "Unknown source";
+  }
+};
+
+const formatAccuracy = (value) => {
+  const numericValue =
+    typeof value === "number"
+      ? value
+      : typeof value === "string"
+        ? Number(value)
+        : NaN;
+
+  if (!Number.isFinite(numericValue) || numericValue <= 0) {
+    return null;
+  }
+
+  if (numericValue >= 1000) {
+    return `${(numericValue / 1000).toFixed(1)} km`;
+  }
+
+  return `${Math.round(numericValue)} m`;
+};
+
+const getLocationSignal = (record) => {
+  if (record?.source === "browser-geolocation") {
+    return {
+      label: "Precise browser geolocation",
+      className:
+        "border-emerald-300/60 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300",
+    };
+  }
+
+  if (getLocationCoordinates(record)) {
+    return {
+      label: "Coordinates from network location",
+      className:
+        "border-sky-300/60 bg-sky-50 text-sky-700 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-300",
+    };
+  }
+
+  return {
+    label: "Approximate network location",
+    className:
+      "border-amber-300/60 bg-amber-50 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200",
+  };
+};
+
+const getCoordinateValue = (value) => {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (typeof value === "string" && value.trim().length === 0) {
+    return null;
+  }
+
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? numericValue : null;
+};
+
+const getLocationCoordinates = (record) => {
+  const latitude = getCoordinateValue(record?.latitude);
+  const longitude = getCoordinateValue(record?.longitude);
+
+  if (latitude === null || longitude === null) {
+    return null;
+  }
+
+  return { latitude, longitude };
+};
+
+const getMapUrls = (coordinates) => {
+  if (!coordinates) {
+    return null;
+  }
+
+  const { latitude, longitude } = coordinates;
+  const encodedCoordinates = encodeURIComponent(`${latitude},${longitude}`);
+
+  return {
+    embedUrl: `https://maps.google.com/maps?ll=${encodedCoordinates}&z=11&output=embed`,
+    externalUrl: `https://www.google.com/maps/search/?api=1&query=${encodedCoordinates}`,
+  };
+};
+
+const MapResizer = ({ latitude, longitude }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    const resizeMap = () => {
+      map.invalidateSize();
+      map.setView([latitude, longitude], 11, { animate: false });
+    };
+
+    resizeMap();
+    const timeoutId = window.setTimeout(resizeMap, 150);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [latitude, longitude, map]);
+
+  return null;
+};
+
+const LocationMap = ({ record, coordinates }) => {
+  if (!coordinates) {
+    return null;
+  }
+
+  const { latitude, longitude } = coordinates;
+
+  return (
+    <MapContainer
+      key={`${latitude}-${longitude}`}
+      center={[latitude, longitude]}
+      zoom={11}
+      scrollWheelZoom={false}
+      className="h-56 w-full"
+      style={{ minHeight: "14rem" }}
+    >
+      <MapResizer latitude={latitude} longitude={longitude} />
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      <CircleMarker
+        center={[latitude, longitude]}
+        radius={10}
+        pathOptions={{
+          color: "#0f172a",
+          weight: 2,
+          fillColor: "#38bdf8",
+          fillOpacity: 0.9,
+        }}
+      >
+        <Popup>
+          {record?.source === "browser-geolocation"
+            ? "Precise signup location"
+            : "Approximate signup location"}
+          <br />
+          {formatLocation(record)}
+          <br />
+          {latitude}, {longitude}
+        </Popup>
+      </CircleMarker>
+    </MapContainer>
+  );
+};
+
 const AdminRegistrationMetadataPage = () => {
   const userInfo = getUserInfo() || {};
   const role = userInfo?.role;
@@ -53,6 +224,10 @@ const AdminRegistrationMetadataPage = () => {
   const [error, setError] = useState("");
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [selectedRecordLoading, setSelectedRecordLoading] = useState(false);
+  const [isInspectionModalOpen, setIsInspectionModalOpen] = useState(false);
+  const [derivedCoordinates, setDerivedCoordinates] = useState(null);
+  const [derivedCoordinatesLoading, setDerivedCoordinatesLoading] =
+    useState(false);
 
   const fetchRecords = async (page = 1, nextFilters = filters) => {
     setLoading(true);
@@ -88,6 +263,98 @@ const AdminRegistrationMetadataPage = () => {
     fetchRecords(1, filters);
   }, []);
 
+  useEffect(() => {
+    const storedCoordinates = getLocationCoordinates(selectedRecord);
+
+    if (!selectedRecord || storedCoordinates) {
+      setDerivedCoordinates(null);
+      setDerivedCoordinatesLoading(false);
+      return undefined;
+    }
+
+    const locationQuery = buildLocationQuery(selectedRecord);
+
+    if (!locationQuery) {
+      setDerivedCoordinates(null);
+      setDerivedCoordinatesLoading(false);
+      return undefined;
+    }
+
+    const abortController = new AbortController();
+
+    const geocodeLocation = async () => {
+      setDerivedCoordinatesLoading(true);
+
+      try {
+        const response = await fetch(
+          `${GEOCODING_ENDPOINT}?format=jsonv2&limit=1&q=${encodeURIComponent(locationQuery)}`,
+          {
+            signal: abortController.signal,
+            headers: {
+              Accept: "application/json",
+            },
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(`Geocoding failed with status ${response.status}`);
+        }
+
+        const results = await response.json();
+        const firstMatch = Array.isArray(results) ? results[0] : null;
+        const latitude = getCoordinateValue(firstMatch?.lat);
+        const longitude = getCoordinateValue(firstMatch?.lon);
+
+        if (latitude === null || longitude === null) {
+          setDerivedCoordinates(null);
+          return;
+        }
+
+        setDerivedCoordinates({
+          latitude,
+          longitude,
+          label: firstMatch?.display_name || locationQuery,
+        });
+      } catch (requestError) {
+        if (requestError.name !== "AbortError") {
+          console.error(
+            "Failed to geocode registration location:",
+            requestError,
+          );
+          setDerivedCoordinates(null);
+        }
+      } finally {
+        if (!abortController.signal.aborted) {
+          setDerivedCoordinatesLoading(false);
+        }
+      }
+    };
+
+    geocodeLocation();
+
+    return () => {
+      abortController.abort();
+    };
+  }, [selectedRecord]);
+
+  useEffect(() => {
+    if (!isInspectionModalOpen) {
+      return undefined;
+    }
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setIsInspectionModalOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isInspectionModalOpen]);
+
   const handleFilterChange = (event) => {
     const { name, value } = event.target;
     setFilters((prev) => ({
@@ -115,6 +382,7 @@ const AdminRegistrationMetadataPage = () => {
   };
 
   const handleInspectRecord = async (userId) => {
+    setIsInspectionModalOpen(true);
     setSelectedRecordLoading(true);
 
     try {
@@ -135,6 +403,10 @@ const AdminRegistrationMetadataPage = () => {
     }
   };
 
+  const handleCloseInspectionModal = () => {
+    setIsInspectionModalOpen(false);
+  };
+
   if (!canAccess) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -143,6 +415,13 @@ const AdminRegistrationMetadataPage = () => {
     Math.ceil((meta.total || 0) / (meta.limit || 20)),
     1,
   );
+  const selectedRecordCoordinates = getLocationCoordinates(selectedRecord);
+  const selectedRecordMapCoordinates =
+    selectedRecordCoordinates || derivedCoordinates;
+  const selectedRecordMap = getMapUrls(selectedRecordMapCoordinates);
+  const isDerivedMapPreview =
+    !selectedRecordCoordinates && Boolean(selectedRecordMapCoordinates);
+  const locationSignal = getLocationSignal(selectedRecord);
 
   return (
     <div className="min-h-screen px-4 py-8 md:px-6 lg:px-8">
@@ -157,8 +436,10 @@ const AdminRegistrationMetadataPage = () => {
                 Registration Metadata
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 dark:text-slate-300 md:text-base">
-                Review signup device, browser, IP, and approximate location
-                signals collected for abuse prevention and account security.
+                Review signup device, browser, IP, and location signals used for
+                abuse prevention and account security. Unless explicitly
+                collected from browser geolocation, location data here should be
+                treated as approximate and IP-derived.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:w-[25rem]">
@@ -186,8 +467,10 @@ const AdminRegistrationMetadataPage = () => {
 
           <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50/90 p-4 text-sm leading-6 text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-100">
             This data is intended for fraud prevention, abuse investigation, and
-            operational security. Avoid exporting or sharing it outside
-            authorized admin workflows.
+            operational security. IP-based locations can be imprecise because
+            VPNs, mobile networks, corporate gateways, and privacy tooling may
+            shift the reported city or region. Avoid exporting or sharing it
+            outside authorized admin workflows.
           </div>
         </section>
 
@@ -290,285 +573,361 @@ const AdminRegistrationMetadataPage = () => {
           </form>
         </section>
 
-        <section className="grid gap-8 xl:grid-cols-[minmax(0,1.8fr)_minmax(21rem,1fr)]">
-          <div className="rounded-3xl border border-slate-200 bg-white/95 p-4 shadow-lg shadow-slate-900/5 dark:border-slate-800 dark:bg-slate-900/85 dark:shadow-black/20 md:p-6">
-            {loading ? (
-              <div className="flex min-h-[18rem] items-center justify-center text-sm font-medium text-slate-500 dark:text-slate-400">
-                Loading registration metadata...
-              </div>
-            ) : error ? (
-              <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-200">
-                {error}
-              </div>
-            ) : records.length === 0 ? (
-              <div className="flex min-h-[18rem] items-center justify-center text-sm font-medium text-slate-500 dark:text-slate-400">
-                No registration metadata matched the current filters.
-              </div>
-            ) : (
-              <>
-                <div className="hidden overflow-x-auto lg:block">
-                  <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
-                    <thead>
-                      <tr className="text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                        <th className="px-4 py-3">User</th>
-                        <th className="px-4 py-3">Location</th>
-                        <th className="px-4 py-3">Device</th>
-                        <th className="px-4 py-3">IP</th>
-                        <th className="px-4 py-3">Source</th>
-                        <th className="px-4 py-3">Registered</th>
-                        <th className="px-4 py-3">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                      {records.map((record) => (
-                        <tr
-                          key={record.id}
-                          className="transition hover:bg-slate-50 dark:hover:bg-slate-950/60"
-                        >
-                          <td className="px-4 py-4">
-                            <p className="font-semibold text-slate-900 dark:text-white">
-                              {record.email}
-                            </p>
-                            <p className="mt-1 font-mono text-xs text-slate-500 dark:text-slate-400">
-                              {record.userId}
-                            </p>
-                          </td>
-                          <td className="px-4 py-4 text-slate-600 dark:text-slate-300">
-                            {formatLocation(record)}
-                          </td>
-                          <td className="px-4 py-4 text-slate-600 dark:text-slate-300">
-                            <div className="space-y-1">
-                              <p className="font-medium text-slate-900 dark:text-white">
-                                {record.deviceType || "Unknown"}
-                              </p>
-                              <p className="text-xs text-slate-500 dark:text-slate-400">
-                                {record.browser || "Unknown browser"}
-                              </p>
-                            </div>
-                          </td>
-                          <td className="px-4 py-4 font-mono text-xs text-slate-500 dark:text-slate-400">
-                            {record.ipAddress || "Unknown"}
-                          </td>
-                          <td className="px-4 py-4 text-slate-600 dark:text-slate-300">
-                            {record.source || "Unknown"}
-                          </td>
-                          <td className="px-4 py-4 text-slate-600 dark:text-slate-300">
-                            {formatDate(record.createdAt)}
-                          </td>
-                          <td className="px-4 py-4">
-                            <button
-                              type="button"
-                              onClick={() => handleInspectRecord(record.userId)}
-                              className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
-                            >
-                              Inspect
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                <div className="grid gap-4 lg:hidden">
-                  {records.map((record) => (
-                    <article
-                      key={record.id}
-                      className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-slate-800 dark:bg-slate-950/50"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <h3 className="font-semibold text-slate-900 dark:text-white">
+        <section className="rounded-3xl border border-slate-200 bg-white/95 p-4 shadow-lg shadow-slate-900/5 dark:border-slate-800 dark:bg-slate-900/85 dark:shadow-black/20 md:p-6">
+          {loading ? (
+            <div className="flex min-h-[18rem] items-center justify-center text-sm font-medium text-slate-500 dark:text-slate-400">
+              Loading registration metadata...
+            </div>
+          ) : error ? (
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-200">
+              {error}
+            </div>
+          ) : records.length === 0 ? (
+            <div className="flex min-h-[18rem] items-center justify-center text-sm font-medium text-slate-500 dark:text-slate-400">
+              No registration metadata matched the current filters.
+            </div>
+          ) : (
+            <>
+              <div className="hidden overflow-x-auto lg:block">
+                <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
+                  <thead>
+                    <tr className="text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                      <th className="px-4 py-3">User</th>
+                      <th className="px-4 py-3">Location</th>
+                      <th className="px-4 py-3">Device</th>
+                      <th className="px-4 py-3">IP</th>
+                      <th className="px-4 py-3">Source</th>
+                      <th className="px-4 py-3">Registered</th>
+                      <th className="px-4 py-3">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                    {records.map((record) => (
+                      <tr
+                        key={record.id}
+                        className="transition hover:bg-slate-50 dark:hover:bg-slate-950/60"
+                      >
+                        <td className="px-4 py-4">
+                          <p className="font-semibold text-slate-900 dark:text-white">
                             {record.email}
-                          </h3>
-                          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                            {formatLocation(record)}
                           </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleInspectRecord(record.userId)}
-                          className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
-                        >
-                          Inspect
-                        </button>
-                      </div>
-                      <div className="mt-4 grid gap-2 text-sm text-slate-600 dark:text-slate-300">
-                        <p>
-                          <span className="font-semibold text-slate-900 dark:text-white">
-                            Device:
-                          </span>{" "}
-                          {record.deviceType || "Unknown"}
-                        </p>
-                        <p>
-                          <span className="font-semibold text-slate-900 dark:text-white">
-                            Browser:
-                          </span>{" "}
-                          {record.browser || "Unknown"}
-                        </p>
-                        <p>
-                          <span className="font-semibold text-slate-900 dark:text-white">
-                            IP:
-                          </span>{" "}
-                          <span className="font-mono text-xs">
-                            {record.ipAddress || "Unknown"}
-                          </span>
-                        </p>
-                        <p>
-                          <span className="font-semibold text-slate-900 dark:text-white">
-                            Registered:
-                          </span>{" "}
+                          <p className="mt-1 font-mono text-xs text-slate-500 dark:text-slate-400">
+                            {record.userId}
+                          </p>
+                        </td>
+                        <td className="px-4 py-4 text-slate-600 dark:text-slate-300">
+                          {formatLocation(record)}
+                        </td>
+                        <td className="px-4 py-4 text-slate-600 dark:text-slate-300">
+                          <div className="space-y-1">
+                            <p className="font-medium text-slate-900 dark:text-white">
+                              {record.deviceType || "Unknown"}
+                            </p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                              {record.browser || "Unknown browser"}
+                            </p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 font-mono text-xs text-slate-500 dark:text-slate-400">
+                          {record.ipAddress || "Unknown"}
+                        </td>
+                        <td className="px-4 py-4 text-slate-600 dark:text-slate-300">
+                          {getLocationSourceLabel(record.source)}
+                        </td>
+                        <td className="px-4 py-4 text-slate-600 dark:text-slate-300">
                           {formatDate(record.createdAt)}
+                        </td>
+                        <td className="px-4 py-4">
+                          <button
+                            type="button"
+                            onClick={() => handleInspectRecord(record.userId)}
+                            className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                          >
+                            Inspect
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="grid gap-4 lg:hidden">
+                {records.map((record) => (
+                  <article
+                    key={record.id}
+                    className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-slate-800 dark:bg-slate-950/50"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h3 className="font-semibold text-slate-900 dark:text-white">
+                          {record.email}
+                        </h3>
+                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                          {formatLocation(record)}
                         </p>
                       </div>
-                    </article>
-                  ))}
-                </div>
-
-                <div className="mt-6 flex flex-col gap-3 border-t border-slate-200 pt-4 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    Page {meta.page || 1} of {totalPages}
-                  </p>
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      disabled={(meta.page || 1) <= 1 || loading}
-                      onClick={() =>
-                        fetchRecords((meta.page || 1) - 1, filters)
-                      }
-                      className="rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
-                    >
-                      Previous
-                    </button>
-                    <button
-                      type="button"
-                      disabled={(meta.page || 1) >= totalPages || loading}
-                      onClick={() =>
-                        fetchRecords((meta.page || 1) + 1, filters)
-                      }
-                      className="rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
-                    >
-                      Next
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-
-          <aside className="rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-lg shadow-slate-900/5 dark:border-slate-800 dark:bg-slate-900/85 dark:shadow-black/20">
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-              Inspection Details
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">
-              Select a row to inspect the stored signup metadata for that
-              account.
-            </p>
-
-            {selectedRecordLoading ? (
-              <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-400">
-                Loading details...
+                      <button
+                        type="button"
+                        onClick={() => handleInspectRecord(record.userId)}
+                        className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                      >
+                        Inspect
+                      </button>
+                    </div>
+                    <div className="mt-4 grid gap-2 text-sm text-slate-600 dark:text-slate-300">
+                      <p>
+                        <span className="font-semibold text-slate-900 dark:text-white">
+                          Device:
+                        </span>{" "}
+                        {record.deviceType || "Unknown"}
+                      </p>
+                      <p>
+                        <span className="font-semibold text-slate-900 dark:text-white">
+                          Browser:
+                        </span>{" "}
+                        {record.browser || "Unknown"}
+                      </p>
+                      <p>
+                        <span className="font-semibold text-slate-900 dark:text-white">
+                          IP:
+                        </span>{" "}
+                        <span className="font-mono text-xs">
+                          {record.ipAddress || "Unknown"}
+                        </span>
+                      </p>
+                      <p>
+                        <span className="font-semibold text-slate-900 dark:text-white">
+                          Registered:
+                        </span>{" "}
+                        {formatDate(record.createdAt)}
+                      </p>
+                    </div>
+                  </article>
+                ))}
               </div>
-            ) : selectedRecord ? (
-              <div className="mt-6 space-y-4">
-                <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-950/60">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                    Account
-                  </p>
-                  <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">
-                    {selectedRecord.email}
-                  </p>
-                  <p className="mt-1 font-mono text-xs text-slate-500 dark:text-slate-400">
-                    {selectedRecord.userId}
-                  </p>
-                </div>
 
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                      IP Address
-                    </p>
-                    <p className="mt-2 break-all font-mono text-sm text-slate-900 dark:text-white">
-                      {selectedRecord.ipAddress || "Unknown"}
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                      Source
-                    </p>
-                    <p className="mt-2 text-sm text-slate-900 dark:text-white">
-                      {selectedRecord.source || "Unknown"}
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                      Browser
-                    </p>
-                    <p className="mt-2 text-sm text-slate-900 dark:text-white">
-                      {selectedRecord.browser || "Unknown"}
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                      Operating System
-                    </p>
-                    <p className="mt-2 text-sm text-slate-900 dark:text-white">
-                      {selectedRecord.operatingSystem || "Unknown"}
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                      Device Type
-                    </p>
-                    <p className="mt-2 text-sm capitalize text-slate-900 dark:text-white">
-                      {selectedRecord.deviceType || "Unknown"}
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                      Registered At
-                    </p>
-                    <p className="mt-2 text-sm text-slate-900 dark:text-white">
-                      {formatDate(selectedRecord.createdAt)}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                    Approximate Location
-                  </p>
-                  <p className="mt-2 text-sm text-slate-900 dark:text-white">
-                    {formatLocation(selectedRecord)}
-                  </p>
-                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                    {selectedRecord.timezone || "Unknown timezone"}
-                  </p>
-                  {(selectedRecord.latitude || selectedRecord.longitude) && (
-                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                      {selectedRecord.latitude || "?"},{" "}
-                      {selectedRecord.longitude || "?"}
-                    </p>
-                  )}
-                </div>
-
-                <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                    User Agent
-                  </p>
-                  <p className="mt-2 break-all text-sm text-slate-700 dark:text-slate-300">
-                    {selectedRecord.userAgent || "Unknown"}
-                  </p>
+              <div className="mt-6 flex flex-col gap-3 border-t border-slate-200 pt-4 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Page {meta.page || 1} of {totalPages}
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    disabled={(meta.page || 1) <= 1 || loading}
+                    onClick={() => fetchRecords((meta.page || 1) - 1, filters)}
+                    className="rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    type="button"
+                    disabled={(meta.page || 1) >= totalPages || loading}
+                    onClick={() => fetchRecords((meta.page || 1) + 1, filters)}
+                    className="rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                  >
+                    Next
+                  </button>
                 </div>
               </div>
-            ) : (
-              <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-5 text-sm leading-6 text-slate-500 dark:border-slate-700 dark:bg-slate-950/50 dark:text-slate-400">
-                No record selected yet. Use Inspect on any entry to review its
-                full metadata snapshot.
-              </div>
-            )}
-          </aside>
+            </>
+          )}
         </section>
+
+        {isInspectionModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4 py-6 backdrop-blur-sm">
+            <div className="max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900">
+              <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5 dark:border-slate-800">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                    Inspection Details
+                  </h2>
+                  <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">
+                    Review the stored signup metadata for this account.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCloseInspectionModal}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                  aria-label="Close inspection details"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="max-h-[calc(90vh-5.5rem)] overflow-y-auto px-6 py-6">
+                {selectedRecordLoading ? (
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-400">
+                    Loading details...
+                  </div>
+                ) : selectedRecord ? (
+                  <div className="space-y-4">
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-950/60">
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                        Account
+                      </p>
+                      <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">
+                        {selectedRecord.email}
+                      </p>
+                      <p className="mt-1 font-mono text-xs text-slate-500 dark:text-slate-400">
+                        {selectedRecord.userId}
+                      </p>
+                    </div>
+
+                    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                      <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                          IP Address
+                        </p>
+                        <p className="mt-2 break-all font-mono text-sm text-slate-900 dark:text-white">
+                          {selectedRecord.ipAddress || "Unknown"}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                          Source
+                        </p>
+                        <p className="mt-2 text-sm text-slate-900 dark:text-white">
+                          {getLocationSourceLabel(selectedRecord.source)}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                          Browser
+                        </p>
+                        <p className="mt-2 text-sm text-slate-900 dark:text-white">
+                          {selectedRecord.browser || "Unknown"}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                          Operating System
+                        </p>
+                        <p className="mt-2 text-sm text-slate-900 dark:text-white">
+                          {selectedRecord.operatingSystem || "Unknown"}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                          Device Type
+                        </p>
+                        <p className="mt-2 text-sm capitalize text-slate-900 dark:text-white">
+                          {selectedRecord.deviceType || "Unknown"}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                          Registered At
+                        </p>
+                        <p className="mt-2 text-sm text-slate-900 dark:text-white">
+                          {formatDate(selectedRecord.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                        Approximate Location
+                      </p>
+                      <span
+                        className={`mt-3 inline-flex rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${locationSignal.className}`}
+                      >
+                        {locationSignal.label}
+                      </span>
+                      <p className="mt-2 text-sm text-slate-900 dark:text-white">
+                        {formatLocation(selectedRecord)}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                        {selectedRecord.timezone || "Unknown timezone"}
+                      </p>
+                      <p className="mt-2 text-xs leading-6 text-slate-500 dark:text-slate-400">
+                        {selectedRecord?.source === "browser-geolocation"
+                          ? "This record includes consented browser geolocation, which is typically the most accurate location signal available during signup."
+                          : "This is a security signal, not a verified physical address. It is typically inferred from network or provider metadata and may only be accurate at country, region, or city level."}
+                      </p>
+                      {formatAccuracy(
+                        selectedRecord?.locationAccuracyMeters,
+                      ) && (
+                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                          Reported accuracy:{" "}
+                          {formatAccuracy(
+                            selectedRecord.locationAccuracyMeters,
+                          )}
+                        </p>
+                      )}
+                      {selectedRecord?.preciseLocationCapturedAt && (
+                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                          Captured at:{" "}
+                          {formatDate(selectedRecord.preciseLocationCapturedAt)}
+                        </p>
+                      )}
+                      {(selectedRecord.latitude ||
+                        selectedRecord.longitude) && (
+                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                          {selectedRecord.latitude || "?"},{" "}
+                          {selectedRecord.longitude || "?"}
+                        </p>
+                      )}
+
+                      {selectedRecordMap ? (
+                        <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800">
+                          <LocationMap
+                            record={selectedRecord}
+                            coordinates={selectedRecordMapCoordinates}
+                          />
+                          <div className="flex items-center justify-between gap-3 border-t border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-400">
+                            <span>
+                              {isDerivedMapPreview
+                                ? "Map preview derived from the stored city, region, and country because this record does not include saved coordinates."
+                                : selectedRecord?.source ===
+                                    "browser-geolocation"
+                                  ? "Map preview using the precise browser geolocation stored with this registration record."
+                                  : "Map preview using the coordinates stored with this registration record."}
+                            </span>
+                            <a
+                              href={selectedRecordMap.externalUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="rounded-full border border-sky-300 bg-white px-3 py-1.5 font-semibold text-sky-700 transition hover:border-sky-400 hover:bg-sky-50 hover:text-sky-800 dark:border-sky-500/30 dark:bg-slate-900 dark:text-sky-300 dark:hover:border-sky-400/50 dark:hover:bg-slate-800"
+                            >
+                              Open in Maps
+                            </a>
+                          </div>
+                        </div>
+                      ) : derivedCoordinatesLoading ? (
+                        <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-500 dark:border-slate-800 dark:bg-slate-950/50 dark:text-slate-400">
+                          Resolving a map preview from the stored approximate
+                          location...
+                        </div>
+                      ) : (
+                        <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-3 text-xs leading-6 text-slate-500 dark:border-slate-700 dark:bg-slate-950/50 dark:text-slate-400">
+                          No stored coordinates are available for this record,
+                          and the approximate city or region could not be
+                          resolved into a map preview.
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                        User Agent
+                      </p>
+                      <p className="mt-2 break-all text-sm text-slate-700 dark:text-slate-300">
+                        {selectedRecord.userAgent || "Unknown"}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-5 text-sm leading-6 text-slate-500 dark:border-slate-700 dark:bg-slate-950/50 dark:text-slate-400">
+                    No record selected yet. Use Inspect on any entry to review
+                    its full metadata snapshot.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

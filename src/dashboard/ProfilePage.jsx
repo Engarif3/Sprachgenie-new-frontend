@@ -259,7 +259,7 @@ const ProfilePage = () => {
     event.preventDefault();
     if (!isValidContactNumberLength(formState.phoneNumber)) {
       setShowPhoneNumberError(true);
-      toast.error("Phone number must contain between 6 and 15 digits.");
+      toast.error("Phone number must contain between 8 and 15 digits.");
       return;
     }
 
