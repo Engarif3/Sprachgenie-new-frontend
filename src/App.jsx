@@ -161,9 +161,11 @@ import DarkVeil from "./View/Home/DarkVeil";
 import Loader from "./utils/Loader";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Swal from "sweetalert2";
-import { storeUserInfo, getUserInfo } from "./services/auth.services";
+import { syncCurrentUser } from "./services/auth.services";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import { LanguageProvider } from "./context/LanguageContext";
+
+const AUTH_SYNC_INTERVAL_MS = 60000;
 
 const AppContent = () => {
   const location = useLocation();
@@ -207,30 +209,39 @@ const AppContent = () => {
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
+
     const initializeAuth = async () => {
-      if (getUserInfo()) {
-        setIsAuthLoading(false);
-        return;
-      }
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_API_URL}/auth/me`,
-          {
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-          },
-        );
-        if (response.ok) {
-          const data = await response.json();
-          if (data?.data) storeUserInfo(data.data);
-        }
-      } catch (error) {
-        console.error("Auth check failed:", error.message);
-      } finally {
+      await syncCurrentUser();
+
+      if (isMounted) {
         setIsAuthLoading(false);
       }
     };
+
+    const syncVisibleSession = async () => {
+      if (document.visibilityState !== "visible") {
+        return;
+      }
+
+      await syncCurrentUser();
+    };
+
     initializeAuth();
+
+    const intervalId = window.setInterval(
+      syncVisibleSession,
+      AUTH_SYNC_INTERVAL_MS,
+    );
+    window.addEventListener("focus", syncVisibleSession);
+    document.addEventListener("visibilitychange", syncVisibleSession);
+
+    return () => {
+      isMounted = false;
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", syncVisibleSession);
+      document.removeEventListener("visibilitychange", syncVisibleSession);
+    };
   }, [location.pathname]);
 
   if (isAuthLoading) return <LoaderFullScreen />;

@@ -1,10 +1,11 @@
 // src/pages/DashboardHome.jsx
 import React from "react";
 import { Link } from "react-router-dom";
-import { getUserInfo } from "../services/auth.services";
+import { useAuth } from "../services/auth.services";
 
 const DashboardHome = () => {
-  const userInfo = getUserInfo() || {};
+  const { userInfo: authUserInfo } = useAuth();
+  const userInfo = authUserInfo || {};
 
   const quickLinks = [
     {

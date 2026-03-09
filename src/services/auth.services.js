@@ -1,14 +1,35 @@
 import api from "../axios";
+import { useSyncExternalStore } from "react";
 
 // ✅ NO localStorage needed - tokens in httpOnly cookies
 // User info will come from API calls, not from decoding client-side tokens
 
 let cachedUserInfo = null;
+const authListeners = new Set();
+
+const notifyAuthListeners = () => {
+  authListeners.forEach((listener) => listener());
+};
+
+const setCachedUserInfo = (userInfo) => {
+  cachedUserInfo = userInfo;
+  notifyAuthListeners();
+  return cachedUserInfo;
+};
+
+const subscribeToAuthStore = (listener) => {
+  authListeners.add(listener);
+
+  return () => {
+    authListeners.delete(listener);
+  };
+};
+
+const getAuthSnapshot = () => cachedUserInfo;
 
 export const storeUserInfo = (userInfo) => {
   // ✅ Store user metadata in memory (not token)
-  cachedUserInfo = userInfo;
-  return userInfo;
+  return setCachedUserInfo(userInfo);
 };
 
 export const getUserInfo = () => {
@@ -21,14 +42,67 @@ export const isLoggedIn = () => {
   return !!cachedUserInfo;
 };
 
+export const clearUserInfo = () => {
+  setCachedUserInfo(null);
+};
+
+export const useAuth = () => {
+  const userInfo = useSyncExternalStore(
+    subscribeToAuthStore,
+    getAuthSnapshot,
+    getAuthSnapshot,
+  );
+
+  return {
+    userInfo,
+    isLoggedIn: !!userInfo,
+  };
+};
+
+export const syncCurrentUser = async ({ preserveOnFailure = true } = {}) => {
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_BACKEND_API_URL}/auth/me`,
+      {
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      return data?.data ? storeUserInfo(data.data) : setCachedUserInfo(null);
+    }
+
+    if (response.status === 401 || response.status === 403) {
+      clearUserInfo();
+      return null;
+    }
+
+    if (!preserveOnFailure) {
+      clearUserInfo();
+    }
+
+    return cachedUserInfo;
+  } catch (error) {
+    if (!preserveOnFailure) {
+      clearUserInfo();
+    }
+
+    return preserveOnFailure ? cachedUserInfo : null;
+  }
+};
+
 export const removeUser = async () => {
   // ✅ Call logout endpoint to clear httpOnly cookies
   try {
     await api.post("/auth/logout", {}, { withCredentials: true });
-    cachedUserInfo = null;
   } catch (error) {
     console.error("Logout error:", error);
-    cachedUserInfo = null;
+  } finally {
+    clearUserInfo();
   }
 };
 

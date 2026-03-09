@@ -4,7 +4,7 @@ import CircularText from "./CircularText";
 import SplashCursor from "./SplashCursor";
 import SplitText from "./SplitText";
 import Marquee from "react-fast-marquee";
-import { isLoggedIn } from "../../services/auth.services";
+import { useAuth } from "../../services/auth.services";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Contact from "./Contact";
@@ -13,7 +13,7 @@ import { useTheme } from "../../context/ThemeContext";
 import ScrollStack, { ScrollStackItem } from "./ScrollStack";
 
 const Home = () => {
-  const userLoggedIn = isLoggedIn();
+  const { isLoggedIn: userLoggedIn } = useAuth();
   const [visibleSections, setVisibleSections] = useState(new Set());
   const { t } = useTranslation("home");
   const { theme } = useTheme();

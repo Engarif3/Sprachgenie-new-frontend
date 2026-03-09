@@ -5,7 +5,7 @@ import { useMap } from "react-leaflet/hooks";
 import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "../axios";
-import { getUserInfo } from "../services/auth.services";
+import { useAuth } from "../services/auth.services";
 
 const GEOCODING_ENDPOINT = "https://nominatim.openstreetmap.org/search";
 
@@ -207,7 +207,8 @@ const LocationMap = ({ record, coordinates }) => {
 };
 
 const AdminRegistrationMetadataPage = () => {
-  const userInfo = getUserInfo() || {};
+  const { userInfo: authUserInfo } = useAuth();
+  const userInfo = authUserInfo || {};
   const role = userInfo?.role;
   const canAccess = role === "admin" || role === "super_admin";
 

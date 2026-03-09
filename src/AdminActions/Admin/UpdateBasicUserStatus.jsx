@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import Container from "../../utils/Container";
-import { getUserInfo, isLoggedIn } from "../../services/auth.services";
+import {
+  removeUser,
+  syncCurrentUser,
+  useAuth,
+} from "../../services/auth.services";
 import { useNavigate } from "react-router-dom";
 import api from "../../axios";
 import { ScaleLoader } from "react-spinners";
@@ -10,17 +14,8 @@ import { dateTimeFormatter } from "../../utils/formatDateTime";
 import Pagination from "../AdminPaginationForUsers";
 
 const UpdateBasicUserStatus = () => {
-  const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo() || {};
-
-  // Security check: Only allow admin/super_admin users
-  if (
-    !userLoggedIn ||
-    !userInfo.id ||
-    (userInfo.role !== "admin" && userInfo.role !== "super_admin")
-  ) {
-    return <Navigate to="/" replace />;
-  }
+  const { userInfo: authUserInfo, isLoggedIn: userLoggedIn } = useAuth();
+  const userInfo = authUserInfo || {};
   const [basicUsers, setBasicUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -29,6 +24,10 @@ const UpdateBasicUserStatus = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   const navigate = useNavigate();
+  const canManageBasicUsers =
+    userLoggedIn &&
+    userInfo.id &&
+    (userInfo.role === "admin" || userInfo.role === "super_admin");
 
   const fetchUsers = async (page, status, limit = 50) => {
     try {
@@ -59,10 +58,50 @@ const UpdateBasicUserStatus = () => {
   useEffect(() => {
     if (userInfo?.role === "admin") {
       fetchUsers(page, selectedStatus);
-    } else {
-      navigate("/");
     }
-  }, [page, selectedStatus]);
+  }, [page, selectedStatus, userInfo?.role]);
+
+  const handleSelfSessionRefresh = async (affectedUserId) => {
+    if (affectedUserId !== userInfo.id) {
+      return false;
+    }
+
+    const refreshedUser = await syncCurrentUser({ preserveOnFailure: false });
+
+    if (!refreshedUser) {
+      await Swal.fire({
+        icon: "info",
+        title: "Session updated",
+        text: "Your permissions changed. Please sign in again.",
+      });
+      await removeUser();
+      navigate("/login", { replace: true });
+      return true;
+    }
+
+    if (refreshedUser.role === "super_admin") {
+      await Swal.fire({
+        icon: "info",
+        title: "Permissions updated",
+        text: "You are now a super admin. Redirecting to your dashboard tools.",
+      });
+      navigate("/dashboard/update-user-status", { replace: true });
+      return true;
+    }
+
+    if (refreshedUser.role !== "admin") {
+      await Swal.fire({
+        icon: "info",
+        title: "Logged out",
+        text: "Your admin access was removed. Please sign in again.",
+      });
+      await removeUser();
+      navigate("/login", { replace: true });
+      return true;
+    }
+
+    return false;
+  };
 
   const handleStatusChange = (userId, newStatus) => {
     Swal.fire({
@@ -77,7 +116,7 @@ const UpdateBasicUserStatus = () => {
             status: newStatus,
             performedById: userInfo.id,
           })
-          .then((response) => {
+          .then(async (response) => {
             if (response.data.success) {
               setBasicUsers((prevUsers) =>
                 prevUsers.map((user) =>
@@ -91,6 +130,8 @@ const UpdateBasicUserStatus = () => {
                 timer: 1000,
                 showConfirmButton: false,
               });
+
+              await handleSelfSessionRefresh(userId);
             } else {
               Swal.fire("Failed", "Failed to update user status", "error");
             }
@@ -106,6 +147,10 @@ const UpdateBasicUserStatus = () => {
   //   const handlePrevPage = () => setPage((prev) => Math.max(prev - 1, 1));
   //   const handleNextPage = () =>
   //     setPage((prev) => Math.min(prev + 1, totalPages));
+
+  if (!canManageBasicUsers) {
+    return <Navigate to="/" replace />;
+  }
 
   if (error) return <div>{error}</div>;
 

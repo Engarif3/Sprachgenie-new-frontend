@@ -1,5 +1,5 @@
 import { Link, Navigate, Outlet, NavLink } from "react-router-dom";
-import { getUserInfo } from "../services/auth.services";
+import { useAuth } from "../services/auth.services";
 import Container from "../utils/Container";
 import { useState } from "react";
 import { IoClose, IoMenu } from "react-icons/io5";
@@ -15,6 +15,18 @@ const getUserInitials = (name, email) => {
   return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
 };
 
+const formatRoleLabel = (role) => {
+  if (!role) {
+    return "User";
+  }
+
+  return role
+    .split("_")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+};
+
 const DashboardLayout = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
@@ -23,8 +35,8 @@ const DashboardLayout = () => {
     analytics: false,
   });
 
-  const userInfo = getUserInfo() || {};
-  const role = userInfo.role;
+  const { userInfo } = useAuth();
+  const role = userInfo?.role;
 
   const toggleSection = (section) => {
     setExpandedSections((prev) => ({
@@ -33,7 +45,7 @@ const DashboardLayout = () => {
     }));
   };
 
-  if (!userInfo) {
+  if (!userInfo?.id) {
     return <Navigate to="/login" replace />;
   }
 
@@ -366,7 +378,7 @@ const DashboardLayout = () => {
                     {userInfo?.name || "User"}
                   </p>
                   <p className="mt-1 text-xs capitalize text-slate-500 dark:text-slate-400">
-                    {role || "user"}
+                    {formatRoleLabel(role)}
                   </p>
                 </div>
               </div>

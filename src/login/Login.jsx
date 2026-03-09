@@ -121,7 +121,7 @@ import { validationSchema } from "./validation";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { userLogin } from "../services/actions/userLogin";
-import { storeUserInfo } from "../services/auth.services";
+import { syncCurrentUser } from "../services/auth.services";
 import DarkVeil from "../View/Home/DarkVeil";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import AuthHomeLink from "../components/auth/AuthHomeLink";
@@ -175,10 +175,9 @@ const Login = () => {
         toast.success(res.message || "Login successful");
 
         // ✅ Fetch user info from /auth/me
-        const userInfo = await fetchUserInfo();
+        const userInfo = await syncCurrentUser({ preserveOnFailure: false });
 
         if (userInfo) {
-          storeUserInfo(userInfo);
           navigate("/");
         } else {
           setError("Failed to fetch user information");
@@ -204,31 +203,6 @@ const Login = () => {
       submittingRef.current = false;
     }
   };
-
-  // Fetch user info from a protected endpoint
-  const fetchUserInfo = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/auth/me`,
-        {
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      if (!response.ok) {
-        return null;
-      }
-
-      const data = await response.json();
-      return data?.data || null;
-    } catch (error) {
-      return null;
-    }
-  };
-
   return (
     <div className="relative min-h-screen flex items-center justify-center px-3">
       {/* DarkVeil fullscreen background */}

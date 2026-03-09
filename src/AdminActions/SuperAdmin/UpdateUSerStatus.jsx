@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import Container from "../../utils/Container";
-import { getUserInfo, isLoggedIn } from "../../services/auth.services";
+import {
+  removeUser,
+  syncCurrentUser,
+  useAuth,
+} from "../../services/auth.services";
 import { useNavigate } from "react-router-dom";
 import api from "../../axios";
 import { ScaleLoader } from "react-spinners";
@@ -10,13 +14,8 @@ import { dateTimeFormatter } from "../../utils/formatDateTime";
 import Pagination from "../AdminPaginationForUsers";
 
 const UpdateUserStatus = () => {
-  const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo() || {};
-
-  // Security check: Only allow super_admin users
-  if (!userLoggedIn || !userInfo.id || userInfo.role !== "super_admin") {
-    return <Navigate to="/" replace />;
-  }
+  const { userInfo: authUserInfo, isLoggedIn: userLoggedIn } = useAuth();
+  const userInfo = authUserInfo || {};
   const [admins, setAdmins] = useState([]);
   const [basicUsers, setBasicUsers] = useState([]);
   const [loadingAdmins, setLoadingAdmins] = useState(true);
@@ -33,6 +32,8 @@ const UpdateUserStatus = () => {
   const [activeTab, setActiveTab] = useState("users");
 
   const navigate = useNavigate();
+  const canManageUsers =
+    userLoggedIn && userInfo.id && userInfo.role === "super_admin";
 
   // Fetch Admins
   const fetchAdmins = async (page = 1, limit = 50) => {
@@ -89,10 +90,50 @@ const UpdateUserStatus = () => {
     if (userInfo?.role === "super_admin") {
       fetchAdmins(adminPage);
       fetchBasicUsers(basicPage, selectedStatus);
-    } else {
-      navigate("/");
     }
-  }, [adminPage, basicPage, selectedStatus]);
+  }, [adminPage, basicPage, selectedStatus, userInfo?.role]);
+
+  const handleSelfSessionRefresh = async (affectedUserId) => {
+    if (affectedUserId !== userInfo.id) {
+      return false;
+    }
+
+    const refreshedUser = await syncCurrentUser({ preserveOnFailure: false });
+
+    if (!refreshedUser) {
+      await Swal.fire({
+        icon: "info",
+        title: "Session updated",
+        text: "Your permissions changed. Please sign in again.",
+      });
+      await removeUser();
+      navigate("/login", { replace: true });
+      return true;
+    }
+
+    if (refreshedUser.role === "admin") {
+      await Swal.fire({
+        icon: "info",
+        title: "Permissions updated",
+        text: "You are now an admin. Redirecting to your dashboard tools.",
+      });
+      navigate("/dashboard/update-basic-user-status", { replace: true });
+      return true;
+    }
+
+    if (refreshedUser.role !== "super_admin") {
+      await Swal.fire({
+        icon: "info",
+        title: "Logged out",
+        text: "Your admin access was removed. Please sign in again.",
+      });
+      await removeUser();
+      navigate("/login", { replace: true });
+      return true;
+    }
+
+    return false;
+  };
 
   // Handle status change
   const handleStatusChange = (userId, newStatus) => {
@@ -108,7 +149,7 @@ const UpdateUserStatus = () => {
             status: newStatus,
             performedById: userInfo.id,
           })
-          .then((response) => {
+          .then(async (response) => {
             if (response.data.success) {
               setAdmins((prev) =>
                 prev.map((u) =>
@@ -128,6 +169,8 @@ const UpdateUserStatus = () => {
                 timer: 1000,
                 showConfirmButton: false,
               });
+
+              await handleSelfSessionRefresh(userId);
             } else {
               Swal.fire("Failed", "Failed to update status", "error");
             }
@@ -220,7 +263,7 @@ const UpdateUserStatus = () => {
             role: newRole,
             performedById: userInfo.id,
           })
-          .then((response) => {
+          .then(async (response) => {
             if (response.data.success) {
               const updatedUser = { ...response.data.data, role: newRole };
 
@@ -247,6 +290,8 @@ const UpdateUserStatus = () => {
                 timer: 1000,
                 showConfirmButton: false,
               });
+
+              await handleSelfSessionRefresh(userId);
             } else {
               Swal.fire("Failed", "Failed to update role", "error");
             }
@@ -255,6 +300,10 @@ const UpdateUserStatus = () => {
       }
     });
   };
+
+  if (!canManageUsers) {
+    return <Navigate to="/" replace />;
+  }
 
   if (error) return <div>{error}</div>;
 

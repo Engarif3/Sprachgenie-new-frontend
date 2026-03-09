@@ -28,7 +28,7 @@
 // export default AuthButton;
 
 import { toast } from "sonner";
-import { getUserInfo, removeUser } from "../../../services/auth.services";
+import { removeUser, useAuth } from "../../../services/auth.services";
 import { Link, useNavigate } from "react-router-dom";
 import { startTransition } from "react";
 import { useTranslation } from "react-i18next";
@@ -40,7 +40,7 @@ const AuthButton = ({
   onLogoutComplete,
 }) => {
   const { t } = useTranslation("common");
-  const userInfo = getUserInfo();
+  const { userInfo } = useAuth();
   const navigate = useNavigate();
   const showLoggedInActions = userInfo?.id && !forceLoggedOutView;
 
