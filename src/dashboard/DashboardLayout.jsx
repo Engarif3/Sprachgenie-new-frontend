@@ -4,6 +4,17 @@ import Container from "../utils/Container";
 import { useState } from "react";
 import { IoClose, IoMenu } from "react-icons/io5";
 
+const getUserInitials = (name, email) => {
+  const source = (name || email || "User").trim();
+  const parts = source.split(/\s+/).filter(Boolean);
+
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+
+  return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
+};
+
 const DashboardLayout = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
@@ -27,59 +38,71 @@ const DashboardLayout = () => {
   }
 
   const navItemClass = (isActive) =>
-    `flex items-center gap-3 py-3 px-4 rounded-lg text-sm md:text-sm transition-all duration-300 font-medium relative group ${
+    `group relative flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-medium transition-all duration-300 ${
       isActive
-        ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
-        : "text-gray-300 hover:bg-gray-800/50 hover:text-white"
+        ? "border-sky-500/30 bg-gradient-to-r from-slate-900 to-sky-700 text-white shadow-lg shadow-sky-900/20 dark:border-sky-500/20 dark:from-sky-600 dark:to-blue-700"
+        : "border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:border-slate-800 dark:hover:bg-white/5 dark:hover:text-white"
     }`;
 
   const sectionHeaderClass =
-    "flex items-center justify-between py-3 px-4 hover:bg-gray-800/30 rounded-lg cursor-pointer text-sm md:text-sm font-semibold text-gray-200 transition-all duration-300";
+    "flex cursor-pointer items-center justify-between rounded-2xl border border-transparent px-4 py-3 text-sm font-semibold text-slate-700 transition-all duration-300 hover:border-slate-200 hover:bg-slate-100 dark:text-slate-200 dark:hover:border-slate-800 dark:hover:bg-white/5";
 
   return (
     <Container>
-      <div className="flex min-h-screen mb-12">
-        {/* Mobile Toggle Button */}
+      <div className="mb-12 flex min-h-screen">
         <button
-          className="fixed top-20 left-4 z-50 md:hidden lg:hidden bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white p-2.5 rounded-lg shadow-lg transition-all duration-300 hover:scale-110"
+          className="fixed left-4 top-20 z-50 rounded-2xl border border-sky-500/30 bg-white/95 p-2.5 text-slate-900 shadow-lg shadow-slate-900/10 transition-all duration-300 hover:scale-105 hover:bg-slate-100 dark:border-sky-500/20 dark:bg-slate-900/95 dark:text-white dark:hover:bg-slate-800 md:hidden lg:hidden"
           onClick={() => setIsOpen(!isOpen)}
           title={isOpen ? "Close menu" : "Open menu"}
         >
           {isOpen ? <IoClose size={24} /> : <IoMenu size={24} />}
         </button>
 
-        {/* Mobile Overlay */}
         {isOpen && (
           <div
-            className="fixed inset-0 bg-black/50 md:hidden lg:hidden z-30"
+            className="fixed inset-0 z-30 bg-slate-950/45 backdrop-blur-[2px] md:hidden lg:hidden"
             onClick={() => setIsOpen(false)}
           />
         )}
 
-        {/* Sidebar Drawer */}
         <aside
-          className={`fixed md:static h-screen overflow-y-auto w-64 text-white flex flex-col bg-gradient-to-b from-gray-900 to-gray-950 border-r border-gray-800/50 shadow-2xl z-40 transform transition-all duration-300 ease-out ${
+          className={`fixed z-40 flex h-screen w-72 flex-col overflow-y-auto border-r border-slate-200/80 bg-white/95 text-slate-900 shadow-2xl shadow-slate-900/10 backdrop-blur-xl transition-all duration-300 ease-out dark:border-slate-800/70 dark:bg-gradient-to-b dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 dark:text-white dark:shadow-black/30 md:static ${
             isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
           }`}
         >
-          {/* Sidebar Header */}
-          <div className="sticky top-0 bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950/50 px-6 py-5 border-b border-gray-800/50 backdrop-blur-md">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                <span className="text-lg font-bold"></span>
+          <div className="sticky top-0 border-b border-slate-200/80 bg-white/90 px-6 py-5 backdrop-blur-md dark:border-slate-800/60 dark:bg-slate-900/90">
+            <div className="mb-2 flex items-center gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-500 via-blue-500 to-indigo-600 text-sm font-bold text-white shadow-lg shadow-sky-900/20 dark:border-sky-500/20">
+                {userInfo?.profilePhoto ? (
+                  <img
+                    src={userInfo.profilePhoto}
+                    alt={userInfo?.name || "Profile"}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span>
+                    {getUserInitials(userInfo?.name, userInfo?.email)}
+                  </span>
+                )}
               </div>
               <div>
-                <h2 className="text-lg font-bold text-white">Dashboard</h2>
-                <p className="text-xs text-gray-400 font-medium">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                  Dashboard
+                </h2>
+                <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                   Control Panel
                 </p>
               </div>
             </div>
+            <div className="rounded-2xl border border-sky-100 bg-sky-50/80 px-3 py-2 text-xs font-medium text-slate-600 dark:border-sky-500/10 dark:bg-sky-500/10 dark:text-slate-300">
+              Signed in as{" "}
+              <span className="font-semibold text-sky-700 dark:text-sky-300">
+                {userInfo?.name || "User"}
+              </span>
+            </div>
           </div>
 
-          {/* Sidebar Navigation */}
-          <nav className="flex-1 px-4 py-5 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800">
-            {/* Overview Link */}
+          <nav className="flex-1 space-y-1 overflow-y-auto px-4 py-5 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent dark:scrollbar-thumb-slate-700">
             <NavLink
               to="/dashboard"
               end
@@ -90,13 +113,22 @@ const DashboardLayout = () => {
               <span className="text-lg">🏠</span>
               <span>Overview</span>
               {expandedSections.admin === false && (
-                <span className="absolute right-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="absolute right-3 text-xs opacity-0 transition-opacity group-hover:opacity-100">
                   →
                 </span>
               )}
             </NavLink>
 
-            {/* Favorites Link */}
+            <NavLink
+              to="/dashboard/profile"
+              className={({ isActive }) => navItemClass(isActive)}
+              onClick={() => setIsOpen(false)}
+              title="Manage Your Profile"
+            >
+              <span className="text-lg">👤</span>
+              <span>Profile</span>
+            </NavLink>
+
             <NavLink
               to="/dashboard/favorites-words"
               className={({ isActive }) => navItemClass(isActive)}
@@ -107,15 +139,15 @@ const DashboardLayout = () => {
               <span>Favorites</span>
             </NavLink>
 
-            {/* Admin Sections */}
             {(role === "admin" || role === "super_admin") && (
               <>
-                {/* Divider */}
                 <div className="my-4 px-2">
-                  <div className="h-px bg-gradient-to-r from-gray-700/0 via-gray-700/50 to-gray-700/0" />
+                  <div className="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent dark:via-slate-700/50" />
                 </div>
+                <p className="px-4 pb-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400 dark:text-slate-500">
+                  Management
+                </p>
 
-                {/* Admin Section */}
                 <div
                   onClick={() => toggleSection("admin")}
                   className={sectionHeaderClass}
@@ -135,7 +167,7 @@ const DashboardLayout = () => {
                   </span>
                 </div>
                 {expandedSections.admin && (
-                  <div className="pl-4 py-2 space-y-1 border-l border-gray-700/50 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="ml-3 space-y-1 border-l border-slate-200 py-2 pl-4 animate-in fade-in slide-in-from-top-2 duration-200 dark:border-slate-700/60">
                     {role === "super_admin" && (
                       <>
                         <NavLink
@@ -169,7 +201,6 @@ const DashboardLayout = () => {
                   </div>
                 )}
 
-                {/* Content Management Section */}
                 <div
                   onClick={() => toggleSection("content")}
                   className={sectionHeaderClass}
@@ -189,7 +220,7 @@ const DashboardLayout = () => {
                   </span>
                 </div>
                 {expandedSections.content && (
-                  <div className="pl-4 py-2 space-y-1 border-l border-gray-700/50 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="ml-3 space-y-1 border-l border-slate-200 py-2 pl-4 animate-in fade-in slide-in-from-top-2 duration-200 dark:border-slate-700/60">
                     <NavLink
                       to="/dashboard/create-word"
                       className={({ isActive }) => navItemClass(isActive)}
@@ -225,7 +256,6 @@ const DashboardLayout = () => {
                   </div>
                 )}
 
-                {/* Analytics Section */}
                 <div
                   onClick={() => toggleSection("analytics")}
                   className={sectionHeaderClass}
@@ -245,7 +275,15 @@ const DashboardLayout = () => {
                   </span>
                 </div>
                 {expandedSections.analytics && (
-                  <div className="pl-4 py-2 space-y-1 border-l border-gray-700/50 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="ml-3 space-y-1 border-l border-slate-200 py-2 pl-4 animate-in fade-in slide-in-from-top-2 duration-200 dark:border-slate-700/60">
+                    <NavLink
+                      to="/dashboard/registration-metadata"
+                      className={({ isActive }) => navItemClass(isActive)}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>🛡️</span>
+                      <span>Registration Signals</span>
+                    </NavLink>
                     <NavLink
                       to="/dashboard/users-favorite-count"
                       className={({ isActive }) => navItemClass(isActive)}
@@ -289,9 +327,8 @@ const DashboardLayout = () => {
                   </div>
                 )}
 
-                {/* System Status Section */}
                 <div className="my-4 px-2">
-                  <div className="h-px bg-gradient-to-r from-gray-700/0 via-gray-700/50 to-gray-700/0" />
+                  <div className="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent dark:via-slate-700/50" />
                 </div>
                 <NavLink
                   to="/dashboard/system-status"
@@ -305,25 +342,40 @@ const DashboardLayout = () => {
             )}
           </nav>
 
-          {/* Sidebar Footer */}
-          <div className="sticky bottom-0 px-4 py-4 bg-gradient-to-t from-gray-950 to-gray-950/50 border-t border-gray-800/50 backdrop-blur-md">
-            <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-lg py-3 px-3 hover:border-blue-500/50 transition-colors duration-300">
-              {/* <p className="text-xs font-semibold text-gray-300 mb-1">
-                User Profile
-              </p> */}
-              <p className="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 truncate">
-                {userInfo?.name || "User"}
-              </p>
-              <p className="text-xs text-gray-500 mt-1 capitalize">
-                {role || "user"}
-              </p>
+          <div className="sticky bottom-0 border-t border-slate-200/80 bg-white/90 px-4 py-4 backdrop-blur-md dark:border-slate-800/60 dark:bg-slate-950/90">
+            <div className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 to-sky-50/70 px-3 py-3 transition-colors duration-300 hover:border-sky-300/60 dark:border-sky-500/20 dark:from-sky-500/10 dark:to-indigo-500/10">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-sky-200 bg-gradient-to-br from-sky-500 to-indigo-600 text-sm font-bold text-white shadow-md dark:border-sky-500/20">
+                  {userInfo?.profilePhoto ? (
+                    <img
+                      src={userInfo.profilePhoto}
+                      alt={userInfo?.name || "Profile"}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span>
+                      {getUserInitials(userInfo?.name, userInfo?.email)}
+                    </span>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-300">
+                    User Profile
+                  </p>
+                  <p className="truncate bg-gradient-to-r from-sky-600 to-indigo-600 bg-clip-text text-sm font-bold text-transparent dark:from-sky-300 dark:to-indigo-300">
+                    {userInfo?.name || "User"}
+                  </p>
+                  <p className="mt-1 text-xs capitalize text-slate-500 dark:text-slate-400">
+                    {role || "user"}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </aside>
 
-        {/* Main Content Area */}
         <main
-          className="flex-1 pl-0 md:pl-6 lg:pl-6 overflow-y-auto mt-16 md:mt-0 lg:mt-0 transition-all duration-300"
+          className="mt-16 flex-1 overflow-y-auto pl-0 transition-all duration-300 md:mt-0 md:pl-6 lg:pl-6"
           onClick={() => setIsOpen(false)}
         >
           <Outlet />

@@ -62,7 +62,11 @@ const UsersFavoriteCount = lazy(
 );
 const DashboardLayout = lazy(() => import("../dashboard/DashboardLayout"));
 const DashboardHome = lazy(() => import("../dashboard/DashboardHome"));
+const ProfilePage = lazy(() => import("../dashboard/ProfilePage"));
 const AdminVisitorsPage = lazy(() => import("../dashboard/AdminVisitorsPage"));
+const AdminRegistrationMetadataPage = lazy(
+  () => import("../dashboard/AdminRegistrationMetadataPage"),
+);
 const FavoritesListDashboard = lazy(
   () => import("../View/Words/Favorite/FavoritesListDashboard"),
 );
@@ -125,7 +129,11 @@ const StoriesWithSuspense = withSuspense(Stories);
 const UsersFavoriteCountWithSuspense = withSuspense(UsersFavoriteCount);
 const DashboardLayoutWithSuspense = withSuspense(DashboardLayout);
 const DashboardHomeWithSuspense = withSuspense(DashboardHome);
+const ProfilePageWithSuspense = withSuspense(ProfilePage);
 const AdminVisitorsPageWithSuspense = withSuspense(AdminVisitorsPage);
+const AdminRegistrationMetadataPageWithSuspense = withSuspense(
+  AdminRegistrationMetadataPage,
+);
 const FavoritesListDashboardWithSuspense = withSuspense(FavoritesListDashboard);
 const BackendWithSuspense = withSuspense(Backend);
 const GlobalLimitsWithSuspense = withSuspense(GlobalLimits);
@@ -213,8 +221,16 @@ export const router = createBrowserRouter(
           children: [
             { index: true, element: <DashboardHomeWithSuspense /> },
             {
+              path: "profile",
+              element: <ProfilePageWithSuspense />,
+            },
+            {
               path: "visitors",
               element: <AdminVisitorsPageWithSuspense />,
+            },
+            {
+              path: "registration-metadata",
+              element: <AdminRegistrationMetadataPageWithSuspense />,
             },
             {
               path: "favorites-words",

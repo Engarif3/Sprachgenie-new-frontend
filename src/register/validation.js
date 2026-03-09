@@ -46,9 +46,13 @@ export const validationSchema = z
       .regex(/[0-9]/, "Password must contain at least one number")
       .regex(
         /[-!@#$%^&*(),.?":{}|<>]/,
-        "Password must include at least one special character"
+        "Password must include at least one special character",
       ),
     confirmPassword: z.string().min(10, "Please confirm your password"),
+    privacyAcknowledged: z.boolean().refine((value) => value === true, {
+      message:
+        "Please confirm that you understand the security and privacy notice.",
+    }),
     basicUser: UserValidationSchema,
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -60,6 +64,7 @@ export const validationSchema = z
 export const defaultValues = {
   password: "",
   confirmPassword: "",
+  privacyAcknowledged: false,
   basicUser: {
     name: "",
     email: "",

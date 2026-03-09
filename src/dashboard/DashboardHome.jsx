@@ -8,6 +8,13 @@ const DashboardHome = () => {
 
   const quickLinks = [
     {
+      icon: "👤",
+      title: "Profile Settings",
+      description: "Update your information and profile image",
+      link: "/dashboard/profile",
+      gradient: "from-cyan-500 to-blue-500",
+    },
+    {
       icon: "❤️",
       title: "Favorite Words",
       description: "View and manage your saved vocabulary",
@@ -31,7 +38,7 @@ const DashboardHome = () => {
       admin: true,
     },
     {
-      icon: "�",
+      icon: "📖",
       title: "Generate Story",
       description: "Create AI-powered German stories",
       link: "/dashboard/generate-story",
@@ -47,7 +54,15 @@ const DashboardHome = () => {
       admin: true,
     },
     {
-      icon: "�👥",
+      icon: "🛡️",
+      title: "Registration Signals",
+      description: "Review signup IP, device, and location metadata",
+      link: "/dashboard/registration-metadata",
+      gradient: "from-emerald-500 to-teal-500",
+      admin: true,
+    },
+    {
+      icon: "👥",
       title: "Manage Users",
       description: "Control user access and permissions",
       link:

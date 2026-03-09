@@ -4,7 +4,6 @@ import Swal from "sweetalert2";
 import AuthButton from "../components/UI/AuthButton/AuthButton";
 import { getUserInfo, isLoggedIn } from "../services/auth.services";
 import { FaBook, FaHome, FaSun, FaMoon } from "react-icons/fa";
-import { MdDashboard } from "react-icons/md";
 import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
@@ -12,23 +11,37 @@ import { useTranslation } from "react-i18next";
 import Container from "../utils/Container";
 import ENFlag from "../assets/EN.svg";
 import DEFlag from "../assets/DE.svg";
+import ShareSiteModal from "./ShareSiteModal";
+
+const getUserInitials = (name, email) => {
+  const source = (name || email || "User").trim();
+  const parts = source.split(/\s+/).filter(Boolean);
+
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+
+  return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
+};
 
 const NavBar = () => {
   const { t } = useTranslation("common");
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const userLoggedIn = isLoggedIn();
   const userInfo = getUserInfo() || {};
   const menuRef = useRef(null);
   const toggleRef = useRef(null);
+  const profileMenuRef = useRef(null);
+  const profileToggleRef = useRef(null);
   const { theme, toggleTheme } = useTheme();
   const { language, toggleLanguage } = useLanguage();
 
-  // Close menu if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // if click is outside both menu and toggle button -> close
       if (
         menuRef.current &&
         !menuRef.current.contains(event.target) &&
@@ -37,9 +50,18 @@ const NavBar = () => {
       ) {
         setIsMenuOpen(false);
       }
+
+      if (
+        profileMenuRef.current &&
+        !profileMenuRef.current.contains(event.target) &&
+        profileToggleRef.current &&
+        !profileToggleRef.current.contains(event.target)
+      ) {
+        setIsProfileMenuOpen(false);
+      }
     };
 
-    if (isMenuOpen) {
+    if (isMenuOpen || isProfileMenuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -48,7 +70,12 @@ const NavBar = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isMenuOpen]);
+  }, [isMenuOpen, isProfileMenuOpen]);
+
+  useEffect(() => {
+    setIsMenuOpen(false);
+    setIsProfileMenuOpen(false);
+  }, [location.pathname]);
 
   const handleCreateTopic = () => {
     Swal.fire({
@@ -157,29 +184,6 @@ const NavBar = () => {
               )}
               {userLoggedIn && (
                 <>
-                  {/* ====pc=== */}
-                  <Link
-                    to="/dashboard"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="group hidden md:flex items-center justify-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 transition-all duration-300"
-                  >
-                    <MdDashboard
-                      size={24}
-                      className="text-sky-500 group-hover:text-sky-500 transition-colors group-hover:animate-bounce"
-                    />
-                    <span className="ml-2 text-xl text-white group-hover:text-sky-400 transition-colors">
-                      {t("navbar.dashboard")}
-                    </span>
-                  </Link>
-                  {/* ====mobile=== */}
-
-                  <Link
-                    to="/dashboard"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="bg-sky-900 text-white font-bold px-6 py-2.5 rounded-full w-full text-center transition-all duration-300 hover:scale-105 shadow-lg  flex justify-center items-center md:hidden lg:hidden"
-                  >
-                    📊 {t("navbar.dashboard")}
-                  </Link>
                   <Link
                     to="/words"
                     onClick={() => setIsMenuOpen(false)}
@@ -357,8 +361,84 @@ const NavBar = () => {
                 </button>
               </div>
 
-              {/* <Link to="/login">Login</Link> */}
-              <AuthButton></AuthButton>
+              <div className="relative flex items-center gap-3">
+                {userLoggedIn && (
+                  <>
+                    <button
+                      ref={profileToggleRef}
+                      type="button"
+                      onClick={() =>
+                        setIsProfileMenuOpen((current) => !current)
+                      }
+                      className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-sky-400/70 bg-gradient-to-br from-sky-500 to-indigo-600 text-sm font-bold text-white shadow-md transition-transform duration-300 hover:scale-105"
+                      title="Open account menu"
+                    >
+                      {userInfo?.profilePhoto ? (
+                        <img
+                          src={userInfo.profilePhoto}
+                          alt={userInfo?.name || "Profile"}
+                          className="h-full w-full rounded-full object-cover"
+                        />
+                      ) : (
+                        <span>
+                          {getUserInitials(userInfo?.name, userInfo?.email)}
+                        </span>
+                      )}
+                    </button>
+
+                    {isProfileMenuOpen && (
+                      <div
+                        ref={profileMenuRef}
+                        className="absolute right-0 top-14 z-30 w-56 overflow-hidden rounded-2xl border border-sky-800/60 bg-gray-900/95 p-2 shadow-2xl backdrop-blur-sm"
+                      >
+                        <div className="border-b border-slate-700/70 px-3 py-2 text-left">
+                          <p className="truncate text-sm font-semibold text-white">
+                            {userInfo?.name}
+                          </p>
+                          <p className="truncate text-xs text-slate-400">
+                            {userInfo?.email}
+                          </p>
+                        </div>
+
+                        <div className="mt-2 flex flex-col gap-1">
+                          <Link
+                            to="/dashboard"
+                            onClick={() => setIsProfileMenuOpen(false)}
+                            className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
+                          >
+                            📊 {t("navbar.dashboard")}
+                          </Link>
+                          <Link
+                            to="/dashboard/profile"
+                            onClick={() => setIsProfileMenuOpen(false)}
+                            className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
+                          >
+                            👤 Profile
+                          </Link>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsProfileMenuOpen(false);
+                              setIsShareModalOpen(true);
+                            }}
+                            className="rounded-xl border border-transparent px-3 py-2 text-left text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
+                          >
+                            🔗 Share with Friends
+                          </button>
+                          <div className="mt-1 flex justify-end border-t border-slate-700/70 pt-2">
+                            <AuthButton
+                              onLogoutComplete={() =>
+                                setIsProfileMenuOpen(false)
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+                <AuthButton hideWhenLoggedIn={userLoggedIn} />
+              </div>
             </div>
           </div>
         </Container>
@@ -373,6 +453,9 @@ const NavBar = () => {
           </p>
         )}
       </div>
+      {isShareModalOpen && (
+        <ShareSiteModal onClose={() => setIsShareModalOpen(false)} />
+      )}
     </>
   );
 };

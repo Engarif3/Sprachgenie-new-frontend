@@ -220,6 +220,42 @@ const Register = () => {
               )}
             </div>
 
+            <div className="rounded-2xl border border-cyan-500/30 bg-cyan-500/10 p-4 text-left">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 text-xl">🛡️</div>
+                <div>
+                  <h3 className="text-sm font-bold text-cyan-200">
+                    Security And Privacy Notice
+                  </h3>
+                  <p className="mt-2 text-xs leading-6 text-gray-300">
+                    To protect accounts and reduce fraud, we record limited
+                    signup metadata such as your IP address, browser, device
+                    type, and approximate location derived from your network.
+                    This data is access-restricted to authorized admins and kept
+                    only for a limited retention period.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <label className="flex items-start gap-3 rounded-2xl border border-gray-700/60 bg-gray-900/40 p-4 text-left transition-all duration-300 hover:border-cyan-500/40">
+              <input
+                {...register("privacyAcknowledged")}
+                type="checkbox"
+                className="mt-1 h-4 w-4 rounded border-gray-500 bg-gray-800 text-cyan-500 focus:ring-2 focus:ring-cyan-500/40"
+              />
+              <span className="text-sm leading-6 text-gray-300">
+                I understand that SprachGenie collects this limited security
+                metadata during registration for abuse prevention and account
+                protection.
+              </span>
+            </label>
+            {errors.privacyAcknowledged && (
+              <p className="text-left text-red-400 text-xs mt-1 flex items-center gap-1">
+                ❌ {errors.privacyAcknowledged.message}
+              </p>
+            )}
+
             {/* Submit */}
             <button
               type="submit"
