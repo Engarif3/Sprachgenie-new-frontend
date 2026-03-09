@@ -11,6 +11,7 @@ const SITE_URL = "https://simplegerman.de";
 const SITE_TITLE = "SimpleGerman";
 const SITE_TEXT = "Learn German with SimpleGerman";
 const FACEBOOK_APP_ID = import.meta.env.VITE_FACEBOOK_APP_ID;
+const MESSENGER_APP_URL = `fb-messenger://share?link=${encodeURIComponent(SITE_URL)}`;
 
 const ShareSiteModal = ({ onClose }) => {
   const encodedShareText = encodeURIComponent(`${SITE_TEXT} ${SITE_URL}`);
@@ -19,17 +20,13 @@ const ShareSiteModal = ({ onClose }) => {
     : null;
 
   const handleMessengerShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: SITE_TITLE,
-          text: SITE_TEXT,
-          url: SITE_URL,
-        });
-        return;
-      } catch (_error) {
-        return;
-      }
+    const isMobileDevice = /android|iphone|ipad|ipod/i.test(
+      navigator.userAgent,
+    );
+
+    if (isMobileDevice) {
+      window.location.href = MESSENGER_APP_URL;
+      return;
     }
 
     if (messengerSendDialogUrl) {
@@ -121,14 +118,23 @@ const ShareSiteModal = ({ onClose }) => {
             <FaTelegramPlane size={18} aria-hidden="true" />
             Telegram
           </a>
-          <button
-            type="button"
-            onClick={handleMessengerShare}
+          <a
+            href={MESSENGER_APP_URL}
+            onClick={(event) => {
+              const isMobileDevice = /android|iphone|ipad|ipod/i.test(
+                navigator.userAgent,
+              );
+
+              if (!isMobileDevice) {
+                event.preventDefault();
+                void handleMessengerShare();
+              }
+            }}
             className="flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-indigo-500"
           >
             <FaFacebookMessenger size={18} aria-hidden="true" />
             Messenger
-          </button>
+          </a>
         </div>
       </div>
     </div>

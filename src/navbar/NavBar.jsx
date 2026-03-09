@@ -485,13 +485,23 @@ const NavBar = () => {
         </Container>
       </div>
       <div className="bg-gray-50 dark:bg-transparent">
-        {userLoggedIn && (
-          <p className="text-end mr-24 text-black dark:text-white py-4 ">
+        {userLoggedIn ? (
+          <p className="text-end mr-2 md:mr-24 text-black dark:text-white py-4 ">
             {t("welcome")}{" "}
             <span className="font-semibold text-pink-600 ">
               {userInfo?.name}
             </span>
           </p>
+        ) : (
+          <div className="mr-2 md:mr-24 flex justify-end py-4">
+            <button
+              type="button"
+              onClick={() => setIsShareModalOpen(true)}
+              className="rounded-xl border border-sky-500/40 bg-sky-500/10 p-2 text-sm font-semibold text-sky-700 transition-all duration-200 hover:border-sky-500/70 hover:bg-sky-500/15 hover:text-sky-600 dark:text-sky-300 dark:hover:text-sky-200"
+            >
+              🔗 Share with Friends
+            </button>
+          </div>
         )}
       </div>
       {isShareModalOpen && (
