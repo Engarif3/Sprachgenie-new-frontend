@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-import Container from "../../../utils/Container";
 import axios from "../../../axios";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -408,17 +407,17 @@ const FavoritesListDashboard = () => {
   //   ==============AI===============
 
   return (
-    <Container>
+    <div className="w-full">
       <div className="text-center mb-8">
-        <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-red-400 to-orange-400 mb-3">
+        <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 via-red-400 to-orange-400 mb-3">
           ❤️ Favorite Words
         </h2>
         <div className="inline-flex gap-4 items-center">
           <div className="inline-block px-4 py-1 bg-gradient-to-r from-pink-500/20 to-red-500/20 border border-pink-500/50 rounded-full">
-            <span className="text-sm md:text-2xl lg:text-2xl font-bold text-white">
+            <span className="text-sm md:text-2xl lg:text-2xl font-bold dark:text-white">
               {favoriteWords.length}
             </span>
-            <span className="text-gray-300 ml-2">words saved</span>
+            <span className="dark:text-gray-300 ml-2 ">words saved</span>
           </div>
           {favoriteWords.length > 0 && (
             <button
@@ -438,47 +437,47 @@ const FavoritesListDashboard = () => {
           <span className="loading loading-spinner text-accent w-24 h-24"></span>
         </div>
       ) : (
-        <div className="min-h-screen mb-12">
+        <div className="min-h-screen mb-12 ">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
             setCurrentPage={setCurrentPage}
           />
-          <div className="min-h-screen bg-gradient-to-br from-gray-900/30 via-gray-800/20 to-black/30 rounded-2xl p-1 md:p-4 lg:p-4">
+          <div className="min-h-screen rounded-2xl bg-slate-50/80 p-1 md:p-4 lg:p-4 dark:bg-transparent ">
             <div className="overflow-x-auto">
               {paginatedFavorites.length > 0 ? (
                 <>
                   <div className="flex justify-end items-center mb-4">
-                    <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/50 rounded-full text-green-400 font-semibold">
+                    <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300 bg-gradient-to-r from-emerald-50 to-teal-50 px-4 py-2 font-semibold text-emerald-700 dark:border-green-500/50 dark:from-green-500/20 dark:to-emerald-500/20 dark:text-green-400">
                       <span className="text-xl">👀</span> Showing{" "}
                       {paginatedFavorites.length}
                     </span>
                   </div>
 
-                  <div className="border border-gray-700/50 rounded-2xl shadow-2xl overflow-hidden">
+                  <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-xl dark:border-gray-700/50 dark:shadow-2xl">
                     <table className="w-full border-collapse text-xs sm:text-sm md:text-base">
                       <thead>
-                        <tr className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 text-sm md:text-xl lg:text-xl text-white">
-                          <th className="py-3 text-sm md:text-lg lg:text-lg text-center text-orange-400 font-bold w-[5%] md:w-[3%] lg:w-[3%] rounded-tl-xl border-b border-gray-700">
+                        <tr className="bg-slate-900 text-sm text-white md:text-xl lg:text-xl dark:bg-gradient-to-r dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
+                          <th className="rounded-tl-xl border-b border-l border-slate-200 py-3 text-center text-sm font-bold text-orange-400 md:text-lg lg:text-lg dark:border-gray-700 w-[5%] md:w-[3%] lg:w-[3%]">
                             Article
                           </th>
-                          <th className="border-l py-3 border-gray-700 border-dotted text-center text-blue-400 font-bold w-[15%] md:w-[10%] lg:w-[10%] border-b">
+                          <th className="border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-blue-400 dark:border-gray-700 w-[15%] md:w-[10%] lg:w-[10%]">
                             Word
                           </th>
-                          <th className="border-l py-3 border-gray-700 border-dotted text-center text-purple-400 font-bold w-[10%] md:w-[25%] lg:w-[25%] border-b">
+                          <th className="border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-purple-400 dark:border-gray-700 w-[10%] md:w-[25%] lg:w-[25%]">
                             Meaning
                           </th>
-                          <th className="border-l py-3 border-gray-700 border-dotted text-center text-cyan-400 font-bold hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b">
+                          <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-cyan-400 dark:border-gray-700 md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                             Synonym
                           </th>
-                          <th className="border-l py-3 border-gray-700 border-dotted text-center text-pink-400 font-bold hidden lg:table-cell xl:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b">
+                          <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-pink-400 dark:border-gray-700 lg:table-cell xl:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                             Antonym
                           </th>
-                          <th className="border-l py-3 border-gray-700 border-dotted text-center text-green-400 font-bold hidden lg:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b">
+                          <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-green-400 dark:border-gray-700 lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                             Word to Watch
                           </th>
-                          <th className="border-l py-3 border-dotted border-gray-700 text-sm md:text-lg lg:text-lg text-center text-red-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b rounded-tr-xl">
-                            Remove
+                          <th className="rounded-tr-xl border-b border-l border-dotted border-slate-200 py-3 text-center text-sm font-bold text-red-400 dark:border-gray-700 md:text-lg lg:text-lg w-[3%] md:w-[3%] lg:w-[3%]">
+                            Del
                           </th>
                         </tr>
                       </thead>
@@ -488,17 +487,17 @@ const FavoritesListDashboard = () => {
                             key={word.id}
                             className={`${
                               index % 2 === 0
-                                ? "bg-gray-800/40 hover:bg-gray-800/60"
-                                : "bg-gray-900/40 hover:bg-gray-900/60"
-                            } transition-all duration-300 border-b border-gray-700`}
+                                ? "bg-white hover:bg-sky-50/70 dark:bg-gray-800 dark:hover:bg-gray-700"
+                                : "bg-slate-50/80 hover:bg-sky-50 dark:bg-gray-900 dark:hover:bg-gray-800"
+                            } border-b border-slate-200 transition-all duration-300 dark:border-gray-700`}
                           >
-                            <td className="border border-gray-700 border-dotted p-2 md:p-2 lg:p-2 font-semibold text-orange-400 text-center text-xs md:text-sm lg:text-base">
+                            <td className="border border-slate-200 border-dotted p-2 text-center text-xs font-semibold text-orange-500 dark:border-gray-700 dark:text-orange-400 md:p-2 md:text-sm lg:p-2 lg:text-base">
                               {word.article?.name}
                             </td>
-                            <td className="border border-gray-700 border-dotted p-2 md:p-2 lg:p-2">
+                            <td className="border border-slate-200 border-dotted p-2 dark:border-gray-700 md:p-2 lg:p-2">
                               <div className="flex justify-between items-center">
                                 <span
-                                  className="cursor-pointer text-blue-400 hover:text-blue-300 text-xs md:text-sm lg:text-base font-bold line-clamp-2 hover:line-clamp-none break-words max-w-[80px] md:max-w-full hover:scale-105 transition-all duration-300"
+                                  className="max-w-[80px] cursor-pointer break-words text-xs font-bold text-blue-600 transition-all duration-300 hover:scale-105 hover:text-blue-700 line-clamp-2 hover:line-clamp-none dark:text-blue-400 dark:hover:text-blue-300 md:max-w-full md:text-sm lg:text-base"
                                   onClick={() => openModal(word)}
                                 >
                                   {word.value.charAt(0).toUpperCase() +
@@ -508,14 +507,14 @@ const FavoritesListDashboard = () => {
                                 <div className="flex gap-1 md:gap-2 lg:gap-2">
                                   <button
                                     onClick={() => pronounceWord(word.value)}
-                                    className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 hover:from-blue-500/40 hover:to-cyan-500/40 border border-blue-500/50 text-white px-2 py-1 rounded-full hover:scale-110 transition-all duration-300 shadow-md text-xs md:text-sm"
+                                    className="rounded-full border border-blue-300 bg-gradient-to-r from-blue-50 to-cyan-50 px-2 py-1 text-xs text-blue-700 shadow-sm transition-all duration-300 hover:scale-110 hover:from-blue-100 hover:to-cyan-100 dark:border-blue-500/50 dark:from-blue-500/20 dark:to-cyan-500/20 dark:text-white dark:hover:from-blue-500/40 dark:hover:to-cyan-500/40 md:text-sm"
                                   >
                                     🔊
                                   </button>
 
                                   <div
                                     onClick={() => generateParagraph(word)}
-                                    className="relative bg-gradient-to-r from-green-500/20 to-emerald-500/20 hover:from-green-500 hover:to-emerald-500 border-2 border-green-500/50 hover:border-green-400 text-white italic px-2 py-1 text-sm rounded-full h-7 w-7 cursor-pointer hover:scale-110 transition-all duration-300 shadow-md flex items-center justify-center"
+                                    className="relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 border-emerald-300 bg-gradient-to-r from-emerald-50 to-green-50 px-2 py-1 text-sm italic text-emerald-700 shadow-sm transition-all duration-300 hover:scale-110 hover:border-emerald-400 hover:from-emerald-500 hover:to-green-500 hover:text-white dark:border-green-500/50 dark:from-green-500/20 dark:to-emerald-500/20 dark:text-white dark:hover:border-green-400 dark:hover:from-green-500 dark:hover:to-emerald-500"
                                   >
                                     {loadingParagraphs[word.id] && (
                                       <span className="absolute inset-0 flex items-center justify-center z-10">
@@ -535,12 +534,12 @@ const FavoritesListDashboard = () => {
                                 </div>
                               </div>
                             </td>
-                            <td className="border border-gray-700 border-dotted p-2 md:p-2 lg:p-2">
-                              <span className="text-xs md:text-sm lg:text-base line-clamp-2 hover:line-clamp-none break-words max-w-[120px] md:max-w-full text-white font-medium">
+                            <td className="border border-slate-200 border-dotted p-2 dark:border-gray-700 md:p-2 lg:p-2">
+                              <span className="max-w-[120px] break-words text-xs font-medium text-slate-700 line-clamp-2 hover:line-clamp-none dark:text-white md:max-w-full md:text-sm lg:text-base">
                                 {word.meaning?.join(", ")}
                               </span>
                             </td>
-                            <td className="border border-gray-700 border-dotted p-2 md:p-2 lg:p-2 hidden md:table-cell">
+                            <td className="hidden border border-slate-200 border-dotted p-2 dark:border-gray-700 md:table-cell md:p-2 lg:p-2">
                               <div className="flex flex-wrap gap-1.5">
                                 {word.synonyms?.map((synonym, index) => (
                                   <span
@@ -548,7 +547,7 @@ const FavoritesListDashboard = () => {
                                     onClick={() =>
                                       openWordInModal(synonym.value)
                                     }
-                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-blue-500/20 to-purple-500/20 hover:from-blue-500/40 hover:to-purple-500/40 border border-blue-500/50 rounded-full text-blue-300 text-xs md:text-sm font-semibold cursor-pointer transition-all duration-300 hover:scale-105 shadow-md hover:shadow-blue-500/50"
+                                    className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-blue-300 bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-1.5 text-xs font-semibold text-blue-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-blue-100 hover:to-indigo-100 dark:border-blue-500/50 dark:from-blue-500/20 dark:to-purple-500/20 dark:text-blue-300 dark:hover:from-blue-500/40 dark:hover:to-purple-500/40 dark:hover:shadow-blue-500/50 md:text-sm"
                                   >
                                     {synonym.value}
                                   </span>
@@ -556,7 +555,7 @@ const FavoritesListDashboard = () => {
                               </div>
                             </td>
 
-                            <td className="border border-gray-700 border-dotted p-2 md:p-2 lg:p-2 hidden lg:table-cell">
+                            <td className="hidden border border-slate-200 border-dotted p-2 dark:border-gray-700 lg:table-cell md:p-2 lg:p-2">
                               <div className="flex flex-wrap gap-1.5">
                                 {word.antonyms?.map((antonym, index) => (
                                   <span
@@ -564,14 +563,14 @@ const FavoritesListDashboard = () => {
                                     onClick={() =>
                                       openWordInModal(antonym.value)
                                     }
-                                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-red-500/20 to-pink-500/20 hover:from-red-500/40 hover:to-pink-500/40 border border-red-500/50 rounded-full text-red-300 text-xs md:text-sm font-semibold cursor-pointer transition-all duration-300 hover:scale-105 shadow-md hover:shadow-red-500/50"
+                                    className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-rose-300 bg-gradient-to-r from-rose-50 to-pink-50 px-3 py-1.5 text-xs font-semibold text-rose-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-rose-100 hover:to-pink-100 dark:border-red-500/50 dark:from-red-500/20 dark:to-pink-500/20 dark:text-red-300 dark:hover:from-red-500/40 dark:hover:to-pink-500/40 dark:hover:shadow-red-500/50 md:text-sm"
                                   >
                                     {antonym.value}
                                   </span>
                                 ))}
                               </div>
                             </td>
-                            <td className="border border-gray-700 border-dotted p-2 md:p-2 lg:p-2 hidden lg:table-cell">
+                            <td className="hidden border border-slate-200 border-dotted p-2 dark:border-gray-700 lg:table-cell md:p-2 lg:p-2">
                               <div className="flex flex-wrap gap-1.5">
                                 {word.similarWords?.map(
                                   (similarWord, index) => (
@@ -580,7 +579,7 @@ const FavoritesListDashboard = () => {
                                       onClick={() =>
                                         openWordInModal(similarWord.value)
                                       }
-                                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 hover:from-purple-500/40 hover:to-pink-500/40 border border-purple-500/50 rounded-full text-purple-300 text-xs md:text-sm font-semibold cursor-pointer transition-all duration-300 hover:scale-105 shadow-md hover:shadow-purple-500/50"
+                                      className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-violet-300 bg-gradient-to-r from-violet-50 to-fuchsia-50 px-3 py-1.5 text-xs font-semibold text-violet-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-violet-100 hover:to-fuchsia-100 dark:border-purple-500/50 dark:from-purple-500/20 dark:to-pink-500/20 dark:text-purple-300 dark:hover:from-purple-500/40 dark:hover:to-pink-500/40 dark:hover:shadow-purple-500/50 md:text-sm"
                                     >
                                       {similarWord.value}
                                     </span>
@@ -589,10 +588,10 @@ const FavoritesListDashboard = () => {
                               </div>
                             </td>
 
-                            <td className="border border-gray-700 border-dotted p-2 md:p-2 lg:p-2 text-center">
+                            <td className="border border-slate-200 border-dotted p-2 text-center dark:border-gray-700 md:p-2 lg:p-2">
                               <button
                                 onClick={() => handleRemoveFavorite(word.id)}
-                                className="bg-gradient-to-r from-red-500/20 to-pink-500/20 hover:from-red-600 hover:to-pink-600 border border-red-500/50 text-red-300 hover:text-white font-bold p-2.5 rounded-xl hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-red-500/50"
+                                className="rounded-xl border border-rose-300 bg-gradient-to-r from-rose-50 to-pink-50 p-2.5 font-bold text-rose-700 shadow-sm transition-all duration-300 hover:scale-110 hover:from-red-600 hover:to-pink-600 hover:text-white dark:border-red-500/50 dark:from-red-500/20 dark:to-pink-500/20 dark:text-red-300 dark:shadow-lg dark:hover:shadow-red-500/50"
                               >
                                 <ImBin size={20} />
                               </button>
@@ -605,12 +604,12 @@ const FavoritesListDashboard = () => {
                 </>
               ) : (
                 <div className="min-h-screen flex justify-center items-center">
-                  <div className="text-center bg-gradient-to-br from-gray-800/80 via-gray-900 to-black border-2 border-gray-700/50 rounded-3xl p-12 shadow-2xl">
+                  <div className="rounded-3xl border-2 border-slate-200 bg-white p-12 text-center shadow-xl dark:border-gray-700/50 dark:bg-slate-950 dark:bg-gradient-to-br dark:from-gray-800 dark:via-gray-900 dark:to-black dark:shadow-2xl">
                     <div className="text-6xl mb-6">💔</div>
-                    <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-red-400 mb-4">
+                    <p className="mb-4 bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-2xl font-bold text-transparent dark:from-pink-400 dark:to-red-400">
                       No Favorite Words Yet
                     </p>
-                    <p className="text-gray-300 mb-6">
+                    <p className="mb-6 text-slate-600 dark:text-gray-300">
                       Start building your vocabulary collection!
                     </p>
                     <Link
@@ -708,7 +707,7 @@ const FavoritesListDashboard = () => {
       )}
 
       {/* =================ai modal ===================== */}
-    </Container>
+    </div>
   );
 };
 
