@@ -35,8 +35,10 @@ const NavBar = () => {
   const userInfo = authUserInfo || {};
   const menuRef = useRef(null);
   const toggleRef = useRef(null);
-  const profileMenuRef = useRef(null);
-  const profileToggleRef = useRef(null);
+  const desktopProfileMenuRef = useRef(null);
+  const desktopProfileToggleRef = useRef(null);
+  const mobileProfileMenuRef = useRef(null);
+  const mobileProfileToggleRef = useRef(null);
   const { theme, toggleTheme } = useTheme();
   const { language, toggleLanguage } = useLanguage();
 
@@ -51,12 +53,14 @@ const NavBar = () => {
         setIsMenuOpen(false);
       }
 
-      if (
-        profileMenuRef.current &&
-        !profileMenuRef.current.contains(event.target) &&
-        profileToggleRef.current &&
-        !profileToggleRef.current.contains(event.target)
-      ) {
+      const clickedDesktopProfile =
+        desktopProfileMenuRef.current?.contains(event.target) ||
+        desktopProfileToggleRef.current?.contains(event.target);
+      const clickedMobileProfile =
+        mobileProfileMenuRef.current?.contains(event.target) ||
+        mobileProfileToggleRef.current?.contains(event.target);
+
+      if (!clickedDesktopProfile && !clickedMobileProfile) {
         setIsProfileMenuOpen(false);
       }
     };
@@ -102,6 +106,50 @@ const NavBar = () => {
 
   const isHomePage = location.pathname === "/";
 
+  const renderProfileMenu = (menuRef) => (
+    <div
+      ref={menuRef}
+      className="absolute right-0 top-14 z-30 w-56 overflow-hidden rounded-2xl border border-sky-800/60 bg-gray-900/95 p-2 shadow-2xl backdrop-blur-sm"
+    >
+      <div className="border-b border-slate-700/70 px-3 py-2 text-left">
+        <p className="truncate text-sm font-semibold text-white">
+          {userInfo?.name}
+        </p>
+        <p className="truncate text-xs text-slate-400">{userInfo?.email}</p>
+      </div>
+
+      <div className="mt-2 flex flex-col gap-1">
+        <Link
+          to="/dashboard"
+          onClick={() => setIsProfileMenuOpen(false)}
+          className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
+        >
+          📊 {t("navbar.dashboard")}
+        </Link>
+        <Link
+          to="/dashboard/profile"
+          onClick={() => setIsProfileMenuOpen(false)}
+          className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
+        >
+          👤 Profile
+        </Link>
+        <button
+          type="button"
+          onClick={() => {
+            setIsProfileMenuOpen(false);
+            setIsShareModalOpen(true);
+          }}
+          className="rounded-xl border border-transparent px-3 py-2 text-left text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
+        >
+          🔗 Share with Friends
+        </button>
+        <div className="mt-1 flex justify-end border-t border-slate-700/70 pt-2">
+          <AuthButton onLogoutComplete={() => setIsProfileMenuOpen(false)} />
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <>
       <div className="w-full sticky top-0 z-50 bg-gray-800 dark:bg-gray-950 ">
@@ -110,39 +158,79 @@ const NavBar = () => {
             <div className="h-1 -mt-2 bg-gray-800 dark:bg-gray-950 " />
           )}
           <div
-            className={`flex flex-wrap justify-between items-center py-3 px-2 text-lg font-semibold relative border-b border-slate-800  mt-0 ${
+            className={`flex flex-wrap items-center justify-between py-3 px-2 text-lg font-semibold relative border-b border-slate-800 mt-0 ${
               isHomePage
                 ? "bg-gray-800 dark:bg-gray-950"
                 : "bg-gray-800 dark:bg-gray-950"
             }`}
           >
             {/* Title and Hamburger Menu */}
-            <div className="flex justify-between items-center w-full md:w-auto px-4">
+            <div className="flex min-w-0 flex-1 items-center justify-between gap-2 px-2 md:w-auto md:flex-none md:px-4">
               <Link
-                className="text-3xl mb-1 hover:scale-105 transition-transform"
+                className="mb-1 whitespace-nowrap text-2xl transition-transform hover:scale-105 sm:text-3xl"
                 to="/"
               >
                 <span className="text-orange-600 font-extrabold">Sprach</span>
                 <span className="text-sky-500 font-extrabold">Genie</span>
               </Link>
 
-              {location.pathname !== "/" && (
-                <Link
-                  onClick={() => setIsMenuOpen(false)}
-                  to="/"
-                  className="border border-sky-700 text-white font-bold px-2 py-1 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center md:hidden lg:hidden"
-                >
-                  🏠 {t("navbar.home")}
-                </Link>
-              )}
+              <div className="ml-auto flex items-center md:hidden">
+                <div className="mr-3 flex items-center gap-3">
+                  {location.pathname !== "/" && (
+                    <Link
+                      onClick={() => setIsMenuOpen(false)}
+                      to="/"
+                      className="flex h-9 w-9 items-center justify-center rounded-lg border border-sky-700 text-lg text-white shadow-lg transition-all duration-300 hover:scale-105"
+                      aria-label={t("navbar.home")}
+                      title={t("navbar.home")}
+                    >
+                      <FaHome className="text-sky-400" size={16} />
+                    </Link>
+                  )}
 
-              <button
-                ref={toggleRef}
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="md:hidden   text-sky-400 text-2xl  font-bold px-2 py-0 rounded-lg   shadow-lg border border-sky-700 "
-              >
-                {isMenuOpen ? "✕" : "☰"}
-              </button>
+                  {userLoggedIn && (
+                    <div className="relative">
+                      <button
+                        ref={mobileProfileToggleRef}
+                        type="button"
+                        onClick={() =>
+                          setIsProfileMenuOpen((current) => !current)
+                        }
+                        className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-sky-400/70 bg-gradient-to-br from-sky-500 to-indigo-600 text-xs font-bold text-white shadow-md transition-transform duration-300 hover:scale-105"
+                        title="Open account menu"
+                      >
+                        {userInfo?.profilePhoto ? (
+                          <img
+                            src={userInfo.profilePhoto}
+                            alt={userInfo?.name || "Profile"}
+                            className="h-full w-full rounded-full object-cover"
+                          />
+                        ) : (
+                          <span>
+                            {getUserInitials(userInfo?.name, userInfo?.email)}
+                          </span>
+                        )}
+                      </button>
+
+                      {isProfileMenuOpen &&
+                        renderProfileMenu(mobileProfileMenuRef)}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  ref={toggleRef}
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="rounded-lg border border-sky-700 px-2 py-0 text-2xl font-bold text-sky-400 shadow-lg md:hidden"
+                  aria-label={
+                    isMenuOpen
+                      ? "Close navigation menu"
+                      : "Open navigation menu"
+                  }
+                >
+                  {isMenuOpen ? "✕" : "☰"}
+                </button>
+              </div>
             </div>
             {/* Navigation Links */}
             <div
@@ -361,16 +449,16 @@ const NavBar = () => {
                 </button>
               </div>
 
-              <div className="relative flex items-center gap-3">
+              <div className="relative ml-auto flex items-center gap-2 md:gap-3">
                 {userLoggedIn && (
                   <>
                     <button
-                      ref={profileToggleRef}
+                      ref={desktopProfileToggleRef}
                       type="button"
                       onClick={() =>
                         setIsProfileMenuOpen((current) => !current)
                       }
-                      className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-sky-400/70 bg-gradient-to-br from-sky-500 to-indigo-600 text-sm font-bold text-white shadow-md transition-transform duration-300 hover:scale-105"
+                      className="hidden h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-sky-400/70 bg-gradient-to-br from-sky-500 to-indigo-600 text-sm font-bold text-white shadow-md transition-transform duration-300 hover:scale-105 md:flex"
                       title="Open account menu"
                     >
                       {userInfo?.profilePhoto ? (
@@ -386,55 +474,8 @@ const NavBar = () => {
                       )}
                     </button>
 
-                    {isProfileMenuOpen && (
-                      <div
-                        ref={profileMenuRef}
-                        className="absolute right-0 top-14 z-30 w-56 overflow-hidden rounded-2xl border border-sky-800/60 bg-gray-900/95 p-2 shadow-2xl backdrop-blur-sm"
-                      >
-                        <div className="border-b border-slate-700/70 px-3 py-2 text-left">
-                          <p className="truncate text-sm font-semibold text-white">
-                            {userInfo?.name}
-                          </p>
-                          <p className="truncate text-xs text-slate-400">
-                            {userInfo?.email}
-                          </p>
-                        </div>
-
-                        <div className="mt-2 flex flex-col gap-1">
-                          <Link
-                            to="/dashboard"
-                            onClick={() => setIsProfileMenuOpen(false)}
-                            className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
-                          >
-                            📊 {t("navbar.dashboard")}
-                          </Link>
-                          <Link
-                            to="/dashboard/profile"
-                            onClick={() => setIsProfileMenuOpen(false)}
-                            className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
-                          >
-                            👤 Profile
-                          </Link>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setIsProfileMenuOpen(false);
-                              setIsShareModalOpen(true);
-                            }}
-                            className="rounded-xl border border-transparent px-3 py-2 text-left text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
-                          >
-                            🔗 Share with Friends
-                          </button>
-                          <div className="mt-1 flex justify-end border-t border-slate-700/70 pt-2">
-                            <AuthButton
-                              onLogoutComplete={() =>
-                                setIsProfileMenuOpen(false)
-                              }
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                    {isProfileMenuOpen &&
+                      renderProfileMenu(desktopProfileMenuRef)}
                   </>
                 )}
                 <AuthButton hideWhenLoggedIn={userLoggedIn} />

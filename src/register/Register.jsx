@@ -25,12 +25,12 @@ const NOTICE_COPY = {
   },
   location: {
     en: {
-      title: "Optional Precise Location",
+      title: "Location Sharing",
       body: "This option is enabled by default. If it stays enabled, SprachGenie may ask your browser for your current device location during signup to improve security accuracy. If you deny permission or your browser cannot provide a location, registration still continues with approximate network-based location only.",
       toggleLabel: "German",
     },
     de: {
-      title: "Optionale genaue Standortfreigabe",
+      title: "Standortfreigabe",
       body: "Diese Option ist standardmäßig aktiviert. Wenn sie aktiviert bleibt, kann SprachGenie Ihren Browser während der Registrierung nach Ihrem aktuellen Gerätestandort fragen, um die Sicherheitsgenauigkeit zu verbessern. Wenn Sie die Berechtigung ablehnen oder Ihr Browser keinen Standort liefern kann, wird die Registrierung dennoch nur mit einem ungefähren netzbasierten Standort fortgesetzt.",
       toggleLabel: "English",
     },
@@ -346,10 +346,7 @@ const Register = () => {
                 className="mt-1 h-4 w-4 rounded border-gray-500 bg-gray-800 text-cyan-500 focus:ring-2 focus:ring-cyan-500/40"
               />
               <span className="flex min-w-0 flex-1 items-start justify-between gap-3 text-sm leading-6 text-gray-300">
-                <span>
-                  {" "}
-                  Allow precise location for better results (optional)
-                </span>
+                <span> Allow location for better results (optional)</span>
                 <button
                   type="button"
                   onClick={(event) => {

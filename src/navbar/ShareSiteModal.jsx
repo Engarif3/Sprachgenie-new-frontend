@@ -1,12 +1,49 @@
 import { QRCodeCanvas } from "qrcode.react";
+import {
+  FaFacebookMessenger,
+  FaShareAlt,
+  FaTelegramPlane,
+  FaWhatsapp,
+} from "react-icons/fa";
 import { toast } from "sonner";
 
 const SITE_URL = "https://simplegerman.de";
 const SITE_TITLE = "SimpleGerman";
 const SITE_TEXT = "Learn German with SimpleGerman";
+const FACEBOOK_APP_ID = import.meta.env.VITE_FACEBOOK_APP_ID;
 
 const ShareSiteModal = ({ onClose }) => {
   const encodedShareText = encodeURIComponent(`${SITE_TEXT} ${SITE_URL}`);
+  const messengerSendDialogUrl = FACEBOOK_APP_ID
+    ? `https://www.facebook.com/dialog/send?app_id=${encodeURIComponent(FACEBOOK_APP_ID)}&link=${encodeURIComponent(SITE_URL)}&redirect_uri=${encodeURIComponent(window.location.origin)}`
+    : null;
+
+  const handleMessengerShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: SITE_TITLE,
+          text: SITE_TEXT,
+          url: SITE_URL,
+        });
+        return;
+      } catch (_error) {
+        return;
+      }
+    }
+
+    if (messengerSendDialogUrl) {
+      window.open(messengerSendDialogUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(SITE_URL);
+      toast.success("Link copied. Open Messenger and paste it there.");
+    } catch (_error) {
+      toast.info("Open Messenger and share this link manually.");
+    }
+  };
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -61,34 +98,37 @@ const ShareSiteModal = ({ onClose }) => {
           <button
             type="button"
             onClick={handleShare}
-            className="rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:from-sky-400 hover:to-blue-500"
+            className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:from-sky-400 hover:to-blue-500"
           >
+            <FaShareAlt size={16} aria-hidden="true" />
             Share / Copy Link
           </button>
           <a
             href={`https://wa.me/?text=${encodedShareText}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-2xl bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-green-500"
+            className="flex items-center justify-center gap-2 rounded-2xl bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-green-500"
           >
+            <FaWhatsapp size={18} aria-hidden="true" />
             WhatsApp
           </a>
           <a
             href={`https://t.me/share/url?url=${encodeURIComponent(SITE_URL)}&text=${encodedShareText}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-2xl bg-sky-500 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-sky-400"
+            className="flex items-center justify-center gap-2 rounded-2xl bg-sky-500 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-sky-400"
           >
+            <FaTelegramPlane size={18} aria-hidden="true" />
             Telegram
           </a>
-          <a
-            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-2xl bg-indigo-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-indigo-500"
+          <button
+            type="button"
+            onClick={handleMessengerShare}
+            className="flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-indigo-500"
           >
-            Facebook
-          </a>
+            <FaFacebookMessenger size={18} aria-hidden="true" />
+            Messenger
+          </button>
         </div>
       </div>
     </div>
