@@ -256,11 +256,7 @@ const Register = () => {
                 className="mt-1 h-4 w-4 rounded border-gray-500 bg-gray-800 text-cyan-500 focus:ring-2 focus:ring-cyan-500/40"
               />
               <span className="flex min-w-0 flex-1 items-start justify-between gap-3 text-sm leading-6 text-gray-300">
-                <span>
-                  I understand that SprachGenie collects this limited security
-                  metadata during registration for abuse prevention and account
-                  protection.
-                </span>
+                <span>I understand and agree to the security check.</span>
                 <button
                   type="button"
                   onClick={(event) => {
