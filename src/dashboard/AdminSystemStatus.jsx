@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import api from "../axios";
+
 const HEALTH_ENDPOINTS = [
   { name: "API Server", url: `${import.meta.env.VITE_BACKEND_API_URL}/health` },
   {
@@ -35,15 +37,21 @@ const AdminSystemStatus = () => {
   const [alertHistory, setAlertHistory] = useState([]);
   const [metricsLoading, setMetricsLoading] = useState(true);
 
+  const fetchProtectedResource = async (path, onSuccess, errorMessage) => {
+    try {
+      const response = await api.get(path);
+      onSuccess(response.data?.data);
+      return true;
+    } catch (error) {
+      console.error(errorMessage, error);
+      return false;
+    }
+  };
+
   const fetchUniqueVisitors = async () => {
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/visitors/unique-count`,
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setUniqueVisitors(data.data?.uniqueCount || 0);
-      }
+      const response = await api.get("/visitors/unique-count");
+      setUniqueVisitors(response.data?.data?.uniqueCount || 0);
     } catch (error) {
       console.error("Failed to fetch unique visitors:", error);
     } finally {
@@ -53,13 +61,8 @@ const AdminSystemStatus = () => {
 
   const fetchAnalytics = async () => {
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/visitors/analytics`,
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setAnalytics(data.data || {});
-      }
+      const response = await api.get("/visitors/analytics");
+      setAnalytics(response.data?.data || {});
     } catch (error) {
       console.error("Failed to fetch analytics:", error);
     } finally {
@@ -69,103 +72,59 @@ const AdminSystemStatus = () => {
 
   // New monitoring fetch functions
   const fetchHealthMetrics = async () => {
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/health-metrics`,
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setHealthMetrics(data.data || {});
-      }
-    } catch (error) {
-      console.error("Failed to fetch health metrics:", error);
-    }
+    return fetchProtectedResource(
+      "/health-metrics",
+      (data) => setHealthMetrics(data || {}),
+      "Failed to fetch health metrics:",
+    );
   };
 
   const fetchDatabaseStats = async () => {
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/database-stats`,
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setDatabaseStats(data.data || {});
-      }
-    } catch (error) {
-      console.error("Failed to fetch database stats:", error);
-    }
+    return fetchProtectedResource(
+      "/database-stats",
+      (data) => setDatabaseStats(data || {}),
+      "Failed to fetch database stats:",
+    );
   };
 
   const fetchSystemStats = async () => {
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/system-stats`,
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setSystemStats(data.data || {});
-      }
-    } catch (error) {
-      console.error("Failed to fetch system stats:", error);
-    }
+    return fetchProtectedResource(
+      "/system-stats",
+      (data) => setSystemStats(data || {}),
+      "Failed to fetch system stats:",
+    );
   };
 
   const fetchRateLimitStatus = async () => {
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/rate-limit-status`,
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setRateLimitStatus(data.data || {});
-      }
-    } catch (error) {
-      console.error("Failed to fetch rate limit status:", error);
-    }
+    return fetchProtectedResource(
+      "/rate-limit-status",
+      (data) => setRateLimitStatus(data || {}),
+      "Failed to fetch rate limit status:",
+    );
   };
 
   const fetchErrorLogs = async () => {
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/error-logs`,
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setErrorLogs(data.data?.recent || []);
-      }
-    } catch (error) {
-      console.error("Failed to fetch error logs:", error);
-    }
+    return fetchProtectedResource(
+      "/error-logs",
+      (data) => setErrorLogs(data?.recent || []),
+      "Failed to fetch error logs:",
+    );
   };
 
   const fetchActivityLogs = async () => {
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/activity-logs?limit=20`,
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setActivityLogs(data.data?.recent || []);
-      }
-    } catch (error) {
-      console.error("Failed to fetch activity logs:", error);
-    }
+    return fetchProtectedResource(
+      "/activity-logs?limit=20",
+      (data) => setActivityLogs(data?.recent || []),
+      "Failed to fetch activity logs:",
+    );
   };
 
   const fetchAlertHistory = async () => {
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/alert-history?limit=20`,
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setAlertHistory(data.data?.recent || []);
-      }
-    } catch (error) {
-      console.error("Failed to fetch alert history:", error);
-    } finally {
-      setMetricsLoading(false);
-    }
+    return fetchProtectedResource(
+      "/alert-history?limit=20",
+      (data) => setAlertHistory(data?.recent || []),
+      "Failed to fetch alert history:",
+    );
   };
 
   useEffect(() => {
@@ -185,13 +144,21 @@ const AdminSystemStatus = () => {
     };
 
     const fetchAllMonitoringData = async () => {
-      fetchHealthMetrics();
-      fetchDatabaseStats();
-      fetchSystemStats();
-      fetchRateLimitStatus();
-      fetchErrorLogs();
-      fetchActivityLogs();
-      fetchAlertHistory();
+      setMetricsLoading(true);
+
+      try {
+        await Promise.allSettled([
+          fetchHealthMetrics(),
+          fetchDatabaseStats(),
+          fetchSystemStats(),
+          fetchRateLimitStatus(),
+          fetchErrorLogs(),
+          fetchActivityLogs(),
+          fetchAlertHistory(),
+        ]);
+      } finally {
+        setMetricsLoading(false);
+      }
     };
 
     fetchHealth();
@@ -229,19 +196,7 @@ const AdminSystemStatus = () => {
   // Refresh unique visitors count
   const handleRefreshVisitors = async () => {
     setVisitorsLoading(true);
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/visitors/unique-count`,
-      );
-      if (res.ok) {
-        const data = await res.json();
-        setUniqueVisitors(data.data?.uniqueCount || 0);
-      }
-    } catch (error) {
-      console.error("Failed to refresh visitor count:", error);
-    } finally {
-      setVisitorsLoading(false);
-    }
+    await fetchUniqueVisitors();
   };
 
   return (
@@ -428,21 +383,7 @@ const AdminSystemStatus = () => {
             📊 Visitor Analytics
           </h2>
           <button
-            onClick={() => {
-              setAnalyticsLoading(true);
-              fetch(
-                `${import.meta.env.VITE_BACKEND_API_URL}/visitors/analytics`,
-              )
-                .then((res) => res.json())
-                .then((data) => {
-                  setAnalytics(data.data || {});
-                  setAnalyticsLoading(false);
-                })
-                .catch((err) => {
-                  console.error("Failed:", err);
-                  setAnalyticsLoading(false);
-                });
-            }}
+            onClick={fetchAnalytics}
             disabled={analyticsLoading}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors text-sm"
           >

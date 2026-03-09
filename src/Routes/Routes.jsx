@@ -276,7 +276,11 @@ export const router = createBrowserRouter(
             { path: "get-reports", element: <ReportsByUsersWithSuspense /> },
             {
               path: "system-status",
-              element: <SystemStatusPageWithSuspense />,
+              element: (
+                <ProtectedRoute allowedRoles={["SUPER_ADMIN", "ADMIN"]}>
+                  <SystemStatusPageWithSuspense />
+                </ProtectedRoute>
+              ),
             },
           ],
         },

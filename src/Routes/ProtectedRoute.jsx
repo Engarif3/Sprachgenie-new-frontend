@@ -2,11 +2,19 @@ import { Navigate } from "react-router-dom";
 import { getUserInfo } from "../services/auth.services";
 import { useState, useEffect } from "react";
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, allowedRoles }) => {
   const userInfo = getUserInfo();
 
   if (!userInfo) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (
+    Array.isArray(allowedRoles) &&
+    allowedRoles.length > 0 &&
+    !allowedRoles.includes(userInfo.role)
+  ) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
