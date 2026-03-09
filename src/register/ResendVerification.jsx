@@ -3,6 +3,9 @@ import React, { useState, useEffect } from "react";
 import api from "../axios";
 import DarkVeil from "../View/Home/DarkVeil";
 
+const RESEND_VERIFICATION_COOLDOWN_MINUTES = 5;
+const RESEND_VERIFICATION_STORAGE_KEY = "resendVerificationTimestamp";
+
 const ResendVerification = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState();
@@ -11,11 +14,31 @@ const ResendVerification = () => {
   const [cooldown, setCooldown] = useState(0); // seconds remaining
 
   useEffect(() => {
+    const stored = localStorage.getItem(RESEND_VERIFICATION_STORAGE_KEY);
+
+    if (!stored) {
+      return;
+    }
+
+    const timestamp = parseInt(stored, 10);
+    const now = Date.now();
+    const diff =
+      RESEND_VERIFICATION_COOLDOWN_MINUTES * 60 * 1000 - (now - timestamp);
+
+    if (diff > 0) {
+      setCooldown(Math.ceil(diff / 1000));
+    } else {
+      localStorage.removeItem(RESEND_VERIFICATION_STORAGE_KEY);
+    }
+  }, []);
+
+  useEffect(() => {
     if (cooldown <= 0) return;
     const timer = setInterval(() => {
       setCooldown((c) => {
         if (c <= 1) {
           clearInterval(timer);
+          localStorage.removeItem(RESEND_VERIFICATION_STORAGE_KEY);
           return 0;
         }
         return c - 1;
@@ -40,8 +63,12 @@ const ResendVerification = () => {
       const response = await api.post("/auth/resend-verification", { email });
       // Response shape: { success: boolean, message: string }
       setMessage(response.data?.message || "Check your email.");
-      // Small optimistic cooldown to prevent accidental double clicks
-      setCooldown(10);
+      const timestamp = Date.now();
+      localStorage.setItem(
+        RESEND_VERIFICATION_STORAGE_KEY,
+        timestamp.toString(),
+      );
+      setCooldown(RESEND_VERIFICATION_COOLDOWN_MINUTES * 60);
     } catch (err) {
       // Handle rate limit (429) specially
       if (err?.response?.status === 429) {
@@ -55,7 +82,7 @@ const ResendVerification = () => {
           ? Number(retryAfterSeconds)
           : 3600;
         setError(
-          err.response.data?.message || "Too many attempts. Please try later."
+          err.response.data?.message || "Too many attempts. Please try later.",
         );
         setCooldown(seconds);
         setMessage(null);
@@ -63,7 +90,7 @@ const ResendVerification = () => {
         const apiMessage = err?.response?.data?.message;
         setError(
           apiMessage ||
-            "An error occurred while resending the verification email."
+            "An error occurred while resending the verification email.",
         );
         setMessage(null);
       }
@@ -105,13 +132,18 @@ const ResendVerification = () => {
             {isSending
               ? "Sending..."
               : cooldown > 0
-              ? `Try again in ${formatCooldown(cooldown)}`
-              : "Send"}
+                ? `Try again in ${formatCooldown(cooldown)}`
+                : "Send"}
           </button>
         </p>
         <div className="mt-4">
           {message && <p className="text-green-700 font-semibold">{message}</p>}
           {error && <p className="text-red-600 font-semibold">{error}</p>}
+          {cooldown > 0 && (
+            <p className="mt-3 text-sm text-white">
+              Did not get the email? Try again in {formatCooldown(cooldown)}.
+            </p>
+          )}
         </div>
       </div>
     </div>
