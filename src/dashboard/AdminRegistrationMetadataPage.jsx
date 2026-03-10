@@ -35,8 +35,28 @@ const formatDate = (value) => {
   });
 };
 
+const decodeDisplayValue = (value) => {
+  if (typeof value !== "string") {
+    return value;
+  }
+
+  const normalizedValue = value.replace(/\+/g, " ").trim();
+
+  if (!normalizedValue) {
+    return "";
+  }
+
+  try {
+    return decodeURIComponent(normalizedValue);
+  } catch (_error) {
+    return normalizedValue;
+  }
+};
+
 const formatLocation = (record) => {
-  const parts = [record.city, record.region, record.country].filter(Boolean);
+  const parts = [record.city, record.region, record.country]
+    .map(decodeDisplayValue)
+    .filter(Boolean);
   return parts.length > 0 ? parts.join(", ") : "Unknown";
 };
 
@@ -840,7 +860,8 @@ const AdminRegistrationMetadataPage = () => {
                         {formatLocation(selectedRecord)}
                       </p>
                       <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                        {selectedRecord.timezone || "Unknown timezone"}
+                        {decodeDisplayValue(selectedRecord.timezone) ||
+                          "Unknown timezone"}
                       </p>
                       <p className="mt-2 text-xs leading-6 text-slate-500 dark:text-slate-400">
                         {selectedRecord?.source === "browser-geolocation"
