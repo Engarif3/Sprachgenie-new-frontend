@@ -2,6 +2,24 @@ import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import api from "../axios";
 
+const decodeDisplayValue = (value) => {
+  if (typeof value !== "string") {
+    return value;
+  }
+
+  const normalizedValue = value.replace(/\+/g, " ").trim();
+
+  if (!normalizedValue) {
+    return "";
+  }
+
+  try {
+    return decodeURIComponent(normalizedValue);
+  } catch (_error) {
+    return normalizedValue;
+  }
+};
+
 const getVisitorLocationSourceLabel = (source) => {
   switch (source) {
     case "vercel-headers":
@@ -162,7 +180,7 @@ const AdminVisitorsPage = () => {
 
   // Helper function to get location key
   const getLocationKey = (country, city) =>
-    `${country || "Unknown"}, ${city || "Unknown"}`;
+    `${decodeDisplayValue(country) || "Unknown"}, ${decodeDisplayValue(city) || "Unknown"}`;
 
   // Handle pagination for visitors within a location
   const handleVisitorPageChange = (country, city, newPage) => {
@@ -256,8 +274,8 @@ const AdminVisitorsPage = () => {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-xl font-semibold text-white">
-                      📍 {location.country || "Unknown"},{" "}
-                      {location.city || "Unknown"}
+                      📍 {decodeDisplayValue(location.country) || "Unknown"},{" "}
+                      {decodeDisplayValue(location.city) || "Unknown"}
                     </h3>
                     <p className="text-sm text-gray-400 mt-2">
                       {location.count}{" "}
@@ -269,10 +287,12 @@ const AdminVisitorsPage = () => {
                     </p>
                     <div className="mt-3 flex flex-wrap gap-2 text-xs text-gray-300">
                       <span className="rounded-full border border-gray-700 px-3 py-1">
-                        Region: {location.region || "Unknown"}
+                        Region:{" "}
+                        {decodeDisplayValue(location.region) || "Unknown"}
                       </span>
                       <span className="rounded-full border border-gray-700 px-3 py-1">
-                        Timezone: {location.timezone || "Unknown"}
+                        Timezone:{" "}
+                        {decodeDisplayValue(location.timezone) || "Unknown"}
                       </span>
                       <span className="rounded-full border border-gray-700 px-3 py-1">
                         Total visits: {location.visitCount}
@@ -464,7 +484,7 @@ const AdminVisitorsPage = () => {
               {deleteConfirmation.type === "all" &&
                 "Are you sure you want to delete ALL visitors? This action cannot be undone."}
               {deleteConfirmation.type === "location" &&
-                `Are you sure you want to delete all visitors from ${deleteConfirmation.data?.country}, ${deleteConfirmation.data?.city}? This action cannot be undone.`}
+                `Are you sure you want to delete all visitors from ${decodeDisplayValue(deleteConfirmation.data?.country) || "Unknown"}, ${decodeDisplayValue(deleteConfirmation.data?.city) || "Unknown"}? This action cannot be undone.`}
               {deleteConfirmation.type === "visitor" &&
                 `Are you sure you want to delete visitor ${deleteConfirmation.data?.ipAddress}? This action cannot be undone.`}
             </p>
