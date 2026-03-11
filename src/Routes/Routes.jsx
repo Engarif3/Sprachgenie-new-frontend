@@ -150,6 +150,8 @@ const QuizWithSuspense = withSuspense(Quiz);
 // System Status
 const SystemStatusPage = lazy(() => import("../dashboard/SystemStatusPage"));
 const SystemStatusPageWithSuspense = withSuspense(SystemStatusPage);
+const VisitorsInfoPage = lazy(() => import("../dashboard/VisitorsInfoPage"));
+const VisitorsInfoPageWithSuspense = withSuspense(VisitorsInfoPage);
 
 // Router
 export const router = createBrowserRouter(
@@ -279,6 +281,14 @@ export const router = createBrowserRouter(
               element: (
                 <ProtectedRoute allowedRoles={["SUPER_ADMIN", "ADMIN"]}>
                   <SystemStatusPageWithSuspense />
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: "visitors-info",
+              element: (
+                <ProtectedRoute allowedRoles={["SUPER_ADMIN", "ADMIN"]}>
+                  <VisitorsInfoPageWithSuspense />
                 </ProtectedRoute>
               ),
             },

@@ -20,11 +20,25 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "tailwindcss";
 
+const frontendBuildMetadata = {
+  __APP_VERSION__: JSON.stringify(process.env.npm_package_version || "0.0.0"),
+  __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+  __NETLIFY_CONTEXT__: JSON.stringify(process.env.CONTEXT || "unknown"),
+  __NETLIFY_DEPLOY_URL__: JSON.stringify(
+    process.env.DEPLOY_PRIME_URL || process.env.DEPLOY_URL || "",
+  ),
+  __NETLIFY_BRANCH__: JSON.stringify(
+    process.env.BRANCH || process.env.HEAD || "",
+  ),
+  __NETLIFY_COMMIT_REF__: JSON.stringify(process.env.COMMIT_REF || ""),
+};
+
 export default defineConfig({
   server: {
     port: 5173,
   },
   plugins: [react()],
+  define: frontendBuildMetadata,
   css: {
     postcss: {
       plugins: [tailwindcss()],

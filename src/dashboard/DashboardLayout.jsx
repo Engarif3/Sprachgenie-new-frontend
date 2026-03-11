@@ -350,6 +350,14 @@ const DashboardLayout = () => {
                   <span>🖥️</span>
                   <span>System Status</span>
                 </NavLink>
+                <NavLink
+                  to="/dashboard/visitors-info"
+                  className={({ isActive }) => navItemClass(isActive)}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <span>👥</span>
+                  <span>Visitors Info</span>
+                </NavLink>
               </>
             )}
           </nav>
