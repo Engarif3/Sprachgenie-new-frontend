@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import api from "../axios";
 
+const GEOCODING_ENDPOINT = "https://nominatim.openstreetmap.org/search";
+
 const decodeDisplayValue = (value) => {
   if (typeof value !== "string") {
     return value;
@@ -36,12 +38,69 @@ const getVisitorLocationSourceLabel = (source) => {
 const getRequiredConfirmationText = (type) =>
   type === "all" ? "confirm" : "ok";
 
+const getGoogleMapsUrl = (latitude, longitude) => {
+  if (latitude === null || latitude === undefined) {
+    return null;
+  }
+
+  if (longitude === null || longitude === undefined) {
+    return null;
+  }
+
+  return `https://www.google.com/maps?q=${latitude},${longitude}`;
+};
+
+const getGoogleMapsSearchUrl = (query) => {
+  const normalizedQuery = typeof query === "string" ? query.trim() : "";
+
+  if (!normalizedQuery) {
+    return null;
+  }
+
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(normalizedQuery)}`;
+};
+
+const hasStoredCoordinates = (location) => {
+  if (
+    location?.latitude === null ||
+    location?.latitude === undefined ||
+    location?.latitude === "" ||
+    location?.longitude === null ||
+    location?.longitude === undefined ||
+    location?.longitude === ""
+  ) {
+    return false;
+  }
+
+  const latitude = Number(location?.latitude);
+  const longitude = Number(location?.longitude);
+
+  return Number.isFinite(latitude) && Number.isFinite(longitude);
+};
+
+const buildLocationQuery = (location) => {
+  const parts = [location?.city, location?.region, location?.country]
+    .map(decodeDisplayValue)
+    .filter((value) => value && value !== "Unknown");
+
+  return parts.length > 0 ? parts.join(", ") : "";
+};
+
+const buttonBaseClass =
+  "inline-flex items-center justify-center rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50";
+const primaryButtonClass = `${buttonBaseClass} border-sky-500/40 bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-lg shadow-sky-950/25 hover:-translate-y-0.5 hover:from-sky-400 hover:to-blue-500 hover:shadow-xl hover:shadow-sky-950/35 focus:ring-sky-400/45`;
+const secondaryButtonClass = `${buttonBaseClass} border-slate-700 bg-slate-900/80 text-slate-100 shadow-lg shadow-slate-950/25 hover:-translate-y-0.5 hover:border-slate-500 hover:bg-slate-800 focus:ring-slate-400/30`;
+const dangerButtonClass = `${buttonBaseClass} border-rose-500/45 bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-lg shadow-rose-950/30 hover:-translate-y-0.5 hover:from-rose-500 hover:to-red-500 hover:shadow-xl hover:shadow-rose-950/40 focus:ring-rose-400/45`;
+const ghostDangerButtonClass = `${buttonBaseClass} border-rose-500/30 bg-rose-500/10 text-rose-100 hover:-translate-y-0.5 hover:border-rose-400/55 hover:bg-rose-500/18 hover:text-white focus:ring-rose-400/35`;
+
 const AdminVisitorsPage = () => {
   const [visitorsByLocation, setVisitorsByLocation] = useState([]);
   const [locationLoading, setLocationLoading] = useState(true);
   const [locationPage, setLocationPage] = useState(1);
   const [locationHasMore, setLocationHasMore] = useState(false);
   const [locationTotal, setLocationTotal] = useState(0);
+  const [derivedCoordinatesByLocation, setDerivedCoordinatesByLocation] =
+    useState({});
   const [visitorPages, setVisitorPages] = useState({}); // Track page for each location
   const [deleteConfirmation, setDeleteConfirmation] = useState({
     show: false,
@@ -207,25 +266,124 @@ const AdminVisitorsPage = () => {
     };
   };
 
+  const getLocationMapUrl = (location) => {
+    if (hasStoredCoordinates(location)) {
+      return getGoogleMapsUrl(location.latitude, location.longitude);
+    }
+
+    const locationQuery = buildLocationQuery(location);
+
+    if (locationQuery) {
+      return getGoogleMapsSearchUrl(locationQuery);
+    }
+
+    const derivedCoordinates =
+      derivedCoordinatesByLocation[
+        getLocationKey(location.country, location.city)
+      ];
+
+    return derivedCoordinates
+      ? getGoogleMapsUrl(
+          derivedCoordinates.latitude,
+          derivedCoordinates.longitude,
+        )
+      : null;
+  };
+
   useEffect(() => {
     fetchVisitorsByLocation(1);
   }, []);
 
+  useEffect(() => {
+    if (visitorsByLocation.length === 0) {
+      setDerivedCoordinatesByLocation({});
+      return undefined;
+    }
+
+    const abortController = new AbortController();
+
+    const geocodeLocations = async () => {
+      for (const location of visitorsByLocation) {
+        const locationKey = getLocationKey(location.country, location.city);
+
+        if (hasStoredCoordinates(location)) {
+          continue;
+        }
+
+        if (derivedCoordinatesByLocation[locationKey]) {
+          continue;
+        }
+
+        const locationQuery = buildLocationQuery(location);
+
+        if (!locationQuery) {
+          continue;
+        }
+
+        try {
+          const response = await fetch(
+            `${GEOCODING_ENDPOINT}?format=jsonv2&limit=1&q=${encodeURIComponent(locationQuery)}`,
+            {
+              signal: abortController.signal,
+              headers: {
+                Accept: "application/json",
+              },
+            },
+          );
+
+          if (!response.ok) {
+            continue;
+          }
+
+          const results = await response.json();
+          const firstMatch = Array.isArray(results) ? results[0] : null;
+          const latitude = Number(firstMatch?.lat);
+          const longitude = Number(firstMatch?.lon);
+
+          if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+            continue;
+          }
+
+          setDerivedCoordinatesByLocation((current) => ({
+            ...current,
+            [locationKey]: {
+              latitude,
+              longitude,
+            },
+          }));
+        } catch (error) {
+          if (error.name === "AbortError") {
+            return;
+          }
+        }
+      }
+    };
+
+    void geocodeLocations();
+
+    return () => {
+      abortController.abort();
+    };
+  }, [visitorsByLocation, derivedCoordinatesByLocation]);
+
   return (
-    <div className="bg-gray-950 min-h-screen p-6">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.12),_transparent_30%),linear-gradient(180deg,_#020617_0%,_#0f172a_48%,_#020617_100%)] p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 flex flex-col gap-4 rounded-3xl border border-slate-800/80 bg-slate-950/70 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.45)] backdrop-blur-sm md:flex-row md:items-center md:justify-between md:p-6">
           <div>
-            <h1 className="text-3xl font-bold text-white">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-sky-300/80">
+              Security Analytics
+            </p>
+            <h1 className="mt-2 text-3xl font-bold text-white">
               🌍 Visitors by Location
             </h1>
-            <p className="text-gray-400 mt-2">
+            <p className="mt-2 text-sm text-slate-400">
               Total locations:{" "}
-              <span className="font-bold text-blue-400">{locationTotal}</span>
+              <span className="font-bold text-sky-300">{locationTotal}</span>
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <button
               onClick={() => {
                 setLocationLoading(true);
@@ -233,7 +391,7 @@ const AdminVisitorsPage = () => {
                 fetchVisitorsByLocation(1);
               }}
               disabled={locationLoading}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+              className={primaryButtonClass}
             >
               {locationLoading ? "Refreshing..." : "🔄 Refresh"}
             </button>
@@ -246,7 +404,7 @@ const AdminVisitorsPage = () => {
                   inputValue: "",
                 })
               }
-              className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+              className={dangerButtonClass}
             >
               🗑️ Delete All
             </button>
@@ -269,43 +427,43 @@ const AdminVisitorsPage = () => {
             {visitorsByLocation.map((location, idx) => (
               <div
                 key={idx}
-                className="p-6 bg-gray-900 border border-gray-700 rounded-lg hover:border-gray-600 transition-colors"
+                className="rounded-3xl border border-slate-800/80 bg-slate-950/75 p-6 shadow-[0_18px_50px_rgba(2,6,23,0.35)] transition-all duration-300 hover:border-slate-700 hover:shadow-[0_24px_60px_rgba(2,6,23,0.42)]"
               >
-                <div className="flex justify-between items-start mb-4">
+                <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div>
                     <h3 className="text-xl font-semibold text-white">
                       📍 {decodeDisplayValue(location.country) || "Unknown"},{" "}
                       {decodeDisplayValue(location.city) || "Unknown"}
                     </h3>
-                    <p className="text-sm text-gray-400 mt-2">
+                    <p className="mt-2 text-sm text-slate-400">
                       {location.count}{" "}
                       {location.count === 1 ? "visitor" : "visitors"}
                     </p>
-                    <p className="text-xs text-gray-500 mt-2 leading-6">
+                    <p className="mt-2 text-xs leading-6 text-slate-500">
                       Approximate IP-based location via{" "}
                       {getVisitorLocationSourceLabel(location.source)}.
                     </p>
-                    <div className="mt-3 flex flex-wrap gap-2 text-xs text-gray-300">
-                      <span className="rounded-full border border-gray-700 px-3 py-1">
+                    <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-200">
+                      <span className="rounded-full border border-slate-700/80 bg-slate-900/80 px-3 py-1.5">
                         Region:{" "}
                         {decodeDisplayValue(location.region) || "Unknown"}
                       </span>
-                      <span className="rounded-full border border-gray-700 px-3 py-1">
+                      <span className="rounded-full border border-slate-700/80 bg-slate-900/80 px-3 py-1.5">
                         Timezone:{" "}
                         {decodeDisplayValue(location.timezone) || "Unknown"}
                       </span>
-                      <span className="rounded-full border border-gray-700 px-3 py-1">
+                      <span className="rounded-full border border-slate-700/80 bg-slate-900/80 px-3 py-1.5">
                         Total visits: {location.visitCount}
                       </span>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    {location.latitude && location.longitude && (
+                  <div className="flex flex-wrap gap-2">
+                    {getLocationMapUrl(location) && (
                       <a
-                        href={`https://www.google.com/maps?q=${location.latitude},${location.longitude}`}
+                        href={getLocationMapUrl(location)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-colors"
+                        className={secondaryButtonClass}
                       >
                         View Map ↗
                       </a>
@@ -322,7 +480,7 @@ const AdminVisitorsPage = () => {
                           inputValue: "",
                         })
                       }
-                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-colors"
+                      className={ghostDangerButtonClass}
                     >
                       🗑️ Delete Location
                     </button>
@@ -330,80 +488,102 @@ const AdminVisitorsPage = () => {
                 </div>
 
                 {/* Visitors Table */}
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-gray-300">
-                    <thead className="bg-gray-800 border-b border-gray-700">
-                      <tr>
-                        <th className="px-4 py-3 text-left font-semibold">
-                          IP Address
-                        </th>
-                        <th className="px-4 py-3 text-left font-semibold">
-                          Browser
-                        </th>
-                        <th className="px-4 py-3 text-left font-semibold">
-                          Device
-                        </th>
-                        <th className="px-4 py-3 text-left font-semibold">
-                          OS
-                        </th>
-                        <th className="px-4 py-3 text-left font-semibold">
-                          Visits
-                        </th>
-                        <th className="px-4 py-3 text-left font-semibold">
-                          Visited At
-                        </th>
-                        <th className="px-4 py-3 text-left font-semibold">
-                          Action
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(() => {
-                        const paginationData = getPaginatedVisitors(location);
-                        return paginationData.visitors.map((visitor, vIdx) => (
-                          <tr
-                            key={vIdx}
-                            className="border-b border-gray-700 hover:bg-gray-800/50 transition-colors"
-                          >
-                            <td className="px-4 py-3 font-mono text-gray-400">
-                              {visitor.ipAddress}
-                            </td>
-                            <td className="px-4 py-3">{visitor.browser}</td>
-                            <td className="px-4 py-3">{visitor.deviceType}</td>
-                            <td className="px-4 py-3">
-                              {visitor.operatingSystem}
-                            </td>
-                            <td className="px-4 py-3">{visitor.visitCount}</td>
-                            <td className="px-4 py-3">
-                              {new Date(visitor.visitedAt).toLocaleString()}
-                            </td>
-                            <td className="px-4 py-3">
-                              <button
-                                onClick={() =>
-                                  setDeleteConfirmation({
-                                    show: true,
-                                    type: "visitor",
-                                    data: { ipAddress: visitor.ipAddress },
-                                    inputValue: "",
-                                  })
-                                }
-                                className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded transition-colors"
+                <div className="overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-950/70">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-slate-300">
+                      <thead className="border-b border-slate-800 bg-slate-900/85">
+                        <tr>
+                          <th className="px-4 py-3 text-left font-semibold">
+                            IP Address
+                          </th>
+                          <th className="px-4 py-3 text-left font-semibold">
+                            Browser
+                          </th>
+                          <th className="px-4 py-3 text-left font-semibold">
+                            Device
+                          </th>
+                          <th className="px-4 py-3 text-left font-semibold">
+                            OS
+                          </th>
+                          <th className="px-4 py-3 text-left font-semibold">
+                            Visits
+                          </th>
+                          <th className="px-4 py-3 text-left font-semibold">
+                            Visited At
+                          </th>
+                          <th className="px-4 py-3 text-left font-semibold">
+                            Action
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {(() => {
+                          const paginationData = getPaginatedVisitors(location);
+                          return paginationData.visitors.map(
+                            (visitor, vIdx) => (
+                              <tr
+                                key={vIdx}
+                                className="border-b border-slate-800/80 transition-colors hover:bg-slate-900/70"
                               >
-                                Delete
-                              </button>
-                            </td>
-                          </tr>
-                        ));
-                      })()}
-                    </tbody>
-                  </table>
+                                <td className="px-4 py-3 font-mono text-slate-400">
+                                  {visitor.ipAddress}
+                                </td>
+                                <td className="px-4 py-3">{visitor.browser}</td>
+                                <td className="px-4 py-3">
+                                  {visitor.deviceType}
+                                </td>
+                                <td className="px-4 py-3">
+                                  {visitor.operatingSystem}
+                                </td>
+                                <td className="px-4 py-3">
+                                  {visitor.visitCount}
+                                </td>
+                                <td className="px-4 py-3">
+                                  {new Date(visitor.visitedAt).toLocaleString()}
+                                </td>
+                                <td className="px-4 py-3">
+                                  <div className="flex flex-wrap gap-2">
+                                    {getLocationMapUrl(location) && (
+                                      <a
+                                        href={getLocationMapUrl(location)}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="rounded-lg border border-sky-500/25 bg-sky-500/10 px-3 py-1.5 text-xs font-semibold text-sky-100 transition-all duration-200 hover:border-sky-400/50 hover:bg-sky-500/20 hover:text-white"
+                                      >
+                                        Map
+                                      </a>
+                                    )}
+                                    <button
+                                      onClick={() =>
+                                        setDeleteConfirmation({
+                                          show: true,
+                                          type: "visitor",
+                                          data: {
+                                            ipAddress: visitor.ipAddress,
+                                          },
+                                          inputValue: "",
+                                        })
+                                      }
+                                      className="rounded-lg border border-rose-500/25 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-100 transition-all duration-200 hover:border-rose-400/50 hover:bg-rose-500/20 hover:text-white"
+                                    >
+                                      Delete
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ),
+                          );
+                        })()}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
 
                 {/* Visitor Pagination */}
                 {(() => {
                   const paginationData = getPaginatedVisitors(location);
                   return location.visitors.length > 10 ? (
-                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-700">
+                    <div className="mt-4 flex flex-col gap-3 border-t border-slate-800 pt-4 md:flex-row md:items-center md:justify-between">
                       <button
                         onClick={() =>
                           handleVisitorPageChange(
@@ -413,17 +593,17 @@ const AdminVisitorsPage = () => {
                           )
                         }
                         disabled={!paginationData.hasPrev}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors text-sm"
+                        className={secondaryButtonClass}
                       >
                         ← Previous
                       </button>
-                      <span className="text-gray-300 text-sm font-medium">
+                      <span className="text-sm font-medium text-slate-300">
                         Page{" "}
-                        <span className="text-blue-400 font-bold">
+                        <span className="font-bold text-sky-300">
                           {paginationData.currentPage}
                         </span>{" "}
                         of{" "}
-                        <span className="text-blue-400 font-bold">
+                        <span className="font-bold text-sky-300">
                           {paginationData.totalPages}
                         </span>{" "}
                         ({location.visitors.length} total)
@@ -437,7 +617,7 @@ const AdminVisitorsPage = () => {
                           )
                         }
                         disabled={!paginationData.hasMore}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors text-sm"
+                        className={primaryButtonClass}
                       >
                         Next →
                       </button>
@@ -448,23 +628,23 @@ const AdminVisitorsPage = () => {
             ))}
 
             {/* Pagination Controls */}
-            <div className="flex items-center justify-between mt-6 p-4 bg-gray-900 border border-gray-700 rounded-lg">
+            <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/75 p-4 shadow-[0_18px_40px_rgba(2,6,23,0.3)] md:flex-row md:items-center md:justify-between">
               <button
                 onClick={() => fetchVisitorsByLocation(locationPage - 1)}
                 disabled={locationLoading || locationPage === 1}
-                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+                className={secondaryButtonClass}
               >
                 ← Previous
               </button>
-              <span className="text-gray-300 font-medium text-center flex-1">
+              <span className="flex-1 text-center font-medium text-slate-300">
                 Page{" "}
-                <span className="text-blue-400 font-bold">{locationPage}</span>{" "}
-                • {locationTotal} total locations
+                <span className="font-bold text-sky-300">{locationPage}</span> •{" "}
+                {locationTotal} total locations
               </span>
               <button
                 onClick={() => fetchVisitorsByLocation(locationPage + 1)}
                 disabled={locationLoading || !locationHasMore}
-                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+                className={primaryButtonClass}
               >
                 Next →
               </button>
@@ -475,12 +655,12 @@ const AdminVisitorsPage = () => {
 
       {/* Delete Confirmation Modal */}
       {deleteConfirmation.show && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-900 border border-red-600 rounded-lg p-8 max-w-md w-full mx-4">
-            <h2 className="text-2xl font-bold text-red-400 mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl border border-rose-500/30 bg-slate-950/95 p-8 shadow-[0_28px_80px_rgba(2,6,23,0.6)]">
+            <h2 className="mb-4 text-2xl font-bold text-rose-300">
               ⚠️ Confirm Deletion
             </h2>
-            <p className="text-gray-300 mb-6">
+            <p className="mb-6 text-slate-300">
               {deleteConfirmation.type === "all" &&
                 "Are you sure you want to delete ALL visitors? This action cannot be undone."}
               {deleteConfirmation.type === "location" &&
@@ -496,7 +676,7 @@ const AdminVisitorsPage = () => {
 
                 return (
                   <>
-                    <label className="block text-gray-400 text-sm mb-2">
+                    <label className="mb-2 block text-sm text-slate-400">
                       Type "{requiredInput}" to confirm:
                     </label>
                     <input
@@ -509,7 +689,7 @@ const AdminVisitorsPage = () => {
                         })
                       }
                       placeholder={`Type '${requiredInput}' to confirm`}
-                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-red-500"
+                      className="w-full rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-white transition-all duration-200 focus:border-rose-400/60 focus:outline-none focus:ring-2 focus:ring-rose-400/25"
                       onKeyPress={(e) => {
                         if (
                           e.key === "Enter" &&
@@ -544,7 +724,7 @@ const AdminVisitorsPage = () => {
                     inputValue: "",
                   })
                 }
-                className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+                className={`${secondaryButtonClass} flex-1`}
               >
                 Cancel
               </button>
@@ -565,7 +745,7 @@ const AdminVisitorsPage = () => {
                   deleteConfirmation.inputValue !==
                   getRequiredConfirmationText(deleteConfirmation.type)
                 }
-                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-800 text-white rounded-lg font-medium transition-colors"
+                className={`${dangerButtonClass} flex-1 disabled:from-rose-900 disabled:to-red-900`}
               >
                 Delete
               </button>
