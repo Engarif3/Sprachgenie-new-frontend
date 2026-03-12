@@ -468,12 +468,6 @@ const AdminRegistrationMetadataPage = () => {
               <h1 className="text-3xl font-bold text-slate-900 dark:text-white md:text-4xl">
                 Registration Metadata
               </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 dark:text-slate-300 md:text-base">
-                Review signup device, browser, IP, and location signals used for
-                abuse prevention and account security. Unless explicitly
-                collected from browser geolocation, location data here should be
-                treated as approximate and IP-derived.
-              </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:w-[25rem]">
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950/60">
@@ -496,14 +490,6 @@ const AdminRegistrationMetadataPage = () => {
                 </p>
               </div>
             </div>
-          </div>
-
-          <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50/90 p-4 text-sm leading-6 text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-100">
-            This data is intended for fraud prevention, abuse investigation, and
-            operational security. IP-based locations can be imprecise because
-            VPNs, mobile networks, corporate gateways, and privacy tooling may
-            shift the reported city or region. Avoid exporting or sharing it
-            outside authorized admin workflows.
           </div>
         </section>
 
