@@ -1,7 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "leaflet/dist/leaflet.css";
-import { CircleMarker, MapContainer, Popup, TileLayer } from "react-leaflet";
-import { useMap } from "react-leaflet/hooks";
 import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "../axios";
@@ -77,6 +74,33 @@ const getLocationSourceLabel = (source) => {
       return "Browser geolocation";
     default:
       return source || "Unknown source";
+  }
+};
+
+const formatRoleLabel = (role) => {
+  if (!role) {
+    return "User";
+  }
+
+  return String(role)
+    .split("_")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+};
+
+const getStatusBadgeClass = (status) => {
+  switch (String(status || "").toUpperCase()) {
+    case "ACTIVE":
+      return "border-emerald-300/60 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300";
+    case "PENDING":
+      return "border-amber-300/60 bg-amber-50 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200";
+    case "BLOCKED":
+      return "border-rose-300/60 bg-rose-50 text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-200";
+    case "DELETED":
+      return "border-slate-300/60 bg-slate-100 text-slate-700 dark:border-slate-600/30 dark:bg-slate-800/80 dark:text-slate-200";
+    default:
+      return "border-sky-300/60 bg-sky-50 text-sky-700 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-300";
   }
 };
 
@@ -161,68 +185,30 @@ const getMapUrls = (coordinates) => {
   };
 };
 
-const MapResizer = ({ latitude, longitude }) => {
-  const map = useMap();
-
-  useEffect(() => {
-    const resizeMap = () => {
-      map.invalidateSize();
-      map.setView([latitude, longitude], 11, { animate: false });
-    };
-
-    resizeMap();
-    const timeoutId = window.setTimeout(resizeMap, 150);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [latitude, longitude, map]);
-
-  return null;
-};
-
-const LocationMap = ({ record, coordinates }) => {
-  if (!coordinates) {
+const LocationMap = ({ mapUrls, coordinates, record }) => {
+  if (!coordinates || !mapUrls?.embedUrl) {
     return null;
   }
 
   const { latitude, longitude } = coordinates;
 
   return (
-    <MapContainer
-      key={`${latitude}-${longitude}`}
-      center={[latitude, longitude]}
-      zoom={11}
-      scrollWheelZoom={false}
-      className="h-56 w-full"
-      style={{ minHeight: "14rem" }}
-    >
-      <MapResizer latitude={latitude} longitude={longitude} />
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <CircleMarker
-        center={[latitude, longitude]}
-        radius={10}
-        pathOptions={{
-          color: "#0f172a",
-          weight: 2,
-          fillColor: "#38bdf8",
-          fillOpacity: 0.9,
-        }}
+    <div className="relative h-56 w-full overflow-hidden bg-slate-100 dark:bg-slate-950/60">
+      <iframe
+        key={`${latitude}-${longitude}`}
+        title={
+          record?.source === "browser-geolocation"
+            ? "Precise signup location preview"
+            : "Approximate signup location preview"
+        }
+        src={mapUrls.embedUrl}
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+        className="h-full w-full border-0"
       >
-        <Popup>
-          {record?.source === "browser-geolocation"
-            ? "Precise signup location"
-            : "Approximate signup location"}
-          <br />
-          {formatLocation(record)}
-          <br />
-          {latitude}, {longitude}
-        </Popup>
-      </CircleMarker>
-    </MapContainer>
+        Map preview for {formatLocation(record)} at {latitude}, {longitude}
+      </iframe>
+    </div>
   );
 };
 
@@ -245,6 +231,9 @@ const AdminRegistrationMetadataPage = () => {
   const [error, setError] = useState("");
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [selectedRecordLoading, setSelectedRecordLoading] = useState(false);
+  const [selectedUserProfile, setSelectedUserProfile] = useState(null);
+  const [selectedUserProfileLoading, setSelectedUserProfileLoading] =
+    useState(false);
   const [isInspectionModalOpen, setIsInspectionModalOpen] = useState(false);
   const [derivedCoordinates, setDerivedCoordinates] = useState(null);
   const [derivedCoordinatesLoading, setDerivedCoordinatesLoading] =
@@ -405,10 +394,30 @@ const AdminRegistrationMetadataPage = () => {
   const handleInspectRecord = async (userId) => {
     setIsInspectionModalOpen(true);
     setSelectedRecordLoading(true);
+    setSelectedUserProfileLoading(true);
+    setSelectedRecord(null);
+    setSelectedUserProfile(null);
 
     try {
-      const response = await api.get(`/user/registration-metadata/${userId}`);
-      setSelectedRecord(response.data?.data || null);
+      const [metadataResponse, userResponse] = await Promise.allSettled([
+        api.get(`/user/registration-metadata/${userId}`),
+        api.get(`/user/${userId}`),
+      ]);
+
+      if (metadataResponse.status === "fulfilled") {
+        setSelectedRecord(metadataResponse.value.data?.data || null);
+      } else {
+        throw metadataResponse.reason;
+      }
+
+      if (userResponse.status === "fulfilled") {
+        setSelectedUserProfile(userResponse.value.data?.data || null);
+      } else {
+        console.error(
+          "Failed to load user profile detail:",
+          userResponse.reason,
+        );
+      }
     } catch (requestError) {
       console.error(
         "Failed to load registration metadata detail:",
@@ -421,11 +430,14 @@ const AdminRegistrationMetadataPage = () => {
       });
     } finally {
       setSelectedRecordLoading(false);
+      setSelectedUserProfileLoading(false);
     }
   };
 
   const handleCloseInspectionModal = () => {
     setIsInspectionModalOpen(false);
+    setSelectedRecord(null);
+    setSelectedUserProfile(null);
   };
 
   if (!canAccess) {
@@ -796,6 +808,73 @@ const AdminRegistrationMetadataPage = () => {
                       </p>
                     </div>
 
+                    <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
+                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                            Account Status
+                          </p>
+                          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                            Current account access state for this user.
+                          </p>
+                        </div>
+
+                        {selectedUserProfileLoading ? (
+                          <div className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-500 dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-400">
+                            Loading status...
+                          </div>
+                        ) : null}
+                      </div>
+
+                      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950/60">
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                            Status
+                          </p>
+                          {selectedUserProfile?.status ? (
+                            <span
+                              className={`mt-3 inline-flex rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${getStatusBadgeClass(
+                                selectedUserProfile.status,
+                              )}`}
+                            >
+                              {String(selectedUserProfile.status).toLowerCase()}
+                            </span>
+                          ) : (
+                            <p className="mt-2 text-sm text-slate-900 dark:text-white">
+                              Unknown
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950/60">
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                            Role
+                          </p>
+                          <p className="mt-2 text-sm text-slate-900 dark:text-white">
+                            {formatRoleLabel(selectedUserProfile?.role)}
+                          </p>
+                        </div>
+
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950/60">
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                            Name
+                          </p>
+                          <p className="mt-2 text-sm text-slate-900 dark:text-white">
+                            {selectedUserProfile?.name || "Unknown"}
+                          </p>
+                        </div>
+
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950/60">
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                            Account Created
+                          </p>
+                          <p className="mt-2 text-sm text-slate-900 dark:text-white">
+                            {formatDate(selectedUserProfile?.createdAt)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                       <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
                         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
@@ -895,6 +974,7 @@ const AdminRegistrationMetadataPage = () => {
                       {selectedRecordMap ? (
                         <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800">
                           <LocationMap
+                            mapUrls={selectedRecordMap}
                             record={selectedRecord}
                             coordinates={selectedRecordMapCoordinates}
                           />
