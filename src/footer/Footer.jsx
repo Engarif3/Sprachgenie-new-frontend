@@ -72,7 +72,7 @@ const Footer = () => {
           <div className="hidden md:flex lg:flex justify-center items-center">
             <div>
               <p className="text-white dark:text-gray-400 text-sm font-semibold mb-3">
-                📍 Based in Chemnitz, Germany 🇩🇪
+                Chemnitz, Germany
               </p>
               <p
                 className={`text-xs ${theme === "dark" ? "text-gray-500" : "text-white"} text-center`}
