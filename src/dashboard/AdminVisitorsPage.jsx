@@ -92,8 +92,19 @@ const primaryButtonClass = `${buttonBaseClass} border-sky-500/40 bg-gradient-to-
 const secondaryButtonClass = `${buttonBaseClass} border-slate-700 bg-slate-900/80 text-slate-100 shadow-lg shadow-slate-950/25 hover:-translate-y-0.5 hover:border-slate-500 hover:bg-slate-800 focus:ring-slate-400/30`;
 const dangerButtonClass = `${buttonBaseClass} border-rose-500/45 bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-lg shadow-rose-950/30 hover:-translate-y-0.5 hover:from-rose-500 hover:to-red-500 hover:shadow-xl hover:shadow-rose-950/40 focus:ring-rose-400/45`;
 const ghostDangerButtonClass = `${buttonBaseClass} border-rose-500/30 bg-rose-500/10 text-rose-100 hover:-translate-y-0.5 hover:border-rose-400/55 hover:bg-rose-500/18 hover:text-white focus:ring-rose-400/35`;
+const dashboardTabClass =
+  "inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-sky-400/35";
+const LOCATION_PAGE_SIZE = 20;
+const RECENT_VISITORS_PAGE_SIZE = 20;
+const VISITORS_PER_LOCATION_PAGE = 10;
 
 const AdminVisitorsPage = () => {
+  const [viewMode, setViewMode] = useState("recent");
+  const [recentVisitors, setRecentVisitors] = useState([]);
+  const [recentLoading, setRecentLoading] = useState(true);
+  const [recentPage, setRecentPage] = useState(1);
+  const [recentHasMore, setRecentHasMore] = useState(false);
+  const [recentTotal, setRecentTotal] = useState(0);
   const [visitorsByLocation, setVisitorsByLocation] = useState([]);
   const [locationLoading, setLocationLoading] = useState(true);
   const [locationPage, setLocationPage] = useState(1);
@@ -109,10 +120,34 @@ const AdminVisitorsPage = () => {
     inputValue: "",
   });
 
+  const fetchRecentVisitors = async (page = 1) => {
+    setRecentLoading(true);
+
+    try {
+      const offset = (page - 1) * RECENT_VISITORS_PAGE_SIZE;
+      const res = await api.get(
+        `/visitors/list?limit=${RECENT_VISITORS_PAGE_SIZE}&offset=${offset}`,
+      );
+      const data = res.data?.data || {};
+      const total = data.total || 0;
+
+      setRecentVisitors(data.visitors || []);
+      setRecentTotal(total);
+      setRecentHasMore(offset + RECENT_VISITORS_PAGE_SIZE < total);
+      setRecentPage(page);
+    } catch (error) {
+      console.error("Failed to fetch recent visitors:", error);
+    } finally {
+      setRecentLoading(false);
+    }
+  };
+
   const fetchVisitorsByLocation = async (page = 1) => {
     setLocationLoading(true);
     try {
-      const res = await api.get(`/visitors/by-location?page=${page}&limit=20`);
+      const res = await api.get(
+        `/visitors/by-location?page=${page}&limit=${LOCATION_PAGE_SIZE}`,
+      );
       const data = res.data;
       setVisitorsByLocation(data.data?.locations || []);
       setLocationTotal(data.data?.totalLocations || 0);
@@ -123,6 +158,14 @@ const AdminVisitorsPage = () => {
     } finally {
       setLocationLoading(false);
     }
+  };
+
+  const refreshVisitorData = () => {
+    setRecentPage(1);
+    setLocationPage(1);
+    setVisitorPages({});
+    fetchRecentVisitors(1);
+    fetchVisitorsByLocation(1);
   };
 
   const handleDeleteAll = async () => {
@@ -153,7 +196,7 @@ const AdminVisitorsPage = () => {
           timer: 1500,
           showConfirmButton: false,
         });
-        fetchVisitorsByLocation(1);
+        refreshVisitorData();
       }
     } catch (error) {
       console.error("Delete error:", error);
@@ -191,7 +234,7 @@ const AdminVisitorsPage = () => {
           timer: 1500,
           showConfirmButton: false,
         });
-        fetchVisitorsByLocation(1);
+        refreshVisitorData();
       }
     } catch (error) {
       console.error("Delete error:", error);
@@ -229,7 +272,7 @@ const AdminVisitorsPage = () => {
           timer: 1500,
           showConfirmButton: false,
         });
-        fetchVisitorsByLocation(1);
+        refreshVisitorData();
       }
     } catch (error) {
       console.error("Delete error:", error);
@@ -254,7 +297,7 @@ const AdminVisitorsPage = () => {
   const getPaginatedVisitors = (location) => {
     const key = getLocationKey(location.country, location.city);
     const currentPage = visitorPages[key] || 1;
-    const itemsPerPage = 10;
+    const itemsPerPage = VISITORS_PER_LOCATION_PAGE;
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return {
@@ -290,9 +333,33 @@ const AdminVisitorsPage = () => {
       : null;
   };
 
+  const getRecentVisitorLocationLabel = (visitor) => {
+    const locationParts = [visitor.city, visitor.region, visitor.country]
+      .map(decodeDisplayValue)
+      .filter((value) => value && value !== "Unknown");
+
+    return locationParts.length > 0 ? locationParts.join(", ") : "Unknown";
+  };
+
+  const getRecentVisitorMapUrl = (visitor) => {
+    if (hasStoredCoordinates(visitor)) {
+      return getGoogleMapsUrl(visitor.latitude, visitor.longitude);
+    }
+
+    const locationQuery = buildLocationQuery(visitor);
+
+    return locationQuery ? getGoogleMapsSearchUrl(locationQuery) : null;
+  };
+
   useEffect(() => {
-    fetchVisitorsByLocation(1);
+    fetchRecentVisitors(1);
   }, []);
+
+  useEffect(() => {
+    if (viewMode === "location" && visitorsByLocation.length === 0) {
+      fetchVisitorsByLocation(1);
+    }
+  }, [viewMode, visitorsByLocation.length]);
 
   useEffect(() => {
     if (visitorsByLocation.length === 0) {
@@ -376,24 +443,31 @@ const AdminVisitorsPage = () => {
               Security Analytics
             </p>
             <h1 className="mt-2 text-3xl font-bold text-white">
-              🌍 Visitors by Location
+              👥 Visitors Dashboard
             </h1>
             <p className="mt-2 text-sm text-slate-400">
-              Total locations:{" "}
-              <span className="font-bold text-sky-300">{locationTotal}</span>
+              See the newest visitors first, or switch back to grouped location
+              analysis when you need the broader breakdown.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => {
-                setLocationLoading(true);
+                if (viewMode === "recent") {
+                  setRecentPage(1);
+                  fetchRecentVisitors(1);
+                  return;
+                }
+
                 setLocationPage(1);
                 fetchVisitorsByLocation(1);
               }}
-              disabled={locationLoading}
+              disabled={viewMode === "recent" ? recentLoading : locationLoading}
               className={primaryButtonClass}
             >
-              {locationLoading ? "Refreshing..." : "🔄 Refresh"}
+              {(viewMode === "recent" ? recentLoading : locationLoading)
+                ? "Refreshing..."
+                : "🔄 Refresh"}
             </button>
             <button
               onClick={() =>
@@ -411,8 +485,196 @@ const AdminVisitorsPage = () => {
           </div>
         </div>
 
+        <div className="mb-6 flex flex-wrap gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/75 p-3 shadow-[0_18px_40px_rgba(2,6,23,0.3)]">
+          <button
+            type="button"
+            onClick={() => setViewMode("recent")}
+            className={`${dashboardTabClass} ${
+              viewMode === "recent"
+                ? "border-sky-400/45 bg-sky-500/15 text-sky-100 shadow-lg shadow-sky-950/20"
+                : "border-slate-700 bg-slate-900/80 text-slate-300 hover:border-slate-500 hover:text-white"
+            }`}
+          >
+            Recent Visitors
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("location")}
+            className={`${dashboardTabClass} ${
+              viewMode === "location"
+                ? "border-sky-400/45 bg-sky-500/15 text-sky-100 shadow-lg shadow-sky-950/20"
+                : "border-slate-700 bg-slate-900/80 text-slate-300 hover:border-slate-500 hover:text-white"
+            }`}
+          >
+            Location Groups
+          </button>
+        </div>
+
         {/* Content */}
-        {locationLoading && locationPage === 1 ? (
+        {viewMode === "recent" ? (
+          recentLoading && recentPage === 1 ? (
+            <div className="text-center p-12">
+              <p className="text-gray-400 text-lg">
+                Loading recent visitors...
+              </p>
+            </div>
+          ) : recentVisitors.length === 0 ? (
+            <div className="text-center p-12">
+              <p className="text-gray-400 text-lg">
+                No recent visitor data available yet
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="rounded-3xl border border-slate-800/80 bg-slate-950/75 p-6 shadow-[0_18px_50px_rgba(2,6,23,0.35)]">
+                <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div>
+                    <h2 className="text-xl font-semibold text-white">
+                      Most Recent Visitors
+                    </h2>
+                    <p className="mt-2 text-sm text-slate-400">
+                      Sorted by latest visit time so you can immediately see who
+                      arrived most recently.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2 text-xs text-slate-200">
+                    <span className="rounded-full border border-slate-700/80 bg-slate-900/80 px-3 py-1.5">
+                      Total unique visitors: {recentTotal}
+                    </span>
+                    <span className="rounded-full border border-slate-700/80 bg-slate-900/80 px-3 py-1.5">
+                      Page: {recentPage}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-950/70">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-slate-300">
+                      <thead className="border-b border-slate-800 bg-slate-900/85">
+                        <tr>
+                          <th className="px-4 py-3 text-left font-semibold">
+                            Visited At
+                          </th>
+                          <th className="px-4 py-3 text-left font-semibold">
+                            IP Address
+                          </th>
+                          <th className="px-4 py-3 text-left font-semibold">
+                            Location
+                          </th>
+                          <th className="px-4 py-3 text-left font-semibold">
+                            Browser
+                          </th>
+                          <th className="px-4 py-3 text-left font-semibold">
+                            Device
+                          </th>
+                          <th className="px-4 py-3 text-left font-semibold">
+                            OS
+                          </th>
+                          <th className="px-4 py-3 text-left font-semibold">
+                            Visits
+                          </th>
+                          <th className="px-4 py-3 text-left font-semibold">
+                            Action
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {recentVisitors.map((visitor) => (
+                          <tr
+                            key={visitor.ipAddress}
+                            className="border-b border-slate-800/80 transition-colors hover:bg-slate-900/70"
+                          >
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              {new Date(visitor.visitedAt).toLocaleString()}
+                            </td>
+                            <td className="px-4 py-3 font-mono text-slate-400">
+                              {visitor.ipAddress}
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex flex-col gap-1">
+                                <span className="font-medium text-white">
+                                  {getRecentVisitorLocationLabel(visitor)}
+                                </span>
+                                <span className="text-xs text-slate-500">
+                                  {getVisitorLocationSourceLabel(
+                                    visitor.source,
+                                  )}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-4 py-3">
+                              {decodeDisplayValue(visitor.browser) || "Unknown"}
+                            </td>
+                            <td className="px-4 py-3">
+                              {decodeDisplayValue(visitor.deviceType) ||
+                                "Unknown"}
+                            </td>
+                            <td className="px-4 py-3">
+                              {decodeDisplayValue(visitor.operatingSystem) ||
+                                "Unknown"}
+                            </td>
+                            <td className="px-4 py-3">{visitor.visitCount}</td>
+                            <td className="px-4 py-3">
+                              <div className="flex flex-wrap gap-2">
+                                {getRecentVisitorMapUrl(visitor) && (
+                                  <a
+                                    href={getRecentVisitorMapUrl(visitor)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="rounded-lg border border-sky-500/25 bg-sky-500/10 px-3 py-1.5 text-xs font-semibold text-sky-100 transition-all duration-200 hover:border-sky-400/50 hover:bg-sky-500/20 hover:text-white"
+                                  >
+                                    Map
+                                  </a>
+                                )}
+                                <button
+                                  onClick={() =>
+                                    setDeleteConfirmation({
+                                      show: true,
+                                      type: "visitor",
+                                      data: {
+                                        ipAddress: visitor.ipAddress,
+                                      },
+                                      inputValue: "",
+                                    })
+                                  }
+                                  className="rounded-lg border border-rose-500/25 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-100 transition-all duration-200 hover:border-rose-400/50 hover:bg-rose-500/20 hover:text-white"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex flex-col gap-3 border-t border-slate-800 pt-4 md:flex-row md:items-center md:justify-between">
+                  <button
+                    onClick={() => fetchRecentVisitors(recentPage - 1)}
+                    disabled={recentLoading || recentPage === 1}
+                    className={secondaryButtonClass}
+                  >
+                    ← Previous
+                  </button>
+                  <span className="text-sm font-medium text-slate-300">
+                    Page{" "}
+                    <span className="font-bold text-sky-300">{recentPage}</span>{" "}
+                    • {recentTotal} total unique visitors
+                  </span>
+                  <button
+                    onClick={() => fetchRecentVisitors(recentPage + 1)}
+                    disabled={recentLoading || !recentHasMore}
+                    className={primaryButtonClass}
+                  >
+                    Next →
+                  </button>
+                </div>
+              </div>
+            </div>
+          )
+        ) : locationLoading && locationPage === 1 ? (
           <div className="text-center p-12">
             <p className="text-gray-400 text-lg">Loading location data...</p>
           </div>

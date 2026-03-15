@@ -1,4 +1,4 @@
-import { FaLinkedinIn, FaFacebook, FaEnvelope } from "react-icons/fa";
+import { FaLinkedinIn, FaGlobe, FaEnvelope } from "react-icons/fa";
 import { useTheme } from "../context/ThemeContext";
 
 const Footer = () => {
@@ -58,10 +58,11 @@ const Footer = () => {
               </a>
               <a
                 target="_blank"
-                href="https://www.facebook.com/md.arifurr"
+                rel="noopener noreferrer"
+                href="https://md-arifur-rahman-portfolio.netlify.app/"
                 className="group relative bg-gradient-to-r from-blue-400/20 to-blue-500/20 hover:from-blue-400 hover:to-blue-500 border border-blue-400/50 hover:border-blue-300 p-4 rounded-full transition-all duration-300 hover:scale-125 hover:rotate-12 shadow-lg hover:shadow-blue-500/50"
               >
-                <FaFacebook
+                <FaGlobe
                   className="text-white group-hover:animate-bounce"
                   size={24}
                 />
