@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { getUserInfo } from "../services/auth.services";
+import { getUserInfo, useAuth } from "../services/auth.services";
 import { useState, useEffect } from "react";
 
 const normalizeRole = (role) =>
@@ -8,7 +8,15 @@ const normalizeRole = (role) =>
     .toLowerCase();
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const userInfo = getUserInfo();
+  const { userInfo, isBootstrapResolved } = useAuth();
+
+  if (!isBootstrapResolved) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-slate-700 dark:bg-slate-950 dark:text-slate-200">
+        Loading...
+      </div>
+    );
+  }
 
   if (!userInfo) {
     return <Navigate to="/login" replace />;

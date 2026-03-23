@@ -133,6 +133,18 @@ const NavBar = () => {
         >
           👤 Profile
         </Link>
+        {/* ========================================== */}
+        {userLoggedIn && (
+          <Link
+            to="/favorites"
+            onClick={() => setIsProfileMenuOpen(false)}
+            className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30 flex items-center gap-2"
+          >
+            ❤️ {t("navbar.favorites")}
+          </Link>
+        )}
+        {/* ========================================== */}
+
         {isMobile &&
           (userInfo.role === "super_admin" || userInfo.role === "admin") && (
             <Link

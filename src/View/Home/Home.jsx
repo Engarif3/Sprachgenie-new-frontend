@@ -707,7 +707,7 @@ const Home = () => {
         {/* ScrollStack */}
         {isDesktop ? (
           <div className="mx-auto w-full max-w-6xl px-4 ">
-            <ScrollStack>
+            <ScrollStack layoutVersion={userLoggedIn ? "logged-in" : "guest"}>
               {featureCards.map((feature, index) => (
                 <ScrollStackItem
                   key={feature.title}

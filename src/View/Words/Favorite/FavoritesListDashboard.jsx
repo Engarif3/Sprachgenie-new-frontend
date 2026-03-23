@@ -459,7 +459,7 @@ const FavoritesListDashboard = () => {
                       <thead>
                         <tr className="bg-slate-900 text-sm text-white md:text-xl lg:text-xl dark:bg-gradient-to-r dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
                           <th className="rounded-tl-xl border-b border-l border-slate-200 py-3 text-center text-sm font-bold text-orange-400 md:text-lg lg:text-lg dark:border-gray-700 w-[5%] md:w-[3%] lg:w-[3%]">
-                            Article
+                            Art.
                           </th>
                           <th className="border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-blue-400 dark:border-gray-700 w-[15%] md:w-[10%] lg:w-[10%]">
                             Word
@@ -476,9 +476,7 @@ const FavoritesListDashboard = () => {
                           <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-green-400 dark:border-gray-700 lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                             Word to Watch
                           </th>
-                          <th className="rounded-tr-xl border-b border-l border-dotted border-slate-200 py-3 text-center text-sm font-bold text-red-400 dark:border-gray-700 md:text-lg lg:text-lg w-[3%] md:w-[3%] lg:w-[3%]">
-                            Del
-                          </th>
+                          <th className="rounded-tr-xl border-b border-l border-dotted border-slate-200 py-3 text-center text-sm font-bold text-red-400 dark:border-gray-700 md:text-lg lg:text-lg w-[3%] md:w-[3%] lg:w-[3%]"></th>
                         </tr>
                       </thead>
                       <tbody>
@@ -495,7 +493,7 @@ const FavoritesListDashboard = () => {
                               {word.article?.name}
                             </td>
                             <td className="border border-slate-200 border-dotted p-2 dark:border-gray-700 md:p-2 lg:p-2">
-                              <div className="flex justify-between items-center">
+                              <div className="flex justify-between gap-1 md:gap-4 items-center">
                                 <span
                                   className="max-w-[80px] cursor-pointer break-words text-xs font-bold text-blue-600 transition-all duration-300 hover:scale-105 hover:text-blue-700 line-clamp-2 hover:line-clamp-none dark:text-blue-400 dark:hover:text-blue-300 md:max-w-full md:text-sm lg:text-base"
                                   onClick={() => openModal(word)}
@@ -507,7 +505,7 @@ const FavoritesListDashboard = () => {
                                 <div className="flex gap-1 md:gap-2 lg:gap-2">
                                   <button
                                     onClick={() => pronounceWord(word.value)}
-                                    className="rounded-full border border-blue-300 bg-gradient-to-r from-blue-50 to-cyan-50 px-2 py-1 text-xs text-blue-700 shadow-sm transition-all duration-300 hover:scale-110 hover:from-blue-100 hover:to-cyan-100 dark:border-blue-500/50 dark:from-blue-500/20 dark:to-cyan-500/20 dark:text-white dark:hover:from-blue-500/40 dark:hover:to-cyan-500/40 md:text-sm"
+                                    className="rounded-full border border-blue-300 bg-gradient-to-r from-blue-50 to-cyan-50 px-1  text-xs text-blue-700 shadow-sm transition-all duration-300 hover:scale-110 hover:from-blue-100 hover:to-cyan-100 dark:border-blue-500/50 dark:from-blue-500/20 dark:to-cyan-500/20 dark:text-white dark:hover:from-blue-500/40 dark:hover:to-cyan-500/40 md:text-sm"
                                   >
                                     🔊
                                   </button>
@@ -525,7 +523,7 @@ const FavoritesListDashboard = () => {
                                       className={`${
                                         loadingParagraphs[word.id]
                                           ? "invisible"
-                                          : "text-xs font-bold uppercase"
+                                          : "text-xs font-bold "
                                       }`}
                                     >
                                       ai
@@ -593,7 +591,7 @@ const FavoritesListDashboard = () => {
                                 onClick={() => handleRemoveFavorite(word.id)}
                                 className="rounded-xl border border-rose-300 bg-gradient-to-r from-rose-50 to-pink-50 p-2.5 font-bold text-rose-700 shadow-sm transition-all duration-300 hover:scale-110 hover:from-red-600 hover:to-pink-600 hover:text-white dark:border-red-500/50 dark:from-red-500/20 dark:to-pink-500/20 dark:text-red-300 dark:shadow-lg dark:hover:shadow-red-500/50"
                               >
-                                <ImBin size={20} />
+                                <ImBin size={12} />
                               </button>
                             </td>
                           </tr>

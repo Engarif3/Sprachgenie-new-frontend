@@ -153,26 +153,27 @@
 
 import "./i18n"; // Initialize i18n first
 import { Outlet, useLocation } from "react-router-dom";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import NavBar from "./navbar/NavBar";
 import Footer from "./footer/Footer";
 import ScrollToTop from "./ScrollToTop";
-import DarkVeil from "./View/Home/DarkVeil";
-import Loader from "./utils/Loader";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Swal from "sweetalert2";
-import { syncCurrentUser } from "./services/auth.services";
+import {
+  markAuthBootstrapResolved,
+  syncCurrentUser,
+} from "./services/auth.services";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import { LanguageProvider } from "./context/LanguageContext";
 
 const AUTH_SYNC_INTERVAL_MS = 60000;
+const VISITOR_TRACK_DELAY_MS = 1500;
+const DarkVeil = lazy(() => import("./View/Home/DarkVeil"));
 
 const AppContent = () => {
   const location = useLocation();
   const { theme } = useTheme();
   const isDark = theme === "dark";
-
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   // Same auth & env logic...
   useEffect(() => {
@@ -205,17 +206,46 @@ const AppContent = () => {
         console.error("Failed to track visitor:", error);
       }
     };
-    trackVisitor();
+
+    let timeoutId;
+    let idleCallbackId;
+
+    const scheduleTrackVisitor = () => {
+      void trackVisitor();
+    };
+
+    if ("requestIdleCallback" in window) {
+      idleCallbackId = window.requestIdleCallback(scheduleTrackVisitor, {
+        timeout: VISITOR_TRACK_DELAY_MS,
+      });
+    } else {
+      timeoutId = window.setTimeout(
+        scheduleTrackVisitor,
+        VISITOR_TRACK_DELAY_MS,
+      );
+    }
+
+    return () => {
+      if (typeof idleCallbackId === "number") {
+        window.cancelIdleCallback(idleCallbackId);
+      }
+
+      if (typeof timeoutId === "number") {
+        window.clearTimeout(timeoutId);
+      }
+    };
   }, []);
 
   useEffect(() => {
     let isMounted = true;
 
     const initializeAuth = async () => {
-      await syncCurrentUser();
-
-      if (isMounted) {
-        setIsAuthLoading(false);
+      try {
+        await syncCurrentUser();
+      } finally {
+        if (isMounted) {
+          markAuthBootstrapResolved();
+        }
       }
     };
 
@@ -242,9 +272,7 @@ const AppContent = () => {
       window.removeEventListener("focus", syncVisibleSession);
       document.removeEventListener("visibilitychange", syncVisibleSession);
     };
-  }, [location.pathname]);
-
-  if (isAuthLoading) return <LoaderFullScreen />;
+  }, []);
 
   const noHeaderFooter = ["/login", "/register"].some((p) =>
     location.pathname.startsWith(p),
@@ -259,7 +287,9 @@ const AppContent = () => {
       {/* Dark mode overlay */}
       {isDark && (
         <div className="fixed inset-0 -z-10">
-          <DarkVeil />
+          <Suspense fallback={null}>
+            <DarkVeil />
+          </Suspense>
         </div>
       )}
 
@@ -274,12 +304,6 @@ const AppContent = () => {
     </div>
   );
 };
-
-const LoaderFullScreen = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <Loader />
-  </div>
-);
 
 const App = () => {
   return (

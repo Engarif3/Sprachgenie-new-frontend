@@ -6,17 +6,28 @@ const FORCED_LOGOUT_NOTICE_KEY = "forcedLogoutNotice";
 // ✅ NO localStorage needed - tokens in httpOnly cookies
 // User info will come from API calls, not from decoding client-side tokens
 
-let cachedUserInfo = null;
+let authStore = {
+  userInfo: null,
+  isBootstrapResolved: false,
+};
 const authListeners = new Set();
 
 const notifyAuthListeners = () => {
   authListeners.forEach((listener) => listener());
 };
 
-const setCachedUserInfo = (userInfo) => {
-  cachedUserInfo = userInfo;
+const setAuthStore = (partialState) => {
+  authStore = {
+    ...authStore,
+    ...partialState,
+  };
   notifyAuthListeners();
-  return cachedUserInfo;
+  return authStore;
+};
+
+const setCachedUserInfo = (userInfo) => {
+  setAuthStore({ userInfo });
+  return authStore.userInfo;
 };
 
 const subscribeToAuthStore = (listener) => {
@@ -27,7 +38,7 @@ const subscribeToAuthStore = (listener) => {
   };
 };
 
-const getAuthSnapshot = () => cachedUserInfo;
+const getAuthSnapshot = () => authStore;
 
 export const storeUserInfo = (userInfo) => {
   // ✅ Store user metadata in memory (not token)
@@ -36,16 +47,24 @@ export const storeUserInfo = (userInfo) => {
 
 export const getUserInfo = () => {
   // ✅ Return cached user info (set after login)
-  return cachedUserInfo;
+  return authStore.userInfo;
 };
 
 export const isLoggedIn = () => {
   // ✅ Check if user info exists in cache
-  return !!cachedUserInfo;
+  return !!authStore.userInfo;
 };
 
 export const clearUserInfo = () => {
   setCachedUserInfo(null);
+};
+
+export const markAuthBootstrapResolved = () => {
+  if (authStore.isBootstrapResolved) {
+    return;
+  }
+
+  setAuthStore({ isBootstrapResolved: true });
 };
 
 export const queueForcedLogoutNotice = ({
@@ -84,15 +103,16 @@ export const consumeForcedLogoutNotice = () => {
 };
 
 export const useAuth = () => {
-  const userInfo = useSyncExternalStore(
+  const snapshot = useSyncExternalStore(
     subscribeToAuthStore,
     getAuthSnapshot,
     getAuthSnapshot,
   );
 
   return {
-    userInfo,
-    isLoggedIn: !!userInfo,
+    userInfo: snapshot.userInfo,
+    isLoggedIn: !!snapshot.userInfo,
+    isBootstrapResolved: snapshot.isBootstrapResolved,
   };
 };
 
@@ -114,7 +134,7 @@ export const syncCurrentUser = async ({ preserveOnFailure = true } = {}) => {
     }
 
     if (response.status === 401 || response.status === 403) {
-      if (cachedUserInfo) {
+      if (authStore.userInfo) {
         queueForcedLogoutNotice({
           title: "Logged out",
           text: "Your account access changed. Please sign in again.",
@@ -130,13 +150,13 @@ export const syncCurrentUser = async ({ preserveOnFailure = true } = {}) => {
       clearUserInfo();
     }
 
-    return cachedUserInfo;
+    return authStore.userInfo;
   } catch (error) {
     if (!preserveOnFailure) {
       clearUserInfo();
     }
 
-    return preserveOnFailure ? cachedUserInfo : null;
+    return preserveOnFailure ? authStore.userInfo : null;
   }
 };
 
