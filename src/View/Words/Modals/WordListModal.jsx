@@ -376,7 +376,7 @@ const WordListModal = ({
                           {item.article}{" "}
                         </span>
                       )}
-                      <span>{item.value}</span>
+                      <span className="text-gray-300 ">{item.value}</span>
                       {idx < synonymsList.length - 1 && ", "}
                     </span>
                   ))}
@@ -397,7 +397,7 @@ const WordListModal = ({
                           {item.article}{" "}
                         </span>
                       )}
-                      <span>{item.value}</span>
+                      <span className="text-gray-300 ">{item.value}</span>
                       {idx < antonymsList.length - 1 && ", "}
                     </span>
                   ))}
@@ -418,7 +418,7 @@ const WordListModal = ({
                           {item.article}{" "}
                         </span>
                       )}
-                      <span>{item.value}</span>
+                      <span className="text-gray-300 ">{item.value}</span>
                       {idx < similarWordsList.length - 1 && ", "}
                     </span>
                   ))}
