@@ -20,6 +20,7 @@ import aiApi from "../../../AI_axios";
 import { IoSearch } from "react-icons/io5";
 import useDebounce from "../../../hooks/useDebounce";
 import WordTableRow from "./WordTableRow";
+import { IoInformationCircleOutline } from "react-icons/io5";
 
 // Lazy load modals for better performance
 const WordListModal = lazy(() => import("../Modals/WordListModal"));
@@ -61,6 +62,7 @@ const WordList = () => {
   const [loadingFavorites, setLoadingFavorites] = useState({});
   const [searchType, setSearchType] = useState("word"); // 'word' | 'meaning'
   const [selectedWordId, setSelectedWordId] = useState(null);
+  const [showInfo, setShowInfo] = useState(false);
 
   // ===================
   const userLoggedIn = isLoggedIn();
@@ -941,6 +943,14 @@ const WordList = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [debouncedSearchValue, selectedLevel, selectedTopic]);
+  // to show info
+  useEffect(() => {
+    const handleClickOutside = () => setShowInfo(false);
+    if (showInfo) {
+      window.addEventListener("click", handleClickOutside);
+    }
+    return () => window.removeEventListener("click", handleClickOutside);
+  }, [showInfo]);
 
   return (
     <Container>
@@ -1113,6 +1123,25 @@ const WordList = () => {
         </div>
       ) : (
         <div className="min-h-screen dark:bg-gradient-to-br from-gray-900/30 via-gray-800/20 to-black/30 rounded-2xl p-0 md:p-1 lg:p-1">
+          <div className="flex items-center justify-end gap-2 mb-2 px-2 relative">
+            <IoInformationCircleOutline
+              size={22}
+              className="text-blue-400 cursor-pointer hover:text-blue-500 transition"
+              onClick={(e) => {
+                e.stopPropagation(); // prevent the click from closing immediately
+                setShowInfo((prev) => !prev);
+              }}
+            />
+
+            {showInfo && (
+              <div className="absolute top-8 right-0 z-50 w-10/12 md:w-6/12 p-3 rounded-lg bg-gray-900 text-gray-200 text-sm shadow-xl border border-gray-700 italic">
+                Please be aware that certain word meanings are context-dependent
+                and sourced from official TELC PDF materials. Words may have
+                additional meanings not listed here. Entries are updated
+                regularly as needed. Thank you for your understanding.
+              </div>
+            )}
+          </div>
           <div className="overflow-x-auto border border-gray-700/50 rounded-2xl shadow-2xl">
             <table className="w-full border-collapse">
               <thead>
