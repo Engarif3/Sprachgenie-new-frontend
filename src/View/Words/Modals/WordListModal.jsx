@@ -336,7 +336,7 @@ const WordListModal = ({
               <span className="mr-2 font-bold text-orange-400 text-center text-md md:text-xl lg:text-xl">
                 {selectedWord.article?.name}
               </span>
-              <span className="capitalize dark:text-white font-bold text-sm md:text-xl lg:text-xl">
+              <span className="capitalize text-white font-bold text-sm md:text-xl lg:text-xl">
                 {capitalizedWord}
               </span>
             </p>
