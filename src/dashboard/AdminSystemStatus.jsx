@@ -6,6 +6,7 @@ const DECLARED_SYSTEMS = {
     label: "Frontend",
     provider: "Netlify",
     primary: "https://simplegerman.de",
+    domain: "www.inwx.com",
     location: "Global edge network",
     secondary: "Public web app and CDN delivery",
     details: [
@@ -898,6 +899,8 @@ const AdminSystemStatus = () => {
                             <p className="text-gray-400">Primary Domain</p>
                             <p className="mt-1 text-base font-semibold text-white break-all">
                               {DECLARED_SYSTEMS.frontend.primary}
+                              <br />
+                              By {DECLARED_SYSTEMS.frontend.domain}
                             </p>
                             <p className="mt-1 text-[10px] text-gray-500">
                               Netlify production hostname
