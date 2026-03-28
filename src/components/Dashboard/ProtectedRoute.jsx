@@ -1,22 +1,31 @@
-import { Route, Redirect } from "react-router-dom";
-import { getUserInfo } from "@/services/auth.services";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "@/services/auth.services";
 
-const ProtectedRoute = ({ element, allowedRoles, ...rest }) => {
-  const user = getUserInfo();
-  const role = user ? user.role : null;
+const ProtectedRoute = ({ children, allowedRoles }) => {
+  const { userInfo, isBootstrapResolved } = useAuth();
 
-  if (!role) {
-    // If no role found (user not logged in), redirect to login
-    return <Redirect to="/login" />;
+  if (!isBootstrapResolved) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
-  // Check if the user's role is allowed to access the route
-  if (!allowedRoles.includes(role)) {
-    // If role doesn't match allowed roles, redirect to home or an unauthorized page
-    return <Redirect to="/" />;
+  if (!userInfo) {
+    return <Navigate to="/login" replace />;
   }
 
-  return <Route {...rest} element={element} />;
+  if (Array.isArray(allowedRoles) && allowedRoles.length > 0) {
+    const normalizedRoles = allowedRoles.map((role) => role.toLowerCase());
+    const currentRole = (userInfo.role || "").toLowerCase();
+
+    if (!normalizedRoles.includes(currentRole)) {
+      return <Navigate to="/" replace />;
+    }
+  }
+
+  return children;
 };
 
 export default ProtectedRoute;

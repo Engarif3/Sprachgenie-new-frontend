@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import WordListModal from "../Modals/WordListModal";
 import Container from "../../../utils/Container";
-import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
+import { useAuth } from "../../../services/auth.services";
 import Pagination from "./Pagination";
 import { pronounceWord } from "../../../utils/wordPronounciation";
 import { ImBin } from "react-icons/im";
@@ -23,13 +23,14 @@ const FavoritesList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const userInfo = getUserInfo();
   const [favorites, setFavorites] = useState([]);
   const [loadingFavorites, setLoadingFavorites] = useState({});
   const [deleteConfirmation, setDeleteConfirmation] = useState({
     show: false,
     inputValue: "",
   });
+
+  const { userInfo } = useAuth();
 
   // =================ai===========================
   const [aiWord, setAiWord] = useState(null);

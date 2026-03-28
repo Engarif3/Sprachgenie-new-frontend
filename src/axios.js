@@ -44,7 +44,7 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Handle 401 Unauthorized - redirect to login
+    // Handle 401 Unauthorized - redirect to login with SPA-friendly navigation
     if (error.response?.status === 401) {
       queueForcedLogoutNotice({
         icon: "warning",
@@ -54,7 +54,11 @@ api.interceptors.response.use(
           "Your access changed or your session expired. Please log in again.",
       });
       clearUserInfo();
-      window.location.href = "/login";
+      window.dispatchEvent(new CustomEvent("auth:logout"));
+      // Fallback for non-SPA contexts
+      if (typeof window !== "undefined") {
+        window.location.replace("/login");
+      }
     }
 
     // Handle 403 Forbidden

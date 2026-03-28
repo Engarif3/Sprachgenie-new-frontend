@@ -1,17 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import SideBarItem from "./SideBarItem";
 import assets from "@/assets";
 import { drawerItems } from "@/utils/drwaerItems";
-import { getUserInfo } from "@/services/auth.services";
+import { useAuth } from "@/services/auth.services";
 
 const SideBar = () => {
-  const [userRole, setUserRole] = useState("");
-
-  useEffect(() => {
-    const { role } = getUserInfo();
-    setUserRole(role);
-  }, []);
+  const { userInfo } = useAuth();
+  const userRole = userInfo?.role || "";
 
   return (
     <div>

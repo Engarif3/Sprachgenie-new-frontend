@@ -12,7 +12,7 @@ import { Link, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import Container from "../../../utils/Container";
 import Pagination from "../../../utils/Pagination";
-import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
+import { useAuth } from "../../../services/auth.services";
 import api from "../../../axios";
 import Loader from "../../../utils/Loader";
 import { getFromStorage, setToStorage } from "../../../utils/storage";
@@ -65,12 +65,11 @@ const WordList = () => {
   const [showInfo, setShowInfo] = useState(false);
 
   // ===================
-  const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo() || {};
+  const { userInfo, isLoggedIn: userLoggedIn } = useAuth();
 
   const isAdmin = useMemo(
-    () => ["admin", "super_admin"].includes(userInfo.role),
-    [userInfo.role],
+    () => ["admin", "super_admin"].includes(userInfo?.role),
+    [userInfo?.role],
   );
 
   const [favorites, setFavorites] = useState([]);

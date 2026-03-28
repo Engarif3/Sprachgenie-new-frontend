@@ -132,21 +132,17 @@
 //     </Box>
 //   );
 // }
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import SideBar from "../SideBar/SideBar";
-import { getUserInfo } from "../../../services/auth.services";
+import { useAuth } from "../../../services/auth.services";
 
 const drawerWidth = 60;
 
 export default function DashboardDrawer({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  const [userEmail, setUserEmail] = useState("");
-
-  useEffect(() => {
-    const { email } = getUserInfo() || {};
-    setUserEmail(email);
-  }, []);
+  const { userInfo } = useAuth();
+  const userEmail = userInfo?.email || "";
 
   const handleDrawerClose = () => {
     setIsClosing(true);

@@ -152,7 +152,7 @@
 // export default App;
 
 import "./i18n"; // Initialize i18n first
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Suspense, lazy, useEffect } from "react";
 import NavBar from "./navbar/NavBar";
 import Footer from "./footer/Footer";
@@ -172,6 +172,7 @@ const DarkVeil = lazy(() => import("./View/Home/DarkVeil"));
 
 const AppContent = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
@@ -237,6 +238,12 @@ const AppContent = () => {
   }, []);
 
   useEffect(() => {
+    const handleLogoutNavigation = () => {
+      navigate("/login");
+    };
+
+    window.addEventListener("auth:logout", handleLogoutNavigation);
+
     let isMounted = true;
 
     const initializeAuth = async () => {
@@ -268,11 +275,12 @@ const AppContent = () => {
 
     return () => {
       isMounted = false;
+      window.removeEventListener("auth:logout", handleLogoutNavigation);
       window.clearInterval(intervalId);
       window.removeEventListener("focus", syncVisibleSession);
       document.removeEventListener("visibilitychange", syncVisibleSession);
     };
-  }, []);
+  }, [navigate]);
 
   const noHeaderFooter = ["/login", "/register"].some((p) =>
     location.pathname.startsWith(p),

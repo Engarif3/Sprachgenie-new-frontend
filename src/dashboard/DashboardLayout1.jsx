@@ -1,13 +1,20 @@
 import { Link, Navigate, Outlet } from "react-router-dom";
-import { getUserInfo } from "../services/auth.services";
+import { useAuth } from "../services/auth.services";
 import Container from "../utils/Container";
 import { useState } from "react";
 
 const DashboardLayout = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { userInfo, isBootstrapResolved } = useAuth();
+  const role = userInfo?.role;
 
-  const userInfo = getUserInfo() || {};
-  const role = userInfo.role;
+  if (!isBootstrapResolved) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
 
   if (!userInfo) {
     return <Navigate to="/login" replace />;
