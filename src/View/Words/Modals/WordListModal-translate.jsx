@@ -58,8 +58,8 @@ const WordListModal = ({
               🔊
             </button>
             {userLoggedIn &&
-              (userInfo.role === "super_admin" ||
-                userInfo.role === "admin") && (
+              (userInfo?.role === "super_admin" ||
+                userInfo?.role === "admin") && (
                 <Link
                   to={`/edit-word/${selectedWord.id}`}
                   className="btn btn-sm btn-warning"

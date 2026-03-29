@@ -94,7 +94,7 @@ const UpdateUserStatus = () => {
   const [isProfileLoading, setIsProfileLoading] = useState(false);
 
   const canManageUsers =
-    userLoggedIn && userInfo.id && userInfo.role === "super_admin";
+    userLoggedIn && userInfo?.id && userInfo?.role === "super_admin";
 
   const fetchAdmins = async (page = 1, limit = 50, query = "") => {
     try {
@@ -189,7 +189,7 @@ const UpdateUserStatus = () => {
   };
 
   const handleSelfSessionRefresh = async (affectedUserId) => {
-    if (affectedUserId !== userInfo.id) {
+    if (affectedUserId !== userInfo?.id) {
       return false;
     }
 
@@ -241,7 +241,7 @@ const UpdateUserStatus = () => {
         api
           .patch(`/user/update-status/${userId}`, {
             status: newStatus,
-            performedById: userInfo.id,
+            performedById: userInfo?.id,
           })
           .then(async (response) => {
             if (response.data.success) {
@@ -366,7 +366,7 @@ const UpdateUserStatus = () => {
         api
           .patch(`/user/update-role/${userId}`, {
             role: newRole,
-            performedById: userInfo.id,
+            performedById: userInfo?.id,
           })
           .then(async (response) => {
             if (response.data.success) {

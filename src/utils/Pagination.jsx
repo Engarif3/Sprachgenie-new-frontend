@@ -37,7 +37,7 @@ const Pagination = ({
         </div>
 
         {userLoggedIn &&
-          (userInfo.role === "super_admin" || userInfo.role === "admin") && (
+          (userInfo?.role === "super_admin" || userInfo?.role === "admin") && (
             <button
               onClick={() => setAction(!showAction)}
               className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-cyan-500/50 mr-2"

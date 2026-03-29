@@ -12,8 +12,8 @@ const CreateConversation = () => {
   // Security check: Only allow admin/super_admin users
   if (
     !userLoggedIn ||
-    !userInfo.id ||
-    (userInfo.role !== "admin" && userInfo.role !== "super_admin")
+    !userInfo?.id ||
+    (userInfo?.role !== "admin" && userInfo?.role !== "super_admin")
   ) {
     return <Navigate to="/" replace />;
   }
@@ -69,7 +69,7 @@ const CreateConversation = () => {
         topic: formData.topic,
         levelId: formData.levelId,
         text: conversationText,
-        createdBy: userInfo.id,
+        createdBy: userInfo?.id,
       };
 
       const response = await api.post("/conversation/create", dataToSend);

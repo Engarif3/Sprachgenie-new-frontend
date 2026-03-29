@@ -97,7 +97,7 @@ const WordList = () => {
       if (!userLoggedIn || !userInfo?.id) return;
 
       try {
-        const response = await api.get(`/favorite-words/${userInfo?.id}`);
+        const response = await api.get(`/favorite-words/${userInfo.id}`);
         setFavorites(response.data.data.map((word) => word.id));
       } catch (error) {
         if (error.response) {
@@ -627,7 +627,7 @@ const WordList = () => {
   // Learning mode implementation (Logic remains the same, good to leave)
   const handleDelete = useCallback(
     (wordId, wordValue) => {
-      if (!userInfo.id) {
+      if (!userInfo?.id) {
         Swal.fire("Error", "User not logged in or user ID missing.", "error");
         return;
       }

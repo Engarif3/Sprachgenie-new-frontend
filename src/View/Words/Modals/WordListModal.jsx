@@ -318,8 +318,8 @@ const WordListModal = ({
               🔊
             </button>
             {userLoggedIn &&
-              (userInfo.role === "super_admin" ||
-                userInfo.role === "admin") && (
+              (userInfo?.role === "super_admin" ||
+                userInfo?.role === "admin") && (
                 <Link
                   to={`/edit-word/${selectedWord.id}`}
                   className="px-2 md:px-4 lg:px-4 py-1 md:py-2 lg:py-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 rounded-full font-semibold text-white text-xs md:text-sm lg:text-sm transition-all duration-200 hover:scale-105 shadow-md"

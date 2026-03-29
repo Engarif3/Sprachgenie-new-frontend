@@ -38,8 +38,8 @@ const UpdateBasicUserStatus = () => {
   const navigate = useNavigate();
   const canManageBasicUsers =
     userLoggedIn &&
-    userInfo.id &&
-    (userInfo.role === "admin" || userInfo.role === "super_admin");
+    userInfo?.id &&
+    (userInfo?.role === "admin" || userInfo?.role === "super_admin");
 
   const fetchUsers = async (page, status, limit = 50) => {
     try {
@@ -74,7 +74,7 @@ const UpdateBasicUserStatus = () => {
   }, [page, selectedStatus, userInfo?.role]);
 
   const handleSelfSessionRefresh = async (affectedUserId) => {
-    if (affectedUserId !== userInfo.id) {
+    if (affectedUserId !== userInfo?.id) {
       return false;
     }
 
@@ -126,7 +126,7 @@ const UpdateBasicUserStatus = () => {
         api
           .patch(`/user/update-basicUser-status/${userId}`, {
             status: newStatus,
-            performedById: userInfo.id,
+            performedById: userInfo?.id,
           })
           .then(async (response) => {
             if (response.data.success) {

@@ -10,8 +10,8 @@ const PartOfSpeechForm = () => {
   // Security check: Only allow admin/super_admin users
   if (
     !userLoggedIn ||
-    !userInfo.id ||
-    (userInfo.role !== "admin" && userInfo.role !== "super_admin")
+    !userInfo?.id ||
+    (userInfo?.role !== "admin" && userInfo?.role !== "super_admin")
   ) {
     return <Navigate to="/" replace />;
   }

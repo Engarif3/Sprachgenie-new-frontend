@@ -13,8 +13,8 @@ const ConversationsList = () => {
   // Security check: Only allow admin/super_admin users
   if (
     !userLoggedIn ||
-    !userInfo.id ||
-    (userInfo.role !== "admin" && userInfo.role !== "super_admin")
+    !userInfo?.id ||
+    (userInfo?.role !== "admin" && userInfo?.role !== "super_admin")
   ) {
     return <Navigate to="/" replace />;
   }
@@ -208,8 +208,8 @@ const ConversationsList = () => {
               className="flex justify-between items-center bg-gray-100 p-3 rounded shadow"
             >
               <span>{conversation.topic}</span>
-              {(userInfo.role === "super_admin" ||
-                userInfo.role === "admin") && (
+              {(userInfo?.role === "super_admin" ||
+                userInfo?.role === "admin") && (
                 <div className="space-x-2">
                   <button
                     onClick={() => openEditModal(conversation)}

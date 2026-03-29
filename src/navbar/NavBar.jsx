@@ -146,7 +146,7 @@ const NavBar = () => {
         {/* ========================================== */}
 
         {isMobile &&
-          (userInfo.role === "super_admin" || userInfo.role === "admin") && (
+          (userInfo?.role === "super_admin" || userInfo?.role === "admin") && (
             <Link
               to="/create-word"
               onClick={() => setIsProfileMenuOpen(false)}

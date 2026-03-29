@@ -27,7 +27,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     allowedRoles.length > 0 &&
     !allowedRoles
       .map((role) => normalizeRole(role))
-      .includes(normalizeRole(userInfo.role))
+      .includes(normalizeRole(userInfo?.role))
   ) {
     return <Navigate to="/dashboard" replace />;
   }

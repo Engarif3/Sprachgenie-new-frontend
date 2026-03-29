@@ -18,7 +18,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
   if (Array.isArray(allowedRoles) && allowedRoles.length > 0) {
     const normalizedRoles = allowedRoles.map((role) => role.toLowerCase());
-    const currentRole = (userInfo.role || "").toLowerCase();
+    const currentRole = (userInfo?.role || "").toLowerCase();
 
     if (!normalizedRoles.includes(currentRole)) {
       return <Navigate to="/" replace />;

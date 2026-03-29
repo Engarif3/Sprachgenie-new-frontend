@@ -365,7 +365,7 @@ const FavoritesList = () => {
       setLoadingParagraphs((prev) => ({ ...prev, [word.id]: true }));
 
       const response = await aiApi.post(`/paragraphs/generate`, {
-        userId: userInfo.id,
+        userId: userInfo?.id,
         wordId: word.id,
         word: word.value,
         level: word.level?.level || "A1",

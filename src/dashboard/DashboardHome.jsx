@@ -67,7 +67,7 @@ const DashboardHome = () => {
       title: "Manage Users",
       description: "Control user access and permissions",
       link:
-        userInfo.role === "super_admin"
+        userInfo?.role === "super_admin"
           ? "/dashboard/update-user-status"
           : "/dashboard/update-basic-user-status",
       gradient: "from-purple-500 to-pink-500",
@@ -93,7 +93,7 @@ const DashboardHome = () => {
         <div className="dark:bg-gray-800/50 border border-gray-700 rounded-xl p-6 hover:border-blue-500/50 hover:bg-gray-800/70 transition-all duration-300">
           <p className="text-gray-400 text-sm font-semibold mb-2">Your Role</p>
           <p className="text-2xl md:text-3xl font-bold text-blue-400 capitalize mb-2">
-            {userInfo.role?.replace("_", " ")}
+            {userInfo?.role?.replace("_", " ")}
           </p>
           <span className="text-2xl">👤</span>
         </div>
@@ -117,8 +117,8 @@ const DashboardHome = () => {
               quickLinks.filter(
                 (link) =>
                   !link.admin ||
-                  userInfo.role === "admin" ||
-                  userInfo.role === "super_admin",
+                  userInfo?.role === "admin" ||
+                  userInfo?.role === "super_admin",
               ).length
             }{" "}
             Tools
@@ -137,8 +137,8 @@ const DashboardHome = () => {
             .filter(
               (link) =>
                 !link.admin ||
-                userInfo.role === "admin" ||
-                userInfo.role === "super_admin",
+                userInfo?.role === "admin" ||
+                userInfo?.role === "super_admin",
             )
             .map((link, index) => (
               <Link
