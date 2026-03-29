@@ -377,9 +377,8 @@ const WordListModal = ({
                         </span>
                       )}
                       <span className="text-gray-300 ">{item.value}</span>
-                      <span className="text-gray-300 ">
-                        {" "}
-                        {idx < synonymsList.length - 1 && ", "}{" "}
+                      <span className="text-orange-400 ">
+                        {idx < synonymsList.length - 1 && ", "}
                       </span>
                     </span>
                   ))}
@@ -401,9 +400,8 @@ const WordListModal = ({
                         </span>
                       )}
                       <span className="text-gray-300 ">{item.value}</span>
-                      <span className="text-gray-300 ">
-                        {" "}
-                        {idx < antonymsList.length - 1 && ", "}{" "}
+                      <span className="text-orange-400 ">
+                        {idx < antonymsList.length - 1 && ", "}
                       </span>
                     </span>
                   ))}
@@ -426,7 +424,7 @@ const WordListModal = ({
                       )}
                       <span className="text-gray-300 ">{item.value}</span>
                       {/* {idx < similarWordsList.length - 1 && ", "} */}
-                      <span className="text-gray-300 ">
+                      <span className="text-orange-400">
                         {idx < similarWordsList.length - 1 && ", "}
                       </span>
                     </span>
