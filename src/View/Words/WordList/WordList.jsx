@@ -94,10 +94,10 @@ const WordList = () => {
       //   )
       //     return;
 
-      if (!userLoggedIn || !userInfo.id) return;
+      if (!userLoggedIn || !userInfo?.id) return;
 
       try {
-        const response = await api.get(`/favorite-words/${userInfo.id}`);
+        const response = await api.get(`/favorite-words/${userInfo?.id}`);
         setFavorites(response.data.data.map((word) => word.id));
       } catch (error) {
         if (error.response) {
@@ -670,7 +670,7 @@ const WordList = () => {
         }
       });
     },
-    [userInfo.id, setCache],
+    [userInfo?.id, setCache],
   );
 
   //learning mode
@@ -867,7 +867,7 @@ const WordList = () => {
       const response = await aiApi.post(
         `/paragraphs/generate`,
         {
-          userId: userInfo.id,
+          userId: userInfo?.id,
           wordId: word.id,
           word: word.value,
           level: word.level?.level || "A1",
@@ -963,7 +963,8 @@ const WordList = () => {
             🎮 Play Quiz
           </Link>
           {userLoggedIn &&
-            (userInfo.role === "admin" || userInfo.role === "super_admin") && (
+            (userInfo?.role === "admin" ||
+              userInfo?.role === "super_admin") && (
               <span className="text-sm text-pink-400 font-bold mr-2">
                 Total: {cache.words.length} words
               </span>
@@ -1182,12 +1183,12 @@ const WordList = () => {
                     ❤️
                   </th>
                   {userLoggedIn &&
-                    (userInfo.role === "super_admin" ||
-                      userInfo.role === "admin") && (
+                    (userInfo?.role === "super_admin" ||
+                      userInfo?.role === "admin") && (
                       <>
                         <th
                           className={`border-l py-3 border-dotted hidden md:table-cell lg:table-cell border-gray-700 text-sm md:text-lg lg:text-lg text-center text-teal-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b ${
-                            userInfo.role !== "basic_user"
+                            userInfo?.role !== "basic_user"
                               ? "rounded-tr-xl"
                               : ""
                           }`}
