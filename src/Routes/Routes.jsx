@@ -4,6 +4,13 @@ import { createBrowserRouter } from "react-router-dom";
 import Loader from "../utils/Loader";
 import ProtectedRoute, { PublicRoute } from "./ProtectedRoute";
 
+const ADMIN_ROLES = ["ADMIN", "SUPER_ADMIN"];
+const SUPER_ADMIN_ROLES = ["SUPER_ADMIN"];
+
+const protectRoute = (element, allowedRoles) => (
+  <ProtectedRoute allowedRoles={allowedRoles}>{element}</ProtectedRoute>
+);
+
 // Lazy-loaded pages
 const Home = lazy(() => import("../View/Home/Home"));
 const WordList = lazy(() => import("../View/Words/WordList/WordList"));
@@ -166,13 +173,34 @@ export const router = createBrowserRouter(
       children: [
         { path: "/", element: <HomeWithSuspense /> },
         { path: "/words", element: <WordListWithSuspense /> },
-        { path: "/create-word", element: <WordFormWithSuspense /> },
-        { path: "/level", element: <LevelFormWithSuspense /> },
-        { path: "/topic", element: <TopicFormWithSuspense /> },
-        { path: "/article", element: <ArticleFormWithSuspense /> },
-        { path: "/part-of-Speech", element: <PartOfSpeechFormWithSuspense /> },
-        { path: "/level-list", element: <LevelListWithSuspense /> },
-        { path: "/edit-word/:id", element: <UpdateWordWithSuspense /> },
+        {
+          path: "/create-word",
+          element: protectRoute(<WordFormWithSuspense />, ADMIN_ROLES),
+        },
+        {
+          path: "/level",
+          element: protectRoute(<LevelFormWithSuspense />, ADMIN_ROLES),
+        },
+        {
+          path: "/topic",
+          element: protectRoute(<TopicFormWithSuspense />, ADMIN_ROLES),
+        },
+        {
+          path: "/article",
+          element: protectRoute(<ArticleFormWithSuspense />, ADMIN_ROLES),
+        },
+        {
+          path: "/part-of-Speech",
+          element: protectRoute(<PartOfSpeechFormWithSuspense />, ADMIN_ROLES),
+        },
+        {
+          path: "/level-list",
+          element: protectRoute(<LevelListWithSuspense />, ADMIN_ROLES),
+        },
+        {
+          path: "/edit-word/:id",
+          element: protectRoute(<UpdateWordWithSuspense />, ADMIN_ROLES),
+        },
         { path: "/favorites", element: <FavoritesListWithSuspense /> },
         {
           path: "/conversation-titles",
@@ -184,11 +212,14 @@ export const router = createBrowserRouter(
         },
         {
           path: "/update-conversation",
-          element: <ConversationsListWithSuspense />,
+          element: protectRoute(<ConversationsListWithSuspense />, ADMIN_ROLES),
         },
         {
           path: "/create-conversation",
-          element: <CreateConversationWithSuspense />,
+          element: protectRoute(
+            <CreateConversationWithSuspense />,
+            ADMIN_ROLES,
+          ),
         },
         { path: "/prefix-types", element: <PrefixTypeListWithSuspense /> },
         { path: "/prefix-list/:id", element: <PrefixListWithSuspense /> },
@@ -199,15 +230,24 @@ export const router = createBrowserRouter(
         { path: "/stories", element: <StoriesWithSuspense /> },
         {
           path: "/update-user-status",
-          element: <UpdateUserStatusWithSuspense />,
+          element: protectRoute(
+            <UpdateUserStatusWithSuspense />,
+            SUPER_ADMIN_ROLES,
+          ),
         },
         {
           path: "/update-basic-user-status",
-          element: <UpdateBasicUserStatusWithSuspense />,
+          element: protectRoute(
+            <UpdateBasicUserStatusWithSuspense />,
+            ADMIN_ROLES,
+          ),
         },
         {
           path: "/users-favorite-count",
-          element: <UsersFavoriteCountWithSuspense />,
+          element: protectRoute(
+            <UsersFavoriteCountWithSuspense />,
+            ADMIN_ROLES,
+          ),
         },
         { path: "/past-perfect", element: <PerfectAndPastFormWithSuspense /> },
         //translator
@@ -218,12 +258,7 @@ export const router = createBrowserRouter(
 
         {
           path: "/dashboard",
-          // element: <DashboardLayoutWithSuspense />,
-          element: (
-            <ProtectedRoute>
-              <DashboardLayoutWithSuspense />
-            </ProtectedRoute>
-          ),
+          element: protectRoute(<DashboardLayoutWithSuspense />),
           children: [
             { index: true, element: <DashboardHomeWithSuspense /> },
             {
@@ -232,11 +267,17 @@ export const router = createBrowserRouter(
             },
             {
               path: "visitors",
-              element: <AdminVisitorsPageWithSuspense />,
+              element: protectRoute(
+                <AdminVisitorsPageWithSuspense />,
+                ADMIN_ROLES,
+              ),
             },
             {
               path: "registration-metadata",
-              element: <AdminRegistrationMetadataPageWithSuspense />,
+              element: protectRoute(
+                <AdminRegistrationMetadataPageWithSuspense />,
+                ADMIN_ROLES,
+              ),
             },
             {
               path: "favorites-words",
@@ -244,29 +285,50 @@ export const router = createBrowserRouter(
             },
             {
               path: "update-user-status",
-              element: <UpdateUserStatusWithSuspense />,
+              element: protectRoute(
+                <UpdateUserStatusWithSuspense />,
+                SUPER_ADMIN_ROLES,
+              ),
             },
             {
               path: "update-basic-user-status",
-              element: <UpdateBasicUserStatusWithSuspense />,
+              element: protectRoute(
+                <UpdateBasicUserStatusWithSuspense />,
+                ADMIN_ROLES,
+              ),
             },
-            { path: "topic", element: <TopicFormWithSuspense /> },
-            { path: "create-word", element: <WordFormWithSuspense /> },
+            {
+              path: "topic",
+              element: protectRoute(<TopicFormWithSuspense />, ADMIN_ROLES),
+            },
+            {
+              path: "create-word",
+              element: protectRoute(<WordFormWithSuspense />, ADMIN_ROLES),
+            },
             {
               path: "generate-story",
-              element: <GenerateStoryWithSuspense />,
+              element: protectRoute(<GenerateStoryWithSuspense />, ADMIN_ROLES),
             },
             {
               path: "stories-management",
-              element: <StoriesManagementWithSuspense />,
+              element: protectRoute(
+                <StoriesManagementWithSuspense />,
+                ADMIN_ROLES,
+              ),
             },
             {
               path: "create-conversation",
-              element: <CreateConversationWithSuspense />,
+              element: protectRoute(
+                <CreateConversationWithSuspense />,
+                ADMIN_ROLES,
+              ),
             },
             {
               path: "update-conversation",
-              element: <ConversationsListWithSuspense />,
+              element: protectRoute(
+                <ConversationsListWithSuspense />,
+                ADMIN_ROLES,
+              ),
             },
             {
               path: "conversation/:id",
@@ -274,26 +336,42 @@ export const router = createBrowserRouter(
             },
             {
               path: "users-favorite-count",
-              element: <UsersFavoriteCountWithSuspense />,
+              element: protectRoute(
+                <UsersFavoriteCountWithSuspense />,
+                ADMIN_ROLES,
+              ),
             },
-            { path: "global-limits", element: <GlobalLimitsWithSuspense /> },
-            { path: "user-limits", element: <UserLimitsWithSuspense /> },
-            { path: "get-usage", element: <UsageWithSuspense /> },
-            { path: "get-reports", element: <ReportsByUsersWithSuspense /> },
+            {
+              path: "global-limits",
+              element: protectRoute(<GlobalLimitsWithSuspense />, ADMIN_ROLES),
+            },
+            {
+              path: "user-limits",
+              element: protectRoute(<UserLimitsWithSuspense />, ADMIN_ROLES),
+            },
+            {
+              path: "get-usage",
+              element: protectRoute(<UsageWithSuspense />, ADMIN_ROLES),
+            },
+            {
+              path: "get-reports",
+              element: protectRoute(
+                <ReportsByUsersWithSuspense />,
+                ADMIN_ROLES,
+              ),
+            },
             {
               path: "system-status",
-              element: (
-                <ProtectedRoute allowedRoles={["SUPER_ADMIN", "ADMIN"]}>
-                  <SystemStatusPageWithSuspense />
-                </ProtectedRoute>
+              element: protectRoute(
+                <SystemStatusPageWithSuspense />,
+                ADMIN_ROLES,
               ),
             },
             {
               path: "visitors-info",
-              element: (
-                <ProtectedRoute allowedRoles={["SUPER_ADMIN", "ADMIN"]}>
-                  <VisitorsInfoPageWithSuspense />
-                </ProtectedRoute>
+              element: protectRoute(
+                <VisitorsInfoPageWithSuspense />,
+                ADMIN_ROLES,
               ),
             },
           ],
