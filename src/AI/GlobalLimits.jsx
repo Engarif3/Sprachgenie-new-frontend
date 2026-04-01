@@ -55,15 +55,27 @@ const GlobalLimits = () => {
     <div className="max-w-lg mx-auto bg-white shadow p-6 rounded-lg mt-6">
       <h2 className="text-xl font-semibold mb-4">Global Limits</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <label className="block text-sm font-medium">Daily Limit</label>
+        <label
+          htmlFor="global-daily-limit"
+          className="block text-sm font-medium"
+        >
+          Daily Limit
+        </label>
         <input
+          id="global-daily-limit"
           type="number"
           value={limits.dailyLimit}
           onChange={(e) => setLimits({ ...limits, dailyLimit: e.target.value })}
           className="w-full border p-2 rounded"
         />
-        <label className="block text-sm font-medium">Monthly Limit</label>
+        <label
+          htmlFor="global-monthly-limit"
+          className="block text-sm font-medium"
+        >
+          Monthly Limit
+        </label>
         <input
+          id="global-monthly-limit"
           type="number"
           value={limits.monthlyLimit}
           onChange={(e) =>
@@ -71,8 +83,14 @@ const GlobalLimits = () => {
           }
           className="w-full border p-2 rounded"
         />
-        <label className="block text-sm font-medium">Yearly Limit</label>
+        <label
+          htmlFor="global-yearly-limit"
+          className="block text-sm font-medium"
+        >
+          Yearly Limit
+        </label>
         <input
+          id="global-yearly-limit"
           type="number"
           value={limits.yearlyLimit}
           onChange={(e) =>

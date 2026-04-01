@@ -659,10 +659,14 @@ const FavoritesListDashboard = () => {
               cannot be undone.
             </p>
             <div className="mb-6">
-              <label className="block text-gray-400 text-sm mb-2">
+              <label
+                htmlFor="dashboard-favorites-delete-confirm"
+                className="block text-gray-400 text-sm mb-2"
+              >
                 Type "ok" to confirm:
               </label>
               <input
+                id="dashboard-favorites-delete-confirm"
                 type="text"
                 value={deleteConfirmation.inputValue}
                 onChange={(e) =>

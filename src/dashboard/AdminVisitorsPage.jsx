@@ -932,10 +932,14 @@ const AdminVisitorsPage = () => {
 
                 return (
                   <>
-                    <label className="mb-2 block text-sm text-slate-400">
+                    <label
+                      htmlFor="visitors-delete-confirm"
+                      className="mb-2 block text-sm text-slate-400"
+                    >
                       Type "{requiredInput}" to confirm:
                     </label>
                     <input
+                      id="visitors-delete-confirm"
                       type="text"
                       value={deleteConfirmation.inputValue}
                       onChange={(e) =>

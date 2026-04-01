@@ -126,10 +126,14 @@ const Contact = () => {
               className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-8 rounded-2xl border-2 border-gray-700 hover:border-orange-500/50 transition-all duration-300 space-y-9"
             >
               <div>
-                <label className="text-white font-semibold mb-2 block">
+                <label
+                  htmlFor="contact-name"
+                  className="text-white font-semibold mb-2 block"
+                >
                   {t("yourName")}
                 </label>
                 <input
+                  id="contact-name"
                   className={`w-full bg-gray-700/50 border-2 ${
                     errors.name ? "border-red-500" : "border-gray-600"
                   } rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none transition-all duration-300`}
@@ -145,10 +149,14 @@ const Contact = () => {
               </div>
 
               <div>
-                <label className="text-white font-semibold mb-2 block">
+                <label
+                  htmlFor="contact-email"
+                  className="text-white font-semibold mb-2 block"
+                >
                   {t("yourEmail")}
                 </label>
                 <input
+                  id="contact-email"
                   className={`w-full bg-gray-700/50 border-2 ${
                     errors.email ? "border-red-500" : "border-gray-600"
                   } rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none transition-all duration-300`}
@@ -170,10 +178,14 @@ const Contact = () => {
               </div>
 
               <div>
-                <label className="text-white font-semibold mb-2 block">
+                <label
+                  htmlFor="contact-message"
+                  className="text-white font-semibold mb-2 block"
+                >
                   {t("yourMessage")}
                 </label>
                 <textarea
+                  id="contact-message"
                   className={`w-full bg-gray-700/50 border-2 ${
                     errors.message ? "border-red-500" : "border-gray-600"
                   } rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none transition-all duration-300 min-h-[150px] resize-y`}

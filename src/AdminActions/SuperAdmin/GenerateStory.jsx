@@ -262,10 +262,14 @@ const GenerateStory = () => {
           >
             {/* Prompt Input */}
             <div className="mb-6">
-              <label className="block text-white font-semibold mb-2">
+              <label
+                htmlFor="generate-story-prompt"
+                className="block text-white font-semibold mb-2"
+              >
                 Story Prompt *
               </label>
               <textarea
+                id="generate-story-prompt"
                 name="prompt"
                 value={formData.prompt}
                 onChange={handleInputChange}
@@ -281,10 +285,14 @@ const GenerateStory = () => {
 
             {/* Level Selection */}
             <div className="mb-6">
-              <label className="block text-white font-semibold mb-2">
+              <label
+                htmlFor="generate-story-level"
+                className="block text-white font-semibold mb-2"
+              >
                 Language Level *
               </label>
               <select
+                id="generate-story-level"
                 name="levelId"
                 value={formData.levelId}
                 onChange={handleInputChange}

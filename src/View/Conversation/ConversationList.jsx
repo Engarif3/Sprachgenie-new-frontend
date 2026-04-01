@@ -232,8 +232,14 @@ const ConversationsList = () => {
             <form className="space-y-3">
               {/* Topic */}
               <div>
-                <label className="block font-semibold">Topic</label>
+                <label
+                  htmlFor="edit-conversation-topic"
+                  className="block font-semibold"
+                >
+                  Topic
+                </label>
                 <input
+                  id="edit-conversation-topic"
                   type="text"
                   name="topic"
                   value={formData.topic || ""}
@@ -244,8 +250,14 @@ const ConversationsList = () => {
 
               {/* Level */}
               <div>
-                <label className="block font-semibold">Level</label>
+                <label
+                  htmlFor="edit-conversation-level"
+                  className="block font-semibold"
+                >
+                  Level
+                </label>
                 <select
+                  id="edit-conversation-level"
                   name="levelId"
                   value={formData.levelId || ""}
                   onChange={handleLevelChange}
@@ -261,10 +273,14 @@ const ConversationsList = () => {
 
               {/* Text Messages as JSON */}
               <div>
-                <label className="block font-semibold">
+                <label
+                  htmlFor="edit-conversation-text"
+                  className="block font-semibold"
+                >
                   Text (JSON format)
                 </label>
                 <textarea
+                  id="edit-conversation-text"
                   name="text"
                   value={formData.text || ""}
                   onChange={handleTextChange}

@@ -281,10 +281,14 @@ const StoriesManagement = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Search */}
             <div>
-              <label className="block text-white font-semibold mb-2">
+              <label
+                htmlFor="stories-search"
+                className="block text-white font-semibold mb-2"
+              >
                 Search Stories
               </label>
               <input
+                id="stories-search"
                 type="text"
                 placeholder="Search by title or description..."
                 value={searchTerm}
@@ -295,10 +299,14 @@ const StoriesManagement = () => {
 
             {/* Filter Status */}
             <div>
-              <label className="block text-white font-semibold mb-2">
+              <label
+                htmlFor="stories-filter-status"
+                className="block text-white font-semibold mb-2"
+              >
                 Filter by Status
               </label>
               <select
+                id="stories-filter-status"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
@@ -439,10 +447,14 @@ const StoriesManagement = () => {
 
               {/* Title Input */}
               <div className="mb-6">
-                <label className="block text-white font-semibold mb-2">
+                <label
+                  htmlFor="edit-story-title"
+                  className="block text-white font-semibold mb-2"
+                >
                   Title
                 </label>
                 <input
+                  id="edit-story-title"
                   type="text"
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
@@ -453,10 +465,14 @@ const StoriesManagement = () => {
 
               {/* Description Input */}
               <div className="mb-6">
-                <label className="block text-white font-semibold mb-2">
+                <label
+                  htmlFor="edit-story-description"
+                  className="block text-white font-semibold mb-2"
+                >
                   Description
                 </label>
                 <textarea
+                  id="edit-story-description"
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 resize-none"
@@ -550,10 +566,14 @@ const StoriesManagement = () => {
 
               {/* Level Selection */}
               <div className="mb-6">
-                <label className="block text-white font-semibold mb-2">
+                <label
+                  htmlFor="regenerate-story-level"
+                  className="block text-white font-semibold mb-2"
+                >
                   Language Level
                 </label>
                 <select
+                  id="regenerate-story-level"
                   value={regenerateLevel}
                   onChange={(e) => setRegenerateLevel(e.target.value)}
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
@@ -567,10 +587,14 @@ const StoriesManagement = () => {
 
               {/* Prompt Input */}
               <div className="mb-6">
-                <label className="block text-white font-semibold mb-2">
+                <label
+                  htmlFor="regenerate-story-prompt"
+                  className="block text-white font-semibold mb-2"
+                >
                   New Prompt
                 </label>
                 <textarea
+                  id="regenerate-story-prompt"
                   value={regeneratePrompt}
                   onChange={(e) => setRegeneratePrompt(e.target.value)}
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 resize-none"

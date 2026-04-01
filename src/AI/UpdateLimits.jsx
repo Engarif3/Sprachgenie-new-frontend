@@ -182,10 +182,14 @@ const UpdateLimits = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* User ID */}
         <div>
-          <label className="block text-sm font-medium">
+          <label
+            htmlFor="update-limit-user-id"
+            className="block text-sm font-medium"
+          >
             User ID (optional)
           </label>
           <input
+            id="update-limit-user-id"
             type="text"
             value={userId}
             onChange={(e) => setUserId(e.target.value)}
@@ -196,8 +200,14 @@ const UpdateLimits = () => {
 
         {/* Daily Limit */}
         <div>
-          <label className="block text-sm font-medium">Daily Limit</label>
+          <label
+            htmlFor="update-limit-daily"
+            className="block text-sm font-medium"
+          >
+            Daily Limit
+          </label>
           <input
+            id="update-limit-daily"
             type="number"
             value={dailyLimit}
             onChange={(e) => setDailyLimit(e.target.value)}
@@ -207,8 +217,14 @@ const UpdateLimits = () => {
 
         {/* Monthly Limit */}
         <div>
-          <label className="block text-sm font-medium">Monthly Limit</label>
+          <label
+            htmlFor="update-limit-monthly"
+            className="block text-sm font-medium"
+          >
+            Monthly Limit
+          </label>
           <input
+            id="update-limit-monthly"
             type="number"
             value={monthlyLimit}
             onChange={(e) => setMonthlyLimit(e.target.value)}
@@ -218,8 +234,14 @@ const UpdateLimits = () => {
 
         {/* Yearly Limit */}
         <div>
-          <label className="block text-sm font-medium">Yearly Limit</label>
+          <label
+            htmlFor="update-limit-yearly"
+            className="block text-sm font-medium"
+          >
+            Yearly Limit
+          </label>
           <input
+            id="update-limit-yearly"
             type="number"
             value={yearlyLimit}
             onChange={(e) => setYearlyLimit(e.target.value)}

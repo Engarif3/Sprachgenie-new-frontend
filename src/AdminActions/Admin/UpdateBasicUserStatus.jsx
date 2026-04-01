@@ -210,8 +210,14 @@ const UpdateBasicUserStatus = () => {
             <>
               {/* Status Filter Dropdown */}
               <div className="flex justify-end mb-4">
-                <label className="mr-2 font-semibold text-white">Status:</label>
+                <label
+                  htmlFor="admin-status-filter"
+                  className="mr-2 font-semibold text-white"
+                >
+                  Status:
+                </label>
                 <select
+                  id="admin-status-filter"
                   value={selectedStatus}
                   onChange={(e) => {
                     setSelectedStatus(e.target.value);

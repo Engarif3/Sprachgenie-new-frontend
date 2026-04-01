@@ -486,10 +486,14 @@ const UpdateUserStatus = () => {
             </h3>
           </div>
           <div className="flex items-center gap-3">
-            <label className="text-sm font-semibold text-slate-700">
+            <label
+              htmlFor="super-admin-status-filter"
+              className="text-sm font-semibold text-slate-700"
+            >
               Status:
             </label>
             <select
+              id="super-admin-status-filter"
               value={selectedStatus}
               onChange={(event) => {
                 setSelectedStatus(event.target.value);

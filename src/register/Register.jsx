@@ -217,10 +217,14 @@ const Register = () => {
           >
             {/* Name */}
             <div className="text-left">
-              <label className="block text-sm font-semibold text-gray-300 mb-2 ">
+              <label
+                htmlFor="register-name"
+                className="block text-sm font-semibold text-gray-300 mb-2 "
+              >
                 👤 Name
               </label>
               <input
+                id="register-name"
                 {...register("basicUser.name")}
                 type="text"
                 placeholder="Your full name"
@@ -236,10 +240,14 @@ const Register = () => {
 
             {/* Email */}
             <div className="text-left">
-              <label className="block text-sm font-semibold text-gray-300 mb-2">
+              <label
+                htmlFor="register-email"
+                className="block text-sm font-semibold text-gray-300 mb-2"
+              >
                 📧 Email
               </label>
               <input
+                id="register-email"
                 {...register("basicUser.email")}
                 type="email"
                 placeholder="your@email.com"
@@ -255,11 +263,15 @@ const Register = () => {
 
             {/* Password */}
             <div className="text-left">
-              <label className="block text-sm font-semibold text-gray-300 mb-2">
+              <label
+                htmlFor="register-password"
+                className="block text-sm font-semibold text-gray-300 mb-2"
+              >
                 🔑 Password
               </label>
               <div className="relative">
                 <input
+                  id="register-password"
                   {...register("password")}
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••••"
@@ -283,11 +295,15 @@ const Register = () => {
 
             {/* Confirm Password */}
             <div className="text-left">
-              <label className="block text-sm font-semibold text-gray-300 mb-2">
+              <label
+                htmlFor="register-confirm-password"
+                className="block text-sm font-semibold text-gray-300 mb-2"
+              >
                 🔐 Confirm Password
               </label>
               <div className="relative">
                 <input
+                  id="register-confirm-password"
                   {...register("confirmPassword")}
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••••"
