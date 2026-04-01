@@ -1,4 +1,4 @@
-import { getUserInfo, isLoggedIn } from "../services/auth.services";
+import { useAuth } from "../services/auth.services";
 
 const Pagination = ({
   currentPage,
@@ -10,8 +10,7 @@ const Pagination = ({
   setAction,
   showAction,
 }) => {
-  const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo();
+  const { isAdmin, isLoggedIn: userLoggedIn } = useAuth();
   return (
     <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8 mb-8 mt-6">
       {/* Left Side Controls */}
@@ -36,15 +35,14 @@ const Pagination = ({
           )}
         </div>
 
-        {userLoggedIn &&
-          (userInfo?.role === "super_admin" || userInfo?.role === "admin") && (
-            <button
-              onClick={() => setAction(!showAction)}
-              className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-cyan-500/50 mr-2"
-            >
-              {showAction ? "🔒 Hide Actions" : "⚙️ Show Actions"}
-            </button>
-          )}
+        {userLoggedIn && isAdmin && (
+          <button
+            onClick={() => setAction(!showAction)}
+            className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-cyan-500/50 mr-2"
+          >
+            {showAction ? "🔒 Hide Actions" : "⚙️ Show Actions"}
+          </button>
+        )}
       </div>
       {/* Pagination Buttons */}
       <div className="flex justify-between md:justify-end items-center gap-4 w-full md:w-auto">

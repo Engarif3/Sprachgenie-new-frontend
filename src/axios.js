@@ -6,16 +6,44 @@ import {
   queueForcedLogoutNotice,
 } from "./services/auth.services";
 
+const backendBaseURL =
+  import.meta.env.VITE_BACKEND_API_URL || "https://api.simplegerman.de/api/v1";
+
+const applyFormDataInterceptor = (client) => {
+  client.interceptors.request.use(
+    (config) => {
+      if (config.data instanceof FormData) {
+        delete config.headers["Content-Type"];
+      }
+
+      return config;
+    },
+    (error) => Promise.reject(error),
+  );
+};
+
 const api = axios.create({
-  baseURL:
-    import.meta.env.VITE_BACKEND_API_URL ||
-    "https://api.simplegerman.de/api/v1",
+  baseURL: backendBaseURL,
   // Don't set default Content-Type header
   // Let axios/browser automatically set it based on data type:
   // - JSON objects → application/json
   // - FormData → multipart/form-data
   withCredentials: true, // ✅ CRITICAL: Send httpOnly cookies automatically
 });
+
+export const publicApi = axios.create({
+  baseURL: backendBaseURL,
+  withCredentials: true,
+});
+
+export const externalApi = axios.create({
+  timeout: 15000,
+  headers: {
+    Accept: "application/json",
+  },
+});
+
+applyFormDataInterceptor(publicApi);
 
 // ✅ Request interceptor: Add auth token from localStorage as fallback if cookies don't work
 api.interceptors.request.use(
@@ -25,18 +53,14 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    // If data is FormData, don't set Content-Type header
-    // Let the browser handle it automatically with the correct boundary
-    if (config.data instanceof FormData) {
-      delete config.headers["Content-Type"];
-    }
-
     return config;
   },
   (error) => {
     return Promise.reject(error);
   },
 );
+
+applyFormDataInterceptor(api);
 
 // Response interceptor for error handling
 api.interceptors.response.use(

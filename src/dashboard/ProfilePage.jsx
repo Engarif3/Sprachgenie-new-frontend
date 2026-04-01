@@ -3,7 +3,7 @@ import { getCountries, getCountryCallingCode } from "libphonenumber-js/min";
 import { toast } from "sonner";
 import Swal from "sweetalert2";
 import api from "../axios";
-import { getUserInfo, storeUserInfo } from "../services/auth.services";
+import { storeUserInfo, useAuth } from "../services/auth.services";
 
 const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
 
@@ -86,7 +86,7 @@ const createInitials = (name, email) => {
 };
 
 const ProfilePage = () => {
-  const cachedUser = getUserInfo() || {};
+  const { safeUserInfo: cachedUser } = useAuth();
   const initialContact = parseContactNumber(cachedUser.contactNumber || "");
   const [profile, setProfile] = useState(null);
   const [formState, setFormState] = useState({

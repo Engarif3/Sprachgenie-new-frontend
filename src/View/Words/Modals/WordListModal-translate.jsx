@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { Link } from "react-router-dom";
-import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
+import { useAuth } from "../../../services/auth.services";
 import { pronounceWord } from "../../../utils/wordPronounciation";
 import FavoriteButton from "./FavoriteButton";
 import { RiCloseCircleFill } from "react-icons/ri";
@@ -15,8 +15,10 @@ const WordListModal = ({
   loadingFavorites = {},
 }) => {
   const modalRef = useRef(null);
-  const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo();
+  const { isAdmin, isLoggedIn: userLoggedIn } = useAuth();
+  const synonyms = selectedWord?.synonyms || [];
+  const antonyms = selectedWord?.antonyms || [];
+  const similarWords = selectedWord?.similarWords || [];
 
   useLockBodyScroll(!!selectedWord);
 
@@ -57,16 +59,14 @@ const WordListModal = ({
             >
               🔊
             </button>
-            {userLoggedIn &&
-              (userInfo?.role === "super_admin" ||
-                userInfo?.role === "admin") && (
-                <Link
-                  to={`/edit-word/${selectedWord.id}`}
-                  className="btn btn-sm btn-warning"
-                >
-                  Edit
-                </Link>
-              )}
+            {userLoggedIn && isAdmin && (
+              <Link
+                to={`/edit-word/${selectedWord.id}`}
+                className="btn btn-sm btn-warning"
+              >
+                Edit
+              </Link>
+            )}
           </h3>
         </div>
 
@@ -88,21 +88,21 @@ const WordListModal = ({
               {selectedWord.meaning?.join(", ")}
             </p>
 
-            {selectedWord.synonyms.length > 0 && (
+            {synonyms.length > 0 && (
               <p className="text-lg text-gray-600">
                 <span className="text-sky-600 font-medium capitalize">
                   Synonyms:
                 </span>{" "}
-                {selectedWord.synonyms.map((s) => s.value).join(", ")}
+                {synonyms.map((s) => s.value).join(", ")}
               </p>
             )}
 
-            {selectedWord.antonyms.length > 0 && (
+            {antonyms.length > 0 && (
               <p className="text-lg text-gray-600">
                 <span className="text-sky-600 font-medium capitalize">
                   Antonyms:
                 </span>{" "}
-                {selectedWord.antonyms.map((a) => a.value).join(", ")}
+                {antonyms.map((a) => a.value).join(", ")}
               </p>
             )}
 
@@ -117,10 +117,10 @@ const WordListModal = ({
               </p>
             )}
 
-            {selectedWord.similarWords.length > 0 && (
+            {similarWords.length > 0 && (
               <p className="text-lg text-gray-600 capitalize">
                 <span className="text-sky-600 font-medium">Word to Watch:</span>{" "}
-                {selectedWord.similarWords.map((sw) => sw.value).join(", ")}
+                {similarWords.map((sw) => sw.value).join(", ")}
               </p>
             )}
 

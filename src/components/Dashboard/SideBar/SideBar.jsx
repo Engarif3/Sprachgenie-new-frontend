@@ -6,8 +6,7 @@ import { drawerItems } from "@/utils/drwaerItems";
 import { useAuth } from "@/services/auth.services";
 
 const SideBar = () => {
-  const { userInfo } = useAuth();
-  const userRole = userInfo?.role || "";
+  const { userRole } = useAuth();
 
   return (
     <div>

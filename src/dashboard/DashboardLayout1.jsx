@@ -5,8 +5,11 @@ import { useState } from "react";
 
 const DashboardLayout = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { userInfo, isBootstrapResolved } = useAuth();
-  const role = userInfo?.role;
+  const {
+    isBootstrapResolved,
+    safeUserInfo: userInfo,
+    userRole: role,
+  } = useAuth();
 
   if (!isBootstrapResolved) {
     return (
@@ -16,7 +19,7 @@ const DashboardLayout = () => {
     );
   }
 
-  if (!userInfo) {
+  if (!userInfo.id) {
     return <Navigate to="/login" replace />;
   }
 

@@ -1,22 +1,12 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
-import axios from "axios";
 import Swal from "sweetalert2"; // Ensure SweetAlert2 is imported
-import { getUserInfo, isLoggedIn } from "../../services/auth.services";
+import { useAuth } from "../../services/auth.services";
 import api from "../../axios";
 
 const CreateConversation = () => {
-  const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo() || {};
-
-  // Security check: Only allow admin/super_admin users
-  if (
-    !userLoggedIn ||
-    !userInfo?.id ||
-    (userInfo?.role !== "admin" && userInfo?.role !== "super_admin")
-  ) {
-    return <Navigate to="/" replace />;
-  }
+  const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
+  const canAccess = userLoggedIn && userId && isAdmin;
   const [formData, setFormData] = useState({
     topic: "",
     levelId: 1, // Default level A1
@@ -69,7 +59,7 @@ const CreateConversation = () => {
         topic: formData.topic,
         levelId: formData.levelId,
         text: conversationText,
-        createdBy: userInfo?.id,
+        createdBy: userId,
       };
 
       const response = await api.post("/conversation/create", dataToSend);
@@ -102,6 +92,10 @@ const CreateConversation = () => {
       });
     }
   };
+
+  if (!canAccess) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="max-w-5xl mx-auto p-4 min-h-screen">

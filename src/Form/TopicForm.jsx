@@ -75,20 +75,11 @@ import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import axios from "../axios";
 import Container from "../utils/Container";
-import { getUserInfo, isLoggedIn } from "../services/auth.services";
+import { useAuth } from "../services/auth.services";
 
 const TopicForm = () => {
-  const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo() || {};
-
-  // Security check: Only allow admin/super_admin users
-  if (
-    !userLoggedIn ||
-    !userInfo?.id ||
-    (userInfo?.role !== "admin" && userInfo?.role !== "super_admin")
-  ) {
-    return <Navigate to="/" replace />;
-  }
+  const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
+  const canAccess = userLoggedIn && userId && isAdmin;
   const [topicData, setTopicData] = useState({
     name: "",
     levelId: "", // add levelId field
@@ -139,6 +130,10 @@ const TopicForm = () => {
       setLoading(false);
     }
   };
+
+  if (!canAccess) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <Container>

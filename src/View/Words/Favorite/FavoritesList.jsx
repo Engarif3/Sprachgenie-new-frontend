@@ -30,7 +30,7 @@ const FavoritesList = () => {
     inputValue: "",
   });
 
-  const { userInfo } = useAuth();
+  const { userId } = useAuth();
 
   // =================ai===========================
   const [aiWord, setAiWord] = useState(null);
@@ -63,10 +63,10 @@ const FavoritesList = () => {
 
   useEffect(() => {
     const fetchFavorites = async () => {
-      if (!userInfo?.id) return;
+      if (!userId) return;
 
       try {
-        const response = await axios.get(`/favorite-words/${userInfo.id}`);
+        const response = await axios.get(`/favorite-words/${userId}`);
         if (response.data.success) {
           const sanitizedData = response.data.data.map((w) => ({
             ...w,
@@ -97,7 +97,7 @@ const FavoritesList = () => {
     };
 
     fetchFavorites();
-  }, [userInfo?.id]);
+  }, [userId]);
 
   // Create Map for O(1) word lookups
   const wordsByIdMap = useMemo(() => {
@@ -256,7 +256,7 @@ const FavoritesList = () => {
     }
 
     try {
-      await axios.delete(`/favorite-words/delete-all/${userInfo.id}`);
+      await axios.delete(`/favorite-words/delete-all/${userId}`);
       setFavoriteWords([]);
       setFavorites([]);
       setToLocalStorage("favorites", []);
@@ -323,7 +323,7 @@ const FavoritesList = () => {
 
         if (response.data.success) {
           // Fetch updated favorites list
-          const favResponse = await axios.get(`/favorite-words/${userInfo.id}`);
+          const favResponse = await axios.get(`/favorite-words/${userId}`);
           if (favResponse.data.success) {
             setFavoriteWords(favResponse.data.data);
             setFavorites(favResponse.data.data.map((w) => w.id));
@@ -352,7 +352,7 @@ const FavoritesList = () => {
   };
 
   const generateParagraph = async (word) => {
-    if (!userInfo?.id) {
+    if (!userId) {
       Swal.fire(
         "Not Logged In",
         "You must be logged in to generate paragraphs",
@@ -365,7 +365,7 @@ const FavoritesList = () => {
       setLoadingParagraphs((prev) => ({ ...prev, [word.id]: true }));
 
       const response = await aiApi.post(`/paragraphs/generate`, {
-        userId: userInfo?.id,
+        userId,
         wordId: word.id,
         word: word.value,
         level: word.level?.level || "A1",

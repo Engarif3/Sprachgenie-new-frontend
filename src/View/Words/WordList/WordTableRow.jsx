@@ -18,8 +18,8 @@ const WordTableRow = ({
   currentIndex,
   revealedWords,
   showActionColumn,
+  canManageWords,
   userLoggedIn,
-  userInfo,
   favorites,
   loadingFavorites,
   loadingParagraphs,
@@ -270,52 +270,51 @@ const WordTableRow = ({
       </td>
 
       {/* History */}
-      {userLoggedIn &&
-        (userInfo?.role === "super_admin" || userInfo?.role === "admin") && (
-          <td className="border border-gray-700 border-dotted p-2 md:p-3 text-center hidden md:table-cell lg:table-cell">
-            <button
-              onClick={() => {
-                setSelectedHistory({
-                  creator: {
-                    name: word.creator?.name,
-                    email: word.creator?.email,
-                  },
-                  modifiers:
-                    word.history?.map((h) => ({
-                      name: h.user?.name,
-                      email: h.user?.email,
-                    })) || [],
-                });
-                setIsHistoryModalOpen(true);
-              }}
-              className={`hover:text-blue-700 ${
-                word.history?.some((h) => {
-                  const adminEmails =
-                    import.meta.env.VITE_ADMIN_EMAILS?.split(",") || [];
-                  return !adminEmails.includes(h.user?.email);
-                })
-                  ? "text-red-500"
-                  : "text-blue-500"
-              }`}
-              aria-label="View history"
+      {userLoggedIn && canManageWords && (
+        <td className="border border-gray-700 border-dotted p-2 md:p-3 text-center hidden md:table-cell lg:table-cell">
+          <button
+            onClick={() => {
+              setSelectedHistory({
+                creator: {
+                  name: word.creator?.name,
+                  email: word.creator?.email,
+                },
+                modifiers:
+                  word.history?.map((h) => ({
+                    name: h.user?.name,
+                    email: h.user?.email,
+                  })) || [],
+              });
+              setIsHistoryModalOpen(true);
+            }}
+            className={`hover:text-blue-700 ${
+              word.history?.some((h) => {
+                const adminEmails =
+                  import.meta.env.VITE_ADMIN_EMAILS?.split(",") || [];
+                return !adminEmails.includes(h.user?.email);
+              })
+                ? "text-red-500"
+                : "text-blue-500"
+            }`}
+            aria-label="View history"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-5 h-5"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </button>
-          </td>
-        )}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </button>
+        </td>
+      )}
     </tr>
   );
 };

@@ -4,21 +4,11 @@ import { Navigate } from "react-router-dom";
 import api from "../axios";
 import aiApi from "../AI_axios";
 import { ScaleLoader } from "react-spinners";
-import { isLoggedIn } from "../services/auth.services";
-import { getUserInfo as getAuthUserInfo } from "../services/auth.services";
+import { useAuth } from "../services/auth.services";
 
 const ReportsByUsers = () => {
-  const userLoggedIn = isLoggedIn();
-  const userInfo = getAuthUserInfo() || {};
-
-  // Security check: Only allow admin/super_admin users
-  if (
-    !userLoggedIn ||
-    !userInfo?.id ||
-    (userInfo?.role !== "admin" && userInfo?.role !== "super_admin")
-  ) {
-    return <Navigate to="/" replace />;
-  }
+  const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
+  const canAccess = userLoggedIn && userId && isAdmin;
   const [reports, setReports] = useState([]);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -355,6 +345,10 @@ const ReportsByUsers = () => {
         No reports found.
       </p>
     );
+
+  if (!canAccess) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="container mx-auto p-4 min-h-screen">

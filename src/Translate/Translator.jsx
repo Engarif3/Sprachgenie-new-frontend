@@ -60,6 +60,7 @@
 
 import { useState } from "react";
 import { IoMdArrowDropright } from "react-icons/io";
+import { publicApi } from "../axios";
 import { pronounceWord } from "../utils/wordPronounciation";
 
 const Translator = ({ sentences }) => {
@@ -72,27 +73,12 @@ const Translator = ({ sentences }) => {
     setLoading((prev) => ({ ...prev, [sentence]: true }));
 
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_API_URL}/translate`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            text: sentence,
-            source: "de",
-            target: "en",
-          }),
-        },
-      );
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        console.error("Translation API error:", data);
-        throw new Error(data.error || "Translation API error");
-      }
+      const response = await publicApi.post("/translate", {
+        text: sentence,
+        source: "de",
+        target: "en",
+      });
+      const data = response.data;
 
       if (!data.data?.translated) {
         console.error("No translation in response:", data);

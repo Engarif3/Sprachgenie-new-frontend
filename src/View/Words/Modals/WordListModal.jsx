@@ -1,7 +1,8 @@
 import { useRef, useCallback, useMemo, memo, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
-import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
+import { publicApi } from "../../../axios";
+import { useAuth } from "../../../services/auth.services";
 import { pronounceWord } from "../../../utils/wordPronounciation";
 import FavoriteButton from "./FavoriteButton";
 import { RiCloseCircleFill } from "react-icons/ri";
@@ -134,8 +135,7 @@ const WordListModal = ({
 }) => {
   const modalRef = useRef(null);
 
-  const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo();
+  const { isAdmin, isLoggedIn: userLoggedIn } = useAuth();
 
   // Translation state
   const [translations, setTranslations] = useState({});
@@ -152,25 +152,12 @@ const WordListModal = ({
       setLoadingTranslations((prev) => ({ ...prev, [sentence]: true }));
 
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_API_URL}/translate`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              text: sentence,
-              source: "de",
-              target: "en",
-            }),
-          },
-        );
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          console.error("Translation API error:", data);
-          throw new Error(data.error || "Translation failed");
-        }
+        const response = await publicApi.post("/translate", {
+          text: sentence,
+          source: "de",
+          target: "en",
+        });
+        const data = response.data;
 
         if (!data.data?.translated) {
           throw new Error("No translation received");
@@ -317,16 +304,14 @@ const WordListModal = ({
             >
               🔊
             </button>
-            {userLoggedIn &&
-              (userInfo?.role === "super_admin" ||
-                userInfo?.role === "admin") && (
-                <Link
-                  to={`/edit-word/${selectedWord.id}`}
-                  className="px-2 md:px-4 lg:px-4 py-1 md:py-2 lg:py-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 rounded-full font-semibold text-white text-xs md:text-sm lg:text-sm transition-all duration-200 hover:scale-105 shadow-md"
-                >
-                  ✏️ Edit
-                </Link>
-              )}
+            {userLoggedIn && isAdmin && (
+              <Link
+                to={`/edit-word/${selectedWord.id}`}
+                className="px-2 md:px-4 lg:px-4 py-1 md:py-2 lg:py-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 rounded-full font-semibold text-white text-xs md:text-sm lg:text-sm transition-all duration-200 hover:scale-105 shadow-md"
+              >
+                ✏️ Edit
+              </Link>
+            )}
           </h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-3 mx-1 md:mx-1 lg:mx-1 px-1 md:px-2 lg:px-2 mt-4 ">

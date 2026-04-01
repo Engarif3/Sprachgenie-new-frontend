@@ -14,8 +14,6 @@ export { instance };
 
 // Add a response interceptor
 instance.interceptors.response.use(
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //@ts-ignore
   function (response) {
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data
@@ -35,5 +33,5 @@ instance.interceptors.response.use(
     };
     // return Promise.reject(error);
     return responseObject;
-  }
+  },
 );

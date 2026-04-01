@@ -1,20 +1,11 @@
 import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import aiApi from "../AI_axios";
-import { getUserInfo, isLoggedIn } from "../services/auth.services";
+import { useAuth } from "../services/auth.services";
 
 const GlobalLimits = () => {
-  const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo() || {};
-
-  // Security check: Only allow admin/super_admin users
-  if (
-    !userLoggedIn ||
-    !userInfo?.id ||
-    (userInfo?.role !== "admin" && userInfo?.role !== "super_admin")
-  ) {
-    return <Navigate to="/" replace />;
-  }
+  const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
+  const canAccess = userLoggedIn && userId && isAdmin;
   const [limits, setLimits] = useState({
     dailyLimit: "",
     monthlyLimit: "",
@@ -55,6 +46,10 @@ const GlobalLimits = () => {
       setLoading(false);
     }
   };
+
+  if (!canAccess) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="max-w-lg mx-auto bg-white shadow p-6 rounded-lg mt-6">

@@ -70,8 +70,13 @@ const getSummaryCardClass = (tone) => {
 };
 
 const UpdateUserStatus = () => {
-  const { userInfo: authUserInfo, isLoggedIn: userLoggedIn } = useAuth();
-  const userInfo = authUserInfo || {};
+  const {
+    isLoggedIn: userLoggedIn,
+    isSuperAdmin,
+    safeUserInfo: userInfo,
+    userId,
+    userRole,
+  } = useAuth();
   const navigate = useNavigate();
 
   const [admins, setAdmins] = useState([]);
@@ -93,8 +98,7 @@ const UpdateUserStatus = () => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isProfileLoading, setIsProfileLoading] = useState(false);
 
-  const canManageUsers =
-    userLoggedIn && userInfo?.id && userInfo?.role === "super_admin";
+  const canManageUsers = userLoggedIn && userId && isSuperAdmin;
 
   const fetchAdmins = async (page = 1, limit = 50, query = "") => {
     try {
@@ -163,11 +167,11 @@ const UpdateUserStatus = () => {
   };
 
   useEffect(() => {
-    if (userInfo?.role === "super_admin") {
+    if (userRole === "super_admin") {
       fetchAdmins(adminPage, 50, searchTerm);
       fetchBasicUsers(basicPage, selectedStatus, 50, searchTerm);
     }
-  }, [adminPage, basicPage, selectedStatus, userInfo?.role, searchTerm]);
+  }, [adminPage, basicPage, selectedStatus, userRole, searchTerm]);
 
   const refreshLists = async () => {
     await Promise.all([
@@ -189,7 +193,7 @@ const UpdateUserStatus = () => {
   };
 
   const handleSelfSessionRefresh = async (affectedUserId) => {
-    if (affectedUserId !== userInfo?.id) {
+    if (affectedUserId !== userId) {
       return false;
     }
 
@@ -241,7 +245,7 @@ const UpdateUserStatus = () => {
         api
           .patch(`/user/update-status/${userId}`, {
             status: newStatus,
-            performedById: userInfo?.id,
+            performedById: userId,
           })
           .then(async (response) => {
             if (response.data.success) {
@@ -366,7 +370,7 @@ const UpdateUserStatus = () => {
         api
           .patch(`/user/update-role/${userId}`, {
             role: newRole,
-            performedById: userInfo?.id,
+            performedById: userId,
           })
           .then(async (response) => {
             if (response.data.success) {
@@ -678,7 +682,7 @@ const UpdateUserStatus = () => {
 
   return (
     <Container>
-      {userInfo?.role === "super_admin" && (
+      {isSuperAdmin && (
         <div className="min-h-screen   px-4 py-5 md:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl space-y-5">
             <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl shadow-slate-200/60">

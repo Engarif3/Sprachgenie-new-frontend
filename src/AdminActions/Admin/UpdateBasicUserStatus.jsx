@@ -26,8 +26,14 @@ const formatRoleLabel = (role) => {
 };
 
 const UpdateBasicUserStatus = () => {
-  const { userInfo: authUserInfo, isLoggedIn: userLoggedIn } = useAuth();
-  const userInfo = authUserInfo || {};
+  const {
+    isAdmin,
+    isLoggedIn: userLoggedIn,
+    isSuperAdmin,
+    safeUserInfo: userInfo,
+    userId,
+    userRole,
+  } = useAuth();
   const [basicUsers, setBasicUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -37,9 +43,7 @@ const UpdateBasicUserStatus = () => {
 
   const navigate = useNavigate();
   const canManageBasicUsers =
-    userLoggedIn &&
-    userInfo?.id &&
-    (userInfo?.role === "admin" || userInfo?.role === "super_admin");
+    userLoggedIn && userId && (isAdmin || isSuperAdmin);
 
   const fetchUsers = async (page, status, limit = 50) => {
     try {
@@ -68,13 +72,13 @@ const UpdateBasicUserStatus = () => {
   };
 
   useEffect(() => {
-    if (userInfo?.role === "admin") {
+    if (userRole === "admin") {
       fetchUsers(page, selectedStatus);
     }
-  }, [page, selectedStatus, userInfo?.role]);
+  }, [page, selectedStatus, userRole]);
 
   const handleSelfSessionRefresh = async (affectedUserId) => {
-    if (affectedUserId !== userInfo?.id) {
+    if (affectedUserId !== userId) {
       return false;
     }
 
@@ -126,7 +130,7 @@ const UpdateBasicUserStatus = () => {
         api
           .patch(`/user/update-basicUser-status/${userId}`, {
             status: newStatus,
-            performedById: userInfo?.id,
+            performedById: userId,
           })
           .then(async (response) => {
             if (response.data.success) {
@@ -183,7 +187,7 @@ const UpdateBasicUserStatus = () => {
 
   return (
     <Container>
-      {userInfo?.role === "admin" && (
+      {userRole === "admin" && (
         <div className="container mx-auto p-4 min-h-screen">
           <h2 className="text-2xl font-bold mb-4 text-center text-white py-2 bg-cyan-700 rounded">
             Update User Status -{" "}

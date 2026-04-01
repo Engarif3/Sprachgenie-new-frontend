@@ -86,11 +86,15 @@ const Quiz = lazy(() => import("../View/Quiz/Quiz"));
 
 // Helper to wrap lazy components with Suspense
 const withSuspense = (Component) => {
-  return (props) => (
+  const WrappedComponent = (props) => (
     <Suspense fallback={<Loader loading={true} />}>
       <Component {...props} />
     </Suspense>
   );
+
+  WrappedComponent.displayName = `withSuspense(${Component.displayName || Component.name || "Component"})`;
+
+  return WrappedComponent;
 };
 
 // Wrap components

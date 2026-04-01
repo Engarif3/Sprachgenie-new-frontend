@@ -1,20 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import axios from "../axios";
-import { getUserInfo, isLoggedIn } from "../services/auth.services";
+import { useAuth } from "../services/auth.services";
 
 const LevelList = () => {
-  const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo() || {};
-
-  // Security check: Only allow admin/super_admin users
-  if (
-    !userLoggedIn ||
-    !userInfo?.id ||
-    (userInfo?.role !== "admin" && userInfo?.role !== "super_admin")
-  ) {
-    return <Navigate to="/" replace />;
-  }
+  const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
+  const canAccess = userLoggedIn && userId && isAdmin;
   const [levels, setLevels] = useState([]);
   const [editingLevel, setEditingLevel] = useState();
   const [newLevelName, setNewLevelName] = useState("");
@@ -68,6 +59,10 @@ const LevelList = () => {
       alert("Failed to delete level. Please try again.");
     }
   };
+
+  if (!canAccess) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="max-w-lg mx-auto">

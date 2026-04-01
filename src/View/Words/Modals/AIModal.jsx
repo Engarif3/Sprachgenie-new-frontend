@@ -3,13 +3,13 @@ import Swal from "sweetalert2";
 
 import { useLockBodyScroll } from "./ModalScrolling";
 import aiApi from "../../../AI_axios";
-import { getUserInfo } from "../../../services/auth.services";
+import { useAuth } from "../../../services/auth.services";
 
 const AIModal = ({ isOpen, aiWord, selectedParagraph, onClose }) => {
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [reportMessage, setReportMessage] = useState("");
   const [reportLoading, setReportLoading] = useState(false);
-  const userInfo = getUserInfo() || {};
+  const { userId } = useAuth();
 
   useLockBodyScroll(isOpen);
 
@@ -27,7 +27,7 @@ const AIModal = ({ isOpen, aiWord, selectedParagraph, onClose }) => {
       setReportLoading(true);
       const response = await aiApi.post("/paragraphs/report", {
         wordId: aiWord.id,
-        userId: userInfo?.id ?? null,
+        userId,
         message: reportMessage?.trim() || null,
       });
 

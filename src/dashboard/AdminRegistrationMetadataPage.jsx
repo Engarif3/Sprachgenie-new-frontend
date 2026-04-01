@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import api from "../axios";
+import api, { externalApi } from "../axios";
 import { useAuth } from "../services/auth.services";
 
 const GEOCODING_ENDPOINT = "https://nominatim.openstreetmap.org/search";
@@ -213,9 +213,7 @@ const LocationMap = ({ mapUrls, coordinates, record }) => {
 };
 
 const AdminRegistrationMetadataPage = () => {
-  const { userInfo: authUserInfo } = useAuth();
-  const userInfo = authUserInfo || {};
-  const role = userInfo?.role;
+  const { safeUserInfo: userInfo, userRole: role } = useAuth();
   const canAccess = role === "admin" || role === "super_admin";
 
   const [filters, setFilters] = useState({
@@ -296,21 +294,15 @@ const AdminRegistrationMetadataPage = () => {
       setDerivedCoordinatesLoading(true);
 
       try {
-        const response = await fetch(
-          `${GEOCODING_ENDPOINT}?format=jsonv2&limit=1&q=${encodeURIComponent(locationQuery)}`,
-          {
-            signal: abortController.signal,
-            headers: {
-              Accept: "application/json",
-            },
+        const response = await externalApi.get(GEOCODING_ENDPOINT, {
+          params: {
+            format: "jsonv2",
+            limit: 1,
+            q: locationQuery,
           },
-        );
-
-        if (!response.ok) {
-          throw new Error(`Geocoding failed with status ${response.status}`);
-        }
-
-        const results = await response.json();
+          signal: abortController.signal,
+        });
+        const results = response.data;
         const firstMatch = Array.isArray(results) ? results[0] : null;
         const latitude = getCoordinateValue(firstMatch?.lat);
         const longitude = getCoordinateValue(firstMatch?.lon);
@@ -326,7 +318,10 @@ const AdminRegistrationMetadataPage = () => {
           label: firstMatch?.display_name || locationQuery,
         });
       } catch (requestError) {
-        if (requestError.name !== "AbortError") {
+        if (
+          requestError.name !== "AbortError" &&
+          requestError.code !== "ERR_CANCELED"
+        ) {
           console.error(
             "Failed to geocode registration location:",
             requestError,

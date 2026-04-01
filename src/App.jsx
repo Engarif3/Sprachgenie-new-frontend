@@ -159,6 +159,7 @@ import Footer from "./footer/Footer";
 import ScrollToTop from "./ScrollToTop";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Swal from "sweetalert2";
+import { publicApi } from "./axios";
 import {
   markAuthBootstrapResolved,
   syncCurrentUser,
@@ -199,10 +200,7 @@ const AppContent = () => {
   useEffect(() => {
     const trackVisitor = async () => {
       try {
-        await fetch(`${import.meta.env.VITE_BACKEND_API_URL}/visitors/track`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        });
+        await publicApi.post("/visitors/track");
       } catch (error) {
         console.error("Failed to track visitor:", error);
       }

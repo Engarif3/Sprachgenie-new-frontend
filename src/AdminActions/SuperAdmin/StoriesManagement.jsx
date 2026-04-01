@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../../axios";
+import aiApi from "../../AI_axios";
 
 const StoriesManagement = () => {
   const [stories, setStories] = useState([]);
@@ -217,20 +218,11 @@ const StoriesManagement = () => {
     setRegenerateLoading(true);
     try {
       // Call AI service to regenerate story
-      const aiResponse = await fetch(
-        `${import.meta.env.VITE_AI_API_URL}/stories/generate`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            prompt: regeneratePrompt.trim(),
-            level: regenerateLevel,
-          }),
-        },
-      );
-
-      if (!aiResponse.ok) throw new Error("AI service error");
-      const data = await aiResponse.json();
+      const aiResponse = await aiApi.post("/stories/generate", {
+        prompt: regeneratePrompt.trim(),
+        level: regenerateLevel,
+      });
+      const data = aiResponse.data;
 
       if (data && data.data) {
         const generatedStory = data.data;

@@ -65,12 +65,7 @@ const WordList = () => {
   const [showInfo, setShowInfo] = useState(false);
 
   // ===================
-  const { userInfo, isLoggedIn: userLoggedIn } = useAuth();
-
-  const isAdmin = useMemo(
-    () => ["admin", "super_admin"].includes(userInfo?.role),
-    [userInfo?.role],
-  );
+  const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
 
   const [favorites, setFavorites] = useState([]);
 
@@ -94,10 +89,10 @@ const WordList = () => {
       //   )
       //     return;
 
-      if (!userLoggedIn || !userInfo?.id) return;
+      if (!userLoggedIn || !userId) return;
 
       try {
-        const response = await api.get(`/favorite-words/${userInfo.id}`);
+        const response = await api.get(`/favorite-words/${userId}`);
         setFavorites(response.data.data.map((word) => word.id));
       } catch (error) {
         if (error.response) {
@@ -109,7 +104,7 @@ const WordList = () => {
       }
     };
     fetchFavorites();
-  }, [userInfo?.id, userLoggedIn]);
+  }, [userId, userLoggedIn]);
 
   const toggleFavorite = async (wordId) => {
     // Prevent concurrent requests to the same word
@@ -627,7 +622,7 @@ const WordList = () => {
   // Learning mode implementation (Logic remains the same, good to leave)
   const handleDelete = useCallback(
     (wordId, wordValue) => {
-      if (!userInfo?.id) {
+      if (!userId) {
         Swal.fire("Error", "User not logged in or user ID missing.", "error");
         return;
       }
@@ -670,7 +665,7 @@ const WordList = () => {
         }
       });
     },
-    [userInfo?.id, setCache],
+    [userId, setCache],
   );
 
   //learning mode
@@ -842,7 +837,7 @@ const WordList = () => {
   // 	==============AI===============
 
   const generateParagraph = async (word) => {
-    if (!userInfo?.id) {
+    if (!userId) {
       Swal.fire(
         "Not Logged In",
         "You must be logged in to generate paragraphs",
@@ -867,7 +862,7 @@ const WordList = () => {
       const response = await aiApi.post(
         `/paragraphs/generate`,
         {
-          userId: userInfo?.id,
+          userId,
           wordId: word.id,
           word: word.value,
           level: word.level?.level || "A1",
@@ -962,13 +957,11 @@ const WordList = () => {
           >
             🎮 Play Quiz
           </Link>
-          {userLoggedIn &&
-            (userInfo?.role === "admin" ||
-              userInfo?.role === "super_admin") && (
-              <span className="text-sm text-pink-400 font-bold mr-2">
-                Total: {cache.words.length} words
-              </span>
-            )}
+          {userLoggedIn && isAdmin && (
+            <span className="text-sm text-pink-400 font-bold mr-2">
+              Total: {cache.words.length} words
+            </span>
+          )}
         </div>
         <div className="mb-4">
           <span className="hidden md:inline-block lg:inline-block px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
@@ -1182,21 +1175,13 @@ const WordList = () => {
                   >
                     ❤️
                   </th>
-                  {userLoggedIn &&
-                    (userInfo?.role === "super_admin" ||
-                      userInfo?.role === "admin") && (
-                      <>
-                        <th
-                          className={`border-l py-3 border-dotted hidden md:table-cell lg:table-cell border-gray-700 text-sm md:text-lg lg:text-lg text-center text-teal-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b ${
-                            userInfo?.role !== "basic_user"
-                              ? "rounded-tr-xl"
-                              : ""
-                          }`}
-                        >
-                          #
-                        </th>
-                      </>
-                    )}
+                  {userLoggedIn && isAdmin && (
+                    <>
+                      <th className="border-l py-3 border-dotted hidden md:table-cell lg:table-cell border-gray-700 text-sm md:text-lg lg:text-lg text-center text-teal-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b rounded-tr-xl">
+                        #
+                      </th>
+                    </>
+                  )}
                 </tr>
               </thead>
 
@@ -1212,8 +1197,8 @@ const WordList = () => {
                       currentIndex={currentIndex}
                       revealedWords={revealedWords}
                       showActionColumn={showActionColumn}
+                      canManageWords={isAdmin}
                       userLoggedIn={userLoggedIn}
-                      userInfo={userInfo}
                       favorites={favorites}
                       loadingFavorites={loadingFavorites}
                       loadingParagraphs={loadingParagraphs}

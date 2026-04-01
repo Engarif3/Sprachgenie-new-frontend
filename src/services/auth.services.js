@@ -1,7 +1,8 @@
-import api from "../axios";
+import api, { publicApi } from "../axios";
 import { useSyncExternalStore } from "react";
 
 const FORCED_LOGOUT_NOTICE_KEY = "forcedLogoutNotice";
+const EMPTY_USER_INFO = Object.freeze({});
 
 // ✅ NO localStorage needed - tokens in httpOnly cookies
 // User info will come from API calls, not from decoding client-side tokens
@@ -11,6 +12,46 @@ let authStore = {
   isBootstrapResolved: false,
 };
 const authListeners = new Set();
+
+export const normalizeRole = (role) =>
+  String(role || "")
+    .trim()
+    .toLowerCase();
+
+export const hasAllowedRole = (currentRole, allowedRoles = []) => {
+  if (!Array.isArray(allowedRoles) || allowedRoles.length === 0) {
+    return false;
+  }
+
+  const normalizedCurrentRole = normalizeRole(currentRole);
+
+  return allowedRoles
+    .map((role) => normalizeRole(role))
+    .filter(Boolean)
+    .includes(normalizedCurrentRole);
+};
+
+export const isAdminRole = (role) =>
+  hasAllowedRole(role, ["admin", "super_admin"]);
+
+const createAuthState = (userInfo, isBootstrapResolved = false) => {
+  const safeUserInfo = userInfo ?? EMPTY_USER_INFO;
+  const userId = safeUserInfo.id ?? null;
+  const userRole = normalizeRole(safeUserInfo.role);
+
+  return {
+    userInfo,
+    safeUserInfo,
+    userId,
+    userRole,
+    isLoggedIn: !!userInfo,
+    isAdmin: isAdminRole(userRole),
+    isSuperAdmin: userRole === "super_admin",
+    isBasicUser: userRole === "basic_user",
+    hasRole: (allowedRoles) => hasAllowedRole(userRole, allowedRoles),
+    isBootstrapResolved,
+  };
+};
 
 const notifyAuthListeners = () => {
   authListeners.forEach((listener) => listener());
@@ -50,10 +91,15 @@ export const getUserInfo = () => {
   return authStore.userInfo;
 };
 
+export const getSafeUserInfo = () => getAuthState().safeUserInfo;
+
 export const isLoggedIn = () => {
   // ✅ Check if user info exists in cache
   return !!authStore.userInfo;
 };
+
+export const getAuthState = () =>
+  createAuthState(authStore.userInfo, authStore.isBootstrapResolved);
 
 export const clearUserInfo = () => {
   setCachedUserInfo(null);
@@ -109,31 +155,23 @@ export const useAuth = () => {
     getAuthSnapshot,
   );
 
-  return {
-    userInfo: snapshot.userInfo,
-    isLoggedIn: !!snapshot.userInfo,
-    isBootstrapResolved: snapshot.isBootstrapResolved,
-  };
+  return createAuthState(snapshot.userInfo, snapshot.isBootstrapResolved);
 };
 
 export const syncCurrentUser = async ({ preserveOnFailure = true } = {}) => {
   try {
-    const response = await fetch(
-      `${import.meta.env.VITE_BACKEND_API_URL}/auth/me`,
-      {
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
-    );
+    const response = await publicApi.get("/auth/me");
+    const data = response.data;
 
-    if (response.ok) {
-      const data = await response.json();
-      return data?.data ? storeUserInfo(data.data) : setCachedUserInfo(null);
+    if (data?.data) {
+      return storeUserInfo(data.data);
     }
 
-    if (response.status === 401 || response.status === 403) {
+    return setCachedUserInfo(null);
+  } catch (error) {
+    const status = error.response?.status;
+
+    if (status === 401 || status === 403) {
       if (authStore.userInfo) {
         queueForcedLogoutNotice({
           title: "Logged out",
@@ -151,12 +189,6 @@ export const syncCurrentUser = async ({ preserveOnFailure = true } = {}) => {
     }
 
     return authStore.userInfo;
-  } catch (error) {
-    if (!preserveOnFailure) {
-      clearUserInfo();
-    }
-
-    return preserveOnFailure ? authStore.userInfo : null;
   }
 };
 

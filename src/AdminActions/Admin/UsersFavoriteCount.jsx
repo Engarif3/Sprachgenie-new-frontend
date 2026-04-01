@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import Container from "../../utils/Container";
-import { getUserInfo, isLoggedIn } from "../../services/auth.services";
+import { useAuth } from "../../services/auth.services";
 import api from "../../axios";
 import { useNavigate } from "react-router-dom";
 import { ScaleLoader } from "react-spinners";
@@ -10,17 +10,8 @@ const UsersFavoriteCount = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo() || {};
-
-  // Security check: Only allow admin/super_admin users
-  if (
-    !userLoggedIn ||
-    !userInfo?.id ||
-    (userInfo?.role !== "admin" && userInfo?.role !== "super_admin")
-  ) {
-    return <Navigate to="/" replace />;
-  }
+  const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
+  const canAccess = userLoggedIn && userId && isAdmin;
 
   const fetchData = async () => {
     try {
@@ -42,6 +33,10 @@ const UsersFavoriteCount = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  if (!canAccess) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="container mx-auto p-4 min-h-screen">

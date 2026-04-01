@@ -1,26 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { ScaleLoader } from "react-spinners";
 import Swal from "sweetalert2";
-import { getFromLocalStorage } from "../utils/local-storage";
-import { authKey } from "../constants/authkey";
 import api from "../axios";
 import aiApi from "../AI_axios";
 import Pagination from "../AdminActions/AdminPaginationForUsers";
-import { getUserInfo, isLoggedIn } from "../services/auth.services";
+import { useAuth } from "../services/auth.services";
 
 const Usage = () => {
-  const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo() || {};
-
-  // Security check: Only allow admin/super_admin users
-  if (
-    !userLoggedIn ||
-    !userInfo?.id ||
-    (userInfo?.role !== "admin" && userInfo?.role !== "super_admin")
-  ) {
-    return <Navigate to="/" replace />;
-  }
+  const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
+  const canAccess = userLoggedIn && userId && isAdmin;
   const [usageData, setUsageData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -43,7 +32,9 @@ const Usage = () => {
           params: { userId: "GLOBAL" },
         });
         globalLimits = resGlobal.data;
-      } catch {}
+      } catch (error) {
+        console.warn("Failed to load global AI limits, using defaults.", error);
+      }
 
       // Fetch active users with pagination
       const userRes = await api.get(
@@ -105,6 +96,10 @@ const Usage = () => {
     return (
       <p className="text-center mt-4 text-white">No active users found.</p>
     );
+
+  if (!canAccess) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="container mx-auto p-4">

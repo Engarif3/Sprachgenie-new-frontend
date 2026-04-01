@@ -106,10 +106,8 @@
 
 import { useState, useEffect } from "react";
 import aiApi from "../AI_axios";
-import { getUserInfo } from "../services/auth.services";
 
 const UpdateLimits = () => {
-  const userInfo = getUserInfo();
   const [userId, setUserId] = useState("");
   const [dailyLimit, setDailyLimit] = useState("");
   const [monthlyLimit, setMonthlyLimit] = useState("");

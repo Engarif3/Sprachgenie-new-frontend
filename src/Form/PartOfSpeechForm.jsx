@@ -1,20 +1,11 @@
 import React, { useState } from "react";
 import { Navigate } from "react-router-dom";
 import axios from "../axios";
-import { getUserInfo, isLoggedIn } from "../services/auth.services";
+import { useAuth } from "../services/auth.services";
 
 const PartOfSpeechForm = () => {
-  const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo() || {};
-
-  // Security check: Only allow admin/super_admin users
-  if (
-    !userLoggedIn ||
-    !userInfo?.id ||
-    (userInfo?.role !== "admin" && userInfo?.role !== "super_admin")
-  ) {
-    return <Navigate to="/" replace />;
-  }
+  const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
+  const canAccess = userLoggedIn && userId && isAdmin;
   const [posData, setPosData] = useState({
     name: "",
   });
@@ -46,6 +37,10 @@ const PartOfSpeechForm = () => {
       setLoading(false); // Set loading to false after submission attempt
     }
   };
+
+  if (!canAccess) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4">

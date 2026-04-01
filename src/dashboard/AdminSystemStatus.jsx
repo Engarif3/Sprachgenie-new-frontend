@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import api from "../axios";
+import api, { externalApi } from "../axios";
 
 const DECLARED_SYSTEMS = {
   frontend: {
@@ -599,8 +599,9 @@ const AdminSystemStatus = () => {
       const results = {};
       for (const endpoint of HEALTH_ENDPOINTS) {
         try {
-          const res = await fetch(endpoint.url);
-          results[endpoint.name] = res.ok ? "UP" : "DOWN";
+          const res = await externalApi.get(endpoint.url);
+          results[endpoint.name] =
+            res.status >= 200 && res.status < 300 ? "UP" : "DOWN";
         } catch {
           results[endpoint.name] = "DOWN";
         }

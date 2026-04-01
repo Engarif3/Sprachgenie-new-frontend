@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import api from "../axios";
+import api, { externalApi } from "../axios";
 
 const GEOCODING_ENDPOINT = "https://nominatim.openstreetmap.org/search";
 
@@ -388,21 +388,15 @@ const AdminVisitorsPage = () => {
         }
 
         try {
-          const response = await fetch(
-            `${GEOCODING_ENDPOINT}?format=jsonv2&limit=1&q=${encodeURIComponent(locationQuery)}`,
-            {
-              signal: abortController.signal,
-              headers: {
-                Accept: "application/json",
-              },
+          const response = await externalApi.get(GEOCODING_ENDPOINT, {
+            params: {
+              format: "jsonv2",
+              limit: 1,
+              q: locationQuery,
             },
-          );
-
-          if (!response.ok) {
-            continue;
-          }
-
-          const results = await response.json();
+            signal: abortController.signal,
+          });
+          const results = response.data;
           const firstMatch = Array.isArray(results) ? results[0] : null;
           const latitude = Number(firstMatch?.lat);
           const longitude = Number(firstMatch?.lon);
@@ -419,7 +413,7 @@ const AdminVisitorsPage = () => {
             },
           }));
         } catch (error) {
-          if (error.name === "AbortError") {
+          if (error.name === "AbortError" || error.code === "ERR_CANCELED") {
             return;
           }
         }

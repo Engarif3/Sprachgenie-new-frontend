@@ -35,8 +35,7 @@ const DashboardLayout = () => {
     analytics: false,
   });
 
-  const { userInfo } = useAuth();
-  const role = userInfo?.role;
+  const { safeUserInfo: userInfo, userId, userRole: role } = useAuth();
 
   const toggleSection = (section) => {
     setExpandedSections((prev) => ({
@@ -45,7 +44,7 @@ const DashboardLayout = () => {
     }));
   };
 
-  if (!userInfo?.id) {
+  if (!userId) {
     return <Navigate to="/login" replace />;
   }
 

@@ -3,8 +3,8 @@ import { Link, useParams, Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { FaChevronCircleUp, FaChevronCircleDown } from "react-icons/fa";
 import Container from "../../../utils/Container";
-import api from "../../../axios";
-import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
+import api, { publicApi } from "../../../axios";
+import { useAuth } from "../../../services/auth.services";
 import {
   DndContext,
   closestCenter,
@@ -204,17 +204,8 @@ const DraggableItem = ({
 
 const UpdateWord = () => {
   const { id } = useParams();
-  const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo() || {};
-
-  // Security check: Only allow admin/super_admin users
-  if (
-    !userLoggedIn ||
-    !userInfo?.id ||
-    (userInfo?.role !== "admin" && userInfo?.role !== "super_admin")
-  ) {
-    return <Navigate to="/" replace />;
-  }
+  const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
+  const canAccess = userLoggedIn && userId && isAdmin;
   const [suggestions, setSuggestions] = useState({
     synonyms: [],
     antonyms: [],
@@ -226,10 +217,10 @@ const UpdateWord = () => {
     value: "",
     meaning: [],
     sentences: [],
-    levelId: "" || null,
-    topicId: "" || null,
-    articleId: "" || null,
-    partOfSpeechId: "" || null,
+    levelId: null,
+    topicId: null,
+    articleId: null,
+    partOfSpeechId: null,
     pluralForm: "",
     synonyms: [],
     antonyms: [],
@@ -483,17 +474,17 @@ const UpdateWord = () => {
 
       if (value.length >= 2) {
         try {
-          const res = await fetch(
-            `/words/suggestions?query=${value}&type=${name}`,
-          );
-          const contentType = res.headers.get("Content-Type");
-          if (contentType && contentType.includes("application/json")) {
-            const data = await res.json();
-            setSuggestions((prevSuggestions) => ({
-              ...prevSuggestions,
-              [name]: data,
-            }));
-          }
+          const response = await publicApi.get("/words/suggestions", {
+            params: {
+              query: value,
+              type: name,
+            },
+          });
+
+          setSuggestions((prevSuggestions) => ({
+            ...prevSuggestions,
+            [name]: response.data,
+          }));
         } catch (error) {
           // Suggestions API call failed, continue without suggestions
         }
@@ -746,6 +737,10 @@ const UpdateWord = () => {
       setEditValue("");
     }
   };
+
+  if (!canAccess) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <Container>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios"; // For AI service
 import api from "../../axios"; // For backend (with cookies)
+import aiApi from "../../AI_axios";
 
 const GenerateStory = () => {
   const [formData, setFormData] = useState({
@@ -82,10 +82,6 @@ const GenerateStory = () => {
     setLoading(true);
 
     try {
-      // First, generate the story using the AI service
-      const aiServiceUrl =
-        import.meta.env.VITE_AI_API_URL || "http://localhost:5000";
-
       // Get the level name
       const selectedLevel = levels.find(
         (l) => l.id === parseInt(formData.levelId),
@@ -95,21 +91,12 @@ const GenerateStory = () => {
       console.log("Sending to AI service:", {
         prompt: formData.prompt,
         level: levelName,
-        aiServiceUrl,
       });
 
-      const aiResponse = await axios.post(
-        `${aiServiceUrl}/stories/generate`,
-        {
-          prompt: formData.prompt,
-          level: levelName,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
+      const aiResponse = await aiApi.post("/stories/generate", {
+        prompt: formData.prompt,
+        level: levelName,
+      });
 
       console.log("AI service response:", aiResponse.data);
 
@@ -213,7 +200,7 @@ const GenerateStory = () => {
     setLoading(true);
     try {
       // Update publish status to true
-      const response = await api.put(`/stories/${storyId}/publish`, {
+      await api.put(`/stories/${storyId}/publish`, {
         isPublished: true,
       });
 

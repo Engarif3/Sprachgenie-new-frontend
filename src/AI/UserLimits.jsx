@@ -6,20 +6,11 @@ import { ScaleLoader } from "react-spinners";
 import { getFromLocalStorage } from "../utils/local-storage";
 import { authKey } from "../constants/authkey";
 import api from "../axios";
-import { getUserInfo, isLoggedIn } from "../services/auth.services";
+import { useAuth } from "../services/auth.services";
 
 const UserLimits = () => {
-  const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo() || {};
-
-  // Security check: Only allow admin/super_admin users
-  if (
-    !userLoggedIn ||
-    !userInfo?.id ||
-    (userInfo?.role !== "admin" && userInfo?.role !== "super_admin")
-  ) {
-    return <Navigate to="/" replace />;
-  }
+  const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
+  const canAccess = userLoggedIn && userId && isAdmin;
   const [users, setUsers] = useState([]);
   const [globalLimits, setGlobalLimits] = useState({
     dailyLimit: 10,
@@ -219,6 +210,10 @@ const UserLimits = () => {
   }
 
   if (!users.length) return <p className="text-center mt-4">No users found.</p>;
+
+  if (!canAccess) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="container mx-auto p-4">

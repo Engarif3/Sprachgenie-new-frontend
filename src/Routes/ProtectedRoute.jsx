@@ -1,14 +1,14 @@
 import { Navigate } from "react-router-dom";
-import { getUserInfo, useAuth } from "../services/auth.services";
+import { publicApi } from "../axios";
+import {
+  getUserInfo,
+  hasAllowedRole,
+  useAuth,
+} from "../services/auth.services";
 import { useState, useEffect } from "react";
 
-const normalizeRole = (role) =>
-  String(role || "")
-    .trim()
-    .toLowerCase();
-
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { userInfo, isBootstrapResolved } = useAuth();
+  const { userInfo, userRole, isBootstrapResolved } = useAuth();
 
   if (!isBootstrapResolved) {
     return (
@@ -25,9 +25,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   if (
     Array.isArray(allowedRoles) &&
     allowedRoles.length > 0 &&
-    !allowedRoles
-      .map((role) => normalizeRole(role))
-      .includes(normalizeRole(userInfo?.role))
+    !hasAllowedRole(userRole, allowedRoles)
   ) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -52,32 +50,23 @@ export const PublicRoute = ({ children }) => {
 
       // If no cached user, check with server
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_API_URL}/auth/me`,
-          {
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-          },
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data?.data) {
-            setIsAuthenticated(true);
-          } else {
-            setIsAuthenticated(false);
-          }
-        } else if (response.status === 401) {
+        const response = await publicApi.get("/auth/me");
+        if (response.data?.data) {
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        if (error.response?.status === 401) {
           // 401 is expected for unauthenticated users, don't log as error
           setIsAuthenticated(false);
         } else {
           // Other errors (4xx, 5xx) - log but continue
-          console.warn(`Auth check failed with status: ${response.status}`);
+          console.warn(
+            `Auth check failed with status: ${error.response?.status || "unknown"}`,
+          );
           setIsAuthenticated(false);
         }
-      } catch (error) {
-        // Network error - silent fail
-        setIsAuthenticated(false);
       } finally {
         setIsLoading(false);
       }

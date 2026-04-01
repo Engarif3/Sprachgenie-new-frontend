@@ -3,7 +3,6 @@ import axios from "../../../axios";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import WordListModal from "../Modals/WordListModal";
-import { getUserInfo, isLoggedIn } from "../../../services/auth.services";
 import Pagination from "./Pagination";
 import { pronounceWord } from "../../../utils/wordPronounciation";
 import {
@@ -14,6 +13,7 @@ import aiApi from "../../../AI_axios";
 import { PuffLoader } from "react-spinners";
 import AIModal from "../Modals/AIModal";
 import { ImBin } from "react-icons/im";
+import { useAuth } from "../../../services/auth.services";
 
 const FavoritesListDashboard = () => {
   const [selectedWord, setSelectedWord] = useState(null);
@@ -22,7 +22,7 @@ const FavoritesListDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const userInfo = getUserInfo();
+  const { userId } = useAuth();
   const [favorites, setFavorites] = useState([]);
   const [loadingFavorites, setLoadingFavorites] = useState({});
   const [deleteConfirmation, setDeleteConfirmation] = useState({
@@ -45,10 +45,10 @@ const FavoritesListDashboard = () => {
 
   useEffect(() => {
     const fetchFavorites = async () => {
-      if (!userInfo?.id) return;
+      if (!userId) return;
 
       try {
-        const response = await axios.get(`/favorite-words/${userInfo.id}`);
+        const response = await axios.get(`/favorite-words/${userId}`);
         if (response.data.success) {
           setFavoriteWords(response.data.data);
         } else {
@@ -66,7 +66,7 @@ const FavoritesListDashboard = () => {
     };
 
     fetchFavorites();
-  }, [userInfo?.id]);
+  }, [userId]);
 
   useEffect(() => {
     const newTotalPages = Math.ceil(favoriteWords.length / 40);
@@ -208,7 +208,7 @@ const FavoritesListDashboard = () => {
     }
 
     try {
-      await axios.delete(`/favorite-words/delete-all/${userInfo.id}`);
+      await axios.delete(`/favorite-words/delete-all/${userId}`);
       setFavoriteWords([]);
       setFavorites([]);
       setDeleteConfirmation({ show: false, inputValue: "" });
@@ -293,7 +293,7 @@ const FavoritesListDashboard = () => {
 
         if (response.data.success) {
           // Fetch updated favorites list
-          const favResponse = await axios.get(`/favorite-words/${userInfo.id}`);
+          const favResponse = await axios.get(`/favorite-words/${userId}`);
           if (favResponse.data.success) {
             setFavoriteWords(favResponse.data.data);
             setFavorites(favResponse.data.data.map((w) => w.id));
@@ -319,7 +319,7 @@ const FavoritesListDashboard = () => {
   };
 
   const generateParagraph = async (word) => {
-    if (!userInfo?.id) {
+    if (!userId) {
       Swal.fire(
         "Not Logged In",
         "You must be logged in to generate paragraphs",
@@ -332,7 +332,7 @@ const FavoritesListDashboard = () => {
       setLoadingParagraphs((prev) => ({ ...prev, [word.id]: true }));
 
       const response = await aiApi.post(`/paragraphs/generate`, {
-        userId: userInfo?.id,
+        userId,
         wordId: word.id,
         word: word.value,
         level: word.level?.level || "A1",

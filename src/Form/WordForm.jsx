@@ -3,21 +3,12 @@ import { useNavigate, Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "../axios";
 
-import { getUserInfo, isLoggedIn } from "../services/auth.services";
+import { useAuth } from "../services/auth.services";
 
 const WordForm = () => {
   const navigate = useNavigate();
-  const userLoggedIn = isLoggedIn();
-  const userInfo = getUserInfo() || {};
-
-  // Security check: Only allow admin/super_admin users
-  if (
-    !userLoggedIn ||
-    !userInfo?.id ||
-    (userInfo?.role !== "admin" && userInfo?.role !== "super_admin")
-  ) {
-    return <Navigate to="/" replace />;
-  }
+  const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
+  const canAccess = userLoggedIn && userId && isAdmin;
 
   const [wordData, setWordData] = useState({
     value: "",
@@ -128,7 +119,7 @@ const WordForm = () => {
               .map((item) => item.trim())
               .filter((item) => item) // Add filter here
           : [],
-      createdBy: userInfo?.id,
+      createdBy: userId,
     };
 
     try {
@@ -181,6 +172,10 @@ const WordForm = () => {
   // if (loading) {
   //   return <p>Loading...</p>;
   // }
+
+  if (!canAccess) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="w-full  p-0 md:p-6  lg:p-6 mt-4">

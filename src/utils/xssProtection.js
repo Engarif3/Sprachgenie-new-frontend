@@ -32,7 +32,7 @@ export function sanitizeInput(input) {
 
   return input
     .trim()
-    .replace(/[<>\"']/g, "") // Remove HTML special chars
+    .replace(/[<>"']/g, "") // Remove HTML special chars
     .substring(0, 255); // Limit length to prevent DoS
 }
 

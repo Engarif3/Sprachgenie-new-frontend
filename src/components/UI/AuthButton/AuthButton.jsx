@@ -40,9 +40,9 @@ const AuthButton = ({
   onLogoutComplete,
 }) => {
   const { t } = useTranslation("common");
-  const { userInfo } = useAuth();
+  const { safeUserInfo: userInfo, userId } = useAuth();
   const navigate = useNavigate();
-  const showLoggedInActions = userInfo?.id && !forceLoggedOutView;
+  const showLoggedInActions = userId && !forceLoggedOutView;
 
   const buttonBaseClass =
     "inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-semibold tracking-wide transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-0";
@@ -78,7 +78,7 @@ const AuthButton = ({
     });
   };
 
-  if (userInfo?.id && hideWhenLoggedIn) {
+  if (userId && hideWhenLoggedIn) {
     return null;
   }
 

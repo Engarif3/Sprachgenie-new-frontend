@@ -31,8 +31,11 @@ const NavBar = () => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isVisitorMenuOpen, setIsVisitorMenuOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const { userInfo: authUserInfo, isLoggedIn: userLoggedIn } = useAuth();
-  const userInfo = authUserInfo || {};
+  const {
+    safeUserInfo: userInfo,
+    isAdmin,
+    isLoggedIn: userLoggedIn,
+  } = useAuth();
   const desktopProfileMenuRef = useRef(null);
   const desktopProfileToggleRef = useRef(null);
   const mobileProfileMenuRef = useRef(null);
@@ -145,16 +148,15 @@ const NavBar = () => {
         )}
         {/* ========================================== */}
 
-        {isMobile &&
-          (userInfo?.role === "super_admin" || userInfo?.role === "admin") && (
-            <Link
-              to="/create-word"
-              onClick={() => setIsProfileMenuOpen(false)}
-              className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
-            >
-              📝 Create Word
-            </Link>
-          )}
+        {isMobile && isAdmin && (
+          <Link
+            to="/create-word"
+            onClick={() => setIsProfileMenuOpen(false)}
+            className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
+          >
+            📝 Create Word
+          </Link>
+        )}
         <button
           type="button"
           onClick={() => {
