@@ -11,12 +11,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Providers>
       <HelmetProvider>
-        <RouterProvider
-          router={router}
-          future={{
-            v7_startTransition: true,
-          }}
-        >
+        <RouterProvider router={router}>
           <Toaster position="top-center" />
         </RouterProvider>
       </HelmetProvider>
