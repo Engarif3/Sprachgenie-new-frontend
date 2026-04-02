@@ -8,7 +8,7 @@ import {
   Suspense,
 } from "react";
 
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import Container from "../../../utils/Container";
 import Pagination from "../../../utils/Pagination";
@@ -37,6 +37,7 @@ const RESTRICTED_LEVEL_ID = 6;
 
 const WordList = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [selectedHistory, setSelectedHistory] = useState({
     creator: "",
@@ -353,10 +354,24 @@ const WordList = () => {
       console.log("Force refresh triggered");
       localStorage.removeItem(CACHE_KEY);
       fetchAllWords();
-      // Clear the state to prevent re-fetching on subsequent renders
-      window.history.replaceState({}, document.title);
+      // Clear the transient navigation state without mutating browser history directly.
+      navigate(
+        {
+          pathname: location.pathname,
+          search: location.search,
+          hash: location.hash,
+        },
+        { replace: true, state: null },
+      );
     }
-  }, [location.state, fetchAllWords]);
+  }, [
+    fetchAllWords,
+    location.hash,
+    location.pathname,
+    location.search,
+    location.state,
+    navigate,
+  ]);
 
   const allFilteredWords = useMemo(() => {
     const wordsArray = cache.words;
