@@ -4,52 +4,19 @@ import Swal from "sweetalert2";
 import { ScaleLoader } from "react-spinners";
 import api from "../../axios";
 import Container from "../../utils/Container";
-import { dateTimeFormatter } from "../../utils/formatDateTime";
 import {
   removeUser,
   syncCurrentUser,
   useAuth,
 } from "../../services/auth.services";
-import Pagination from "../AdminPaginationForUsers";
+import UserManagementSearchPanel from "../UserManagementSearchPanel";
+import UserManagementSummary from "../UserManagementSummary";
+import UserManagementTable from "../UserManagementTable";
+import {
+  formatRoleLabel,
+  formatStatusLabel,
+} from "../userManagementDisplay";
 import UserProfileModal from "./UserProfileModal";
-
-const formatRoleLabel = (role) => {
-  if (!role) {
-    return "User";
-  }
-
-  return role
-    .split("_")
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-    .join(" ");
-};
-
-const createInitials = (name, email) => {
-  const source = (name || email || "User").trim();
-  const parts = source.split(/\s+/).filter(Boolean);
-
-  if (parts.length === 1) {
-    return parts[0].slice(0, 2).toUpperCase();
-  }
-
-  return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
-};
-
-const getStatusBadgeClass = (status) => {
-  switch (String(status || "").toUpperCase()) {
-    case "ACTIVE":
-      return "border-emerald-200 bg-emerald-50 text-emerald-700";
-    case "PENDING":
-      return "border-amber-200 bg-amber-50 text-amber-700";
-    case "BLOCKED":
-      return "border-rose-200 bg-rose-50 text-rose-700";
-    case "DELETED":
-      return "border-slate-200 bg-slate-100 text-slate-700";
-    default:
-      return "border-sky-200 bg-sky-50 text-sky-700";
-  }
-};
 
 const getTabButtonClass = (isActive) =>
   `inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition-all duration-200 ${
@@ -57,17 +24,6 @@ const getTabButtonClass = (isActive) =>
       ? "bg-slate-950 text-white shadow-lg shadow-slate-950/20"
       : "bg-gray-400 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
   }`;
-
-const getSummaryCardClass = (tone) => {
-  switch (tone) {
-    case "admin":
-      return "border-cyan-200 ";
-    case "user":
-      return "border-emerald-200 ";
-    default:
-      return "border-amber-200";
-  }
-};
 
 const UpdateUserStatus = () => {
   const {
@@ -236,7 +192,7 @@ const UpdateUserStatus = () => {
 
   const handleStatusChange = (userId, newStatus) => {
     Swal.fire({
-      text: `Change the status to ${newStatus}?`,
+      text: `Change the status to ${formatStatusLabel(newStatus)}?`,
       showCancelButton: true,
       confirmButtonText: "Yes",
       cancelButtonText: "No",
@@ -265,7 +221,7 @@ const UpdateUserStatus = () => {
 
               Swal.fire({
                 title: "Success",
-                text: "User status updated successfully!",
+                text: `User status updated to ${formatStatusLabel(newStatus)}.`,
                 icon: "success",
                 timer: 1000,
                 showConfirmButton: false,
@@ -281,14 +237,23 @@ const UpdateUserStatus = () => {
     });
   };
 
-  const handlePermanentDelete = (userId, userName, userEmail) => {
+  const handlePermanentDeleteUser = (user) => {
+    if (String(user.status || "").toUpperCase() !== "DELETED") {
+      Swal.fire({
+        icon: "info",
+        title: "Deactivate First",
+        text: "Deactivate the user first. Permanent delete is only available for already deactivated accounts.",
+      });
+      return;
+    }
+
     Swal.fire({
-      title: "Permanent Delete Warning",
+      title: "Permanent Delete",
       html: `
-        <p class="text-lg mb-2">Are you sure you want to <strong class="text-red-600">permanently delete</strong> this user?</p>
-        <p class="text-red-600 font-bold mb-3">This action CANNOT be undone!</p>
-        <p class="mb-2"><strong>Name:</strong> ${userName}</p>
-        <p class="mb-4"><strong>Email:</strong> ${userEmail}</p>
+        <p class="text-lg mb-2">This will <strong class="text-red-600">permanently delete</strong> the account.</p>
+        <p class="text-red-600 font-bold mb-3">This cannot be undone and the email can be used to register again.</p>
+        <p class="mb-2"><strong>Name:</strong> ${user.name}</p>
+        <p class="mb-2"><strong>Email:</strong> ${user.email}</p>
         <p class="text-sm font-semibold mb-2">Type the user's email to confirm:</p>
       `,
       input: "text",
@@ -297,18 +262,18 @@ const UpdateUserStatus = () => {
         autocomplete: "off",
       },
       showCancelButton: true,
-      confirmButtonColor: "#dc2626",
+      confirmButtonColor: "#b91c1c",
       cancelButtonColor: "#6b7280",
-      confirmButtonText: "Yes, Delete Permanently",
+      confirmButtonText: "Delete Permanently",
       cancelButtonText: "Cancel",
       focusCancel: true,
       preConfirm: (inputValue) => {
-        if (!inputValue) {
+        if (!String(inputValue || "").trim()) {
           Swal.showValidationMessage("Email is required");
           return false;
         }
 
-        if (inputValue.trim() !== userEmail) {
+        if (String(inputValue || "").trim() !== user.email) {
           Swal.showValidationMessage("Email does not match");
           return false;
         }
@@ -318,38 +283,45 @@ const UpdateUserStatus = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         api
-          .delete(`/user/permanent-delete/${userId}`)
+          .delete(`/user/permanent-delete/${user.id}`)
           .then(async (response) => {
             if (response.data.success) {
-              await refreshLists();
+              const preservedHistory = Boolean(
+                response.data?.data?.preservedHistory,
+              );
 
               setProfileCache((prev) => {
                 const nextCache = { ...prev };
-                delete nextCache[userId];
+                delete nextCache[user.id];
                 return nextCache;
               });
 
-              if (selectedProfile?.id === userId) {
+              if (selectedProfile?.id === user.id) {
                 setSelectedProfile(null);
                 setIsProfileModalOpen(false);
               }
 
+              await refreshLists();
+
               Swal.fire({
-                title: "Deleted!",
-                text: "User has been permanently deleted from the database.",
+                title: "Deleted Permanently",
+                text: preservedHistory
+                  ? "The account was archived for history preservation. The email can be used to register again."
+                  : "The account was removed from the database and the email can be used again.",
                 icon: "success",
                 timer: 2000,
                 showConfirmButton: false,
               });
             } else {
-              Swal.fire("Failed", "Failed to delete user", "error");
+              Swal.fire("Failed", "Failed to permanently delete user", "error");
             }
           })
           .catch((requestError) => {
             console.error(requestError);
             Swal.fire(
               "Error",
-              requestError.response?.data?.message || "Failed to delete user",
+              requestError.response?.data?.message ||
+                "Failed to permanently delete user",
               "error",
             );
           });
@@ -465,289 +437,43 @@ const UpdateUserStatus = () => {
     );
   }
 
-  const renderTable = ({
-    users,
-    showRoleSelect = false,
-    roleLabel = "USER",
-    page,
-    totalPages,
-    onPageChange,
-    isUsersTab = false,
-  }) => (
-    <div className="space-y-4">
-      {isUsersTab && (
-        <div className="flex flex-col gap-3  border border-slate-200 bg-slate-50 py-2 md:flex-row md:items-center md:justify-between px-8 rounded-lg">
-          <div className="">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
-              Filter
-            </p>
-            <h3 className="mt-1 text-lg font-bold text-slate-950 ">
-              User status
-            </h3>
-          </div>
-          <div className="flex items-center gap-3">
-            <label
-              htmlFor="super-admin-status-filter"
-              className="text-sm font-semibold text-slate-700"
-            >
-              Status:
-            </label>
-            <select
-              id="super-admin-status-filter"
-              value={selectedStatus}
-              onChange={(event) => {
-                setSelectedStatus(event.target.value);
-                setBasicPage(1);
-              }}
-              className="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
-            >
-              <option value="ALL">All</option>
-              <option value="ACTIVE">Active</option>
-              <option value="BLOCKED">Blocked</option>
-              <option value="DELETED">Deleted</option>
-              <option value="PENDING">Pending</option>
-            </select>
-          </div>
-        </div>
-      )}
-
-      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg shadow-slate-200/60">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200">
-            <thead className="bg-slate-900 text-white">
-              <tr>
-                <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.18em]">
-                  User
-                </th>
-                <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.18em]">
-                  Email
-                </th>
-                <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.18em]">
-                  Profile
-                </th>
-                <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.18em]">
-                  Role
-                </th>
-                <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.18em]">
-                  Status
-                </th>
-                <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.18em]">
-                  Delete
-                </th>
-                <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.18em]">
-                  Created At
-                </th>
-              </tr>
-            </thead>
-            <tbody className="[&>tr:nth-child(odd)]:bg-gray-200 [&>tr:nth-child(even)]:bg-white">
-              {users.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={7}
-                    className="px-4 py-10 text-center text-sm text-slate-500"
-                  >
-                    No users found for the current selection.
-                  </td>
-                </tr>
-              ) : (
-                users.map((user) => {
-                  const formattedDateTime = dateTimeFormatter(
-                    user.createdAt,
-                  ).split(" - ");
-
-                  return (
-                    <tr
-                      key={user.id}
-                      className="transition-colors hover:bg-slate-50/80"
-                    >
-                      <td className="px-4 py-2.5 align-top">
-                        <div className="flex items-center gap-2.5">
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md mr-2 border border-slate-400 bg-slate-700 text-xs font-bold text-white">
-                            {user.profilePhoto ? (
-                              <img
-                                src={user.profilePhoto}
-                                alt={user.name || user.email}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <span>
-                                {createInitials(user.name, user.email)}
-                              </span>
-                            )}
-                          </div>
-                          <div className="min-w-0 max-w-[220px]">
-                            <p className="whitespace-normal break-words text-sm font-semibold leading-5 text-slate-950">
-                              {user.name || "No name"}
-                            </p>
-                            {/* <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">
-                              {formatRoleLabel(user.role || roleLabel)}
-                            </p> */}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-3 py-1  text-sm text-slate-700">
-                        <div className="max-w-[260px] whitespace-normal break-all leading-5">
-                          {user.email}
-                        </div>
-                      </td>
-                      <td className="px-3 py-1  text-center">
-                        <button
-                          type="button"
-                          onClick={() => openProfileModal(user)}
-                          className="rounded-lg border border-cyan-200 bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700 transition hover:border-cyan-300 hover:bg-cyan-100 hover:text-cyan-800"
-                        >
-                          Profile
-                        </button>
-                      </td>
-                      <td className="px-3 py-1 text-center">
-                        {showRoleSelect ? (
-                          <select
-                            value={user.role}
-                            onChange={(event) =>
-                              handleRoleChange(user.id, event.target.value)
-                            }
-                            className="rounded-lg border border-slate-300 bg-white px-3 py-1 text-xs font-semibold text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
-                          >
-                            <option value="ADMIN">ADMIN</option>
-                            <option value="BASIC_USER">USER</option>
-                          </select>
-                        ) : (
-                          <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-700">
-                            {formatRoleLabel(roleLabel)}
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-3 py-1  text-center">
-                        <div className="flex  items-center gap-1">
-                          <span
-                            className={`inline-flex rounded-lg w-20 text-center border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] ${getStatusBadgeClass(
-                              user.status,
-                            )}`}
-                          >
-                            {String(user.status || "Unknown").toLowerCase()}
-                          </span>
-                          <select
-                            value={user.status}
-                            onChange={(event) =>
-                              handleStatusChange(user.id, event.target.value)
-                            }
-                            className="rounded-lg border border-slate-300 bg-white px-3 py-1  text-xs font-medium text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
-                          >
-                            <option value="ACTIVE">Active</option>
-                            <option value="BLOCKED">Blocked</option>
-                            <option value="DELETED">Deleted</option>
-                            <option value="PENDING">Pending</option>
-                          </select>
-                        </div>
-                      </td>
-                      <td className="px-3 py-1 mt-2  text-center">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handlePermanentDelete(
-                              user.id,
-                              user.name,
-                              user.email,
-                            )
-                          }
-                          className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-1  text-[11px] font-semibold text-rose-700 transition hover:border-rose-300 hover:bg-rose-100 hover:text-rose-800"
-                          title="Permanently delete user"
-                        >
-                          Permanent
-                        </button>
-                      </td>
-                      <td className="px-3 py-1   text-center text-xs text-slate-700">
-                        <div className="flex  items-center gap-1 leading-tight">
-                          <span className="rounded-lg bg-slate-100 px-3 py-1 font-medium text-slate-700">
-                            {formattedDateTime[0]}
-                          </span>
-                          <span>-</span>
-                          <span className="rounded-lg bg-emerald-50 px-3 py-1 font-medium text-emerald-700">
-                            {formattedDateTime[1]}
-                          </span>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <Pagination
-        page={page}
-        totalPages={totalPages}
-        onPageChange={onPageChange}
-      />
-    </div>
-  );
-
   return (
     <Container>
       {isSuperAdmin && (
         <div className="min-h-screen   px-4 py-5 md:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl space-y-5">
-            <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl shadow-slate-200/60">
-              <div className="border-b border-slate-200 bg-slate-900 px-6 py-6 text-white md:px-8">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-cyan-200">
-                  Super Admin Console
-                </p>
-                <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                  <div>
-                    <h1 className="text-2xl font-bold md:text-3xl">
-                      User access and profile management
-                    </h1>
-                  </div>
-                  <div className=" border border-white/10 rounded-lg bg-white/10 px-4 py-3 backdrop-blur-sm">
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-100">
-                      Current Filter
-                    </p>
-                    <p className="mt-1.5 text-base font-semibold text-white">
-                      {selectedStatus === "ALL"
-                        ? "All user statuses"
-                        : `${formatRoleLabel(selectedStatus.toLowerCase())} users`}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid gap-3 px-6 py-5 md:grid-cols-3 md:px-8">
-                <div
-                  className={`rounded-[24px] border p-5 ${getSummaryCardClass("admin")}`}
-                >
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-cyan-900">
-                    Admin Accounts
-                  </p>
-                  <p className="mt-2 text-2xl font-bold text-slate-950">
-                    {adminTotalCount}
-                  </p>
-                </div>
-                <div
-                  className={`rounded-[24px] border p-5 ${getSummaryCardClass("user")}`}
-                >
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-emerald-700">
-                    Basic User Accounts
-                  </p>
-                  <p className="mt-2 text-2xl font-bold text-slate-950">
-                    {basicUserTotalCount}
-                  </p>
-                </div>
-                <div
-                  className={`rounded-[24px] border p-5 ${getSummaryCardClass("filter")}`}
-                >
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-700">
-                    Status View
-                  </p>
-                  <p className="mt-2 text-2xl font-bold text-slate-950">
-                    {selectedStatus === "ALL"
+            <UserManagementSummary
+              badge="Super Admin Console"
+              title="User access and profile management"
+              currentFilterLabel={
+                selectedStatus === "ALL"
+                  ? "All user statuses"
+                  : `${formatRoleLabel(selectedStatus.toLowerCase())} users`
+              }
+              cards={[
+                {
+                  label: "Admin Accounts",
+                  value: adminTotalCount,
+                  borderClass: "border-cyan-200",
+                  labelClass: "text-cyan-900",
+                },
+                {
+                  label: "Basic User Accounts",
+                  value: basicUserTotalCount,
+                  borderClass: "border-emerald-200",
+                  labelClass: "text-emerald-700",
+                },
+                {
+                  label: "Status View",
+                  value:
+                    selectedStatus === "ALL"
                       ? "All"
-                      : formatRoleLabel(selectedStatus.toLowerCase())}
-                  </p>
-                </div>
-              </div>
-            </section>
+                      : formatRoleLabel(selectedStatus.toLowerCase()),
+                  borderClass: "border-amber-200",
+                  labelClass: "text-amber-700",
+                },
+              ]}
+            />
 
             <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-lg shadow-slate-200/60 md:p-5">
               <div className="flex flex-col gap-4 px-4 lg:flex-row lg:items-center lg:justify-between">
@@ -780,32 +506,11 @@ const UpdateUserStatus = () => {
               </div>
 
               <div className="mt-4 px-4">
-                <div className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 lg:flex-row lg:items-center lg:justify-between">
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
-                      Search Users
-                    </p>
-                    <p className="mt-1 text-sm text-slate-600">
-                      Find by user name, email, or ID.
-                    </p>
-                  </div>
-                  <div className="flex w-full flex-col gap-2 sm:flex-row lg:max-w-2xl">
-                    <input
-                      type="text"
-                      value={searchTerm}
-                      onChange={handleSearchChange}
-                      placeholder="Search by name, email, or ID"
-                      className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
-                    />
-                    <button
-                      type="button"
-                      onClick={clearSearch}
-                      className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-100"
-                    >
-                      Clear
-                    </button>
-                  </div>
-                </div>
+                <UserManagementSearchPanel
+                  searchTerm={searchTerm}
+                  onSearchChange={handleSearchChange}
+                  onClear={clearSearch}
+                />
               </div>
             </section>
 
@@ -819,14 +524,20 @@ const UpdateUserStatus = () => {
                   />
                 </div>
               ) : (
-                renderTable({
-                  users: admins,
-                  showRoleSelect: true,
-                  roleLabel: "ADMIN",
-                  page: adminPage,
-                  totalPages: adminTotalPages,
-                  onPageChange: setAdminPage,
-                })
+                <UserManagementTable
+                  users={admins}
+                  page={adminPage}
+                  totalPages={adminTotalPages}
+                  onPageChange={setAdminPage}
+                  onOpenProfile={openProfileModal}
+                  onStatusChange={handleStatusChange}
+                  showRoleSelect
+                  roleOptions={["ADMIN", "BASIC_USER"]}
+                  fallbackRoleLabel="ADMIN"
+                  onRoleChange={handleRoleChange}
+                  showPermanentDelete
+                  onPermanentDelete={handlePermanentDeleteUser}
+                />
               )
             ) : loadingUsers ? (
               <div className="flex min-h-[260px] items-center justify-center rounded-[28px] border border-slate-200 bg-white shadow-xl shadow-slate-200/70">
@@ -837,14 +548,27 @@ const UpdateUserStatus = () => {
                 />
               </div>
             ) : (
-              renderTable({
-                users: basicUsers,
-                roleLabel: "BASIC_USER",
-                page: basicPage,
-                totalPages: basicTotalPages,
-                onPageChange: setBasicPage,
-                isUsersTab: true,
-              })
+              <UserManagementTable
+                users={basicUsers}
+                page={basicPage}
+                totalPages={basicTotalPages}
+                onPageChange={setBasicPage}
+                onOpenProfile={openProfileModal}
+                onStatusChange={handleStatusChange}
+                selectedStatus={selectedStatus}
+                onSelectedStatusChange={(nextStatus) => {
+                  setSelectedStatus(nextStatus);
+                  setBasicPage(1);
+                }}
+                filterId="super-admin-status-filter"
+                showFilter
+                showRoleSelect
+                roleOptions={["ADMIN", "BASIC_USER"]}
+                fallbackRoleLabel="BASIC_USER"
+                onRoleChange={handleRoleChange}
+                showPermanentDelete
+                onPermanentDelete={handlePermanentDeleteUser}
+              />
             )}
           </div>
 

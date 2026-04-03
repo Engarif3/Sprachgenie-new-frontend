@@ -11,6 +11,7 @@ import Contact from "./Contact";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../../context/ThemeContext";
 import ScrollStack, { ScrollStackItem } from "./ScrollStack";
+import TodaysWordBalloon from "./TodaysWordBalloon";
 
 const Home = () => {
   const { isLoggedIn: userLoggedIn } = useAuth();
@@ -363,6 +364,8 @@ const Home = () => {
           <p className="text-sm md:text-2xl text-gray-800 dark:text-gray-300 mb-12 max-w-3xl mx-auto">
             {t("heroDescription")}
           </p>
+
+          <TodaysWordBalloon />
 
           {/* Benefits Section */}
           {!userLoggedIn && (

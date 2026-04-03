@@ -34,6 +34,7 @@ const WORDS_PER_PAGE = 40;
 
 const UNKNOWN_TOPIC_ID = 1;
 const RESTRICTED_LEVEL_ID = 6;
+const RECENT_WORD_WINDOW_DAYS = 7;
 
 const WordList = () => {
   const location = useLocation();
@@ -64,6 +65,7 @@ const WordList = () => {
   const [searchType, setSearchType] = useState("word"); // 'word' | 'meaning'
   const [selectedWordId, setSelectedWordId] = useState(null);
   const [showInfo, setShowInfo] = useState(false);
+  const [showRecentOnly, setShowRecentOnly] = useState(false);
 
   // ===================
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
@@ -146,6 +148,7 @@ const WordList = () => {
     levels: [],
     topics: [],
     lastUpdated: null,
+    isPartial: false,
   });
 
   // Progressive loading: Load initial batch fast, then fetch all in background
@@ -376,6 +379,11 @@ const WordList = () => {
   const allFilteredWords = useMemo(() => {
     const wordsArray = cache.words;
     let filtered = wordsArray.filter((word) => word.value?.trim());
+    const recentThreshold = new Date();
+    recentThreshold.setDate(
+      recentThreshold.getDate() - RECENT_WORD_WINDOW_DAYS,
+    );
+
     // Normalize strings for alphabetical sorting:
     // - remove parenthetical content (e.g. "(fast) alle" -> " alle")
     // - strip remaining punctuation/extra characters
@@ -406,6 +414,19 @@ const WordList = () => {
     // 1. Level Filter
     if (selectedLevel) {
       filtered = filtered.filter((word) => word.level?.level === selectedLevel);
+    }
+
+    if (showRecentOnly) {
+      filtered = filtered.filter((word) => {
+        if (!word.createdAt) {
+          return false;
+        }
+
+        const createdAt = new Date(word.createdAt);
+        return (
+          !Number.isNaN(createdAt.getTime()) && createdAt >= recentThreshold
+        );
+      });
     }
 
     // 2. Topic Filter
@@ -504,6 +525,7 @@ const WordList = () => {
   }, [
     cache.words,
     selectedLevel,
+    showRecentOnly,
     selectedTopic,
     debouncedSearchValue,
     searchType,
@@ -945,13 +967,23 @@ const WordList = () => {
     setSearchValue("");
     setSelectedLevel("");
     setSelectedTopic("");
+    setShowRecentOnly(false);
     setCurrentPage(1);
     setFilteredTopics(topics); // Reset filtered topics back to the full list
   }, [topics]);
 
+  const handleToggleRecentWords = useCallback(() => {
+    if (!showRecentOnly && cache.isPartial) {
+      void fetchAllWords();
+    }
+
+    setShowRecentOnly((prev) => !prev);
+    setCurrentPage(1);
+  }, [cache.isPartial, fetchAllWords, showRecentOnly]);
+
   useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearchValue, selectedLevel, selectedTopic]);
+  }, [debouncedSearchValue, selectedLevel, selectedTopic, showRecentOnly]);
   // to show info
   useEffect(() => {
     const handleClickOutside = () => setShowInfo(false);
@@ -1023,7 +1055,20 @@ const WordList = () => {
         </div>
         {/* ===============showing words by page ==================  */}
         <div className="flex items-center gap-4">
-          {(searchValue || selectedLevel || selectedTopic) && (
+          <button
+            onClick={handleToggleRecentWords}
+            className={`px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 hover:scale-105 shadow-lg ${
+              showRecentOnly
+                ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white"
+                : "bg-gradient-to-r from-slate-700 to-slate-800 text-white hover:from-slate-600 hover:to-slate-700"
+            }`}
+          >
+            {showRecentOnly ? "Showing New" : "New Words"}
+          </button>
+          {(searchValue ||
+            selectedLevel ||
+            selectedTopic ||
+            showRecentOnly) && (
             <button
               onClick={handleResetFilters}
               className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 hover:scale-105 shadow-lg"

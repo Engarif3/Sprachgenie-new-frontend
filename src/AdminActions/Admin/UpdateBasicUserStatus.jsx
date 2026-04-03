@@ -1,36 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { ScaleLoader } from "react-spinners";
+import api from "../../axios";
 import Container from "../../utils/Container";
 import {
   removeUser,
   syncCurrentUser,
   useAuth,
 } from "../../services/auth.services";
-import { useNavigate } from "react-router-dom";
-import api from "../../axios";
-import { ScaleLoader } from "react-spinners";
-import { dateTimeFormatter } from "../../utils/formatDateTime";
-import Pagination from "../AdminPaginationForUsers";
-
-const formatRoleLabel = (role) => {
-  if (!role) {
-    return "User";
-  }
-
-  return role
-    .split("_")
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-    .join(" ");
-};
+import UserManagementSearchPanel from "../UserManagementSearchPanel";
+import UserManagementSummary from "../UserManagementSummary";
+import UserManagementTable from "../UserManagementTable";
+import { formatRoleLabel, formatStatusLabel } from "../userManagementDisplay";
+import UserProfileModal from "../SuperAdmin/UserProfileModal";
 
 const UpdateBasicUserStatus = () => {
   const {
     isAdmin,
     isLoggedIn: userLoggedIn,
     isSuperAdmin,
-    safeUserInfo: userInfo,
     userId,
     userRole,
   } = useAuth();
@@ -40,31 +29,43 @@ const UpdateBasicUserStatus = () => {
   const [selectedStatus, setSelectedStatus] = useState("ALL");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [profileCache, setProfileCache] = useState({});
+  const [selectedProfile, setSelectedProfile] = useState(null);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isProfileLoading, setIsProfileLoading] = useState(false);
 
   const navigate = useNavigate();
   const canManageBasicUsers =
     userLoggedIn && userId && (isAdmin || isSuperAdmin);
 
-  const fetchUsers = async (page, status, limit = 50) => {
+  const fetchUsers = async (nextPage, status, limit = 50, query = "") => {
     try {
       setLoading(true);
+      setError(null);
 
       const statusParam = status === "ALL" ? "" : `&status=${status}`;
+      const searchParam = query.trim()
+        ? `&searchTerm=${encodeURIComponent(query.trim())}`
+        : "";
       const response = await api.get(
-        `/user?page=${page}&limit=${limit}&role=BASIC_USER${statusParam}`,
+        `/user?page=${nextPage}&limit=${limit}&role=BASIC_USER${statusParam}${searchParam}`,
       );
 
       if (response.data.success && Array.isArray(response.data.data)) {
         setBasicUsers(response.data.data);
 
         const total = response.data.meta.total || 0;
-        const limitUsed = response.data.meta.limit || limit; // ensure we use backend's limit
-        setTotalPages(Math.ceil(total / limitUsed));
+        const limitUsed = response.data.meta.limit || limit;
+        setTotalPages(Math.max(1, Math.ceil(total / limitUsed)));
       } else {
-        setError("Invalid data format received.");
+        setError("Failed to fetch users");
       }
-    } catch (err) {
-      console.error("Fetching error:", err.response || err.message || err);
+    } catch (requestError) {
+      console.error(
+        "Fetching error:",
+        requestError.response || requestError.message || requestError,
+      );
       setError("Error fetching users");
     } finally {
       setLoading(false);
@@ -73,9 +74,23 @@ const UpdateBasicUserStatus = () => {
 
   useEffect(() => {
     if (userRole === "admin") {
-      fetchUsers(page, selectedStatus);
+      fetchUsers(page, selectedStatus, 50, searchTerm);
     }
-  }, [page, selectedStatus, userRole]);
+  }, [page, selectedStatus, userRole, searchTerm]);
+
+  const refreshUsers = async () => {
+    await fetchUsers(page, selectedStatus, 50, searchTerm);
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+    setPage(1);
+  };
+
+  const clearSearch = () => {
+    setSearchTerm("");
+    setPage(1);
+  };
 
   const handleSelfSessionRefresh = async (affectedUserId) => {
     if (affectedUserId !== userId) {
@@ -119,45 +134,105 @@ const UpdateBasicUserStatus = () => {
     return false;
   };
 
-  const handleStatusChange = (userId, newStatus) => {
+  const handleStatusChange = (targetUserId, newStatus) => {
     Swal.fire({
-      text: `Change the status to ${newStatus}?`,
+      text: `Change the status to ${formatStatusLabel(newStatus)}?`,
       showCancelButton: true,
       confirmButtonText: "Yes",
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
         api
-          .patch(`/user/update-basicUser-status/${userId}`, {
+          .patch(`/user/update-basicUser-status/${targetUserId}`, {
             status: newStatus,
             performedById: userId,
           })
           .then(async (response) => {
             if (response.data.success) {
-              setBasicUsers((prevUsers) =>
-                prevUsers.map((user) =>
-                  user.id === userId ? { ...user, status: newStatus } : user,
-                ),
+              setSelectedProfile((prev) =>
+                prev?.id === targetUserId
+                  ? { ...prev, status: newStatus }
+                  : prev,
               );
+              setProfileCache((prev) =>
+                prev[targetUserId]
+                  ? {
+                      ...prev,
+                      [targetUserId]: {
+                        ...prev[targetUserId],
+                        status: newStatus,
+                      },
+                    }
+                  : prev,
+              );
+
+              await refreshUsers();
+
               Swal.fire({
                 title: "Success",
-                text: "User status updated successfully!",
+                text: `User status updated to ${formatStatusLabel(newStatus)}.`,
                 icon: "success",
                 timer: 1000,
                 showConfirmButton: false,
               });
 
-              await handleSelfSessionRefresh(userId);
+              await handleSelfSessionRefresh(targetUserId);
             } else {
               Swal.fire("Failed", "Failed to update user status", "error");
             }
           })
-          .catch((err) => {
-            console.log("Error Response:", err.response);
+          .catch((requestError) => {
+            console.log("Error Response:", requestError.response);
             Swal.fire("Error", "Failed to update user status", "error");
           });
       }
     });
+  };
+
+  const openProfileModal = async (user) => {
+    const cachedProfile = profileCache[user.id];
+
+    setIsProfileModalOpen(true);
+    setSelectedProfile(
+      cachedProfile ? { ...user, ...cachedProfile } : { ...user },
+    );
+
+    if (cachedProfile) {
+      setIsProfileLoading(false);
+      return;
+    }
+
+    try {
+      setIsProfileLoading(true);
+      const response = await api.get(`/user/${user.id}`);
+      const nextProfile = {
+        ...user,
+        ...(response?.data?.data || {}),
+      };
+
+      setSelectedProfile(nextProfile);
+      setProfileCache((prev) => ({
+        ...prev,
+        [user.id]: nextProfile,
+      }));
+    } catch (requestError) {
+      console.error(requestError);
+      Swal.fire({
+        icon: "error",
+        title: "Could not load profile",
+        text:
+          requestError?.response?.data?.message ||
+          "The user profile could not be loaded right now.",
+      });
+    } finally {
+      setIsProfileLoading(false);
+    }
+  };
+
+  const closeProfileModal = () => {
+    setIsProfileModalOpen(false);
+    setSelectedProfile(null);
+    setIsProfileLoading(false);
   };
 
   //   const handlePrevPage = () => setPage((prev) => Math.max(prev - 1, 1));
@@ -170,137 +245,80 @@ const UpdateBasicUserStatus = () => {
 
   if (error) return <div>{error}</div>;
 
-  const getStatusClass = (status) => {
-    switch (status) {
-      case "ACTIVE":
-        return "status status-success"; // green
-      case "PENDING":
-        return "status status-warning"; // yellow
-      case "BLOCKED":
-        return "status status-error"; // red
-      case "DELETED":
-        return "status status-neutral"; // gray
-      default:
-        return "status status-info"; // blue fallback
-    }
-  };
-
   return (
     <Container>
       {userRole === "admin" && (
-        <div className="container mx-auto p-4 min-h-screen">
-          <h2 className="text-2xl font-bold mb-4 text-center text-white py-2 bg-cyan-700 rounded">
-            Update User Status -{" "}
-            <span className="text-md text-orange-600">
-              ({basicUsers.length})
-            </span>
-          </h2>
+        <div className="min-h-screen px-4 py-5 md:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl space-y-5">
+            <UserManagementSummary
+              badge="Admin Console"
+              title="Basic user status management"
+              currentFilterLabel={
+                selectedStatus === "ALL"
+                  ? "All user statuses"
+                  : `${formatStatusLabel(selectedStatus)} users`
+              }
+              cards={[
+                {
+                  label: "Basic User Accounts",
+                  value: basicUsers.length,
+                  borderClass: "border-emerald-200",
+                  labelClass: "text-emerald-700",
+                },
+                {
+                  label: "Status View",
+                  value:
+                    selectedStatus === "ALL"
+                      ? "All"
+                      : formatStatusLabel(selectedStatus),
+                  borderClass: "border-amber-200",
+                  labelClass: "text-amber-700",
+                },
+                {
+                  label: "Search Query",
+                  value: searchTerm.trim() || "None",
+                  borderClass: "border-cyan-200",
+                  labelClass: "text-cyan-700",
+                },
+              ]}
+            />
 
-          {loading && (
-            <div className="flex justify-center items-center">
-              <ScaleLoader
-                color="oklch(0.5 0.134 242.749)"
-                loading={loading}
-                size={150}
-              />
-            </div>
-          )}
+            <UserManagementSearchPanel
+              searchTerm={searchTerm}
+              onSearchChange={handleSearchChange}
+              onClear={clearSearch}
+            />
 
-          {!loading && (
-            <>
-              {/* Status Filter Dropdown */}
-              <div className="flex justify-end mb-4">
-                <label
-                  htmlFor="admin-status-filter"
-                  className="mr-2 font-semibold text-white"
-                >
-                  Status:
-                </label>
-                <select
-                  id="admin-status-filter"
-                  value={selectedStatus}
-                  onChange={(e) => {
-                    setSelectedStatus(e.target.value);
-                    setPage(1); // reset page on filter change
-                  }}
-                  className="border p-1 rounded"
-                >
-                  <option value="ALL">All</option>
-                  <option value="ACTIVE">Active</option>
-                  <option value="BLOCKED">Blocked</option>
-                  <option value="DELETED">Deleted</option>
-                  <option value="PENDING">Pending</option>
-                </select>
+            {loading ? (
+              <div className="flex min-h-[260px] items-center justify-center rounded-[28px] border border-slate-200 bg-white shadow-xl shadow-slate-200/70">
+                <ScaleLoader color="#155e75" loading={loading} size={150} />
               </div>
-
-              <div className="overflow-x-auto">
-                <table className="min-w-full table-auto">
-                  <thead>
-                    <tr className="bg-stone-700 text-white">
-                      <th className="p-2 hidden lg:table-cell text-center">
-                        Name
-                      </th>
-                      <th className="p-2 text-center">Email</th>
-                      <th className="p-2 text-center">Role</th>
-                      <th className="p-2 text-center">Action</th>
-                      <th className="p-2 text-center hidden lg:table-cell">
-                        Created at <br />
-                        <span className="text-sm font-thin ">
-                          DD:MM:YYYY-HH:MM:SS
-                        </span>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {basicUsers.map((user) => (
-                      <tr
-                        key={user.id}
-                        className={`border-b odd:bg-white even:bg-gray-200`}
-                      >
-                        <td className="p-1 hidden lg:table-cell text-center text-slate-950">
-                          {user.name}
-                        </td>
-                        <td className="p-1 text-start md:text-center text-sm md:text-md text-slate-950">
-                          {user.email}
-                        </td>
-                        <td className="p-1 text-center">USER</td>
-                        <td className="p-1 text-center">
-                          <select
-                            value={user.status}
-                            onChange={(e) =>
-                              handleStatusChange(user.id, e.target.value)
-                            }
-                            className="p-1 border rounded"
-                          >
-                            {<option value="ACTIVE">Active</option>}
-                            <option value="BLOCKED">Blocked</option>
-                            <option value="DELETED">Deleted</option>
-                            <option value="PENDING">Pending</option>
-                          </select>
-                        </td>
-                        <td className="p-1 hidden lg:table-cell text-center text-slate-950">
-                          <span className="bg-blue-200 px-1 rounded">
-                            {dateTimeFormatter(user.createdAt).split(" - ")[0]}
-                          </span>
-                          {" - "}
-                          <span className="bg-green-200 px-1 rounded">
-                            {dateTimeFormatter(user.createdAt).split(" - ")[1]}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Pagination Controls */}
-              <Pagination
+            ) : (
+              <UserManagementTable
+                users={basicUsers}
                 page={page}
                 totalPages={totalPages}
                 onPageChange={(newPage) => setPage(newPage)}
+                onOpenProfile={openProfileModal}
+                onStatusChange={handleStatusChange}
+                selectedStatus={selectedStatus}
+                onSelectedStatusChange={(nextStatus) => {
+                  setSelectedStatus(nextStatus);
+                  setPage(1);
+                }}
+                filterId="admin-status-filter"
+                showFilter
+                fallbackRoleLabel="BASIC_USER"
               />
-            </>
-          )}
+            )}
+          </div>
+
+          <UserProfileModal
+            isOpen={isProfileModalOpen}
+            user={selectedProfile}
+            isLoading={isProfileLoading}
+            onClose={closeProfileModal}
+          />
         </div>
       )}
     </Container>

@@ -42,6 +42,10 @@
     animation: gradient 3s ease infinite;
   }
 
+  .animate-today-word-reveal {
+    animation: todayWordReveal 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
   @keyframes gradient {
     0%,
     100% {
@@ -92,5 +96,213 @@
     75% {
       transform: rotate(-1deg);
     }
+  }
+
+  @keyframes balloonFloat {
+    0% {
+      transform: translate3d(-12px, 10px, 0) rotate(-5deg);
+    }
+    25% {
+      transform: translate3d(14px, -14px, 0) rotate(2deg);
+    }
+    50% {
+      transform: translate3d(-4px, -22px, 0) rotate(5deg);
+    }
+    75% {
+      transform: translate3d(16px, -6px, 0) rotate(-2deg);
+    }
+    100% {
+      transform: translate3d(-12px, 10px, 0) rotate(-5deg);
+    }
+  }
+
+  @keyframes balloonBurst {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+      filter: drop-shadow(0 28px 50px rgba(249, 115, 22, 0.22));
+    }
+    55% {
+      transform: scale(1.18);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(0.18);
+      opacity: 0;
+      filter: drop-shadow(0 0 0 rgba(249, 115, 22, 0));
+    }
+  }
+
+  @keyframes balloonSpark {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 0, 0) scale(0.2);
+    }
+    25% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate3d(var(--spark-x), var(--spark-y), 0) scale(1.4);
+    }
+  }
+
+  @keyframes todayWordReveal {
+    0% {
+      opacity: 0;
+      transform: translateY(26px) scale(0.92);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .hero-balloon {
+    position: relative;
+    display: block;
+    width: min(100%, 19rem);
+    height: 24rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    appearance: none;
+    filter: drop-shadow(0 28px 50px rgba(249, 115, 22, 0.22));
+  }
+
+  .hero-balloon-float {
+    animation: balloonFloat 4.8s ease-in-out infinite;
+  }
+
+  .hero-balloon-burst {
+    animation: balloonBurst 0.38s ease-in forwards;
+  }
+
+  .hero-balloon-glow {
+    position: absolute;
+    inset: 1.8rem;
+    border-radius: 9999px;
+    background: radial-gradient(
+      circle,
+      rgba(56, 189, 248, 0.28) 0%,
+      rgba(249, 115, 22, 0.08) 45%,
+      transparent 72%
+    );
+    filter: blur(16px);
+  }
+
+  .hero-balloon-surface {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: 52% 48% 46% 54% / 43% 42% 58% 57%;
+    border: 2px solid rgba(255, 255, 255, 0.72);
+    background:
+      radial-gradient(
+        circle at 28% 24%,
+        rgba(255, 255, 255, 0.8),
+        transparent 24%
+      ),
+      radial-gradient(
+        circle at 68% 28%,
+        rgba(255, 244, 214, 0.4),
+        transparent 26%
+      ),
+      linear-gradient(
+        160deg,
+        #fde68a 0%,
+        #fb923c 28%,
+        #f97316 52%,
+        #ec4899 100%
+      );
+    box-shadow:
+      inset -22px -28px 50px rgba(157, 23, 77, 0.28),
+      inset 16px 24px 42px rgba(255, 255, 255, 0.18);
+  }
+
+  .hero-balloon-shine {
+    position: absolute;
+    left: 18%;
+    top: 14%;
+    width: 20%;
+    height: 34%;
+    border-radius: 9999px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.95),
+      rgba(255, 255, 255, 0.12)
+    );
+    transform: rotate(-14deg);
+    opacity: 0.7;
+  }
+
+  .hero-balloon-knot {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 2.7rem;
+    width: 1.5rem;
+    height: 1.2rem;
+    margin-inline: auto;
+    clip-path: polygon(50% 100%, 0 0, 100% 0);
+    background: linear-gradient(180deg, #fb923c 0%, #ea580c 100%);
+  }
+
+  .hero-balloon-string {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 2px;
+    height: 3.2rem;
+    margin-inline: auto;
+    background: linear-gradient(
+      180deg,
+      rgba(148, 163, 184, 0.95),
+      rgba(148, 163, 184, 0)
+    );
+  }
+
+  .hero-balloon-spark {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1rem;
+    height: 1rem;
+    margin-left: -0.5rem;
+    margin-top: -0.5rem;
+    border-radius: 9999px;
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(250, 204, 21, 0.95) 35%,
+      rgba(249, 115, 22, 0) 72%
+    );
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .hero-balloon-burst .hero-balloon-spark {
+    animation: balloonSpark 0.42s ease-out forwards;
+  }
+
+  .hero-balloon-spark-a {
+    --spark-x: -7.5rem;
+    --spark-y: -4rem;
+  }
+
+  .hero-balloon-spark-b {
+    --spark-x: 7rem;
+    --spark-y: -5.5rem;
+  }
+
+  .hero-balloon-spark-c {
+    --spark-x: -6rem;
+    --spark-y: 5.5rem;
+  }
+
+  .hero-balloon-spark-d {
+    --spark-x: 7.2rem;
+    --spark-y: 4.8rem;
   }
 }

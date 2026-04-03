@@ -1,28 +1,10 @@
 import { useEffect } from "react";
 import { dateTimeFormatter } from "../../utils/formatDateTime";
-
-const formatRoleLabel = (role) => {
-  if (!role) {
-    return "User";
-  }
-
-  return role
-    .split("_")
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-    .join(" ");
-};
-
-const createInitials = (name, email) => {
-  const source = (name || email || "User").trim();
-  const parts = source.split(/\s+/).filter(Boolean);
-
-  if (parts.length === 1) {
-    return parts[0].slice(0, 2).toUpperCase();
-  }
-
-  return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
-};
+import {
+  createInitials,
+  formatRoleLabel,
+  formatStatusLabel,
+} from "../userManagementDisplay";
 
 const statusBadgeClass = (status) => {
   switch (String(status || "").toUpperCase()) {
@@ -152,7 +134,7 @@ const UserProfileModal = ({ isOpen, user, isLoading, onClose }) => {
                           user?.status,
                         )}`}
                       >
-                        {String(user?.status || "Unknown").toLowerCase()}
+                        {formatStatusLabel(user?.status)}
                       </span>
                     </div>
                   </div>
@@ -203,9 +185,7 @@ const UserProfileModal = ({ isOpen, user, isLoading, onClose }) => {
                   <InfoCard label="Role" value={formatRoleLabel(user?.role)} />
                   <InfoCard
                     label="Status"
-                    value={formatRoleLabel(
-                      String(user?.status || "Unknown").toLowerCase(),
-                    )}
+                    value={formatStatusLabel(user?.status)}
                   />
                   <InfoCard
                     label="Contact Number"
