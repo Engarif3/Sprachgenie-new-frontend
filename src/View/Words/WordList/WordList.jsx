@@ -973,11 +973,15 @@ const WordList = () => {
   }, [topics]);
 
   const handleToggleRecentWords = useCallback(() => {
-    if (!showRecentOnly && cache.isPartial) {
+    if (showRecentOnly) {
+      return;
+    }
+
+    if (cache.isPartial) {
       void fetchAllWords();
     }
 
-    setShowRecentOnly((prev) => !prev);
+    setShowRecentOnly(true);
     setCurrentPage(1);
   }, [cache.isPartial, fetchAllWords, showRecentOnly]);
 
@@ -992,6 +996,10 @@ const WordList = () => {
     }
     return () => window.removeEventListener("click", handleClickOutside);
   }, [showInfo]);
+
+  const hasActiveFilters = Boolean(
+    searchValue || selectedLevel || selectedTopic || showRecentOnly,
+  );
 
   return (
     <Container>
@@ -1055,20 +1063,15 @@ const WordList = () => {
         </div>
         {/* ===============showing words by page ==================  */}
         <div className="flex items-center gap-4">
-          <button
-            onClick={handleToggleRecentWords}
-            className={`px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 hover:scale-105 shadow-lg ${
-              showRecentOnly
-                ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white"
-                : "bg-gradient-to-r from-slate-700 to-slate-800 text-white hover:from-slate-600 hover:to-slate-700"
-            }`}
-          >
-            {showRecentOnly ? "Showing New" : "New Words"}
-          </button>
-          {(searchValue ||
-            selectedLevel ||
-            selectedTopic ||
-            showRecentOnly) && (
+          {!hasActiveFilters && (
+            <button
+              onClick={handleToggleRecentWords}
+              className="bg-gradient-to-r from-slate-700 to-slate-800 text-white hover:from-slate-600 hover:to-slate-700 px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 hover:scale-105 shadow-lg"
+            >
+              Recently added
+            </button>
+          )}
+          {hasActiveFilters && (
             <button
               onClick={handleResetFilters}
               className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 hover:scale-105 shadow-lg"
