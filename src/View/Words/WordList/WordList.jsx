@@ -15,7 +15,12 @@ import Pagination from "../../../utils/Pagination";
 import { useAuth } from "../../../services/auth.services";
 import api from "../../../axios";
 import Loader from "../../../utils/Loader";
-import { getFromStorage, setToStorage } from "../../../utils/storage";
+import {
+  getFromStorage,
+  removeFromStorage,
+  setToStorage,
+  WORD_LIST_CACHE_KEY,
+} from "../../../utils/storage";
 import aiApi from "../../../AI_axios";
 import { IoSearch } from "react-icons/io5";
 import useDebounce from "../../../hooks/useDebounce";
@@ -28,7 +33,7 @@ const HistoryModal = lazy(() => import("../Modals/HistoryModal"));
 const AIModal = lazy(() => import("../Modals/AIModal"));
 
 // Cache key constants
-const CACHE_KEY = "wordListCache";
+const CACHE_KEY = WORD_LIST_CACHE_KEY;
 const CACHE_EXPIRY = 15 * 60 * 1000; // 15 minutes
 const WORDS_PER_PAGE = 40;
 
@@ -329,7 +334,11 @@ const WordList = () => {
       }
     };
 
-    const handleCacheInvalidated = () => {
+    const handleCacheInvalidated = (event) => {
+      if (event.detail?.key && event.detail.key !== CACHE_KEY) {
+        return;
+      }
+
       // Cache was cleared in same tab, refetch data
       console.log("Cache invalidated, refetching words...");
       fetchInitialWords();
@@ -355,8 +364,14 @@ const WordList = () => {
   useEffect(() => {
     if (location.state?.forceRefresh) {
       console.log("Force refresh triggered");
-      localStorage.removeItem(CACHE_KEY);
-      fetchAllWords();
+
+      const refreshWords = async () => {
+        await removeFromStorage(CACHE_KEY);
+        fetchAllWords();
+      };
+
+      void refreshWords();
+
       // Clear the transient navigation state without mutating browser history directly.
       navigate(
         {

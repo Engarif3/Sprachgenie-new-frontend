@@ -5,6 +5,7 @@ import { FaChevronCircleUp, FaChevronCircleDown } from "react-icons/fa";
 import Container from "../../../utils/Container";
 import api, { publicApi } from "../../../axios";
 import { useAuth } from "../../../services/auth.services";
+import { invalidateWordsCache } from "../../../utils/storage";
 import {
   DndContext,
   closestCenter,
@@ -677,7 +678,7 @@ const UpdateWord = () => {
         });
 
         // Clear the word list cache after successful update
-        localStorage.removeItem("wordListCache");
+        await invalidateWordsCache();
 
         // Show SweetAlert success message
         await Swal.fire({

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "../axios";
+import { invalidateWordsCache } from "../utils/storage";
 
 import { useAuth } from "../services/auth.services";
 
@@ -130,8 +131,8 @@ const WordForm = () => {
       //   method: "POST",
       //   data: newWordData,
       // });
-      const response = await api.post("/word/create", newWordData);
-      localStorage.removeItem("wordListCache");
+      await api.post("/word/create", newWordData);
+      await invalidateWordsCache();
 
       setWordData(initialWordData); // Reset form state
 
