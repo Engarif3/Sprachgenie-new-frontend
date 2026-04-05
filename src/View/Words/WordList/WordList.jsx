@@ -41,6 +41,120 @@ const UNKNOWN_TOPIC_ID = 1;
 const RESTRICTED_LEVEL_ID = 6;
 const RECENT_WORD_WINDOW_DAYS = 7;
 
+const EMPTY_CACHE = Object.freeze({
+  words: [],
+  levels: [],
+  topics: [],
+  lastUpdated: null,
+  isPartial: false,
+});
+
+const isRecord = (value) =>
+  value !== null && typeof value === "object" && !Array.isArray(value);
+
+const normalizeStringList = (value) =>
+  Array.isArray(value)
+    ? value
+        .filter((item) => typeof item === "string")
+        .map((item) => item.trim())
+        .filter(Boolean)
+    : [];
+
+const normalizeLinkedWords = (value) =>
+  Array.isArray(value)
+    ? value
+        .map((item) => {
+          if (typeof item === "string") {
+            const normalizedValue = item.trim();
+            return normalizedValue ? { value: normalizedValue } : null;
+          }
+
+          if (!isRecord(item)) {
+            return null;
+          }
+
+          const normalizedValue =
+            typeof item.value === "string" ? item.value.trim() : "";
+
+          if (!normalizedValue) {
+            return null;
+          }
+
+          return {
+            ...item,
+            value: normalizedValue,
+          };
+        })
+        .filter(Boolean)
+    : [];
+
+const normalizeWords = (value) =>
+  Array.isArray(value)
+    ? value
+        .map((word) => {
+          if (!isRecord(word)) {
+            return null;
+          }
+
+          const normalizedValue =
+            typeof word.value === "string" ? word.value.trim() : "";
+
+          if (!normalizedValue) {
+            return null;
+          }
+
+          return {
+            ...word,
+            value: normalizedValue,
+            pluralForm:
+              typeof word.pluralForm === "string" ? word.pluralForm : "",
+            meaning: normalizeStringList(word.meaning),
+            sentences: normalizeStringList(word.sentences),
+            synonyms: normalizeLinkedWords(word.synonyms),
+            antonyms: normalizeLinkedWords(word.antonyms),
+            similarWords: normalizeLinkedWords(word.similarWords),
+            history: Array.isArray(word.history)
+              ? word.history.filter((item) => isRecord(item))
+              : [],
+          };
+        })
+        .filter(Boolean)
+    : [];
+
+const normalizeEntityList = (value) =>
+  Array.isArray(value) ? value.filter((item) => isRecord(item)) : [];
+
+const sortTopics = (topics) =>
+  [...topics].sort((a, b) => (Number(a?.id) || 0) - (Number(b?.id) || 0));
+
+const normalizeCachePayload = (payload, defaults = {}) => {
+  const source = isRecord(payload) ? payload : {};
+
+  return {
+    words: normalizeWords(source.words),
+    levels: normalizeEntityList(source.levels),
+    topics: sortTopics(normalizeEntityList(source.topics)),
+    lastUpdated:
+      typeof source.lastUpdated === "number" &&
+      Number.isFinite(source.lastUpdated)
+        ? source.lastUpdated
+        : (defaults.lastUpdated ?? null),
+    isPartial: source.isPartial === true || defaults.isPartial === true,
+  };
+};
+
+const showWordListRecoveryToast = ({ icon, title }) => {
+  void Swal.fire({
+    toast: true,
+    position: "top-end",
+    icon,
+    title,
+    showConfirmButton: false,
+    timer: 2800,
+    timerProgressBar: true,
+  });
+};
+
 const WordList = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -87,6 +201,7 @@ const WordList = () => {
   const debouncedSearchValue = useDebounce(searchValue, 300);
   const cacheDebounceTimer = useRef(null);
   const aiAbortControllers = useRef(new Map());
+  const hasRecoveredCorruptData = useRef(false);
 
   // useEffect for fetching favorites (Logic remains the same, good to leave)
   useEffect(() => {
@@ -148,13 +263,18 @@ const WordList = () => {
 
   // ===================
 
-  const [cache, setCache] = useState({
-    words: [],
-    levels: [],
-    topics: [],
-    lastUpdated: null,
-    isPartial: false,
-  });
+  const [cache, setCache] = useState(EMPTY_CACHE);
+
+  const applyCacheState = useCallback((payload, defaults = {}) => {
+    const normalizedCache = normalizeCachePayload(payload, defaults);
+
+    setCache(normalizedCache);
+    setLevels(normalizedCache.levels);
+    setTopics(normalizedCache.topics);
+    setFilteredTopics(normalizedCache.topics);
+
+    return normalizedCache;
+  }, []);
 
   // Progressive loading: Load initial batch fast, then fetch all in background
   const fetchInitialWords = useCallback(async () => {
@@ -163,17 +283,11 @@ const WordList = () => {
       // First, load just 50 words for fast initial render
       const response = await api.get("/word/all?limit=50&page=1");
 
-      const initialCache = {
-        words: response.data.data.words || [],
-        levels: response.data.data.levels || [],
-        topics: (response.data.data.topics || []).sort((a, b) => a.id - b.id),
+      const initialCache = applyCacheState(response.data?.data, {
         lastUpdated: Date.now(),
-        isPartial: true, // Flag to indicate this is not complete data
-      };
-      setCache(initialCache);
-      setLevels(initialCache.levels);
-      setTopics(initialCache.topics);
-      setFilteredTopics(initialCache.topics);
+        isPartial: true,
+      });
+      hasRecoveredCorruptData.current = false;
       setIsLoading(false);
 
       // Store partial cache immediately so it persists on refresh
@@ -183,24 +297,17 @@ const WordList = () => {
       setTimeout(async () => {
         try {
           const fullResponse = await api.get("/word/all?all=true");
-          const fullCache = {
-            words: fullResponse.data.data.words || [],
-            levels: fullResponse.data.data.levels || [],
-            topics: (fullResponse.data.data.topics || []).sort(
-              (a, b) => a.id - b.id,
-            ),
+          const fullCache = normalizeCachePayload(fullResponse.data?.data, {
             lastUpdated: Date.now(),
             isPartial: false,
-          };
+          });
 
           // Store full data in IndexedDB for future visits
           setToStorage(CACHE_KEY, fullCache);
 
           // Update state with full data
-          setCache(fullCache);
-          setLevels(fullCache.levels);
-          setTopics(fullCache.topics);
-          setFilteredTopics(fullCache.topics);
+          applyCacheState(fullCache);
+          hasRecoveredCorruptData.current = false;
 
           console.log("Background fetch complete: All words loaded and cached");
         } catch (error) {
@@ -211,24 +318,47 @@ const WordList = () => {
       console.error("Initial fetch failed:", error);
       setIsLoading(false);
     }
-  }, []);
+  }, [applyCacheState]);
+
+  const recoverFromInvalidWordList = useCallback(
+    async (reason, error) => {
+      console.warn(`Recovering word list after invalid data: ${reason}`, error);
+
+      if (hasRecoveredCorruptData.current) {
+        console.error(
+          "Word list recovery already attempted once; stopping retry loop.",
+        );
+        applyCacheState(EMPTY_CACHE);
+        setIsLoading(false);
+        showWordListRecoveryToast({
+          icon: "warning",
+          title: "Vocabulary list could not be refreshed automatically.",
+        });
+        return;
+      }
+
+      hasRecoveredCorruptData.current = true;
+      await removeFromStorage(CACHE_KEY);
+      applyCacheState(EMPTY_CACHE);
+      showWordListRecoveryToast({
+        icon: "info",
+        title: "Vocabulary list cache was refreshed.",
+      });
+      await fetchInitialWords();
+    },
+    [applyCacheState, fetchInitialWords],
+  );
 
   const fetchAllWords = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await api.get("/word/all?all=true");
 
-      const newCache = {
-        words: response.data.data.words || [],
-        levels: response.data.data.levels || [],
-        topics: (response.data.data.topics || []).sort((a, b) => a.id - b.id),
+      const newCache = applyCacheState(response.data?.data, {
         lastUpdated: Date.now(),
         isPartial: false,
-      };
-      setCache(newCache);
-      setLevels(newCache.levels);
-      setTopics(newCache.topics);
-      setFilteredTopics(newCache.topics);
+      });
+      hasRecoveredCorruptData.current = false;
 
       // Store in localStorage
       setToStorage(CACHE_KEY, newCache);
@@ -237,7 +367,7 @@ const WordList = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [applyCacheState]);
 
   // Load cache from storage on mount
   // ====================================================================
@@ -248,25 +378,31 @@ const WordList = () => {
         const cachedData = await getFromStorage(CACHE_KEY);
 
         if (cachedData) {
+          if (
+            !Array.isArray(cachedData.words) ||
+            !Array.isArray(cachedData.levels) ||
+            !Array.isArray(cachedData.topics)
+          ) {
+            await recoverFromInvalidWordList(
+              "cache shape was not an array payload",
+              cachedData,
+            );
+            return;
+          }
+
           const isExpired = Date.now() - cachedData.lastUpdated >= CACHE_EXPIRY;
 
           if (!isExpired && !cachedData.isPartial) {
             // Fresh complete cache - use it immediately
             console.log("Using fresh cached data");
-            setCache(cachedData);
-            setLevels(cachedData.levels);
-            setTopics(cachedData.topics);
-            setFilteredTopics(cachedData.topics);
+            applyCacheState(cachedData);
             setIsLoading(false);
             return;
           }
 
           if (isExpired && !cachedData.isPartial) {
             console.log("Using stale cache, refreshing in background");
-            setCache(cachedData);
-            setLevels(cachedData.levels);
-            setTopics(cachedData.topics);
-            setFilteredTopics(cachedData.topics);
+            applyCacheState(cachedData);
             setIsLoading(false);
 
             setTimeout(() => fetchAllWords(), 100);
@@ -275,29 +411,22 @@ const WordList = () => {
 
           if (cachedData.isPartial) {
             console.log("Using partial cache, fetching remaining data");
-            setCache(cachedData);
-            setLevels(cachedData.levels);
-            setTopics(cachedData.topics);
-            setFilteredTopics(cachedData.topics);
+            applyCacheState(cachedData);
             setIsLoading(false);
 
             setTimeout(async () => {
               try {
                 const fullResponse = await api.get("/word/all?all=true");
-                const fullCache = {
-                  words: fullResponse.data.data.words || [],
-                  levels: fullResponse.data.data.levels || [],
-                  topics: (fullResponse.data.data.topics || []).sort(
-                    (a, b) => a.id - b.id,
-                  ),
-                  lastUpdated: Date.now(),
-                  isPartial: false,
-                };
+                const fullCache = normalizeCachePayload(
+                  fullResponse.data?.data,
+                  {
+                    lastUpdated: Date.now(),
+                    isPartial: false,
+                  },
+                );
                 setToStorage(CACHE_KEY, fullCache);
-                setCache(fullCache);
-                setLevels(fullCache.levels);
-                setTopics(fullCache.topics);
-                setFilteredTopics(fullCache.topics);
+                applyCacheState(fullCache);
+                hasRecoveredCorruptData.current = false;
                 console.log("Background fetch complete from partial cache");
               } catch (error) {
                 console.error("Background fetch failed:", error);
@@ -321,7 +450,12 @@ const WordList = () => {
     };
 
     loadData();
-  }, [fetchInitialWords, fetchAllWords]);
+  }, [
+    applyCacheState,
+    fetchInitialWords,
+    fetchAllWords,
+    recoverFromInvalidWordList,
+  ]);
 
   // ====================================================================
   // Listen for cache invalidation from other tabs/components (MUST be after fetchAllWords definition)
@@ -393,7 +527,7 @@ const WordList = () => {
 
   const allFilteredWords = useMemo(() => {
     const wordsArray = cache.words;
-    let filtered = wordsArray.filter((word) => word.value?.trim());
+    let filtered = wordsArray.filter((word) => word?.value?.trim());
     const recentThreshold = new Date();
     recentThreshold.setDate(
       recentThreshold.getDate() - RECENT_WORD_WINDOW_DAYS,
@@ -570,7 +704,11 @@ const WordList = () => {
   // Create a Map for O(1) word lookup by ID (optimized from O(n) find)
   const wordsByIdMap = useMemo(() => {
     const map = new Map();
-    cache.words.forEach((word) => map.set(word.id, word));
+    cache.words.forEach((word) => {
+      if (word?.id !== undefined && word?.id !== null) {
+        map.set(word.id, word);
+      }
+    });
     return map;
   }, [cache.words]);
 
@@ -581,10 +719,21 @@ const WordList = () => {
   // }, []);
   // ========================new ============
 
-  const openModal = useCallback((word) => {
-    setSelectedWordId(word.id);
-    setIsModalOpen(true);
-  }, []);
+  const openModal = useCallback(
+    (word) => {
+      if (!word?.id) {
+        void recoverFromInvalidWordList(
+          "attempted to open modal for invalid word",
+          word,
+        );
+        return;
+      }
+
+      setSelectedWordId(word.id);
+      setIsModalOpen(true);
+    },
+    [recoverFromInvalidWordList],
+  );
 
   const closeModal = useCallback(() => {
     setSelectedWordId(null);
@@ -606,10 +755,12 @@ const WordList = () => {
     (wordValue) => {
       const word = cache.words.find(
         (w) =>
-          w.value === wordValue ||
-          (w.synonyms && w.synonyms.includes(wordValue)) ||
-          (w.antonyms && w.antonyms.includes(wordValue)) ||
-          (w.similarWords && w.similarWords.includes(wordValue)),
+          w?.value === wordValue ||
+          w?.synonyms?.some((synonym) => synonym?.value === wordValue) ||
+          w?.antonyms?.some((antonym) => antonym?.value === wordValue) ||
+          w?.similarWords?.some(
+            (similarWord) => similarWord?.value === wordValue,
+          ),
       );
 
       if (word) {
@@ -628,8 +779,8 @@ const WordList = () => {
   const levelToTopicsMap = useMemo(() => {
     const map = new Map();
     cache.words.forEach((word) => {
-      const levelName = word.level?.level;
-      const topicName = word.topic?.name;
+      const levelName = word?.level?.level;
+      const topicName = word?.topic?.name;
       if (levelName && topicName) {
         if (!map.has(levelName)) {
           map.set(levelName, new Set());
@@ -700,7 +851,7 @@ const WordList = () => {
               // Update cache directly to avoid refetching all data
               setCache((prev) => ({
                 ...prev,
-                words: prev.words.filter((word) => word.id !== wordId),
+                words: prev.words.filter((word) => word?.id !== wordId),
                 lastUpdated: Date.now(),
               }));
 
@@ -931,7 +1082,7 @@ const WordList = () => {
       const wordId = response.data.wordId || word.id; // depends on AI API response
 
       // 🔑 Find the full word object in your /all words cache
-      const fullWord = cache.words.find((w) => w.id === wordId);
+      const fullWord = cache.words.find((w) => w?.id === wordId);
 
       setAiWord({
         ...(fullWord || { id: word.id, value: word.value }),
