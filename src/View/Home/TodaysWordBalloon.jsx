@@ -106,6 +106,26 @@ const TodaysWordBalloon = () => {
     return selectedWord.meaning[0];
   }, [selectedWord]);
 
+  const isBalloonReady = Boolean(selectedWord) && phase !== "loading";
+
+  const handleBalloonPress = (event) => {
+    if (!isBalloonReady) {
+      event.preventDefault();
+      return;
+    }
+
+    triggerReveal();
+  };
+
+  const handleBalloonKeyDown = (event) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+
+    event.preventDefault();
+    handleBalloonPress(event);
+  };
+
   return (
     <div className="relative mx-auto mt-10 flex min-h-[26rem] w-full max-w-3xl items-center justify-center overflow-visible px-4">
       <div
@@ -116,9 +136,12 @@ const TodaysWordBalloon = () => {
         {phase !== "revealed" && (
           <button
             type="button"
-            className={`hero-balloon ${phase === "burst" ? "hero-balloon-burst" : "hero-balloon-float"}`}
-            onClick={triggerReveal}
+            className={`hero-balloon ${phase === "burst" ? "hero-balloon-burst" : "hero-balloon-float"} ${isBalloonReady ? "cursor-pointer" : "cursor-wait"}`}
+            onPointerDown={handleBalloonPress}
+            onKeyDown={handleBalloonKeyDown}
             aria-label="Reveal today's word"
+            aria-disabled={!isBalloonReady}
+            disabled={phase === "burst"}
           >
             <div className="hero-balloon-glow" />
             <div className="hero-balloon-surface">
@@ -131,7 +154,7 @@ const TodaysWordBalloon = () => {
                   Today&apos;s Word
                 </p>
                 <p className="mt-4 text-sm font-semibold uppercase tracking-[0.18em] text-slate-800/90 ">
-                  Tap to burst
+                  {isBalloonReady ? "Tap to burst" : "Loading surprise..."}
                 </p>
               </div>
             </div>
