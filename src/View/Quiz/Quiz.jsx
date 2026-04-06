@@ -1,14 +1,11 @@
 import Container from "../../utils/Container";
 import { useState, useEffect, useReducer } from "react";
 import Swal from "sweetalert2";
-import { getFromStorage, setToStorage } from "../../utils/storage";
 import api from "../../axios";
 import { pronounceWord } from "../../utils/wordPronounciation";
 
-const CACHE_KEY = "wordListCache";
 const QUIZ_STORAGE_KEY = "quizState";
 const QUIZ_LENGTH = 30;
-const CACHE_EXPIRY = 15 * 60 * 1000; // 15 mins
 
 const DIFFICULTY_LEVELS = {
   1: { name: "Easy", description: "Level A1 & A2 words (Beginner)" },
@@ -22,62 +19,22 @@ const DIFFICULTY_LEVELS = {
   },
 };
 
-const loadWords = async () => {
-  try {
-    const cachedData = await getFromStorage(CACHE_KEY);
-    if (
-      cachedData &&
-      cachedData.words &&
-      cachedData.lastUpdated &&
-      Date.now() - cachedData.lastUpdated < CACHE_EXPIRY
-    ) {
-      return cachedData;
-    }
-  } catch (err) {
-    // Cache retrieval failed
-  }
+const loadQuizWords = async (difficulty) => {
+  const response = await api.get(
+    `/word/quiz?difficulty=${difficulty}&limit=${QUIZ_LENGTH}`,
+  );
 
-  try {
-    const response = await api.get("/word/all?all=true");
-    const words = response.data.data?.words || [];
-    const levels = response.data.data?.levels || [];
-    const topics = response.data.data?.topics || [];
-
-    const newCache = { words, levels, topics, lastUpdated: Date.now() };
-    try {
-      await setToStorage(CACHE_KEY, newCache);
-    } catch (err) {
-      // Storage failed
-    }
-    return newCache;
-  } catch (error) {
-    return { words: [], levels: [], topics: [] };
-  }
-};
-
-const filterWordsByDifficulty = (words, difficulty) => {
-  if (!words.length) return [];
-  switch (difficulty) {
-    case 1:
-      return words.filter(
-        (word) => word.level?.id === 1 || word.level?.id === 2,
-      );
-    case 2:
-      return words.filter(
-        (word) => word.level?.id === 3 || word.level?.id === 4,
-      );
-    case 3:
-      return words.filter((word) => [1, 2, 3, 4, 6].includes(word.level?.id));
-    default:
-      return words;
-  }
+  return {
+    words: response.data?.data?.words || [],
+    availableCount: response.data?.data?.availableCount || 0,
+  };
 };
 
 const Quiz = () => {
   const initialState = {
     difficulty: 1,
-    words: [],
-    allWords: [],
+    availableWordsCount: 0,
+    preparedQuizWords: [],
     quizWords: [],
     currentIndex: 0,
     showMeaning: false,
@@ -91,10 +48,10 @@ const Quiz = () => {
     switch (action.type) {
       case "SET_DIFFICULTY":
         return { ...state, difficulty: action.payload };
-      case "SET_WORDS":
-        return { ...state, words: action.payload };
-      case "SET_ALL_WORDS":
-        return { ...state, allWords: action.payload };
+      case "SET_AVAILABLE_WORDS_COUNT":
+        return { ...state, availableWordsCount: action.payload };
+      case "SET_PREPARED_QUIZ_WORDS":
+        return { ...state, preparedQuizWords: action.payload };
       case "SET_QUIZ_WORDS":
         return { ...state, quizWords: action.payload };
       case "SET_CURRENT_INDEX":
@@ -123,8 +80,8 @@ const Quiz = () => {
   // Destructure for cleaner JSX
   const {
     difficulty,
-    words,
-    allWords,
+    availableWordsCount,
+    preparedQuizWords,
     quizWords,
     currentIndex,
     showMeaning,
@@ -136,35 +93,57 @@ const Quiz = () => {
 
   useEffect(() => {
     const init = async () => {
+      const saved = JSON.parse(localStorage.getItem(QUIZ_STORAGE_KEY));
+
+      if (saved?.quizStarted && Array.isArray(saved.quizWords)) {
+        dispatch({ type: "LOAD_STATE", payload: saved });
+        dispatch({ type: "SET_LOADING", payload: false });
+        return;
+      }
+
       dispatch({ type: "SET_LOADING", payload: true });
       try {
-        const data = await loadWords();
-        dispatch({ type: "SET_ALL_WORDS", payload: data.words || [] });
-        const initialFiltered = filterWordsByDifficulty(
-          data.words || [],
-          difficulty,
-        );
-        dispatch({ type: "SET_WORDS", payload: initialFiltered });
-
-        const saved = JSON.parse(localStorage.getItem(QUIZ_STORAGE_KEY));
-        if (saved) dispatch({ type: "LOAD_STATE", payload: saved });
+        const data = await loadQuizWords(difficulty);
+        dispatch({ type: "SET_PREPARED_QUIZ_WORDS", payload: data.words });
+        dispatch({
+          type: "SET_AVAILABLE_WORDS_COUNT",
+          payload: data.availableCount,
+        });
       } catch (error) {
         console.error(error);
       } finally {
-        dispatch({ type: "SET_LOADING", payload: false }); // Corrected from setLoading(false)
+        dispatch({ type: "SET_LOADING", payload: false });
       }
     };
-    init();
+
+    void init();
   }, []);
 
   useEffect(() => {
-    if (allWords.length > 0) {
-      dispatch({
-        type: "SET_WORDS",
-        payload: filterWordsByDifficulty(allWords, difficulty),
-      });
+    if (quizStarted) {
+      return;
     }
-  }, [difficulty, allWords]);
+
+    const loadForDifficulty = async () => {
+      dispatch({ type: "SET_LOADING", payload: true });
+      try {
+        const data = await loadQuizWords(difficulty);
+        dispatch({ type: "SET_PREPARED_QUIZ_WORDS", payload: data.words });
+        dispatch({
+          type: "SET_AVAILABLE_WORDS_COUNT",
+          payload: data.availableCount,
+        });
+      } catch (error) {
+        console.error(error);
+        dispatch({ type: "SET_PREPARED_QUIZ_WORDS", payload: [] });
+        dispatch({ type: "SET_AVAILABLE_WORDS_COUNT", payload: 0 });
+      } finally {
+        dispatch({ type: "SET_LOADING", payload: false });
+      }
+    };
+
+    void loadForDifficulty();
+  }, [difficulty, quizStarted]);
 
   useEffect(() => {
     if (quizStarted) {
@@ -180,8 +159,10 @@ const Quiz = () => {
   }, [difficulty, quizWords, currentIndex, score, quizStarted]);
 
   const startQuiz = () => {
-    const shuffled = [...words].sort(() => 0.5 - Math.random());
-    const selected = shuffled.slice(0, Math.min(QUIZ_LENGTH, words.length));
+    const selected = preparedQuizWords.slice(
+      0,
+      Math.min(QUIZ_LENGTH, preparedQuizWords.length),
+    );
 
     dispatch({ type: "SET_QUIZ_WORDS", payload: selected });
     dispatch({ type: "SET_CURRENT_INDEX", payload: 0 });
@@ -324,8 +305,8 @@ const Quiz = () => {
                     📚 Available Words
                   </div>
                   <div className="text-3xl font-bold text-purple-400">
-                    {words.length > 0
-                      ? words.length.toLocaleString()
+                    {availableWordsCount > 0
+                      ? availableWordsCount.toLocaleString()
                       : "Loading..."}
                   </div>
                   <div className="text-gray-500 text-xs mt-1">
@@ -338,10 +319,10 @@ const Quiz = () => {
             {/* Start Button */}
             <div className="text-center">
               <button
-                disabled={words.length === 0}
+                disabled={preparedQuizWords.length === 0}
                 onClick={startQuiz}
                 className={`relative px-10 md:px-16 py-4 md:py-5 rounded-full font-bold text-lg md:text-xl transition-all duration-300 overflow-hidden group ${
-                  words.length === 0
+                  preparedQuizWords.length === 0
                     ? "bg-gray-600 text-gray-400 cursor-not-allowed opacity-50"
                     : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white hover:scale-110 hover:shadow-green-500/50 shadow-xl hover:shadow-2xl"
                 }`}
@@ -351,7 +332,7 @@ const Quiz = () => {
                 </span>
               </button>
 
-              {words.length === 0 && (
+              {preparedQuizWords.length === 0 && (
                 <p className="text-orange-400 text-sm mt-4 animate-pulse">
                   ⚠️ Loading words... Please wait
                 </p>
