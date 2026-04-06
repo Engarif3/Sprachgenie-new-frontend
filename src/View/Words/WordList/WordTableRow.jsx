@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import { pronounceWord } from "../../../utils/wordPronounciation";
@@ -9,6 +9,95 @@ import { PuffLoader } from "react-spinners";
 const capitalizeFirstLetter = (str) => {
   if (!str) return str;
   return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+const normalizeText = (value) =>
+  String(value ?? "")
+    .trim()
+    .toLowerCase();
+
+const getArticleColumnDisplay = (word) => {
+  const partOfSpeechName = normalizeText(word?.partOfSpeech?.name);
+  const articleName =
+    typeof word?.article?.name === "string" ? word.article.name : "";
+  const defaultArticleClassName =
+    "font-bold text-orange-400 text-xs md:text-lg lg:text-lg";
+  const baseMarkerClassName =
+    "inline-block bg-black w-full px-1 md:px-2 lg:px-2 py-1 rounded-xl border text-xs md:text-sm lg:text-sm shadow-sm";
+
+  if (
+    !partOfSpeechName ||
+    partOfSpeechName === "unknown" ||
+    partOfSpeechName === "not specified"
+  ) {
+    return {
+      text: articleName,
+      className: defaultArticleClassName,
+    };
+  }
+
+  if (partOfSpeechName === "noun") {
+    return {
+      text: articleName,
+      className: defaultArticleClassName,
+    };
+  }
+
+  if (partOfSpeechName === "verb") {
+    return {
+      text: "vrb.",
+      className: `${baseMarkerClassName} text-white bg-green-600 font-bold`,
+    };
+  }
+
+  if (partOfSpeechName === "adjective") {
+    return {
+      text: "adj.",
+      className: `${baseMarkerClassName}  text-emerald-300`,
+    };
+  }
+
+  if (partOfSpeechName === "adverb") {
+    return {
+      text: "adv.",
+      className: `${baseMarkerClassName}  text-violet-300`,
+    };
+  }
+
+  if (
+    partOfSpeechName === "adjective/adverb" ||
+    partOfSpeechName === "adjective / adverb"
+  ) {
+    return {
+      text: "aj/av",
+      className: `${baseMarkerClassName}  text-fuchsia-300`,
+    };
+  }
+
+  if (partOfSpeechName === "preposition") {
+    return {
+      text: "pre.",
+      className: `${baseMarkerClassName} text-amber-200`,
+    };
+  }
+
+  if (partOfSpeechName === "conjunction") {
+    return {
+      text: "conj.",
+      className: `${baseMarkerClassName} text-rose-300`,
+    };
+  }
+  if (partOfSpeechName === "phrase") {
+    return {
+      text: "phr.",
+      className: `${baseMarkerClassName} text-cyan-400`,
+    };
+  }
+
+  return {
+    text: articleName,
+    className: defaultArticleClassName,
+  };
 };
 
 const WordTableRow = ({
@@ -34,6 +123,8 @@ const WordTableRow = ({
   setSelectedHistory,
   setIsHistoryModalOpen,
 }) => {
+  const articleColumnDisplay = getArticleColumnDisplay(word);
+
   const handleFavoriteLocked = () => {
     Swal.fire({
       icon: "info",
@@ -74,8 +165,10 @@ const WordTableRow = ({
       }`}
     >
       {/* Article */}
-      <td className="border border-gray-700 border-dotted p-1 md:p-3 lg:p-3 font-bold text-orange-400 text-center text-xs md:text-lg lg:text-lg">
-        {word.article?.name}
+      <td className="border border-gray-700 border-dotted p-1 md:p-3 lg:p-3 text-center">
+        <span className={articleColumnDisplay.className}>
+          {articleColumnDisplay.text}
+        </span>
       </td>
 
       {/* Word value */}
@@ -86,12 +179,12 @@ const WordTableRow = ({
           <span
             tabIndex={learningMode ? 0 : -1}
             ref={learningMode && index === currentIndex ? focusElement : null}
-            className="cursor-pointer p-0 md:p-2 lg:p-2 text-blue-600 dark:text-blue-400 hover:text-blue-300 text-sm md:text-lg lg:text-lg font-semibold md:font-bold lg:font-bold break-words max-w-[120px] md:max-w-full transition-colors duration-200"
+            className="inline-flex items-center gap-2 cursor-pointer p-0 md:p-2 lg:p-2 text-blue-600 dark:text-blue-400 hover:text-blue-300 text-sm md:text-lg lg:text-lg font-semibold md:font-bold lg:font-bold break-words max-w-[120px] md:max-w-full transition-colors duration-200"
             onClick={() => openModal(word)}
           >
             {/* Previous version - used CSS capitalize */}
             {/* {word.value} */}
-            {capitalizeFirstLetter(word.value)}
+            <span>{capitalizeFirstLetter(word.value)}</span>
           </span>
 
           <div className="flex gap-1 md:gap-4 lg:gap-4 ">

@@ -148,7 +148,8 @@ const NavBar = () => {
         )}
         {/* ========================================== */}
 
-        {isMobile && isAdmin && (
+        {/* {isMobile && isAdmin && ( */}
+        {isAdmin && (
           <Link
             to="/create-word"
             onClick={() => setIsProfileMenuOpen(false)}

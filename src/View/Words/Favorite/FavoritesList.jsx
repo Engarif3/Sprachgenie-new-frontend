@@ -15,6 +15,7 @@ import {
 import aiApi from "../../../AI_axios";
 import { PuffLoader } from "react-spinners";
 import AIModal from "../Modals/AIModal";
+import FavoriteWordsTable from "./FavoriteWordsTable";
 
 const FavoritesList = () => {
   const [selectedWordId, setSelectedWordId] = useState(null);
@@ -491,151 +492,15 @@ const FavoritesList = () => {
                     </span>
                   </div>
 
-                  <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-xl dark:border-gray-700/50 dark:shadow-2xl">
-                    <table className="w-full border-collapse text-xs sm:text-sm md:text-base">
-                      <thead>
-                        <tr className="bg-slate-900 text-sm text-white md:text-xl lg:text-xl dark:bg-gradient-to-r dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
-                          <th className="rounded-tl-xl border-b border-l border-slate-200 py-3 text-center text-sm font-bold text-orange-400 md:text-lg lg:text-lg dark:border-gray-700 w-[5%] md:w-[3%] lg:w-[3%]">
-                            Art.
-                          </th>
-                          <th className="border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-blue-400 dark:border-gray-700 w-[15%] md:w-[10%] lg:w-[10%]">
-                            Word
-                          </th>
-                          <th className="border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-purple-400 dark:border-gray-700 w-[10%] md:w-[25%] lg:w-[25%]">
-                            Meaning
-                          </th>
-                          <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-cyan-400 dark:border-gray-700 md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
-                            Synonym
-                          </th>
-                          <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-pink-400 dark:border-gray-700 lg:table-cell xl:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
-                            Antonym
-                          </th>
-                          <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-green-400 dark:border-gray-700 lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
-                            Word to Watch
-                          </th>
-                          <th className="rounded-tr-xl border-b border-l border-dotted border-slate-200 py-3 text-center text-sm font-bold text-red-400 dark:border-gray-700 md:text-lg lg:text-lg w-[3%] md:w-[3%] lg:w-[3%]"></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {paginatedFavorites.map((word, index) => (
-                          <tr
-                            key={word.id}
-                            className={`${
-                              index % 2 === 0
-                                ? "bg-white hover:bg-sky-50/70 dark:bg-gray-800 dark:hover:bg-gray-700"
-                                : "bg-slate-50/80 hover:bg-sky-50 dark:bg-gray-900 dark:hover:bg-gray-800"
-                            } border-b border-slate-200 transition-all duration-300 dark:border-gray-700`}
-                          >
-                            <td className="border border-slate-200 border-dotted p-0 text-center font-semibold text-orange-500 dark:border-gray-700 dark:text-orange-400 md:p-2 lg:p-2">
-                              {word.article?.name}
-                            </td>
-                            <td className="border border-slate-200 border-dotted p-1 dark:border-gray-700 md:p-2 lg:p-2">
-                              <div className="flex justify-between gap-1 md:gap-4 items-center">
-                                <span
-                                  className="max-w-[120px] cursor-pointer break-words pl-1 text-sm font-bold text-blue-600 transition-all duration-300 hover:scale-105 hover:text-blue-700 line-clamp-2 hover:line-clamp-none hover:max-w-full dark:text-blue-400 dark:hover:text-blue-300 md:max-w-full md:pl-0 md:text-lg lg:pl-0 lg:text-lg"
-                                  onClick={() => openModal(word)}
-                                >
-                                  {word.value.charAt(0).toUpperCase() +
-                                    word.value.slice(1)}
-                                </span>
-
-                                <div className="flex gap-1 md:gap-2 lg:gap-2">
-                                  <button
-                                    onClick={() => pronounceWord(word.value)}
-                                    className="rounded-full border border-blue-300 bg-gradient-to-r from-blue-50 to-cyan-50 p-1 text-blue-700 shadow-sm transition-all duration-300 hover:scale-110 hover:from-blue-100 hover:to-cyan-100 dark:border-blue-500/50 dark:from-blue-500/20 dark:to-cyan-500/20 dark:text-white dark:hover:from-blue-500/40 dark:hover:to-cyan-500/40"
-                                  >
-                                    🔊
-                                  </button>
-
-                                  <div
-                                    onClick={() => generateParagraph(word)}
-                                    className="relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 border-emerald-300 bg-gradient-to-r from-emerald-50 to-green-50 px-2 py-1 text-sm italic text-emerald-700 shadow-sm transition-all duration-300 hover:scale-110 hover:border-emerald-400 hover:from-emerald-500 hover:to-green-500 hover:text-white dark:border-green-500/50 dark:from-green-500/20 dark:to-emerald-500/20 dark:text-white dark:hover:border-green-400 dark:hover:from-green-500 dark:hover:to-emerald-500"
-                                  >
-                                    {loadingParagraphs[word.id] && (
-                                      <span className="absolute inset-0 flex items-center justify-center z-10">
-                                        <PuffLoader size={20} color="#10b981" />
-                                      </span>
-                                    )}
-                                    <span
-                                      className={`${
-                                        loadingParagraphs[word.id]
-                                          ? "invisible"
-                                          : "text-xs font-bold "
-                                      }`}
-                                    >
-                                      ai
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="border border-slate-200 border-dotted p-0 pl-2 dark:border-gray-700 md:p-2 lg:p-2">
-                              <span className="max-w-[120px] break-words text-sm font-medium text-slate-700 line-clamp-2 hover:line-clamp-none dark:text-white md:max-w-full md:text-base lg:text-base">
-                                {word.meaning?.join(", ")}
-                              </span>
-                            </td>
-                            <td className="hidden border border-slate-200 border-dotted p-1 dark:border-gray-700 md:table-cell md:p-2 lg:p-2">
-                              <div className="flex flex-wrap gap-1.5">
-                                {word.synonyms?.map((synonym, index) => (
-                                  <span
-                                    key={index}
-                                    onClick={() =>
-                                      openWordInModal(synonym.value)
-                                    }
-                                    className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-blue-300 bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-1.5 text-md font-semibold text-blue-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-blue-100 hover:to-indigo-100 dark:border-blue-500/50 dark:from-blue-500/20 dark:to-purple-500/20 dark:text-blue-300 dark:hover:from-blue-500/40 dark:hover:to-purple-500/40 dark:hover:shadow-blue-500/50"
-                                  >
-                                    {synonym.value}
-                                  </span>
-                                ))}
-                              </div>
-                            </td>
-
-                            <td className="hidden border border-slate-200 p-1 dark:border-gray-700/50 md:table-cell md:p-2 lg:p-2">
-                              <div className="flex flex-wrap gap-1.5">
-                                {word.antonyms?.map((antonym, index) => (
-                                  <span
-                                    key={index}
-                                    onClick={() =>
-                                      openWordInModal(antonym.value)
-                                    }
-                                    className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-rose-300 bg-gradient-to-r from-rose-50 to-pink-50 px-3 py-1.5 text-md font-semibold text-rose-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-rose-100 hover:to-pink-100 dark:border-red-500/50 dark:from-red-500/20 dark:to-pink-500/20 dark:text-red-300 dark:hover:from-red-500/40 dark:hover:to-pink-500/40 dark:hover:shadow-red-500/50"
-                                  >
-                                    {antonym.value}
-                                  </span>
-                                ))}
-                              </div>
-                            </td>
-                            <td className="hidden border border-slate-200 border-dotted p-1 dark:border-gray-700 lg:table-cell md:p-2 lg:p-2">
-                              <div className="flex flex-wrap gap-1.5">
-                                {word.similarWords?.map(
-                                  (similarWord, index) => (
-                                    <span
-                                      key={index}
-                                      onClick={() =>
-                                        openWordInModal(similarWord.value)
-                                      }
-                                      className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-violet-300 bg-gradient-to-r from-violet-50 to-fuchsia-50 px-3 py-1.5 text-md font-semibold text-violet-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-violet-100 hover:to-fuchsia-100 dark:border-purple-500/50 dark:from-purple-500/20 dark:to-pink-500/20 dark:text-purple-300 dark:hover:from-purple-500/40 dark:hover:to-pink-500/40 dark:hover:shadow-purple-500/50"
-                                    >
-                                      {similarWord.value}
-                                    </span>
-                                  ),
-                                )}
-                              </div>
-                            </td>
-
-                            <td className="border border-slate-200 border-dotted p-1 text-center dark:border-gray-700 md:p-2 lg:p-2">
-                              <button
-                                onClick={() => handleRemoveFavorite(word.id)}
-                                className="rounded-xl border border-rose-300 bg-gradient-to-r from-rose-50 to-pink-50 p-2.5 font-bold text-rose-700 shadow-sm transition-all duration-300 hover:scale-110 hover:from-red-600 hover:to-pink-600 hover:text-white dark:border-red-500/50 dark:from-red-500/20 dark:to-pink-500/20 dark:text-red-300 dark:shadow-lg dark:hover:shadow-red-500/50"
-                              >
-                                <ImBin size={12} />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                  <FavoriteWordsTable
+                    paginatedFavorites={paginatedFavorites}
+                    openModal={openModal}
+                    openWordInModal={openWordInModal}
+                    generateParagraph={generateParagraph}
+                    loadingParagraphs={loadingParagraphs}
+                    handleRemoveFavorite={handleRemoveFavorite}
+                    variant="page"
+                  />
                 </>
               ) : (
                 <div className="min-h-screen flex justify-center items-center">
@@ -714,7 +579,7 @@ const FavoritesList = () => {
                 }
                 placeholder="Type 'ok' to confirm"
                 className="w-full px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:outline-none focus:border-red-500"
-                onKeyPress={(e) => {
+                onKeyDown={(e) => {
                   if (
                     e.key === "Enter" &&
                     deleteConfirmation.inputValue === "ok"

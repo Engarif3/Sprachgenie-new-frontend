@@ -81,6 +81,29 @@ const WordForm = () => {
   // Handle form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (!wordData.levelId) {
+      Swal.fire({
+        title: "Level Required",
+        text: "Please select a level before creating the word.",
+        icon: "warning",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    if (!wordData.partOfSpeechId) {
+      Swal.fire({
+        title: "Part of Speech Required",
+        text: "Please select a part of speech before creating the word.",
+        icon: "warning",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
     const newWordData = {
       value: wordData.value,
       meaning:
@@ -95,10 +118,10 @@ const WordForm = () => {
               .filter((item) => item) // Removes empty strings
           : [],
       pluralForm: wordData.pluralForm,
-      levelId: wordData.levelId || "2",
+      levelId: wordData.levelId,
       topicId: wordData.topicId || "1",
       articleId: wordData.articleId || "4",
-      partOfSpeechId: wordData.partOfSpeechId || "3",
+      partOfSpeechId: wordData.partOfSpeechId,
       synonyms:
         typeof wordData.synonyms === "string"
           ? wordData.synonyms
@@ -305,6 +328,7 @@ const WordForm = () => {
                   name="levelId"
                   value={wordData.levelId}
                   onChange={handleChange}
+                  required
                   className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
                 >
                   <option value="">Select Level</option>
@@ -335,6 +359,7 @@ const WordForm = () => {
                   name="partOfSpeechId"
                   value={wordData.partOfSpeechId}
                   onChange={handleChange}
+                  required
                   className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
                 >
                   <option value="">Select Part of Speech</option>

@@ -950,7 +950,7 @@ const AdminVisitorsPage = () => {
                       }
                       placeholder={`Type '${requiredInput}' to confirm`}
                       className="w-full rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-white transition-all duration-200 focus:border-rose-400/60 focus:outline-none focus:ring-2 focus:ring-rose-400/25"
-                      onKeyPress={(e) => {
+                      onKeyDown={(e) => {
                         if (
                           e.key === "Enter" &&
                           deleteConfirmation.inputValue === requiredInput

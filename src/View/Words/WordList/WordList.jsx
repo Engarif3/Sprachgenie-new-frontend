@@ -40,6 +40,16 @@ const WORDS_PER_PAGE = 40;
 const UNKNOWN_TOPIC_ID = 1;
 const RESTRICTED_LEVEL_ID = 6;
 const RECENT_WORD_WINDOW_DAYS = 7;
+const NOT_SPECIFIED_PART_OF_SPEECH = "not_specified";
+const UNKNOWN_PART_OF_SPEECH = "unknown";
+const HIDDEN_PART_OF_SPEECH_IDS = new Set([3]);
+const NOUN_ARTICLE_IDS = new Set([1, 2, 3, 5]);
+const DEFAULT_PART_OF_SPEECH_OPTIONS = [
+  { value: "noun", label: "Noun" },
+  { value: "verb", label: "Verb" },
+  { value: "adjective", label: "Adjective" },
+  { value: "adverb", label: "Adverb" },
+];
 
 const EMPTY_CACHE = Object.freeze({
   words: [],
@@ -51,6 +61,11 @@ const EMPTY_CACHE = Object.freeze({
 
 const isRecord = (value) =>
   value !== null && typeof value === "object" && !Array.isArray(value);
+
+const normalizeText = (value) =>
+  String(value ?? "")
+    .trim()
+    .toLowerCase();
 
 const normalizeStringList = (value) =>
   Array.isArray(value)
@@ -143,6 +158,59 @@ const normalizeCachePayload = (payload, defaults = {}) => {
   };
 };
 
+const normalizePartOfSpeechName = (value) => normalizeText(value);
+
+const normalizePartOfSpeechOptions = (value) => {
+  const options = Array.isArray(value) ? value : [];
+  const seenValues = new Set();
+
+  return options
+    .map((item) => {
+      if (!isRecord(item)) {
+        return null;
+      }
+
+      const label = typeof item.name === "string" ? item.name.trim() : "";
+      const itemId = Number(item.id);
+      const normalizedValue = normalizePartOfSpeechName(label);
+
+      if (
+        !label ||
+        !normalizedValue ||
+        HIDDEN_PART_OF_SPEECH_IDS.has(itemId) ||
+        seenValues.has(normalizedValue)
+      ) {
+        return null;
+      }
+
+      seenValues.add(normalizedValue);
+
+      return {
+        value: normalizedValue,
+        label,
+      };
+    })
+    .filter(Boolean);
+};
+
+const getEffectivePartOfSpeechName = (word) => {
+  const explicitPartOfSpeech = normalizePartOfSpeechName(
+    word?.partOfSpeech?.name,
+  );
+
+  if (explicitPartOfSpeech && explicitPartOfSpeech !== UNKNOWN_PART_OF_SPEECH) {
+    return explicitPartOfSpeech;
+  }
+
+  const articleId = Number(word?.article?.id);
+
+  if (NOUN_ARTICLE_IDS.has(articleId)) {
+    return "noun";
+  }
+
+  return explicitPartOfSpeech;
+};
+
 const showWordListRecoveryToast = ({ icon, title }) => {
   void Swal.fire({
     toast: true,
@@ -172,6 +240,10 @@ const WordList = () => {
   const [levels, setLevels] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState("");
   const [topics, setTopics] = useState([]);
+  const [partOfSpeechOptions, setPartOfSpeechOptions] = useState(
+    DEFAULT_PART_OF_SPEECH_OPTIONS,
+  );
+  const [selectedPartOfSpeech, setSelectedPartOfSpeech] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -204,6 +276,23 @@ const WordList = () => {
   const hasRecoveredCorruptData = useRef(false);
 
   // useEffect for fetching favorites (Logic remains the same, good to leave)
+  useEffect(() => {
+    const fetchPartOfSpeechOptions = async () => {
+      try {
+        const response = await api.get("/part-of-speech");
+        const normalizedOptions = normalizePartOfSpeechOptions(response.data);
+
+        if (normalizedOptions.length > 0) {
+          setPartOfSpeechOptions(normalizedOptions);
+        }
+      } catch (error) {
+        console.error("Failed to fetch part of speech options:", error);
+      }
+    };
+
+    fetchPartOfSpeechOptions();
+  }, []);
+
   useEffect(() => {
     const fetchFavorites = async () => {
       //   if (
@@ -590,7 +679,22 @@ const WordList = () => {
       });
     }
 
-    // 3. Search Filter (Uses the debounced value)
+    // 3. Part of speech filter
+    if (selectedPartOfSpeech) {
+      filtered = filtered.filter((word) => {
+        const partOfSpeechName = getEffectivePartOfSpeechName(word);
+
+        if (selectedPartOfSpeech === NOT_SPECIFIED_PART_OF_SPEECH) {
+          return (
+            !partOfSpeechName || partOfSpeechName === UNKNOWN_PART_OF_SPEECH
+          );
+        }
+
+        return partOfSpeechName === selectedPartOfSpeech;
+      });
+    }
+
+    // 4. Search Filter (Uses the debounced value)
     if (debouncedSearchValue.trim().length > 0) {
       const lower = debouncedSearchValue.trim().toLowerCase();
 
@@ -676,6 +780,7 @@ const WordList = () => {
     selectedLevel,
     showRecentOnly,
     selectedTopic,
+    selectedPartOfSpeech,
     debouncedSearchValue,
     searchType,
     topics,
@@ -820,6 +925,11 @@ const WordList = () => {
   const handleTopicChange = useCallback((e) => {
     setSelectedTopic(e.target.value);
     setCurrentPage(1); // Reset page on filter change
+  }, []);
+
+  const handlePartOfSpeechChange = useCallback((e) => {
+    setSelectedPartOfSpeech(e.target.value);
+    setCurrentPage(1);
   }, []);
 
   // Learning mode implementation (Logic remains the same, good to leave)
@@ -1133,6 +1243,7 @@ const WordList = () => {
     setSearchValue("");
     setSelectedLevel("");
     setSelectedTopic("");
+    setSelectedPartOfSpeech("");
     setShowRecentOnly(false);
     setCurrentPage(1);
     setFilteredTopics(topics); // Reset filtered topics back to the full list
@@ -1153,7 +1264,13 @@ const WordList = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearchValue, selectedLevel, selectedTopic, showRecentOnly]);
+  }, [
+    debouncedSearchValue,
+    selectedLevel,
+    selectedTopic,
+    selectedPartOfSpeech,
+    showRecentOnly,
+  ]);
   // to show info
   useEffect(() => {
     const handleClickOutside = () => setShowInfo(false);
@@ -1164,7 +1281,11 @@ const WordList = () => {
   }, [showInfo]);
 
   const hasActiveFilters = Boolean(
-    searchValue || selectedLevel || selectedTopic || showRecentOnly,
+    searchValue ||
+    selectedLevel ||
+    selectedTopic ||
+    selectedPartOfSpeech ||
+    showRecentOnly,
   );
 
   return (
@@ -1252,7 +1373,7 @@ const WordList = () => {
         </div>
       </div>
       {/* =============radio buttons ========== */}
-      <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 xl:grid-cols-3 gap-4 mb-6 mx-0 md:mx-2 lg:mx-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4 mb-6 mx-0 md:mx-2 lg:mx-2">
         <div className="w-full space-y-2">
           {/* Search input */}
           <div className="relative">
@@ -1292,7 +1413,7 @@ const WordList = () => {
               id="level-select"
               value={selectedLevel}
               onChange={handleLevelChange}
-              className="border border-gray-600 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl px-4 py-3 w-full dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition-all"
+              className="border  border-gray-600 dark:bg-gray-800 backdrop-blur-sm rounded-xl px-4 py-3 w-full dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition-all"
               aria-label="Filter words by level"
             >
               <option value="">All Levels</option>
@@ -1311,7 +1432,7 @@ const WordList = () => {
               id="topic-select"
               value={selectedTopic}
               onChange={handleTopicChange}
-              className="border border-gray-600 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl px-4 py-3 w-full dark:text-white focus:border-pink-500 focus:ring-2 focus:ring-pink-500/50 transition-all"
+              className="border border-gray-600 dark:bg-gray-800 backdrop-blur-sm rounded-xl px-4 py-3 w-full dark:text-white focus:border-pink-500 focus:ring-2 focus:ring-pink-500/50 transition-all"
               aria-label="Filter words by topic"
             >
               {/* <option value=""> `All Topics for {selectedLevel} Level`</option> */}
@@ -1321,6 +1442,31 @@ const WordList = () => {
               </option>
 
               {topicOptions}
+            </select>
+          </div>
+        </div>
+
+        <div className="w-full ">
+          <div className="flex justify-center md:justify-start">
+            <label htmlFor="part-of-speech-select" className="sr-only">
+              Filter by part of speech
+            </label>
+            <select
+              id="part-of-speech-select"
+              value={selectedPartOfSpeech}
+              onChange={handlePartOfSpeechChange}
+              className="border  border-gray-600 dark:bg-gray-800 backdrop-blur-sm rounded-xl px-4 py-3 w-full dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50 transition-all"
+              aria-label="Filter words by part of speech"
+            >
+              <option value="">All Types</option>
+              {partOfSpeechOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+              <option value={NOT_SPECIFIED_PART_OF_SPEECH}>
+                Not specified
+              </option>
             </select>
           </div>
         </div>
@@ -1369,7 +1515,7 @@ const WordList = () => {
               <thead>
                 <tr className="bg-slate-900 dark:bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 text-sm md:text-xl lg:text-xl text-white">
                   <th className="py-3 text-sm md:text-lg lg:text-lg text-center text-orange-400 font-bold w-[5%] md:w-[3%] lg:w-[3%] rounded-tl-xl border-l border-gray-700">
-                    Art.
+                    {/* Art. */}
                   </th>
                   <th className="border-l py-3 border-gray-700 border-dotted text-center text-blue-400 font-bold w-[15%] md:w-[10%] lg:w-[10%] border-b">
                     Word

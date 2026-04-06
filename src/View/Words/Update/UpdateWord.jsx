@@ -821,7 +821,7 @@ const UpdateWord = () => {
                                     onChange={(e) =>
                                       setNewItemValue(e.target.value)
                                     }
-                                    onKeyPress={(e) => {
+                                    onKeyDown={(e) => {
                                       if (e.key === "Enter") {
                                         handleAddItem(
                                           "meaning",
@@ -900,7 +900,7 @@ const UpdateWord = () => {
                                     onChange={(e) =>
                                       setNewItemValue(e.target.value)
                                     }
-                                    onKeyPress={(e) => {
+                                    onKeyDown={(e) => {
                                       if (e.key === "Enter") {
                                         handleAddItem(
                                           "meaning",
@@ -996,7 +996,7 @@ const UpdateWord = () => {
                                     onChange={(e) =>
                                       setNewItemValue(e.target.value)
                                     }
-                                    onKeyPress={(e) => {
+                                    onKeyDown={(e) => {
                                       if (e.key === "Enter") {
                                         handleAddItem(
                                           "sentences",
@@ -1075,7 +1075,7 @@ const UpdateWord = () => {
                                     onChange={(e) =>
                                       setNewItemValue(e.target.value)
                                     }
-                                    onKeyPress={(e) => {
+                                    onKeyDown={(e) => {
                                       if (e.key === "Enter") {
                                         handleAddItem(
                                           "sentences",

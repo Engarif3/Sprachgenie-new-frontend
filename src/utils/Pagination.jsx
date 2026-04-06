@@ -12,7 +12,7 @@ const Pagination = ({
 }) => {
   const { isAdmin, isLoggedIn: userLoggedIn } = useAuth();
   return (
-    <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8 mb-8 mt-6">
+    <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8 mb-2 mt-6">
       {/* Left Side Controls */}
       <div className="flex flex-wrap gap-1 justify-between md:justify-start w-full md:w-auto">
         {/* Learning Mode Toggle */}
@@ -51,6 +51,18 @@ const Pagination = ({
         </p>
         <div>
           <div className="flex gap-3 items-center">
+            {currentPage > 1 && (
+              <button
+                onClick={() => {
+                  setTimeout(() => {
+                    setCurrentPage(1);
+                  }, 300);
+                }}
+                className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 rounded-full font-semibold text-white text-sm transition-all duration-300 hover:scale-105 shadow-md"
+              >
+                First
+              </button>
+            )}
             <button
               onClick={() => {
                 setTimeout(() => {
