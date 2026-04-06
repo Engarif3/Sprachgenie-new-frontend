@@ -1344,6 +1344,11 @@ const WordList = () => {
               {wordCountLabel}: {displayedWordsCount} words
             </span>
           )}
+          {/* {!isAdmin && (
+            <span className="text-sm text-pink-400 font-bold mr-2">
+              {wordCountLabel}: {displayedWordsCount} words
+            </span>
+          )} */}
         </div>
         <div className="mb-4">
           <span className="hidden md:inline-block lg:inline-block px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">

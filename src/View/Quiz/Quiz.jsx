@@ -302,7 +302,7 @@ const Quiz = () => {
                 </div>
                 <div>
                   <div className="text-gray-400 text-sm mb-2">
-                    📚 Available Words
+                    Available Words
                   </div>
                   <div className="text-3xl font-bold text-purple-400">
                     {availableWordsCount > 0
