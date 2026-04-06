@@ -12,14 +12,19 @@ const Pagination = ({
 }) => {
   const { isAdmin, isLoggedIn: userLoggedIn } = useAuth();
   return (
-    <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8 mb-2 mt-6">
+    // <div className="flex flex-col md:flex-row lg:flex-row justify-between items-center gap-4 md:gap-8 mb-2 mt-6">
+    <div
+      className={`flex ${
+        isAdmin ? "flex-col" : "flex-row md:flex-row lg:flex-row"
+      } justify-between items-center gap-4 md:gap-8 mb-2 mt-6`}
+    >
       {/* Left Side Controls */}
-      <div className="flex flex-wrap gap-1 justify-between md:justify-start w-full md:w-auto">
+      <div className="flex gap-1 justify-between md:justify-start w-full md:w-auto ">
         {/* Learning Mode Toggle */}
         {!learningMode && (
           <button
             onClick={toggleLearningMode}
-            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-2 md:px-6 lg:px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-purple-500/50 ml-2 md:ml-6"
+            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 px-2 md:px-6 lg:px-6 py-2 rounded-full text-sm md:text-md lg:text-md font-light md:font-semibold lg:font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-purple-500/50 ml-2 md:ml-6"
           >
             Enable Learning Mode
           </button>
@@ -28,17 +33,24 @@ const Pagination = ({
           {learningMode && (
             <button
               onClick={toggleLearningMode}
-              className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 px-2 md:px-6 lg:px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/50 ml-2 md:ml-6"
+              className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 px-2 md:px-6 lg:px-6 py-2 rounded-full text-sm md:text-md lg:text-md font-light md:font-semibold lg:font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/50 ml-2 md:ml-6"
             >
               Disable Learning Mode
             </button>
+          )}
+        </div>
+        <div className="flex md:hidden lg:hidden justify-center items-center mr-6">
+          {userLoggedIn && isAdmin && (
+            <p className=" text-info text-sm md:text-md lg:text-md font-semibold whitespace-nowrap  ">
+              {totalWords} words
+            </p>
           )}
         </div>
 
         {userLoggedIn && isAdmin && (
           <button
             onClick={() => setAction(!showAction)}
-            className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-cyan-500/50 mr-2"
+            className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 px-2 md:px-6 lg:px-6 py-2 rounded-full text-sm md:text-md lg:text-md font-light md:font-semibold lg:font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-cyan-500/50 mr-2 "
           >
             {showAction ? "🔒 Hide Actions" : "⚙️ Show Actions"}
           </button>
@@ -46,11 +58,13 @@ const Pagination = ({
       </div>
       {/* Pagination Buttons */}
       <div className="flex justify-between md:justify-end items-center gap-4 w-full md:w-auto">
-        <p className="text-lg text-info font-bold whitespace-nowrap ml-2 block md:hidden">
-          {totalWords} words
-        </p>
-        <div>
-          <div className="flex gap-3 items-center">
+        {/* {userLoggedIn && isAdmin && (
+          <p className="text-info text-sm md:text-md lg:text-md font-semibold lg:font-semibold whitespace-nowrap ml-2 block md:hidden">
+            {totalWords} words
+          </p>
+        )} */}
+        <div className="w-full">
+          <div className="flex  gap-3 justify-center items-center">
             {currentPage > 1 && (
               <button
                 onClick={() => {

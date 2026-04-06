@@ -160,7 +160,8 @@ const normalizeCachePayload = (payload, defaults = {}) => {
         : (defaults.lastUpdated ?? null),
     isPartial: source.isPartial === true || defaults.isPartial === true,
     totalWords:
-      typeof source.totalWords === "number" && Number.isFinite(source.totalWords)
+      typeof source.totalWords === "number" &&
+      Number.isFinite(source.totalWords)
         ? source.totalWords
         : (defaults.totalWords ?? 0),
     totalPages:
@@ -193,7 +194,10 @@ const normalizePagedCacheStore = (value) => {
 
       const pages = Object.entries(queryEntry.pages).reduce(
         (pageAccumulator, [pageKey, pageValue]) => {
-          pageAccumulator[pageKey] = normalizeCachePayload(pageValue, EMPTY_CACHE);
+          pageAccumulator[pageKey] = normalizeCachePayload(
+            pageValue,
+            EMPTY_CACHE,
+          );
           return pageAccumulator;
         },
         {},
@@ -549,8 +553,18 @@ const WordList = () => {
   );
 
   const fetchWordsPage = useCallback(
-    async ({ queryState, queryKey, page, preferCache = true, prefetch = false }) => {
-      const cachedPage = getCachedQueryPage(pageCacheStoreRef.current, queryKey, page);
+    async ({
+      queryState,
+      queryKey,
+      page,
+      preferCache = true,
+      prefetch = false,
+    }) => {
+      const cachedPage = getCachedQueryPage(
+        pageCacheStoreRef.current,
+        queryKey,
+        page,
+      );
 
       if (preferCache && cachedPage && isFreshCacheEntry(cachedPage)) {
         if (!prefetch) {
@@ -701,13 +715,7 @@ const WordList = () => {
         preferCache: false,
       });
     },
-    [
-      activeQuery,
-      activeQueryKey,
-      applyCacheState,
-      currentPage,
-      fetchWordsPage,
-    ],
+    [activeQuery, activeQueryKey, applyCacheState, currentPage, fetchWordsPage],
   );
 
   useEffect(() => {
@@ -729,9 +737,7 @@ const WordList = () => {
         clearTimeout(cacheDebounceTimer.current);
       }
     };
-  }, [
-    recoverFromInvalidWordList,
-  ]);
+  }, [recoverFromInvalidWordList]);
 
   useEffect(() => {
     if (!pageCacheReady) {
@@ -928,7 +934,9 @@ const WordList = () => {
       }
 
       try {
-        const response = await api.get(`/word/${encodeURIComponent(wordValue)}`);
+        const response = await api.get(
+          `/word/${encodeURIComponent(wordValue)}`,
+        );
         const fetchedWord = response.data?.data;
 
         if (fetchedWord?.id) {
@@ -949,15 +957,12 @@ const WordList = () => {
     [openModal, paginatedWords],
   );
 
-  const handleLevelChange = useCallback(
-    (e) => {
-      const selected = e.target.value;
-      setSelectedLevel(selected);
-      setSelectedTopic("");
-      setCurrentPage(1);
-    },
-    [],
-  );
+  const handleLevelChange = useCallback((e) => {
+    const selected = e.target.value;
+    setSelectedLevel(selected);
+    setSelectedTopic("");
+    setCurrentPage(1);
+  }, []);
 
   const handleTopicChange = useCallback((e) => {
     setSelectedTopic(e.target.value);
@@ -1316,6 +1321,13 @@ const WordList = () => {
     showRecentOnly,
   );
 
+  const displayedWordsCount =
+    typeof cache.totalWords === "number" && Number.isFinite(cache.totalWords)
+      ? cache.totalWords
+      : paginatedWords.length;
+
+  const wordCountLabel = hasActiveFilters ? "Filtered" : "Total";
+
   return (
     <Container>
       {/* Modern Header Section */}
@@ -1329,7 +1341,7 @@ const WordList = () => {
           </Link>
           {userLoggedIn && isAdmin && (
             <span className="text-sm text-pink-400 font-bold mr-2">
-              Total: {cache.totalWords} words
+              {wordCountLabel}: {displayedWordsCount} words
             </span>
           )}
         </div>
@@ -1400,9 +1412,11 @@ const WordList = () => {
             </button>
           )}
           {/* ===============showing words by page ==================  */}
-          <p className="text-md font-bold whitespace-nowrap hidden md:block px-4 py-1 bg-cyan-600 dark:bg-gradient-to-r from-blue-500/20 to-purple-500/20 border dark:border-blue-500/50 rounded-full text-white">
-            {paginatedWords.length} words
-          </p>
+          {userLoggedIn && isAdmin && (
+            <p className="text-md font-bold whitespace-nowrap hidden md:block px-4 py-1 bg-cyan-600 dark:bg-gradient-to-r from-blue-500/20 to-purple-500/20 border dark:border-blue-500/50 rounded-full text-white">
+              {displayedWordsCount} words
+            </p>
+          )}
         </div>
       </div>
       {/* =============radio buttons ========== */}
@@ -1514,7 +1528,7 @@ const WordList = () => {
         learningMode={learningMode}
         setAction={setShowActionColumn}
         showAction={showActionColumn}
-        totalWords={cache.totalWords}
+        totalWords={displayedWordsCount}
       />
 
       {/* Table content */}
@@ -1660,7 +1674,7 @@ const WordList = () => {
         learningMode={learningMode}
         setAction={setShowActionColumn}
         showAction={showActionColumn}
-        totalWords={cache.totalWords}
+        totalWords={displayedWordsCount}
       />
 
       {/* ========= */}
