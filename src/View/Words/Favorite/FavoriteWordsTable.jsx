@@ -8,6 +8,23 @@ const normalizeText = (value) =>
     .trim()
     .toLowerCase();
 
+const PartOfSpeechBadge = ({ text, className, tooltipText }) => {
+  const showTooltip = Boolean(tooltipText);
+
+  return (
+    <span className="group relative inline-flex items-center justify-center">
+      <span className={className} aria-label={tooltipText || undefined}>
+        {text}
+      </span>
+      {showTooltip && (
+        <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-950 px-2 py-1 text-[10px] font-semibold text-white opacity-0 shadow-lg transition-opacity duration-100 group-hover:opacity-100 dark:bg-slate-100 dark:text-slate-900">
+          {tooltipText}
+        </span>
+      )}
+    </span>
+  );
+};
+
 const getArticleColumnDisplay = (word) => {
   const partOfSpeechName = normalizeText(word?.partOfSpeech?.name);
   const articleName =
@@ -25,6 +42,7 @@ const getArticleColumnDisplay = (word) => {
     return {
       text: articleName,
       className: defaultArticleClassName,
+      tooltipText: "",
     };
   }
 
@@ -32,6 +50,7 @@ const getArticleColumnDisplay = (word) => {
     return {
       text: articleName,
       className: defaultArticleClassName,
+      tooltipText: "",
     };
   }
 
@@ -39,6 +58,7 @@ const getArticleColumnDisplay = (word) => {
     return {
       text: "vrb.",
       className: `${baseMarkerClassName} text-white bg-cyan-600 font-bold`,
+      tooltipText: "Verb",
     };
   }
 
@@ -46,6 +66,7 @@ const getArticleColumnDisplay = (word) => {
     return {
       text: "adj.",
       className: `${baseMarkerClassName} text-emerald-300`,
+      tooltipText: "Adjective",
     };
   }
 
@@ -53,6 +74,7 @@ const getArticleColumnDisplay = (word) => {
     return {
       text: "adv.",
       className: `${baseMarkerClassName} text-violet-300`,
+      tooltipText: "Adverb",
     };
   }
 
@@ -61,15 +83,17 @@ const getArticleColumnDisplay = (word) => {
     partOfSpeechName === "adjective / adverb"
   ) {
     return {
-      text: "aj/av",
+      text: "adj/adv",
       className: `${baseMarkerClassName} text-fuchsia-300`,
+      tooltipText: "Adjective/Adverb",
     };
   }
 
   if (partOfSpeechName === "preposition") {
     return {
-      text: "pre.",
+      text: "prep.",
       className: `${baseMarkerClassName} text-amber-200`,
+      tooltipText: "Preposition",
     };
   }
 
@@ -77,6 +101,7 @@ const getArticleColumnDisplay = (word) => {
     return {
       text: "conj.",
       className: `${baseMarkerClassName} text-rose-300`,
+      tooltipText: "Conjunction",
     };
   }
 
@@ -84,12 +109,14 @@ const getArticleColumnDisplay = (word) => {
     return {
       text: "phr.",
       className: `${baseMarkerClassName} text-cyan-400`,
+      tooltipText: "Phrase",
     };
   }
 
   return {
     text: articleName,
     className: defaultArticleClassName,
+    tooltipText: "",
   };
 };
 
@@ -203,9 +230,11 @@ const FavoriteWordsTable = ({
                 } border-b border-slate-200 transition-all duration-300 dark:border-gray-700`}
               >
                 <td className={tableVariant.articleCell}>
-                  <span className={articleColumnDisplay.className}>
-                    {articleColumnDisplay.text}
-                  </span>
+                  <PartOfSpeechBadge
+                    text={articleColumnDisplay.text}
+                    className={articleColumnDisplay.className}
+                    tooltipText={articleColumnDisplay.tooltipText}
+                  />
                 </td>
                 <td className={tableVariant.wordCell}>
                   <div className="flex justify-between gap-1 md:gap-4 items-center">
