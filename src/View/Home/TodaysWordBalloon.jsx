@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { publicApi } from "../../axios";
 
 const TODAY_WORD_CACHE_KEY = "todayWordBalloon";
+const TODAY_WORD_BATCH_SIZE = 12;
 
 const getTodayCacheToken = () => {
   const now = new Date();
@@ -12,7 +13,7 @@ const getTodayCacheToken = () => {
   return `${year}-${month}-${day}`;
 };
 
-const getCachedTodayWord = () => {
+const getCachedTodayWordState = () => {
   try {
     const rawValue = localStorage.getItem(TODAY_WORD_CACHE_KEY);
 
@@ -22,28 +23,60 @@ const getCachedTodayWord = () => {
 
     const parsedValue = JSON.parse(rawValue);
 
-    if (parsedValue?.token !== getTodayCacheToken() || !parsedValue?.word) {
+    if (
+      parsedValue?.token !== getTodayCacheToken() ||
+      !Array.isArray(parsedValue?.words) ||
+      parsedValue.words.length === 0
+    ) {
       return null;
     }
 
-    return parsedValue.word;
+    return {
+      words: parsedValue.words,
+      nextIndex:
+        typeof parsedValue.nextIndex === "number" && parsedValue.nextIndex >= 0
+          ? parsedValue.nextIndex
+          : 0,
+    };
   } catch {
     return null;
   }
 };
 
-const setCachedTodayWord = (word) => {
+const setCachedTodayWordState = (words, nextIndex) => {
   try {
     localStorage.setItem(
       TODAY_WORD_CACHE_KEY,
       JSON.stringify({
         token: getTodayCacheToken(),
-        word,
+        words,
+        nextIndex,
       }),
     );
   } catch {
     // Ignore storage errors and fall back to network-only behavior.
   }
+};
+
+const consumeCachedTodayWord = () => {
+  const cacheState = getCachedTodayWordState();
+
+  if (!cacheState) {
+    return null;
+  }
+
+  const { words, nextIndex } = cacheState;
+  const safeIndex = nextIndex < words.length ? nextIndex : 0;
+  const selectedWord = words[safeIndex] ?? null;
+
+  if (!selectedWord) {
+    return null;
+  }
+
+  const followingIndex = safeIndex + 1 >= words.length ? 0 : safeIndex + 1;
+  setCachedTodayWordState(words, followingIndex);
+
+  return selectedWord;
 };
 
 const formatWordLabel = (word) => {
@@ -93,7 +126,7 @@ const TodaysWordBalloon = () => {
     let isActive = true;
 
     const loadWord = async () => {
-      const cachedWord = getCachedTodayWord();
+      const cachedWord = consumeCachedTodayWord();
 
       if (isActive && cachedWord) {
         setSelectedWord(cachedWord);
@@ -102,14 +135,19 @@ const TodaysWordBalloon = () => {
       }
 
       try {
-        const response = await publicApi.get("/word/today");
-        const nextWord = response.data?.data || null;
+        const response = await publicApi.get(
+          `/word/balloon?limit=${TODAY_WORD_BATCH_SIZE}`,
+        );
+        const nextWords = Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
+        const nextWord = nextWords[0] ?? null;
 
         if (!isActive || !nextWord) {
           return;
         }
 
-        setCachedTodayWord(nextWord);
+        setCachedTodayWordState(nextWords, nextWords.length > 1 ? 1 : 0);
         setSelectedWord(nextWord);
         setPhase("floating");
       } catch {
