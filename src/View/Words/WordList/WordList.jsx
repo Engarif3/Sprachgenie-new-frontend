@@ -1390,11 +1390,11 @@ const WordList = () => {
         </div>
         {/* ===============showing words by page ==================  */}
         <div className="flex items-center gap-4">
-          {isRefreshingPage && paginatedWords.length > 0 && (
+          {/* {isRefreshingPage && paginatedWords.length > 0 && (
             <span className="text-xs font-semibold px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 whitespace-nowrap">
               Loading page...
             </span>
-          )}
+          )} */}
           {!hasActiveFilters && (
             <button
               onClick={handleToggleRecentWords}
@@ -1537,8 +1537,13 @@ const WordList = () => {
           <Loader loading={isLoading} />
         </div>
       ) : (
-        <div className="min-h-screen dark:bg-gradient-to-br from-gray-900/30 via-gray-800/20 to-black/30 rounded-2xl p-0 md:p-1 lg:p-1">
+        <div className=" min-h-screen dark:bg-gradient-to-br from-gray-900/30 via-gray-800/20 to-black/30 rounded-2xl p-0 md:p-1 lg:p-1">
           <div className="flex items-center justify-end gap-2 mb-2 px-2 relative">
+            {isRefreshingPage && paginatedWords.length > 0 && (
+              <span className="text-xs  px-3 py-0 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 whitespace-nowrap">
+                Loading page...
+              </span>
+            )}
             <IoInformationCircleOutline
               size={22}
               className="text-blue-400 cursor-pointer hover:text-blue-500 transition"
