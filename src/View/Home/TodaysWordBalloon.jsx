@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { publicApi } from "../../axios";
 
 const TODAY_WORD_CACHE_KEY = "todayWordBalloon";
-const TODAY_WORD_BATCH_SIZE = 12;
+const TODAY_WORD_BATCH_SIZE = 20;
 
 const getTodayCacheToken = () => {
   const now = new Date();
@@ -58,6 +58,14 @@ const setCachedTodayWordState = (words, nextIndex) => {
   }
 };
 
+const clearCachedTodayWordState = () => {
+  try {
+    localStorage.removeItem(TODAY_WORD_CACHE_KEY);
+  } catch {
+    // Ignore storage errors and fall back to network-only behavior.
+  }
+};
+
 const consumeCachedTodayWord = () => {
   const cacheState = getCachedTodayWordState();
 
@@ -66,14 +74,20 @@ const consumeCachedTodayWord = () => {
   }
 
   const { words, nextIndex } = cacheState;
-  const safeIndex = nextIndex < words.length ? nextIndex : 0;
-  const selectedWord = words[safeIndex] ?? null;
-
-  if (!selectedWord) {
+  if (nextIndex >= words.length) {
+    clearCachedTodayWordState();
     return null;
   }
 
-  const followingIndex = safeIndex + 1 >= words.length ? 0 : safeIndex + 1;
+  const safeIndex = nextIndex;
+  const selectedWord = words[safeIndex] ?? null;
+
+  if (!selectedWord) {
+    clearCachedTodayWordState();
+    return null;
+  }
+
+  const followingIndex = safeIndex + 1;
   setCachedTodayWordState(words, followingIndex);
 
   return selectedWord;

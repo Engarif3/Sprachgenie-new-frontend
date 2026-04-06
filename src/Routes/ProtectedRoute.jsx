@@ -1,16 +1,44 @@
 import { Navigate } from "react-router-dom";
-import { publicApi } from "../axios";
 import {
-  getUserInfo,
+  hasAuthSessionHint,
   hasAllowedRole,
+  syncCurrentUser,
   useAuth,
 } from "../services/auth.services";
 import { useState, useEffect } from "react";
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { userInfo, userRole, isBootstrapResolved } = useAuth();
+  const [isResolvingProtectedSession, setIsResolvingProtectedSession] =
+    useState(false);
 
-  if (!isBootstrapResolved) {
+  useEffect(() => {
+    if (!isBootstrapResolved || userInfo || isResolvingProtectedSession) {
+      return;
+    }
+
+    let isMounted = true;
+
+    const resolveProtectedSession = async () => {
+      setIsResolvingProtectedSession(true);
+
+      try {
+        await syncCurrentUser({ preserveOnFailure: false });
+      } finally {
+        if (isMounted) {
+          setIsResolvingProtectedSession(false);
+        }
+      }
+    };
+
+    resolveProtectedSession();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isBootstrapResolved, isResolvingProtectedSession, userInfo]);
+
+  if (!isBootstrapResolved || isResolvingProtectedSession) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 text-slate-700 dark:bg-slate-950 dark:text-slate-200">
         Loading...
@@ -40,42 +68,20 @@ export const PublicRoute = ({ children }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      // First check cached user info
-      const cachedUser = getUserInfo();
-      if (cachedUser) {
-        setIsAuthenticated(true);
+      if (hasAuthSessionHint()) {
+        const userInfo = await syncCurrentUser({ preserveOnFailure: false });
+        setIsAuthenticated(!!userInfo);
         setIsLoading(false);
         return;
       }
 
-      // If no cached user, check with server
-      try {
-        const response = await publicApi.get("/auth/me");
-        if (response.data?.data) {
-          setIsAuthenticated(true);
-        } else {
-          setIsAuthenticated(false);
-        }
-      } catch (error) {
-        if (error.response?.status === 401) {
-          // 401 is expected for unauthenticated users, don't log as error
-          setIsAuthenticated(false);
-        } else {
-          // Other errors (4xx, 5xx) - log but continue
-          console.warn(
-            `Auth check failed with status: ${error.response?.status || "unknown"}`,
-          );
-          setIsAuthenticated(false);
-        }
-      } finally {
-        setIsLoading(false);
-      }
+      setIsAuthenticated(false);
+      setIsLoading(false);
     };
 
     checkAuth();
   }, []);
 
-  // Show loading state while checking authentication
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -84,12 +90,10 @@ export const PublicRoute = ({ children }) => {
     );
   }
 
-  // Redirect authenticated users
   if (isAuthenticated) {
     return <Navigate to="/" replace />;
   }
 
-  // Allow access for unauthenticated users
   return children;
 };
 

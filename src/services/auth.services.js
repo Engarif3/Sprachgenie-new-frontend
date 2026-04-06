@@ -2,6 +2,8 @@ import api, { publicApi } from "../axios";
 import { useSyncExternalStore } from "react";
 
 const FORCED_LOGOUT_NOTICE_KEY = "forcedLogoutNotice";
+const AUTH_SESSION_HINT_KEY = "authSessionHint";
+const AUTH_LOGOUT_IN_PROGRESS_KEY = "authLogoutInProgress";
 const EMPTY_USER_INFO = Object.freeze({});
 
 // ✅ NO localStorage needed - tokens in httpOnly cookies
@@ -81,8 +83,52 @@ const subscribeToAuthStore = (listener) => {
 
 const getAuthSnapshot = () => authStore;
 
+const readSessionHint = () => {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return window.localStorage.getItem(AUTH_SESSION_HINT_KEY) === "1";
+};
+
+const writeSessionHint = (hasSession) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  if (hasSession) {
+    window.localStorage.setItem(AUTH_SESSION_HINT_KEY, "1");
+    return;
+  }
+
+  window.localStorage.removeItem(AUTH_SESSION_HINT_KEY);
+};
+
+const readLogoutInProgress = () => {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return window.sessionStorage.getItem(AUTH_LOGOUT_IN_PROGRESS_KEY) === "1";
+};
+
+const writeLogoutInProgress = (isActive) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  if (isActive) {
+    window.sessionStorage.setItem(AUTH_LOGOUT_IN_PROGRESS_KEY, "1");
+    return;
+  }
+
+  window.sessionStorage.removeItem(AUTH_LOGOUT_IN_PROGRESS_KEY);
+};
+
 export const storeUserInfo = (userInfo) => {
   // ✅ Store user metadata in memory (not token)
+  writeSessionHint(!!userInfo);
+  writeLogoutInProgress(false);
   return setCachedUserInfo(userInfo);
 };
 
@@ -102,7 +148,15 @@ export const getAuthState = () =>
   createAuthState(authStore.userInfo, authStore.isBootstrapResolved);
 
 export const clearUserInfo = () => {
+  writeSessionHint(false);
   setCachedUserInfo(null);
+};
+
+export const hasAuthSessionHint = () =>
+  !readLogoutInProgress() && (readSessionHint() || !!authStore.userInfo);
+
+export const setLogoutInProgress = (isActive) => {
+  writeLogoutInProgress(isActive);
 };
 
 export const markAuthBootstrapResolved = () => {
@@ -143,7 +197,7 @@ export const consumeForcedLogoutNotice = () => {
 
   try {
     return JSON.parse(rawNotice);
-  } catch (error) {
+  } catch {
     return null;
   }
 };
@@ -159,6 +213,11 @@ export const useAuth = () => {
 };
 
 export const syncCurrentUser = async ({ preserveOnFailure = true } = {}) => {
+  if (readLogoutInProgress()) {
+    clearUserInfo();
+    return null;
+  }
+
   try {
     const response = await publicApi.get("/auth/me");
     const data = response.data;
@@ -194,12 +253,15 @@ export const syncCurrentUser = async ({ preserveOnFailure = true } = {}) => {
 
 export const removeUser = async () => {
   // ✅ Call logout endpoint to clear httpOnly cookies
+  setLogoutInProgress(true);
+
   try {
     await api.post("/auth/logout", {}, { withCredentials: true });
   } catch (error) {
     console.error("Logout error:", error);
   } finally {
     clearUserInfo();
+    setLogoutInProgress(false);
   }
 };
 

@@ -161,6 +161,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import Swal from "sweetalert2";
 import { publicApi } from "./axios";
 import {
+  hasAuthSessionHint,
   markAuthBootstrapResolved,
   syncCurrentUser,
 } from "./services/auth.services";
@@ -246,7 +247,9 @@ const AppContent = () => {
 
     const initializeAuth = async () => {
       try {
-        await syncCurrentUser();
+        if (hasAuthSessionHint()) {
+          await syncCurrentUser();
+        }
       } finally {
         if (isMounted) {
           markAuthBootstrapResolved();
@@ -256,6 +259,10 @@ const AppContent = () => {
 
     const syncVisibleSession = async () => {
       if (document.visibilityState !== "visible") {
+        return;
+      }
+
+      if (!hasAuthSessionHint()) {
         return;
       }
 
