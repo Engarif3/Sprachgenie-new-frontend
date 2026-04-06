@@ -416,10 +416,10 @@ const Quiz = () => {
                   🔊
                 </button>
                 <div className="text-2xl md:text-5xl lg:text-5xl font-bold">
-                  <span className="text-sky-500 italic mr-2 md:mr-3">
+                  <span className="text-orange-400 italic mr-2 md:mr-3">
                     {currentWord?.article?.name || ""}
                   </span>
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500">
+                  <span className="text-white">
                     {currentWord?.value
                       ? currentWord.value.charAt(0).toUpperCase() +
                         currentWord.value.slice(1)

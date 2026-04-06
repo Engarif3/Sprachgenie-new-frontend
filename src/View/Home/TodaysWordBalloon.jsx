@@ -2,13 +2,48 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { publicApi } from "../../axios";
 
-const pickRandomWord = (words) => {
-  if (!Array.isArray(words) || words.length === 0) {
+const TODAY_WORD_CACHE_KEY = "todayWordBalloon";
+
+const getTodayCacheToken = () => {
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const month = String(now.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(now.getUTCDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const getCachedTodayWord = () => {
+  try {
+    const rawValue = localStorage.getItem(TODAY_WORD_CACHE_KEY);
+
+    if (!rawValue) {
+      return null;
+    }
+
+    const parsedValue = JSON.parse(rawValue);
+
+    if (parsedValue?.token !== getTodayCacheToken() || !parsedValue?.word) {
+      return null;
+    }
+
+    return parsedValue.word;
+  } catch {
     return null;
   }
+};
 
-  const randomIndex = Math.floor(Math.random() * words.length);
-  return words[randomIndex] ?? null;
+const setCachedTodayWord = (word) => {
+  try {
+    localStorage.setItem(
+      TODAY_WORD_CACHE_KEY,
+      JSON.stringify({
+        token: getTodayCacheToken(),
+        word,
+      }),
+    );
+  } catch {
+    // Ignore storage errors and fall back to network-only behavior.
+  }
 };
 
 const formatWordLabel = (word) => {
@@ -58,15 +93,23 @@ const TodaysWordBalloon = () => {
     let isActive = true;
 
     const loadWord = async () => {
+      const cachedWord = getCachedTodayWord();
+
+      if (isActive && cachedWord) {
+        setSelectedWord(cachedWord);
+        setPhase("floating");
+        return;
+      }
+
       try {
-        const response = await publicApi.get("/word/all?all=true");
-        const allWords = response.data?.data?.words || [];
-        const nextWord = pickRandomWord(allWords);
+        const response = await publicApi.get("/word/today");
+        const nextWord = response.data?.data || null;
 
         if (!isActive || !nextWord) {
           return;
         }
 
+        setCachedTodayWord(nextWord);
         setSelectedWord(nextWord);
         setPhase("floating");
       } catch {
