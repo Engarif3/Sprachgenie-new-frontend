@@ -9,9 +9,10 @@ import pako from "pako";
 const DB_NAME = "WordAppDB";
 const DB_VERSION = 1;
 const STORE_NAME = "cacheStore";
-const CACHE_VERSION = "v2"; // bump this when data shape changes
+const CACHE_VERSION = "v3"; // bump this when data shape or page ordering changes
 
 export const WORD_LIST_CACHE_KEY = "wordListCache";
+export const WORD_LIST_PAGE_CACHE_KEY = "wordListPageCache";
 
 function isRecord(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -152,7 +153,9 @@ export async function removeFromStorage(key) {
 // Call this AFTER create/update/delete word
 export async function invalidateWordsCache() {
   await removeFromStorage(WORD_LIST_CACHE_KEY);
+  await removeFromStorage(WORD_LIST_PAGE_CACHE_KEY);
   notifyCacheInvalidated(WORD_LIST_CACHE_KEY);
+  notifyCacheInvalidated(WORD_LIST_PAGE_CACHE_KEY);
 }
 
 // Optional: clear everything

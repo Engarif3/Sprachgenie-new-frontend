@@ -19,7 +19,8 @@ import {
   getFromStorage,
   removeFromStorage,
   setToStorage,
-  WORD_LIST_CACHE_KEY,
+  invalidateWordsCache,
+  WORD_LIST_PAGE_CACHE_KEY,
 } from "../../../utils/storage";
 import aiApi from "../../../AI_axios";
 import { IoSearch } from "react-icons/io5";
@@ -33,7 +34,7 @@ const HistoryModal = lazy(() => import("../Modals/HistoryModal"));
 const AIModal = lazy(() => import("../Modals/AIModal"));
 
 // Cache key constants
-const CACHE_KEY = WORD_LIST_CACHE_KEY;
+const CACHE_KEY = WORD_LIST_PAGE_CACHE_KEY;
 const CACHE_EXPIRY = 15 * 60 * 1000; // 15 minutes
 const WORDS_PER_PAGE = 40;
 
@@ -57,6 +58,9 @@ const EMPTY_CACHE = Object.freeze({
   topics: [],
   lastUpdated: null,
   isPartial: false,
+  totalWords: 0,
+  totalPages: 1,
+  currentPage: 1,
 });
 
 const isRecord = (value) =>
@@ -155,7 +159,96 @@ const normalizeCachePayload = (payload, defaults = {}) => {
         ? source.lastUpdated
         : (defaults.lastUpdated ?? null),
     isPartial: source.isPartial === true || defaults.isPartial === true,
+    totalWords:
+      typeof source.totalWords === "number" && Number.isFinite(source.totalWords)
+        ? source.totalWords
+        : (defaults.totalWords ?? 0),
+    totalPages:
+      typeof source.totalPages === "number" &&
+      Number.isFinite(source.totalPages) &&
+      source.totalPages > 0
+        ? source.totalPages
+        : (defaults.totalPages ?? 1),
+    currentPage:
+      typeof source.currentPage === "number" &&
+      Number.isFinite(source.currentPage) &&
+      source.currentPage > 0
+        ? source.currentPage
+        : (defaults.currentPage ?? 1),
   };
+};
+
+const createEmptyPageCacheStore = () => ({ queries: {} });
+
+const normalizePagedCacheStore = (value) => {
+  if (!isRecord(value) || !isRecord(value.queries)) {
+    return createEmptyPageCacheStore();
+  }
+
+  const queries = Object.entries(value.queries).reduce(
+    (accumulator, [queryKey, queryEntry]) => {
+      if (!isRecord(queryEntry) || !isRecord(queryEntry.pages)) {
+        return accumulator;
+      }
+
+      const pages = Object.entries(queryEntry.pages).reduce(
+        (pageAccumulator, [pageKey, pageValue]) => {
+          pageAccumulator[pageKey] = normalizeCachePayload(pageValue, EMPTY_CACHE);
+          return pageAccumulator;
+        },
+        {},
+      );
+
+      accumulator[queryKey] = { pages };
+      return accumulator;
+    },
+    {},
+  );
+
+  return { queries };
+};
+
+const getCachedQueryPage = (store, queryKey, page) =>
+  store?.queries?.[queryKey]?.pages?.[String(page)] ?? null;
+
+const isFreshCacheEntry = (entry) =>
+  typeof entry?.lastUpdated === "number" &&
+  Date.now() - entry.lastUpdated < CACHE_EXPIRY;
+
+const buildWordListQueryKey = (queryState) =>
+  JSON.stringify({
+    ...queryState,
+    search: normalizeText(queryState.search),
+  });
+
+const buildWordListRequestParams = (queryState, page) => {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(WORDS_PER_PAGE),
+  });
+
+  if (queryState.level) {
+    params.set("level", queryState.level);
+  }
+
+  if (queryState.topic) {
+    params.set("topic", queryState.topic);
+  }
+
+  if (queryState.partOfSpeech) {
+    params.set("partOfSpeech", queryState.partOfSpeech);
+  }
+
+  if (queryState.recentOnly) {
+    params.set("recentOnly", "true");
+  }
+
+  if (queryState.search) {
+    params.set("search", queryState.search);
+    params.set("searchType", queryState.searchType);
+  }
+
+  return params.toString();
 };
 
 const normalizePartOfSpeechName = (value) => normalizeText(value);
@@ -254,9 +347,11 @@ const WordList = () => {
   const [showActionColumn, setShowActionColumn] = useState(false);
   const [loadingFavorites, setLoadingFavorites] = useState({});
   const [searchType, setSearchType] = useState("word"); // 'word' | 'meaning'
-  const [selectedWordId, setSelectedWordId] = useState(null);
+  const [selectedWord, setSelectedWord] = useState(null);
   const [showInfo, setShowInfo] = useState(false);
   const [showRecentOnly, setShowRecentOnly] = useState(false);
+  const [isRefreshingPage, setIsRefreshingPage] = useState(false);
+  const [pageCacheReady, setPageCacheReady] = useState(false);
 
   // ===================
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
@@ -271,9 +366,14 @@ const WordList = () => {
   // 	=========AI ===============
 
   const debouncedSearchValue = useDebounce(searchValue, 300);
+  const debouncedCurrentPage = useDebounce(currentPage, 180);
   const cacheDebounceTimer = useRef(null);
   const aiAbortControllers = useRef(new Map());
   const hasRecoveredCorruptData = useRef(false);
+  const pageCacheStoreRef = useRef(createEmptyPageCacheStore());
+  const latestVisibleRequestId = useRef(0);
+  const prefetchingPagesRef = useRef(new Set());
+  const inFlightRequestsRef = useRef(new Map());
 
   // useEffect for fetching favorites (Logic remains the same, good to leave)
   useEffect(() => {
@@ -354,6 +454,48 @@ const WordList = () => {
 
   const [cache, setCache] = useState(EMPTY_CACHE);
 
+  const activeQuery = useMemo(
+    () => ({
+      search: debouncedSearchValue.trim(),
+      searchType,
+      level: selectedLevel,
+      topic: selectedTopic,
+      partOfSpeech: selectedPartOfSpeech,
+      recentOnly: showRecentOnly,
+    }),
+    [
+      debouncedSearchValue,
+      searchType,
+      selectedLevel,
+      selectedTopic,
+      selectedPartOfSpeech,
+      showRecentOnly,
+    ],
+  );
+
+  const activeQueryKey = useMemo(
+    () => buildWordListQueryKey(activeQuery),
+    [activeQuery],
+  );
+
+  const hasFreshCurrentPageCache = useMemo(() => {
+    if (!pageCacheReady) {
+      return false;
+    }
+
+    const cachedPage = getCachedQueryPage(
+      pageCacheStoreRef.current,
+      activeQueryKey,
+      currentPage,
+    );
+
+    return Boolean(cachedPage && isFreshCacheEntry(cachedPage));
+  }, [activeQueryKey, currentPage, pageCacheReady, cache.lastUpdated]);
+
+  const requestedPageToFetch = hasFreshCurrentPageCache
+    ? currentPage
+    : debouncedCurrentPage;
+
   const applyCacheState = useCallback((payload, defaults = {}) => {
     const normalizedCache = normalizeCachePayload(payload, defaults);
 
@@ -361,53 +503,171 @@ const WordList = () => {
     setLevels(normalizedCache.levels);
     setTopics(normalizedCache.topics);
     setFilteredTopics(normalizedCache.topics);
+    setTotalPages(normalizedCache.totalPages || 1);
 
     return normalizedCache;
   }, []);
 
-  // Progressive loading: Load initial batch fast, then fetch all in background
-  const fetchInitialWords = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      // First, load just 50 words for fast initial render
-      const response = await api.get("/word/all?limit=50&page=1");
-
-      const initialCache = applyCacheState(response.data?.data, {
-        lastUpdated: Date.now(),
-        isPartial: true,
-      });
-      hasRecoveredCorruptData.current = false;
-      setIsLoading(false);
-
-      // Store partial cache immediately so it persists on refresh
-      setToStorage(CACHE_KEY, initialCache);
-
-      // Now fetch all words in the background and update cache
-      setTimeout(async () => {
-        try {
-          const fullResponse = await api.get("/word/all?all=true");
-          const fullCache = normalizeCachePayload(fullResponse.data?.data, {
-            lastUpdated: Date.now(),
-            isPartial: false,
-          });
-
-          // Store full data in IndexedDB for future visits
-          setToStorage(CACHE_KEY, fullCache);
-
-          // Update state with full data
-          applyCacheState(fullCache);
-          hasRecoveredCorruptData.current = false;
-
-          console.log("Background fetch complete: All words loaded and cached");
-        } catch (error) {
-          console.error("Background fetch failed:", error);
-        }
-      }, 100); // Small delay to ensure UI renders first
-    } catch (error) {
-      console.error("Initial fetch failed:", error);
-      setIsLoading(false);
+  const persistPageCacheStore = useCallback(() => {
+    if (cacheDebounceTimer.current) {
+      clearTimeout(cacheDebounceTimer.current);
     }
-  }, [applyCacheState]);
+
+    cacheDebounceTimer.current = setTimeout(() => {
+      void setToStorage(CACHE_KEY, pageCacheStoreRef.current);
+    }, 100);
+  }, []);
+
+  const cachePageResult = useCallback(
+    (queryKey, page, payload, defaults = {}) => {
+      const normalizedPage = normalizeCachePayload(payload, {
+        ...defaults,
+        currentPage: page,
+        lastUpdated: defaults.lastUpdated ?? Date.now(),
+        isPartial: false,
+      });
+
+      const existingPages =
+        pageCacheStoreRef.current.queries?.[queryKey]?.pages ?? {};
+
+      pageCacheStoreRef.current = {
+        queries: {
+          ...pageCacheStoreRef.current.queries,
+          [queryKey]: {
+            pages: {
+              ...existingPages,
+              [String(page)]: normalizedPage,
+            },
+          },
+        },
+      };
+
+      persistPageCacheStore();
+      return normalizedPage;
+    },
+    [persistPageCacheStore],
+  );
+
+  const fetchWordsPage = useCallback(
+    async ({ queryState, queryKey, page, preferCache = true, prefetch = false }) => {
+      const cachedPage = getCachedQueryPage(pageCacheStoreRef.current, queryKey, page);
+
+      if (preferCache && cachedPage && isFreshCacheEntry(cachedPage)) {
+        if (!prefetch) {
+          applyCacheState(cachedPage);
+          setIsLoading(false);
+          setIsRefreshingPage(false);
+        }
+
+        return cachedPage;
+      }
+
+      const requestId = prefetch ? null : ++latestVisibleRequestId.current;
+      const requestKey = `${queryKey}:${page}`;
+
+      if (!prefetch) {
+        if (cachedPage) {
+          applyCacheState(cachedPage);
+          setIsRefreshingPage(true);
+        } else if (cache.words.length > 0) {
+          setIsRefreshingPage(true);
+        } else {
+          setIsLoading(true);
+        }
+      }
+
+      try {
+        let pageRequest = inFlightRequestsRef.current.get(requestKey);
+
+        if (!pageRequest) {
+          pageRequest = api
+            .get(`/word/all?${buildWordListRequestParams(queryState, page)}`)
+            .then((response) =>
+              cachePageResult(queryKey, page, response.data?.data, {
+                lastUpdated: Date.now(),
+                totalPages: 1,
+                totalWords: 0,
+              }),
+            )
+            .finally(() => {
+              inFlightRequestsRef.current.delete(requestKey);
+            });
+
+          inFlightRequestsRef.current.set(requestKey, pageRequest);
+        }
+
+        const normalizedPage = await pageRequest;
+
+        if (!prefetch) {
+          if (
+            normalizedPage.totalPages > 0 &&
+            page > normalizedPage.totalPages &&
+            normalizedPage.totalPages !== currentPage
+          ) {
+            setCurrentPage(normalizedPage.totalPages);
+            return normalizedPage;
+          }
+
+          if (requestId === latestVisibleRequestId.current) {
+            applyCacheState(normalizedPage);
+            hasRecoveredCorruptData.current = false;
+          }
+        }
+
+        return normalizedPage;
+      } catch (error) {
+        if (!prefetch) {
+          console.error("Failed to fetch word list page:", error);
+        }
+        throw error;
+      } finally {
+        if (!prefetch && requestId === latestVisibleRequestId.current) {
+          setIsLoading(false);
+          setIsRefreshingPage(false);
+        }
+      }
+    },
+    [applyCacheState, cache.words.length, cachePageResult, currentPage],
+  );
+
+  const prefetchAdjacentPages = useCallback(
+    (queryState, queryKey, page, totalPagesCount) => {
+      const candidatePages = [page - 1, page + 1].filter(
+        (candidatePage) =>
+          candidatePage >= 1 && candidatePage <= totalPagesCount,
+      );
+
+      candidatePages.forEach((candidatePage) => {
+        const prefetchKey = `${queryKey}:${candidatePage}`;
+        const cachedPage = getCachedQueryPage(
+          pageCacheStoreRef.current,
+          queryKey,
+          candidatePage,
+        );
+
+        if (cachedPage && isFreshCacheEntry(cachedPage)) {
+          return;
+        }
+
+        if (prefetchingPagesRef.current.has(prefetchKey)) {
+          return;
+        }
+
+        prefetchingPagesRef.current.add(prefetchKey);
+
+        void fetchWordsPage({
+          queryState,
+          queryKey,
+          page: candidatePage,
+          preferCache: true,
+          prefetch: true,
+        }).finally(() => {
+          prefetchingPagesRef.current.delete(prefetchKey);
+        });
+      });
+    },
+    [fetchWordsPage],
+  );
 
   const recoverFromInvalidWordList = useCallback(
     async (reason, error) => {
@@ -427,133 +687,66 @@ const WordList = () => {
       }
 
       hasRecoveredCorruptData.current = true;
+      pageCacheStoreRef.current = createEmptyPageCacheStore();
       await removeFromStorage(CACHE_KEY);
       applyCacheState(EMPTY_CACHE);
       showWordListRecoveryToast({
         icon: "info",
         title: "Vocabulary list cache was refreshed.",
       });
-      await fetchInitialWords();
+      await fetchWordsPage({
+        queryState: activeQuery,
+        queryKey: activeQueryKey,
+        page: currentPage,
+        preferCache: false,
+      });
     },
-    [applyCacheState, fetchInitialWords],
+    [
+      activeQuery,
+      activeQueryKey,
+      applyCacheState,
+      currentPage,
+      fetchWordsPage,
+    ],
   );
 
-  const fetchAllWords = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const response = await api.get("/word/all?all=true");
-
-      const newCache = applyCacheState(response.data?.data, {
-        lastUpdated: Date.now(),
-        isPartial: false,
-      });
-      hasRecoveredCorruptData.current = false;
-
-      // Store in localStorage
-      setToStorage(CACHE_KEY, newCache);
-    } catch (error) {
-      // Error handled silently; users see empty list if fetch fails
-    } finally {
-      setIsLoading(false);
-    }
-  }, [applyCacheState]);
-
-  // Load cache from storage on mount
-  // ====================================================================
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Attempt to get cached data
         const cachedData = await getFromStorage(CACHE_KEY);
-
-        if (cachedData) {
-          if (
-            !Array.isArray(cachedData.words) ||
-            !Array.isArray(cachedData.levels) ||
-            !Array.isArray(cachedData.topics)
-          ) {
-            await recoverFromInvalidWordList(
-              "cache shape was not an array payload",
-              cachedData,
-            );
-            return;
-          }
-
-          const isExpired = Date.now() - cachedData.lastUpdated >= CACHE_EXPIRY;
-
-          if (!isExpired && !cachedData.isPartial) {
-            // Fresh complete cache - use it immediately
-            console.log("Using fresh cached data");
-            applyCacheState(cachedData);
-            setIsLoading(false);
-            return;
-          }
-
-          if (isExpired && !cachedData.isPartial) {
-            console.log("Using stale cache, refreshing in background");
-            applyCacheState(cachedData);
-            setIsLoading(false);
-
-            setTimeout(() => fetchAllWords(), 100);
-            return;
-          }
-
-          if (cachedData.isPartial) {
-            console.log("Using partial cache, fetching remaining data");
-            applyCacheState(cachedData);
-            setIsLoading(false);
-
-            setTimeout(async () => {
-              try {
-                const fullResponse = await api.get("/word/all?all=true");
-                const fullCache = normalizeCachePayload(
-                  fullResponse.data?.data,
-                  {
-                    lastUpdated: Date.now(),
-                    isPartial: false,
-                  },
-                );
-                setToStorage(CACHE_KEY, fullCache);
-                applyCacheState(fullCache);
-                hasRecoveredCorruptData.current = false;
-                console.log("Background fetch complete from partial cache");
-              } catch (error) {
-                console.error("Background fetch failed:", error);
-              }
-            }, 100);
-            return;
-          }
-        }
-
-        // No cache at all - progressive fetch
-        console.log(
-          "No cache found, fetching fresh data with progressive loading",
-        );
-        fetchInitialWords();
+        pageCacheStoreRef.current = normalizePagedCacheStore(cachedData);
       } catch (err) {
-        // <-- Catch any errors from getFromStorage
         console.error("Failed to load cached data:", err);
-        // Proceed to fetch fresh data anyway
-        fetchInitialWords();
+        pageCacheStoreRef.current = createEmptyPageCacheStore();
+      } finally {
+        setPageCacheReady(true);
       }
     };
 
-    loadData();
+    void loadData();
+    return () => {
+      if (cacheDebounceTimer.current) {
+        clearTimeout(cacheDebounceTimer.current);
+      }
+    };
   }, [
-    applyCacheState,
-    fetchInitialWords,
-    fetchAllWords,
     recoverFromInvalidWordList,
   ]);
 
-  // ====================================================================
-  // Listen for cache invalidation from other tabs/components (MUST be after fetchAllWords definition)
   useEffect(() => {
+    if (!pageCacheReady) {
+      return undefined;
+    }
+
     const handleStorageChange = (e) => {
       if (e.key === CACHE_KEY && e.newValue === null) {
-        // Cache was cleared, refetch data
-        console.log("Cache cleared, refetching words...");
-        fetchInitialWords();
+        pageCacheStoreRef.current = createEmptyPageCacheStore();
+        void fetchWordsPage({
+          queryState: activeQuery,
+          queryKey: activeQueryKey,
+          page: currentPage,
+          preferCache: false,
+        });
       }
     };
 
@@ -562,9 +755,13 @@ const WordList = () => {
         return;
       }
 
-      // Cache was cleared in same tab, refetch data
-      console.log("Cache invalidated, refetching words...");
-      fetchInitialWords();
+      pageCacheStoreRef.current = createEmptyPageCacheStore();
+      void fetchWordsPage({
+        queryState: activeQuery,
+        queryKey: activeQueryKey,
+        page: currentPage,
+        preferCache: false,
+      });
     };
 
     window.addEventListener("storage", handleStorageChange);
@@ -573,15 +770,86 @@ const WordList = () => {
       window.removeEventListener("storage", handleStorageChange);
       window.removeEventListener("cacheInvalidated", handleCacheInvalidated);
     };
-  }, [fetchInitialWords]);
+  }, [
+    activeQuery,
+    activeQueryKey,
+    currentPage,
+    fetchWordsPage,
+    pageCacheReady,
+  ]);
 
-  // Effect to fetch data if cache is empty
   useEffect(() => {
-    if (cache.words.length === 0 && !isLoading) {
-      fetchInitialWords();
+    if (!pageCacheReady) {
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cache.words.length, isLoading]);
+
+    const cachedPage = getCachedQueryPage(
+      pageCacheStoreRef.current,
+      activeQueryKey,
+      currentPage,
+    );
+
+    if (cachedPage && isFreshCacheEntry(cachedPage)) {
+      applyCacheState(cachedPage);
+      setIsLoading(false);
+      setIsRefreshingPage(false);
+      return;
+    }
+
+    if (cache.words.length > 0) {
+      setIsRefreshingPage(true);
+    }
+  }, [
+    activeQueryKey,
+    applyCacheState,
+    cache.words.length,
+    currentPage,
+    pageCacheReady,
+  ]);
+
+  useEffect(() => {
+    if (!pageCacheReady) {
+      return;
+    }
+
+    void (async () => {
+      try {
+        const pageData = await fetchWordsPage({
+          queryState: activeQuery,
+          queryKey: activeQueryKey,
+          page: requestedPageToFetch,
+          preferCache: true,
+        });
+
+        if (pageData) {
+          prefetchAdjacentPages(
+            activeQuery,
+            activeQueryKey,
+            pageData.currentPage || requestedPageToFetch,
+            pageData.totalPages || 1,
+          );
+        }
+      } catch (error) {
+        const cachedPage = getCachedQueryPage(
+          pageCacheStoreRef.current,
+          activeQueryKey,
+          requestedPageToFetch,
+        );
+
+        if (!cachedPage) {
+          applyCacheState(EMPTY_CACHE);
+        }
+      }
+    })();
+  }, [
+    activeQuery,
+    activeQueryKey,
+    applyCacheState,
+    requestedPageToFetch,
+    fetchWordsPage,
+    pageCacheReady,
+    prefetchAdjacentPages,
+  ]);
 
   // Force refresh when navigating from word creation
   useEffect(() => {
@@ -589,8 +857,8 @@ const WordList = () => {
       console.log("Force refresh triggered");
 
       const refreshWords = async () => {
-        await removeFromStorage(CACHE_KEY);
-        fetchAllWords();
+        pageCacheStoreRef.current = createEmptyPageCacheStore();
+        await invalidateWordsCache();
       };
 
       void refreshWords();
@@ -606,7 +874,6 @@ const WordList = () => {
       );
     }
   }, [
-    fetchAllWords,
     location.hash,
     location.pathname,
     location.search,
@@ -614,215 +881,13 @@ const WordList = () => {
     navigate,
   ]);
 
-  const allFilteredWords = useMemo(() => {
-    const wordsArray = cache.words;
-    let filtered = wordsArray.filter((word) => word?.value?.trim());
-    const recentThreshold = new Date();
-    recentThreshold.setDate(
-      recentThreshold.getDate() - RECENT_WORD_WINDOW_DAYS,
-    );
-
-    // Normalize strings for alphabetical sorting:
-    // - remove parenthetical content (e.g. "(fast) alle" -> " alle")
-    // - strip remaining punctuation/extra characters
-    // - collapse spaces and lowercase for consistent comparison
-    const normalizeForSort = (str) => {
-      if (!str) return "";
-      try {
-        return String(str)
-          .replace(/\(.*?\)/g, "")
-          .replace(/[^\p{L}\p{N}\s-]/gu, " ")
-          .replace(/[-_]+/g, " ")
-          .replace(/\s+/g, " ")
-          .trim()
-          .toLowerCase();
-      } catch (e) {
-        return String(str).toLowerCase();
-      }
-    };
-
-    const compareNormalized = (a, b) => {
-      const na = normalizeForSort(a || "");
-      const nb = normalizeForSort(b || "");
-      return na.localeCompare(nb, "de", { sensitivity: "base" });
-    };
-    const defaultTopic = topics.find((topic) => topic.id === UNKNOWN_TOPIC_ID);
-    const defaultTopicName = defaultTopic?.name;
-
-    // 1. Level Filter
-    if (selectedLevel) {
-      filtered = filtered.filter((word) => word.level?.level === selectedLevel);
-    }
-
-    if (showRecentOnly) {
-      filtered = filtered.filter((word) => {
-        if (!word.createdAt) {
-          return false;
-        }
-
-        const createdAt = new Date(word.createdAt);
-        return (
-          !Number.isNaN(createdAt.getTime()) && createdAt >= recentThreshold
-        );
-      });
-    }
-
-    // 2. Topic Filter
-    if (selectedTopic) {
-      filtered = filtered.filter((word) => {
-        const hasNoMeaning = !word.meaning?.length;
-        const hasNoTopic = !word.topic;
-        return (
-          word.topic?.name === selectedTopic ||
-          (selectedTopic === defaultTopicName && hasNoMeaning && hasNoTopic)
-        );
-      });
-    }
-
-    // 3. Part of speech filter
-    if (selectedPartOfSpeech) {
-      filtered = filtered.filter((word) => {
-        const partOfSpeechName = getEffectivePartOfSpeechName(word);
-
-        if (selectedPartOfSpeech === NOT_SPECIFIED_PART_OF_SPEECH) {
-          return (
-            !partOfSpeechName || partOfSpeechName === UNKNOWN_PART_OF_SPEECH
-          );
-        }
-
-        return partOfSpeechName === selectedPartOfSpeech;
-      });
-    }
-
-    // 4. Search Filter (Uses the debounced value)
-    if (debouncedSearchValue.trim().length > 0) {
-      const lower = debouncedSearchValue.trim().toLowerCase();
-
-      filtered = filtered.filter((word) => {
-        if (searchType === "word") {
-          // Check both singular (value) and plural (pluralForm)
-          const singular = word.value?.toLowerCase() || "";
-          const plural = word.pluralForm?.toLowerCase() || "";
-
-          return singular.includes(lower) || plural.includes(lower);
-        }
-
-        if (searchType === "meaning") {
-          // Optimized: Check meanings without joining if possible
-          if (!word.meaning?.length) return false;
-
-          // For single word searches, check each meaning individually (faster)
-          return word.meaning.some((meaning) =>
-            meaning.toLowerCase().includes(lower),
-          );
-        }
-
-        return true;
-      });
-    }
-
-    // Sort by relevance when searching, otherwise alphabetically
-    if (debouncedSearchValue.trim().length > 0) {
-      const query = debouncedSearchValue.trim().toLowerCase();
-
-      filtered.sort((x, y) => {
-        const getRelevanceScore = (word) => {
-          const singular = word.value?.toLowerCase() || "";
-          const plural = word.pluralForm?.toLowerCase() || "";
-
-          // Check exact matches
-          if (singular === query || plural === query) return 100;
-
-          // Check starts with
-          if (singular.startsWith(query) || plural.startsWith(query)) return 50;
-
-          // Check contains
-          if (singular.includes(query) || plural.includes(query)) return 10;
-
-          // If meaning search
-          if (
-            searchType === "meaning" &&
-            word.meaning?.some((m) => m.toLowerCase() === query)
-          )
-            return 100;
-          if (
-            searchType === "meaning" &&
-            word.meaning?.some((m) => m.toLowerCase().startsWith(query))
-          )
-            return 50;
-          if (
-            searchType === "meaning" &&
-            word.meaning?.some((m) => m.toLowerCase().includes(query))
-          )
-            return 10;
-
-          return 0;
-        };
-
-        const scoreX = getRelevanceScore(x);
-        const scoreY = getRelevanceScore(y);
-
-        // Higher score first
-        if (scoreX !== scoreY) return scoreY - scoreX;
-
-        // If same score, sort alphabetically
-        return compareNormalized(x.value, y.value);
-      });
-    } else {
-      // Sort alphabetically by normalized word value so entries starting
-      // with punctuation or parentheses don't float to the top.
-      filtered.sort((x, y) => compareNormalized(x.value, y.value));
-    }
-
-    return filtered;
-  }, [
-    cache.words,
-    selectedLevel,
-    showRecentOnly,
-    selectedTopic,
-    selectedPartOfSpeech,
-    debouncedSearchValue,
-    searchType,
-    topics,
-  ]);
-
-  useEffect(() => {
-    const totalWords = allFilteredWords.length;
-    const newTotalPages = Math.max(1, Math.ceil(totalWords / WORDS_PER_PAGE));
-    setTotalPages(newTotalPages);
-  }, [allFilteredWords.length]);
-
-  // The useMemo for paginatedWords can then be simplified to:
-  const paginatedWords = useMemo(() => {
-    return allFilteredWords.slice(
-      (currentPage - 1) * WORDS_PER_PAGE,
-      currentPage * WORDS_PER_PAGE,
-    );
-  }, [allFilteredWords, currentPage]);
+  const paginatedWords = useMemo(() => cache.words, [cache.words]);
 
   // Handlers remain the same, but simplified input handler
   const handleSearchInputChange = useCallback((event) => {
     const value = event.target.value; // Allow spaces for multi-word searches
     setSearchValue(value);
   }, []);
-
-  // Create a Map for O(1) word lookup by ID (optimized from O(n) find)
-  const wordsByIdMap = useMemo(() => {
-    const map = new Map();
-    cache.words.forEach((word) => {
-      if (word?.id !== undefined && word?.id !== null) {
-        map.set(word.id, word);
-      }
-    });
-    return map;
-  }, [cache.words]);
-
-  // Memoized modal handlers
-  // const openModal = useCallback((word) => {
-  //   setSelectedWord(word);
-  //   setIsModalOpen(true);
-  // }, []);
-  // ========================new ============
 
   const openModal = useCallback(
     (word) => {
@@ -834,31 +899,20 @@ const WordList = () => {
         return;
       }
 
-      setSelectedWordId(word.id);
+      setSelectedWord(word);
       setIsModalOpen(true);
     },
     [recoverFromInvalidWordList],
   );
 
   const closeModal = useCallback(() => {
-    setSelectedWordId(null);
+    setSelectedWord(null);
     setIsModalOpen(false);
   }, []);
 
-  const selectedWord = useMemo(() => {
-    if (!selectedWordId) return null;
-    return wordsByIdMap.get(selectedWordId) || null;
-  }, [selectedWordId, wordsByIdMap]);
-
-  // =========================================
-  // const closeModal = useCallback(() => {
-  //   setSelectedWord(null);
-  //   setIsModalOpen(false);
-  // }, []);
-
   const openWordInModal = useCallback(
-    (wordValue) => {
-      const word = cache.words.find(
+    async (wordValue) => {
+      const word = paginatedWords.find(
         (w) =>
           w?.value === wordValue ||
           w?.synonyms?.some((synonym) => synonym?.value === wordValue) ||
@@ -870,31 +924,30 @@ const WordList = () => {
 
       if (word) {
         openModal(word);
-      } else {
-        Swal.fire(
-          "Not Found",
-          "The word doesn't exist in your word list.",
-          "error",
-        );
+        return;
       }
-    },
-    [cache.words, openModal],
-  );
 
-  const levelToTopicsMap = useMemo(() => {
-    const map = new Map();
-    cache.words.forEach((word) => {
-      const levelName = word?.level?.level;
-      const topicName = word?.topic?.name;
-      if (levelName && topicName) {
-        if (!map.has(levelName)) {
-          map.set(levelName, new Set());
+      try {
+        const response = await api.get(`/word/${encodeURIComponent(wordValue)}`);
+        const fetchedWord = response.data?.data;
+
+        if (fetchedWord?.id) {
+          setSelectedWord(fetchedWord);
+          setIsModalOpen(true);
+          return;
         }
-        map.get(levelName).add(topicName);
+      } catch (error) {
+        console.error("Failed to fetch linked word:", error);
       }
-    });
-    return map;
-  }, [cache.words]);
+
+      Swal.fire(
+        "Not Found",
+        "The word doesn't exist in your word list.",
+        "error",
+      );
+    },
+    [openModal, paginatedWords],
+  );
 
   const handleLevelChange = useCallback(
     (e) => {
@@ -902,25 +955,9 @@ const WordList = () => {
       setSelectedLevel(selected);
       setSelectedTopic("");
       setCurrentPage(1);
-
-      if (selected === "") {
-        setFilteredTopics(topics);
-      } else {
-        const topicNamesForLevel = levelToTopicsMap.get(selected) || new Set();
-        const matchedTopics = topics.filter((topic) =>
-          topicNamesForLevel.has(topic.name),
-        );
-        setFilteredTopics(matchedTopics);
-      }
     },
-    [topics, levelToTopicsMap],
+    [],
   );
-
-  useEffect(() => {
-    if (topics.length > 0) {
-      setFilteredTopics(topics);
-    }
-  }, [topics]);
 
   const handleTopicChange = useCallback((e) => {
     setSelectedTopic(e.target.value);
@@ -957,13 +994,9 @@ const WordList = () => {
         if (result.isConfirmed) {
           api
             .delete(`/word/delete/${wordId}`)
-            .then(() => {
-              // Update cache directly to avoid refetching all data
-              setCache((prev) => ({
-                ...prev,
-                words: prev.words.filter((word) => word?.id !== wordId),
-                lastUpdated: Date.now(),
-              }));
+            .then(async () => {
+              pageCacheStoreRef.current = createEmptyPageCacheStore();
+              await invalidateWordsCache();
 
               Swal.fire({
                 title: "Deleted!",
@@ -978,7 +1011,7 @@ const WordList = () => {
         }
       });
     },
-    [userId, setCache],
+    [userId],
   );
 
   //learning mode
@@ -1191,8 +1224,7 @@ const WordList = () => {
       const paragraph = response.data.paragraph;
       const wordId = response.data.wordId || word.id; // depends on AI API response
 
-      // 🔑 Find the full word object in your /all words cache
-      const fullWord = cache.words.find((w) => w?.id === wordId);
+      const fullWord = paginatedWords.find((w) => w?.id === wordId) || word;
 
       setAiWord({
         ...(fullWord || { id: word.id, value: word.value }),
@@ -1254,13 +1286,9 @@ const WordList = () => {
       return;
     }
 
-    if (cache.isPartial) {
-      void fetchAllWords();
-    }
-
     setShowRecentOnly(true);
     setCurrentPage(1);
-  }, [cache.isPartial, fetchAllWords, showRecentOnly]);
+  }, [showRecentOnly]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -1301,7 +1329,7 @@ const WordList = () => {
           </Link>
           {userLoggedIn && isAdmin && (
             <span className="text-sm text-pink-400 font-bold mr-2">
-              Total: {cache.words.length} words
+              Total: {cache.totalWords} words
             </span>
           )}
         </div>
@@ -1350,6 +1378,11 @@ const WordList = () => {
         </div>
         {/* ===============showing words by page ==================  */}
         <div className="flex items-center gap-4">
+          {isRefreshingPage && paginatedWords.length > 0 && (
+            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 whitespace-nowrap">
+              Loading page...
+            </span>
+          )}
           {!hasActiveFilters && (
             <button
               onClick={handleToggleRecentWords}
@@ -1481,7 +1514,7 @@ const WordList = () => {
         learningMode={learningMode}
         setAction={setShowActionColumn}
         showAction={showActionColumn}
-        totalWords={paginatedWords.length}
+        totalWords={cache.totalWords}
       />
 
       {/* Table content */}
@@ -1627,7 +1660,7 @@ const WordList = () => {
         learningMode={learningMode}
         setAction={setShowActionColumn}
         showAction={showActionColumn}
-        totalWords={paginatedWords.length}
+        totalWords={cache.totalWords}
       />
 
       {/* ========= */}
