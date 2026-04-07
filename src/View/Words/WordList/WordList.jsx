@@ -918,18 +918,12 @@ const WordList = () => {
 
   const openWordInModal = useCallback(
     async (wordValue) => {
-      const word = paginatedWords.find(
-        (w) =>
-          w?.value === wordValue ||
-          w?.synonyms?.some((synonym) => synonym?.value === wordValue) ||
-          w?.antonyms?.some((antonym) => antonym?.value === wordValue) ||
-          w?.similarWords?.some(
-            (similarWord) => similarWord?.value === wordValue,
-          ),
+      const exactWordMatch = paginatedWords.find(
+        (word) => word?.value === wordValue,
       );
 
-      if (word) {
-        openModal(word);
+      if (exactWordMatch) {
+        openModal(exactWordMatch);
         return;
       }
 
@@ -946,6 +940,20 @@ const WordList = () => {
         }
       } catch (error) {
         console.error("Failed to fetch linked word:", error);
+      }
+
+      const relatedWordMatch = paginatedWords.find(
+        (word) =>
+          word?.synonyms?.some((synonym) => synonym?.value === wordValue) ||
+          word?.antonyms?.some((antonym) => antonym?.value === wordValue) ||
+          word?.similarWords?.some(
+            (similarWord) => similarWord?.value === wordValue,
+          ),
+      );
+
+      if (relatedWordMatch) {
+        openModal(relatedWordMatch);
+        return;
       }
 
       Swal.fire(

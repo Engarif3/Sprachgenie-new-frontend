@@ -1,18 +1,15 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "../../../axios";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import WordListModal from "../Modals/WordListModal";
 import Pagination from "./Pagination";
-import { pronounceWord } from "../../../utils/wordPronounciation";
 import {
   getFromLocalStorage,
   setToLocalStorage,
 } from "../../../utils/local-storage";
 import aiApi from "../../../AI_axios";
-import { PuffLoader } from "react-spinners";
 import AIModal from "../Modals/AIModal";
-import { ImBin } from "react-icons/im";
 import { useAuth } from "../../../services/auth.services";
 import FavoriteWordsTable from "./FavoriteWordsTable";
 
@@ -33,7 +30,7 @@ const FavoritesListDashboard = () => {
 
   // =================ai===========================
   const [aiWord, setAiWord] = useState(null);
-  const [generatedParagraphs, setGeneratedParagraphs] = useState({});
+  const [, setGeneratedParagraphs] = useState({});
   const [loadingParagraphs, setLoadingParagraphs] = useState({});
   const [selectedParagraph, setSelectedParagraph] = useState("");
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
@@ -42,7 +39,7 @@ const FavoritesListDashboard = () => {
 
   useEffect(() => {
     setFavorites(favoriteWords.map((w) => w.id));
-  }, [favoriteWords]);
+  }, [currentPage, favoriteWords]);
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -79,13 +76,43 @@ const FavoritesListDashboard = () => {
     } else if (newTotalPages === 0) {
       setCurrentPage(1);
     }
-  }, [favoriteWords]);
+  }, [currentPage, favoriteWords]);
 
   const openWordInModal = useCallback(
-    (wordValue) => {
+    async (wordValue) => {
+      const exactWordMatch = favoriteWords.find(
+        (word) => word.value === wordValue,
+      );
+
+      if (exactWordMatch) {
+        openModal(exactWordMatch);
+        return;
+      }
+
+      try {
+        const response = await axios.get(
+          `/word/${encodeURIComponent(wordValue)}`,
+        );
+        const fetchedWord = response.data?.data;
+
+        if (fetchedWord?.id) {
+          openModal({
+            ...fetchedWord,
+            sentences: fetchedWord.sentences || [],
+            meaning: fetchedWord.meaning || [],
+            synonyms: fetchedWord.synonyms || [],
+            antonyms: fetchedWord.antonyms || [],
+            similarWords: fetchedWord.similarWords || [],
+            pluralForm: fetchedWord.pluralForm || "",
+          });
+          return;
+        }
+      } catch (error) {
+        console.error("Failed to fetch linked favorite dashboard word:", error);
+      }
+
       const word = favoriteWords.find(
         (w) =>
-          w.value === wordValue ||
           (w.synonyms && w.synonyms.some((syn) => syn.value === wordValue)) ||
           (w.antonyms && w.antonyms.some((ant) => ant.value === wordValue)) ||
           (w.similarWords &&
@@ -190,7 +217,7 @@ const FavoritesListDashboard = () => {
           timer: 1000,
           showConfirmButton: false,
         });
-      } catch (error) {
+      } catch {
         Swal.fire({
           title: "Error!",
           text: "Failed to remove favorite.",
@@ -221,7 +248,7 @@ const FavoritesListDashboard = () => {
         timer: 1500,
         showConfirmButton: false,
       });
-    } catch (error) {
+    } catch {
       Swal.fire({
         title: "Error!",
         text: "Failed to delete all favorites.",
@@ -312,7 +339,7 @@ const FavoritesListDashboard = () => {
           });
         }
       }
-    } catch (err) {
+    } catch {
       Swal.fire("Error", "Failed to update favorites", "error");
     } finally {
       setLoadingFavorites((prev) => ({ ...prev, [wordId]: false }));

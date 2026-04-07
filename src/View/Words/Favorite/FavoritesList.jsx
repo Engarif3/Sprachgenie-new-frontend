@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "../../../axios";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -6,19 +6,16 @@ import WordListModal from "../Modals/WordListModal";
 import Container from "../../../utils/Container";
 import { useAuth } from "../../../services/auth.services";
 import Pagination from "./Pagination";
-import { pronounceWord } from "../../../utils/wordPronounciation";
-import { ImBin } from "react-icons/im";
 import {
   getFromLocalStorage,
   setToLocalStorage,
 } from "../../../utils/local-storage";
 import aiApi from "../../../AI_axios";
-import { PuffLoader } from "react-spinners";
 import AIModal from "../Modals/AIModal";
 import FavoriteWordsTable from "./FavoriteWordsTable";
 
 const FavoritesList = () => {
-  const [selectedWordId, setSelectedWordId] = useState(null);
+  const [selectedWord, setSelectedWord] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [favoriteWords, setFavoriteWords] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,7 +32,7 @@ const FavoritesList = () => {
 
   // =================ai===========================
   const [aiWord, setAiWord] = useState(null);
-  const [generatedParagraphs, setGeneratedParagraphs] = useState({});
+  const [, setGeneratedParagraphs] = useState({});
   const [loadingParagraphs, setLoadingParagraphs] = useState({});
   const [selectedParagraph, setSelectedParagraph] = useState("");
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
@@ -100,19 +97,6 @@ const FavoritesList = () => {
     fetchFavorites();
   }, [userId]);
 
-  // Create Map for O(1) word lookups
-  const wordsByIdMap = useMemo(() => {
-    const map = new Map();
-    favoriteWords.forEach((word) => map.set(word.id, word));
-    return map;
-  }, [favoriteWords]);
-
-  // Derive selectedWord from ID
-  const selectedWord = useMemo(() => {
-    if (!selectedWordId) return null;
-    return wordsByIdMap.get(selectedWordId) || null;
-  }, [selectedWordId, wordsByIdMap]);
-
   useEffect(() => {
     const newTotalPages = Math.ceil(favoriteWords.length / 40);
     setTotalPages(newTotalPages);
@@ -123,16 +107,47 @@ const FavoritesList = () => {
     } else if (newTotalPages === 0) {
       setCurrentPage(1);
     }
-  }, [favoriteWords]);
+  }, [currentPage, favoriteWords]);
 
   const openWordInModal = useCallback(
-    (wordValue) => {
+    async (wordValue) => {
+      const exactWordMatch = favoriteWords.find(
+        (word) => word.value === wordValue,
+      );
+
+      if (exactWordMatch) {
+        openModal(exactWordMatch);
+        return;
+      }
+
+      try {
+        const response = await axios.get(
+          `/word/${encodeURIComponent(wordValue)}`,
+        );
+        const fetchedWord = response.data?.data;
+
+        if (fetchedWord?.id) {
+          openModal({
+            ...fetchedWord,
+            sentences: fetchedWord.sentences || [],
+            meaning: fetchedWord.meaning || [],
+            synonyms: fetchedWord.synonyms || [],
+            antonyms: fetchedWord.antonyms || [],
+            similarWords: fetchedWord.similarWords || [],
+            pluralForm: fetchedWord.pluralForm || "",
+          });
+          return;
+        }
+      } catch (error) {
+        console.error("Failed to fetch linked favorite word:", error);
+      }
+
       const word = favoriteWords.find(
         (w) =>
-          w.value === wordValue ||
-          (w.synonyms && w.synonyms.includes(wordValue)) ||
-          (w.antonyms && w.antonyms.includes(wordValue)) ||
-          (w.similarWords && w.similarWords.includes(wordValue)),
+          (w.synonyms && w.synonyms.some((syn) => syn.value === wordValue)) ||
+          (w.antonyms && w.antonyms.some((ant) => ant.value === wordValue)) ||
+          (w.similarWords &&
+            w.similarWords.some((sim) => sim.value === wordValue)),
       );
 
       if (!word) {
@@ -170,7 +185,7 @@ const FavoritesList = () => {
         ? word.synonyms || []
         : isSynonym
           ? [
-              { value: word.value }, // original favorite word included here
+              { value: word.value },
               ...word.synonyms.filter((syn) => syn.value !== wordValue),
             ]
           : [];
@@ -238,7 +253,7 @@ const FavoritesList = () => {
           timer: 1000,
           showConfirmButton: false,
         });
-      } catch (error) {
+      } catch {
         Swal.fire({
           title: "Error!",
           text: "Failed to remove favorite.",
@@ -270,7 +285,7 @@ const FavoritesList = () => {
         timer: 1500,
         showConfirmButton: false,
       });
-    } catch (error) {
+    } catch {
       Swal.fire({
         title: "Error!",
         text: "Failed to delete all favorites.",
@@ -282,12 +297,12 @@ const FavoritesList = () => {
   };
 
   const openModal = (word) => {
-    setSelectedWordId(word.id);
+    setSelectedWord(word);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
-    setSelectedWordId(null);
+    setSelectedWord(null);
     setIsModalOpen(false);
   };
 
@@ -340,7 +355,7 @@ const FavoritesList = () => {
           });
         }
       }
-    } catch (err) {
+    } catch {
       // Rollback on error
       setFavoriteWords(previousFavorites);
       setFavorites(previousIds);
