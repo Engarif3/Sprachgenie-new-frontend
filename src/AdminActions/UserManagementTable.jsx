@@ -168,7 +168,7 @@ const UserManagementTable = ({
                           <select
                             value={resolvedRole}
                             onChange={(event) =>
-                              onRoleChange?.(user.id, event.target.value)
+                              onRoleChange?.(user, event.target.value)
                             }
                             className="rounded-lg border border-slate-300 bg-white px-3 py-1 text-xs font-semibold text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
                           >

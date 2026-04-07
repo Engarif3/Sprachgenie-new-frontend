@@ -12,10 +12,7 @@ import {
 import UserManagementSearchPanel from "../UserManagementSearchPanel";
 import UserManagementSummary from "../UserManagementSummary";
 import UserManagementTable from "../UserManagementTable";
-import {
-  formatRoleLabel,
-  formatStatusLabel,
-} from "../userManagementDisplay";
+import { formatRoleLabel, formatStatusLabel } from "../userManagementDisplay";
 import UserProfileModal from "./UserProfileModal";
 
 const getTabButtonClass = (isActive) =>
@@ -29,7 +26,6 @@ const UpdateUserStatus = () => {
   const {
     isLoggedIn: userLoggedIn,
     isSuperAdmin,
-    safeUserInfo: userInfo,
     userId,
     userRole,
   } = useAuth();
@@ -329,29 +325,65 @@ const UpdateUserStatus = () => {
     });
   };
 
-  const handleRoleChange = (userId, newRole) => {
+  const handleRoleChange = (user, newRole) => {
+    const targetUserId = user?.id;
+    const userEmail = String(user?.email || "").trim();
     const newAssignedRole = newRole === "BASIC_USER" ? "Basic User" : "Admin";
 
     Swal.fire({
-      text: `Change the role to ${newAssignedRole}?`,
+      title: `Change role to ${newAssignedRole}?`,
+      text: `Type ${userEmail} to confirm this role change.`,
+      input: "text",
+      inputPlaceholder: "Enter the user's email",
+      inputAttributes: {
+        autocapitalize: "off",
+        autocorrect: "off",
+        spellcheck: "false",
+      },
       showCancelButton: true,
       confirmButtonText: "Yes",
       cancelButtonText: "No",
+      preConfirm: (value) => {
+        const confirmedEmail = String(value || "")
+          .trim()
+          .toLowerCase();
+
+        if (!confirmedEmail) {
+          Swal.showValidationMessage("Enter the user's email to confirm.");
+          return false;
+        }
+
+        if (confirmedEmail !== userEmail.toLowerCase()) {
+          Swal.showValidationMessage(
+            "The entered email does not match the selected user.",
+          );
+          return false;
+        }
+
+        return value.trim();
+      },
     }).then((result) => {
       if (result.isConfirmed) {
         api
-          .patch(`/user/update-role/${userId}`, {
+          .patch(`/user/update-role/${targetUserId}`, {
             role: newRole,
             performedById: userId,
+            confirmEmail: result.value,
           })
           .then(async (response) => {
             if (response.data.success) {
               setSelectedProfile((prev) =>
-                prev?.id === userId ? { ...prev, role: newRole } : prev,
+                prev?.id === targetUserId ? { ...prev, role: newRole } : prev,
               );
               setProfileCache((prev) =>
-                prev[userId]
-                  ? { ...prev, [userId]: { ...prev[userId], role: newRole } }
+                prev[targetUserId]
+                  ? {
+                      ...prev,
+                      [targetUserId]: {
+                        ...prev[targetUserId],
+                        role: newRole,
+                      },
+                    }
                   : prev,
               );
 
@@ -365,7 +397,7 @@ const UpdateUserStatus = () => {
                 showConfirmButton: false,
               });
 
-              await handleSelfSessionRefresh(userId);
+              await handleSelfSessionRefresh(targetUserId);
             } else {
               Swal.fire("Failed", "Failed to update role", "error");
             }

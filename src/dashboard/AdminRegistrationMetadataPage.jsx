@@ -104,6 +104,17 @@ const getStatusBadgeClass = (status) => {
   }
 };
 
+const getStatusEmailClass = (status) => {
+  switch (String(status || "").toUpperCase()) {
+    case "PENDING":
+      return "text-amber-600 dark:text-amber-300";
+    case "BLOCKED":
+      return "text-rose-600 dark:text-rose-300";
+    default:
+      return "text-slate-900 dark:text-white";
+  }
+};
+
 const formatAccuracy = (value) => {
   const numericValue =
     typeof value === "number"
@@ -622,7 +633,11 @@ const AdminRegistrationMetadataPage = () => {
                         className="transition hover:bg-slate-50 dark:hover:bg-slate-950/60"
                       >
                         <td className="px-4 py-4">
-                          <p className="font-semibold text-slate-900 dark:text-white">
+                          <p
+                            className={`font-semibold ${getStatusEmailClass(
+                              record.status,
+                            )}`}
+                          >
                             {record.email}
                           </p>
                           <p className="mt-1 font-mono text-xs text-slate-500 dark:text-slate-400">
@@ -674,7 +689,11 @@ const AdminRegistrationMetadataPage = () => {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <h3 className="font-semibold text-slate-900 dark:text-white">
+                        <h3
+                          className={`font-semibold ${getStatusEmailClass(
+                            record.status,
+                          )}`}
+                        >
                           {record.email}
                         </h3>
                         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
