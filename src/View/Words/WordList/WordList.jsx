@@ -1542,7 +1542,7 @@ const WordList = () => {
           <Loader loading={isLoading} />
         </div>
       ) : (
-        <div className=" min-h-screen dark:bg-gradient-to-br from-gray-900/30 via-gray-800/20 to-black/30 rounded-2xl p-0 md:p-1 lg:p-1">
+        <div className=" min-h-screen  rounded-2xl p-0 md:p-1 lg:p-1">
           <div className="flex items-center justify-end gap-2 mb-2 px-2 relative">
             {isRefreshingPage && paginatedWords.length > 0 && (
               <span className="text-xs  px-3 py-0 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 whitespace-nowrap">
@@ -1567,11 +1567,11 @@ const WordList = () => {
               </div>
             )}
           </div>
-          <div className="overflow-x-auto border border-gray-700/50 rounded-2xl shadow-2xl">
+          <div className="overflow-x-auto  border-gray-700/50 rounded-2xl shadow-2xl">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-slate-900 dark:bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 text-sm md:text-xl lg:text-xl text-white">
-                  <th className="py-3 text-sm md:text-lg lg:text-lg text-center text-orange-400 font-bold w-[5%] md:w-[3%] lg:w-[3%] rounded-tl-xl border-l border-gray-700">
+                  <th className="py-3  text-sm md:text-lg lg:text-lg text-center text-orange-400 font-bold w-[5%] md:w-[3%] lg:w-[3%] rounded-tl-xl border-l  border-gray-700">
                     {/* Art. */}
                   </th>
                   <th className="border-l py-3 border-gray-700 border-dotted text-center text-blue-400 font-bold w-[15%] md:w-[10%] lg:w-[10%] border-b">
@@ -1601,7 +1601,7 @@ const WordList = () => {
                     Action
                   </th>
                   <th
-                    className={`border-l border-dotted border-gray-700 text-sm md:text-lg lg:text-lg py-3 text-center text-red-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b ${
+                    className={`border-r border-l border-dotted border-gray-700 text-sm md:text-lg lg:text-lg py-3 text-center text-red-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b ${
                       !userLoggedIn ? "rounded-tr-xl" : ""
                     }`}
                   >

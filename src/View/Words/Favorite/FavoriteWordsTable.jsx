@@ -191,11 +191,11 @@ const FavoriteWordsTable = ({
   const tableVariant = TABLE_VARIANTS[variant] ?? TABLE_VARIANTS.page;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 shadow-xl dark:border-gray-700/50 dark:shadow-2xl">
+    <div className="overflow-hidden rounded-2xl  shadow-xl dark:border-gray-700/50 dark:shadow-2xl">
       <table className="w-full border-collapse text-xs sm:text-sm md:text-base">
         <thead>
           <tr className="bg-slate-900 text-sm text-white md:text-xl lg:text-xl dark:bg-gradient-to-r dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
-            <th className="rounded-tl-xl border-b border-l border-slate-200 py-3 text-center text-sm font-bold text-orange-400 md:text-lg lg:text-lg dark:border-gray-700 w-[5%] md:w-[3%] lg:w-[3%]">
+            <th className="rounded-tl-xl border-l border-slate-200 py-3 text-center text-sm font-bold text-orange-400 md:text-lg lg:text-lg dark:border-gray-700 w-[5%] md:w-[3%] lg:w-[3%]">
               {/* Art. */}
             </th>
             <th className="border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-blue-400 dark:border-gray-700 w-[15%] md:w-[10%] lg:w-[10%]">
@@ -213,7 +213,7 @@ const FavoriteWordsTable = ({
             <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-green-400 dark:border-gray-700 lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
               Word to Watch
             </th>
-            <th className="rounded-tr-xl border-b border-l border-dotted border-slate-200 py-3 text-center text-sm font-bold text-red-400 dark:border-gray-700 md:text-lg lg:text-lg w-[3%] md:w-[3%] lg:w-[3%]"></th>
+            <th className="rounded-tr-xl border-l border-r border-dotted border-slate-200 py-3 text-center text-sm font-bold text-red-400 dark:border-gray-700 md:text-lg lg:text-lg w-[3%] md:w-[3%] lg:w-[3%]"></th>
           </tr>
         </thead>
         <tbody>

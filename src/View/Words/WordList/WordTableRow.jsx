@@ -192,7 +192,7 @@ const WordTableRow = ({
       }`}
     >
       {/* Article */}
-      <td className="border border-gray-700 border-dotted p-1 md:p-3 lg:p-3 text-center">
+      <td className="border border-gray-700 border-dotted p-1  text-center">
         <PartOfSpeechBadge
           text={articleColumnDisplay.text}
           className={articleColumnDisplay.className}
@@ -359,6 +359,9 @@ const WordTableRow = ({
 
       {/* Favorite */}
       <td className="border border-gray-700 border-dotted p-0 md:p-3 text-center">
+        {/* <td
+        className={`${userLoggedIn ? "border" : "border"} border-gray-700 border-dotted p-0 md:p-3 text-center`}
+      > */}
         {userLoggedIn ? (
           <FavoriteButton
             isFavorite={favorites.includes(word.id)}
@@ -393,7 +396,7 @@ const WordTableRow = ({
 
       {/* History */}
       {userLoggedIn && canManageWords && (
-        <td className="border border-gray-700 border-dotted p-2 md:p-3 text-center hidden md:table-cell lg:table-cell">
+        <td className="border-b border-gray-700 border-dotted  p-2 md:p-3 text-center hidden md:table-cell lg:table-cell">
           <button
             onClick={() => {
               setSelectedHistory({
