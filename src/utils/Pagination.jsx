@@ -41,13 +41,13 @@ const Pagination = ({
             </button>
           )}
         </div>
-        <div className="flex md:hidden lg:hidden justify-center items-center mr-6">
+        {/* <div className="flex md:hidden lg:hidden justify-center items-center mr-6">
           {userLoggedIn && isAdmin && (
             <p className=" text-info text-sm md:text-md lg:text-md font-semibold whitespace-nowrap  ">
               {totalWords} words
             </p>
           )}
-        </div>
+        </div> */}
 
         {userLoggedIn && isAdmin && (
           <button
