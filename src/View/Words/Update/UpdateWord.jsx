@@ -10,7 +10,9 @@ import {
   DndContext,
   closestCenter,
   KeyboardSensor,
+  MouseSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -111,7 +113,7 @@ const DraggableItem = ({
       ) : (
         <div className="flex items-center justify-between w-full gap-2">
           <div
-            className="flex-1 break-words font-medium cursor-grab active:cursor-grabbing"
+            className="flex-1 break-words font-medium cursor-grab active:cursor-grabbing touch-none"
             {...attributes}
             {...listeners}
           >
@@ -303,8 +305,21 @@ const UpdateWord = () => {
 
   // Setup DnD Kit sensors
   const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 180,
+        tolerance: 8,
+      },
+    }),
     useSensor(PointerSensor, {
-      distance: 8,
+      activationConstraint: {
+        distance: 8,
+      },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
