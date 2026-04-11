@@ -57,8 +57,6 @@ const WordForm = () => {
         setArticles(articleResponse.data);
         setPartsOfSpeech(partOfSpeechResponse.data);
 
-        console.log(articles);
-
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error); // Log the error for debugging

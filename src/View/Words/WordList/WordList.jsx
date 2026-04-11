@@ -889,10 +889,15 @@ const WordList = () => {
 
   const paginatedWords = useMemo(() => cache.words, [cache.words]);
 
-  // Handlers remain the same, but simplified input handler
   const handleSearchInputChange = useCallback((event) => {
-    const value = event.target.value; // Allow spaces for multi-word searches
+    const value = event.target.value;
     setSearchValue(value);
+    setCurrentPage(1);
+  }, []);
+
+  const handleSearchTypeChange = useCallback((event) => {
+    setSearchType(event.target.value);
+    setCurrentPage(1);
   }, []);
 
   const openModal = useCallback(
@@ -1303,15 +1308,6 @@ const WordList = () => {
     setCurrentPage(1);
   }, [showRecentOnly]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [
-    debouncedSearchValue,
-    selectedLevel,
-    selectedTopic,
-    selectedPartOfSpeech,
-    showRecentOnly,
-  ]);
   // to show info
   useEffect(() => {
     const handleClickOutside = () => setShowInfo(false);
@@ -1383,7 +1379,7 @@ const WordList = () => {
               name="searchType"
               value="word"
               checked={searchType === "word"}
-              onChange={(e) => setSearchType(e.target.value)}
+              onChange={handleSearchTypeChange}
               className="w-4 h-4 accent-blue-500"
             />
             <span className="font-medium">By Word</span>
@@ -1395,7 +1391,7 @@ const WordList = () => {
               name="searchType"
               value="meaning"
               checked={searchType === "meaning"}
-              onChange={(e) => setSearchType(e.target.value)}
+              onChange={handleSearchTypeChange}
               className="w-4 h-4 accent-purple-500"
             />
             <span className="font-medium">By Meaning</span>

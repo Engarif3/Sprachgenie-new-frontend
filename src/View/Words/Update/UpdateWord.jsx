@@ -203,11 +203,58 @@ const DraggableItem = ({
   );
 };
 
+const FIELD_DELIMITERS = {
+  meaning: ",",
+  synonyms: ",",
+  antonyms: ",",
+  similarWords: ",",
+};
+
+const normalizeFieldItems = (field, value) => {
+  const normalizedValue = typeof value === "string" ? value.trim() : "";
+
+  if (!normalizedValue) {
+    return [];
+  }
+
+  const delimiter = FIELD_DELIMITERS[field];
+
+  if (!delimiter) {
+    return [normalizedValue];
+  }
+
+  return normalizedValue
+    .split(delimiter)
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
+
+const normalizeSentenceItems = (value) => {
+  const normalizedValue = typeof value === "string" ? value.trim() : "";
+
+  if (!normalizedValue) {
+    return [];
+  }
+
+  return normalizedValue
+    .split("|")
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
+
+const normalizeInsertedItems = (field, value) => {
+  if (field === "sentences") {
+    return normalizeSentenceItems(value);
+  }
+
+  return normalizeFieldItems(null, value);
+};
+
 const UpdateWord = () => {
   const { id } = useParams();
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
   const canAccess = userLoggedIn && userId && isAdmin;
-  const [suggestions, setSuggestions] = useState({
+  const [, setSuggestions] = useState({
     synonyms: [],
     antonyms: [],
     similarWords: [],
@@ -324,7 +371,7 @@ const UpdateWord = () => {
       });
 
       setRefetchTrigger((prev) => prev + 1);
-    } catch (error) {
+    } catch {
       Swal.fire({
         title: "Error!",
         text: "Failed to reorder. Please try again.",
@@ -338,7 +385,9 @@ const UpdateWord = () => {
   };
 
   const handleAddItem = async (field, index, position) => {
-    if (!newItemValue.trim()) {
+    const itemsToInsert = normalizeInsertedItems(field, newItemValue);
+
+    if (itemsToInsert.length === 0) {
       Swal.fire({
         title: "Error",
         text: "Please enter a value",
@@ -349,7 +398,7 @@ const UpdateWord = () => {
 
     const updatedArray = [...formData[field]];
     const insertIndex = position === "above" ? index : index + 1;
-    updatedArray.splice(insertIndex, 0, newItemValue.trim());
+    updatedArray.splice(insertIndex, 0, ...itemsToInsert);
 
     setFormData((prev) => ({
       ...prev,
@@ -375,7 +424,7 @@ const UpdateWord = () => {
       setAddingAt(null);
       setNewItemValue("");
       setRefetchTrigger((prev) => prev + 1);
-    } catch (error) {
+    } catch {
       Swal.fire({
         title: "Error!",
         text: "Failed to add item. Please try again.",
@@ -486,7 +535,7 @@ const UpdateWord = () => {
             ...prevSuggestions,
             [name]: response.data,
           }));
-        } catch (error) {
+        } catch {
           // Suggestions API call failed, continue without suggestions
         }
       } else {
@@ -525,7 +574,7 @@ const UpdateWord = () => {
 
       try {
         // Send the updated data to the backend
-        const response = await api.put(`/word/update/${formData.id}`, {
+        await api.put(`/word/update/${formData.id}`, {
           ...formData,
           [field]: filteredArray, // Send the updated list to the backend
         });
@@ -540,7 +589,7 @@ const UpdateWord = () => {
 
         // Trigger refetch by incrementing counter
         setRefetchTrigger((prev) => prev + 1);
-      } catch (error) {
+      } catch {
         Swal.fire({
           title: "Error!",
           text: "Failed to update the backend. Please try again.",
@@ -584,7 +633,7 @@ const UpdateWord = () => {
 
       try {
         // Send the updated data to the backend
-        const response = await api.put(`/word/update/${formData.id}`, {
+        await api.put(`/word/update/${formData.id}`, {
           ...formData,
           sentences: emptyArray,
         });
@@ -599,7 +648,7 @@ const UpdateWord = () => {
 
         // Trigger refetch by incrementing counter
         setRefetchTrigger((prev) => prev + 1);
-      } catch (error) {
+      } catch {
         Swal.fire({
           title: "Error!",
           text: "Failed to update the backend. Please try again.",
@@ -621,34 +670,19 @@ const UpdateWord = () => {
       ...formData,
 
       meaning: formData.meaning.concat(
-        inputData.meaning
-          .split(",")
-          .map((item) => item.trim())
-          .filter((item) => item !== ""),
+        normalizeFieldItems("meaning", inputData.meaning),
       ),
       sentences: formData.sentences.concat(
-        inputData.sentences
-          .split("|")
-          .map((item) => item.trim())
-          .filter((item) => item !== ""),
+        normalizeSentenceItems(inputData.sentences),
       ),
       synonyms: formData.synonyms.concat(
-        inputData.synonyms
-          .split(",")
-          .map((item) => item.trim())
-          .filter((item) => item !== ""),
+        normalizeFieldItems("synonyms", inputData.synonyms),
       ),
       antonyms: formData.antonyms.concat(
-        inputData.antonyms
-          .split(",")
-          .map((item) => item.trim())
-          .filter((item) => item !== ""),
+        normalizeFieldItems("antonyms", inputData.antonyms),
       ),
       similarWords: formData.similarWords.concat(
-        inputData.similarWords
-          .split(",")
-          .map((item) => item.trim())
-          .filter((item) => item !== ""),
+        normalizeFieldItems("similarWords", inputData.similarWords),
       ),
     };
 
@@ -691,7 +725,7 @@ const UpdateWord = () => {
 
         // Trigger refetch by incrementing counter
         setRefetchTrigger((prev) => prev + 1);
-      } catch (error) {
+      } catch {
         setMessage("Failed to update the word.");
       } finally {
         setLoading(false);
@@ -700,11 +734,14 @@ const UpdateWord = () => {
   };
 
   const handleSaveEdit = async (field, index) => {
-    const updatedArray = [...formData[field]];
-    updatedArray[index] = editValue.trim();
+    const replacementItems = normalizeInsertedItems(field, editValue);
 
-    // Optional: Prevent saving empty values
-    if (!updatedArray[index]) return;
+    if (replacementItems.length === 0) {
+      return;
+    }
+
+    const updatedArray = [...formData[field]];
+    updatedArray.splice(index, 1, ...replacementItems);
 
     setFormData((prev) => ({
       ...prev,
@@ -727,7 +764,7 @@ const UpdateWord = () => {
 
       // Trigger refetch by incrementing counter
       setRefetchTrigger((prev) => prev + 1);
-    } catch (error) {
+    } catch {
       Swal.fire({
         title: "Error!",
         text: "Failed to update. Please try again.",
