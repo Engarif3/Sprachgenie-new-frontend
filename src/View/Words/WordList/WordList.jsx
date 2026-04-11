@@ -1548,11 +1548,14 @@ const WordList = () => {
                   </option>
                 ))}
               </select>
-              <p className="text-md font-bold whitespace-nowrap hidden md:block px-2 py-1 md:px-2.5 md:py-1.5 bg-sky-600  rounded-full text-white">
+              {/* <p className="text-md font-bold whitespace-nowrap hidden md:block px-2 py-1 md:px-2.5 md:py-1.5 bg-sky-600  rounded-full text-white">
                 {displayedWordsCount} words
-              </p>
+              </p> */}
             </div>
           )}
+          <p className="text-md font-bold whitespace-nowrap hidden md:block px-2 py-1 md:px-2.5 md:py-1.5 bg-sky-600  rounded-full text-white">
+            {displayedWordsCount} words
+          </p>
         </div>
       </div>
       {/* =============radio buttons ========== */}
