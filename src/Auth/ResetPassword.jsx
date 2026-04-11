@@ -104,8 +104,9 @@
 
 // export default ResetPassword;
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { IoEye, IoEyeOff } from "react-icons/io5";
 import Container from "../utils/Container";
 import api from "../axios";
 import DarkVeil from "../View/Home/DarkVeil";
@@ -117,6 +118,7 @@ const ResetPassword = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false); // Disable form if token used
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -134,6 +136,8 @@ const ResetPassword = () => {
       setIsDisabled(true);
     }
   }, [token]);
+
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -170,7 +174,7 @@ const ResetPassword = () => {
 
       // Redirect after short delay
       setTimeout(() => navigate("/login"), 1000);
-    } catch (err) {
+    } catch {
       setError("Invalid link or failed to reset password. Please try again.");
     } finally {
       setIsLoading(false);
@@ -196,24 +200,46 @@ const ResetPassword = () => {
           )}
 
           <form onSubmit={handleSubmit}>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="Enter new password"
-              className="border border-purple-600 rounded text-lg p-2 text-center w-full mb-4"
-              disabled={isDisabled}
-            />
-            <input
-              type="password"
-              value={repeatPassword}
-              onChange={(e) => setRepeatPassword(e.target.value)}
-              required
-              placeholder="Repeat new password"
-              className="border border-purple-600 rounded text-lg p-2 text-center w-full mb-4"
-              disabled={isDisabled}
-            />
+            <div className="relative mb-4">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="Enter new password"
+                className="border border-purple-600 rounded text-lg p-2 pr-12 text-center w-full"
+                disabled={isDisabled}
+              />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-3 flex items-center justify-center text-gray-300 hover:text-white transition-colors duration-300"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                disabled={isDisabled}
+              >
+                {showPassword ? <IoEyeOff size={22} /> : <IoEye size={22} />}
+              </button>
+            </div>
+            <div className="relative mb-4">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={repeatPassword}
+                onChange={(e) => setRepeatPassword(e.target.value)}
+                required
+                placeholder="Repeat new password"
+                className="border border-purple-600 rounded text-lg p-2 pr-12 text-center w-full"
+                disabled={isDisabled}
+              />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-3 flex items-center justify-center text-gray-300 hover:text-white transition-colors duration-300"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                disabled={isDisabled}
+              >
+                {showPassword ? <IoEyeOff size={22} /> : <IoEye size={22} />}
+              </button>
+            </div>
             <button
               type="submit"
               className={`btn btn-sm btn-warning w-full ${
