@@ -37,14 +37,13 @@ const AIModal = lazy(() => import("../Modals/AIModal"));
 const CACHE_KEY = WORD_LIST_PAGE_CACHE_KEY;
 const CACHE_EXPIRY = 15 * 60 * 1000; // 15 minutes
 const WORDS_PER_PAGE = 40;
+const WORD_LIST_QUERY_VERSION = 3;
 
 const UNKNOWN_TOPIC_ID = 1;
 const RESTRICTED_LEVEL_ID = 6;
 const RECENT_WORD_WINDOW_DAYS = 7;
 const NOT_SPECIFIED_PART_OF_SPEECH = "not_specified";
-const UNKNOWN_PART_OF_SPEECH = "unknown";
 const HIDDEN_PART_OF_SPEECH_IDS = new Set([3]);
-const NOUN_ARTICLE_IDS = new Set([1, 2, 3, 5]);
 const DEFAULT_PART_OF_SPEECH_OPTIONS = [
   { value: "noun", label: "Noun" },
   { value: "verb", label: "Verb" },
@@ -179,6 +178,58 @@ const normalizeCachePayload = (payload, defaults = {}) => {
   };
 };
 
+const hasAdminCompletenessFilter = (queryState) =>
+  queryState?.missingMeaningOnly || queryState?.missingSentencesOnly;
+
+const filterWordsByAdminCompleteness = (words, queryState) => {
+  if (!hasAdminCompletenessFilter(queryState)) {
+    return words;
+  }
+
+  return words.filter((word) => {
+    if (queryState.missingMeaningOnly) {
+      return word.meaning.length === 0;
+    }
+
+    if (queryState.missingSentencesOnly) {
+      return word.sentences.length === 0;
+    }
+
+    return true;
+  });
+};
+
+const buildAdminCompletenessPagePayload = (payload, queryState, page) => {
+  const normalizedPayload = normalizeCachePayload(payload, {
+    currentPage: page,
+    totalPages: 1,
+    totalWords: 0,
+    lastUpdated: Date.now(),
+    isPartial: false,
+  });
+
+  if (!hasAdminCompletenessFilter(queryState)) {
+    return normalizedPayload;
+  }
+
+  const filteredWords = filterWordsByAdminCompleteness(
+    normalizedPayload.words,
+    queryState,
+  );
+  const totalWords = filteredWords.length;
+  const totalPages = Math.max(1, Math.ceil(totalWords / WORDS_PER_PAGE));
+  const safePage = Math.min(Math.max(page, 1), totalPages);
+  const startIndex = (safePage - 1) * WORDS_PER_PAGE;
+
+  return {
+    ...normalizedPayload,
+    words: filteredWords.slice(startIndex, startIndex + WORDS_PER_PAGE),
+    totalWords,
+    totalPages,
+    currentPage: safePage,
+  };
+};
+
 const createEmptyPageCacheStore = () => ({ queries: {} });
 
 const normalizePagedCacheStore = (value) => {
@@ -219,17 +270,26 @@ const isFreshCacheEntry = (entry) =>
   typeof entry?.lastUpdated === "number" &&
   Date.now() - entry.lastUpdated < CACHE_EXPIRY;
 
-const buildWordListQueryKey = (queryState) =>
-  JSON.stringify({
+const buildWordListQueryKey = (queryState) => {
+  const normalizedSearch = normalizeText(queryState.search);
+
+  return JSON.stringify({
+    version: WORD_LIST_QUERY_VERSION,
     ...queryState,
-    search: normalizeText(queryState.search),
+    search: normalizedSearch,
+    searchType: normalizedSearch ? queryState.searchType : "word",
   });
+};
 
 const buildWordListRequestParams = (queryState, page) => {
   const params = new URLSearchParams({
     page: String(page),
     limit: String(WORDS_PER_PAGE),
   });
+
+  if (hasAdminCompletenessFilter(queryState)) {
+    params.set("all", "true");
+  }
 
   if (queryState.level) {
     params.set("level", queryState.level);
@@ -252,8 +312,27 @@ const buildWordListRequestParams = (queryState, page) => {
     params.set("searchType", queryState.searchType);
   }
 
+  if (queryState.missingMeaningOnly) {
+    params.set("missingMeaningOnly", "true");
+  }
+
+  if (queryState.missingSentencesOnly) {
+    params.set("missingSentencesOnly", "true");
+  }
+
   return params.toString();
 };
+
+const buildWordListEndpoint = (queryState) =>
+  queryState.missingMeaningOnly || queryState.missingSentencesOnly
+    ? "/word/admin/all"
+    : "/word/all";
+
+const ADMIN_COMPLETENESS_FILTER_OPTIONS = [
+  { value: "", label: "All words" },
+  { value: "missingMeaning", label: "Missing meaning" },
+  { value: "missingSentences", label: "Missing sentences" },
+];
 
 const normalizePartOfSpeechName = (value) => normalizeText(value);
 
@@ -288,24 +367,6 @@ const normalizePartOfSpeechOptions = (value) => {
       };
     })
     .filter(Boolean);
-};
-
-const getEffectivePartOfSpeechName = (word) => {
-  const explicitPartOfSpeech = normalizePartOfSpeechName(
-    word?.partOfSpeech?.name,
-  );
-
-  if (explicitPartOfSpeech && explicitPartOfSpeech !== UNKNOWN_PART_OF_SPEECH) {
-    return explicitPartOfSpeech;
-  }
-
-  const articleId = Number(word?.article?.id);
-
-  if (NOUN_ARTICLE_IDS.has(articleId)) {
-    return "noun";
-  }
-
-  return explicitPartOfSpeech;
 };
 
 const showWordListRecoveryToast = ({ icon, title }) => {
@@ -354,6 +415,7 @@ const WordList = () => {
   const [selectedWord, setSelectedWord] = useState(null);
   const [showInfo, setShowInfo] = useState(false);
   const [showRecentOnly, setShowRecentOnly] = useState(false);
+  const [adminCompletenessFilter, setAdminCompletenessFilter] = useState("");
   const [isRefreshingPage, setIsRefreshingPage] = useState(false);
   const [pageCacheReady, setPageCacheReady] = useState(false);
 
@@ -466,6 +528,10 @@ const WordList = () => {
       topic: selectedTopic,
       partOfSpeech: selectedPartOfSpeech,
       recentOnly: showRecentOnly,
+      missingMeaningOnly:
+        isAdmin && adminCompletenessFilter === "missingMeaning",
+      missingSentencesOnly:
+        isAdmin && adminCompletenessFilter === "missingSentences",
     }),
     [
       debouncedSearchValue,
@@ -474,6 +540,8 @@ const WordList = () => {
       selectedTopic,
       selectedPartOfSpeech,
       showRecentOnly,
+      isAdmin,
+      adminCompletenessFilter,
     ],
   );
 
@@ -595,14 +663,22 @@ const WordList = () => {
 
         if (!pageRequest) {
           pageRequest = api
-            .get(`/word/all?${buildWordListRequestParams(queryState, page)}`)
-            .then((response) =>
-              cachePageResult(queryKey, page, response.data?.data, {
+            .get(
+              `${buildWordListEndpoint(queryState)}?${buildWordListRequestParams(queryState, page)}`,
+            )
+            .then((response) => {
+              const pagePayload = buildAdminCompletenessPagePayload(
+                response.data?.data,
+                queryState,
+                page,
+              );
+
+              return cachePageResult(queryKey, page, pagePayload, {
                 lastUpdated: Date.now(),
                 totalPages: 1,
                 totalWords: 0,
-              }),
-            )
+              });
+            })
             .finally(() => {
               inFlightRequestsRef.current.delete(requestKey);
             });
@@ -646,6 +722,10 @@ const WordList = () => {
 
   const prefetchAdjacentPages = useCallback(
     (queryState, queryKey, page, totalPagesCount) => {
+      if (hasAdminCompletenessFilter(queryState)) {
+        return;
+      }
+
       const candidatePages = [page - 1, page + 1].filter(
         (candidatePage) =>
           candidatePage >= 1 && candidatePage <= totalPagesCount,
@@ -1295,18 +1375,27 @@ const WordList = () => {
     setSelectedTopic("");
     setSelectedPartOfSpeech("");
     setShowRecentOnly(false);
+    setAdminCompletenessFilter("");
     setCurrentPage(1);
     setFilteredTopics(topics); // Reset filtered topics back to the full list
   }, [topics]);
 
   const handleToggleRecentWords = useCallback(() => {
-    if (showRecentOnly) {
-      return;
-    }
-
-    setShowRecentOnly(true);
+    setShowRecentOnly((prev) => !prev);
     setCurrentPage(1);
-  }, [showRecentOnly]);
+  }, []);
+
+  const handleAdminCompletenessFilterChange = useCallback(
+    (event) => {
+      if (!isAdmin) {
+        return;
+      }
+
+      setAdminCompletenessFilter(event.target.value);
+      setCurrentPage(1);
+    },
+    [isAdmin],
+  );
 
   // to show info
   useEffect(() => {
@@ -1317,13 +1406,15 @@ const WordList = () => {
     return () => window.removeEventListener("click", handleClickOutside);
   }, [showInfo]);
 
-  const hasActiveFilters = Boolean(
+  const hasResettableFilters = Boolean(
     searchValue ||
     selectedLevel ||
     selectedTopic ||
     selectedPartOfSpeech ||
-    showRecentOnly,
+    adminCompletenessFilter,
   );
+
+  const hasActiveFilters = hasResettableFilters || showRecentOnly;
 
   const displayedWordsCount =
     typeof cache.totalWords === "number" && Number.isFinite(cache.totalWords)
@@ -1331,6 +1422,7 @@ const WordList = () => {
       : paginatedWords.length;
 
   const wordCountLabel = hasActiveFilters ? "Filtered" : "Total";
+  const showAdminControls = userLoggedIn && isAdmin;
 
   return (
     <Container>
@@ -1371,60 +1463,90 @@ const WordList = () => {
       </div>
 
       {/* =============radio buttons ========== */}
-      <div className="flex justify-between  dark:text-white mb-4 dark:bg-gradient-to-r from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-2 px-4 mx-0 md:mx-2 lg:mx-2">
-        <div className="flex gap-4 items-center">
-          <label className="flex items-center gap-2 cursor-pointer hover:text-blue-400 transition-colors">
-            <input
-              type="radio"
-              name="searchType"
-              value="word"
-              checked={searchType === "word"}
-              onChange={handleSearchTypeChange}
-              className="w-4 h-4 accent-blue-500"
-            />
-            <span className="font-medium">By Word</span>
-          </label>
+      <div className="dark:text-white mb-4 dark:bg-gradient-to-r from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-2 md:px-4 mx-0 md:mx-2 lg:mx-2 overflow-hidden">
+        <div className="flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-2 min-w-0 overflow-hidden md:flex-1">
+            <div className="flex items-center gap-1.5 flex-nowrap min-w-0 ">
+              <label className="flex items-center gap-1.5 cursor-pointer hover:text-blue-400 transition-colors min-h-[30px] px-2 py-1 md:px-2.5 md:py-1.5 rounded-full bg-white/5 text-[11px] sm:text-sm flex-shrink-0">
+                <input
+                  type="radio"
+                  name="searchType"
+                  value="word"
+                  checked={searchType === "word"}
+                  onChange={handleSearchTypeChange}
+                  className="w-4 h-4 accent-blue-500"
+                />
+                <span className="font-medium hidden sm:inline">By Word</span>
+                <span className="font-medium sm:hidden">By Word</span>
+              </label>
 
-          <label className="flex items-center gap-2 cursor-pointer hover:text-purple-400 transition-colors">
-            <input
-              type="radio"
-              name="searchType"
-              value="meaning"
-              checked={searchType === "meaning"}
-              onChange={handleSearchTypeChange}
-              className="w-4 h-4 accent-purple-500"
-            />
-            <span className="font-medium">By Meaning</span>
-          </label>
-        </div>
-        {/* ===============showing words by page ==================  */}
-        <div className="flex items-center gap-4">
-          {/* {isRefreshingPage && paginatedWords.length > 0 && (
+              <label className="flex items-center gap-1 cursor-pointer hover:text-purple-400 transition-colors min-h-[36px] px-1 sm:px-4 py-1 sm:py-2 rounded-full bg-white/5 text-[11px] sm:text-sm flex-shrink-0">
+                <input
+                  type="radio"
+                  name="searchType"
+                  value="meaning"
+                  checked={searchType === "meaning"}
+                  onChange={handleSearchTypeChange}
+                  className="w-4 h-4 accent-purple-500"
+                />
+                <span className="font-medium hidden sm:inline">By Meaning</span>
+                <span className="font-medium sm:hidden">By Meaning</span>
+              </label>
+            </div>
+            <div className="ml-auto flex items-center gap-1.5 flex-nowrap flex-shrink-0 md:ml-3">
+              {/* {isRefreshingPage && paginatedWords.length > 0 && (
             <span className="text-xs font-semibold px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 whitespace-nowrap">
               Loading page...
             </span>
           )} */}
-          {!hasActiveFilters && (
-            <button
-              onClick={handleToggleRecentWords}
-              className="bg-gradient-to-r from-slate-700 to-slate-800 text-white hover:from-slate-600 hover:to-slate-700 px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 hover:scale-105 shadow-lg"
-            >
-              Recently added
-            </button>
-          )}
-          {hasActiveFilters && (
-            <button
-              onClick={handleResetFilters}
-              className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 px-4 py-2 rounded-full font-semibold text-sm transition-all duration-300 hover:scale-105 shadow-lg"
-            >
-              Reset Filters
-            </button>
-          )}
-          {/* ===============showing words by page ==================  */}
-          {userLoggedIn && isAdmin && (
-            <p className="text-md font-bold whitespace-nowrap hidden md:block px-4 py-1 bg-cyan-600 dark:bg-gradient-to-r from-blue-500/20 to-purple-500/20 border dark:border-blue-500/50 rounded-full text-white">
-              {displayedWordsCount} words
-            </p>
+              <button
+                onClick={handleToggleRecentWords}
+                className={`min-h-[30px] mr-2 w-auto flex-shrink-0 px-1 sm:px-4 py-1 sm:py-2 rounded-full font-semibold text-[11px] sm:text-sm transition-all duration-300 hover:scale-105 shadow-lg ${
+                  showRecentOnly
+                    ? "bg-gradient-to-r from-red-500 to-orange-500 text-white hover:from-red-600 hover:to-orange-600 px-2"
+                    : "bg-gradient-to-r from-slate-700 to-slate-800 text-white hover:from-slate-600 hover:to-slate-700 px-2"
+                }`}
+              >
+                <span className="hidden sm:inline">
+                  {showRecentOnly ? "Recently added X" : "Recently added"}
+                </span>
+                <span className="sm:hidden ">
+                  {showRecentOnly ? "Recently added X" : "Recently added"}
+                </span>
+              </button>
+              {hasResettableFilters && (
+                <button
+                  onClick={handleResetFilters}
+                  className="min-h-[30px] mr-2 w-auto flex-shrink-0 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 px-1 sm:px-4 py-1 sm:py-2 rounded-full font-semibold text-[11px] sm:text-sm transition-all duration-300 hover:scale-105 shadow-lg px-2"
+                >
+                  <span className="hidden sm:inline">Reset Filters</span>
+                  <span className="sm:hidden">Reset Filters</span>
+                </button>
+              )}
+            </div>
+          </div>
+          {showAdminControls && (
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-white/10 md:pt-0 md:border-t-0 md:flex-nowrap md:justify-end md:gap-3 md:flex-shrink-0">
+              <select
+                value={adminCompletenessFilter}
+                onChange={handleAdminCompletenessFilterChange}
+                className="min-h-[30px] w-full sm:w-auto md:w-auto px-1 sm:px-4 py-2 sm:py-1.5 rounded-full font-semibold text-sm shadow-lg border border-stone-500 bg-stone-800 text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50"
+                aria-label="Admin word completeness filter"
+              >
+                {ADMIN_COMPLETENESS_FILTER_OPTIONS.map((option) => (
+                  <option
+                    key={option.value || "all"}
+                    value={option.value}
+                    className="bg-stone-800 text-white"
+                  >
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <p className="text-md font-bold whitespace-nowrap hidden md:block px-4 py-1 bg-cyan-600 dark:bg-gradient-to-r from-blue-500/20 to-purple-500/20 border dark:border-blue-500/50 rounded-full text-white">
+                {displayedWordsCount} words
+              </p>
+            </div>
           )}
         </div>
       </div>
