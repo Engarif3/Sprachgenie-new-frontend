@@ -1427,11 +1427,11 @@ const WordList = () => {
   return (
     <Container>
       {/* Modern Header Section */}
-      <div className="text-center mb-8 mt-8 ">
-        <div className="flex justify-between items-center mb-6 ml-2">
+      <div className="text-center my-2 md:my-8 lg:my-8 ">
+        <div className="flex justify-between items-center mb-2 md:mb-6 lg:mb-6 ml-2">
           <Link
             to="/quiz"
-            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-2 md:px-6 lg:px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/50"
+            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-1.5 md:px-6 lg:px-6 py-1.5 md:py-2 lg:py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/50"
           >
             🎮 Play Quiz
           </Link>
@@ -1446,12 +1446,12 @@ const WordList = () => {
             </span>
           )} */}
         </div>
-        <div className="mb-4">
-          <span className="hidden md:inline-block lg:inline-block px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
+        <div className="mb-4 hidden md:inline-block lg:inline-block">
+          <span className=" px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
             📚 Learn Vocabulary
           </span>
         </div>
-        <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-4">
+        <h2 className="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-1 md:pb-4 lg:pb-4">
           Vocabulary Library
         </h2>
         <p className="text-xl text-gray-950 dark:text-gray-300 max-w-2xl mx-auto hidden md:inline-block lg:inline-block">
@@ -1464,7 +1464,7 @@ const WordList = () => {
 
       {/* =============radio buttons ========== */}
       <div className="dark:text-white mb-4 dark:bg-gradient-to-r from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-2 md:px-4 mx-0 md:mx-2 lg:mx-2 overflow-hidden">
-        <div className="flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col  gap-2.5 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2 min-w-0 overflow-hidden md:flex-1">
             <div className="flex items-center gap-1.5 flex-nowrap min-w-0 ">
               <label className="flex items-center gap-1.5 cursor-pointer hover:text-blue-400 transition-colors min-h-[30px] px-2 py-1 md:px-2.5 md:py-1.5 rounded-full bg-white/5 text-[11px] sm:text-sm flex-shrink-0">
@@ -1480,7 +1480,7 @@ const WordList = () => {
                 <span className="font-medium sm:hidden">By Word</span>
               </label>
 
-              <label className="flex items-center gap-1 cursor-pointer hover:text-purple-400 transition-colors min-h-[30px] px-2 py-1 md:px-2.5 md:py-1.5 rounded-full bg-white/5 text-[11px] sm:text-sm flex-shrink-0">
+              <label className="flex items-center  gap-1 cursor-pointer hover:text-purple-400 transition-colors min-h-[30px] px-2 py-1 md:px-2.5 md:py-1.5 rounded-full bg-white/5 text-[11px] sm:text-sm flex-shrink-0">
                 <input
                   type="radio"
                   name="searchType"
@@ -1493,7 +1493,7 @@ const WordList = () => {
                 <span className="font-medium sm:hidden">By Meaning</span>
               </label>
             </div>
-            <div className="ml-auto flex items-center gap-1.5 flex-nowrap flex-shrink-0 md:ml-3">
+            <div className="ml-auto flex items-center gap-1.5  flex-nowrap flex-shrink-0 md:ml-3">
               {/* {isRefreshingPage && paginatedWords.length > 0 && (
             <span className="text-xs font-semibold px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 whitespace-nowrap">
               Loading page...
@@ -1551,7 +1551,7 @@ const WordList = () => {
         </div>
       </div>
       {/* =============radio buttons ========== */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4 mb-6 mx-0 md:mx-2 lg:mx-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-2 md:gap-4 lg:gap-4 mb-6 mx-0 md:mx-2 lg:mx-2">
         <div className="w-full space-y-2">
           {/* Search input */}
           <div className="relative">
