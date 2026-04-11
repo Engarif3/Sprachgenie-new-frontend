@@ -1435,11 +1435,16 @@ const WordList = () => {
           >
             🎮 Play Quiz
           </Link>
-          {userLoggedIn && isAdmin && (
+
+          <span className="text-sm block md:hidden lg:hidden text-pink-400 font-bold mr-2">
+            {wordCountLabel}: {displayedWordsCount} words
+          </span>
+
+          {/* {userLoggedIn && isAdmin && (
             <span className="text-sm block md:hidden lg:hidden text-pink-400 font-bold mr-2">
               {wordCountLabel}: {displayedWordsCount} words
             </span>
-          )}
+          )} */}
           {/* {!isAdmin && (
             <span className="text-sm text-pink-400 font-bold mr-2">
               {wordCountLabel}: {displayedWordsCount} words
