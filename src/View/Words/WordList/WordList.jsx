@@ -1480,7 +1480,7 @@ const WordList = () => {
                 <span className="font-medium sm:hidden">By Word</span>
               </label>
 
-              <label className="flex items-center gap-1 cursor-pointer hover:text-purple-400 transition-colors min-h-[36px] px-1 sm:px-4 py-1 sm:py-2 rounded-full bg-white/5 text-[11px] sm:text-sm flex-shrink-0">
+              <label className="flex items-center gap-1 cursor-pointer hover:text-purple-400 transition-colors min-h-[30px] px-2 py-1 md:px-2.5 md:py-1.5 rounded-full bg-white/5 text-[11px] sm:text-sm flex-shrink-0">
                 <input
                   type="radio"
                   name="searchType"
@@ -1501,7 +1501,7 @@ const WordList = () => {
           )} */}
               <button
                 onClick={handleToggleRecentWords}
-                className={`min-h-[30px] mr-2 w-auto flex-shrink-0 px-1 sm:px-4 py-1 sm:py-2 rounded-full font-semibold text-[11px] sm:text-sm transition-all duration-300 hover:scale-105 shadow-lg ${
+                className={`min-h-[30px] mr-2 w-auto flex-shrink-0 px-2 py-1 md:px-2.5 md:py-1.5 rounded-full font-semibold text-[11px] sm:text-sm transition-all duration-300 hover:scale-105 shadow-lg ${
                   showRecentOnly
                     ? "bg-gradient-to-r from-red-500 to-orange-500 text-white hover:from-red-600 hover:to-orange-600 px-2"
                     : "bg-gradient-to-r from-slate-700 to-slate-800 text-white hover:from-slate-600 hover:to-slate-700 px-2"
@@ -1517,7 +1517,7 @@ const WordList = () => {
               {hasResettableFilters && (
                 <button
                   onClick={handleResetFilters}
-                  className="min-h-[30px] mr-2 w-auto flex-shrink-0 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 px-1 sm:px-4 py-1 sm:py-2 rounded-full font-semibold text-[11px] sm:text-sm transition-all duration-300 hover:scale-105 shadow-lg px-2"
+                  className="min-h-[30px] mr-2 w-auto flex-shrink-0 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 px-2 py-1 md:px-2.5 md:py-1.5 rounded-full font-semibold text-[11px] sm:text-sm transition-all duration-300 hover:scale-105 shadow-lg "
                 >
                   <span className="hidden sm:inline">Reset Filters</span>
                   <span className="sm:hidden">Reset Filters</span>
@@ -1530,7 +1530,7 @@ const WordList = () => {
               <select
                 value={adminCompletenessFilter}
                 onChange={handleAdminCompletenessFilterChange}
-                className="min-h-[30px] w-full sm:w-auto md:w-auto px-1 sm:px-4 py-2 sm:py-1.5 rounded-full font-semibold text-sm shadow-lg border border-stone-500 bg-stone-800 text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50"
+                className="min-h-[30px] w-full sm:w-auto md:w-auto px-2 py-2 md:px-2.5 md:py-1.5 rounded-full font-semibold text-sm shadow-lg border border-stone-500 bg-stone-800 text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50"
                 aria-label="Admin word completeness filter"
               >
                 {ADMIN_COMPLETENESS_FILTER_OPTIONS.map((option) => (
@@ -1543,7 +1543,7 @@ const WordList = () => {
                   </option>
                 ))}
               </select>
-              <p className="text-md font-bold whitespace-nowrap hidden md:block px-4 py-1 bg-cyan-600 dark:bg-gradient-to-r from-blue-500/20 to-purple-500/20 border dark:border-blue-500/50 rounded-full text-white">
+              <p className="text-md font-bold whitespace-nowrap hidden md:block px-2 py-1 md:px-2.5 md:py-1.5 bg-sky-600  rounded-full text-white">
                 {displayedWordsCount} words
               </p>
             </div>
