@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import axios from "../axios";
 import Container from "../utils/Container";
 import { useAuth } from "../services/auth.services";
@@ -82,6 +83,29 @@ const UpdateTopicForm = () => {
       return;
     }
 
+    const confirmation = await Swal.fire({
+      title: "Update topic?",
+      text: "Type ok to confirm this topic update.",
+      input: "text",
+      inputPlaceholder: "Type ok",
+      inputAutoTrim: true,
+      inputValidator: (value) =>
+        value?.trim().toLowerCase() === "ok"
+          ? null
+          : 'Please type "ok" to continue.',
+      showCancelButton: true,
+      confirmButtonText: "Update",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#4f46e5",
+      cancelButtonColor: "#475569",
+      background: "#1c1917",
+      color: "#f5f5f4",
+    });
+
+    if (!confirmation.isConfirmed) {
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -154,7 +178,7 @@ const UpdateTopicForm = () => {
           </div>
 
           <div>
-            <label htmlFor="name" className="block font-medium">
+            <label htmlFor="name" className="block font-medium ">
               Topic Name
             </label>
             <input
@@ -165,7 +189,7 @@ const UpdateTopicForm = () => {
               onChange={handleChange}
               required
               disabled={!selectedTopicId}
-              className="mt-1 block w-full input-md rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+              className="mt-1 block w-full input-md rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 text-black"
             />
           </div>
 
