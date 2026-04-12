@@ -442,6 +442,26 @@ const WordList = () => {
   const prefetchingPagesRef = useRef(new Set());
   const inFlightRequestsRef = useRef(new Map());
 
+  const handleAiWordUpdated = useCallback((updatedWord, updatedParagraph) => {
+    setCache((prev) => ({
+      ...prev,
+      words: Array.isArray(prev.words)
+        ? prev.words.map((word) =>
+            word.id === updatedWord.id
+              ? {
+                  ...word,
+                  meaning: updatedWord.meaning,
+                }
+              : word,
+          )
+        : prev.words,
+    }));
+    setAiWord(updatedWord);
+    if (typeof updatedParagraph === "string") {
+      setSelectedParagraph(updatedParagraph);
+    }
+  }, []);
+
   // useEffect for fetching favorites (Logic remains the same, good to leave)
   useEffect(() => {
     const fetchPartOfSpeechOptions = async () => {
@@ -1319,7 +1339,8 @@ const WordList = () => {
       );
 
       const aiMeanings = response.data.meanings || [];
-      const sentences = response.data.otherSentences || [];
+      const sentences =
+        response.data.otherSentences || response.data.sentences || [];
       const paragraph = response.data.paragraph;
       const wordId = response.data.wordId || word.id; // depends on AI API response
 
@@ -1841,6 +1862,7 @@ const WordList = () => {
             isOpen={isAIModalOpen}
             aiWord={aiWord}
             selectedParagraph={selectedParagraph}
+            onWordUpdated={handleAiWordUpdated}
             onClose={() => setIsAIModalOpen(false)}
           />
         </Suspense>

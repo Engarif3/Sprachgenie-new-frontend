@@ -8,4 +8,16 @@ const aiApi = axios.create({
   withCredentials: true, // ✅ CRITICAL: Send httpOnly cookies automatically
 });
 
+aiApi.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token && token !== "null") {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
+
 export default aiApi;

@@ -39,6 +39,25 @@ const FavoritesList = () => {
 
   // =================ai===========================
 
+  const handleAiWordUpdated = useCallback((updatedWord, updatedParagraph) => {
+    setFavoriteWords((prev) => {
+      const nextWords = prev.map((word) =>
+        word.id === updatedWord.id
+          ? {
+              ...word,
+              meaning: updatedWord.meaning,
+            }
+          : word,
+      );
+      setToLocalStorage("favorites", nextWords);
+      return nextWords;
+    });
+    setAiWord(updatedWord);
+    if (typeof updatedParagraph === "string") {
+      setSelectedParagraph(updatedParagraph);
+    }
+  }, []);
+
   // Initialize favorites from localStorage on mount
   useEffect(() => {
     const cachedFavorites = getFromLocalStorage("favorites");
@@ -395,7 +414,8 @@ const FavoritesList = () => {
           .filter(Boolean);
 
       const aiMeanings = response.data.meanings || [];
-      const otherSentences = response.data.otherSentences || [];
+      const otherSentences =
+        response.data.otherSentences || response.data.sentences || [];
       const paragraph = response.data.paragraph;
       const wordId = response.data.wordId || word.id; // depends on AI API response
 
@@ -561,6 +581,7 @@ const FavoritesList = () => {
         isOpen={isAIModalOpen}
         aiWord={aiWord}
         selectedParagraph={selectedParagraph}
+        onWordUpdated={handleAiWordUpdated}
         onClose={() => setIsAIModalOpen(false)}
       />
 

@@ -37,6 +37,23 @@ const FavoritesListDashboard = () => {
 
   // =================ai===========================
 
+  const handleAiWordUpdated = useCallback((updatedWord, updatedParagraph) => {
+    setFavoriteWords((prev) =>
+      prev.map((word) =>
+        word.id === updatedWord.id
+          ? {
+              ...word,
+              meaning: updatedWord.meaning,
+            }
+          : word,
+      ),
+    );
+    setAiWord(updatedWord);
+    if (typeof updatedParagraph === "string") {
+      setSelectedParagraph(updatedParagraph);
+    }
+  }, []);
+
   useEffect(() => {
     setFavorites(favoriteWords.map((w) => w.id));
   }, [currentPage, favoriteWords]);
@@ -374,7 +391,8 @@ const FavoritesListDashboard = () => {
           .filter(Boolean);
 
       const aiMeanings = response.data.meanings || [];
-      const otherSentences = response.data.otherSentences || [];
+      const otherSentences =
+        response.data.otherSentences || response.data.sentences || [];
       const paragraph = response.data.paragraph;
       const wordId = response.data.wordId || word.id; // depends on AI API response
 
@@ -536,6 +554,7 @@ const FavoritesListDashboard = () => {
         isOpen={isAIModalOpen}
         aiWord={aiWord}
         selectedParagraph={selectedParagraph}
+        onWordUpdated={handleAiWordUpdated}
         onClose={() => setIsAIModalOpen(false)}
       />
 

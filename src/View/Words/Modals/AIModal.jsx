@@ -3,30 +3,118 @@ import Swal from "sweetalert2";
 
 import { useLockBodyScroll } from "./ModalScrolling";
 import aiApi from "../../../AI_axios";
+import api from "../../../axios";
 import { useAuth } from "../../../services/auth.services";
+import { invalidateWordsCache } from "../../../utils/storage";
 
-const AIModal = ({ isOpen, aiWord, selectedParagraph, onClose }) => {
+const splitItems = (value, separators) =>
+  String(value || "")
+    .split(separators)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+const splitMeaningItems = (value) => splitItems(value, /[\n,;]+/);
+const splitSentenceItems = (value) => splitItems(value, /\n+/);
+
+const getWordLevelValue = (word) => {
+  if (typeof word?.level === "string") {
+    return word.level;
+  }
+
+  if (typeof word?.level?.level === "string") {
+    return word.level.level;
+  }
+
+  return "A1";
+};
+
+const AIModal = ({
+  isOpen,
+  aiWord,
+  selectedParagraph,
+  onClose,
+  onWordUpdated,
+}) => {
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [reportMessage, setReportMessage] = useState("");
   const [reportLoading, setReportLoading] = useState(false);
-  const { userId } = useAuth();
+  const [currentAiWord, setCurrentAiWord] = useState(aiWord);
+  const [currentParagraph, setCurrentParagraph] = useState(selectedParagraph);
+  const [correctionPrompt, setCorrectionPrompt] = useState("");
+  const [manualMeanings, setManualMeanings] = useState("");
+  const [manualParagraph, setManualParagraph] = useState("");
+  const [manualOtherSentences, setManualOtherSentences] = useState("");
+  const [promptLoading, setPromptLoading] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
+  const { userId, isSuperAdmin } = useAuth();
 
   useLockBodyScroll(isOpen);
 
   useEffect(() => {
+    setCurrentAiWord(aiWord);
+    setCurrentParagraph(selectedParagraph || "");
     setReportMessage("");
     setIsReportOpen(false);
-  }, [aiWord?.id]);
 
-  if (!isOpen || !aiWord) return null;
+    const nextMeanings =
+      Array.isArray(aiWord?.aiMeanings) && aiWord.aiMeanings.length
+        ? aiWord.aiMeanings
+        : Array.isArray(aiWord?.meaning)
+          ? aiWord.meaning
+          : [];
+    const nextOtherSentences = Array.isArray(aiWord?.sentences)
+      ? aiWord.sentences
+      : [];
+
+    setCorrectionPrompt("");
+    setManualMeanings(nextMeanings.join("\n"));
+    setManualParagraph(selectedParagraph || "");
+    setManualOtherSentences(nextOtherSentences.join("\n"));
+  }, [aiWord, selectedParagraph]);
+
+  if (!isOpen || !currentAiWord) return null;
+
+  const applyUpdatedContent = ({
+    meanings,
+    paragraph,
+    otherSentences,
+    canonicalMeanings,
+  }) => {
+    const nextMeanings = Array.isArray(meanings) ? meanings : [];
+    const nextCanonicalMeanings = Array.isArray(canonicalMeanings)
+      ? canonicalMeanings
+      : Array.isArray(currentAiWord?.meaning)
+        ? currentAiWord.meaning
+        : [];
+    const nextOtherSentences = Array.isArray(otherSentences)
+      ? otherSentences
+      : [];
+    const nextParagraph = paragraph || "";
+
+    const nextWord = {
+      ...currentAiWord,
+      meaning: nextCanonicalMeanings,
+      aiMeanings: nextMeanings,
+      sentences: nextOtherSentences,
+    };
+
+    setCurrentAiWord(nextWord);
+    setCurrentParagraph(nextParagraph);
+    setManualMeanings(nextMeanings.join("\n"));
+    setManualParagraph(nextParagraph);
+    setManualOtherSentences(nextOtherSentences.join("\n"));
+    onWordUpdated?.(nextWord, nextParagraph);
+  };
 
   const handleReportSubmit = async () => {
-    if (!aiWord?.id) return Swal.fire("Error", "Missing word ID", "error");
+    if (!currentAiWord?.id) {
+      return Swal.fire("Error", "Missing word ID", "error");
+    }
 
     try {
       setReportLoading(true);
       const response = await aiApi.post("/paragraphs/report", {
-        wordId: aiWord.id,
+        wordId: currentAiWord.id,
         userId,
         message: reportMessage?.trim() || null,
       });
@@ -48,6 +136,132 @@ const AIModal = ({ isOpen, aiWord, selectedParagraph, onClose }) => {
     }
   };
 
+  const handlePromptCorrection = async () => {
+    if (!isSuperAdmin) {
+      return;
+    }
+
+    if (!currentAiWord?.id) {
+      return Swal.fire("Error", "Missing word ID", "error");
+    }
+
+    if (!correctionPrompt.trim()) {
+      return Swal.fire(
+        "Prompt Required",
+        "Please enter a correction prompt.",
+        "warning",
+      );
+    }
+
+    try {
+      setPromptLoading(true);
+      const response = await aiApi.post("/paragraphs/regenerate-with-prompt", {
+        wordId: currentAiWord.id,
+        word: currentAiWord.value,
+        level: getWordLevelValue(currentAiWord),
+        language: "de",
+        prompt: correctionPrompt.trim(),
+      });
+
+      applyUpdatedContent({
+        meanings: response.data.meanings,
+        paragraph: response.data.paragraph,
+        otherSentences: response.data.otherSentences || response.data.sentences,
+      });
+      setCorrectionPrompt("");
+
+      await Swal.fire({
+        title: "Regenerated",
+        text: "AI paragraph regenerated with your correction prompt.",
+        icon: "success",
+        timer: 1200,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      const message =
+        error.response?.data?.error ||
+        error.response?.data?.details ||
+        error.message;
+      Swal.fire("Error", message, "error");
+    } finally {
+      setPromptLoading(false);
+    }
+  };
+
+  const handleSaveManualCorrections = async () => {
+    if (!isSuperAdmin) {
+      return;
+    }
+
+    if (!currentAiWord?.id) {
+      return Swal.fire("Error", "Missing word ID", "error");
+    }
+
+    const meanings = splitMeaningItems(manualMeanings);
+    const otherSentences = splitSentenceItems(manualOtherSentences);
+    const paragraph = manualParagraph.trim();
+
+    if (meanings.length === 0) {
+      return Swal.fire(
+        "Meanings Required",
+        "Please enter at least one meaning.",
+        "warning",
+      );
+    }
+
+    if (!paragraph) {
+      return Swal.fire(
+        "Paragraph Required",
+        "Please enter the corrected paragraph.",
+        "warning",
+      );
+    }
+
+    try {
+      setSaveLoading(true);
+
+      await api.put(`/word/update-meaning/${currentAiWord.id}`, {
+        meaning: meanings,
+      });
+
+      const response = await aiApi.put("/paragraphs/override", {
+        wordId: currentAiWord.id,
+        word: currentAiWord.value,
+        level: getWordLevelValue(currentAiWord),
+        language: "de",
+        meanings,
+        paragraph,
+        otherSentences,
+      });
+
+      await invalidateWordsCache();
+
+      applyUpdatedContent({
+        meanings: response.data.meanings,
+        paragraph: response.data.paragraph,
+        otherSentences: response.data.otherSentences || response.data.sentences,
+        canonicalMeanings: meanings,
+      });
+
+      await Swal.fire({
+        title: "Saved",
+        text: "Meaning and paragraph corrections have been saved.",
+        icon: "success",
+        timer: 1200,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.response?.data?.details ||
+        error.message;
+      Swal.fire("Error", message, "error");
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
   return (
     <>
       {/* AI Modal */}
@@ -55,33 +269,31 @@ const AIModal = ({ isOpen, aiWord, selectedParagraph, onClose }) => {
         <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl shadow-2xl p-1 md:p-8 lg:p-8 w-full md:w-2/3 lg:w-1/2 max-h-[90vh] overflow-y-auto mx-1 border-2 border-gray-700/50">
           <h2 className="text-3xl md:text-5xl lg:text-5xl font-bold text-center mb-4">
             <span className="text-sky-400 font-bold">
-              {typeof aiWord?.article === "string"
-                ? aiWord.article
-                : aiWord?.article?.name || ""}
+              {typeof currentAiWord?.article === "string"
+                ? currentAiWord.article
+                : currentAiWord?.article?.name || ""}
             </span>{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 capitalize">
-              {aiWord?.value}
+              {currentAiWord?.value}
             </span>
           </h2>
           <div className="flex justify-center mb-6 ">
             <p className="text-center text-cyan-300 text-md px-4 py-2 bg-cyan-500/10 rounded-2xl border border-cyan-500/30">
-              {/* <span className="text-pink-400 font-bold text-md">[</span> */}
-              {Array.isArray(aiWord?.meaning)
-                ? aiWord.meaning.join(", ")
-                : aiWord?.meaning || ""}
-              {/* <span className="text-pink-600 font-bold text-2xl">]</span> */}
+              {Array.isArray(currentAiWord?.meaning)
+                ? currentAiWord.meaning.join(", ")
+                : currentAiWord?.meaning || ""}
             </p>
           </div>
 
           <div className="space-y-4 ">
-            {aiWord?.aiMeanings?.length > 0 && (
+            {currentAiWord?.aiMeanings?.length > 0 && (
               <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 p-2 md:p-4 lg:p-4 rounded-2xl border-2 border-green-400/50">
                 <p className="text-base md:text-lg">
                   <strong className="text-green-400 font-semibold">
                     🤖 AI Meanings:
                   </strong>{" "}
                   <span className="text-white font-medium">
-                    {aiWord.aiMeanings.join(", ")}
+                    {currentAiWord.aiMeanings.join(", ")}
                   </span>
                 </p>
               </div>
@@ -89,9 +301,99 @@ const AIModal = ({ isOpen, aiWord, selectedParagraph, onClose }) => {
 
             <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 p-2 md:p-6 lg:p-6 rounded-2xl border-2 border-blue-400/50">
               <p className="text-white text-xl leading-relaxed whitespace-pre-line ">
-                {selectedParagraph}
+                {currentParagraph}
               </p>
             </div>
+
+            {isSuperAdmin && (
+              <div className="space-y-4 rounded-2xl border-2 border-amber-400/40 bg-gradient-to-br from-amber-500/10 to-orange-500/10 p-4 md:p-6">
+                <div>
+                  <h3 className="text-xl font-semibold text-amber-300">
+                    Super Admin Correction
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-300">
+                    Use a correction prompt to regenerate, then manually save
+                    the final meaning and paragraph.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-amber-200">
+                    Correction Prompt
+                  </label>
+                  <textarea
+                    value={correctionPrompt}
+                    onChange={(e) => setCorrectionPrompt(e.target.value)}
+                    rows={4}
+                    className="w-full rounded-xl border border-amber-300/30 bg-slate-950/60 p-3 text-sm text-white outline-none transition focus:border-amber-300/60"
+                    placeholder="Explain exactly what the AI got wrong and what it should produce instead."
+                  />
+                  <div className="mt-3 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handlePromptCorrection}
+                      disabled={promptLoading}
+                      className="rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-2.5 font-semibold text-slate-950 transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+                    >
+                      {promptLoading
+                        ? "Regenerating..."
+                        : "Regenerate With Prompt"}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-amber-200">
+                      Meanings
+                    </label>
+                    <textarea
+                      value={manualMeanings}
+                      onChange={(e) => setManualMeanings(e.target.value)}
+                      rows={6}
+                      className="w-full rounded-xl border border-white/10 bg-slate-950/60 p-3 text-sm text-white outline-none transition focus:border-amber-300/60"
+                      placeholder="One meaning per line"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-amber-200">
+                      Other Sentences
+                    </label>
+                    <textarea
+                      value={manualOtherSentences}
+                      onChange={(e) => setManualOtherSentences(e.target.value)}
+                      rows={6}
+                      className="w-full rounded-xl border border-white/10 bg-slate-950/60 p-3 text-sm text-white outline-none transition focus:border-amber-300/60"
+                      placeholder="One sentence per line"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-amber-200">
+                    Paragraph
+                  </label>
+                  <textarea
+                    value={manualParagraph}
+                    onChange={(e) => setManualParagraph(e.target.value)}
+                    rows={7}
+                    className="w-full rounded-xl border border-white/10 bg-slate-950/60 p-3 text-sm leading-6 text-white outline-none transition focus:border-amber-300/60"
+                    placeholder="Enter the final paragraph to store for this word"
+                  />
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleSaveManualCorrections}
+                    disabled={saveLoading}
+                    className="rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 px-5 py-2.5 font-semibold text-slate-950 transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+                  >
+                    {saveLoading ? "Saving..." : "Save Manual Corrections"}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="mt-8 flex justify-between gap-4">
