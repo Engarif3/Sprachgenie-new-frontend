@@ -412,15 +412,6 @@ const AIModal = ({
 
                 {previewData && (
                   <div className="flex items-center justify-between rounded-2xl border border-sky-300/30 bg-sky-500/10 px-4 py-3">
-                    <div>
-                      <h4 className="text-base font-semibold text-sky-200">
-                        Preview Generated
-                      </h4>
-                      <p className="text-sm text-slate-300">
-                        Open the preview modal to compare current and proposed
-                        AI content.
-                      </p>
-                    </div>
                     <div className="flex gap-3">
                       <button
                         type="button"
