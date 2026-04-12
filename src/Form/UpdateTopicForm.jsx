@@ -10,6 +10,14 @@ const EMPTY_TOPIC_FORM = {
   levelId: "",
 };
 
+const buildNoCacheRequestConfig = () => ({
+  params: { _ts: Date.now() },
+  headers: {
+    "Cache-Control": "no-cache",
+    Pragma: "no-cache",
+  },
+});
+
 const UpdateTopicForm = () => {
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
   const canAccess = userLoggedIn && userId && isAdmin;
@@ -20,27 +28,39 @@ const UpdateTopicForm = () => {
   const [loading, setLoading] = useState(false);
   const [loadingOptions, setLoadingOptions] = useState(true);
 
+  const fetchOptions = async () => {
+    setLoadingOptions(true);
+
+    try {
+      const [levelResponse, topicResponse] = await Promise.all([
+        axios.get("/level/all", buildNoCacheRequestConfig()),
+        axios.get("/topic/all", buildNoCacheRequestConfig()),
+      ]);
+
+      const nextLevels = levelResponse.data.data || [];
+      const nextTopics = topicResponse.data.data || [];
+
+      setLevels(nextLevels);
+      setTopics(nextTopics);
+
+      return nextTopics;
+    } catch (error) {
+      console.error("Failed to fetch topic options:", error);
+      await Swal.fire({
+        icon: "error",
+        title: "Unable to load topics",
+        text: "Please refresh and try again.",
+        background: "#1c1917",
+        color: "#f5f5f4",
+      });
+      return [];
+    } finally {
+      setLoadingOptions(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchOptions = async () => {
-      setLoadingOptions(true);
-
-      try {
-        const [levelResponse, topicResponse] = await Promise.all([
-          axios.get("/level/all"),
-          axios.get("/topic/all"),
-        ]);
-
-        setLevels(levelResponse.data.data || []);
-        setTopics(topicResponse.data.data || []);
-      } catch (error) {
-        console.error("Failed to fetch topic options:", error);
-        alert("Unable to load topics and levels");
-      } finally {
-        setLoadingOptions(false);
-      }
-    };
-
-    fetchOptions();
+    void fetchOptions();
   }, []);
 
   const handleTopicSelection = (event) => {
@@ -114,11 +134,7 @@ const UpdateTopicForm = () => {
         levelId: parseInt(topicData.levelId, 10),
       });
 
-      alert("Topic updated successfully");
-
-      const topicResponse = await axios.get("/topic/all");
-      const refreshedTopics = topicResponse.data.data || [];
-      setTopics(refreshedTopics);
+      const refreshedTopics = await fetchOptions();
 
       const updatedTopic = refreshedTopics.find(
         (topic) => String(topic.id) === String(selectedTopicId),
@@ -130,9 +146,24 @@ const UpdateTopicForm = () => {
           levelId: updatedTopic.levelId ? String(updatedTopic.levelId) : "",
         });
       }
+
+      await Swal.fire({
+        icon: "success",
+        title: "Topic updated successfully",
+        timer: 1400,
+        showConfirmButton: false,
+        background: "#1c1917",
+        color: "#f5f5f4",
+      });
     } catch (error) {
       console.error("Error updating topic:", error);
-      alert(error.response?.data?.message || "Error updating topic");
+      await Swal.fire({
+        icon: "error",
+        title: "Update failed",
+        text: error.response?.data?.message || "Error updating topic",
+        background: "#1c1917",
+        color: "#f5f5f4",
+      });
     } finally {
       setLoading(false);
     }
