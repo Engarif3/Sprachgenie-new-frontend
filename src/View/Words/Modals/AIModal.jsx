@@ -37,7 +37,7 @@ const AIModal = ({
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [reportMessage, setReportMessage] = useState("");
   const [reportLoading, setReportLoading] = useState(false);
-  const [currentAiWord, setCurrentAiWord] = useState(aiWord);
+  const [currentWordData, setCurrentWordData] = useState(aiWord);
   const [currentParagraph, setCurrentParagraph] = useState(selectedParagraph);
   const [correctionPrompt, setCorrectionPrompt] = useState("");
   const [manualMeanings, setManualMeanings] = useState("");
@@ -47,11 +47,12 @@ const AIModal = ({
   const [saveLoading, setSaveLoading] = useState(false);
   const [showSuperAdminTools, setShowSuperAdminTools] = useState(false);
   const { userId, isSuperAdmin } = useAuth();
+  const activeWord = aiWord || currentWordData;
 
   useLockBodyScroll(isOpen);
 
   useEffect(() => {
-    setCurrentAiWord(aiWord);
+    setCurrentWordData(aiWord);
     setCurrentParagraph(selectedParagraph || "");
     setReportMessage("");
     setIsReportOpen(false);
@@ -73,7 +74,7 @@ const AIModal = ({
     setShowSuperAdminTools(false);
   }, [aiWord, selectedParagraph]);
 
-  if (!isOpen || !currentAiWord) return null;
+  if (!isOpen || !activeWord) return null;
 
   const applyUpdatedContent = ({ meanings, paragraph, otherSentences }) => {
     const nextMeanings = Array.isArray(meanings) ? meanings : [];
@@ -83,12 +84,12 @@ const AIModal = ({
     const nextParagraph = paragraph || "";
 
     const nextWord = {
-      ...currentAiWord,
+      ...activeWord,
       aiMeanings: nextMeanings,
       sentences: nextOtherSentences,
     };
 
-    setCurrentAiWord(nextWord);
+    setCurrentWordData(nextWord);
     setCurrentParagraph(nextParagraph);
     setManualMeanings(nextMeanings.join("\n"));
     setManualParagraph(nextParagraph);
@@ -97,14 +98,14 @@ const AIModal = ({
   };
 
   const handleReportSubmit = async () => {
-    if (!currentAiWord?.id) {
+    if (!activeWord?.id) {
       return Swal.fire("Error", "Missing word ID", "error");
     }
 
     try {
       setReportLoading(true);
       const response = await aiApi.post("/paragraphs/report", {
-        wordId: currentAiWord.id,
+        wordId: activeWord.id,
         userId,
         message: reportMessage?.trim() || null,
       });
@@ -131,7 +132,7 @@ const AIModal = ({
       return;
     }
 
-    if (!currentAiWord?.id) {
+    if (!activeWord?.id) {
       return Swal.fire("Error", "Missing word ID", "error");
     }
 
@@ -146,10 +147,10 @@ const AIModal = ({
     try {
       setPromptLoading(true);
       const response = await api.post(
-        `/word/paragraph/regenerate-with-prompt/${currentAiWord.id}`,
+        `/word/paragraph/regenerate-with-prompt/${activeWord.id}`,
         {
-          word: currentAiWord.value,
-          level: getWordLevelValue(currentAiWord),
+          word: activeWord.value,
+          level: getWordLevelValue(activeWord),
           language: "de",
           prompt: correctionPrompt.trim(),
         },
@@ -187,7 +188,7 @@ const AIModal = ({
       return;
     }
 
-    if (!currentAiWord?.id) {
+    if (!activeWord?.id) {
       return Swal.fire("Error", "Missing word ID", "error");
     }
 
@@ -229,10 +230,10 @@ const AIModal = ({
       setSaveLoading(true);
 
       const response = await api.put(
-        `/word/paragraph/override/${currentAiWord.id}`,
+        `/word/paragraph/override/${activeWord.id}`,
         {
-          word: currentAiWord.value,
-          level: getWordLevelValue(currentAiWord),
+          word: activeWord.value,
+          level: getWordLevelValue(activeWord),
           language: "de",
           meanings,
           paragraph,
@@ -274,31 +275,31 @@ const AIModal = ({
         <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl shadow-2xl p-1 md:p-8 lg:p-8 w-full md:w-2/3 lg:w-1/2 max-h-[90vh] overflow-y-auto mx-1 border-2 border-gray-700/50">
           <h2 className="text-3xl md:text-5xl lg:text-5xl font-bold text-center mb-4">
             <span className="text-sky-400 font-bold">
-              {typeof currentAiWord?.article === "string"
-                ? currentAiWord.article
-                : currentAiWord?.article?.name || ""}
+              {typeof activeWord?.article === "string"
+                ? activeWord.article
+                : activeWord?.article?.name || ""}
             </span>{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 capitalize">
-              {currentAiWord?.value}
+              {activeWord?.value}
             </span>
           </h2>
           <div className="flex justify-center mb-6 ">
             <p className="text-center text-cyan-300 text-md px-4 py-2 bg-cyan-500/10 rounded-2xl border border-cyan-500/30">
-              {Array.isArray(currentAiWord?.meaning)
-                ? currentAiWord.meaning.join(", ")
-                : currentAiWord?.meaning || ""}
+              {Array.isArray(activeWord?.meaning)
+                ? activeWord.meaning.join(", ")
+                : activeWord?.meaning || ""}
             </p>
           </div>
 
           <div className="space-y-4 ">
-            {currentAiWord?.aiMeanings?.length > 0 && (
+            {activeWord?.aiMeanings?.length > 0 && (
               <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 p-2 md:p-4 lg:p-4 rounded-2xl border-2 border-green-400/50">
                 <p className="text-base md:text-lg">
                   <strong className="text-green-400 font-semibold">
                     🤖 AI Meanings:
                   </strong>{" "}
                   <span className="text-white font-medium">
-                    {currentAiWord.aiMeanings.join(", ")}
+                    {activeWord.aiMeanings.join(", ")}
                   </span>
                 </p>
               </div>

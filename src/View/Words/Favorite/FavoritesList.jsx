@@ -578,6 +578,7 @@ const FavoritesList = () => {
 
       {/* =======AI modal=============== */}
       <AIModal
+        key={aiWord?.id || "ai-modal"}
         isOpen={isAIModalOpen}
         aiWord={aiWord}
         selectedParagraph={selectedParagraph}

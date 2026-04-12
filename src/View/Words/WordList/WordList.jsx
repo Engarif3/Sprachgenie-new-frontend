@@ -1859,6 +1859,7 @@ const WordList = () => {
       {isAIModalOpen && (
         <Suspense fallback={<div />}>
           <AIModal
+            key={aiWord?.id || "ai-modal"}
             isOpen={isAIModalOpen}
             aiWord={aiWord}
             selectedParagraph={selectedParagraph}
