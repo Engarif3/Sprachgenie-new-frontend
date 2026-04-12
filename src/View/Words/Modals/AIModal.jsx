@@ -155,18 +155,22 @@ const AIModal = ({
 
     try {
       setPromptLoading(true);
-      const response = await aiApi.post("/paragraphs/regenerate-with-prompt", {
-        wordId: currentAiWord.id,
-        word: currentAiWord.value,
-        level: getWordLevelValue(currentAiWord),
-        language: "de",
-        prompt: correctionPrompt.trim(),
-      });
+      const response = await api.post(
+        `/word/paragraph/regenerate-with-prompt/${currentAiWord.id}`,
+        {
+          word: currentAiWord.value,
+          level: getWordLevelValue(currentAiWord),
+          language: "de",
+          prompt: correctionPrompt.trim(),
+        },
+      );
+
+      const paragraphData = response.data?.data || response.data;
 
       applyUpdatedContent({
-        meanings: response.data.meanings,
-        paragraph: response.data.paragraph,
-        otherSentences: response.data.otherSentences || response.data.sentences,
+        meanings: paragraphData.meanings,
+        paragraph: paragraphData.paragraph,
+        otherSentences: paragraphData.otherSentences || paragraphData.sentences,
       });
       setCorrectionPrompt("");
 
@@ -224,22 +228,26 @@ const AIModal = ({
         meaning: meanings,
       });
 
-      const response = await aiApi.put("/paragraphs/override", {
-        wordId: currentAiWord.id,
-        word: currentAiWord.value,
-        level: getWordLevelValue(currentAiWord),
-        language: "de",
-        meanings,
-        paragraph,
-        otherSentences,
-      });
+      const response = await api.put(
+        `/word/paragraph/override/${currentAiWord.id}`,
+        {
+          word: currentAiWord.value,
+          level: getWordLevelValue(currentAiWord),
+          language: "de",
+          meanings,
+          paragraph,
+          otherSentences,
+        },
+      );
+
+      const paragraphData = response.data?.data || response.data;
 
       await invalidateWordsCache();
 
       applyUpdatedContent({
-        meanings: response.data.meanings,
-        paragraph: response.data.paragraph,
-        otherSentences: response.data.otherSentences || response.data.sentences,
+        meanings: paragraphData.meanings,
+        paragraph: paragraphData.paragraph,
+        otherSentences: paragraphData.otherSentences || paragraphData.sentences,
         canonicalMeanings: meanings,
       });
 
