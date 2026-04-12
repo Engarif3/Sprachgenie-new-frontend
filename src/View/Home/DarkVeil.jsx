@@ -90,12 +90,28 @@ export default function DarkVeil({
     const parent = canvas.parentElement;
     if (!parent) return; // Guard against canvas not in DOM
 
-    const renderer = new Renderer({
-      dpr: Math.min(window.devicePixelRatio, 2),
-      canvas,
-    });
+    let renderer;
+
+    try {
+      renderer = new Renderer({
+        dpr: Math.min(window.devicePixelRatio, 2),
+        canvas,
+      });
+    } catch (error) {
+      console.warn(
+        "DarkVeil disabled: WebGL context could not be created.",
+        error,
+      );
+      return undefined;
+    }
 
     const gl = renderer.gl;
+
+    if (!gl) {
+      console.warn("DarkVeil disabled: missing WebGL context.");
+      return undefined;
+    }
+
     const geometry = new Triangle(gl);
 
     const program = new Program(gl, {
@@ -126,8 +142,21 @@ export default function DarkVeil({
 
     const start = performance.now();
     let frame = 0;
+    let isContextLost = false;
+
+    const handleContextLost = (event) => {
+      event.preventDefault();
+      isContextLost = true;
+      cancelAnimationFrame(frame);
+    };
+
+    canvas.addEventListener("webglcontextlost", handleContextLost, false);
 
     const loop = () => {
+      if (isContextLost) {
+        return;
+      }
+
       program.uniforms.uTime.value =
         ((performance.now() - start) / 1000) * speed;
       program.uniforms.uHueShift.value = hueShift;
@@ -144,6 +173,7 @@ export default function DarkVeil({
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("resize", resize);
+      canvas.removeEventListener("webglcontextlost", handleContextLost, false);
       // Properly dispose of WebGL resources
       if (renderer && typeof renderer.destroy === "function") {
         renderer.destroy();

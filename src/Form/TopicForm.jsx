@@ -71,7 +71,7 @@
 
 // export default TopicForm;
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import axios from "../axios";
 import Container from "../utils/Container";
@@ -82,17 +82,16 @@ const TopicForm = () => {
   const canAccess = userLoggedIn && userId && isAdmin;
   const [topicData, setTopicData] = useState({
     name: "",
-    levelId: "", // add levelId field
+    levelId: "",
   });
   const [levels, setLevels] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch all levels on mount
   useEffect(() => {
     const fetchLevels = async () => {
       try {
-        const response = await axios.get("/level/all"); // Update this endpoint if needed
-        setLevels(response.data.data);
+        const response = await axios.get("/level/all");
+        setLevels(response.data.data || []);
       } catch (error) {
         console.error("Failed to fetch levels:", error);
         alert("Unable to load levels");
@@ -102,7 +101,6 @@ const TopicForm = () => {
     fetchLevels();
   }, []);
 
-  // Handle form input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setTopicData((prevData) => ({
@@ -111,21 +109,20 @@ const TopicForm = () => {
     }));
   };
 
-  // Submit the form
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
 
     try {
-      const response = await axios.post("/topic/create", {
+      await axios.post("/topic/create", {
         ...topicData,
-        levelId: parseInt(topicData.levelId), // cast to number
+        levelId: parseInt(topicData.levelId, 10),
       });
       alert("Topic created successfully");
       setTopicData({ name: "", levelId: "" });
     } catch (error) {
       console.error("Error creating topic:", error);
-      alert("Error creating topic");
+      alert(error.response?.data?.message || "Error creating topic");
     } finally {
       setLoading(false);
     }
@@ -186,7 +183,7 @@ const TopicForm = () => {
             disabled={loading}
             className="mt-24 w-full rounded-md bg-indigo-600 py-2 text-white font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 "
           >
-            {loading ? "Submitting..." : "Submit"}
+            {loading ? "Creating..." : "Create Topic"}
           </button>
         </form>
       </div>

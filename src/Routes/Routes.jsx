@@ -22,6 +22,7 @@ const ForgotPassword = lazy(() => import("../Auth/ForgotPassword"));
 const ResetPassword = lazy(() => import("../Auth/ResetPassword"));
 const LevelForm = lazy(() => import("../Form/LevelForm"));
 const TopicForm = lazy(() => import("../Form/TopicForm"));
+const UpdateTopicForm = lazy(() => import("../Form/UpdateTopicForm"));
 const ArticleForm = lazy(() => import("../Form/ArticleForm"));
 const PartOfSpeechForm = lazy(() => import("../Form/PartOfSpeechForm"));
 const LevelList = lazy(() => import("../View/LevelList"));
@@ -115,6 +116,7 @@ const ForgotPasswordWithSuspense = withSuspense(ForgotPassword);
 const ResetPasswordWithSuspense = withSuspense(ResetPassword);
 const LevelFormWithSuspense = withSuspense(LevelForm);
 const TopicFormWithSuspense = withSuspense(TopicForm);
+const UpdateTopicFormWithSuspense = withSuspense(UpdateTopicForm);
 const ArticleFormWithSuspense = withSuspense(ArticleForm);
 const PartOfSpeechFormWithSuspense = withSuspense(PartOfSpeechForm);
 const LevelListWithSuspense = withSuspense(LevelList);
@@ -300,6 +302,13 @@ export const router = createBrowserRouter(
             {
               path: "topic",
               element: protectRoute(<TopicFormWithSuspense />, ADMIN_ROLES),
+            },
+            {
+              path: "update-topic",
+              element: protectRoute(
+                <UpdateTopicFormWithSuspense />,
+                ADMIN_ROLES,
+              ),
             },
             {
               path: "create-word",

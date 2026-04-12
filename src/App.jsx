@@ -177,6 +177,12 @@ const AppContent = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const showGlobalDarkVeil = isDark && location.pathname === "/";
+  const appBackgroundClass = isDark
+    ? showGlobalDarkVeil
+      ? "bg-transparent"
+      : "bg-gradient-to-b from-slate-800 via-slate-900 to-slate-950"
+    : "bg-gray-50";
 
   // Same auth & env logic...
   useEffect(() => {
@@ -292,18 +298,17 @@ const AppContent = () => {
   );
 
   return (
-    <div
-      className={`relative min-h-screen ${
-        isDark ? "bg-transparent" : "bg-gray-50"
-      }`}
-    >
+    <div className={`relative min-h-screen ${appBackgroundClass}`}>
       {/* Dark mode overlay */}
-      {isDark && (
-        <div className="fixed inset-0 -z-10">
-          <Suspense fallback={null}>
-            <DarkVeil />
-          </Suspense>
-        </div>
+      {showGlobalDarkVeil && (
+        <>
+          <div className="fixed inset-0 -z-20 bg-slate-950" />
+          <div className="fixed inset-0 -z-10">
+            <Suspense fallback={null}>
+              <DarkVeil />
+            </Suspense>
+          </div>
+        </>
       )}
 
       <ScrollToTop />

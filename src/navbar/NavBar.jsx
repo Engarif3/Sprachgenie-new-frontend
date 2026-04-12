@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
+import { Link, useLocation } from "react-router-dom";
 import AuthButton from "../components/UI/AuthButton/AuthButton";
 import { useAuth } from "../services/auth.services";
 import { FaBook, FaHome, FaSun, FaMoon } from "react-icons/fa";
@@ -26,7 +25,6 @@ const getUserInitials = (name, email) => {
 
 const NavBar = () => {
   const { t } = useTranslation("common");
-  const navigate = useNavigate();
   const location = useLocation();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isVisitorMenuOpen, setIsVisitorMenuOpen] = useState(false);
@@ -82,32 +80,51 @@ const NavBar = () => {
     setIsVisitorMenuOpen(false);
   }, [location.pathname]);
 
-  const handleCreateTopic = () => {
-    Swal.fire({
-      title: "Enter password",
-      input: "password",
-      inputPlaceholder: "Type password",
-      inputValidator: (value) => {
-        if (value !== "aydin451280") {
-          return "Wrong Password!";
-        }
-      },
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Proceed to create",
-    }).then((result) => {
-      if (result.isConfirmed && result.value === "aydin451280") {
-        navigate("/topic");
-      } else {
-        console.log("Action canceled or incorrect password.");
-      }
-    });
-  };
-
-  const isHomePage = location.pathname === "/";
+  const navbarBackgroundClass =
+    "bg-gray-800/95 dark:bg-slate-950/55 backdrop-blur-lg";
   const mobileQuickActionClass =
     "group flex h-10 w-10 items-center justify-center rounded-xl border border-slate-700/80 bg-slate-900/80 text-slate-100 shadow-[0_10px_24px_rgba(15,23,42,0.35)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-sky-400/60 hover:bg-sky-500/12 hover:text-sky-100 hover:shadow-[0_14px_30px_rgba(14,165,233,0.18)] focus:outline-none focus:ring-2 focus:ring-sky-400/40";
+  const languageToggleButtonClass =
+    "flex items-center justify-center gap-1 bg-teal-900 hover:bg-gray-700/50 px-2 py-1 rounded-full transition-all duration-300 hover:scale-110 border border-gray-700/50 hover:border-gray-600";
+  const renderLanguageToggle = () => (
+    <>
+      <span className="flex h-4 w-5 items-center justify-center overflow-visible">
+        <img
+          src={ENFlag}
+          alt="English"
+          className={`h-2.9 w-5 transition-all duration-300 ${
+            language === "en"
+              ? "scale-110 opacity-100 brightness-125 saturate-150 drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]"
+              : "opacity-40 saturate-75"
+          }`}
+        />
+      </span>
+      <span className="flex w-8 items-center justify-center">
+        {language === "en" ? (
+          <PiToggleLeftFill
+            className="text-2xl text-sky-500 mt-[2px]"
+            size={22}
+          />
+        ) : (
+          <PiToggleRightFill
+            className="text-2xl text-sky-500 mt-[2px]"
+            size={22}
+          />
+        )}
+      </span>
+      <span className="flex h-4 w-5 items-center justify-center overflow-visible">
+        <img
+          src={DEFlag}
+          alt="Deutsch"
+          className={`h-3.5 w-5 transition-all duration-300 ${
+            language === "de"
+              ? "scale-110 opacity-100 brightness-125 saturate-150 drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]"
+              : "opacity-40 saturate-75"
+          }`}
+        />
+      </span>
+    </>
+  );
 
   const renderProfileMenu = (menuRef, isMobile = false) => (
     <div
@@ -175,38 +192,10 @@ const NavBar = () => {
                 toggleLanguage();
                 setIsProfileMenuOpen(false);
               }}
-              className="flex items-center justify-center gap-1 bg-teal-900 hover:bg-gray-700/50 px-2 py-1 rounded-full transition-all duration-300 hover:scale-110 border border-gray-700/50 hover:border-gray-600"
+              className={languageToggleButtonClass}
               title={`Switch to ${language === "en" ? "Deutsch" : "English"}`}
             >
-              <img
-                src={ENFlag}
-                alt="English"
-                className={`h-2.9 w-5 transition-all duration-300 ${
-                  language === "en"
-                    ? "scale-110 opacity-100 brightness-125 saturate-150 drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]"
-                    : "opacity-40 saturate-75"
-                }`}
-              />
-              {language === "en" ? (
-                <PiToggleLeftFill
-                  className="text-2xl text-sky-500 w-8 mt-[2px]"
-                  size={22}
-                />
-              ) : (
-                <PiToggleRightFill
-                  className="text-2xl text-sky-500 w-8 mt-[2px]"
-                  size={22}
-                />
-              )}
-              <img
-                src={DEFlag}
-                alt="Deutsch"
-                className={`h-3.5 w-5 transition-all duration-300 ${
-                  language === "de"
-                    ? "scale-110 opacity-100 brightness-125 saturate-150 drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]"
-                    : "opacity-40 saturate-75"
-                }`}
-              />
+              {renderLanguageToggle()}
             </button>
 
             <button
@@ -244,38 +233,10 @@ const NavBar = () => {
               toggleLanguage();
               setIsVisitorMenuOpen(false);
             }}
-            className="flex items-center justify-center gap-1 bg-teal-900 hover:bg-gray-700/50 px-2 py-1 rounded-full transition-all duration-300 hover:scale-110 border border-gray-700/50 hover:border-gray-600"
+            className={languageToggleButtonClass}
             title={`Switch to ${language === "en" ? "Deutsch" : "English"}`}
           >
-            <img
-              src={ENFlag}
-              alt="English"
-              className={`h-2.9 w-5 transition-all duration-300 ${
-                language === "en"
-                  ? "scale-110 opacity-100 brightness-125 saturate-150 drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]"
-                  : "opacity-40 saturate-75"
-              }`}
-            />
-            {language === "en" ? (
-              <PiToggleLeftFill
-                className="text-2xl text-sky-500 w-8 mt-[2px]"
-                size={22}
-              />
-            ) : (
-              <PiToggleRightFill
-                className="text-2xl text-sky-500 w-8 mt-[2px]"
-                size={22}
-              />
-            )}
-            <img
-              src={DEFlag}
-              alt="Deutsch"
-              className={`h-3.5 w-5 transition-all duration-300 ${
-                language === "de"
-                  ? "scale-110 opacity-100 brightness-125 saturate-150 drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]"
-                  : "opacity-40 saturate-75"
-              }`}
-            />
+            {renderLanguageToggle()}
           </button>
 
           <button
@@ -303,18 +264,10 @@ const NavBar = () => {
 
   return (
     <>
-      <div className="w-full sticky top-0 z-50 bg-gray-800 dark:bg-gray-950 ">
+      <div className={`w-full sticky top-0 z-50 ${navbarBackgroundClass}`}>
         <Container>
-          {isHomePage && (
-            <div className="h-1 -mt-2 bg-gray-800 dark:bg-gray-950 " />
-          )}
-          <div
-            className={`flex flex-wrap items-center justify-between py-3 px-2 text-lg font-semibold relative border-b border-slate-800 mt-0 ${
-              isHomePage
-                ? "bg-gray-800 dark:bg-gray-950"
-                : "bg-gray-800 dark:bg-gray-950"
-            }`}
-          >
+          <div className="h-1 -mt-2" />
+          <div className="flex flex-wrap items-center justify-between py-3 px-2 text-lg font-semibold relative border-b border-slate-800 mt-0">
             {/* Title and Mobile Actions */}
             <div className="flex min-w-0 flex-1 items-center justify-between gap-2 px-2 md:w-auto md:flex-none md:px-4">
               <Link
@@ -471,38 +424,10 @@ const NavBar = () => {
               {/* Language Toggle Button with SVG Flags */}
               <button
                 onClick={toggleLanguage}
-                className=" flex items-center justify-center gap-1 bg-teal-900 hover:bg-gray-700/50 px-2 py-1 rounded-full transition-all duration-300 hover:scale-110 border border-gray-700/50 hover:border-gray-600 "
+                className={languageToggleButtonClass}
                 title={`Switch to ${language === "en" ? "Deutsch" : "English"}`}
               >
-                <img
-                  src={ENFlag}
-                  alt="English"
-                  className={`h-2.9 w-5 transition-all duration-300 ${
-                    language === "en"
-                      ? "scale-110 opacity-100 brightness-125 saturate-150 drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]"
-                      : "opacity-40 saturate-75"
-                  }`}
-                />
-                {language === "en" ? (
-                  <PiToggleLeftFill
-                    className="text-2xl text-sky-500 w-8 mt-[2px] "
-                    size={22}
-                  />
-                ) : (
-                  <PiToggleRightFill
-                    className="text-2xl text-sky-500 w-8 mt-[2px]"
-                    size={22}
-                  />
-                )}
-                <img
-                  src={DEFlag}
-                  alt="Deutsch"
-                  className={`h-3.5 w-5 transition-all duration-300 ${
-                    language === "de"
-                      ? "scale-110 opacity-100 brightness-125 saturate-150 drop-shadow-[0_0_10px_rgba(255,255,255,0.45)]"
-                      : "opacity-40 saturate-75"
-                  }`}
-                />
+                {renderLanguageToggle()}
               </button>
 
               {/* Theme Toggle Button */}
@@ -522,8 +447,8 @@ const NavBar = () => {
                 </button>
               </div>
 
-              <div className="relative ml-auto flex items-center gap-2 md:gap-3">
-                {userLoggedIn && (
+              <div className="relative ml-auto flex min-w-[8.5rem] items-center justify-end">
+                {userLoggedIn ? (
                   <>
                     <button
                       ref={desktopProfileToggleRef}
@@ -550,8 +475,9 @@ const NavBar = () => {
                     {isProfileMenuOpen &&
                       renderProfileMenu(desktopProfileMenuRef, false)}
                   </>
+                ) : (
+                  <AuthButton hideWhenLoggedIn={userLoggedIn} />
                 )}
-                <AuthButton hideWhenLoggedIn={userLoggedIn} />
               </div>
             </div>
           </div>

@@ -195,7 +195,15 @@ const DashboardLayout = () => {
                           onClick={() => setIsOpen(false)}
                         >
                           <span>📚</span>
-                          <span>Topics</span>
+                          <span>Create Topic</span>
+                        </NavLink>
+                        <NavLink
+                          to="/dashboard/update-topic"
+                          className={({ isActive }) => navItemClass(isActive)}
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <span>✏️</span>
+                          <span>Update Topic</span>
                         </NavLink>
                       </>
                     )}
