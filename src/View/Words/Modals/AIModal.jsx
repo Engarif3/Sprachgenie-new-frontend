@@ -49,6 +49,7 @@ const AIModal = ({
   const [saveLoading, setSaveLoading] = useState(false);
   const [showSuperAdminTools, setShowSuperAdminTools] = useState(false);
   const [previewData, setPreviewData] = useState(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const { userId, isSuperAdmin } = useAuth();
   const activeWord = aiWord || currentWordData;
 
@@ -76,6 +77,7 @@ const AIModal = ({
     setManualOtherSentences(nextOtherSentences.join("\n"));
     setShowSuperAdminTools(false);
     setPreviewData(null);
+    setIsPreviewOpen(false);
   }, [aiWord, selectedParagraph]);
 
   if (!isOpen || !activeWord) return null;
@@ -99,6 +101,7 @@ const AIModal = ({
     setManualParagraph(nextParagraph);
     setManualOtherSentences(nextOtherSentences.join("\n"));
     setPreviewData(null);
+    setIsPreviewOpen(false);
     onWordUpdated?.(nextWord, nextParagraph);
   };
 
@@ -281,10 +284,11 @@ const AIModal = ({
       setManualOtherSentences(
         toJoinedLines(paragraphData.otherSentences || paragraphData.sentences),
       );
+      setIsPreviewOpen(true);
 
       await Swal.fire({
         title: "Preview Ready",
-        text: "Review the proposed AI changes below, then publish them if you want to keep them.",
+        text: "Review the proposed AI changes in the preview modal, then publish them if you want to keep them.",
         icon: "success",
         timer: 1600,
         showConfirmButton: false,
@@ -433,16 +437,24 @@ const AIModal = ({
                 </div>
 
                 {previewData && (
-                  <div className="space-y-4 rounded-2xl border border-sky-300/30 bg-sky-500/10 p-4">
-                    <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                      <div>
-                        <h4 className="text-lg font-semibold text-sky-200">
-                          Preview Changes
-                        </h4>
-                        <p className="text-sm text-slate-300">
-                          Review the proposed AI update before publishing it.
-                        </p>
-                      </div>
+                  <div className="flex items-center justify-between rounded-2xl border border-sky-300/30 bg-sky-500/10 px-4 py-3">
+                    <div>
+                      <h4 className="text-base font-semibold text-sky-200">
+                        Preview Generated
+                      </h4>
+                      <p className="text-sm text-slate-300">
+                        Open the preview modal to compare current and proposed
+                        AI content.
+                      </p>
+                    </div>
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setIsPreviewOpen(true)}
+                        className="rounded-full border border-sky-300/40 bg-sky-500/20 px-4 py-2 text-sm font-semibold text-sky-100 transition hover:bg-sky-500/30"
+                      >
+                        Open Preview
+                      </button>
                       <button
                         type="button"
                         onClick={handlePublishPreview}
@@ -451,68 +463,6 @@ const AIModal = ({
                       >
                         {saveLoading ? "Publishing..." : "Publish Preview"}
                       </button>
-                    </div>
-
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div className="rounded-xl border border-white/10 bg-slate-950/40 p-3">
-                        <p className="mb-2 text-sm font-semibold text-slate-200">
-                          Current AI Meanings
-                        </p>
-                        <p className="text-sm whitespace-pre-line text-slate-300">
-                          {currentMeanings.length
-                            ? currentMeanings.join("\n")
-                            : "No stored AI meanings yet."}
-                        </p>
-                      </div>
-                      <div className="rounded-xl border border-sky-300/30 bg-slate-950/50 p-3">
-                        <p className="mb-2 text-sm font-semibold text-sky-200">
-                          Proposed AI Meanings
-                        </p>
-                        <p className="text-sm whitespace-pre-line text-white">
-                          {previewData.meanings.length
-                            ? previewData.meanings.join("\n")
-                            : "No meanings returned."}
-                        </p>
-                      </div>
-                      <div className="rounded-xl border border-white/10 bg-slate-950/40 p-3">
-                        <p className="mb-2 text-sm font-semibold text-slate-200">
-                          Current Paragraph
-                        </p>
-                        <p className="text-sm whitespace-pre-line text-slate-300">
-                          {currentParagraph || "No stored paragraph yet."}
-                        </p>
-                      </div>
-                      <div className="rounded-xl border border-sky-300/30 bg-slate-950/50 p-3">
-                        <p className="mb-2 text-sm font-semibold text-sky-200">
-                          Proposed Paragraph
-                        </p>
-                        <p className="text-sm whitespace-pre-line text-white">
-                          {previewData.paragraph || "No paragraph returned."}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div className="rounded-xl border border-white/10 bg-slate-950/40 p-3">
-                        <p className="mb-2 text-sm font-semibold text-slate-200">
-                          Current Other Sentences
-                        </p>
-                        <p className="text-sm whitespace-pre-line text-slate-300">
-                          {currentOtherSentences.length
-                            ? currentOtherSentences.join("\n")
-                            : "No stored sentences yet."}
-                        </p>
-                      </div>
-                      <div className="rounded-xl border border-sky-300/30 bg-slate-950/50 p-3">
-                        <p className="mb-2 text-sm font-semibold text-sky-200">
-                          Proposed Other Sentences
-                        </p>
-                        <p className="text-sm whitespace-pre-line text-white">
-                          {previewData.otherSentences.length
-                            ? previewData.otherSentences.join("\n")
-                            : "No sentences returned."}
-                        </p>
-                      </div>
                     </div>
                   </div>
                 )}
@@ -612,6 +562,115 @@ const AIModal = ({
           </div>
         </div>
       </div>
+
+      {isPreviewOpen && previewData && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="mx-3 max-h-[92vh] w-full max-w-6xl overflow-y-auto rounded-3xl border border-sky-300/25 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 shadow-2xl md:p-8">
+            <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div>
+                <h3 className="text-2xl font-bold text-sky-200">
+                  Preview Changes
+                </h3>
+                <p className="mt-1 text-sm text-slate-300">
+                  Compare the current AI content with the proposed regenerated
+                  content before publishing.
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsPreviewOpen(false)}
+                  className="rounded-full border border-white/15 bg-slate-900/60 px-5 py-2.5 font-semibold text-white transition hover:scale-105"
+                >
+                  Close Preview
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePublishPreview}
+                  disabled={saveLoading}
+                  className="rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 px-5 py-2.5 font-semibold text-slate-950 transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+                >
+                  {saveLoading ? "Publishing..." : "Publish Preview"}
+                </button>
+              </div>
+            </div>
+
+            <div className="grid gap-5 lg:grid-cols-2">
+              <div className="space-y-5 rounded-2xl border border-white/10 bg-slate-950/40 p-4">
+                <h4 className="text-lg font-semibold text-slate-100">
+                  Current
+                </h4>
+
+                <div className="rounded-xl border border-white/10 bg-slate-900/50 p-4">
+                  <p className="mb-2 text-sm font-semibold text-slate-200">
+                    AI Meanings
+                  </p>
+                  <p className="text-sm whitespace-pre-line text-slate-300">
+                    {currentMeanings.length
+                      ? currentMeanings.join("\n")
+                      : "No stored AI meanings yet."}
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-white/10 bg-slate-900/50 p-4">
+                  <p className="mb-2 text-sm font-semibold text-slate-200">
+                    Paragraph
+                  </p>
+                  <p className="text-sm whitespace-pre-line text-slate-300">
+                    {currentParagraph || "No stored paragraph yet."}
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-white/10 bg-slate-900/50 p-4">
+                  <p className="mb-2 text-sm font-semibold text-slate-200">
+                    Other Sentences
+                  </p>
+                  <p className="text-sm whitespace-pre-line text-slate-300">
+                    {currentOtherSentences.length
+                      ? currentOtherSentences.join("\n")
+                      : "No stored sentences yet."}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-5 rounded-2xl border border-sky-300/30 bg-sky-500/10 p-4">
+                <h4 className="text-lg font-semibold text-sky-100">Proposed</h4>
+
+                <div className="rounded-xl border border-sky-300/30 bg-slate-900/60 p-4">
+                  <p className="mb-2 text-sm font-semibold text-sky-200">
+                    AI Meanings
+                  </p>
+                  <p className="text-sm whitespace-pre-line text-white">
+                    {previewData.meanings.length
+                      ? previewData.meanings.join("\n")
+                      : "No meanings returned."}
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-sky-300/30 bg-slate-900/60 p-4">
+                  <p className="mb-2 text-sm font-semibold text-sky-200">
+                    Paragraph
+                  </p>
+                  <p className="text-sm whitespace-pre-line text-white">
+                    {previewData.paragraph || "No paragraph returned."}
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-sky-300/30 bg-slate-900/60 p-4">
+                  <p className="mb-2 text-sm font-semibold text-sky-200">
+                    Other Sentences
+                  </p>
+                  <p className="text-sm whitespace-pre-line text-white">
+                    {previewData.otherSentences.length
+                      ? previewData.otherSentences.join("\n")
+                      : "No sentences returned."}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Report Modal */}
       {isReportOpen && (
