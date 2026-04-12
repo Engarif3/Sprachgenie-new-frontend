@@ -5,50 +5,77 @@ import api from "../axios";
 import aiApi from "../AI_axios";
 import { ScaleLoader } from "react-spinners";
 import { useAuth } from "../services/auth.services";
+import AIModal from "../View/Words/Modals/AIModal";
 
 const ReportsByUsers = () => {
-  const { isAdmin, isSuperAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
+  const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
   const canAccess = userLoggedIn && userId && isAdmin;
   const [reports, setReports] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedMessage, setSelectedMessage] = useState(null);
-  const [regenerating, setRegenerating] = useState(null);
-  const [showSuperAdminTools, setShowSuperAdminTools] = useState(false);
+  const [openingWordId, setOpeningWordId] = useState(null);
+  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
+  const [aiWord, setAiWord] = useState(null);
+  const [selectedParagraph, setSelectedParagraph] = useState("");
 
-  const fetchReportsAndUsers = async () => {
-    try {
-      setLoading(true);
+  const fetchUsersByIds = async (userIds) => {
+    const uniqueIds = [...new Set((userIds || []).filter(Boolean))];
 
-      // fetch reports
-      const reportRes = await aiApi.get("/paragraphs/get-reports");
-      const reportData = reportRes.data || [];
-
-      // fetch all users
-      const userRes = await api.get("/user");
-      const usersData = userRes.data.data;
-
-      setReports(reportData);
-      setUsers(usersData);
-    } catch (err) {
-      console.error("Error fetching reports/users:", err);
-      setError("Failed to load reports");
-    } finally {
-      setLoading(false);
+    if (uniqueIds.length === 0) {
+      return {};
     }
+
+    const settledUsers = await Promise.allSettled(
+      uniqueIds.map(async (reportUserId) => {
+        const response = await api.get(`/user/${reportUserId}`);
+        const userData = response.data?.data || response.data;
+
+        return [reportUserId, userData];
+      }),
+    );
+
+    return settledUsers.reduce((acc, result) => {
+      if (result.status === "fulfilled") {
+        const [reportUserId, userData] = result.value;
+        acc[reportUserId] = userData;
+      }
+
+      return acc;
+    }, {});
   };
 
   useEffect(() => {
-    fetchReportsAndUsers();
+    const loadReportsAndUsers = async () => {
+      try {
+        setLoading(true);
+
+        const reportRes = await aiApi.get("/paragraphs/get-reports");
+        const reportData = reportRes.data || [];
+        const userIds = reportData.flatMap((report) =>
+          Array.isArray(report.reports)
+            ? report.reports.map((entry) => entry.userId)
+            : [],
+        );
+        const usersData = await fetchUsersByIds(userIds);
+
+        setReports(reportData);
+        setUsers(usersData);
+      } catch (err) {
+        console.error("Error fetching reports/users:", err);
+        setError("Failed to load reports");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadReportsAndUsers();
   }, []);
 
-  const shouldShowAdminTools = !isSuperAdmin || showSuperAdminTools;
-
-  // Component to handle async user info fetching
   const UserInfoDisplay = ({ userId }) => {
-    const user = users.find((entry) => entry.id === userId);
+    const user = users[userId];
 
     if (!user) {
       return (
@@ -77,104 +104,66 @@ const ReportsByUsers = () => {
     return <UserInfoDisplay userId={userId} />;
   };
 
-  // Re-generate handler
-
-  const handleRegenerate = async (report) => {
+  const handleOpenAiModal = async (report) => {
     try {
-      // Step 1: Show confirmation dialog
-      const result = await Swal.fire({
-        title: `Re-generate AI for "${report.word}"?`,
-        text: "This will regenerate the AI content for this word.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, regenerate it!",
-        cancelButtonText: "Cancel",
+      setOpeningWordId(report.wordId);
+
+      const [wordResponse, paragraphResponse] = await Promise.all([
+        api.get(`/word/${report.wordId}`),
+        aiApi.get(`/paragraphs/${report.wordId}`),
+      ]);
+
+      const wordData = wordResponse.data?.data || wordResponse.data;
+      const paragraphData =
+        paragraphResponse.data?.data || paragraphResponse.data;
+
+      setAiWord({
+        ...wordData,
+        aiMeanings: Array.isArray(paragraphData?.meanings)
+          ? paragraphData.meanings
+          : [],
+        sentences: Array.isArray(paragraphData?.otherSentences)
+          ? paragraphData.otherSentences
+          : Array.isArray(paragraphData?.sentences)
+            ? paragraphData.sentences
+            : [],
       });
-
-      // Step 2: Only proceed if user confirmed
-      if (!result.isConfirmed) return;
-
-      // Step 3: Show loading while API is in progress
-      Swal.fire({
-        title: "Regenerating...",
-        text: `Please wait while AI content for "${report.word}" is regenerated.`,
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
-      });
-
-      setRegenerating(report.wordId);
-
-      // Step 4: Call the API
-      await aiApi.post("/paragraphs/regenerate", {
-        userId: report.reports[0]?.userId,
-        wordId: report.wordId,
-        word: report.word,
-        level: report.level,
-        language: report.language,
-      });
-
-      // Step 5: Update frontend state (mark as regenerated)
-
-      setReports((prev) =>
-        prev.map((r) =>
-          r.wordId === report.wordId
-            ? { ...r, regenerationRequired: false }
-            : r,
-        ),
-      );
-
-      // Step 6: Close loading and show success
-      Swal.close();
-      Swal.fire({
-        icon: "success",
-        title: "Re-generated!",
-        text: `AI content for "${report.word}" has been regenerated successfully.`,
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      setSelectedParagraph(paragraphData?.paragraph || "");
+      setIsAIModalOpen(true);
     } catch (err) {
-      console.error("Error regenerating:", err);
-      Swal.close();
+      console.error("Error opening AI modal from reports:", err);
+      const errorMessage =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.response?.data?.details ||
+        err.message;
 
-      // Check if it's a limit or service error
-      const errorMessage = err.response?.data?.error || err.message;
-      const isLimitError =
-        err.response?.status === 403 ||
-        errorMessage?.toLowerCase().includes("limit") ||
-        errorMessage?.toLowerCase().includes("exceeded");
-      const isServiceError =
-        (err.response?.status === 500 ||
-          err.response?.status === 429 ||
-          err.response?.status === 503) &&
-        !isLimitError;
-
-      if (isLimitError) {
-        Swal.fire({
-          icon: "warning",
-          title: "Limit Reached",
-          text: errorMessage || "You have exceeded your daily/monthly limit",
-        });
-      } else if (isServiceError) {
-        Swal.fire({
-          icon: "info",
-          title: "Service Temporarily Unavailable",
-          text:
-            errorMessage || "AI service is busy. Please try again in a moment.",
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Oops!",
-          text: "Failed to re-generate word. Please try again.",
-        });
-      }
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: errorMessage || "Failed to open AI details for this word.",
+      });
     } finally {
-      setRegenerating(null);
+      setOpeningWordId(null);
     }
   };
-  // Add this at the top, inside ReportsByUsers component
+
+  const handleAiWordUpdated = (updatedWord, paragraph) => {
+    setAiWord(updatedWord);
+    setSelectedParagraph(paragraph || "");
+    setReports((prev) =>
+      prev.map((report) =>
+        report.wordId === updatedWord?.id
+          ? {
+              ...report,
+              word: updatedWord?.value || report.word,
+              regenerationRequired: false,
+            }
+          : report,
+      ),
+    );
+  };
+
   const handleDeleteAllReports = async () => {
     try {
       const result = await Swal.fire({
@@ -321,37 +310,21 @@ const ReportsByUsers = () => {
         Reports By Users
       </h2>
 
-      {isSuperAdmin && (
-        <div className="mb-6 flex justify-center">
-          <button
-            type="button"
-            onClick={() => setShowSuperAdminTools((prev) => !prev)}
-            className="rounded-full border border-cyan-300/40 bg-cyan-700/20 px-5 py-2.5 text-sm font-semibold text-cyan-100 transition hover:border-cyan-300/70 hover:bg-cyan-700/30"
-          >
-            {showSuperAdminTools
-              ? "Hide Super Admin Tools"
-              : "Show Super Admin Tools"}
-          </button>
-        </div>
-      )}
+      <div className="flex justify-center gap-4 mb-4 ">
+        <button
+          onClick={handleDeleteAllReports}
+          className="btn btn-sm bg-red-600 text-white hover:bg-red-700"
+        >
+          Delete All Reports
+        </button>
 
-      {shouldShowAdminTools && (
-        <div className="flex justify-center gap-4 mb-4 ">
-          <button
-            onClick={handleDeleteAllReports}
-            className="btn btn-sm bg-red-600 text-white hover:bg-red-700"
-          >
-            Delete All Reports
-          </button>
-
-          <button
-            onClick={handleDeleteAllRegeneratedReports}
-            className="btn btn-sm bg-orange-500 text-white hover:bg-orange-600"
-          >
-            Delete All Regenerated Reports
-          </button>
-        </div>
-      )}
+        <button
+          onClick={handleDeleteAllRegeneratedReports}
+          className="btn btn-sm bg-orange-500 text-white hover:bg-orange-600"
+        >
+          Delete All Regenerated Reports
+        </button>
+      </div>
 
       <div className="overflow-x-auto mt-12 bg-white">
         {/* Table */}
@@ -362,9 +335,7 @@ const ReportsByUsers = () => {
               <th className="px-4 py-2 border">Total Reports</th>
               <th className="px-4 py-2 border">Reported By</th>
               <th className="px-4 py-2 border">Message</th>
-              {shouldShowAdminTools && (
-                <th className="px-4 py-2 border">Admin Action</th>
-              )}
+              <th className="px-4 py-2 border">AI Details</th>
             </tr>
           </thead>
           <tbody>
@@ -407,28 +378,35 @@ const ReportsByUsers = () => {
                     </div>
                   ))}
                 </td>
-                {shouldShowAdminTools && (
-                  <td className="px-4 py-2 border text-center">
-                    <button
-                      onClick={() => handleRegenerate(r)}
-                      className={`btn btn-sm ${
-                        r.regenerationRequired === false
-                          ? "bg-cyan-700 text-white "
-                          : "bg-red-600 text-white"
-                      }`}
-                    >
-                      {regenerating === r.wordId
-                        ? "Regenerating..."
-                        : r.regenerationRequired === false
-                          ? "Generated"
-                          : "Re-generate"}
-                    </button>
-                  </td>
-                )}
+                <td className="px-4 py-2 border text-center">
+                  <button
+                    onClick={() => handleOpenAiModal(r)}
+                    className={`btn btn-sm ${
+                      r.regenerationRequired === false
+                        ? "bg-cyan-700 text-white "
+                        : "bg-red-600 text-white"
+                    }`}
+                  >
+                    {openingWordId === r.wordId
+                      ? "Opening..."
+                      : r.regenerationRequired === false
+                        ? "Generated"
+                        : "Re-generate"}
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+
+        <AIModal
+          key={aiWord?.id || "reports-ai-modal"}
+          isOpen={isAIModalOpen}
+          aiWord={aiWord}
+          selectedParagraph={selectedParagraph}
+          onWordUpdated={handleAiWordUpdated}
+          onClose={() => setIsAIModalOpen(false)}
+        />
 
         {/* Modal */}
         {selectedUser && (

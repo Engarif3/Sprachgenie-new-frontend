@@ -231,12 +231,26 @@ const AIModal = ({
       return Swal.fire("Error", "Missing word ID", "error");
     }
 
-    if (!correctionPrompt.trim()) {
-      return Swal.fire(
-        "Prompt Required",
-        "Please enter a correction prompt.",
-        "warning",
-      );
+    const normalizedPrompt = correctionPrompt.trim();
+
+    const confirmation = await Swal.fire({
+      title: normalizedPrompt
+        ? "Generate preview with this prompt?"
+        : "Generate preview without a prompt?",
+      text: normalizedPrompt
+        ? "This will generate a preview using your correction instructions."
+        : "This will generate a preview using the default AI regeneration without any correction prompt.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: normalizedPrompt
+        ? "Yes, generate preview"
+        : "Yes, continue without prompt",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#d97706",
+    });
+
+    if (!confirmation.isConfirmed) {
+      return;
     }
 
     try {
@@ -247,7 +261,7 @@ const AIModal = ({
           word: activeWord.value,
           level: getWordLevelValue(activeWord),
           language: "de",
-          prompt: correctionPrompt.trim(),
+          prompt: normalizedPrompt,
         },
       );
 
