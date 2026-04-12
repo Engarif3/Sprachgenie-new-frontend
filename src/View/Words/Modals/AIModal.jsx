@@ -14,6 +14,8 @@ const splitItems = (value, separators) =>
 
 const splitMeaningItems = (value) => splitItems(value, /[\n,;]+/);
 const splitSentenceItems = (value) => splitItems(value, /\n+/);
+const toJoinedLines = (items) =>
+  Array.isArray(items) ? items.filter(Boolean).join("\n") : "";
 
 const getWordLevelValue = (word) => {
   if (typeof word?.level === "string") {
@@ -46,6 +48,7 @@ const AIModal = ({
   const [promptLoading, setPromptLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const [showSuperAdminTools, setShowSuperAdminTools] = useState(false);
+  const [previewData, setPreviewData] = useState(null);
   const { userId, isSuperAdmin } = useAuth();
   const activeWord = aiWord || currentWordData;
 
@@ -72,6 +75,7 @@ const AIModal = ({
     setManualParagraph(selectedParagraph || "");
     setManualOtherSentences(nextOtherSentences.join("\n"));
     setShowSuperAdminTools(false);
+    setPreviewData(null);
   }, [aiWord, selectedParagraph]);
 
   if (!isOpen || !activeWord) return null;
@@ -94,7 +98,98 @@ const AIModal = ({
     setManualMeanings(nextMeanings.join("\n"));
     setManualParagraph(nextParagraph);
     setManualOtherSentences(nextOtherSentences.join("\n"));
+    setPreviewData(null);
     onWordUpdated?.(nextWord, nextParagraph);
+  };
+
+  const saveCorrections = async ({
+    meanings,
+    paragraph,
+    otherSentences,
+    confirmationTitle,
+    confirmationText,
+    confirmButtonText,
+    successTitle,
+    successText,
+  }) => {
+    if (!isSuperAdmin) {
+      return;
+    }
+
+    if (!activeWord?.id) {
+      return Swal.fire("Error", "Missing word ID", "error");
+    }
+
+    if (!Array.isArray(meanings) || meanings.length === 0) {
+      return Swal.fire(
+        "Meanings Required",
+        "Please enter at least one meaning.",
+        "warning",
+      );
+    }
+
+    if (!String(paragraph || "").trim()) {
+      return Swal.fire(
+        "Paragraph Required",
+        "Please enter the corrected paragraph.",
+        "warning",
+      );
+    }
+
+    const confirmation = await Swal.fire({
+      title: confirmationTitle,
+      text: confirmationText,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText,
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#059669",
+    });
+
+    if (!confirmation.isConfirmed) {
+      return;
+    }
+
+    try {
+      setSaveLoading(true);
+
+      const response = await api.put(
+        `/word/paragraph/override/${activeWord.id}`,
+        {
+          word: activeWord.value,
+          level: getWordLevelValue(activeWord),
+          language: "de",
+          meanings,
+          paragraph: String(paragraph || "").trim(),
+          otherSentences: Array.isArray(otherSentences) ? otherSentences : [],
+        },
+      );
+
+      const paragraphData = response.data?.data || response.data;
+
+      applyUpdatedContent({
+        meanings: paragraphData.meanings,
+        paragraph: paragraphData.paragraph,
+        otherSentences: paragraphData.otherSentences || paragraphData.sentences,
+      });
+
+      await Swal.fire({
+        title: successTitle,
+        text: successText,
+        icon: "success",
+        timer: 1200,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.response?.data?.details ||
+        error.message;
+      Swal.fire("Error", message, "error");
+    } finally {
+      setSaveLoading(false);
+    }
   };
 
   const handleReportSubmit = async () => {
@@ -144,24 +239,10 @@ const AIModal = ({
       );
     }
 
-    const confirmation = await Swal.fire({
-      title: "Regenerate and save corrections?",
-      text: "This will regenerate the AI meanings and paragraph for the selected word and save them.",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Yes, regenerate",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: "#2563eb",
-    });
-
-    if (!confirmation.isConfirmed) {
-      return;
-    }
-
     try {
       setPromptLoading(true);
       const response = await api.post(
-        `/word/paragraph/regenerate-with-prompt/${activeWord.id}`,
+        `/word/paragraph/regenerate-with-prompt-preview/${activeWord.id}`,
         {
           word: activeWord.value,
           level: getWordLevelValue(activeWord),
@@ -172,20 +253,30 @@ const AIModal = ({
 
       const paragraphData = response.data?.data || response.data;
 
-      applyUpdatedContent({
-        meanings: paragraphData.meanings,
-        paragraph: paragraphData.paragraph,
-        otherSentences: paragraphData.otherSentences || paragraphData.sentences,
+      setPreviewData({
+        meanings: Array.isArray(paragraphData.meanings)
+          ? paragraphData.meanings
+          : [],
+        paragraph: paragraphData.paragraph || "",
+        otherSentences:
+          paragraphData.otherSentences || paragraphData.sentences || [],
       });
-      setCorrectionPrompt("");
+
+      setManualMeanings(toJoinedLines(paragraphData.meanings));
+      setManualParagraph(paragraphData.paragraph || "");
+      setManualOtherSentences(
+        toJoinedLines(paragraphData.otherSentences || paragraphData.sentences),
+      );
 
       await Swal.fire({
-        title: "Regenerated",
-        text: "AI paragraph regenerated with your correction prompt.",
+        title: "Preview Ready",
+        text: "Review the proposed AI changes below, then publish them if you want to keep them.",
         icon: "success",
-        timer: 1200,
+        timer: 1600,
         showConfirmButton: false,
       });
+
+      return;
     } catch (error) {
       const message =
         error.response?.data?.error ||
@@ -198,89 +289,54 @@ const AIModal = ({
   };
 
   const handleSaveManualCorrections = async () => {
-    if (!isSuperAdmin) {
-      return;
-    }
-
-    if (!activeWord?.id) {
-      return Swal.fire("Error", "Missing word ID", "error");
-    }
-
     const meanings = splitMeaningItems(manualMeanings);
     const otherSentences = splitSentenceItems(manualOtherSentences);
     const paragraph = manualParagraph.trim();
 
-    if (meanings.length === 0) {
-      return Swal.fire(
-        "Meanings Required",
-        "Please enter at least one meaning.",
-        "warning",
-      );
-    }
-
-    if (!paragraph) {
-      return Swal.fire(
-        "Paragraph Required",
-        "Please enter the corrected paragraph.",
-        "warning",
-      );
-    }
-
-    const confirmation = await Swal.fire({
-      title: "Save manual corrections?",
-      text: "This will update only the AI meanings and stored AI paragraph.",
-      icon: "question",
-      showCancelButton: true,
+    return saveCorrections({
+      meanings,
+      paragraph,
+      otherSentences,
+      confirmationTitle: "Save manual corrections?",
+      confirmationText:
+        "This will update only the AI meanings and stored AI paragraph.",
       confirmButtonText: "Yes, save it",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: "#059669",
+      successTitle: "Saved",
+      successText: "Meaning and paragraph corrections have been saved.",
     });
-
-    if (!confirmation.isConfirmed) {
-      return;
-    }
-
-    try {
-      setSaveLoading(true);
-
-      const response = await api.put(
-        `/word/paragraph/override/${activeWord.id}`,
-        {
-          word: activeWord.value,
-          level: getWordLevelValue(activeWord),
-          language: "de",
-          meanings,
-          paragraph,
-          otherSentences,
-        },
-      );
-
-      const paragraphData = response.data?.data || response.data;
-
-      applyUpdatedContent({
-        meanings: paragraphData.meanings,
-        paragraph: paragraphData.paragraph,
-        otherSentences: paragraphData.otherSentences || paragraphData.sentences,
-      });
-
-      await Swal.fire({
-        title: "Saved",
-        text: "Meaning and paragraph corrections have been saved.",
-        icon: "success",
-        timer: 1200,
-        showConfirmButton: false,
-      });
-    } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        error.response?.data?.details ||
-        error.message;
-      Swal.fire("Error", message, "error");
-    } finally {
-      setSaveLoading(false);
-    }
   };
+
+  const handlePublishPreview = async () => {
+    if (!previewData) {
+      return Swal.fire(
+        "No Preview",
+        "Generate a prompt preview first.",
+        "warning",
+      );
+    }
+
+    return saveCorrections({
+      meanings: Array.isArray(previewData.meanings) ? previewData.meanings : [],
+      paragraph: previewData.paragraph || "",
+      otherSentences: Array.isArray(previewData.otherSentences)
+        ? previewData.otherSentences
+        : [],
+      confirmationTitle: "Publish preview changes?",
+      confirmationText:
+        "This will publish the previewed AI meanings and paragraph for the selected word.",
+      confirmButtonText: "Yes, publish",
+      successTitle: "Published",
+      successText: "Previewed AI changes have been published.",
+    });
+  };
+
+  const currentMeanings =
+    Array.isArray(activeWord?.aiMeanings) && activeWord.aiMeanings.length
+      ? activeWord.aiMeanings
+      : [];
+  const currentOtherSentences = Array.isArray(activeWord?.sentences)
+    ? activeWord.sentences
+    : [];
 
   return (
     <>
@@ -352,15 +408,100 @@ const AIModal = ({
                     <button
                       type="button"
                       onClick={handlePromptCorrection}
-                      disabled={promptLoading}
+                      disabled={promptLoading || saveLoading}
                       className="rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-2.5 font-semibold text-slate-950 transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
                     >
                       {promptLoading
-                        ? "Regenerating..."
+                        ? "Generating Preview..."
                         : "Regenerate With Prompt"}
                     </button>
                   </div>
                 </div>
+
+                {previewData && (
+                  <div className="space-y-4 rounded-2xl border border-sky-300/30 bg-sky-500/10 p-4">
+                    <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                      <div>
+                        <h4 className="text-lg font-semibold text-sky-200">
+                          Preview Changes
+                        </h4>
+                        <p className="text-sm text-slate-300">
+                          Review the proposed AI update before publishing it.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handlePublishPreview}
+                        disabled={saveLoading}
+                        className="rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 px-5 py-2.5 font-semibold text-slate-950 transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+                      >
+                        {saveLoading ? "Publishing..." : "Publish Preview"}
+                      </button>
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="rounded-xl border border-white/10 bg-slate-950/40 p-3">
+                        <p className="mb-2 text-sm font-semibold text-slate-200">
+                          Current AI Meanings
+                        </p>
+                        <p className="text-sm whitespace-pre-line text-slate-300">
+                          {currentMeanings.length
+                            ? currentMeanings.join("\n")
+                            : "No stored AI meanings yet."}
+                        </p>
+                      </div>
+                      <div className="rounded-xl border border-sky-300/30 bg-slate-950/50 p-3">
+                        <p className="mb-2 text-sm font-semibold text-sky-200">
+                          Proposed AI Meanings
+                        </p>
+                        <p className="text-sm whitespace-pre-line text-white">
+                          {previewData.meanings.length
+                            ? previewData.meanings.join("\n")
+                            : "No meanings returned."}
+                        </p>
+                      </div>
+                      <div className="rounded-xl border border-white/10 bg-slate-950/40 p-3">
+                        <p className="mb-2 text-sm font-semibold text-slate-200">
+                          Current Paragraph
+                        </p>
+                        <p className="text-sm whitespace-pre-line text-slate-300">
+                          {currentParagraph || "No stored paragraph yet."}
+                        </p>
+                      </div>
+                      <div className="rounded-xl border border-sky-300/30 bg-slate-950/50 p-3">
+                        <p className="mb-2 text-sm font-semibold text-sky-200">
+                          Proposed Paragraph
+                        </p>
+                        <p className="text-sm whitespace-pre-line text-white">
+                          {previewData.paragraph || "No paragraph returned."}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="rounded-xl border border-white/10 bg-slate-950/40 p-3">
+                        <p className="mb-2 text-sm font-semibold text-slate-200">
+                          Current Other Sentences
+                        </p>
+                        <p className="text-sm whitespace-pre-line text-slate-300">
+                          {currentOtherSentences.length
+                            ? currentOtherSentences.join("\n")
+                            : "No stored sentences yet."}
+                        </p>
+                      </div>
+                      <div className="rounded-xl border border-sky-300/30 bg-slate-950/50 p-3">
+                        <p className="mb-2 text-sm font-semibold text-sky-200">
+                          Proposed Other Sentences
+                        </p>
+                        <p className="text-sm whitespace-pre-line text-white">
+                          {previewData.otherSentences.length
+                            ? previewData.otherSentences.join("\n")
+                            : "No sentences returned."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
@@ -402,7 +543,17 @@ const AIModal = ({
                   />
                 </div>
 
-                <div className="flex justify-end">
+                <div className="flex justify-end gap-3">
+                  {previewData && (
+                    <button
+                      type="button"
+                      onClick={() => setPreviewData(null)}
+                      disabled={saveLoading}
+                      className="rounded-full border border-white/15 bg-slate-900/60 px-5 py-2.5 font-semibold text-white transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+                    >
+                      Clear Preview
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={handleSaveManualCorrections}
