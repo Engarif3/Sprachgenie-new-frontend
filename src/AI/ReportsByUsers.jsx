@@ -7,7 +7,7 @@ import { ScaleLoader } from "react-spinners";
 import { useAuth } from "../services/auth.services";
 
 const ReportsByUsers = () => {
-  const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
+  const { isAdmin, isSuperAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
   const canAccess = userLoggedIn && userId && isAdmin;
   const [reports, setReports] = useState([]);
   const [users, setUsers] = useState([]);
@@ -16,6 +16,7 @@ const ReportsByUsers = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [regenerating, setRegenerating] = useState(null);
+  const [showSuperAdminTools, setShowSuperAdminTools] = useState(false);
 
   const fetchReportsAndUsers = async () => {
     try {
@@ -39,50 +40,15 @@ const ReportsByUsers = () => {
     }
   };
 
-  const [userCache, setUserCache] = useState({});
-
   useEffect(() => {
     fetchReportsAndUsers();
   }, []);
 
+  const shouldShowAdminTools = !isSuperAdmin || showSuperAdminTools;
+
   // Component to handle async user info fetching
   const UserInfoDisplay = ({ userId }) => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-      const fetchUserInfo = async () => {
-        // Check if already in users list
-        let foundUser = users.find((u) => u.id === userId);
-
-        // Check if in cache
-        if (!foundUser && userCache[userId]) {
-          foundUser = userCache[userId];
-        }
-
-        // Fetch on-demand if not found (checks backend user table and related tables)
-        if (!foundUser) {
-          try {
-            const res = await api.get(`/user/${userId}`);
-            if (res.data.data) {
-              foundUser = res.data.data;
-              setUserCache((prev) => ({ ...prev, [userId]: foundUser }));
-            }
-          } catch (err) {
-            console.error(`Could not fetch user ${userId}:`, err);
-          }
-        }
-
-        setUser(foundUser);
-        setLoading(false);
-      };
-
-      fetchUserInfo();
-    }, [userId, users, userCache]);
-
-    if (loading) {
-      return <span className="text-gray-400 text-sm">Loading...</span>;
-    }
+    const user = users.find((entry) => entry.id === userId);
 
     if (!user) {
       return (
@@ -274,9 +240,8 @@ const ReportsByUsers = () => {
       // Remove regenerated reports from frontend state
       const updatedReports = reports
         .map((r) => {
-          const filteredReports = r.reports.filter(
-            (rep) => r.regenerationRequired !== false, // keep reports that are not regenerated
-          );
+          const filteredReports =
+            r.regenerationRequired !== false ? r.reports : [];
           return {
             ...r,
             reports: filteredReports,
@@ -355,21 +320,38 @@ const ReportsByUsers = () => {
       <h2 className="text-md md:text-2xl lg:text-2xl font-bold mb-4 text-center  py-2 text-white bg-cyan-700  rounded">
         Reports By Users
       </h2>
-      <div className="flex justify-center gap-4 mb-4 ">
-        <button
-          onClick={handleDeleteAllReports}
-          className="btn btn-sm bg-red-600 text-white hover:bg-red-700"
-        >
-          Delete All Reports
-        </button>
 
-        <button
-          onClick={handleDeleteAllRegeneratedReports}
-          className="btn btn-sm bg-orange-500 text-white hover:bg-orange-600"
-        >
-          Delete All Regenerated Reports
-        </button>
-      </div>
+      {isSuperAdmin && (
+        <div className="mb-6 flex justify-center">
+          <button
+            type="button"
+            onClick={() => setShowSuperAdminTools((prev) => !prev)}
+            className="rounded-full border border-cyan-300/40 bg-cyan-700/20 px-5 py-2.5 text-sm font-semibold text-cyan-100 transition hover:border-cyan-300/70 hover:bg-cyan-700/30"
+          >
+            {showSuperAdminTools
+              ? "Hide Super Admin Tools"
+              : "Show Super Admin Tools"}
+          </button>
+        </div>
+      )}
+
+      {shouldShowAdminTools && (
+        <div className="flex justify-center gap-4 mb-4 ">
+          <button
+            onClick={handleDeleteAllReports}
+            className="btn btn-sm bg-red-600 text-white hover:bg-red-700"
+          >
+            Delete All Reports
+          </button>
+
+          <button
+            onClick={handleDeleteAllRegeneratedReports}
+            className="btn btn-sm bg-orange-500 text-white hover:bg-orange-600"
+          >
+            Delete All Regenerated Reports
+          </button>
+        </div>
+      )}
 
       <div className="overflow-x-auto mt-12 bg-white">
         {/* Table */}
@@ -380,6 +362,9 @@ const ReportsByUsers = () => {
               <th className="px-4 py-2 border">Total Reports</th>
               <th className="px-4 py-2 border">Reported By</th>
               <th className="px-4 py-2 border">Message</th>
+              {shouldShowAdminTools && (
+                <th className="px-4 py-2 border">Admin Action</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -422,29 +407,24 @@ const ReportsByUsers = () => {
                     </div>
                   ))}
                 </td>
-                {/* 🔹 Re-generate button */}
-
-                <td className="px-4 py-2 border text-center">
-                  <button
-                    onClick={() => handleRegenerate(r)}
-                    className={`btn btn-sm ${
-                      r.regenerationRequired === false
-                        ? // ? "bg-gray-400 text-white cursor-not-allowed"
-                          "bg-cyan-700 text-white "
-                        : "bg-red-600 text-white"
-                    }`}
-                    // disabled={
-                    //   regenerating === r.wordId ||
-                    //   r.regenerationRequired === false
-                    // }
-                  >
-                    {regenerating === r.wordId
-                      ? "Regenerating..."
-                      : r.regenerationRequired === false
-                        ? "Generated"
-                        : "Re-generate"}
-                  </button>
-                </td>
+                {shouldShowAdminTools && (
+                  <td className="px-4 py-2 border text-center">
+                    <button
+                      onClick={() => handleRegenerate(r)}
+                      className={`btn btn-sm ${
+                        r.regenerationRequired === false
+                          ? "bg-cyan-700 text-white "
+                          : "bg-red-600 text-white"
+                      }`}
+                    >
+                      {regenerating === r.wordId
+                        ? "Regenerating..."
+                        : r.regenerationRequired === false
+                          ? "Generated"
+                          : "Re-generate"}
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

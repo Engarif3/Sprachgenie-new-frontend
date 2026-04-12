@@ -5,7 +5,6 @@ import { useLockBodyScroll } from "./ModalScrolling";
 import aiApi from "../../../AI_axios";
 import api from "../../../axios";
 import { useAuth } from "../../../services/auth.services";
-import { invalidateWordsCache } from "../../../utils/storage";
 
 const splitItems = (value, separators) =>
   String(value || "")
@@ -46,6 +45,7 @@ const AIModal = ({
   const [manualOtherSentences, setManualOtherSentences] = useState("");
   const [promptLoading, setPromptLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [showSuperAdminTools, setShowSuperAdminTools] = useState(false);
   const { userId, isSuperAdmin } = useAuth();
 
   useLockBodyScroll(isOpen);
@@ -70,22 +70,13 @@ const AIModal = ({
     setManualMeanings(nextMeanings.join("\n"));
     setManualParagraph(selectedParagraph || "");
     setManualOtherSentences(nextOtherSentences.join("\n"));
+    setShowSuperAdminTools(false);
   }, [aiWord, selectedParagraph]);
 
   if (!isOpen || !currentAiWord) return null;
 
-  const applyUpdatedContent = ({
-    meanings,
-    paragraph,
-    otherSentences,
-    canonicalMeanings,
-  }) => {
+  const applyUpdatedContent = ({ meanings, paragraph, otherSentences }) => {
     const nextMeanings = Array.isArray(meanings) ? meanings : [];
-    const nextCanonicalMeanings = Array.isArray(canonicalMeanings)
-      ? canonicalMeanings
-      : Array.isArray(currentAiWord?.meaning)
-        ? currentAiWord.meaning
-        : [];
     const nextOtherSentences = Array.isArray(otherSentences)
       ? otherSentences
       : [];
@@ -93,7 +84,6 @@ const AIModal = ({
 
     const nextWord = {
       ...currentAiWord,
-      meaning: nextCanonicalMeanings,
       aiMeanings: nextMeanings,
       sentences: nextOtherSentences,
     };
@@ -221,12 +211,22 @@ const AIModal = ({
       );
     }
 
+    const confirmation = await Swal.fire({
+      title: "Save manual corrections?",
+      text: "This will update only the AI meanings and stored AI paragraph.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, save it",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#059669",
+    });
+
+    if (!confirmation.isConfirmed) {
+      return;
+    }
+
     try {
       setSaveLoading(true);
-
-      await api.put(`/word/update-meaning/${currentAiWord.id}`, {
-        meaning: meanings,
-      });
 
       const response = await api.put(
         `/word/paragraph/override/${currentAiWord.id}`,
@@ -242,13 +242,10 @@ const AIModal = ({
 
       const paragraphData = response.data?.data || response.data;
 
-      await invalidateWordsCache();
-
       applyUpdatedContent({
         meanings: paragraphData.meanings,
         paragraph: paragraphData.paragraph,
         otherSentences: paragraphData.otherSentences || paragraphData.sentences,
-        canonicalMeanings: meanings,
       });
 
       await Swal.fire({
@@ -313,7 +310,7 @@ const AIModal = ({
               </p>
             </div>
 
-            {isSuperAdmin && (
+            {isSuperAdmin && showSuperAdminTools && (
               <div className="space-y-4 rounded-2xl border-2 border-amber-400/40 bg-gradient-to-br from-amber-500/10 to-orange-500/10 p-4 md:p-6">
                 <div>
                   <h3 className="text-xl font-semibold text-amber-300">
@@ -403,6 +400,20 @@ const AIModal = ({
               </div>
             )}
           </div>
+
+          {isSuperAdmin && (
+            <div className="mt-6 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setShowSuperAdminTools((prev) => !prev)}
+                className="rounded-full border border-amber-300/40 bg-amber-500/10 px-5 py-2.5 text-sm font-semibold text-amber-200 transition hover:border-amber-300/70 hover:bg-amber-500/20"
+              >
+                {showSuperAdminTools
+                  ? "Hide Super Admin Tools"
+                  : "Show Super Admin Tools"}
+              </button>
+            </div>
+          )}
 
           <div className="mt-8 flex justify-between gap-4">
             <button
