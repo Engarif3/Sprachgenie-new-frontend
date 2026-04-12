@@ -450,6 +450,17 @@ const AIModal = ({
                     <div className="flex gap-3">
                       <button
                         type="button"
+                        onClick={() => {
+                          setPreviewData(null);
+                          setIsPreviewOpen(false);
+                        }}
+                        disabled={saveLoading}
+                        className="rounded-full border border-white/15 bg-slate-900/60 px-4 py-2 text-sm font-semibold text-white transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+                      >
+                        Clear Preview
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => setIsPreviewOpen(true)}
                         className="rounded-full border border-sky-300/40 bg-sky-500/20 px-4 py-2 text-sm font-semibold text-sky-100 transition hover:bg-sky-500/30"
                       >
