@@ -508,16 +508,6 @@ const AIModal = ({
                 </div>
 
                 <div className="flex justify-end gap-3">
-                  {previewData && (
-                    <button
-                      type="button"
-                      onClick={() => setPreviewData(null)}
-                      disabled={saveLoading}
-                      className="rounded-full border border-white/15 bg-slate-900/60 px-5 py-2.5 font-semibold text-white transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
-                    >
-                      Clear Preview
-                    </button>
-                  )}
                   <button
                     type="button"
                     onClick={handleSaveManualCorrections}
