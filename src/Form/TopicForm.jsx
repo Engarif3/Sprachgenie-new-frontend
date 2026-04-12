@@ -76,6 +76,7 @@ import { Navigate } from "react-router-dom";
 import axios from "../axios";
 import Container from "../utils/Container";
 import { useAuth } from "../services/auth.services";
+import { invalidateWordsCache } from "../utils/storage";
 
 const TopicForm = () => {
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
@@ -118,6 +119,7 @@ const TopicForm = () => {
         ...topicData,
         levelId: parseInt(topicData.levelId, 10),
       });
+      await invalidateWordsCache();
       alert("Topic created successfully");
       setTopicData({ name: "", levelId: "" });
     } catch (error) {

@@ -285,6 +285,7 @@ const buildWordListRequestParams = (queryState, page) => {
   const params = new URLSearchParams({
     page: String(page),
     limit: String(WORDS_PER_PAGE),
+    _ts: String(Date.now()),
   });
 
   if (hasAdminCompletenessFilter(queryState)) {

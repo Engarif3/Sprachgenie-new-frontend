@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import axios from "../axios";
 import Container from "../utils/Container";
 import { useAuth } from "../services/auth.services";
+import { invalidateWordsCache } from "../utils/storage";
 
 const EMPTY_TOPIC_FORM = {
   name: "",
@@ -12,10 +13,6 @@ const EMPTY_TOPIC_FORM = {
 
 const buildNoCacheRequestConfig = () => ({
   params: { _ts: Date.now() },
-  headers: {
-    "Cache-Control": "no-cache",
-    Pragma: "no-cache",
-  },
 });
 
 const UpdateTopicForm = () => {
@@ -133,6 +130,8 @@ const UpdateTopicForm = () => {
         ...topicData,
         levelId: parseInt(topicData.levelId, 10),
       });
+
+      await invalidateWordsCache();
 
       const refreshedTopics = await fetchOptions();
 
