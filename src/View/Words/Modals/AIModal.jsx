@@ -144,6 +144,20 @@ const AIModal = ({
       );
     }
 
+    const confirmation = await Swal.fire({
+      title: "Regenerate and save corrections?",
+      text: "This will regenerate the AI meanings and paragraph for the selected word and save them.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, regenerate",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#2563eb",
+    });
+
+    if (!confirmation.isConfirmed) {
+      return;
+    }
+
     try {
       setPromptLoading(true);
       const response = await api.post(
