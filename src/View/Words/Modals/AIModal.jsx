@@ -13,7 +13,6 @@ const splitItems = (value, separators) =>
     .filter(Boolean);
 
 const splitMeaningItems = (value) => splitItems(value, /[\n,;]+/);
-const splitSentenceItems = (value) => splitItems(value, /\n+/);
 const toJoinedLines = (items) =>
   Array.isArray(items) ? items.filter(Boolean).join("\n") : "";
 
@@ -44,7 +43,6 @@ const AIModal = ({
   const [correctionPrompt, setCorrectionPrompt] = useState("");
   const [manualMeanings, setManualMeanings] = useState("");
   const [manualParagraph, setManualParagraph] = useState("");
-  const [manualOtherSentences, setManualOtherSentences] = useState("");
   const [promptLoading, setPromptLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const [showSuperAdminTools, setShowSuperAdminTools] = useState(false);
@@ -67,14 +65,10 @@ const AIModal = ({
         : Array.isArray(aiWord?.meaning)
           ? aiWord.meaning
           : [];
-    const nextOtherSentences = Array.isArray(aiWord?.sentences)
-      ? aiWord.sentences
-      : [];
 
     setCorrectionPrompt("");
     setManualMeanings(nextMeanings.join("\n"));
     setManualParagraph(selectedParagraph || "");
-    setManualOtherSentences(nextOtherSentences.join("\n"));
     setShowSuperAdminTools(false);
     setPreviewData(null);
     setIsPreviewOpen(false);
@@ -82,24 +76,19 @@ const AIModal = ({
 
   if (!isOpen || !activeWord) return null;
 
-  const applyUpdatedContent = ({ meanings, paragraph, otherSentences }) => {
+  const applyUpdatedContent = ({ meanings, paragraph }) => {
     const nextMeanings = Array.isArray(meanings) ? meanings : [];
-    const nextOtherSentences = Array.isArray(otherSentences)
-      ? otherSentences
-      : [];
     const nextParagraph = paragraph || "";
 
     const nextWord = {
       ...activeWord,
       aiMeanings: nextMeanings,
-      sentences: nextOtherSentences,
     };
 
     setCurrentWordData(nextWord);
     setCurrentParagraph(nextParagraph);
     setManualMeanings(nextMeanings.join("\n"));
     setManualParagraph(nextParagraph);
-    setManualOtherSentences(nextOtherSentences.join("\n"));
     setPreviewData(null);
     setIsPreviewOpen(false);
     onWordUpdated?.(nextWord, nextParagraph);
@@ -108,7 +97,6 @@ const AIModal = ({
   const saveCorrections = async ({
     meanings,
     paragraph,
-    otherSentences,
     confirmationTitle,
     confirmationText,
     confirmButtonText,
@@ -164,7 +152,6 @@ const AIModal = ({
           language: "de",
           meanings,
           paragraph: String(paragraph || "").trim(),
-          otherSentences: Array.isArray(otherSentences) ? otherSentences : [],
         },
       );
 
@@ -275,15 +262,10 @@ const AIModal = ({
           ? paragraphData.meanings
           : [],
         paragraph: paragraphData.paragraph || "",
-        otherSentences:
-          paragraphData.otherSentences || paragraphData.sentences || [],
       });
 
       setManualMeanings(toJoinedLines(paragraphData.meanings));
       setManualParagraph(paragraphData.paragraph || "");
-      setManualOtherSentences(
-        toJoinedLines(paragraphData.otherSentences || paragraphData.sentences),
-      );
       setIsPreviewOpen(true);
 
       await Swal.fire({
@@ -308,13 +290,11 @@ const AIModal = ({
 
   const handleSaveManualCorrections = async () => {
     const meanings = splitMeaningItems(manualMeanings);
-    const otherSentences = splitSentenceItems(manualOtherSentences);
     const paragraph = manualParagraph.trim();
 
     return saveCorrections({
       meanings,
       paragraph,
-      otherSentences,
       confirmationTitle: "Save manual corrections?",
       confirmationText:
         "This will update only the AI meanings and stored AI paragraph.",
@@ -336,9 +316,6 @@ const AIModal = ({
     return saveCorrections({
       meanings: Array.isArray(previewData.meanings) ? previewData.meanings : [],
       paragraph: previewData.paragraph || "",
-      otherSentences: Array.isArray(previewData.otherSentences)
-        ? previewData.otherSentences
-        : [],
       confirmationTitle: "Publish preview changes?",
       confirmationText:
         "This will publish the previewed AI meanings and paragraph for the selected word.",
@@ -352,9 +329,6 @@ const AIModal = ({
     Array.isArray(activeWord?.aiMeanings) && activeWord.aiMeanings.length
       ? activeWord.aiMeanings
       : [];
-  const currentOtherSentences = Array.isArray(activeWord?.sentences)
-    ? activeWord.sentences
-    : [];
 
   return (
     <>
@@ -478,31 +452,17 @@ const AIModal = ({
                   </div>
                 )}
 
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-amber-200">
-                      Meanings
-                    </label>
-                    <textarea
-                      value={manualMeanings}
-                      onChange={(e) => setManualMeanings(e.target.value)}
-                      rows={6}
-                      className="w-full rounded-xl border border-white/10 bg-slate-950/60 p-3 text-sm text-white outline-none transition focus:border-amber-300/60"
-                      placeholder="One meaning per line"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-amber-200">
-                      Other Sentences
-                    </label>
-                    <textarea
-                      value={manualOtherSentences}
-                      onChange={(e) => setManualOtherSentences(e.target.value)}
-                      rows={6}
-                      className="w-full rounded-xl border border-white/10 bg-slate-950/60 p-3 text-sm text-white outline-none transition focus:border-amber-300/60"
-                      placeholder="One sentence per line"
-                    />
-                  </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-amber-200">
+                    Meanings
+                  </label>
+                  <textarea
+                    value={manualMeanings}
+                    onChange={(e) => setManualMeanings(e.target.value)}
+                    rows={6}
+                    className="w-full rounded-xl border border-white/10 bg-slate-950/60 p-3 text-sm text-white outline-none transition focus:border-amber-300/60"
+                    placeholder="One meaning per line"
+                  />
                 </div>
 
                 <div>
@@ -621,17 +581,6 @@ const AIModal = ({
                     {currentParagraph || "No stored paragraph yet."}
                   </p>
                 </div>
-
-                <div className="rounded-xl border border-white/10 bg-slate-900/50 p-4">
-                  <p className="mb-2 text-sm font-semibold text-slate-200">
-                    Other Sentences
-                  </p>
-                  <p className="text-sm whitespace-pre-line text-slate-300">
-                    {currentOtherSentences.length
-                      ? currentOtherSentences.join("\n")
-                      : "No stored sentences yet."}
-                  </p>
-                </div>
               </div>
 
               <div className="space-y-5 rounded-2xl border border-sky-300/30 bg-sky-500/10 p-4">
@@ -654,17 +603,6 @@ const AIModal = ({
                   </p>
                   <p className="text-sm whitespace-pre-line text-white">
                     {previewData.paragraph || "No paragraph returned."}
-                  </p>
-                </div>
-
-                <div className="rounded-xl border border-sky-300/30 bg-slate-900/60 p-4">
-                  <p className="mb-2 text-sm font-semibold text-sky-200">
-                    Other Sentences
-                  </p>
-                  <p className="text-sm whitespace-pre-line text-white">
-                    {previewData.otherSentences.length
-                      ? previewData.otherSentences.join("\n")
-                      : "No sentences returned."}
                   </p>
                 </div>
               </div>
