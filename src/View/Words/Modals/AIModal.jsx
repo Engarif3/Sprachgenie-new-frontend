@@ -411,7 +411,7 @@ const AIModal = ({
                 </div>
 
                 {previewData && (
-                  <div className="flex items-center justify-between rounded-2xl border border-sky-300/30 bg-sky-500/10 px-4 py-3">
+                  <div className="flex items-center justify-end gap-2 rounded-2xl border border-sky-300/30 bg-sky-500/10 px-4 py-3">
                     <div className="flex gap-3">
                       <button
                         type="button"
