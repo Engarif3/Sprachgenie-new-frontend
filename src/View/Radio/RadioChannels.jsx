@@ -56,6 +56,26 @@ const formatNumber = (value) =>
 
 const getComparableBitrate = (bitrate) => (bitrate > 0 ? bitrate : -1);
 
+const canUseStreamUrl = (streamUrl) => {
+  const normalizedUrl = normalizeText(streamUrl);
+
+  if (!normalizedUrl) {
+    return false;
+  }
+
+  if (typeof window === "undefined") {
+    return true;
+  }
+
+  const pageProtocol = window.location.protocol;
+
+  if (pageProtocol !== "https:") {
+    return true;
+  }
+
+  return normalizedUrl.startsWith("https://");
+};
+
 const STREAM_SUFFIX_PATTERNS = [
   /\s*\|\s*(?:aac|mp3|opus|ogg|mpeg)\s*\d+\s*k(?:bit\/s|bps)?\s*$/i,
   /\s*\|\s*\d+\s*k(?:bit\/s|bps)?\s*(?:aac|mp3|opus|ogg|mpeg)?\s*$/i,
@@ -156,6 +176,7 @@ const normalizeStation = (station) => {
 
   if (
     !streamUrl ||
+    !canUseStreamUrl(streamUrl) ||
     !name ||
     station.lastcheckok === 0 ||
     BLOCKED_CHANNEL_PATTERNS.some((pattern) => pattern.test(name))
