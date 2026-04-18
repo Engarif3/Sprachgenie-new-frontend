@@ -4,6 +4,7 @@ import AuthButton from "../components/UI/AuthButton/AuthButton";
 import { useAuth } from "../services/auth.services";
 import { FaBook, FaHome, FaSun, FaMoon } from "react-icons/fa";
 import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
+import { RiRadioFill } from "react-icons/ri";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import { useTranslation } from "react-i18next";
@@ -214,6 +215,35 @@ const NavBar = () => {
             </button>
           </div>
         )}
+        {!isMobile && (
+          <div className="mt-1 hidden items-center justify-between rounded-xl border border-slate-700/70 px-3 py-2 md:flex lg:hidden">
+            <button
+              onClick={() => {
+                toggleLanguage();
+                setIsProfileMenuOpen(false);
+              }}
+              className={languageToggleButtonClass}
+              title={`Switch to ${language === "en" ? "Deutsch" : "English"}`}
+            >
+              {renderLanguageToggle()}
+            </button>
+
+            <button
+              onClick={() => {
+                toggleTheme();
+                setIsProfileMenuOpen(false);
+              }}
+              className="flex p-1 rounded-full transition-all duration-300 border bg-cyan-900 hover:bg-gray-700/50 text-white border-gray-700/50"
+              title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+            >
+              {theme === "light" ? (
+                <FaMoon className="text-lg text-yellow-500 hover:scale-110" />
+              ) : (
+                <FaSun className="text-lg hover:scale-110" />
+              )}
+            </button>
+          </div>
+        )}
         <div className="mt-1 flex justify-end border-t border-slate-700/70 pt-2">
           <AuthButton onLogoutComplete={() => setIsProfileMenuOpen(false)} />
         </div>
@@ -266,8 +296,8 @@ const NavBar = () => {
     <>
       <div className={`w-full sticky top-0 z-50 ${navbarBackgroundClass}`}>
         <Container>
-          <div className="h-1 -mt-2" />
-          <div className="flex flex-wrap items-center justify-between py-3 px-2 text-lg font-semibold relative border-b border-slate-800 mt-0">
+          <div className="h-1 -mt-2  " />
+          <div className="flex flex-wrap items-center justify-between py-3 px-2 text-lg font-semibold relative border-b border-slate-800 mt-0 md:flex-nowrap">
             {/* Title and Mobile Actions */}
             <div className="flex min-w-0 flex-1 items-center justify-between gap-2 px-2 md:w-auto md:flex-none md:px-4">
               <Link
@@ -290,6 +320,20 @@ const NavBar = () => {
                       <FaBook
                         className="text-[15px] text-sky-300 transition-colors duration-300 group-hover:text-sky-100"
                         size={15}
+                      />
+                    </Link>
+                  )}
+
+                  {location.pathname !== "/radio" && (
+                    <Link
+                      to="/radio"
+                      className={mobileQuickActionClass}
+                      aria-label={t("navbar.radio")}
+                      title={t("navbar.radio")}
+                    >
+                      <RiRadioFill
+                        className="text-[16px] text-sky-300 transition-colors duration-300 group-hover:text-sky-100"
+                        size={16}
                       />
                     </Link>
                   )}
@@ -362,16 +406,16 @@ const NavBar = () => {
               </div>
             </div>
             {/* Navigation Links */}
-            <div className="hidden md:flex md:flex-row rounded-xl items-center gap-3 md:gap-4 lg:gap-16 w-full md:w-auto px-4 mt-2 md:mt-0 md:static md:py-0 md:border-0 md:bg-transparent">
+            <div className="hidden md:ml-auto md:flex md:flex-row md:flex-nowrap rounded-xl items-center gap-2 md:gap-2 lg:gap-16 w-full md:w-auto px-2 lg:px-4 mt-2 md:mt-0 md:static md:py-0 md:border-0 md:bg-transparent">
               {location.pathname !== "/" && (
                 <Link
                   to="/"
                   className="group hidden md:flex items-center justify-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 transition-all duration-300"
                 >
-                  <FaHome className="text-3xl text-sky-500 group-hover:text-sky-500 transition-colors group-hover:animate-bounce" />
+                  <FaHome className="text-2xl lg:text-3xl text-sky-500 group-hover:text-sky-500 transition-colors group-hover:animate-bounce" />
                   <span
                     className={
-                      "ml-2 text-xl text-white group-hover:text-sky-400 transition-colors"
+                      "ml-1 lg:ml-2 text-base lg:text-xl text-white group-hover:text-sky-400 transition-colors"
                     }
                   >
                     {t("navbar.home")}
@@ -386,10 +430,24 @@ const NavBar = () => {
                 >
                   <FaBook
                     className="text-sky-500 group-hover:text-sky-500 transition-colors group-hover:animate-bounce"
+                    size={18}
+                  />
+                  <span className="ml-1 lg:ml-2 text-base lg:text-xl text-white group-hover:text-sky-400 transition-colors">
+                    {t("navbar.vocabulary")}
+                  </span>
+                </Link>
+              )}
+              {location.pathname !== "/radio" && (
+                <Link
+                  to="/radio"
+                  className="group hidden md:flex w-full md:w-auto items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 mt-0 transition-all duration-300"
+                >
+                  <RiRadioFill
+                    className="text-sky-500 group-hover:text-sky-500 transition-colors group-hover:animate-bounce"
                     size={20}
                   />
-                  <span className="ml-2 text-xl text-white group-hover:text-sky-400 transition-colors">
-                    {t("navbar.vocabulary")}
+                  <span className="ml-1 lg:ml-2 text-base lg:text-xl text-white group-hover:text-sky-400 transition-colors">
+                    {t("navbar.radio")}
                   </span>
                 </Link>
               )}
@@ -397,7 +455,7 @@ const NavBar = () => {
                 <>
                   <Link
                     to="/favorites"
-                    className="group hidden md:flex lg:flex items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 transition-all duration-300"
+                    className="group hidden lg:flex items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 transition-all duration-300"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -424,14 +482,14 @@ const NavBar = () => {
               {/* Language Toggle Button with SVG Flags */}
               <button
                 onClick={toggleLanguage}
-                className={languageToggleButtonClass}
+                className={`${languageToggleButtonClass} ${userLoggedIn ? "hidden lg:flex" : "hidden md:flex"}`}
                 title={`Switch to ${language === "en" ? "Deutsch" : "English"}`}
               >
                 {renderLanguageToggle()}
               </button>
 
               {/* Theme Toggle Button */}
-              <div>
+              <div className={userLoggedIn ? "hidden lg:block" : "block"}>
                 <button
                   onClick={toggleTheme}
                   className="flex p-1 rounded-full transition-all duration-300  border

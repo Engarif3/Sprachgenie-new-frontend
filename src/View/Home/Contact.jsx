@@ -80,9 +80,9 @@ const Contact = () => {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row justify-center items-center gap-12 px-4">
+        <div className="flex flex-col lg:flex-row justify-center items-center gap-12 px-4 ">
           {/* Contact Info */}
-          <div className="w-full lg:w-1/2 max-w-lg space-y-6">
+          <div className="w-full lg:w-1/2 md:w-full lg:max-w-lg space-y-6">
             <div className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-8 rounded-2xl border border-gray-700 hover:border-orange-500/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(249,115,22,0.2)]">
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-2xl">
@@ -119,11 +119,11 @@ const Contact = () => {
           </div>
 
           {/* Contact Form */}
-          <div className="w-full lg:w-1/2 max-w-lg">
+          <div className="w-full lg:w-1/2 md:w-full lg:max-w-lg">
             <form
               ref={form}
               onSubmit={handleSubmit(onSubmit)}
-              className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-8 rounded-2xl border-2 border-gray-700 hover:border-orange-500/50 transition-all duration-300 space-y-9"
+              className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-4 md:p-8 lg:p-8 rounded-2xl border-2 border-gray-700 hover:border-orange-500/50 transition-all duration-300 space-y-9 md:space-y-16 lg:space-y-9"
             >
               <div>
                 <label

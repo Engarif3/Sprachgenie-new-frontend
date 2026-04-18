@@ -139,7 +139,7 @@ const TABLE_VARIANTS = {
     synonymsTag:
       "inline-flex cursor-pointer items-center gap-1 rounded-full border border-blue-300 bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-1.5 text-md font-semibold text-blue-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-blue-100 hover:to-indigo-100 dark:border-blue-500/50 dark:from-blue-500/20 dark:to-purple-500/20 dark:text-blue-300 dark:hover:from-blue-500/40 dark:hover:to-purple-500/40 dark:hover:shadow-blue-500/50",
     antonymsCell:
-      "hidden border border-slate-200 p-1 dark:border-gray-700/50 md:table-cell md:p-2 lg:p-2",
+      "hidden border border-slate-200 p-1 dark:border-gray-700/50 lg:table-cell md:p-2 lg:p-2",
     antonymsTag:
       "inline-flex cursor-pointer items-center gap-1 rounded-full border border-rose-300 bg-gradient-to-r from-rose-50 to-pink-50 px-3 py-1.5 text-md font-semibold text-rose-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-rose-100 hover:to-pink-100 dark:border-red-500/50 dark:from-red-500/20 dark:to-pink-500/20 dark:text-red-300 dark:hover:from-red-500/40 dark:hover:to-pink-500/40 dark:hover:shadow-red-500/50",
     similarCell:
@@ -207,7 +207,7 @@ const FavoriteWordsTable = ({
             <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-cyan-400 dark:border-gray-700 md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
               Synonym
             </th>
-            <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-pink-400 dark:border-gray-700 lg:table-cell xl:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+            <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-pink-400 dark:border-gray-700  lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
               Antonym
             </th>
             <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-green-400 dark:border-gray-700 lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">

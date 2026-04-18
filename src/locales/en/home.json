@@ -98,6 +98,8 @@
   "messageMinLength": "Message must be at least 10 characters",
   "vocabCardTitle": "Vocabulary Library",
   "vocabCardDesc": "Master 4500+ German words with examples, audio, and contextual usage",
+  "radioCardTitle": "German Radio Channels",
+  "radioCardDesc": "Listen to live German stations and train your ear with real broadcasts, news, and music",
   "storiesCardTitle": "German Stories",
   "storiesCardDesc": "Immerse yourself in engaging stories to enhance reading skills",
   "grammarCardTitle": "Learn Grammar",

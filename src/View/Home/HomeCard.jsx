@@ -1,5 +1,14 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "../../context/ThemeContext";
+
+const lightModePalette = {
+  shell: "bg-[linear-gradient(160deg,#ffffff_0%,#fafafa_52%,#f3f4f6_100%)]",
+  glow: "bg-white/80",
+  icon: "from-white via-gray-50 to-gray-100",
+  accent: "bg-gray-500",
+  label: "text-gray-700",
+};
 
 const tones = {
   blue: {
@@ -62,58 +71,128 @@ const HomeCard = ({
   tone = "blue",
 }) => {
   const { t } = useTranslation("home");
-  const palette = tones[tone] ?? tones.blue;
+  const { theme } = useTheme();
+  const isLight = theme === "light";
+  const palette = isLight ? lightModePalette : (tones[tone] ?? tones.blue);
 
   return (
     <Link
       to={link}
-      className={`group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-[28px] ${palette.shell} p-6 md:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_56px_rgba(15,23,42,0.22)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950`}
+      className={` group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-[28px] ${palette.shell}  p-6 md:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_24px_56px_rgba(15,23,42,0.22)] focus-visible:outline-none focus-visible:ring-2 ${
+        isLight
+          ? " border border-gray-200/90 focus-visible:ring-gray-300/80 focus-visible:ring-offset-white "
+          : "focus-visible:ring-white/30 focus-visible:ring-offset-slate-950"
+      } focus-visible:ring-offset-2`}
     >
-      <div className="absolute inset-0 rounded-[28px] border border-white/[0.08] transition-colors duration-300 group-hover:border-white/[0.14] group-focus-visible:border-white/[0.16]" />
-      <div className="absolute inset-[1px] rounded-[27px] bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_30%)]" />
+      <div
+        className={` absolute inset-0 rounded-[28px] border transition-colors duration-300 ${
+          isLight
+            ? "hidden"
+            : "border-white/[0.08] group-hover:border-white/[0.14] group-focus-visible:border-white/[0.16]"
+        }`}
+      />
+      <div
+        className={`absolute rounded-[28px] ${
+          isLight
+            ? "inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.92),transparent_36%)]"
+            : "bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_30%)]"
+        }`}
+      />
       <div
         className={`absolute -right-8 top-4 h-28 w-28 rounded-full blur-3xl ${palette.glow}`}
       />
-      <div className="absolute inset-x-0 top-0 h-24 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),transparent)]" />
-      <div className="absolute left-6 right-6 top-0 h-px bg-white/[0.16]" />
+      <div
+        className={`absolute inset-x-0 top-0 h-24 ${
+          isLight
+            ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.72),rgba(255,255,255,0))]"
+            : "bg-[linear-gradient(180deg,rgba(255,255,255,0.08),transparent)]"
+        }`}
+      />
+      <div
+        className={`absolute left-6 right-6 top-0 h-px ${
+          isLight ? "bg-gray-200/90" : "bg-white/[0.16]"
+        }`}
+      />
 
       <div className="relative z-10 flex h-full flex-col">
         <div className="mb-6 flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-white/85 shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+            <div
+              className={`mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] shadow-[0_8px_24px_rgba(0,0,0,0.12)] ${
+                isLight
+                  ? "border-gray-200 bg-white/90 text-gray-700"
+                  : "border-white/10 bg-white/[0.06] text-white/85"
+              }`}
+            >
               <span className={`h-1.5 w-1.5 rounded-full ${palette.accent}`} />
               {eyebrow}
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="inline-flex h-14 w-14 items-center justify-center rounded-[18px] bg-white/[0.07] text-slate-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+            <div
+              className={`inline-flex h-14 w-14 items-center justify-center rounded-[18px] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] ${
+                isLight
+                  ? "border border-gray-200/90 bg-white text-gray-700"
+                  : "bg-white/[0.07] text-slate-50"
+              }`}
+            >
               <div
                 className={`flex h-12 w-12 items-center justify-center rounded-[15px] bg-gradient-to-br ${palette.icon}`}
               >
                 {icon}
               </div>
             </div>
-            <div className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-[12px] font-semibold tracking-[0.14em] text-white/80">
+            <div
+              className={`rounded-full border px-3 py-1.5 text-[12px] font-semibold tracking-[0.14em] ${
+                isLight
+                  ? "border-gray-200 bg-white/90 text-gray-700"
+                  : "border-white/10 bg-white/[0.06] text-white/80"
+              }`}
+            >
               {index}
             </div>
           </div>
         </div>
 
-        <h3 className="mb-3 text-left text-[24px] font-semibold leading-[1.12] text-white md:text-[27px]">
+        <h3
+          className={`mb-3 text-left text-[24px] font-semibold leading-[1.12] md:text-[27px] ${
+            isLight ? "text-slate-900" : "text-white"
+          }`}
+        >
           {title}
         </h3>
 
-        <p className="min-h-[4.5rem] max-w-[34ch] text-left text-[15px] leading-7 text-white md:min-h-[4.9rem] md:text-[16px]">
+        <p
+          className={`min-h-[4.5rem] max-w-[34ch] text-left text-[15px] leading-7 md:min-h-[4.9rem] md:text-[16px] ${
+            isLight ? "text-slate-700" : "text-white"
+          }`}
+        >
           {text}
         </p>
 
-        <div className="mt-6 flex items-center justify-between border-t border-white/[0.08] pt-5 text-sm transition-colors duration-300 group-hover:border-white/[0.14]">
+        <div
+          className={`mt-6 flex items-center justify-between border-t pt-5 text-sm transition-colors duration-300 ${
+            isLight
+              ? "border-gray-200/90 group-hover:border-gray-300"
+              : "border-white/[0.08] group-hover:border-white/[0.14]"
+          }`}
+        >
           <span className={`font-medium ${palette.label}`}>
             {t("exploreNow")}
           </span>
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.08] px-3.5 py-2 text-slate-100/95 transition-all duration-300 group-hover:bg-white/[0.12] group-hover:translate-x-1">
-            <span className="text-[12px] font-semibold tracking-[0.08em] text-white/90">
+          <span
+            className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-2 transition-all duration-300 group-hover:translate-x-1 ${
+              isLight
+                ? "border-gray-200 bg-white/95 text-gray-700 group-hover:bg-white"
+                : "border-white/10 bg-white/[0.08] text-slate-100/95 group-hover:bg-white/[0.12]"
+            }`}
+          >
+            <span
+              className={`text-[12px] font-semibold tracking-[0.08em] ${
+                isLight ? "text-gray-700" : "text-white/90"
+              }`}
+            >
               Open
             </span>
             <svg

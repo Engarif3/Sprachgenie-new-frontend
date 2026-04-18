@@ -2,6 +2,7 @@
   "navbar": {
     "home": "Home",
     "vocabulary": "Vocabulary",
+    "radio": "Radio",
     "dashboard": "Dashboard",
     "favorites": "Favorites",
     "login": "Log In",

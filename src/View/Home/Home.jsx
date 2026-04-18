@@ -169,11 +169,42 @@ const Home = () => {
       ),
     },
     {
+      title: t("radioCardTitle"),
+      text: t("radioCardDesc"),
+      link: "/radio",
+      eyebrow: "Live Listening",
+      index: "02",
+      tone: "rose",
+      icon: (
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          className="h-7 w-7"
+          aria-hidden="true"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M5 10.5A2.5 2.5 0 0 1 7.5 8H19a2 2 0 0 1 2 2v6.5A2.5 2.5 0 0 1 18.5 19h-11A2.5 2.5 0 0 1 5 16.5v-6Z"
+          />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8 8 15.5 4" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M9 13h.01M12 13a2 2 0 1 0 4 0 2 2 0 0 0-4 0ZM18.5 13h.01"
+          />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8 17h3" />
+        </svg>
+      ),
+    },
+    {
       title: t("storiesCardTitle"),
       text: t("storiesCardDesc"),
       link: "/stories",
       eyebrow: "Narrative Practice",
-      index: "02",
+      index: "03",
       tone: "teal",
       icon: (
         <svg
@@ -202,7 +233,7 @@ const Home = () => {
       text: t("grammarCardDesc"),
       link: "/grammar",
       eyebrow: "Rule System",
-      index: "03",
+      index: "04",
       tone: "violet",
       icon: (
         <svg
@@ -226,7 +257,7 @@ const Home = () => {
       text: t("prefixCardDesc"),
       link: "/prefix-types",
       eyebrow: "Word Building",
-      index: "04",
+      index: "05",
       tone: "amber",
       icon: (
         <svg
@@ -261,7 +292,7 @@ const Home = () => {
       text: t("conversationCardDesc"),
       link: "/conversation-titles",
       eyebrow: "Speaking Flows",
-      index: "05",
+      index: "06",
       tone: "rose",
       icon: (
         <svg
@@ -290,7 +321,7 @@ const Home = () => {
       text: t("quizCardDesc"),
       link: "/quiz",
       eyebrow: "Retention Check",
-      index: "06",
+      index: "07",
       tone: "emerald",
       icon: (
         <svg
@@ -639,7 +670,7 @@ const Home = () => {
 
         <Container>
           <div
-            className={`mb-16 relative transition-all duration-1000 ${
+            className={`mb-16  relative transition-all duration-1000 ${
               visibleSections.has("resources")
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-10"
@@ -653,7 +684,7 @@ const Home = () => {
             <h2 className="text-center text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 dark:text-white pb-8">
               {t("learningResources")}
             </h2>
-            <p className="text-center text-xl md:text-2xl text-gray-950 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-center  text-xl md:text-2xl text-gray-950 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
               {t("everythingYouNeed")}
             </p>
             <div className="flex justify-center mt-6">
@@ -689,7 +720,7 @@ const Home = () => {
         {/* TITLE inside Container (safe) */}
         <Container>
           <div
-            className={`text-center mb-16 md:mb-1 lg:mb-1 transition-all duration-1000 ${
+            className={`text-center mb-16  transition-all duration-1000 ${
               visibleSections.has("features") ? "opacity-100" : "opacity-0"
             }`}
           >
@@ -900,14 +931,14 @@ const Home = () => {
       >
         <Container>
           <div
-            className={`grid grid-cols-2 md:grid-cols-4 gap-8 px-4 transition-all duration-1000 ${
+            className={`grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8 px-4 transition-all duration-1000 ${
               visibleSections.has("stats")
                 ? "opacity-100 scale-100"
                 : "opacity-0 scale-95"
             }`}
           >
             <div className="text-center">
-              <div className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-3">
+              <div className="text-4xl md:text-6xl lg:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-3">
                 {t("wordCount")}
               </div>
               <p className="text-white dark:text-gray-300 text-lg font-semibold">
@@ -915,7 +946,7 @@ const Home = () => {
               </p>
             </div>
             <div className="text-center">
-              <div className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-3">
+              <div className="text-4xl md:text-6xl lg:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-3">
                 {t("practicalConversations")}
               </div>
               <p className="text-white dark:text-gray-300 text-lg font-semibold">

@@ -65,6 +65,7 @@ const PerfectAndPastForm = lazy(
   () => import("../View/Grammar/PerfectAndPastForm/PerfectAndPastForm"),
 );
 const Stories = lazy(() => import("../View/Stories/Stories"));
+const RadioChannels = lazy(() => import("../View/Radio/RadioChannels"));
 const UsersFavoriteCount = lazy(
   () => import("../AdminActions/Admin/UsersFavoriteCount"),
 );
@@ -139,6 +140,7 @@ const GenerateStoryWithSuspense = withSuspense(GenerateStory);
 const StoriesManagementWithSuspense = withSuspense(StoriesManagement);
 const PerfectAndPastFormWithSuspense = withSuspense(PerfectAndPastForm);
 const StoriesWithSuspense = withSuspense(Stories);
+const RadioChannelsWithSuspense = withSuspense(RadioChannels);
 const UsersFavoriteCountWithSuspense = withSuspense(UsersFavoriteCount);
 const DashboardLayoutWithSuspense = withSuspense(DashboardLayout);
 const DashboardHomeWithSuspense = withSuspense(DashboardHome);
@@ -230,6 +232,7 @@ export const router = createBrowserRouter(
         { path: "/clauses", element: <ClausesWithSuspense /> },
         { path: "/clause/:id", element: <ClauseWithSuspense /> },
         { path: "/stories", element: <StoriesWithSuspense /> },
+        { path: "/radio", element: <RadioChannelsWithSuspense /> },
         {
           path: "/update-user-status",
           element: protectRoute(
