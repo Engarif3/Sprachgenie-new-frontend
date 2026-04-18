@@ -252,6 +252,50 @@ const normalizeInsertedItems = (field, value) => {
   return normalizeFieldItems(null, value);
 };
 
+const RELATION_FIELDS = ["synonyms", "antonyms", "similarWords"];
+
+const normalizeWordValue = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase();
+
+const getSelfReferenceMessage = (value, relations) => {
+  const normalizedValue = normalizeWordValue(value);
+
+  if (!normalizedValue) {
+    return null;
+  }
+
+  const invalidLabels = [
+    ["synonyms", "synonym"],
+    ["antonyms", "antonym"],
+    ["similarWords", "similar word"],
+  ]
+    .filter(([field]) =>
+      Array.isArray(relations[field])
+        ? relations[field].some(
+            (item) => normalizeWordValue(item) === normalizedValue,
+          )
+        : false,
+    )
+    .map(([, label]) => label);
+
+  if (!invalidLabels.length) {
+    return null;
+  }
+
+  return `The word cannot reference itself as a ${invalidLabels.join(", ")}.`;
+};
+
+const showSelfReferenceAlert = (message) =>
+  Swal.fire({
+    title: "Invalid relation",
+    text: message,
+    icon: "warning",
+    timer: 2200,
+    showConfirmButton: false,
+  });
+
 const UpdateWord = () => {
   const { id } = useParams();
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
@@ -414,6 +458,17 @@ const UpdateWord = () => {
     const updatedArray = [...formData[field]];
     const insertIndex = position === "above" ? index : index + 1;
     updatedArray.splice(insertIndex, 0, ...itemsToInsert);
+
+    if (RELATION_FIELDS.includes(field)) {
+      const selfReferenceMessage = getSelfReferenceMessage(formData.value, {
+        [field]: updatedArray,
+      });
+
+      if (selfReferenceMessage) {
+        await showSelfReferenceAlert(selfReferenceMessage);
+        return;
+      }
+    }
 
     setFormData((prev) => ({
       ...prev,
@@ -701,6 +756,17 @@ const UpdateWord = () => {
       ),
     };
 
+    const selfReferenceMessage = getSelfReferenceMessage(
+      dataToSend.value,
+      dataToSend,
+    );
+
+    if (selfReferenceMessage) {
+      setLoading(false);
+      await showSelfReferenceAlert(selfReferenceMessage);
+      return;
+    }
+
     // Show SweetAlert confirmation
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -757,6 +823,17 @@ const UpdateWord = () => {
 
     const updatedArray = [...formData[field]];
     updatedArray.splice(index, 1, ...replacementItems);
+
+    if (RELATION_FIELDS.includes(field)) {
+      const selfReferenceMessage = getSelfReferenceMessage(formData.value, {
+        [field]: updatedArray,
+      });
+
+      if (selfReferenceMessage) {
+        await showSelfReferenceAlert(selfReferenceMessage);
+        return;
+      }
+    }
 
     setFormData((prev) => ({
       ...prev,

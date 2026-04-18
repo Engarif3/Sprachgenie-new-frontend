@@ -6,6 +6,39 @@ import { invalidateWordsCache } from "../utils/storage";
 
 import { useAuth } from "../services/auth.services";
 
+const normalizeWordValue = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase();
+
+const getSelfReferenceMessage = (value, relations) => {
+  const normalizedValue = normalizeWordValue(value);
+
+  if (!normalizedValue) {
+    return null;
+  }
+
+  const invalidLabels = [
+    ["synonyms", "synonym"],
+    ["antonyms", "antonym"],
+    ["similarWords", "similar word"],
+  ]
+    .filter(([field]) =>
+      Array.isArray(relations[field])
+        ? relations[field].some(
+            (item) => normalizeWordValue(item) === normalizedValue,
+          )
+        : false,
+    )
+    .map(([, label]) => label);
+
+  if (!invalidLabels.length) {
+    return null;
+  }
+
+  return `The word cannot reference itself as a ${invalidLabels.join(", ")}.`;
+};
+
 const WordForm = () => {
   const navigate = useNavigate();
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
@@ -143,6 +176,22 @@ const WordForm = () => {
           : [],
       createdBy: userId,
     };
+
+    const selfReferenceMessage = getSelfReferenceMessage(
+      newWordData.value,
+      newWordData,
+    );
+
+    if (selfReferenceMessage) {
+      Swal.fire({
+        title: "Invalid relation",
+        text: selfReferenceMessage,
+        icon: "warning",
+        timer: 2200,
+        showConfirmButton: false,
+      });
+      return;
+    }
 
     try {
       // Directly submit the wordData state
