@@ -415,6 +415,22 @@ const getChannelStream = (channel, streamSelections) => {
   );
 };
 
+const syncAudioSource = (audio, streamUrl) => {
+  if (!audio || !streamUrl) {
+    return false;
+  }
+
+  if (audio.src !== streamUrl) {
+    audio.src = streamUrl;
+    audio.load();
+  }
+
+  return true;
+};
+
+const getStationPage = (stationIndex) =>
+  Math.floor(stationIndex / STATIONS_PER_PAGE) + 1;
+
 const fetchStationsFromMirror = async (signal) => {
   let lastError = null;
 
@@ -456,6 +472,7 @@ const RadioChannels = () => {
   const selectedStationRef = useRef(null);
   const selectedStreamsRef = useRef({});
   const lastNonZeroVolumeRef = useRef(1);
+  const shouldAutoplaySelectionRef = useRef(false);
 
   useEffect(() => {
     selectedStationRef.current = selectedStation;
@@ -556,6 +573,8 @@ const RadioChannels = () => {
             return accumulator;
           }, {}),
         );
+        setSelectedStation(nextStations[0] || null);
+        shouldAutoplaySelectionRef.current = false;
         setCurrentPage(1);
       } catch (fetchError) {
         if (fetchError.name === "AbortError") {
@@ -579,7 +598,12 @@ const RadioChannels = () => {
     const audio = audioRef.current;
     const selectedStream = getChannelStream(selectedStation, selectedStreams);
 
-    if (!audio || !selectedStream?.streamUrl) {
+    if (!audio || !selectedStation || !selectedStream?.streamUrl) {
+      return;
+    }
+
+    if (!shouldAutoplaySelectionRef.current) {
+      shouldAutoplaySelectionRef.current = true;
       return;
     }
 
@@ -587,9 +611,8 @@ const RadioChannels = () => {
       try {
         setPlayerError("");
 
-        if (audio.src !== selectedStream.streamUrl) {
-          audio.src = selectedStream.streamUrl;
-          audio.load();
+        if (!syncAudioSource(audio, selectedStream.streamUrl)) {
+          return;
         }
 
         await audio.play();
@@ -629,6 +652,28 @@ const RadioChannels = () => {
     return pages;
   }, [currentPage, totalPages]);
 
+  const selectedStationIndex = stations.findIndex(
+    (station) => station.id === selectedStation?.id,
+  );
+  const hasPreviousStation = selectedStationIndex > 0;
+  const hasNextStation =
+    selectedStationIndex >= 0 && selectedStationIndex < stations.length - 1;
+
+  const selectStationByIndex = (stationIndex) => {
+    const nextStation = stations[stationIndex];
+
+    if (!nextStation) {
+      return;
+    }
+
+    shouldAutoplaySelectionRef.current = true;
+    setSelectedStation(nextStation);
+
+    if (shouldShowPagination) {
+      setCurrentPage(getStationPage(stationIndex));
+    }
+  };
+
   const handlePlayToggle = async (station) => {
     const audio = audioRef.current;
     const selectedStream = getChannelStream(station, selectedStreams);
@@ -645,6 +690,11 @@ const RadioChannels = () => {
 
       try {
         setPlayerError("");
+
+        if (!syncAudioSource(audio, selectedStream.streamUrl)) {
+          return;
+        }
+
         await audio.play();
       } catch {
         setPlayerError("Playback was blocked or the stream is unavailable.");
@@ -653,6 +703,7 @@ const RadioChannels = () => {
       return;
     }
 
+    shouldAutoplaySelectionRef.current = true;
     setSelectedStation(station);
   };
 
@@ -663,6 +714,7 @@ const RadioChannels = () => {
     }));
 
     if (selectedStation?.id === station.id) {
+      shouldAutoplaySelectionRef.current = true;
       setSelectedStation(station);
     }
   };
@@ -693,6 +745,11 @@ const RadioChannels = () => {
 
     try {
       setPlayerError("");
+
+      if (!syncAudioSource(audio, activeStream?.streamUrl)) {
+        return;
+      }
+
       await audio.play();
     } catch {
       setPlayerError("Playback was blocked or the stream is unavailable.");
@@ -706,6 +763,22 @@ const RadioChannels = () => {
     }
 
     setVolume(0);
+  };
+
+  const handleSelectPreviousStation = () => {
+    if (!hasPreviousStation) {
+      return;
+    }
+
+    selectStationByIndex(selectedStationIndex - 1);
+  };
+
+  const handleSelectNextStation = () => {
+    if (!hasNextStation) {
+      return;
+    }
+
+    selectStationByIndex(selectedStationIndex + 1);
   };
 
   const isLight = theme === "light";
@@ -725,7 +798,15 @@ const RadioChannels = () => {
       }`}
     >
       <Container>
-        <div className="relative overflow-hidden rounded-[32px] border border-white/10 bg-[linear-gradient(145deg,rgba(249,115,22,0.16),rgba(236,72,153,0.12),rgba(59,130,246,0.14))] p-6 shadow-[0_28px_90px_rgba(15,23,42,0.18)] backdrop-blur md:p-10">
+        <div className="md:min-h-[700px] lg:min-h-[700px] relative overflow-hidden rounded-[32px] border border-white/10 bg-slate-950 p-6 shadow-[0_28px_90px_rgba(15,23,42,0.18)] md:p-10">
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-80"
+            style={{
+              backgroundImage: "url('/radio.webp')",
+              transform: "scaleX(-1)",
+            }}
+          />
+          {/* <div className="absolute inset-0 bg-[linear-gradient(145deg,rgba(15,23,42,0.82),rgba(249,115,22,0.22),rgba(59,130,246,0.20))]" /> */}
           <div className="absolute -right-16 top-0 h-44 w-44 rounded-full bg-orange-400/20 blur-3xl" />
           <div className="absolute -left-10 bottom-0 h-40 w-40 rounded-full bg-sky-400/15 blur-3xl" />
 
@@ -736,7 +817,7 @@ const RadioChannels = () => {
                 Live radio channels
               </div>
 
-              <h1 className="max-w-3xl  font-black leading-tight text-2xl md:text-6xl text-center md:text-center lg:text-left">
+              <h1 className="max-w-3xl  font-black leading-tight text-2xl md:text-6xl text-center md:text-center lg:text-left text-white">
                 German radio channels for listening practice
               </h1>
 
@@ -756,7 +837,7 @@ const RadioChannels = () => {
                   <div className="text-xs uppercase tracking-[0.10em] md:tracking-[0.18em] lg:tracking-[0.18em] text-orange-600">
                     Stations loaded
                   </div>
-                  <div className="mt-2 text-2xl font-bold ">
+                  <div className="mt-2 text-2xl font-bold text-white">
                     {stations.length}
                   </div>
                 </div>
@@ -764,18 +845,23 @@ const RadioChannels = () => {
                   <div className="text-xs uppercase tracking-[0.18em] text-orange-600">
                     Pages
                   </div>
-                  <div className="mt-2 text-2xl font-bold">{totalPages}</div>
+                  <div className="mt-2 text-2xl font-bold text-white">
+                    {totalPages}
+                  </div>
                 </div>
                 <div className="rounded-2xl  bg-white/10 px-4 py-3 shadow-lg backdrop-blur text-center">
                   <div className="text-xs uppercase tracking-[0.18em] text-orange-600">
                     Source
                   </div>
-                  <div className="mt-2 text-sm font-semibold">Online Radio</div>
+                  <div className="mt-2 text-sm font-semibold text-white">
+                    Online Radio
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-[28px] border border-sky-600 bg-slate-950/50 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur">
+            <div className="md:absolute lg:absolute top-80  -right-9 w-full md:w-8/12 lg:w-5/12 rounded-[28px] border border-sky-600 bg-transparent shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur p-4">
+              {/* bg-slate-950/50 */}
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-300">
@@ -868,6 +954,28 @@ const RadioChannels = () => {
                   </span>
                 </div>
               ) : null}
+
+              <div className="mt-6 flex items-center justify-between gap-3 border-t border-white/10 pt-5">
+                <button
+                  type="button"
+                  onClick={handleSelectPreviousStation}
+                  disabled={!hasPreviousStation}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous channel
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSelectNextStation}
+                  disabled={!hasNextStation}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Next channel
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -94,7 +94,7 @@ const HomeCard = ({
       <div
         className={`absolute rounded-[28px] ${
           isLight
-            ? "inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.92),transparent_36%)]"
+            ? "inset-0 bg-[radial-gradient(circle_at_top_right,rgba(234, 110, 110, 0.92),transparent_36%)]"
             : "bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_30%)]"
         }`}
       />
@@ -120,7 +120,7 @@ const HomeCard = ({
             <div
               className={`mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] shadow-[0_8px_24px_rgba(0,0,0,0.12)] ${
                 isLight
-                  ? "border-gray-200 bg-white/90 text-gray-700"
+                  ? "border-gray-200 bg-white/90 text-teal-400"
                   : "border-white/10 bg-white/[0.06] text-white/85"
               }`}
             >
@@ -133,17 +133,17 @@ const HomeCard = ({
             <div
               className={`inline-flex h-14 w-14 items-center justify-center rounded-[18px] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] ${
                 isLight
-                  ? "border border-gray-200/90 bg-white text-gray-700"
+                  ? "border text-orange-400"
                   : "bg-white/[0.07] text-slate-50"
               }`}
             >
               <div
-                className={`flex h-12 w-12 items-center justify-center rounded-[15px] bg-gradient-to-br ${palette.icon}`}
+                className={`flex h-12 w-12 items-center justify-center rounded-[15px] bg-gradient-to-br ${palette.icon} `}
               >
                 {icon}
               </div>
             </div>
-            <div
+            {/* <div
               className={`rounded-full border px-3 py-1.5 text-[12px] font-semibold tracking-[0.14em] ${
                 isLight
                   ? "border-gray-200 bg-white/90 text-gray-700"
@@ -151,13 +151,13 @@ const HomeCard = ({
               }`}
             >
               {index}
-            </div>
+            </div> */}
           </div>
         </div>
 
         <h3
           className={`mb-3 text-left text-[24px] font-semibold leading-[1.12] md:text-[27px] ${
-            isLight ? "text-slate-900" : "text-white"
+            isLight ? "text-sky-700" : "text-white"
           }`}
         >
           {title}
@@ -174,23 +174,23 @@ const HomeCard = ({
         <div
           className={`mt-6 flex items-center justify-between border-t pt-5 text-sm transition-colors duration-300 ${
             isLight
-              ? "border-gray-200/90 group-hover:border-gray-300"
+              ? "border-gray-200/90 group-hover:border-gray-300 "
               : "border-white/[0.08] group-hover:border-white/[0.14]"
           }`}
         >
-          <span className={`font-medium ${palette.label}`}>
+          <span className={`font-medium text-teal-400 dark:text-white  ${palette.label}`}>
             {t("exploreNow")}
           </span>
           <span
             className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-2 transition-all duration-300 group-hover:translate-x-1 ${
               isLight
-                ? "border-gray-200 bg-white/95 text-gray-700 group-hover:bg-white"
+                ? "border-gray-200 bg-sky-400 text-white group-hover:bg-orange-400"
                 : "border-white/10 bg-white/[0.08] text-slate-100/95 group-hover:bg-white/[0.12]"
             }`}
           >
             <span
               className={`text-[12px] font-semibold tracking-[0.08em] ${
-                isLight ? "text-gray-700" : "text-white/90"
+                isLight ? "text-white" : "text-white/90"
               }`}
             >
               Open
