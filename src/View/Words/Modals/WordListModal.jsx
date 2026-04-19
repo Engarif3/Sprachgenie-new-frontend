@@ -339,7 +339,7 @@ const WordListModal = ({
                     <span className="font-bold text-orange-400 text-md md:text-lg lg:text-xl">
                       die
                     </span>{" "}
-                    <span className="dark:text-white font-bold">
+                    <span className="text-white font-bold">
                       {capitalizedPluralForm}
                     </span>
                   </>
