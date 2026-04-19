@@ -102,6 +102,12 @@ const RadioMiniPlayer = () => {
     };
   }, [clampPosition, isMiniPlayerExpanded]);
 
+  const handleCloseMiniPlayer = useCallback(() => {
+    stopPlayback();
+    setMiniPlayerExpanded(false);
+    setMiniPlayerVisible(false);
+  }, [setMiniPlayerExpanded, setMiniPlayerVisible, stopPlayback]);
+
   const runFoldedAction = useCallback(
     (action) => {
       if (action === "toggle") {
@@ -116,22 +122,8 @@ const RadioMiniPlayer = () => {
 
       setMiniPlayerExpanded(true);
     },
-    [setMiniPlayerExpanded, togglePlayback],
+    [handleCloseMiniPlayer, setMiniPlayerExpanded, togglePlayback],
   );
-
-  const handleDragEnd = useCallback(() => {
-    const dragState = dragStateRef.current;
-
-    dragStateRef.current = null;
-    setIsDragging(false);
-    window.removeEventListener("pointermove", handlePointerMove);
-    window.removeEventListener("pointerup", handleDragEnd);
-    window.removeEventListener("pointercancel", handleDragEnd);
-
-    if (!dragState?.didMove && !isMiniPlayerExpanded) {
-      runFoldedAction(dragState?.action || "expand");
-    }
-  }, [isMiniPlayerExpanded, runFoldedAction]);
 
   const handlePointerMove = useCallback(
     (event) => {
@@ -165,6 +157,29 @@ const RadioMiniPlayer = () => {
     [clampPosition],
   );
 
+  const handleDragEnd = useCallback(() => {
+    const dragState = dragStateRef.current;
+    const playerElement = playerRef.current;
+
+    dragStateRef.current = null;
+    setIsDragging(false);
+    window.removeEventListener("pointermove", handlePointerMove);
+    window.removeEventListener("pointerup", handleDragEnd);
+    window.removeEventListener("pointercancel", handleDragEnd);
+
+    if (playerElement && dragState?.pointerId != null) {
+      try {
+        playerElement.releasePointerCapture(dragState.pointerId);
+      } catch {
+        // Ignore capture release failures from interrupted touch sequences.
+      }
+    }
+
+    if (!dragState?.didMove && !isMiniPlayerExpanded) {
+      runFoldedAction(dragState?.action || "expand");
+    }
+  }, [handlePointerMove, isMiniPlayerExpanded, runFoldedAction]);
+
   useEffect(() => {
     return () => {
       window.removeEventListener("pointermove", handlePointerMove);
@@ -174,7 +189,7 @@ const RadioMiniPlayer = () => {
   }, [handleDragEnd, handlePointerMove]);
 
   const handleDragStart = (event) => {
-    if (event.button !== 0) {
+    if (event.pointerType === "mouse" && event.button !== 0) {
       return;
     }
 
@@ -206,9 +221,18 @@ const RadioMiniPlayer = () => {
       didMove: false,
       offsetX: event.clientX - bounds.left,
       offsetY: event.clientY - bounds.top,
+      pointerId: event.pointerId,
       startX: event.clientX,
       startY: event.clientY,
     };
+
+    if (event.pointerId != null) {
+      try {
+        playerElement.setPointerCapture(event.pointerId);
+      } catch {
+        // Some browsers can reject capture during interrupted gestures.
+      }
+    }
 
     window.addEventListener("pointermove", handlePointerMove);
     window.addEventListener("pointerup", handleDragEnd);
@@ -219,17 +243,13 @@ const RadioMiniPlayer = () => {
     ? {
         left: `${position.x}px`,
         top: `${position.y}px`,
+        touchAction: "none",
       }
     : {
         right: `${VIEWPORT_MARGIN}px`,
         bottom: `${VIEWPORT_MARGIN}px`,
+        touchAction: "none",
       };
-
-  const handleCloseMiniPlayer = () => {
-    stopPlayback();
-    setMiniPlayerExpanded(false);
-    setMiniPlayerVisible(false);
-  };
 
   if (!currentStation || !isMiniPlayerVisible) {
     return null;
