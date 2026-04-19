@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { RiRadioFill } from "react-icons/ri";
 import Container from "../../utils/Container";
+import { useRadioPlayer } from "../../context/RadioPlayerContext";
 import { useTheme } from "../../context/ThemeContext";
 
 const RADIO_API_URLS = [
@@ -386,22 +387,6 @@ const groupStations = (stations) => {
 
 const getDefaultStream = (channel) => channel?.streams?.[0] || null;
 
-const getNextChannelStream = (channel, currentStreamId) => {
-  if (!channel?.streams?.length) {
-    return null;
-  }
-
-  const currentIndex = channel.streams.findIndex(
-    (stream) => stream.id === currentStreamId,
-  );
-
-  if (currentIndex === -1) {
-    return null;
-  }
-
-  return channel.streams[currentIndex + 1] || null;
-};
-
 const getChannelStream = (channel, streamSelections) => {
   if (!channel) {
     return null;
@@ -413,19 +398,6 @@ const getChannelStream = (channel, streamSelections) => {
     channel.streams.find((stream) => stream.id === selectedStreamId) ||
     getDefaultStream(channel)
   );
-};
-
-const syncAudioSource = (audio, streamUrl) => {
-  if (!audio || !streamUrl) {
-    return false;
-  }
-
-  if (audio.src !== streamUrl) {
-    audio.src = streamUrl;
-    audio.load();
-  }
-
-  return true;
 };
 
 const getStationPage = (stationIndex) =>
@@ -457,93 +429,46 @@ const fetchStationsFromMirror = async (signal) => {
 
 const RadioChannels = () => {
   const { theme } = useTheme();
+  const {
+    currentStation: selectedStation,
+    currentStream: activeStream,
+    hasNextStation,
+    hasPreviousStation,
+    isMiniPlayerExpanded,
+    isMiniPlayerVisible,
+    isPlaying,
+    playNextStation,
+    playPreviousStation,
+    playerError,
+    playSelection,
+    setMiniPlayerExpanded,
+    setMiniPlayerVisible,
+    setQueue,
+    setVolume,
+    togglePlayback,
+    volume,
+  } = useRadioPlayer();
   const [stations, setStations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedStation, setSelectedStation] = useState(null);
   const [selectedStreams, setSelectedStreams] = useState({});
   const [brokenFavicons, setBrokenFavicons] = useState({});
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [playerError, setPlayerError] = useState("");
-  const [volume, setVolume] = useState(1);
   const [reloadKey, setReloadKey] = useState(0);
-  const audioRef = useRef(null);
-  const selectedStationRef = useRef(null);
-  const selectedStreamsRef = useRef({});
+  const selectedStationRef = useRef(selectedStation);
+  const isPlayingRef = useRef(isPlaying);
   const lastNonZeroVolumeRef = useRef(1);
-  const shouldAutoplaySelectionRef = useRef(false);
 
   useEffect(() => {
     selectedStationRef.current = selectedStation;
-    selectedStreamsRef.current = selectedStreams;
-  }, [selectedStation, selectedStreams]);
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying, selectedStation]);
 
   useEffect(() => {
-    const audio = audioRef.current;
-
-    if (!audio) {
-      return;
-    }
-
-    audio.volume = volume;
-
     if (volume > 0) {
       lastNonZeroVolumeRef.current = volume;
     }
   }, [volume]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-
-    if (!audio) {
-      return undefined;
-    }
-
-    const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
-    const handleEnded = () => setIsPlaying(false);
-    const handleError = () => {
-      const currentStation = selectedStationRef.current;
-      const currentSelections = selectedStreamsRef.current;
-      const currentStream = getChannelStream(currentStation, currentSelections);
-      const fallbackStream = getNextChannelStream(
-        currentStation,
-        currentStream?.id,
-      );
-
-      if (currentStation && fallbackStream) {
-        const fallbackLabel =
-          fallbackStream.bitrate > 0
-            ? `${fallbackStream.bitrate} kbps`
-            : "variable bitrate";
-
-        setPlayerError(
-          `Primary stream failed. Switched to ${fallbackStream.codec} ${fallbackLabel}.`,
-        );
-        setSelectedStreams((previous) => ({
-          ...previous,
-          [currentStation.id]: fallbackStream.id,
-        }));
-        return;
-      }
-
-      setIsPlaying(false);
-      setPlayerError("This stream could not be played in your browser.");
-    };
-
-    audio.addEventListener("play", handlePlay);
-    audio.addEventListener("pause", handlePause);
-    audio.addEventListener("ended", handleEnded);
-    audio.addEventListener("error", handleError);
-
-    return () => {
-      audio.removeEventListener("play", handlePlay);
-      audio.removeEventListener("pause", handlePause);
-      audio.removeEventListener("ended", handleEnded);
-      audio.removeEventListener("error", handleError);
-    };
-  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -559,11 +484,8 @@ const RadioChannels = () => {
           ...(Array.isArray(data) ? data : []),
         ];
         const nextStations = groupStations(mergedStations);
-
-        setStations(nextStations);
-        setBrokenFavicons({});
-        setSelectedStreams(
-          nextStations.reduce((accumulator, channel) => {
+        const nextSelectedStreams = nextStations.reduce(
+          (accumulator, channel) => {
             const defaultStream = getDefaultStream(channel);
 
             if (defaultStream) {
@@ -571,10 +493,32 @@ const RadioChannels = () => {
             }
 
             return accumulator;
-          }, {}),
+          },
+          {},
         );
-        setSelectedStation(nextStations[0] || null);
-        shouldAutoplaySelectionRef.current = false;
+        const matchedCurrentStation = selectedStationRef.current
+          ? nextStations.find(
+              (station) => station.id === selectedStationRef.current.id,
+            )
+          : null;
+        const initialStation = matchedCurrentStation || nextStations[0] || null;
+        const initialStream = initialStation
+          ? initialStation.streams.find(
+              (stream) => stream.id === nextSelectedStreams[initialStation.id],
+            ) || getDefaultStream(initialStation)
+          : null;
+
+        setStations(nextStations);
+        setQueue(nextStations);
+        setBrokenFavicons({});
+        setSelectedStreams(nextSelectedStreams);
+
+        if (initialStation && initialStream) {
+          void playSelection(initialStation, initialStream, {
+            autoplay: matchedCurrentStation ? isPlayingRef.current : false,
+          });
+        }
+
         setCurrentPage(1);
       } catch (fetchError) {
         if (fetchError.name === "AbortError") {
@@ -592,44 +536,46 @@ const RadioChannels = () => {
     void loadStations();
 
     return () => controller.abort();
-  }, [reloadKey]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    const selectedStream = getChannelStream(selectedStation, selectedStreams);
-
-    if (!audio || !selectedStation || !selectedStream?.streamUrl) {
-      return;
-    }
-
-    if (!shouldAutoplaySelectionRef.current) {
-      shouldAutoplaySelectionRef.current = true;
-      return;
-    }
-
-    const playSelectedStation = async () => {
-      try {
-        setPlayerError("");
-
-        if (!syncAudioSource(audio, selectedStream.streamUrl)) {
-          return;
-        }
-
-        await audio.play();
-      } catch {
-        setIsPlaying(false);
-        setPlayerError("Playback was blocked or the stream is unavailable.");
-      }
-    };
-
-    void playSelectedStation();
-  }, [selectedStation, selectedStreams]);
+  }, [playSelection, reloadKey, setQueue]);
 
   const totalPages = Math.max(
     1,
     Math.ceil(stations.length / STATIONS_PER_PAGE),
   );
   const shouldShowPagination = stations.length > STATIONS_PER_PAGE;
+
+  useEffect(() => {
+    if (!stations.length || !selectedStation) {
+      return;
+    }
+
+    const matchedStationIndex = stations.findIndex(
+      (station) => station.id === selectedStation.id,
+    );
+
+    if (matchedStationIndex === -1 || !shouldShowPagination) {
+      return;
+    }
+
+    setCurrentPage(getStationPage(matchedStationIndex));
+  }, [selectedStation, shouldShowPagination, stations]);
+
+  useEffect(() => {
+    if (!selectedStation || !activeStream) {
+      return;
+    }
+
+    setSelectedStreams((previous) => {
+      if (previous[selectedStation.id] === activeStream.id) {
+        return previous;
+      }
+
+      return {
+        ...previous,
+        [selectedStation.id]: activeStream.id,
+      };
+    });
+  }, [activeStream, selectedStation]);
 
   const visibleStations = useMemo(() => {
     if (!shouldShowPagination) {
@@ -652,59 +598,19 @@ const RadioChannels = () => {
     return pages;
   }, [currentPage, totalPages]);
 
-  const selectedStationIndex = stations.findIndex(
-    (station) => station.id === selectedStation?.id,
-  );
-  const hasPreviousStation = selectedStationIndex > 0;
-  const hasNextStation =
-    selectedStationIndex >= 0 && selectedStationIndex < stations.length - 1;
-
-  const selectStationByIndex = (stationIndex) => {
-    const nextStation = stations[stationIndex];
-
-    if (!nextStation) {
-      return;
-    }
-
-    shouldAutoplaySelectionRef.current = true;
-    setSelectedStation(nextStation);
-
-    if (shouldShowPagination) {
-      setCurrentPage(getStationPage(stationIndex));
-    }
-  };
-
   const handlePlayToggle = async (station) => {
-    const audio = audioRef.current;
     const selectedStream = getChannelStream(station, selectedStreams);
 
-    if (!audio || !selectedStream?.streamUrl) {
+    if (!selectedStream?.streamUrl) {
       return;
     }
 
     if (selectedStation?.id === station.id) {
-      if (!audio.paused) {
-        audio.pause();
-        return;
-      }
-
-      try {
-        setPlayerError("");
-
-        if (!syncAudioSource(audio, selectedStream.streamUrl)) {
-          return;
-        }
-
-        await audio.play();
-      } catch {
-        setPlayerError("Playback was blocked or the stream is unavailable.");
-      }
-
+      await togglePlayback();
       return;
     }
 
-    shouldAutoplaySelectionRef.current = true;
-    setSelectedStation(station);
+    await playSelection(station, selectedStream, { autoplay: true });
   };
 
   const handleStreamSelect = (station, streamId) => {
@@ -714,8 +620,13 @@ const RadioChannels = () => {
     }));
 
     if (selectedStation?.id === station.id) {
-      shouldAutoplaySelectionRef.current = true;
-      setSelectedStation(station);
+      const nextStream =
+        station.streams.find((stream) => stream.id === streamId) ||
+        getDefaultStream(station);
+
+      if (nextStream) {
+        void playSelection(station, nextStream, { autoplay: isPlaying });
+      }
     }
   };
 
@@ -732,28 +643,11 @@ const RadioChannels = () => {
   };
 
   const handleNowPlayingToggle = async () => {
-    const audio = audioRef.current;
-
-    if (!audio || !selectedStation) {
+    if (!selectedStation) {
       return;
     }
 
-    if (!audio.paused) {
-      audio.pause();
-      return;
-    }
-
-    try {
-      setPlayerError("");
-
-      if (!syncAudioSource(audio, activeStream?.streamUrl)) {
-        return;
-      }
-
-      await audio.play();
-    } catch {
-      setPlayerError("Playback was blocked or the stream is unavailable.");
-    }
+    await togglePlayback();
   };
 
   const handleMuteToggle = () => {
@@ -766,23 +660,14 @@ const RadioChannels = () => {
   };
 
   const handleSelectPreviousStation = () => {
-    if (!hasPreviousStation) {
-      return;
-    }
-
-    selectStationByIndex(selectedStationIndex - 1);
+    void playPreviousStation();
   };
 
   const handleSelectNextStation = () => {
-    if (!hasNextStation) {
-      return;
-    }
-
-    selectStationByIndex(selectedStationIndex + 1);
+    void playNextStation();
   };
 
   const isLight = theme === "light";
-  const activeStream = getChannelStream(selectedStation, selectedStreams);
 
   return (
     // <div
@@ -860,17 +745,17 @@ const RadioChannels = () => {
               </div>
             </div>
 
-            <div className="md:absolute lg:absolute top-80  -right-9 w-full md:w-8/12 lg:w-5/12 rounded-[28px] border border-sky-600 bg-transparent shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur p-4">
+            <div className="md:absolute  lg:absolute top-[343px]  -right-9 w-full md:w-8/12 lg:w-5/12 rounded-[28px] border border-sky-600 bg-transparent shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur p-4">
               {/* bg-slate-950/50 */}
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-300">
                     Now playing
                   </p>
-                  <h2 className="mt-2 text-2xl font-bold text-white">
+                  <h2 className="mt-1 text-2xl font-bold text-white">
                     {selectedStation?.name || "Select a station"}
                   </h2>
-                  <p className="mt-2 text-sm text-slate-300">
+                  <p className="mt-1 text-sm text-slate-300">
                     {selectedStation
                       ? `${selectedStation.country}${selectedStation.state ? `, ${selectedStation.state}` : ""}`
                       : "Use the play button on any station card to start streaming."}
@@ -890,16 +775,13 @@ const RadioChannels = () => {
                   )}
                 </button>
               </div>
-
-              <audio ref={audioRef} preload="none" className="hidden" />
-
-              <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-4">
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="mt-1 rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between ">
                   <button
                     type="button"
                     onClick={handleNowPlayingToggle}
                     disabled={!selectedStation}
-                    className={`inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
+                    className={`inline-flex items-center justify-center gap-2 rounded-full px-4 py-1 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
                       isPlaying
                         ? "bg-rose-500 text-white shadow-lg shadow-rose-500/25"
                         : "bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg shadow-orange-500/20"
@@ -933,6 +815,28 @@ const RadioChannels = () => {
                     />
                   </div>
                 </div>
+
+                <div className="mt-1 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (isMiniPlayerVisible && isMiniPlayerExpanded) {
+                        setMiniPlayerExpanded(false);
+                        setMiniPlayerVisible(false);
+                        return;
+                      }
+
+                      setMiniPlayerVisible(true);
+                      setMiniPlayerExpanded(false);
+                    }}
+                    disabled={!selectedStation}
+                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1 text-sm font-semibold text-slate-200 transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {isMiniPlayerVisible && isMiniPlayerExpanded
+                      ? "Close mini player"
+                      : "Open mini player"}
+                  </button>
+                </div>
               </div>
 
               {playerError ? (
@@ -940,7 +844,7 @@ const RadioChannels = () => {
               ) : null}
 
               {selectedStation ? (
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="mt-2 flex flex-wrap gap-2">
                   <span className="rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-emerald-200">
                     {isPlaying ? "Live" : "Ready"}
                   </span>
@@ -955,12 +859,12 @@ const RadioChannels = () => {
                 </div>
               ) : null}
 
-              <div className="mt-6 flex items-center justify-between gap-3 border-t border-white/10 pt-5">
+              <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/10 pt-5">
                 <button
                   type="button"
                   onClick={handleSelectPreviousStation}
                   disabled={!hasPreviousStation}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1 text-sm font-semibold text-slate-200 transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <ChevronLeft className="h-4 w-4" />
                   Previous channel
@@ -970,7 +874,7 @@ const RadioChannels = () => {
                   type="button"
                   onClick={handleSelectNextStation}
                   disabled={!hasNextStation}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1 text-sm font-semibold text-slate-200 transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Next channel
                   <ChevronRight className="h-4 w-4" />

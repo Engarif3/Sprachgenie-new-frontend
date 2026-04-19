@@ -158,6 +158,7 @@ import NavBar from "./navbar/NavBar";
 import Footer from "./footer/Footer";
 import ScrollToTop from "./ScrollToTop";
 import ErrorBoundary from "./components/ErrorBoundary";
+import RadioMiniPlayer from "./components/RadioMiniPlayer";
 import Swal from "sweetalert2";
 import { publicApi } from "./axios";
 import {
@@ -165,6 +166,7 @@ import {
   markAuthBootstrapResolved,
   syncCurrentUser,
 } from "./services/auth.services";
+import { RadioPlayerProvider } from "./context/RadioPlayerContext";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import { LanguageProvider } from "./context/LanguageContext";
 
@@ -319,6 +321,7 @@ const AppContent = () => {
       </Suspense>
 
       {!noHeaderFooter && <Footer />}
+      {!noHeaderFooter && <RadioMiniPlayer />}
     </div>
   );
 };
@@ -327,9 +330,11 @@ const App = () => {
   return (
     <ThemeProvider>
       <LanguageProvider>
-        <ErrorBoundary>
-          <AppContent />
-        </ErrorBoundary>
+        <RadioPlayerProvider>
+          <ErrorBoundary>
+            <AppContent />
+          </ErrorBoundary>
+        </RadioPlayerProvider>
       </LanguageProvider>
     </ThemeProvider>
   );
