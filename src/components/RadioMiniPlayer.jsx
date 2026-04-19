@@ -401,12 +401,12 @@ const RadioMiniPlayer = () => {
                 stopEventPropagation(event);
                 setMiniPlayerExpanded(false);
               }}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-300 transition-colors hover:bg-white/10"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-500 dark:border-white/10 bg-white/5 text-slate-500 dark:text-white transition-colors hover:bg-white/10"
               aria-label="Minimize mini player"
               title="Minimize"
               data-no-drag="true"
             >
-              <Minimize2 className="h-4 w-4" />
+              <Minimize2 className="h-4 w-4 " />
             </button>
 
             <button
@@ -415,7 +415,7 @@ const RadioMiniPlayer = () => {
                 stopEventPropagation(event);
                 handleCloseMiniPlayer();
               }}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-300 transition-colors hover:bg-white/10"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-500 dark:border-white/10 bg-white/5 text-slate-500 dark:text-white transition-colors hover:bg-white/10"
               aria-label="Close mini player"
               title="Close"
               data-no-drag="true"
@@ -433,7 +433,7 @@ const RadioMiniPlayer = () => {
               void playPreviousStation();
             }}
             disabled={!hasPreviousStation}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-200 transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-500 dark:text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
             aria-label="Previous channel"
             data-no-drag="true"
           >
@@ -464,7 +464,7 @@ const RadioMiniPlayer = () => {
               void playNextStation();
             }}
             disabled={!hasNextStation}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-200 transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-500 dark:text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
             aria-label="Next channel"
             data-no-drag="true"
           >
