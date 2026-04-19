@@ -820,7 +820,7 @@ const RadioChannels = () => {
                   <button
                     type="button"
                     onClick={() => {
-                      if (isMiniPlayerVisible && isMiniPlayerExpanded) {
+                      if (isMiniPlayerVisible) {
                         setMiniPlayerExpanded(false);
                         setMiniPlayerVisible(false);
                         return;
@@ -832,7 +832,7 @@ const RadioChannels = () => {
                     disabled={!selectedStation}
                     className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1 text-sm font-semibold text-slate-200 transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    {isMiniPlayerVisible && isMiniPlayerExpanded
+                    {isMiniPlayerVisible
                       ? "Close mini player"
                       : "Open mini player"}
                   </button>

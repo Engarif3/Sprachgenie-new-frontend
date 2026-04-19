@@ -73,6 +73,39 @@
     backface-visibility: hidden;
   }
 
+  @keyframes miniPlayerEqualizer {
+    0%,
+    100% {
+      transform: scaleY(0.45);
+      opacity: 0.28;
+    }
+    25% {
+      transform: scaleY(1);
+      opacity: 0.82;
+    }
+    50% {
+      transform: scaleY(0.62);
+      opacity: 0.48;
+    }
+    75% {
+      transform: scaleY(0.9);
+      opacity: 0.72;
+    }
+  }
+
+  .mini-player-eq-bar {
+    width: 4px;
+    border-radius: 9999px;
+    transform-origin: bottom center;
+    animation: miniPlayerEqualizer 1.2s ease-in-out infinite;
+    will-change: transform, opacity;
+  }
+
+  .mini-player-eq-bar-paused {
+    animation-play-state: paused;
+    opacity: 0.3;
+  }
+
   /* Centered wrapper to separate translate from rotate */
   .centered-wrap {
     position: absolute;

@@ -241,47 +241,139 @@ const RadioMiniPlayer = () => {
         ref={playerRef}
         onPointerDown={handleDragStart}
         style={playerStyle}
-        className={`fixed z-50 inline-flex max-w-[calc(100vw-2rem)] items-center gap-3 rounded-full border px-3 py-3 text-left shadow-[0_20px_60px_rgba(15,23,42,0.28)] backdrop-blur ${
-          isLight
-            ? "border-slate-200 bg-white/95 text-slate-900"
-            : "border-white/10 bg-slate-950/90 text-white"
-        } ${isDragging ? "cursor-grabbing select-none" : "cursor-grab"}`}
+        className={`fixed z-50  max-w-[calc(100vw-2rem)] overflow-hidden rounded-full p-[3px] text-left shadow-[0_20px_60px_rgba(15,23,42,0.28)] ${
+          isDragging ? "cursor-grabbing select-none" : "cursor-grab"
+        }`}
       >
-        <button
-          type="button"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg shadow-orange-500/25"
-          aria-label={isPlaying ? "Pause radio" : "Play radio"}
-          data-folded-action="toggle"
-        >
-          {isPlaying ? (
-            <Pause className="h-4 w-4" />
-          ) : (
-            <Play className="h-4 w-4" />
-          )}
-        </button>
+        <span className="absolute inset-0 block rounded-full pointer-events-none">
+          <span
+            className="absolute aspect-square w-[200%] animate-rotate [left:50%] [top:50%] [transform-origin:0_0] blur-sm"
+            style={{
+              backgroundImage: isLight
+                ? "conic-gradient(from 0deg, transparent 0deg 332deg, rgba(59,130,246,0.95) 348deg, rgba(249,115,22,0.98) 360deg)"
+                : "conic-gradient(from 0deg, transparent 0deg 332deg, rgba(255,255,255,0.95) 348deg, rgba(249,115,22,0.98) 360deg)",
+            }}
+          />
+        </span>
 
-        <button
-          type="button"
-          className="min-w-0 text-left"
-          data-folded-action="expand"
-        >
-          <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-orange-500">
-            Mini player
-          </span>
-          <span className="block max-w-40 truncate text-sm font-semibold">
-            {currentStation.name}
-          </span>
-        </button>
+        <span className="absolute inset-0 block rounded-full pointer-events-none">
+          <span
+            className="absolute aspect-square w-[200%] animate-rotate [left:50%] [top:50%] [transform-origin:0_0] blur-xl opacity-60"
+            style={{
+              backgroundImage: isLight
+                ? "conic-gradient(from 0deg, transparent 0deg 332deg, rgba(56,189,248,0.78) 348deg, rgba(249,115,22,0.72) 360deg)"
+                : "conic-gradient(from 0deg, transparent 0deg 332deg, rgba(255,255,255,0.78) 348deg, rgba(249,115,22,0.68) 360deg)",
+            }}
+          />
+        </span>
 
-        <button
-          type="button"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-300 transition-colors hover:bg-white/10"
-          aria-label="Close mini player"
-          title="Close"
-          data-folded-action="close"
+        <div
+          className={`relative z-10 inline-flex items-center gap-3 rounded-full px-3 py-3 backdrop-blur ${
+            isLight
+              ? "bg-[linear-gradient(135deg,#ffffff,#f8fafc)] text-slate-900"
+              : "bg-slate-950/90 text-white"
+          }`}
         >
-          <X className="h-4 w-4" />
-        </button>
+          {/* <div className="pointer-events-none absolute inset-[3px] overflow-hidden rounded-full opacity-100">
+            <div className="absolute left-[4.35rem] right-[3.6rem] top-1/2 -translate-y-1/2">
+              <div
+                className={`absolute inset-x-0 top-1/2 h-6 -translate-y-1/2 rounded-full ${
+                  isLight
+                    ? "bg-gradient-to-r from-sky-200/25 via-orange-200/30 to-pink-200/25"
+                    : "bg-gradient-to-r from-sky-400/10 via-orange-400/15 to-white/10"
+                }`}
+              />
+
+              <div className="relative flex h-8 w-full items-end justify-between px-1">
+                {Array.from({ length: 18 }, (_, barIndex) => (
+                  <span
+                    key={`mini-player-eq-${barIndex}`}
+                    className={`mini-player-eq-bar ${
+                      !isPlaying ? "mini-player-eq-bar-paused" : ""
+                    } ${
+                      isLight
+                        ? "bg-gradient-to-t from-sky-400/45 via-orange-400/65 to-pink-500/95 shadow-[0_0_12px_rgba(249,115,22,0.28)]"
+                        : "bg-gradient-to-t from-sky-400/34 via-orange-400/58 to-white/95 shadow-[0_0_14px_rgba(255,255,255,0.18)]"
+                    }`}
+                    style={{
+                      animationDelay: `${barIndex * 0.09}s`,
+                      height: `${10 + (barIndex % 5) * 5 + ((barIndex + 1) % 3) * 2}px`,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div> */}
+
+          <div className="pointer-events-none absolute inset-[3px] overflow-hidden rounded-full">
+            <div className="absolute left-[4.5rem] right-[3.8rem] top-1/2 -translate-y-1/2">
+              <div
+                className={`absolute inset-x-0 top-1/2 h-8 -translate-y-1/2 rounded-full blur-sm ${
+                  isLight
+                    ? "bg-gradient-to-r from-sky-200/40 via-orange-200/50 to-pink-200/40"
+                    : "bg-gradient-to-r from-sky-400/20 via-orange-400/25 to-white/20"
+                }`}
+              />
+
+              <div className="relative flex h-10 w-full items-end justify-between px-1">
+                {Array.from({ length: 18 }, (_, barIndex) => (
+                  <span
+                    key={`mini-player-eq-${barIndex}`}
+                    className={`mini-player-eq-bar ${
+                      !isPlaying ? "mini-player-eq-bar-paused" : ""
+                    } ${
+                      isLight
+                        ? "bg-gradient-to-t from-sky-500/70 via-orange-500/85 to-pink-500 shadow-[0_0_18px_rgba(249,115,22,0.45)]"
+                        : "bg-gradient-to-t from-sky-400/60 via-orange-400/80 to-white shadow-[0_0_18px_rgba(255,255,255,0.35)]"
+                    }`}
+                    style={{
+                      animationDelay: `${barIndex * 0.09}s`,
+                      height: `${14 + (barIndex % 5) * 7 + ((barIndex + 1) % 3) * 3}px`,
+                      width: "3px",
+                      borderRadius: "999px",
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="relative z-10 inline-flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg shadow-orange-500/25"
+            aria-label={isPlaying ? "Pause radio" : "Play radio"}
+            data-folded-action="toggle"
+          >
+            {isPlaying ? (
+              <Pause className="h-4 w-4" />
+            ) : (
+              <Play className="h-4 w-4" />
+            )}
+          </button>
+
+          <button
+            type="button"
+            className="relative z-10 min-w-0 text-left"
+            data-folded-action="expand"
+          >
+            <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-orange-500">
+              Mini player
+            </span>
+            <span className="block max-w-40 truncate text-sm font-semibold">
+              {currentStation.name}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            className="relative z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-300 transition-colors hover:bg-white/10"
+            aria-label="Close mini player"
+            title="Close"
+            data-folded-action="close"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
       </div>
     );
   }
