@@ -274,37 +274,6 @@ const RadioMiniPlayer = () => {
               : "bg-slate-950/90 text-white"
           }`}
         >
-          {/* <div className="pointer-events-none absolute inset-[3px] overflow-hidden rounded-full opacity-100">
-            <div className="absolute left-[4.35rem] right-[3.6rem] top-1/2 -translate-y-1/2">
-              <div
-                className={`absolute inset-x-0 top-1/2 h-6 -translate-y-1/2 rounded-full ${
-                  isLight
-                    ? "bg-gradient-to-r from-sky-200/25 via-orange-200/30 to-pink-200/25"
-                    : "bg-gradient-to-r from-sky-400/10 via-orange-400/15 to-white/10"
-                }`}
-              />
-
-              <div className="relative flex h-8 w-full items-end justify-between px-1">
-                {Array.from({ length: 18 }, (_, barIndex) => (
-                  <span
-                    key={`mini-player-eq-${barIndex}`}
-                    className={`mini-player-eq-bar ${
-                      !isPlaying ? "mini-player-eq-bar-paused" : ""
-                    } ${
-                      isLight
-                        ? "bg-gradient-to-t from-sky-400/45 via-orange-400/65 to-pink-500/95 shadow-[0_0_12px_rgba(249,115,22,0.28)]"
-                        : "bg-gradient-to-t from-sky-400/34 via-orange-400/58 to-white/95 shadow-[0_0_14px_rgba(255,255,255,0.18)]"
-                    }`}
-                    style={{
-                      animationDelay: `${barIndex * 0.09}s`,
-                      height: `${10 + (barIndex % 5) * 5 + ((barIndex + 1) % 3) * 2}px`,
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          </div> */}
-
           <div className="pointer-events-none absolute inset-[3px] overflow-hidden rounded-full">
             <div className="absolute left-[4.5rem] right-[3.8rem] top-1/2 -translate-y-1/2">
               <div
@@ -353,13 +322,13 @@ const RadioMiniPlayer = () => {
 
           <button
             type="button"
-            className="relative z-10 min-w-0 text-left"
+            className="relative z-10 min-w-0 text-left backdrop-blur-xs"
             data-folded-action="expand"
           >
             <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-orange-500">
               Mini player
             </span>
-            <span className="block max-w-40 truncate text-sm font-semibold">
+            <span className="block max-w-40 truncate text-sm font-semibold ">
               {currentStation.name}
             </span>
           </button>
