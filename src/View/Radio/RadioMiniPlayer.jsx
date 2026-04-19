@@ -10,8 +10,8 @@ import {
   Volume2,
 } from "lucide-react";
 import { RiRadioFill } from "react-icons/ri";
-import { useTheme } from "../context/ThemeContext";
-import { useRadioPlayer } from "../context/RadioPlayerContext";
+import { useTheme } from "../../context/ThemeContext";
+import { useRadioPlayer } from "../../context/RadioPlayerContext";
 
 const VIEWPORT_MARGIN = 16;
 const DRAG_THRESHOLD = 6;
@@ -355,7 +355,7 @@ const RadioMiniPlayer = () => {
 
           <button
             type="button"
-            className="relative z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-300 transition-colors hover:bg-white/10"
+            className="relative z-10 inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 dark:border-white/10 bg-white/5 text-slate-500 dark:text-white transition-colors hover:bg-white/10"
             aria-label="Close mini player"
             title="Close"
             data-folded-action="close"
