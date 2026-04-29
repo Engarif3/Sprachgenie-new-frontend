@@ -4,6 +4,7 @@ import { publicApi } from "../../axios";
 
 const TODAY_WORD_CACHE_KEY = "todayWordBalloon";
 const TODAY_WORD_BATCH_SIZE = 20;
+const MEANING_PREVIEW_LIMIT = 120;
 
 const getTodayCacheToken = () => {
   const now = new Date();
@@ -104,6 +105,7 @@ const formatWordLabel = (word) => {
 const TodaysWordBalloon = () => {
   const [selectedWord, setSelectedWord] = useState(null);
   const [phase, setPhase] = useState("loading");
+  const [isMeaningExpanded, setIsMeaningExpanded] = useState(false);
   const revealTimerRef = useRef(null);
   const selectedWordRef = useRef(null);
   const phaseRef = useRef("loading");
@@ -198,7 +200,12 @@ const TodaysWordBalloon = () => {
       return "";
     }
 
-    return selectedWord.meaning[0];
+    return selectedWord.meaning.join(", ");
+  }, [selectedWord]);
+  const shouldTruncateMeaning = wordMeaning.length > MEANING_PREVIEW_LIMIT;
+
+  useEffect(() => {
+    setIsMeaningExpanded(false);
   }, [selectedWord]);
 
   const isBalloonReady = Boolean(selectedWord) && phase !== "loading";
@@ -280,9 +287,27 @@ const TodaysWordBalloon = () => {
               <span className="">{wordLabel}</span>
             </p>
             {wordMeaning && (
-              <p className="mt-3 text-base font-medium text-slate-600 dark:text-slate-300 md:text-lg">
-                {wordMeaning}
-              </p>
+              <button
+                type="button"
+                className={`mt-3 w-full text-base font-medium text-slate-600 transition-colors duration-200 md:text-lg dark:text-slate-300 ${shouldTruncateMeaning ? "cursor-pointer hover:text-slate-900 dark:hover:text-white" : "cursor-default"}`}
+                onClick={() => {
+                  if (shouldTruncateMeaning) {
+                    setIsMeaningExpanded((currentValue) => !currentValue);
+                  }
+                }}
+                aria-expanded={shouldTruncateMeaning ? isMeaningExpanded : true}
+              >
+                <span
+                  className={`block break-words text-center ${shouldTruncateMeaning && !isMeaningExpanded ? "line-clamp-2" : ""}`}
+                >
+                  {wordMeaning}
+                </span>
+                {shouldTruncateMeaning && !isMeaningExpanded && (
+                  <span className="mt-2 block text-xs font-bold uppercase tracking-[0.18em] text-orange-500 dark:text-sky-300">
+                    Click to see full meaning
+                  </span>
+                )}
+              </button>
             )}
             <Link
               to="/words"
