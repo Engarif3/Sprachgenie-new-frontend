@@ -7,6 +7,10 @@ import api, { publicApi } from "../../../axios";
 import { useAuth } from "../../../services/auth.services";
 import { invalidateWordsCache } from "../../../utils/storage";
 import {
+  validateSingleRelationField,
+  validateRelationWords,
+} from "../../../utils/wordValidation";
+import {
   DndContext,
   closestCenter,
   KeyboardSensor,
@@ -468,6 +472,12 @@ const UpdateWord = () => {
         await showSelfReferenceAlert(selfReferenceMessage);
         return;
       }
+
+      // Validate that the words exist if they are relation fields
+      const isValid = await validateSingleRelationField(itemsToInsert, field);
+      if (!isValid) {
+        return; // User cancelled the operation
+      }
     }
 
     setFormData((prev) => ({
@@ -767,6 +777,28 @@ const UpdateWord = () => {
       return;
     }
 
+    // Validate relation words (only the new ones from input)
+    const newRelationWords = {
+      synonyms: normalizeFieldItems("synonyms", inputData.synonyms),
+      antonyms: normalizeFieldItems("antonyms", inputData.antonyms),
+      similarWords: normalizeFieldItems("similarWords", inputData.similarWords),
+    };
+
+    // Only validate if there are new relation words to add
+    const hasNewRelationWords =
+      newRelationWords.synonyms.length > 0 ||
+      newRelationWords.antonyms.length > 0 ||
+      newRelationWords.similarWords.length > 0;
+
+    if (hasNewRelationWords) {
+      const validation = await validateRelationWords(newRelationWords);
+
+      if (!validation.valid) {
+        setLoading(false);
+        return; // User cancelled the operation
+      }
+    }
+
     // Show SweetAlert confirmation
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -832,6 +864,15 @@ const UpdateWord = () => {
       if (selfReferenceMessage) {
         await showSelfReferenceAlert(selfReferenceMessage);
         return;
+      }
+
+      // Validate that the words exist if they are relation fields
+      const isValid = await validateSingleRelationField(
+        replacementItems,
+        field,
+      );
+      if (!isValid) {
+        return; // User cancelled the operation
       }
     }
 

@@ -3,6 +3,7 @@ import { useNavigate, Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "../axios";
 import { invalidateWordsCache } from "../utils/storage";
+import { validateRelationWords } from "../utils/wordValidation";
 
 import { useAuth } from "../services/auth.services";
 
@@ -191,6 +192,17 @@ const WordForm = () => {
         showConfirmButton: false,
       });
       return;
+    }
+
+    // Validate relation words (synonyms, antonyms, similar words)
+    const validation = await validateRelationWords({
+      synonyms: newWordData.synonyms,
+      antonyms: newWordData.antonyms,
+      similarWords: newWordData.similarWords,
+    });
+
+    if (!validation.valid) {
+      return; // User cancelled the operation
     }
 
     try {

@@ -23,6 +23,12 @@
   }
 }
 
+/* SweetAlert2 custom styles */
+.swal-wide {
+  width: 600px !important;
+  max-width: 90vw !important;
+}
+
 /* Improve color contrast */
 @layer utilities {
   .text-contrast {
