@@ -45,28 +45,6 @@ const WordForm = () => {
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
   const canAccess = userLoggedIn && userId && isAdmin;
 
-  const [wordData, setWordData] = useState({
-    value: "",
-    meaning: "",
-    sentences: "",
-    pluralForm: "",
-    levelId: "",
-    topicId: "",
-    articleId: "",
-    partOfSpeechId: "",
-    synonyms: "",
-    antonyms: "",
-    similarWords: "",
-    verbConjugation: "REGULAR",
-    verbIsReflexive: false,
-    verbIsModal: false,
-    verbIsSeparable: false,
-  });
-  const [loading, setLoading] = useState(true); // Loading state
-  const [levels, setLevels] = useState([]);
-  const [topics, setTopics] = useState([]);
-  const [articles, setArticles] = useState([]);
-  const [partsOfSpeech, setPartsOfSpeech] = useState([]);
   const initialWordData = {
     value: "",
     meaning: "",
@@ -87,6 +65,13 @@ const WordForm = () => {
       caseRequirement: "ACCUSATIVE",
     },
   };
+
+  const [wordData, setWordData] = useState(initialWordData);
+  const [loading, setLoading] = useState(true); // Loading state
+  const [levels, setLevels] = useState([]);
+  const [topics, setTopics] = useState([]);
+  const [articles, setArticles] = useState([]);
+  const [partsOfSpeech, setPartsOfSpeech] = useState([]);
 
   // Fetch the options for level, topic, article, and partOfSpeech
   useEffect(() => {
