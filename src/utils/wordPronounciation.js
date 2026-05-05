@@ -1,3 +1,5 @@
+import { getBestGermanVoice } from "./voiceSettings";
+
 // let canPronounce = true;
 
 // export const pronounceWord = (word) => {
@@ -15,11 +17,22 @@
 //   }, 900);
 // };
 
-export const pronounceWord = (word) => {
+export const pronounceWord = async (word) => {
   // Cancel any queued or ongoing speech
   speechSynthesis.cancel();
 
   const utterance = new SpeechSynthesisUtterance(word);
   utterance.lang = "de-DE";
+
+  // Try to get the best/preferred German voice
+  try {
+    const preferredVoice = await getBestGermanVoice();
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+    }
+  } catch (error) {
+    console.warn("Failed to load preferred voice, using default:", error);
+  }
+
   speechSynthesis.speak(utterance);
 };

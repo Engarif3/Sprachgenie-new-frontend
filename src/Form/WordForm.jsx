@@ -57,6 +57,10 @@ const WordForm = () => {
     synonyms: "",
     antonyms: "",
     similarWords: "",
+    verbConjugation: "REGULAR",
+    verbIsReflexive: false,
+    verbIsModal: false,
+    verbIsSeparable: false,
   });
   const [loading, setLoading] = useState(true); // Loading state
   const [levels, setLevels] = useState([]);
@@ -75,6 +79,13 @@ const WordForm = () => {
     synonyms: "",
     antonyms: "",
     similarWords: "",
+    verbAttributes: {
+      conjugation: "REGULAR",
+      isReflexive: false,
+      isModal: false,
+      prefixType: "NONE",
+      caseRequirement: "ACCUSATIVE",
+    },
   };
 
   // Fetch the options for level, topic, article, and partOfSpeech
@@ -103,11 +114,53 @@ const WordForm = () => {
 
   // Handle form field changes
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setWordData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    const { name, value, type, checked } = e.target;
+
+    // Handle verb attributes nested object
+    if (name.startsWith("verbAttributes.")) {
+      const field = name.split(".")[1];
+
+      setWordData((prevData) => {
+        const newVerbAttrs = { ...prevData.verbAttributes };
+
+        // Handle boolean checkboxes
+        if (type === "checkbox") {
+          newVerbAttrs[field] = checked;
+
+          // Mutual exclusivity: Modal clears reflexive and sets prefixType to none
+          if (field === "isModal" && checked) {
+            newVerbAttrs.isReflexive = false;
+            newVerbAttrs.prefixType = "NONE";
+          }
+
+          // Reflexive unchecks Modal
+          if (field === "isReflexive" && checked) {
+            newVerbAttrs.isModal = false;
+          }
+        } else {
+          // Handle select dropdowns
+          newVerbAttrs[field] = value;
+
+          // Changing prefixType to separable/inseparable unchecks Modal
+          if (
+            field === "prefixType" &&
+            (value === "SEPARABLE" || value === "INSEPARABLE")
+          ) {
+            newVerbAttrs.isModal = false;
+          }
+        }
+
+        return {
+          ...prevData,
+          verbAttributes: newVerbAttrs,
+        };
+      });
+    } else {
+      setWordData((prevData) => ({
+        ...prevData,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    }
   };
 
   // Handle form submission
@@ -175,8 +228,30 @@ const WordForm = () => {
               .map((item) => item.trim())
               .filter((item) => item) // Add filter here
           : [],
-      createdBy: userId,
     };
+
+    // Add verbAttributes only if there are non-default values
+    const defaults = {
+      conjugation: "REGULAR",
+      isReflexive: false,
+      isModal: false,
+      prefixType: "NONE",
+      caseRequirement: "ACCUSATIVE",
+    };
+
+    const verbAttributes = {};
+    Object.keys(wordData.verbAttributes).forEach((key) => {
+      if (wordData.verbAttributes[key] !== defaults[key]) {
+        verbAttributes[key] = wordData.verbAttributes[key];
+      }
+    });
+
+    // Only include verbAttributes if it has non-default values
+    if (Object.keys(verbAttributes).length > 0) {
+      newWordData.verbAttributes = verbAttributes;
+    }
+
+    newWordData.createdBy = userId;
 
     const selfReferenceMessage = getSelfReferenceMessage(
       newWordData.value,
@@ -433,6 +508,127 @@ const WordForm = () => {
                   )}
                 </select>
               </div>
+
+              {/* Verb Attributes - Only show when part of speech is verb */}
+              {partsOfSpeech
+                .find((pos) => pos.id === parseInt(wordData.partOfSpeechId))
+                ?.name?.toLowerCase() === "verb" && (
+                <div className="space-y-4 p-4 bg-blue-50 dark:bg-slate-800 rounded-lg border-2 border-blue-200 dark:border-blue-600">
+                  <h3 className="text-sm font-semibold text-blue-700 dark:text-blue-300">
+                    🔹 Verb Attributes
+                  </h3>
+
+                  {/* Conjugation Type */}
+                  <div>
+                    <label
+                      htmlFor="verbAttributes.conjugation"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      Conjugation Type
+                    </label>
+                    <select
+                      id="verbAttributes.conjugation"
+                      name="verbAttributes.conjugation"
+                      value={wordData.verbAttributes.conjugation}
+                      onChange={handleChange}
+                      className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                    >
+                      <option value="REGULAR">Regular (weak)</option>
+                      <option value="IRREGULAR">Irregular (strong)</option>
+                    </select>
+                  </div>
+
+                  {/* Prefix Type */}
+                  <div>
+                    <label
+                      htmlFor="verbAttributes.prefixType"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      Prefix Type
+                    </label>
+                    <select
+                      id="verbAttributes.prefixType"
+                      name="verbAttributes.prefixType"
+                      value={wordData.verbAttributes.prefixType}
+                      onChange={handleChange}
+                      className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                    >
+                      <option value="NONE">No Prefix</option>
+                      <option value="SEPARABLE">
+                        Separable (e.g., aufstehen, ankommen)
+                      </option>
+                      <option value="INSEPARABLE">
+                        Inseparable (e.g., verstehen, bekommen)
+                      </option>
+                    </select>
+                  </div>
+
+                  {/* Case Requirement */}
+                  <div>
+                    <label
+                      htmlFor="verbAttributes.caseRequirement"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      Case Requirement
+                    </label>
+                    <select
+                      id="verbAttributes.caseRequirement"
+                      name="verbAttributes.caseRequirement"
+                      value={wordData.verbAttributes.caseRequirement}
+                      onChange={handleChange}
+                      className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                    >
+                      <option value="ACCUSATIVE">Accusative (Akkusativ)</option>
+                      <option value="DATIVE">Dative (Dativ)</option>
+                      <option value="GENITIVE">Genitive (Genitiv)</option>
+                      <option value="PREPOSITIONAL">Prepositional</option>
+                    </select>
+                  </div>
+
+                  {/* Reflexive Checkbox */}
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="verbAttributes.isReflexive"
+                      name="verbAttributes.isReflexive"
+                      checked={wordData.verbAttributes.isReflexive}
+                      onChange={handleChange}
+                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                    />
+                    <label
+                      htmlFor="verbAttributes.isReflexive"
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      Reflexive Verb (e.g., sich erinnern)
+                    </label>
+                  </div>
+
+                  {/* Modal Checkbox */}
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="verbAttributes.isModal"
+                      name="verbAttributes.isModal"
+                      checked={wordData.verbAttributes.isModal}
+                      onChange={handleChange}
+                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                    />
+                    <label
+                      htmlFor="verbAttributes.isModal"
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      Modal Verb (e.g., können, müssen)
+                    </label>
+                  </div>
+
+                  {/* Info Text */}
+                  <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+                    ℹ️ Note: Modal verbs cannot be Reflexive or have
+                    Separable/Inseparable prefixes. All other combinations are
+                    allowed.
+                  </p>
+                </div>
+              )}
 
               {/* Topic Dropdown */}
               <div>

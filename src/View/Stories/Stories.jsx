@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../../axios";
 import stories from "./stories.json";
 import Container from "../../utils/Container";
+import { getBestGermanVoice } from "../../utils/voiceSettings";
 
 // Import Google Font - Roboto for clean, professional look (like Todaii)
 import "@fontsource/roboto";
@@ -226,11 +227,25 @@ const Stories = () => {
                         className="flex items-center gap-2 justify-start p-3 dark.bg-gray-800/40 backdrop-blur-sm border border-gray-700/40 rounded-xl shadow-lg hover:border-orange-500/40 transition-all duration-300"
                       >
                         <button
-                          onClick={() => {
+                          onClick={async () => {
                             const utterance = new SpeechSynthesisUtterance(
                               item.word,
                             );
                             utterance.lang = "de-DE";
+
+                            // Use preferred voice if available
+                            try {
+                              const preferredVoice = await getBestGermanVoice();
+                              if (preferredVoice) {
+                                utterance.voice = preferredVoice;
+                              }
+                            } catch (error) {
+                              console.warn(
+                                "Failed to load preferred voice:",
+                                error,
+                              );
+                            }
+
                             window.speechSynthesis.speak(utterance);
                           }}
                           className="flex-shrink-0 w-8 h-8 flex items-center justify-center  dark:dark:text-white rounded-full transition-colors"

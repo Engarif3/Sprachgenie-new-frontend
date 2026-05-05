@@ -323,6 +323,13 @@ const UpdateWord = () => {
     synonyms: [],
     antonyms: [],
     similarWords: [],
+    verbAttributes: {
+      conjugation: "REGULAR",
+      isReflexive: false,
+      isModal: false,
+      prefixType: "NONE",
+      caseRequirement: "ACCUSATIVE",
+    },
     level: {},
     topic: {},
     article: {},
@@ -537,6 +544,24 @@ const UpdateWord = () => {
         ]);
 
         const word = wordResponse.data.data;
+
+        // Construct verbAttributes from individual DB columns (NULL = use defaults)
+        const defaults = {
+          conjugation: "REGULAR",
+          isReflexive: false,
+          isModal: false,
+          prefixType: "NONE",
+          caseRequirement: "ACCUSATIVE",
+        };
+
+        const verbAttributes = {
+          conjugation: word.conjugation ?? defaults.conjugation,
+          isReflexive: word.isReflexive ?? defaults.isReflexive,
+          isModal: word.isModal ?? defaults.isModal,
+          prefixType: word.prefixType ?? defaults.prefixType,
+          caseRequirement: word.caseRequirement ?? defaults.caseRequirement,
+        };
+
         setFormData({
           id: word.id,
           value: word.value,
@@ -550,6 +575,7 @@ const UpdateWord = () => {
           synonyms: word.synonyms?.map((item) => item.value) || [],
           antonyms: word.antonyms?.map((item) => item.value) || [],
           similarWords: word.similarWords?.map((item) => item.value) || [],
+          verbAttributes,
           level: word.level,
           topic: word.topic,
           article: word.article,
@@ -572,10 +598,50 @@ const UpdateWord = () => {
   }, [id, refetchTrigger]);
 
   const handleInputChange = async (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
 
+    // Handle verb attributes nested object
+    if (name.startsWith("verbAttributes.")) {
+      const field = name.split(".")[1];
+
+      setFormData((prevData) => {
+        const newVerbAttrs = { ...prevData.verbAttributes };
+
+        // Handle boolean checkboxes
+        if (type === "checkbox") {
+          newVerbAttrs[field] = checked;
+
+          // Mutual exclusivity: Modal clears reflexive and sets prefixType to none
+          if (field === "isModal" && checked) {
+            newVerbAttrs.isReflexive = false;
+            newVerbAttrs.prefixType = "NONE";
+          }
+
+          // Reflexive unchecks Modal
+          if (field === "isReflexive" && checked) {
+            newVerbAttrs.isModal = false;
+          }
+        } else {
+          // Handle select dropdowns
+          newVerbAttrs[field] = value;
+
+          // Changing prefixType to separable/inseparable unchecks Modal
+          if (
+            field === "prefixType" &&
+            (value === "SEPARABLE" || value === "INSEPARABLE")
+          ) {
+            newVerbAttrs.isModal = false;
+          }
+        }
+
+        return {
+          ...prevData,
+          verbAttributes: newVerbAttrs,
+        };
+      });
+    }
     // If it's a select field (levelId, topicId, articleId, partOfSpeechId), update formData directly
-    if (
+    else if (
       name === "levelId" ||
       name === "topicId" ||
       name === "articleId" ||
@@ -740,6 +806,65 @@ const UpdateWord = () => {
     }
   };
 
+  const handleClearAllMeanings = async () => {
+    const result = await Swal.fire({
+      title: "Clear all meanings?",
+      text: 'Type "ok" (case insensitive) to confirm this action. This cannot be undone.',
+      input: "text",
+      inputPlaceholder: 'Type "ok" to confirm',
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+      confirmButtonText: "Clear All",
+      reverseButtons: true,
+      preConfirm: (value) => {
+        if (value && value.toLowerCase() === "ok") {
+          return true;
+        } else {
+          Swal.showValidationMessage('Please type "ok" to confirm');
+          return false;
+        }
+      },
+    });
+
+    if (result.isConfirmed) {
+      setLoading(true);
+      const emptyArray = [];
+
+      // Update the state
+      setFormData((prev) => ({
+        ...prev,
+        meaning: emptyArray,
+      }));
+
+      try {
+        // Send the updated data to the backend
+        await api.put(`/word/update/${formData.id}`, {
+          ...formData,
+          meaning: emptyArray,
+        });
+
+        Swal.fire({
+          title: "Cleared!",
+          text: "All meanings have been removed.",
+          timer: 500,
+          showConfirmButton: false,
+          icon: "success",
+        });
+
+        // Trigger refetch by incrementing counter
+        setRefetchTrigger((prev) => prev + 1);
+      } catch {
+        Swal.fire({
+          title: "Error!",
+          text: "Failed to update the backend. Please try again.",
+          icon: "error",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -765,6 +890,29 @@ const UpdateWord = () => {
         normalizeFieldItems("similarWords", inputData.similarWords),
       ),
     };
+
+    // Filter verbAttributes to only include non-default values
+    const defaults = {
+      conjugation: "REGULAR",
+      isReflexive: false,
+      isModal: false,
+      prefixType: "NONE",
+      caseRequirement: "ACCUSATIVE",
+    };
+
+    const verbAttributes = {};
+    Object.keys(formData.verbAttributes).forEach((key) => {
+      if (formData.verbAttributes[key] !== defaults[key]) {
+        verbAttributes[key] = formData.verbAttributes[key];
+      }
+    });
+
+    // Only include verbAttributes if it has non-default values
+    if (Object.keys(verbAttributes).length > 0) {
+      dataToSend.verbAttributes = verbAttributes;
+    } else {
+      dataToSend.verbAttributes = null;
+    }
 
     const selfReferenceMessage = getSelfReferenceMessage(
       dataToSend.value,
@@ -954,10 +1102,22 @@ const UpdateWord = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 justify-center items-start  gap-4 w-full md:w-8/12 p-1  md:p-8 lg:p-8 rounded-lg bg-stone-800">
                 {/* Meanings Section */}
                 <div className="w-full">
-                  <label className="block  mb-2 text-white">
-                    <span className="font-medium text-lg"> Meaning</span> (for
-                    multiple input use comma)
-                  </label>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-white">
+                      <span className="font-medium text-lg"> Meaning</span> (for
+                      multiple input use comma)
+                    </label>
+                    {formData.meaning.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleClearAllMeanings}
+                        disabled={loading}
+                        className="btn btn-error btn-sm"
+                      >
+                        Clear All
+                      </button>
+                    )}
+                  </div>
                   <input
                     type="text"
                     name="meaning"
@@ -1493,6 +1653,130 @@ const UpdateWord = () => {
                     ))}
                   </select>
                 </div>
+
+                {/* Verb Attributes - Only show when part of speech is verb */}
+                {partOfSpeeches
+                  .find((pos) => pos.id === parseInt(formData.partOfSpeechId))
+                  ?.name?.toLowerCase() === "verb" && (
+                  <div className="space-y-4 p-4 bg-blue-50 dark:bg-slate-800 rounded-lg border-2 border-blue-200 dark:border-blue-600">
+                    <h3 className="text-sm font-semibold text-blue-700 dark:text-blue-300">
+                      🔹 Verb Attributes
+                    </h3>
+
+                    {/* Conjugation Type */}
+                    <div>
+                      <label
+                        htmlFor="verbAttributes.conjugation"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                      >
+                        Conjugation Type
+                      </label>
+                      <select
+                        id="verbAttributes.conjugation"
+                        name="verbAttributes.conjugation"
+                        value={formData.verbAttributes.conjugation}
+                        onChange={handleInputChange}
+                        className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="REGULAR">Regular (weak)</option>
+                        <option value="IRREGULAR">Irregular (strong)</option>
+                      </select>
+                    </div>
+
+                    {/* Prefix Type */}
+                    <div>
+                      <label
+                        htmlFor="verbAttributes.prefixType"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                      >
+                        Prefix Type
+                      </label>
+                      <select
+                        id="verbAttributes.prefixType"
+                        name="verbAttributes.prefixType"
+                        value={formData.verbAttributes.prefixType}
+                        onChange={handleInputChange}
+                        className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="NONE">No Prefix</option>
+                        <option value="SEPARABLE">
+                          Separable (e.g., aufstehen, ankommen)
+                        </option>
+                        <option value="INSEPARABLE">
+                          Inseparable (e.g., verstehen, bekommen)
+                        </option>
+                      </select>
+                    </div>
+
+                    {/* Case Requirement */}
+                    <div>
+                      <label
+                        htmlFor="verbAttributes.caseRequirement"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                      >
+                        Case Requirement
+                      </label>
+                      <select
+                        id="verbAttributes.caseRequirement"
+                        name="verbAttributes.caseRequirement"
+                        value={formData.verbAttributes.caseRequirement}
+                        onChange={handleInputChange}
+                        className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="ACCUSATIVE">
+                          Accusative (Akkusativ)
+                        </option>
+                        <option value="DATIVE">Dative (Dativ)</option>
+                        <option value="GENITIVE">Genitive (Genitiv)</option>
+                        <option value="PREPOSITIONAL">Prepositional</option>
+                      </select>
+                    </div>
+
+                    {/* Reflexive Checkbox */}
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="verbAttributes.isReflexive"
+                        name="verbAttributes.isReflexive"
+                        checked={formData.verbAttributes.isReflexive}
+                        onChange={handleInputChange}
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      />
+                      <label
+                        htmlFor="verbAttributes.isReflexive"
+                        className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                      >
+                        Reflexive Verb (e.g., sich erinnern)
+                      </label>
+                    </div>
+
+                    {/* Modal Checkbox */}
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="verbAttributes.isModal"
+                        name="verbAttributes.isModal"
+                        checked={formData.verbAttributes.isModal}
+                        onChange={handleInputChange}
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      />
+                      <label
+                        htmlFor="verbAttributes.isModal"
+                        className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                      >
+                        Modal Verb (e.g., können, müssen)
+                      </label>
+                    </div>
+
+                    {/* Info Text */}
+                    <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+                      ℹ️ Note: Modal verbs cannot be Reflexive or have
+                      Separable/Inseparable prefixes. All other combinations are
+                      allowed.
+                    </p>
+                  </div>
+                )}
+
                 {/* </div> */}
               </div>
             </div>
