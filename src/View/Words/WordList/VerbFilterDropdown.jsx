@@ -171,6 +171,8 @@ const PartOfSpeechDropdown = ({
       hoverTimeoutRef.current = null;
     }
 
+    console.log("=== VERB FILTER SELECTED ===");
+    console.log("Filter value:", filter);
     onSelectPartOfSpeech("verb");
     onSelectVerbFilter(filter);
     onSelectPrepositionFilter(""); // Clear preposition filter
@@ -205,6 +207,7 @@ const PartOfSpeechDropdown = ({
       description: "können, müssen, wollen",
       color: "text-indigo-400",
     },
+
     {
       value: "separable",
       label: "Separable Verbs",
@@ -228,6 +231,12 @@ const PartOfSpeechDropdown = ({
       label: "Prepositional Verbs",
       description: "denken an, warten auf",
       color: "text-pink-400",
+    },
+    {
+      value: "irregular",
+      label: "Irregular (Strong) Verbs",
+      description: "gehen, sehen, sein",
+      color: "text-orange-400",
     },
   ];
 

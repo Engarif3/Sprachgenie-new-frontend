@@ -289,6 +289,11 @@ const buildWordListRequestParams = (queryState, page) => {
     _ts: String(Date.now()),
   });
 
+  console.log("=== BUILD WORD LIST REQUEST PARAMS ===");
+  console.log("queryState:", queryState);
+  console.log("queryState.verbFilter:", queryState.verbFilter);
+  console.log("queryState.partOfSpeech:", queryState.partOfSpeech);
+
   if (hasAdminCompletenessFilter(queryState)) {
     params.set("all", "true");
   }
@@ -307,6 +312,7 @@ const buildWordListRequestParams = (queryState, page) => {
 
   // Add verb-specific filters
   if (queryState.verbFilter) {
+    console.log("Adding verbFilter to params:", queryState.verbFilter);
     params.set("verbFilter", queryState.verbFilter);
   }
 
@@ -555,8 +561,8 @@ const WordList = () => {
 
   const [cache, setCache] = useState(EMPTY_CACHE);
 
-  const activeQuery = useMemo(
-    () => ({
+  const activeQuery = useMemo(() => {
+    const query = {
       search: debouncedSearchValue.trim(),
       searchType,
       level: selectedLevel,
@@ -569,20 +575,26 @@ const WordList = () => {
         isAdmin && adminCompletenessFilter === "missingMeaning",
       missingSentencesOnly:
         isAdmin && adminCompletenessFilter === "missingSentences",
-    }),
-    [
-      debouncedSearchValue,
-      searchType,
-      selectedLevel,
-      selectedTopic,
-      selectedPartOfSpeech,
-      selectedVerbFilter, // Add to dependency array
-      selectedPrepositionFilter, // Add to dependency array
-      showRecentOnly,
-      isAdmin,
-      adminCompletenessFilter,
-    ],
-  );
+    };
+
+    console.log("=== ACTIVE QUERY RECALCULATED ===");
+    console.log("verbFilter:", query.verbFilter);
+    console.log("partOfSpeech:", query.partOfSpeech);
+    console.log("Full query:", query);
+
+    return query;
+  }, [
+    debouncedSearchValue,
+    searchType,
+    selectedLevel,
+    selectedTopic,
+    selectedPartOfSpeech,
+    selectedVerbFilter, // Add to dependency array
+    selectedPrepositionFilter, // Add to dependency array
+    showRecentOnly,
+    isAdmin,
+    adminCompletenessFilter,
+  ]);
 
   const activeQueryKey = useMemo(
     () => buildWordListQueryKey(activeQuery),
@@ -933,12 +945,20 @@ const WordList = () => {
   ]);
 
   useEffect(() => {
+    console.log("=== FETCH WORDS USEEFFECT TRIGGERED ===");
+    console.log("pageCacheReady:", pageCacheReady);
+    console.log("activeQueryKey:", activeQueryKey);
+    console.log("requestedPageToFetch:", requestedPageToFetch);
+    console.log("activeQuery:", activeQuery);
+
     if (!pageCacheReady) {
+      console.log("Skipping fetch - pageCacheReady is false");
       return;
     }
 
     void (async () => {
       try {
+        console.log("=== CALLING FETCH WORDS PAGE ===");
         const pageData = await fetchWordsPage({
           queryState: activeQuery,
           queryKey: activeQueryKey,
@@ -1109,10 +1129,17 @@ const WordList = () => {
     setCurrentPage(1);
   }, []);
 
-  const handleVerbFilterChange = useCallback((value) => {
-    setSelectedVerbFilter(value);
-    setCurrentPage(1);
-  }, []);
+  const handleVerbFilterChange = useCallback(
+    (value) => {
+      console.log("=== HANDLE VERB FILTER CHANGE ===");
+      console.log("Previous selectedVerbFilter:", selectedVerbFilter);
+      console.log("New value:", value);
+      setSelectedVerbFilter(value);
+      setCurrentPage(1);
+      console.log("State updates queued");
+    },
+    [selectedVerbFilter],
+  );
 
   const handlePrepositionFilterChange = useCallback((value) => {
     setSelectedPrepositionFilter(value);
