@@ -344,4 +344,75 @@
     --spark-x: 7.2rem;
     --spark-y: 4.8rem;
   }
+
+  /* Verb Filter Dropdown Animations */
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideRight {
+    from {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideLeft {
+    from {
+      opacity: 0;
+      transform: translateX(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .animate-slideDown {
+    animation: slideDown 0.2s ease-out forwards;
+  }
+
+  .animate-slideRight {
+    animation: slideRight 0.15s ease-out forwards;
+  }
+
+  .animate-slideLeft {
+    animation: slideLeft 0.15s ease-out forwards;
+  }
+
+  /* Custom Scrollbar for Dropdown */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(31, 41, 55, 0.4);
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(96, 165, 250, 0.6);
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(96, 165, 250, 0.8);
+  }
+
+  /* Firefox scrollbar */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(96, 165, 250, 0.6) rgba(31, 41, 55, 0.4);
+  }
 }

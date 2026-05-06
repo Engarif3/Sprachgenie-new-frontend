@@ -27,6 +27,7 @@ import { IoSearch } from "react-icons/io5";
 import useDebounce from "../../../hooks/useDebounce";
 import WordTableRow from "./WordTableRow";
 import { IoInformationCircleOutline } from "react-icons/io5";
+import PartOfSpeechDropdown from "./VerbFilterDropdown";
 
 // Lazy load modals for better performance
 const WordListModal = lazy(() => import("../Modals/WordListModal"));
@@ -304,6 +305,11 @@ const buildWordListRequestParams = (queryState, page) => {
     params.set("partOfSpeech", queryState.partOfSpeech);
   }
 
+  // Add verb-specific filters
+  if (queryState.verbFilter) {
+    params.set("verbFilter", queryState.verbFilter);
+  }
+
   if (queryState.recentOnly) {
     params.set("recentOnly", "true");
   }
@@ -403,6 +409,7 @@ const WordList = () => {
     DEFAULT_PART_OF_SPEECH_OPTIONS,
   );
   const [selectedPartOfSpeech, setSelectedPartOfSpeech] = useState("");
+  const [selectedVerbFilter, setSelectedVerbFilter] = useState(""); // modal, reflexive, separable, dative, etc.
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -548,6 +555,7 @@ const WordList = () => {
       level: selectedLevel,
       topic: selectedTopic,
       partOfSpeech: selectedPartOfSpeech,
+      verbFilter: selectedVerbFilter, // Add verb sub-filter
       recentOnly: showRecentOnly,
       missingMeaningOnly:
         isAdmin && adminCompletenessFilter === "missingMeaning",
@@ -560,6 +568,7 @@ const WordList = () => {
       selectedLevel,
       selectedTopic,
       selectedPartOfSpeech,
+      selectedVerbFilter, // Add to dependency array
       showRecentOnly,
       isAdmin,
       adminCompletenessFilter,
@@ -1083,8 +1092,16 @@ const WordList = () => {
     setCurrentPage(1); // Reset page on filter change
   }, []);
 
-  const handlePartOfSpeechChange = useCallback((e) => {
-    setSelectedPartOfSpeech(e.target.value);
+  const handlePartOfSpeechChange = useCallback((value) => {
+    setSelectedPartOfSpeech(value);
+    if (value !== "verb") {
+      setSelectedVerbFilter(""); // Clear verb filter if not selecting verb
+    }
+    setCurrentPage(1);
+  }, []);
+
+  const handleVerbFilterChange = useCallback((value) => {
+    setSelectedVerbFilter(value);
     setCurrentPage(1);
   }, []);
 
@@ -1396,6 +1413,7 @@ const WordList = () => {
     setSelectedLevel("");
     setSelectedTopic("");
     setSelectedPartOfSpeech("");
+    setSelectedVerbFilter(""); // Reset verb filter
     setShowRecentOnly(false);
     setAdminCompletenessFilter("");
     setCurrentPage(1);
@@ -1659,23 +1677,15 @@ const WordList = () => {
             <label htmlFor="part-of-speech-select" className="sr-only">
               Filter by part of speech
             </label>
-            <select
-              id="part-of-speech-select"
-              value={selectedPartOfSpeech}
-              onChange={handlePartOfSpeechChange}
-              className="border  border-gray-600 dark:bg-gray-800 backdrop-blur-sm rounded-xl px-4 py-3 w-full dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50 transition-all"
-              aria-label="Filter words by part of speech"
-            >
-              <option value="">All Types</option>
-              {partOfSpeechOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-              <option value={NOT_SPECIFIED_PART_OF_SPEECH}>
-                Not specified
-              </option>
-            </select>
+
+            <PartOfSpeechDropdown
+              selectedPartOfSpeech={selectedPartOfSpeech}
+              selectedVerbFilter={selectedVerbFilter}
+              onSelectPartOfSpeech={handlePartOfSpeechChange}
+              onSelectVerbFilter={handleVerbFilterChange}
+              partOfSpeechOptions={partOfSpeechOptions}
+              notSpecifiedValue={NOT_SPECIFIED_PART_OF_SPEECH}
+            />
           </div>
         </div>
       </div>
