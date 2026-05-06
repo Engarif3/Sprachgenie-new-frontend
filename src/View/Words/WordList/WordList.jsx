@@ -1590,6 +1590,8 @@ const WordList = () => {
           {showAdminControls && (
             <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-white/10 md:pt-0 md:border-t-0 md:flex-nowrap md:justify-end md:gap-3 md:flex-shrink-0">
               <select
+                id="admin-completeness-filter"
+                name="adminCompletenessFilter"
                 value={adminCompletenessFilter}
                 onChange={handleAdminCompletenessFilterChange}
                 className="min-h-[30px] w-full sm:w-auto md:w-auto px-2 py-2 md:px-2.5 md:py-1.5 rounded-full font-semibold text-sm shadow-lg border border-stone-500 bg-stone-800 text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50"
