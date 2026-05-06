@@ -527,13 +527,13 @@ const WordForm = () => {
                   {/* Conjugation Type */}
                   <div>
                     <label
-                      htmlFor="verbAttributes.conjugation"
+                      htmlFor="verbAttributes-conjugation"
                       className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                       Conjugation Type
                     </label>
                     <select
-                      id="verbAttributes.conjugation"
+                      id="verbAttributes-conjugation"
                       name="verbAttributes.conjugation"
                       value={wordData.verbAttributes.conjugation}
                       onChange={handleChange}
@@ -547,13 +547,13 @@ const WordForm = () => {
                   {/* Prefix Type */}
                   <div>
                     <label
-                      htmlFor="verbAttributes.prefixType"
+                      htmlFor="verbAttributes-prefixType"
                       className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                       Prefix Type
                     </label>
                     <select
-                      id="verbAttributes.prefixType"
+                      id="verbAttributes-prefixType"
                       name="verbAttributes.prefixType"
                       value={wordData.verbAttributes.prefixType}
                       onChange={handleChange}
@@ -572,13 +572,13 @@ const WordForm = () => {
                   {/* Case Requirement */}
                   <div>
                     <label
-                      htmlFor="verbAttributes.caseRequirement"
+                      htmlFor="verbAttributes-caseRequirement"
                       className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                       Case Requirement
                     </label>
                     <select
-                      id="verbAttributes.caseRequirement"
+                      id="verbAttributes-caseRequirement"
                       name="verbAttributes.caseRequirement"
                       value={wordData.verbAttributes.caseRequirement}
                       onChange={handleChange}
@@ -595,14 +595,14 @@ const WordForm = () => {
                   <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
-                      id="verbAttributes.isReflexive"
+                      id="verbAttributes-isReflexive"
                       name="verbAttributes.isReflexive"
                       checked={wordData.verbAttributes.isReflexive}
                       onChange={handleChange}
                       className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                     />
                     <label
-                      htmlFor="verbAttributes.isReflexive"
+                      htmlFor="verbAttributes-isReflexive"
                       className="text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                       Reflexive Verb (e.g., sich erinnern)
@@ -613,14 +613,14 @@ const WordForm = () => {
                   <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
-                      id="verbAttributes.isModal"
+                      id="verbAttributes-isModal"
                       name="verbAttributes.isModal"
                       checked={wordData.verbAttributes.isModal}
                       onChange={handleChange}
                       className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                     />
                     <label
-                      htmlFor="verbAttributes.isModal"
+                      htmlFor="verbAttributes-isModal"
                       className="text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                       Modal Verb (e.g., können, müssen)
@@ -648,13 +648,13 @@ const WordForm = () => {
                   {/* Preposition Case */}
                   <div>
                     <label
-                      htmlFor="prepositionAttributes.prepositionCase"
+                      htmlFor="prepositionAttributes-prepositionCase"
                       className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                       Case Requirement
                     </label>
                     <select
-                      id="prepositionAttributes.prepositionCase"
+                      id="prepositionAttributes-prepositionCase"
                       name="prepositionAttributes.prepositionCase"
                       value={
                         wordData.prepositionAttributes.prepositionCase || ""
