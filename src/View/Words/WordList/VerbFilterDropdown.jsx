@@ -287,6 +287,7 @@ const PartOfSpeechDropdown = ({
     <div ref={dropdownRef} className="relative w-full">
       {/* Main Button */}
       <button
+        id="part-of-speech-select"
         onClick={() => setIsOpen(!isOpen)}
         className="border border-gray-600 dark:bg-gray-800 backdrop-blur-sm rounded-xl px-4 py-3 w-full dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50 transition-all text-left flex items-center justify-between"
         aria-label="Filter words by part of speech"
