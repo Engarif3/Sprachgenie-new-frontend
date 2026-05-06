@@ -1146,7 +1146,10 @@ const UpdateWord = () => {
                 {/* Meanings Section */}
                 <div className="w-full">
                   <div className="flex justify-between items-center mb-2">
-                    <label className="block text-white">
+                    <label
+                      htmlFor="update-meaning-input"
+                      className="block text-white"
+                    >
                       <span className="font-medium text-lg"> Meaning</span> (for
                       multiple input use comma)
                     </label>
@@ -1162,6 +1165,7 @@ const UpdateWord = () => {
                     )}
                   </div>
                   <input
+                    id="update-meaning-input"
                     type="text"
                     name="meaning"
                     value={inputData.meaning}
@@ -1320,7 +1324,10 @@ const UpdateWord = () => {
                 {/* Sentences Section */}
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <label className="block text-white">
+                    <label
+                      htmlFor="update-sentences-input"
+                      className="block text-white"
+                    >
                       <span className="font-medium text-lg">Sentences</span>{" "}
                       (for multiple input use "|". eg. sentence A. | Sentence
                       B.)
@@ -1337,6 +1344,7 @@ const UpdateWord = () => {
                     )}
                   </div>
                   <input
+                    id="update-sentences-input"
                     type="text"
                     name="sentences"
                     value={inputData.sentences}
@@ -1493,10 +1501,14 @@ const UpdateWord = () => {
                 </div>
 
                 <div>
-                  <label className="block  mb-2 text-white">
+                  <label
+                    htmlFor="update-pluralForm"
+                    className="block  mb-2 text-white"
+                  >
                     <span className="font-medium text-lg"> Plural Form</span>
                   </label>
                   <input
+                    id="update-pluralForm"
                     type="text"
                     name="pluralForm"
                     value={formData.pluralForm}
@@ -1508,11 +1520,15 @@ const UpdateWord = () => {
 
                 {/* Synonyms Section */}
                 <div>
-                  <label className="block  mb-2 text-white">
+                  <label
+                    htmlFor="update-synonyms"
+                    className="block  mb-2 text-white"
+                  >
                     <span className="font-medium text-lg"> Synonyms</span> (for
                     multiple input use comma)
                   </label>
                   <input
+                    id="update-synonyms"
                     type="text"
                     name="synonyms"
                     value={inputData.synonyms}
@@ -1541,12 +1557,16 @@ const UpdateWord = () => {
 
                 {/* Antonyms Section */}
                 <div>
-                  <label className="block  mb-2 text-white">
+                  <label
+                    htmlFor="update-antonyms"
+                    className="block  mb-2 text-white"
+                  >
                     <span className="font-medium text-lg"> Antonyms</span> (for
                     multiple input use comma)
                   </label>
 
                   <input
+                    id="update-antonyms"
                     type="text"
                     name="antonyms"
                     value={inputData.antonyms}
@@ -1575,12 +1595,16 @@ const UpdateWord = () => {
 
                 {/* Similar Words Section */}
                 <div>
-                  <label className="block mb-2 text-white">
+                  <label
+                    htmlFor="update-similarWords"
+                    className="block mb-2 text-white"
+                  >
                     <span className="font-medium text-lg"> Word to Watch</span>{" "}
                     (for multiple input use comma)
                   </label>
 
                   <input
+                    id="update-similarWords"
                     type="text"
                     name="similarWords"
                     value={inputData.similarWords}
@@ -1611,10 +1635,14 @@ const UpdateWord = () => {
 
                 {/* Level Dropdown */}
                 <div>
-                  <label className="block  mb-2 text-white">
+                  <label
+                    htmlFor="update-levelId"
+                    className="block  mb-2 text-white"
+                  >
                     <span className="font-medium text-lg"> Level</span>
                   </label>
                   <select
+                    id="update-levelId"
                     name="levelId"
                     value={formData.levelId || "1"}
                     onChange={handleInputChange}
@@ -1633,10 +1661,14 @@ const UpdateWord = () => {
 
                 {/* Topic Dropdown */}
                 <div>
-                  <label className="block  mb-2 text-white">
+                  <label
+                    htmlFor="update-topicId"
+                    className="block  mb-2 text-white"
+                  >
                     <span className="font-medium text-lg">Topic</span>
                   </label>
                   <select
+                    id="update-topicId"
                     name="topicId"
                     value={formData.topicId || "1"}
                     onChange={handleInputChange}
@@ -1655,10 +1687,14 @@ const UpdateWord = () => {
 
                 {/* Article Dropdown */}
                 <div>
-                  <label className="block  mb-2 text-white">
+                  <label
+                    htmlFor="update-articleId"
+                    className="block  mb-2 text-white"
+                  >
                     <span className="font-medium text-lg">Article</span>
                   </label>
                   <select
+                    id="update-articleId"
                     name="articleId"
                     value={formData.articleId || "4"}
                     onChange={handleInputChange}
@@ -1677,10 +1713,14 @@ const UpdateWord = () => {
 
                 {/* Part of Speech Dropdown */}
                 <div>
-                  <label className="block  mb-2 text-white">
+                  <label
+                    htmlFor="update-partOfSpeechId"
+                    className="block  mb-2 text-white"
+                  >
                     <span className="font-medium text-lg"> Part of Speech</span>
                   </label>
                   <select
+                    id="update-partOfSpeechId"
                     name="partOfSpeechId"
                     value={formData.partOfSpeechId || "3"}
                     onChange={handleInputChange}
