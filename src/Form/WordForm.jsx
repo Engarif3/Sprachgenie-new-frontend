@@ -64,6 +64,9 @@ const WordForm = () => {
       prefixType: "NONE",
       caseRequirement: "ACCUSATIVE",
     },
+    prepositionAttributes: {
+      prepositionCase: null,
+    },
   };
 
   const [wordData, setWordData] = useState(initialWordData);
@@ -138,6 +141,20 @@ const WordForm = () => {
         return {
           ...prevData,
           verbAttributes: newVerbAttrs,
+        };
+      });
+    } else if (name.startsWith("prepositionAttributes.")) {
+      const field = name.split(".")[1];
+
+      setWordData((prevData) => {
+        const newPrepositionAttrs = { ...prevData.prepositionAttributes };
+
+        // Handle select dropdown - null means "Not specified"
+        newPrepositionAttrs[field] = value === "" ? null : value;
+
+        return {
+          ...prevData,
+          prepositionAttributes: newPrepositionAttrs,
         };
       });
     } else {
@@ -235,6 +252,10 @@ const WordForm = () => {
     if (Object.keys(verbAttributes).length > 0) {
       newWordData.verbAttributes = verbAttributes;
     }
+
+    // Always include prepositionCase (can be null)
+    newWordData.prepositionCase =
+      wordData.prepositionAttributes.prepositionCase;
 
     newWordData.createdBy = userId;
 
@@ -611,6 +632,56 @@ const WordForm = () => {
                     ℹ️ Note: Modal verbs cannot be Reflexive or have
                     Separable/Inseparable prefixes. All other combinations are
                     allowed.
+                  </p>
+                </div>
+              )}
+
+              {/* Preposition Attributes - Only show when part of speech is preposition */}
+              {partsOfSpeech
+                .find((pos) => pos.id === parseInt(wordData.partOfSpeechId))
+                ?.name?.toLowerCase() === "preposition" && (
+                <div className="space-y-4 p-4 bg-purple-50 dark:bg-slate-800 rounded-lg border-2 border-purple-200 dark:border-purple-600">
+                  <h3 className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                    🔹 Preposition Attributes
+                  </h3>
+
+                  {/* Preposition Case */}
+                  <div>
+                    <label
+                      htmlFor="prepositionAttributes.prepositionCase"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      Case Requirement
+                    </label>
+                    <select
+                      id="prepositionAttributes.prepositionCase"
+                      name="prepositionAttributes.prepositionCase"
+                      value={
+                        wordData.prepositionAttributes.prepositionCase || ""
+                      }
+                      onChange={handleChange}
+                      className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                    >
+                      <option value="">Not specified</option>
+                      <option value="ACCUSATIVE">
+                        Accusative (e.g., durch, für, gegen, ohne)
+                      </option>
+                      <option value="DATIVE">
+                        Dative (e.g., aus, bei, mit, nach)
+                      </option>
+                      <option value="GENITIVE">
+                        Genitive (e.g., während, wegen, trotz)
+                      </option>
+                      <option value="WECHSEL">
+                        Wechsel / Two-way (e.g., an, auf, in, über)
+                      </option>
+                    </select>
+                  </div>
+
+                  {/* Info Text */}
+                  <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+                    ℹ️ Note: Wechsel prepositions can take Accusative (motion)
+                    or Dative (location) depending on context.
                   </p>
                 </div>
               )}

@@ -330,6 +330,9 @@ const UpdateWord = () => {
       prefixType: "NONE",
       caseRequirement: "ACCUSATIVE",
     },
+    prepositionAttributes: {
+      prepositionCase: null,
+    },
     level: {},
     topic: {},
     article: {},
@@ -562,6 +565,15 @@ const UpdateWord = () => {
           caseRequirement: word.caseRequirement ?? defaults.caseRequirement,
         };
 
+        const prepositionAttributes = {
+          prepositionCase: word.prepositionCase ?? null,
+        };
+
+        console.log("=== LOADING WORD DATA ===");
+        console.log("Word from API:", word);
+        console.log("prepositionCase from API:", word.prepositionCase);
+        console.log("prepositionAttributes being set:", prepositionAttributes);
+
         setFormData({
           id: word.id,
           value: word.value,
@@ -576,6 +588,7 @@ const UpdateWord = () => {
           antonyms: word.antonyms?.map((item) => item.value) || [],
           similarWords: word.similarWords?.map((item) => item.value) || [],
           verbAttributes,
+          prepositionAttributes,
           level: word.level,
           topic: word.topic,
           article: word.article,
@@ -637,6 +650,20 @@ const UpdateWord = () => {
         return {
           ...prevData,
           verbAttributes: newVerbAttrs,
+        };
+      });
+    } else if (name.startsWith("prepositionAttributes.")) {
+      const field = name.split(".")[1];
+
+      setFormData((prevData) => {
+        const newPrepositionAttrs = { ...prevData.prepositionAttributes };
+
+        // Handle select dropdown - null means "Not specified"
+        newPrepositionAttrs[field] = value === "" ? null : value;
+
+        return {
+          ...prevData,
+          prepositionAttributes: newPrepositionAttrs,
         };
       });
     }
@@ -913,6 +940,22 @@ const UpdateWord = () => {
     } else {
       dataToSend.verbAttributes = null;
     }
+
+    // Remove prepositionAttributes from dataToSend (backend expects prepositionCase directly)
+    delete dataToSend.prepositionAttributes;
+
+    // Remove display-only objects that backend doesn't need
+    delete dataToSend.level;
+    delete dataToSend.topic;
+    delete dataToSend.article;
+    delete dataToSend.partOfSpeech;
+
+    // Add prepositionCase directly to dataToSend
+    dataToSend.prepositionCase = formData.prepositionAttributes.prepositionCase;
+
+    console.log("=== UPDATE WORD DATA ===");
+    console.log("prepositionCase being sent:", dataToSend.prepositionCase);
+    console.log("Full payload:", dataToSend);
 
     const selfReferenceMessage = getSelfReferenceMessage(
       dataToSend.value,
@@ -1773,6 +1816,56 @@ const UpdateWord = () => {
                       ℹ️ Note: Modal verbs cannot be Reflexive or have
                       Separable/Inseparable prefixes. All other combinations are
                       allowed.
+                    </p>
+                  </div>
+                )}
+
+                {/* Preposition Attributes - Only show when part of speech is preposition */}
+                {partOfSpeeches
+                  .find((pos) => pos.id === parseInt(formData.partOfSpeechId))
+                  ?.name?.toLowerCase() === "preposition" && (
+                  <div className="space-y-4 p-4 bg-purple-50 dark:bg-slate-800 rounded-lg border-2 border-purple-200 dark:border-purple-600">
+                    <h3 className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                      🔹 Preposition Attributes
+                    </h3>
+
+                    {/* Preposition Case */}
+                    <div>
+                      <label
+                        htmlFor="prepositionAttributes.prepositionCase"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                      >
+                        Case Requirement
+                      </label>
+                      <select
+                        id="prepositionAttributes.prepositionCase"
+                        name="prepositionAttributes.prepositionCase"
+                        value={
+                          formData.prepositionAttributes.prepositionCase || ""
+                        }
+                        onChange={handleInputChange}
+                        className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      >
+                        <option value="">Not specified</option>
+                        <option value="ACCUSATIVE">
+                          Accusative (e.g., durch, für, gegen, ohne)
+                        </option>
+                        <option value="DATIVE">
+                          Dative (e.g., aus, bei, mit, nach)
+                        </option>
+                        <option value="GENITIVE">
+                          Genitive (e.g., während, wegen, trotz)
+                        </option>
+                        <option value="WECHSEL">
+                          Wechsel / Two-way (e.g., an, auf, in, über)
+                        </option>
+                      </select>
+                    </div>
+
+                    {/* Info Text */}
+                    <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+                      ℹ️ Note: Wechsel prepositions can take Accusative (motion)
+                      or Dative (location) depending on context.
                     </p>
                   </div>
                 )}

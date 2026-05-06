@@ -310,6 +310,11 @@ const buildWordListRequestParams = (queryState, page) => {
     params.set("verbFilter", queryState.verbFilter);
   }
 
+  // Add preposition-specific filters
+  if (queryState.prepositionFilter) {
+    params.set("prepositionFilter", queryState.prepositionFilter);
+  }
+
   if (queryState.recentOnly) {
     params.set("recentOnly", "true");
   }
@@ -410,6 +415,8 @@ const WordList = () => {
   );
   const [selectedPartOfSpeech, setSelectedPartOfSpeech] = useState("");
   const [selectedVerbFilter, setSelectedVerbFilter] = useState(""); // modal, reflexive, separable, dative, etc.
+  const [selectedPrepositionFilter, setSelectedPrepositionFilter] =
+    useState(""); // accusative, dative, genitive, wechsel
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -556,6 +563,7 @@ const WordList = () => {
       topic: selectedTopic,
       partOfSpeech: selectedPartOfSpeech,
       verbFilter: selectedVerbFilter, // Add verb sub-filter
+      prepositionFilter: selectedPrepositionFilter, // Add preposition sub-filter
       recentOnly: showRecentOnly,
       missingMeaningOnly:
         isAdmin && adminCompletenessFilter === "missingMeaning",
@@ -569,6 +577,7 @@ const WordList = () => {
       selectedTopic,
       selectedPartOfSpeech,
       selectedVerbFilter, // Add to dependency array
+      selectedPrepositionFilter, // Add to dependency array
       showRecentOnly,
       isAdmin,
       adminCompletenessFilter,
@@ -1105,6 +1114,11 @@ const WordList = () => {
     setCurrentPage(1);
   }, []);
 
+  const handlePrepositionFilterChange = useCallback((value) => {
+    setSelectedPrepositionFilter(value);
+    setCurrentPage(1);
+  }, []);
+
   // Learning mode implementation (Logic remains the same, good to leave)
   const handleDelete = useCallback(
     (wordId, wordValue) => {
@@ -1414,6 +1428,7 @@ const WordList = () => {
     setSelectedTopic("");
     setSelectedPartOfSpeech("");
     setSelectedVerbFilter(""); // Reset verb filter
+    setSelectedPrepositionFilter(""); // Reset preposition filter
     setShowRecentOnly(false);
     setAdminCompletenessFilter("");
     setCurrentPage(1);
@@ -1451,6 +1466,8 @@ const WordList = () => {
     selectedLevel ||
     selectedTopic ||
     selectedPartOfSpeech ||
+    selectedVerbFilter ||
+    selectedPrepositionFilter ||
     adminCompletenessFilter,
   );
 
@@ -1681,8 +1698,10 @@ const WordList = () => {
             <PartOfSpeechDropdown
               selectedPartOfSpeech={selectedPartOfSpeech}
               selectedVerbFilter={selectedVerbFilter}
+              selectedPrepositionFilter={selectedPrepositionFilter}
               onSelectPartOfSpeech={handlePartOfSpeechChange}
               onSelectVerbFilter={handleVerbFilterChange}
+              onSelectPrepositionFilter={handlePrepositionFilterChange}
               partOfSpeechOptions={partOfSpeechOptions}
               notSpecifiedValue={NOT_SPECIFIED_PART_OF_SPEECH}
             />
