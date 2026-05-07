@@ -12,6 +12,104 @@ import { HiSpeakerWave } from "react-icons/hi2";
 import { MdOutlineDoubleArrow } from "react-icons/md";
 import { SiGoogletranslate } from "react-icons/si";
 import { FaSpinner } from "react-icons/fa";
+import { IoInformationCircleOutline } from "react-icons/io5";
+
+// Helper function to capitalize first letter
+const capitalizeFirstLetter = (str) => {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+// Helper function to normalize text for comparison
+const normalizeText = (value) =>
+  String(value ?? "")
+    .trim()
+    .toLowerCase();
+
+// Helper function to render word with highlighted separable prefix
+const renderWordWithPrefix = (word) => {
+  const wordValue = word.value || "";
+  const prefix = word.prefix;
+  const partOfSpeech = normalizeText(word?.partOfSpeech?.name);
+  const prefixType = word.prefixType;
+
+  // Only highlight if it's a separable verb with a prefix
+  if (partOfSpeech === "verb" && prefixType === "SEPARABLE" && prefix) {
+    const sichPrefix = "sich ";
+    let workingValue = wordValue;
+    let sichPart = "";
+
+    if (wordValue.toLowerCase().startsWith(sichPrefix)) {
+      sichPart = wordValue.slice(0, sichPrefix.length);
+      workingValue = wordValue.slice(sichPrefix.length);
+    }
+
+    if (workingValue.toLowerCase().startsWith(prefix.toLowerCase())) {
+      const prefixLength = prefix.length;
+      const prefixPart = workingValue.slice(0, prefixLength);
+      const restPart = workingValue.slice(prefixLength);
+
+      return (
+        <span>
+          {sichPart && <span>{capitalizeFirstLetter(sichPart)}</span>}
+          <span className="text-orange-500 font-bold">
+            {sichPart ? prefixPart : capitalizeFirstLetter(prefixPart)}
+          </span>
+          {restPart}
+        </span>
+      );
+    }
+  }
+
+  return <span>{capitalizeFirstLetter(wordValue)}</span>;
+};
+
+// Helper function to get word info based on part of speech
+const getWordInfo = (word) => {
+  const partOfSpeech = normalizeText(word?.partOfSpeech?.name);
+  const info = [];
+
+  // Add part of speech as the first item
+  if (partOfSpeech) {
+    // info.push(partOfSpeech.charAt(0).toUpperCase() + partOfSpeech.slice(1));
+    info.push(partOfSpeech);
+  }
+
+  if (partOfSpeech === "verb") {
+    // Verb info
+    if (word.prefixType === "SEPARABLE") info.push("Separable");
+    if (word.prefixType === "INSEPARABLE") info.push("Inseparable");
+    if (word.isReflexive) info.push("Reflexive");
+    if (word.isModal) info.push("Modal");
+    if (word.conjugation === "IRREGULAR") info.push("Irregular");
+
+    const caseReq = word.caseRequirement;
+    if (caseReq) {
+      const caseMap = {
+        ACCUSATIVE: "Accusative",
+        DATIVE: "Dative",
+        GENITIVE: "Genitive",
+      };
+      info.push(caseMap[caseReq] || caseReq);
+    }
+  } else if (partOfSpeech === "preposition") {
+    // Preposition info
+    if (word.prepositionCase) {
+      const caseMap = {
+        ACCUSATIVE: "Accusative",
+        DATIVE: "Dative",
+        GENITIVE: "Genitive",
+        WECHSEL: "Wechsel (Acc/Dat)",
+      };
+      info.push(caseMap[word.prepositionCase] || word.prepositionCase);
+    }
+  } else if (partOfSpeech === "adjective") {
+    // Adjective info
+    if (word.isPrepositional) info.push("Prepositional");
+  }
+
+  return info;
+};
 
 // Memoized sentence renderer component
 const SentenceRenderer = memo(
@@ -321,7 +419,7 @@ const WordListModal = ({
                 {selectedWord.article?.name}
               </span>
               <span className="capitalize text-white font-bold text-sm md:text-lg lg:text-xl">
-                {capitalizedWord}
+                {renderWordWithPrefix(selectedWord)}
               </span>
             </p>
             <p className="text-sm md:text-base lg:text-lg">
@@ -419,10 +517,46 @@ const WordListModal = ({
 
             <p className="text-sm md:text-base lg:text-lg">
               <span className="text-blue-400 font-semibold">Level:</span>{" "}
-              <span className="inline-block px-2 md:px-3 py-1 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-bold text-xs md:text-sm">
+              <span className="inline-block px-2 md:px-2 py-0 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-md text-orange-400 font-bold text-xs md:text-sm">
                 {selectedWord.level?.level || ""}
               </span>
             </p>
+
+            {/* {getWordInfo(selectedWord).length > 0 && (
+              <p className="text-sm md:text-base lg:text-lg flex">
+                <span className="text-blue-400 font-semibold">
+                  <IoInformationCircleOutline
+                    size={22}
+                    // className="text-blue-400 cursor-pointer hover:text-blue-500 transition"
+                    className="text-white  cursor-pointer hover:text-blue-500 transition mr-2 "
+                  />
+                </span>{" "}
+                <span className="text-orange-300 text-xs md:text-sm italic bg-slate-800 border border-cyan-500 rounded-md h-5 p-1 flex justify-center items-center">
+                  {getWordInfo(selectedWord).join(", ")}
+                </span>
+              </p>
+            )} */}
+            {getWordInfo(selectedWord).length > 0 && (
+              <p className="text-sm md:text-base lg:text-lg flex">
+                <span className="text-blue-400 font-semibold">
+                  <IoInformationCircleOutline
+                    size={23}
+                    className="text-white cursor-pointer hover:text-blue-500 transition mr-2"
+                  />
+                </span>
+
+                <span className="flex flex-wrap gap-1">
+                  {getWordInfo(selectedWord).map((item, index) => (
+                    <span
+                      key={index}
+                      className="text-orange-400 text-xs md:text-sm italic bg-slate-800 border border-cyan-500 rounded-md h-6 p-1 flex justify-center items-center mb-1"
+                    >
+                      <span className="mb-1"> {item}</span>
+                    </span>
+                  ))}
+                </span>
+              </p>
+            )}
           </div>
           <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm p-2 md:p-4 lg:p-3 rounded-2xl border border-gray-700/30 ">
             <p className="text-md md:text-lg lg:text-lg text-green-400 font-semibold mb-3">

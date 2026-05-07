@@ -8,6 +8,47 @@ const normalizeText = (value) =>
     .trim()
     .toLowerCase();
 
+const capitalizeFirstLetter = (str) => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+// Helper function to render word with prefix highlighting for separable verbs
+const renderWordWithPrefix = (word) => {
+  const wordValue = word.value || "";
+  const prefix = word.prefix;
+  const partOfSpeech = normalizeText(word?.partOfSpeech?.name);
+  const prefixType = word.prefixType;
+
+  if (partOfSpeech === "verb" && prefixType === "SEPARABLE" && prefix) {
+    const sichPrefix = "sich ";
+    let workingValue = wordValue;
+    let sichPart = "";
+
+    if (wordValue.toLowerCase().startsWith(sichPrefix)) {
+      sichPart = wordValue.slice(0, sichPrefix.length);
+      workingValue = wordValue.slice(sichPrefix.length);
+    }
+
+    if (workingValue.toLowerCase().startsWith(prefix.toLowerCase())) {
+      const prefixLength = prefix.length;
+      const prefixPart = workingValue.slice(0, prefixLength);
+      const restPart = workingValue.slice(prefixLength);
+
+      return (
+        <span>
+          {sichPart && <span>{capitalizeFirstLetter(sichPart)}</span>}
+          <span className="text-orange-500 font-bold">
+            {sichPart ? prefixPart : capitalizeFirstLetter(prefixPart)}
+          </span>
+          {restPart}
+        </span>
+      );
+    }
+  }
+
+  return <span>{capitalizeFirstLetter(wordValue)}</span>;
+};
+
 const PartOfSpeechBadge = ({ text, className, tooltipText }) => {
   const showTooltip = Boolean(tooltipText);
 
@@ -242,7 +283,7 @@ const FavoriteWordsTable = ({
                       className={tableVariant.wordText}
                       onClick={() => openModal(word)}
                     >
-                      {word.value.charAt(0).toUpperCase() + word.value.slice(1)}
+                      {renderWordWithPrefix(word)}
                     </span>
 
                     <div className="flex gap-1 md:gap-2 lg:gap-2">
