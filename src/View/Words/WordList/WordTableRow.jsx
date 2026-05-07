@@ -16,6 +16,42 @@ const normalizeText = (value) =>
     .trim()
     .toLowerCase();
 
+// Helper function to render word with highlighted separable prefix
+const renderWordWithPrefix = (word) => {
+  const wordValue = word.value || "";
+  const prefix = word.prefix;
+  const partOfSpeech = normalizeText(word?.partOfSpeech?.name);
+  const prefixType = word.prefixType;
+
+  // Only highlight if:
+  // 1. It's a verb
+  // 2. It's marked as separable
+  // 3. A prefix is defined
+  // 4. The word starts with the prefix (case-insensitive)
+  if (
+    partOfSpeech === "verb" &&
+    prefixType === "SEPARABLE" &&
+    prefix &&
+    wordValue.toLowerCase().startsWith(prefix.toLowerCase())
+  ) {
+    const prefixLength = prefix.length;
+    const prefixPart = wordValue.slice(0, prefixLength);
+    const restPart = wordValue.slice(prefixLength);
+
+    return (
+      <span>
+        <span className="text-orange-500 font-bold">
+          {capitalizeFirstLetter(prefixPart)}
+        </span>
+        {restPart}
+      </span>
+    );
+  }
+
+  // Default: just capitalize first letter
+  return <span>{capitalizeFirstLetter(wordValue)}</span>;
+};
+
 const PartOfSpeechBadge = ({ text, className, tooltipText }) => {
   const showTooltip = Boolean(tooltipText);
 
@@ -213,7 +249,7 @@ const WordTableRow = ({
           >
             {/* Previous version - used CSS capitalize */}
             {/* {word.value} */}
-            <span>{capitalizeFirstLetter(word.value)}</span>
+            {renderWordWithPrefix(word)}
           </span>
 
           <div className="flex gap-1 md:gap-4 lg:gap-4 ">

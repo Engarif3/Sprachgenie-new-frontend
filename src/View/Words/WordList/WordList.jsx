@@ -27,7 +27,7 @@ import { IoSearch } from "react-icons/io5";
 import useDebounce from "../../../hooks/useDebounce";
 import WordTableRow from "./WordTableRow";
 import { IoInformationCircleOutline } from "react-icons/io5";
-import PartOfSpeechDropdown from "./VerbFilterDropdown";
+import PartOfSpeechDropdown from "./PartOfSpeechDropdown";
 
 // Lazy load modals for better performance
 const WordListModal = lazy(() => import("../Modals/WordListModal"));
@@ -289,11 +289,6 @@ const buildWordListRequestParams = (queryState, page) => {
     _ts: String(Date.now()),
   });
 
-  console.log("=== BUILD WORD LIST REQUEST PARAMS ===");
-  console.log("queryState:", queryState);
-  console.log("queryState.verbFilter:", queryState.verbFilter);
-  console.log("queryState.partOfSpeech:", queryState.partOfSpeech);
-
   if (hasAdminCompletenessFilter(queryState)) {
     params.set("all", "true");
   }
@@ -312,13 +307,17 @@ const buildWordListRequestParams = (queryState, page) => {
 
   // Add verb-specific filters
   if (queryState.verbFilter) {
-    console.log("Adding verbFilter to params:", queryState.verbFilter);
     params.set("verbFilter", queryState.verbFilter);
   }
 
   // Add preposition-specific filters
   if (queryState.prepositionFilter) {
     params.set("prepositionFilter", queryState.prepositionFilter);
+  }
+
+  // Add adjective-specific filters
+  if (queryState.adjectiveFilter) {
+    params.set("adjectiveFilter", queryState.adjectiveFilter);
   }
 
   if (queryState.recentOnly) {
@@ -423,6 +422,7 @@ const WordList = () => {
   const [selectedVerbFilter, setSelectedVerbFilter] = useState(""); // modal, reflexive, separable, dative, etc.
   const [selectedPrepositionFilter, setSelectedPrepositionFilter] =
     useState(""); // accusative, dative, genitive, wechsel
+  const [selectedAdjectiveFilter, setSelectedAdjectiveFilter] = useState(""); // prepositional
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -570,17 +570,13 @@ const WordList = () => {
       partOfSpeech: selectedPartOfSpeech,
       verbFilter: selectedVerbFilter, // Add verb sub-filter
       prepositionFilter: selectedPrepositionFilter, // Add preposition sub-filter
+      adjectiveFilter: selectedAdjectiveFilter, // Add adjective sub-filter
       recentOnly: showRecentOnly,
       missingMeaningOnly:
         isAdmin && adminCompletenessFilter === "missingMeaning",
       missingSentencesOnly:
         isAdmin && adminCompletenessFilter === "missingSentences",
     };
-
-    console.log("=== ACTIVE QUERY RECALCULATED ===");
-    console.log("verbFilter:", query.verbFilter);
-    console.log("partOfSpeech:", query.partOfSpeech);
-    console.log("Full query:", query);
 
     return query;
   }, [
@@ -591,6 +587,7 @@ const WordList = () => {
     selectedPartOfSpeech,
     selectedVerbFilter, // Add to dependency array
     selectedPrepositionFilter, // Add to dependency array
+    selectedAdjectiveFilter, // Add to dependency array
     showRecentOnly,
     isAdmin,
     adminCompletenessFilter,
@@ -945,20 +942,12 @@ const WordList = () => {
   ]);
 
   useEffect(() => {
-    console.log("=== FETCH WORDS USEEFFECT TRIGGERED ===");
-    console.log("pageCacheReady:", pageCacheReady);
-    console.log("activeQueryKey:", activeQueryKey);
-    console.log("requestedPageToFetch:", requestedPageToFetch);
-    console.log("activeQuery:", activeQuery);
-
     if (!pageCacheReady) {
-      console.log("Skipping fetch - pageCacheReady is false");
       return;
     }
 
     void (async () => {
       try {
-        console.log("=== CALLING FETCH WORDS PAGE ===");
         const pageData = await fetchWordsPage({
           queryState: activeQuery,
           queryKey: activeQueryKey,
@@ -999,8 +988,6 @@ const WordList = () => {
   // Force refresh when navigating from word creation
   useEffect(() => {
     if (location.state?.forceRefresh) {
-      console.log("Force refresh triggered");
-
       const refreshWords = async () => {
         pageCacheStoreRef.current = createEmptyPageCacheStore();
         await invalidateWordsCache();
@@ -1126,17 +1113,19 @@ const WordList = () => {
     if (value !== "verb") {
       setSelectedVerbFilter(""); // Clear verb filter if not selecting verb
     }
+    if (value !== "preposition") {
+      setSelectedPrepositionFilter(""); // Clear preposition filter if not selecting preposition
+    }
+    if (value !== "adjective") {
+      setSelectedAdjectiveFilter(""); // Clear adjective filter if not selecting adjective
+    }
     setCurrentPage(1);
   }, []);
 
   const handleVerbFilterChange = useCallback(
     (value) => {
-      console.log("=== HANDLE VERB FILTER CHANGE ===");
-      console.log("Previous selectedVerbFilter:", selectedVerbFilter);
-      console.log("New value:", value);
       setSelectedVerbFilter(value);
       setCurrentPage(1);
-      console.log("State updates queued");
     },
     [selectedVerbFilter],
   );
@@ -1145,6 +1134,14 @@ const WordList = () => {
     setSelectedPrepositionFilter(value);
     setCurrentPage(1);
   }, []);
+
+  const handleAdjectiveFilterChange = useCallback(
+    (value) => {
+      setSelectedAdjectiveFilter(value);
+      setCurrentPage(1);
+    },
+    [selectedAdjectiveFilter],
+  );
 
   // Learning mode implementation (Logic remains the same, good to leave)
   const handleDelete = useCallback(
@@ -1456,6 +1453,7 @@ const WordList = () => {
     setSelectedPartOfSpeech("");
     setSelectedVerbFilter(""); // Reset verb filter
     setSelectedPrepositionFilter(""); // Reset preposition filter
+    setSelectedAdjectiveFilter(""); // Reset adjective filter
     setShowRecentOnly(false);
     setAdminCompletenessFilter("");
     setCurrentPage(1);
@@ -1495,6 +1493,7 @@ const WordList = () => {
     selectedPartOfSpeech ||
     selectedVerbFilter ||
     selectedPrepositionFilter ||
+    selectedAdjectiveFilter ||
     adminCompletenessFilter,
   );
 
@@ -1728,9 +1727,11 @@ const WordList = () => {
               selectedPartOfSpeech={selectedPartOfSpeech}
               selectedVerbFilter={selectedVerbFilter}
               selectedPrepositionFilter={selectedPrepositionFilter}
+              selectedAdjectiveFilter={selectedAdjectiveFilter}
               onSelectPartOfSpeech={handlePartOfSpeechChange}
               onSelectVerbFilter={handleVerbFilterChange}
               onSelectPrepositionFilter={handlePrepositionFilterChange}
+              onSelectAdjectiveFilter={handleAdjectiveFilterChange}
               partOfSpeechOptions={partOfSpeechOptions}
               notSpecifiedValue={NOT_SPECIFIED_PART_OF_SPEECH}
             />

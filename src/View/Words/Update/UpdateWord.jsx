@@ -323,12 +323,14 @@ const UpdateWord = () => {
     synonyms: [],
     antonyms: [],
     similarWords: [],
+    prefix: null,
+    isPrepositional: false,
     verbAttributes: {
       conjugation: "REGULAR",
       isReflexive: false,
       isModal: false,
       prefixType: "NONE",
-      caseRequirement: "ACCUSATIVE",
+      caseRequirement: null,
     },
     prepositionAttributes: {
       prepositionCase: null,
@@ -554,7 +556,7 @@ const UpdateWord = () => {
           isReflexive: false,
           isModal: false,
           prefixType: "NONE",
-          caseRequirement: "ACCUSATIVE",
+          caseRequirement: null,
         };
 
         const verbAttributes = {
@@ -587,6 +589,8 @@ const UpdateWord = () => {
           synonyms: word.synonyms?.map((item) => item.value) || [],
           antonyms: word.antonyms?.map((item) => item.value) || [],
           similarWords: word.similarWords?.map((item) => item.value) || [],
+          prefix: word.prefix || null,
+          isPrepositional: word.isPrepositional || false,
           verbAttributes,
           prepositionAttributes,
           level: word.level,
@@ -636,7 +640,15 @@ const UpdateWord = () => {
           }
         } else {
           // Handle select dropdowns
-          newVerbAttrs[field] = value;
+          // Convert empty string to null for caseRequirement
+          if (field === "caseRequirement") {
+            newVerbAttrs[field] = value === "" ? null : value;
+            console.log("=== CASE REQUIREMENT CHANGE ===");
+            console.log("Selected value:", value);
+            console.log("Converted to:", newVerbAttrs[field]);
+          } else {
+            newVerbAttrs[field] = value;
+          }
 
           // Changing prefixType to separable/inseparable unchecks Modal
           if (
@@ -678,10 +690,15 @@ const UpdateWord = () => {
         ...prevData,
         [name]: value,
       }));
-    } else if (name === "value" || name === "pluralForm") {
+    } else if (
+      name === "value" ||
+      name === "pluralForm" ||
+      name === "prefix" ||
+      name === "isPrepositional"
+    ) {
       setFormData((prevData) => ({
         ...prevData,
-        [name]: value,
+        [name]: type === "checkbox" ? checked : value,
       }));
     } else if (
       name === "meaning" ||
@@ -924,7 +941,7 @@ const UpdateWord = () => {
       isReflexive: false,
       isModal: false,
       prefixType: "NONE",
-      caseRequirement: "ACCUSATIVE",
+      caseRequirement: null,
     };
 
     const verbAttributes = {};
@@ -933,6 +950,11 @@ const UpdateWord = () => {
         verbAttributes[key] = formData.verbAttributes[key];
       }
     });
+
+    console.log("=== UPDATE WORD VERB ATTRIBUTES DEBUG ===");
+    console.log("formData.verbAttributes:", formData.verbAttributes);
+    console.log("defaults:", defaults);
+    console.log("verbAttributes to send:", verbAttributes);
 
     // Only include verbAttributes if it has non-default values
     if (Object.keys(verbAttributes).length > 0) {
@@ -953,8 +975,37 @@ const UpdateWord = () => {
     // Add prepositionCase directly to dataToSend
     dataToSend.prepositionCase = formData.prepositionAttributes.prepositionCase;
 
+    // Add prefix directly to dataToSend
+    dataToSend.prefix =
+      formData.prefix && formData.prefix.trim() ? formData.prefix.trim() : null;
+
+    // Add isPrepositional directly to dataToSend
+    dataToSend.isPrepositional = formData.isPrepositional;
+
+    // Validate prefix matches the word if it's a separable verb
+    if (
+      formData.verbAttributes.prefixType === "SEPARABLE" &&
+      dataToSend.prefix &&
+      dataToSend.prefix.trim()
+    ) {
+      const wordValue = dataToSend.value.toLowerCase();
+      const prefixValue = dataToSend.prefix.toLowerCase();
+
+      if (!wordValue.startsWith(prefixValue)) {
+        setLoading(false);
+        await Swal.fire({
+          title: "Invalid Prefix",
+          text: `The prefix "${dataToSend.prefix}" doesn't match the beginning of the word "${dataToSend.value}". Please enter a valid prefix.`,
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+    }
+
     console.log("=== UPDATE WORD DATA ===");
     console.log("prepositionCase being sent:", dataToSend.prepositionCase);
+    console.log("prefix being sent:", dataToSend.prefix);
     console.log("Full payload:", dataToSend);
 
     const selfReferenceMessage = getSelfReferenceMessage(
@@ -1791,21 +1842,50 @@ const UpdateWord = () => {
                       </select>
                     </div>
 
+                    {/* Separable Prefix Input - Only shown for separable verbs */}
+                    {formData.verbAttributes.prefixType === "SEPARABLE" && (
+                      <div>
+                        <label
+                          htmlFor="prefix"
+                          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                        >
+                          Separable Prefix{" "}
+                          <span className="text-xs text-gray-500">
+                            (e.g., "auf" for aufstehen, "aus" for ausgeben)
+                          </span>
+                        </label>
+                        <input
+                          type="text"
+                          id="prefix"
+                          name="prefix"
+                          value={formData.prefix || ""}
+                          onChange={handleInputChange}
+                          placeholder="Enter prefix"
+                          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <p className="mt-1 text-xs text-gray-500">
+                          The prefix will be highlighted in orange when
+                          displaying the word
+                        </p>
+                      </div>
+                    )}
+
                     {/* Case Requirement */}
                     <div>
                       <label
                         htmlFor="verbAttributes-caseRequirement"
                         className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                       >
-                        Case Requirement
+                        Case Type
                       </label>
                       <select
                         id="verbAttributes-caseRequirement"
                         name="verbAttributes.caseRequirement"
-                        value={formData.verbAttributes.caseRequirement}
+                        value={formData.verbAttributes.caseRequirement || ""}
                         onChange={handleInputChange}
                         className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
+                        <option value="">Not specified</option>
                         <option value="ACCUSATIVE">
                           Accusative (Akkusativ)
                         </option>
@@ -1897,7 +1977,7 @@ const UpdateWord = () => {
                           Genitive (e.g., während, wegen, trotz)
                         </option>
                         <option value="WECHSEL">
-                          Wechsel / Two-way (e.g., an, auf, in, über)
+                          Changeable (Accusative/Dative)
                         </option>
                       </select>
                     </div>
@@ -1906,6 +1986,41 @@ const UpdateWord = () => {
                     <p className="text-xs text-gray-500 dark:text-gray-400 italic">
                       ℹ️ Note: Wechsel prepositions can take Accusative (motion)
                       or Dative (location) depending on context.
+                    </p>
+                  </div>
+                )}
+
+                {/* Adjective Attributes - Only show when part of speech is adjective */}
+                {partOfSpeeches
+                  .find((pos) => pos.id === parseInt(formData.partOfSpeechId))
+                  ?.name?.toLowerCase() === "adjective" && (
+                  <div className="space-y-4 p-4 bg-yellow-50 dark:bg-slate-800 rounded-lg border-2 border-yellow-200 dark:border-yellow-600">
+                    <h3 className="text-sm font-semibold text-yellow-700 dark:text-yellow-300">
+                      🔹 Adjective Attributes
+                    </h3>
+
+                    {/* Prepositional Checkbox */}
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="isPrepositional"
+                        name="isPrepositional"
+                        checked={formData.isPrepositional}
+                        onChange={handleInputChange}
+                        className="h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded"
+                      />
+                      <label
+                        htmlFor="isPrepositional"
+                        className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                      >
+                        Prepositional Adjective (e.g., abhängig von,
+                        interessiert an)
+                      </label>
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 italic mt-2">
+                      ℹ️ Check this box for adjectives that require a specific
+                      preposition. Include the preposition in the word field
+                      (e.g., "abhängig von", "interessiert an")
                     </p>
                   </div>
                 )}

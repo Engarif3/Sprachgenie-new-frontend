@@ -9,24 +9,30 @@ const PartOfSpeechDropdown = ({
   selectedPartOfSpeech,
   selectedVerbFilter,
   selectedPrepositionFilter,
+  selectedAdjectiveFilter,
   onSelectPartOfSpeech,
   onSelectVerbFilter,
   onSelectPrepositionFilter,
+  onSelectAdjectiveFilter,
   partOfSpeechOptions,
   notSpecifiedValue,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVerbHovered, setIsVerbHovered] = useState(false);
   const [isPrepositionHovered, setIsPrepositionHovered] = useState(false);
+  const [isAdjectiveHovered, setIsAdjectiveHovered] = useState(false);
   const [showVerbSubmenu, setShowVerbSubmenu] = useState(false);
   const [showPrepositionSubmenu, setShowPrepositionSubmenu] = useState(false);
+  const [showAdjectiveSubmenu, setShowAdjectiveSubmenu] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [submenuPosition, setSubmenuPosition] = useState("right");
   const dropdownRef = useRef(null);
   const verbSubmenuRef = useRef(null);
   const prepositionSubmenuRef = useRef(null);
+  const adjectiveSubmenuRef = useRef(null);
   const verbItemRef = useRef(null);
   const prepositionItemRef = useRef(null);
+  const adjectiveItemRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
 
   // Clear timeout on unmount
@@ -105,13 +111,17 @@ const PartOfSpeechDropdown = ({
         (!verbSubmenuRef.current ||
           !verbSubmenuRef.current.contains(event.target)) &&
         (!prepositionSubmenuRef.current ||
-          !prepositionSubmenuRef.current.contains(event.target))
+          !prepositionSubmenuRef.current.contains(event.target)) &&
+        (!adjectiveSubmenuRef.current ||
+          !adjectiveSubmenuRef.current.contains(event.target))
       ) {
         setIsOpen(false);
         setIsVerbHovered(false);
         setIsPrepositionHovered(false);
+        setIsAdjectiveHovered(false);
         setShowVerbSubmenu(false);
         setShowPrepositionSubmenu(false);
+        setShowAdjectiveSubmenu(false);
       }
     };
 
@@ -129,39 +139,56 @@ const PartOfSpeechDropdown = ({
       hoverTimeoutRef.current = null;
     }
 
-    // On mobile, clicking verb or preposition from main menu should toggle submenu
+    // On mobile, clicking verb or preposition or adjective from main menu should toggle submenu
     // But if forceSelect is true (clicked from submenu), proceed with selection
     if (isMobile && !forceSelect) {
       if (value === "verb") {
         setShowVerbSubmenu(!showVerbSubmenu);
         setShowPrepositionSubmenu(false);
+        setShowAdjectiveSubmenu(false);
         return; // Don't close dropdown, don't select
       } else if (value === "preposition") {
         setShowPrepositionSubmenu(!showPrepositionSubmenu);
         setShowVerbSubmenu(false);
+        setShowAdjectiveSubmenu(false);
+        return; // Don't close dropdown, don't select
+      } else if (value === "adjective") {
+        setShowAdjectiveSubmenu(!showAdjectiveSubmenu);
+        setShowVerbSubmenu(false);
+        setShowPrepositionSubmenu(false);
         return; // Don't close dropdown, don't select
       }
     }
 
-    // Desktop behavior or non-verb/preposition selections or forced selections
+    // Desktop behavior or non-verb/preposition/adjective selections or forced selections
     if (value === "verb") {
       onSelectPartOfSpeech("verb");
       onSelectVerbFilter(""); // Clear verb filter when selecting "All Verbs"
       onSelectPrepositionFilter(""); // Clear preposition filter
+      onSelectAdjectiveFilter(""); // Clear adjective filter
     } else if (value === "preposition") {
       onSelectPartOfSpeech("preposition");
       onSelectVerbFilter(""); // Clear verb filter
       onSelectPrepositionFilter(""); // Clear preposition filter when selecting "All Prepositions"
+      onSelectAdjectiveFilter(""); // Clear adjective filter
+    } else if (value === "adjective") {
+      onSelectPartOfSpeech("adjective");
+      onSelectVerbFilter(""); // Clear verb filter
+      onSelectPrepositionFilter(""); // Clear preposition filter
+      onSelectAdjectiveFilter(""); // Clear adjective filter when selecting "All Adjectives"
     } else {
       onSelectPartOfSpeech(value);
       onSelectVerbFilter(""); // Clear verb filter for non-verb selections
       onSelectPrepositionFilter(""); // Clear preposition filter for non-preposition selections
+      onSelectAdjectiveFilter(""); // Clear adjective filter for non-adjective selections
     }
     setIsOpen(false);
     setIsVerbHovered(false);
     setIsPrepositionHovered(false);
+    setIsAdjectiveHovered(false);
     setShowVerbSubmenu(false);
     setShowPrepositionSubmenu(false);
+    setShowAdjectiveSubmenu(false);
   };
 
   const handleVerbFilterSelect = (filter) => {
@@ -171,16 +198,17 @@ const PartOfSpeechDropdown = ({
       hoverTimeoutRef.current = null;
     }
 
-    console.log("=== VERB FILTER SELECTED ===");
-    console.log("Filter value:", filter);
     onSelectPartOfSpeech("verb");
     onSelectVerbFilter(filter);
     onSelectPrepositionFilter(""); // Clear preposition filter
+    onSelectAdjectiveFilter(""); // Clear adjective filter
     setIsOpen(false);
     setIsVerbHovered(false);
     setIsPrepositionHovered(false);
+    setIsAdjectiveHovered(false);
     setShowVerbSubmenu(false);
     setShowPrepositionSubmenu(false);
+    setShowAdjectiveSubmenu(false);
   };
 
   const handlePrepositionFilterSelect = (filter) => {
@@ -193,11 +221,35 @@ const PartOfSpeechDropdown = ({
     onSelectPartOfSpeech("preposition");
     onSelectVerbFilter(""); // Clear verb filter
     onSelectPrepositionFilter(filter);
+    onSelectAdjectiveFilter(""); // Clear adjective filter
     setIsOpen(false);
     setIsVerbHovered(false);
     setIsPrepositionHovered(false);
+    setIsAdjectiveHovered(false);
     setShowVerbSubmenu(false);
     setShowPrepositionSubmenu(false);
+    setShowAdjectiveSubmenu(false);
+  };
+
+  const handleAdjectiveFilterSelect = (filter) => {
+    // Clear any pending timeout
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+
+    onSelectPartOfSpeech("adjective");
+    onSelectVerbFilter(""); // Clear verb filter
+    onSelectPrepositionFilter(""); // Clear preposition filter
+    onSelectAdjectiveFilter(filter);
+
+    setIsOpen(false);
+    setIsVerbHovered(false);
+    setIsPrepositionHovered(false);
+    setIsAdjectiveHovered(false);
+    setShowVerbSubmenu(false);
+    setShowPrepositionSubmenu(false);
+    setShowAdjectiveSubmenu(false);
   };
 
   const verbSubFilters = [
@@ -261,9 +313,18 @@ const PartOfSpeechDropdown = ({
     },
     {
       value: "wechsel",
-      label: "Wechsel (Two-way)",
+      label: "Changeable (Accusative/Dative)",
       description: "an, auf, in, über",
       color: "text-blue-400",
+    },
+  ];
+
+  const adjectiveSubFilters = [
+    {
+      value: "prepositional",
+      label: "Prepositional Adjectives",
+      description: "abhängig von, interessiert an",
+      color: "text-yellow-400",
     },
   ];
 
@@ -280,6 +341,13 @@ const PartOfSpeechDropdown = ({
         (f) => f.value === selectedPrepositionFilter,
       );
       return filter ? filter.label : "Preposition";
+    }
+
+    if (selectedPartOfSpeech === "adjective" && selectedAdjectiveFilter) {
+      const filter = adjectiveSubFilters.find(
+        (f) => f.value === selectedAdjectiveFilter,
+      );
+      return filter ? filter.label : "Adjective";
     }
 
     if (selectedPartOfSpeech === notSpecifiedValue) {
@@ -336,10 +404,12 @@ const PartOfSpeechDropdown = ({
             {partOfSpeechOptions.map((option) => {
               const isVerb = option.value === "verb";
               const isPreposition = option.value === "preposition";
+              const isAdjective = option.value === "adjective";
               const isSelected =
                 selectedPartOfSpeech === option.value &&
                 !selectedVerbFilter &&
-                !selectedPrepositionFilter;
+                !selectedPrepositionFilter &&
+                !selectedAdjectiveFilter;
 
               return (
                 <div
@@ -349,7 +419,9 @@ const PartOfSpeechDropdown = ({
                       ? verbItemRef
                       : isPreposition
                         ? prepositionItemRef
-                        : null
+                        : isAdjective
+                          ? adjectiveItemRef
+                          : null
                   }
                   className="relative"
                   onMouseEnter={() => {
@@ -363,6 +435,8 @@ const PartOfSpeechDropdown = ({
                         hoverTimeoutRef.current = null;
                       }
                       setIsVerbHovered(true);
+                      setIsPrepositionHovered(false);
+                      setIsAdjectiveHovered(false);
                     } else if (isPreposition) {
                       // Clear any pending timeout
                       if (hoverTimeoutRef.current) {
@@ -370,6 +444,22 @@ const PartOfSpeechDropdown = ({
                         hoverTimeoutRef.current = null;
                       }
                       setIsPrepositionHovered(true);
+                      setIsVerbHovered(false);
+                      setIsAdjectiveHovered(false);
+                    } else if (isAdjective) {
+                      // Clear any pending timeout
+                      if (hoverTimeoutRef.current) {
+                        clearTimeout(hoverTimeoutRef.current);
+                        hoverTimeoutRef.current = null;
+                      }
+                      setIsAdjectiveHovered(true);
+                      setIsVerbHovered(false);
+                      setIsPrepositionHovered(false);
+                    } else {
+                      // Not a submenu item, clear all submenu states
+                      setIsVerbHovered(false);
+                      setIsPrepositionHovered(false);
+                      setIsAdjectiveHovered(false);
                     }
                   }}
                   onMouseLeave={() => {
@@ -386,6 +476,11 @@ const PartOfSpeechDropdown = ({
                       hoverTimeoutRef.current = setTimeout(() => {
                         setIsPrepositionHovered(false);
                       }, 300);
+                    } else if (isAdjective) {
+                      // Delay hiding to give time to reach submenu
+                      hoverTimeoutRef.current = setTimeout(() => {
+                        setIsAdjectiveHovered(false);
+                      }, 300);
                     }
                   }}
                 >
@@ -395,12 +490,12 @@ const PartOfSpeechDropdown = ({
                       w-full px-4 py-2.5 text-left text-sm transition-colors duration-150
                       hover:bg-cyan-500/10 border-b border-gray-700/30
                       ${isSelected ? "bg-cyan-500/10 text-cyan-400" : "text-gray-300"}
-                      ${isVerb || isPreposition ? "flex items-center justify-between" : ""}
+                      ${isVerb || isPreposition || isAdjective ? "flex items-center justify-between" : ""}
                     `}
                     role="menuitem"
                   >
                     <span>{option.label}</span>
-                    {(isVerb || isPreposition) && (
+                    {(isVerb || isPreposition || isAdjective) && (
                       <IoChevronDown
                         className={`text-gray-500 transition-transform duration-200 ${
                           isMobile
@@ -408,7 +503,9 @@ const PartOfSpeechDropdown = ({
                               ? "rotate-180"
                               : isPreposition && showPrepositionSubmenu
                                 ? "rotate-180"
-                                : ""
+                                : isAdjective && showAdjectiveSubmenu
+                                  ? "rotate-180"
+                                  : ""
                             : "rotate-[-90deg]"
                         }`}
                         size={14}
@@ -577,6 +674,94 @@ const PartOfSpeechDropdown = ({
                                 <div
                                   className={`font-semibold text-sm ${
                                     selectedPrepositionFilter === filter.value
+                                      ? filter.color
+                                      : ""
+                                  }`}
+                                >
+                                  {filter.label}
+                                </div>
+                                <div className="text-xs text-gray-500 mt-0.5">
+                                  {filter.description}
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Adjective Submenu - appears below on mobile, right/left on desktop */}
+                  {isAdjective &&
+                    (isMobile ? showAdjectiveSubmenu : isAdjectiveHovered) && (
+                      <div
+                        ref={adjectiveSubmenuRef}
+                        onMouseEnter={() => {
+                          // Only handle hover on desktop
+                          if (isMobile) return;
+                          // Clear the timeout - keep submenu open
+                          if (hoverTimeoutRef.current) {
+                            clearTimeout(hoverTimeoutRef.current);
+                            hoverTimeoutRef.current = null;
+                          }
+                          setIsAdjectiveHovered(true);
+                        }}
+                        onMouseLeave={() => {
+                          // Only handle hover on desktop
+                          if (isMobile) return;
+                          setIsAdjectiveHovered(false);
+                        }}
+                        className={`absolute z-[100] ${
+                          submenuPosition === "below"
+                            ? "top-full left-0 right-0 mt-1 w-full animate-slideDown"
+                            : submenuPosition === "right"
+                              ? "top-0 left-full ml-2 w-72 animate-slideRight"
+                              : "top-0 right-full mr-2 w-72 animate-slideLeft"
+                        }`}
+                      >
+                        <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl">
+                          <div className="max-h-96 overflow-y-auto custom-scrollbar">
+                            {/* All Adjectives Option */}
+                            <button
+                              onClick={() => handleSelect("adjective", true)}
+                              className={`
+                                w-full px-4 py-3 text-left transition-all duration-150
+                                hover:bg-gray-800 border-b border-gray-800/30
+                                ${
+                                  selectedPartOfSpeech === "adjective" &&
+                                  !selectedAdjectiveFilter
+                                    ? "bg-cyan-500/10 text-cyan-400 font-semibold"
+                                    : "text-gray-300"
+                                }
+                              `}
+                              role="menuitem"
+                            >
+                              <div className="font-semibold text-sm">
+                                All Adjectives
+                              </div>
+                              <div className="text-xs text-gray-500 mt-0.5">
+                                Show all adjective types
+                              </div>
+                            </button>
+                            {adjectiveSubFilters.map((filter) => (
+                              <button
+                                key={filter.value}
+                                onClick={() =>
+                                  handleAdjectiveFilterSelect(filter.value)
+                                }
+                                className={`
+                                w-full px-4 py-3 text-left transition-all duration-150
+                                hover:bg-gray-800 border-b border-gray-800/30 last:border-b-0
+                                ${
+                                  selectedAdjectiveFilter === filter.value
+                                    ? `bg-gray-800/50 ${filter.color}`
+                                    : "text-gray-300"
+                                }
+                              `}
+                                role="menuitem"
+                              >
+                                <div
+                                  className={`font-semibold text-sm ${
+                                    selectedAdjectiveFilter === filter.value
                                       ? filter.color
                                       : ""
                                   }`}
