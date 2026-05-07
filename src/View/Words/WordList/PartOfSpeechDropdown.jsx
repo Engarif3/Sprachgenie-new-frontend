@@ -60,6 +60,9 @@ const PartOfSpeechDropdown = ({
     const shouldShowPrepositionSubmenu = isMobile
       ? showPrepositionSubmenu
       : isPrepositionHovered;
+    const shouldShowAdjectiveSubmenu = isMobile
+      ? showAdjectiveSubmenu
+      : isAdjectiveHovered;
 
     if (shouldShowVerbSubmenu && verbItemRef.current) {
       if (isMobile) {
@@ -94,11 +97,30 @@ const PartOfSpeechDropdown = ({
         }
       }
     }
+
+    if (shouldShowAdjectiveSubmenu && adjectiveItemRef.current) {
+      if (isMobile) {
+        setSubmenuPosition("below");
+      } else {
+        const rect = adjectiveItemRef.current.getBoundingClientRect();
+        const submenuWidth = 288; // 72 * 4 (w-72 in Tailwind)
+        const spaceOnRight = window.innerWidth - rect.right;
+
+        // If not enough space on right, show on left
+        if (spaceOnRight < submenuWidth + 20) {
+          setSubmenuPosition("left");
+        } else {
+          setSubmenuPosition("right");
+        }
+      }
+    }
   }, [
     isVerbHovered,
     isPrepositionHovered,
+    isAdjectiveHovered,
     showVerbSubmenu,
     showPrepositionSubmenu,
+    showAdjectiveSubmenu,
     isMobile,
   ]);
 
