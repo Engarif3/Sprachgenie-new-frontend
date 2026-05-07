@@ -562,7 +562,7 @@ const PartOfSpeechDropdown = ({
                             : "top-0 right-full mr-2 w-72 animate-slideLeft"
                       }`}
                     >
-                      <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl">
+                      <div className="bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-cyan-500/30 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl">
                         <div className="max-h-96 overflow-y-auto custom-scrollbar">
                           {/* All Verbs Option */}
                           <button
@@ -652,7 +652,7 @@ const PartOfSpeechDropdown = ({
                               : "top-0 right-full mr-2 w-72 animate-slideLeft"
                         }`}
                       >
-                        <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl">
+                        <div className="bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-cyan-500/30 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl">
                           <div className="max-h-96 overflow-y-auto custom-scrollbar">
                             {/* All Prepositions Option */}
                             <button
@@ -740,7 +740,7 @@ const PartOfSpeechDropdown = ({
                               : "top-0 right-full mr-2 w-72 animate-slideLeft"
                         }`}
                       >
-                        <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl">
+                        <div className="bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-cyan-500/30 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl">
                           <div className="max-h-96 overflow-y-auto custom-scrollbar">
                             {/* All Adjectives Option */}
                             <button
