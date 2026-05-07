@@ -1867,7 +1867,7 @@ const WordList = () => {
                       colSpan="7"
                       className="text-center py-4 font-bold text-gray-500 h-96 align-middle text-xl sm:text-2xl"
                     >
-                      No words available
+                      No words available. Will be added soon!
                     </td>
                   </tr>
                 )}
