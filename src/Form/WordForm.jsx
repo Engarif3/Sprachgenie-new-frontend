@@ -281,8 +281,14 @@ const WordForm = () => {
       newWordData.prefix &&
       newWordData.prefix.trim()
     ) {
-      const wordValue = newWordData.value.toLowerCase();
+      let wordValue = newWordData.value.toLowerCase();
       const prefixValue = newWordData.prefix.toLowerCase();
+
+      // Skip "sich " if the word is reflexive
+      const sichPrefix = "sich ";
+      if (wordValue.startsWith(sichPrefix)) {
+        wordValue = wordValue.slice(sichPrefix.length);
+      }
 
       if (!wordValue.startsWith(prefixValue)) {
         Swal.fire({

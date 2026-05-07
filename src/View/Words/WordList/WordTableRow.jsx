@@ -27,25 +27,33 @@ const renderWordWithPrefix = (word) => {
   // 1. It's a verb
   // 2. It's marked as separable
   // 3. A prefix is defined
-  // 4. The word starts with the prefix (case-insensitive)
-  if (
-    partOfSpeech === "verb" &&
-    prefixType === "SEPARABLE" &&
-    prefix &&
-    wordValue.toLowerCase().startsWith(prefix.toLowerCase())
-  ) {
-    const prefixLength = prefix.length;
-    const prefixPart = wordValue.slice(0, prefixLength);
-    const restPart = wordValue.slice(prefixLength);
+  if (partOfSpeech === "verb" && prefixType === "SEPARABLE" && prefix) {
+    // Check if word starts with "sich " (reflexive pronoun)
+    const sichPrefix = "sich ";
+    let workingValue = wordValue;
+    let sichPart = "";
 
-    return (
-      <span>
-        <span className="text-orange-500 font-bold">
-          {capitalizeFirstLetter(prefixPart)}
+    if (wordValue.toLowerCase().startsWith(sichPrefix)) {
+      sichPart = wordValue.slice(0, sichPrefix.length);
+      workingValue = wordValue.slice(sichPrefix.length);
+    }
+
+    // Check if the working part (after "sich") starts with the prefix
+    if (workingValue.toLowerCase().startsWith(prefix.toLowerCase())) {
+      const prefixLength = prefix.length;
+      const prefixPart = workingValue.slice(0, prefixLength);
+      const restPart = workingValue.slice(prefixLength);
+
+      return (
+        <span>
+          {sichPart && <span>{capitalizeFirstLetter(sichPart)}</span>}
+          <span className="text-orange-500 font-bold">
+            {sichPart ? prefixPart : capitalizeFirstLetter(prefixPart)}
+          </span>
+          {restPart}
         </span>
-        {restPart}
-      </span>
-    );
+      );
+    }
   }
 
   // Default: just capitalize first letter

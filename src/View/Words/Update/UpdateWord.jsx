@@ -571,11 +571,6 @@ const UpdateWord = () => {
           prepositionCase: word.prepositionCase ?? null,
         };
 
-        console.log("=== LOADING WORD DATA ===");
-        console.log("Word from API:", word);
-        console.log("prepositionCase from API:", word.prepositionCase);
-        console.log("prepositionAttributes being set:", prepositionAttributes);
-
         setFormData({
           id: word.id,
           value: word.value,
@@ -643,9 +638,6 @@ const UpdateWord = () => {
           // Convert empty string to null for caseRequirement
           if (field === "caseRequirement") {
             newVerbAttrs[field] = value === "" ? null : value;
-            console.log("=== CASE REQUIREMENT CHANGE ===");
-            console.log("Selected value:", value);
-            console.log("Converted to:", newVerbAttrs[field]);
           } else {
             newVerbAttrs[field] = value;
           }
@@ -951,11 +943,6 @@ const UpdateWord = () => {
       }
     });
 
-    console.log("=== UPDATE WORD VERB ATTRIBUTES DEBUG ===");
-    console.log("formData.verbAttributes:", formData.verbAttributes);
-    console.log("defaults:", defaults);
-    console.log("verbAttributes to send:", verbAttributes);
-
     // Only include verbAttributes if it has non-default values
     if (Object.keys(verbAttributes).length > 0) {
       dataToSend.verbAttributes = verbAttributes;
@@ -988,8 +975,14 @@ const UpdateWord = () => {
       dataToSend.prefix &&
       dataToSend.prefix.trim()
     ) {
-      const wordValue = dataToSend.value.toLowerCase();
+      let wordValue = dataToSend.value.toLowerCase();
       const prefixValue = dataToSend.prefix.toLowerCase();
+
+      // Skip "sich " if the word is reflexive
+      const sichPrefix = "sich ";
+      if (wordValue.startsWith(sichPrefix)) {
+        wordValue = wordValue.slice(sichPrefix.length);
+      }
 
       if (!wordValue.startsWith(prefixValue)) {
         setLoading(false);
@@ -1002,11 +995,6 @@ const UpdateWord = () => {
         return;
       }
     }
-
-    console.log("=== UPDATE WORD DATA ===");
-    console.log("prepositionCase being sent:", dataToSend.prepositionCase);
-    console.log("prefix being sent:", dataToSend.prefix);
-    console.log("Full payload:", dataToSend);
 
     const selfReferenceMessage = getSelfReferenceMessage(
       dataToSend.value,
