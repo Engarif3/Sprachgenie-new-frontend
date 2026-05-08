@@ -87,8 +87,8 @@ const getWordInfo = (word) => {
   const partOfSpeech = normalizeText(word?.partOfSpeech?.name);
   const info = [];
 
-  // Add part of speech as the first item
-  if (partOfSpeech) {
+  // Add part of speech as the first item (skip "unknown")
+  if (partOfSpeech && partOfSpeech !== "unknown") {
     info.push(partOfSpeech);
   }
 
