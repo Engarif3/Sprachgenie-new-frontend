@@ -35,27 +35,45 @@ const renderWordWithPrefix = (word) => {
 
   // Only highlight if it's a separable verb with a prefix
   if (partOfSpeech === "verb" && prefixType === "SEPARABLE" && prefix) {
-    const sichPrefix = "sich ";
-    let workingValue = wordValue;
-    let sichPart = "";
+    // Split the word into parts
+    const parts = wordValue.split(" ");
+    let foundMatch = false;
+    let matchIndex = -1;
 
-    if (wordValue.toLowerCase().startsWith(sichPrefix)) {
-      sichPart = wordValue.slice(0, sichPrefix.length);
-      workingValue = wordValue.slice(sichPrefix.length);
+    // Find which part starts with the prefix (skip "sich" if it's the first part)
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      if (part.toLowerCase() === "sich") continue; // Skip "sich"
+      
+      if (part.toLowerCase().startsWith(prefix.toLowerCase())) {
+        foundMatch = true;
+        matchIndex = i;
+        break;
+      }
     }
 
-    if (workingValue.toLowerCase().startsWith(prefix.toLowerCase())) {
+    if (foundMatch && matchIndex !== -1) {
+      const matchedPart = parts[matchIndex];
       const prefixLength = prefix.length;
-      const prefixPart = workingValue.slice(0, prefixLength);
-      const restPart = workingValue.slice(prefixLength);
+      const prefixPart = matchedPart.slice(0, prefixLength);
+      const restPart = matchedPart.slice(prefixLength);
 
+      // Reconstruct the word with highlighted prefix
       return (
         <span>
-          {sichPart && <span>{capitalizeFirstLetter(sichPart)}</span>}
+          {parts.slice(0, matchIndex).map((p, idx) => (
+            <span key={idx}>
+              {idx === 0 ? capitalizeFirstLetter(p) : p}
+              {" "}
+            </span>
+          ))}
           <span className="text-orange-500 font-bold">
-            {sichPart ? prefixPart : capitalizeFirstLetter(prefixPart)}
+            {matchIndex === 0 ? capitalizeFirstLetter(prefixPart) : prefixPart}
           </span>
           {restPart}
+          {parts.slice(matchIndex + 1).map((p, idx) => (
+            <span key={idx}> {p}</span>
+          ))}
         </span>
       );
     }

@@ -975,20 +975,28 @@ const UpdateWord = () => {
       dataToSend.prefix &&
       dataToSend.prefix.trim()
     ) {
-      let wordValue = dataToSend.value.toLowerCase();
+      const wordValue = dataToSend.value.toLowerCase();
       const prefixValue = dataToSend.prefix.toLowerCase();
 
-      // Skip "sich " if the word is reflexive
-      const sichPrefix = "sich ";
-      if (wordValue.startsWith(sichPrefix)) {
-        wordValue = wordValue.slice(sichPrefix.length);
+      // Split the word into parts to handle multi-part verbs like "über etwas hinausdenken"
+      const parts = wordValue.split(" ");
+      let foundMatch = false;
+
+      // Check if any part (excluding "sich") starts with the prefix
+      for (const part of parts) {
+        if (part === "sich") continue; // Skip "sich"
+
+        if (part.startsWith(prefixValue)) {
+          foundMatch = true;
+          break;
+        }
       }
 
-      if (!wordValue.startsWith(prefixValue)) {
+      if (!foundMatch) {
         setLoading(false);
         await Swal.fire({
           title: "Invalid Prefix",
-          text: `The prefix "${dataToSend.prefix}" doesn't match the beginning of the word "${dataToSend.value}". Please enter a valid prefix.`,
+          text: `The prefix "${dataToSend.prefix}" doesn't match any part of the word "${dataToSend.value}". Please enter a valid prefix.`,
           icon: "error",
           confirmButtonText: "OK",
         });
