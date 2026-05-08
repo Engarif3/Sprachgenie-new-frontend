@@ -1766,7 +1766,7 @@ const WordList = () => {
             )}
             <IoInformationCircleOutline
               size={22}
-              className="text-blue-400 cursor-pointer hover:text-blue-500 transition"
+              className="text-blue-400 cursor-pointer hover:text-blue-500 transition "
               onClick={(e) => {
                 e.stopPropagation(); // prevent the click from closing immediately
                 setShowInfo((prev) => !prev);

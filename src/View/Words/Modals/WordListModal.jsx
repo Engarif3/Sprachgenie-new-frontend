@@ -71,41 +71,42 @@ const getWordInfo = (word) => {
 
   // Add part of speech as the first item
   if (partOfSpeech) {
-    // info.push(partOfSpeech.charAt(0).toUpperCase() + partOfSpeech.slice(1));
     info.push(partOfSpeech);
   }
 
   if (partOfSpeech === "verb") {
     // Verb info
-    if (word.prefixType === "SEPARABLE") info.push("Separable");
-    if (word.prefixType === "INSEPARABLE") info.push("Inseparable");
-    if (word.isReflexive) info.push("Reflexive");
-    if (word.isModal) info.push("Modal");
-    if (word.conjugation === "IRREGULAR") info.push("Irregular");
+    if (word.prefixType === "SEPARABLE") info.push("separable");
+    if (word.prefixType === "INSEPARABLE") info.push("inseparable");
+    if (word.isReflexive) info.push("reflexive");
+    if (word.isModal) info.push("modal");
+    if (word.conjugation === "IRREGULAR") info.push("irregular");
 
     const caseReq = word.caseRequirement;
     if (caseReq) {
       const caseMap = {
-        ACCUSATIVE: "Accusative",
-        DATIVE: "Dative",
-        GENITIVE: "Genitive",
+        ACCUSATIVE: "accusative",
+        DATIVE: "dative",
+        GENITIVE: "genitive",
       };
-      info.push(caseMap[caseReq] || caseReq);
+      info.push(caseMap[caseReq] || caseReq.toLowerCase());
     }
   } else if (partOfSpeech === "preposition") {
     // Preposition info
     if (word.prepositionCase) {
       const caseMap = {
-        ACCUSATIVE: "Accusative",
-        DATIVE: "Dative",
-        GENITIVE: "Genitive",
-        WECHSEL: "Wechsel (Acc/Dat)",
+        ACCUSATIVE: "accusative",
+        DATIVE: "dative",
+        GENITIVE: "genitive",
+        WECHSEL: "wechsel (acc/dat)",
       };
-      info.push(caseMap[word.prepositionCase] || word.prepositionCase);
+      info.push(
+        caseMap[word.prepositionCase] || word.prepositionCase.toLowerCase(),
+      );
     }
   } else if (partOfSpeech === "adjective") {
     // Adjective info
-    if (word.isPrepositional) info.push("Prepositional");
+    if (word.isPrepositional) info.push("prepositional");
   }
 
   return info;
@@ -537,11 +538,11 @@ const WordListModal = ({
               </p>
             )} */}
             {getWordInfo(selectedWord).length > 0 && (
-              <p className="text-sm md:text-base lg:text-lg flex">
-                <span className="text-blue-400 font-semibold">
+              <p className="text-sm md:text-base lg:text-lg flex  items-center ">
+                <span className="text-blue-400 font-semibold ">
                   <IoInformationCircleOutline
                     size={23}
-                    className="text-white cursor-pointer hover:text-blue-500 transition mr-2"
+                    className="text-white cursor-pointer hover:text-blue-500 transition mr-1 mt-1 animate-pulse "
                   />
                 </span>
 
@@ -549,9 +550,9 @@ const WordListModal = ({
                   {getWordInfo(selectedWord).map((item, index) => (
                     <span
                       key={index}
-                      className="text-orange-400 text-xs md:text-sm italic bg-slate-800 border border-cyan-500 rounded-md h-6 p-1 flex justify-center items-center mb-1"
+                      className="text-orange-400 text-xs md:text-sm italic bg-slate-800 border border-cyan-500 rounded-md  px-1 flex justify-center items-center "
                     >
-                      <span className="mb-1"> {item}</span>
+                      <span className=""> {item}</span>
                     </span>
                   ))}
                 </span>
