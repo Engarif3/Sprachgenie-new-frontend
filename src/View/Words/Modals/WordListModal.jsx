@@ -542,7 +542,7 @@ const WordListModal = ({
                 <span className="text-blue-400 font-semibold ">
                   <IoInformationCircleOutline
                     size={23}
-                    className="text-white cursor-pointer hover:text-blue-500 transition mr-1 mt-1 animate-pulse "
+                    className="text-white cursor-pointer hover:text-blue-500 transition mr-1 mt-[1px] animate-pulse "
                   />
                 </span>
 
