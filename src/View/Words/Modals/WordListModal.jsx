@@ -13,6 +13,7 @@ import { MdOutlineDoubleArrow } from "react-icons/md";
 import { SiGoogletranslate } from "react-icons/si";
 import { FaSpinner } from "react-icons/fa";
 import { IoInformationCircleOutline } from "react-icons/io5";
+import { highlightPrefixInSentence } from "../../../utils/sentencePrefixHighlighter.jsx";
 
 // Helper function to capitalize first letter
 const capitalizeFirstLetter = (str) => {
@@ -132,7 +133,7 @@ const getWordInfo = (word) => {
 
 // Memoized sentence renderer component
 const SentenceRenderer = memo(
-  ({ sentence, onTranslate, translation, isLoading, userLoggedIn }) => {
+  ({ sentence, word, onTranslate, translation, isLoading, userLoggedIn }) => {
     const trimmed = sentence.trim();
     let className = "text-slate-300 text-sm md:text-base lg:text-lg";
     let cleanSentence = sentence;
@@ -176,6 +177,12 @@ const SentenceRenderer = memo(
       });
     };
 
+    // Determine if this is a normal sentence for highlighting
+    const isNormalSentence = !trimmed.startsWith("##") && !trimmed.startsWith("**");
+    const sentenceContent = isNormalSentence
+      ? highlightPrefixInSentence(word, cleanSentence)
+      : cleanSentence;
+
     return (
       <div>
         <div className="text-gray-600 flex items-start gap-2">
@@ -197,7 +204,7 @@ const SentenceRenderer = memo(
               </span>
             </span>
           )}
-          <span className={className}>{cleanSentence}</span>
+          <span className={className}>{sentenceContent}</span>
           {showSpeakerButton && userLoggedIn && (
             <button
               onClick={() => onTranslate(cleanSentence)}
@@ -587,7 +594,7 @@ const WordListModal = ({
                   <SentenceRenderer
                     key={`${selectedWord.id}-${index}`}
                     sentence={sentence}
-                    index={index}
+                    word={selectedWord}
                     onTranslate={translateSentence}
                     translation={translations[sentence]}
                     isLoading={loadingTranslations[sentence]}
