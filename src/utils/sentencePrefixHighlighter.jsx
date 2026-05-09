@@ -15,18 +15,104 @@ export const highlightPrefixInSentence = (word, sentence) => {
   // Split sentence into words and punctuation
   const parts = sentence.split(/(\s+|[.,!?;:])/);
 
-  const highlightedParts = parts.map((part) => {
-    // Only process actual words (not whitespace or punctuation)
-    if (part.trim() === "" || /[.,!?;:]/.test(part)) {
+  const isSeparator = (value) =>
+    value.trim() === "" || /^[.,!?;:]$/.test(value);
+
+  const getNextNonSpaceIndex = (startIndex) => {
+    let nextIndex = startIndex + 1;
+    while (nextIndex < parts.length && parts[nextIndex].trim() === "") {
+      nextIndex += 1;
+    }
+    return nextIndex;
+  };
+
+  const getToken = (index) => {
+    if (index < 0 || index >= parts.length) return "";
+    return parts[index].trim().toLowerCase();
+  };
+
+  const isClauseEnd = (index) => {
+    const nextIndex = getNextNonSpaceIndex(index);
+    return nextIndex >= parts.length || /^[,!?;.]$/.test(parts[nextIndex]);
+  };
+
+  const isModalAuxiliary = (token) =>
+    [
+      "kann",
+      "kannst",
+      "können",
+      "könnt",
+      "muss",
+      "musst",
+      "müssen",
+      "soll",
+      "sollst",
+      "sollen",
+      "darf",
+      "darfst",
+      "dürfen",
+      "mag",
+      "mögen",
+      "möchte",
+      "will",
+      "willst",
+      "wollen",
+    ].includes(token);
+
+  const isAuxiliary = (token) =>
+    [
+      "werden",
+      "wird",
+      "wurden",
+      "wurde",
+      "werde",
+      "sein",
+      "bin",
+      "bist",
+      "ist",
+      "sind",
+      "seid",
+      "war",
+      "warst",
+      "waren",
+      "wart",
+      "habe",
+      "hast",
+      "hat",
+      "haben",
+      "habt",
+    ].includes(token);
+
+  const isValidAuxiliaryChain = (index) => {
+    const nextIndex = getNextNonSpaceIndex(index);
+    const nextToken = getToken(nextIndex);
+    const nextNextIndex = getNextNonSpaceIndex(nextIndex);
+    const nextNextToken = getToken(nextNextIndex);
+
+    if (nextToken === "werden") {
+      return true;
+    }
+
+    if (isModalAuxiliary(nextToken) && nextNextToken === "werden") {
+      return true;
+    }
+
+    return false;
+  };
+
+  const highlightedParts = parts.map((part, index) => {
+    // Keep whitespace and punctuation unchanged
+    if (isSeparator(part)) {
       return part;
     }
 
     const lowerPart = part.toLowerCase();
+    const isEndOfClause = isClauseEnd(index);
+    const isAuxChain = isValidAuxiliaryChain(index);
 
-    // Check if word starts with the prefix
-    if (lowerPart.startsWith(prefix)) {
+    if ((isEndOfClause || isAuxChain) && lowerPart.startsWith(prefix)) {
       return (
-        <span key={Math.random()}>
+        <span key={`${part}-${index}`}>
           <span className="text-orange-500 font-bold">
             {part.slice(0, prefixLength)}
           </span>
