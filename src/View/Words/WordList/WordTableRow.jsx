@@ -97,7 +97,7 @@ const getArticleColumnDisplay = (word) => {
   const defaultArticleClassName =
     "font-bold text-orange-400 text-xs md:text-lg lg:text-lg";
   const baseMarkerClassName =
-    "inline-block bg-black w-full px-1 md:px-2 lg:px-2 py-1 rounded-xl border text-xs md:text-sm lg:text-sm shadow-sm";
+    "inline-block bg-black w-full px-1 py-1 rounded-xl border text-xs  shadow-sm";
 
   if (
     !partOfSpeechName ||
@@ -122,7 +122,7 @@ const getArticleColumnDisplay = (word) => {
   if (partOfSpeechName === "verb") {
     return {
       text: "vrb.",
-      className: `${baseMarkerClassName} text-white bg-green-600 font-bold`,
+      className: `${baseMarkerClassName} text-white bg-sky-600 font-bold`,
       tooltipText: "Verb",
     };
   }
@@ -148,7 +148,7 @@ const getArticleColumnDisplay = (word) => {
     partOfSpeechName === "adjective / adverb"
   ) {
     return {
-      text: "adj/adv",
+      text: "aj/av",
       className: `${baseMarkerClassName} text-fuchsia-300`,
       tooltipText: "Adjective/Adverb",
     };
@@ -156,7 +156,7 @@ const getArticleColumnDisplay = (word) => {
 
   if (partOfSpeechName === "preposition") {
     return {
-      text: "prep.",
+      text: "pre.",
       className: `${baseMarkerClassName} text-amber-200`,
       tooltipText: "Preposition",
     };
