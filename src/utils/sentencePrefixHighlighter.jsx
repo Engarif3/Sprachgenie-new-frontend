@@ -31,9 +31,24 @@ export const highlightPrefixInSentence = (word, sentence) => {
     return parts[index].trim().toLowerCase();
   };
 
+  const isConjunctionSeparator = (token) =>
+    [
+      "und",
+      "oder",
+      "sowie",
+      "beziehungsweise",
+      "sondern",
+      "aber",
+      "doch",
+    ].includes(token);
+
   const isClauseEnd = (index) => {
     const nextIndex = getNextNonSpaceIndex(index);
-    return nextIndex >= parts.length || /^[,!?;.]$/.test(parts[nextIndex]);
+    if (nextIndex >= parts.length) return true;
+    const nextToken = getToken(nextIndex);
+    return (
+      /^[,!?;.]$/.test(parts[nextIndex]) || isConjunctionSeparator(nextToken)
+    );
   };
 
   const isModalAuxiliary = (token) =>
@@ -66,6 +81,7 @@ export const highlightPrefixInSentence = (word, sentence) => {
       "wurden",
       "wurde",
       "werde",
+      "worden",
       "sein",
       "bin",
       "bist",
@@ -81,6 +97,18 @@ export const highlightPrefixInSentence = (word, sentence) => {
       "hat",
       "haben",
       "habt",
+      "hatte",
+      "hattest",
+      "hatten",
+      "hattet",
+      "würde",
+      "würdest",
+      "würden",
+      "würdet",
+      "hätte",
+      "hättest",
+      "hätten",
+      "hättet",
     ].includes(token);
 
   const isValidAuxiliaryChain = (index) => {
@@ -89,11 +117,11 @@ export const highlightPrefixInSentence = (word, sentence) => {
     const nextNextIndex = getNextNonSpaceIndex(nextIndex);
     const nextNextToken = getToken(nextNextIndex);
 
-    if (nextToken === "werden") {
+    if (isAuxiliary(nextToken)) {
       return true;
     }
 
-    if (isModalAuxiliary(nextToken) && nextNextToken === "werden") {
+    if (isModalAuxiliary(nextToken) && isAuxiliary(nextNextToken)) {
       return true;
     }
 
