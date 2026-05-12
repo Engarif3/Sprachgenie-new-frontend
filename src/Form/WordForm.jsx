@@ -254,10 +254,10 @@ const WordForm = () => {
       }
     });
 
-    console.log("=== WORD FORM DEBUG ===");
-    console.log("wordData.verbAttributes:", wordData.verbAttributes);
-    console.log("defaults:", defaults);
-    console.log("verbAttributes to send:", verbAttributes);
+    // console.log("=== WORD FORM DEBUG ===");
+    // console.log("wordData.verbAttributes:", wordData.verbAttributes);
+    // console.log("defaults:", defaults);
+    // console.log("verbAttributes to send:", verbAttributes);
 
     // Only include verbAttributes if it has non-default values
     if (Object.keys(verbAttributes).length > 0) {
