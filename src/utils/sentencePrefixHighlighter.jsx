@@ -40,6 +40,7 @@ export const highlightPrefixInSentence = (word, sentence) => {
       "sondern",
       "aber",
       "doch",
+      "als",
     ].includes(token);
 
   const isClauseEnd = (index) => {
