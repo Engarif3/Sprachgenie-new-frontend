@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "../axios";
 import { invalidateWordsCache } from "../utils/storage";
-import { validateRelationWords } from "../utils/wordValidation";
+import {
+  validateRelationWords,
+  detectWordsNeedingPOSSelection,
+  showPOSSelectionPopup,
+  fetchWordVariants,
+} from "../utils/wordValidation";
 
 import { useAuth } from "../services/auth.services";
 
@@ -40,8 +45,60 @@ const getSelfReferenceMessage = (value, relations) => {
   return `The word cannot reference itself as a ${invalidLabels.join(", ")}.`;
 };
 
+const handleShowPOSSelectionPopup = async (wordValue) => {
+  try {
+    const { data: response } = await api.get(
+      `/word/variants/${encodeURIComponent(wordValue)}`,
+    );
+
+    if (!response.data.variants || response.data.variants.length <= 1) {
+      return response.data.variants?.[0] || null;
+    }
+
+    return new Promise((resolve) => {
+      Swal.fire({
+        title: `Multiple meanings found for "${wordValue}"`,
+        html: `
+          <div style="text-align: left; margin-top: 10px;">
+            ${response.data.variants
+              .map(
+                (variant) => `
+              <div style="padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; transition: all 0.2s;"
+                   class="pos-option" data-id="${variant.id}"
+                   onmouseenter="this.style.backgroundColor='#f0f0f0'; this.style.borderColor='#999';"
+                   onmouseleave="this.style.backgroundColor='transparent'; this.style.borderColor='#ddd';">
+                <strong>${variant.partOfSpeech.name}</strong>
+                ${variant.level ? ` (Level: ${variant.level.level})` : ""}
+              </div>
+            `,
+              )
+              .join("")}
+          </div>
+        `,
+        didOpen: () => {
+          document.querySelectorAll(".pos-option").forEach((el) => {
+            el.addEventListener("click", () => {
+              const selectedId = parseInt(el.dataset.id);
+              const selectedVariant = response.data.variants.find(
+                (v) => v.id === selectedId,
+              );
+              Swal.close();
+              resolve(selectedVariant);
+            });
+          });
+        },
+        showCancelButton: true,
+        confirmButtonText: "Select",
+        allowOutsideClick: false,
+      });
+    });
+  } catch (error) {
+    console.error("Error fetching word variants:", error);
+    return null;
+  }
+};
+
 const WordForm = () => {
-  const navigate = useNavigate();
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
   const canAccess = userLoggedIn && userId && isAdmin;
 
@@ -76,6 +133,8 @@ const WordForm = () => {
   const [topics, setTopics] = useState([]);
   const [articles, setArticles] = useState([]);
   const [partsOfSpeech, setPartsOfSpeech] = useState([]);
+  const [wordsNeedingPOSSelection, setWordsNeedingPOSSelection] = useState([]);
+  const [posSelections, setPOSSelections] = useState({});
 
   // Fetch the options for level, topic, article, and partOfSpeech
   useEffect(() => {
@@ -98,7 +157,66 @@ const WordForm = () => {
     fetchData();
   }, []);
 
-  // Handle form field changes
+  // Handle POS selection for a specific relation word
+  const handlePOSSelection = async (word, relationType) => {
+    const variants = await fetchWordVariants(word);
+
+    if (variants.length <= 1) {
+      // Only one variant, store it directly
+      setPOSSelections((prev) => ({
+        ...prev,
+        [`${word}-${relationType}`]: variants[0],
+      }));
+      return;
+    }
+
+    // Show popup for user to select
+    const selected = await showPOSSelectionPopup(
+      `${word} (${relationType})`,
+      variants,
+    );
+
+    if (selected) {
+      setPOSSelections((prev) => ({
+        ...prev,
+        [`${word}-${relationType}`]: selected,
+      }));
+    }
+  };
+
+  // Check for words needing POS selection when relations change
+  useEffect(() => {
+    const checkRelations = async () => {
+      const normalizeRelationList = (text) =>
+        Array.from(
+          new Set(
+            text
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean),
+          ),
+        );
+
+      const relationsToCheck = {
+        synonyms: normalizeRelationList(wordData.synonyms),
+        antonyms: normalizeRelationList(wordData.antonyms),
+        similarWords: normalizeRelationList(wordData.similarWords),
+      };
+
+      const wordsNeeding =
+        await detectWordsNeedingPOSSelection(relationsToCheck);
+
+      // Add unique index to handle duplicate words in different relation types
+      const wordsWithIndex = wordsNeeding.map((w, idx) => ({
+        ...w,
+        uniqueKey: `${w.word}-${w.relationType}-${idx}`,
+      }));
+
+      setWordsNeedingPOSSelection(wordsWithIndex);
+    };
+
+    checkRelations();
+  }, [wordData.synonyms, wordData.antonyms, wordData.similarWords]);
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -197,6 +315,29 @@ const WordForm = () => {
       return;
     }
 
+    // Check if all required POS selections have been made
+    if (wordsNeedingPOSSelection.length > 0) {
+      const allSelectionsComplete = wordsNeedingPOSSelection.every(
+        (w) => posSelections[`${w.word}-${w.relationType}`],
+      );
+
+      if (!allSelectionsComplete) {
+        Swal.fire({
+          title: "POS Selection Required",
+          text: "Please select the part of speech for all related words with multiple meanings.",
+          icon: "warning",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        return;
+      }
+    }
+
+    const parseIntOrNull = (value) =>
+      value === "" || value === null || value === undefined
+        ? null
+        : parseInt(value, 10);
+
     const newWordData = {
       value: wordData.value,
       meaning:
@@ -211,30 +352,42 @@ const WordForm = () => {
               .filter((item) => item) // Removes empty strings
           : [],
       pluralForm: wordData.pluralForm,
-      levelId: wordData.levelId,
-      topicId: wordData.topicId || "1",
-      articleId: wordData.articleId || "4",
-      partOfSpeechId: wordData.partOfSpeechId,
+      levelId: parseIntOrNull(wordData.levelId),
+      topicId: parseIntOrNull(wordData.topicId) || 1,
+      articleId: parseIntOrNull(wordData.articleId) || 4,
+      partOfSpeechId: parseIntOrNull(wordData.partOfSpeechId),
       synonyms:
         typeof wordData.synonyms === "string"
-          ? wordData.synonyms
-              .split(",")
-              .map((item) => item.trim())
-              .filter((item) => item) // Add filter here
+          ? Array.from(
+              new Set(
+                wordData.synonyms
+                  .split(",")
+                  .map((item) => item.trim())
+                  .filter((item) => item),
+              ),
+            )
           : [],
       antonyms:
         typeof wordData.antonyms === "string"
-          ? wordData.antonyms
-              .split(",")
-              .map((item) => item.trim())
-              .filter((item) => item) // Add filter here
+          ? Array.from(
+              new Set(
+                wordData.antonyms
+                  .split(",")
+                  .map((item) => item.trim())
+                  .filter((item) => item),
+              ),
+            )
           : [],
       similarWords:
         typeof wordData.similarWords === "string"
-          ? wordData.similarWords
-              .split(",")
-              .map((item) => item.trim())
-              .filter((item) => item) // Add filter here
+          ? Array.from(
+              new Set(
+                wordData.similarWords
+                  .split(",")
+                  .map((item) => item.trim())
+                  .filter((item) => item),
+              ),
+            )
           : [],
     };
 
@@ -339,27 +492,150 @@ const WordForm = () => {
     }
 
     try {
-      // Directly submit the wordData state
-      // const response = await instance({
-      //   url: "https://sprcahgenie-new-backend.vercel.app/api/v1/word/create",
-      //   // url: "http://localhost:5000/api/v1/word/create",
-      //   method: "POST",
-      //   data: newWordData,
-      // });
-      await api.post("/word/create", newWordData);
-      await invalidateWordsCache();
+      const wordDataToSubmit = {
+        ...newWordData,
+        // Don't include relations in creation - we'll add them after with selected POS
+        synonyms: [],
+        antonyms: [],
+        similarWords: [],
+      };
 
-      setWordData(initialWordData); // Reset form state
+      const createResponse = await api.post("/word/create", wordDataToSubmit);
 
-      Swal.fire({
-        title: "Created",
-        text: "The word created successfully.",
-        icon: "success",
-        timer: 1500,
-        showConfirmButton: false,
-      });
+      // Check if ambiguous words were found
+      if (createResponse.data.data?.requiresSelection === true) {
+        const ambiguousWords = createResponse.data.data.ambiguousWords || [];
 
-      // Stay on the same page after creating word
+        // Show popup for POS selection
+        const posSelections = await new Promise((resolve) => {
+          const selections = {};
+          let currentIndex = 0;
+
+          const showNextAmbiguousWord = () => {
+            if (currentIndex >= ambiguousWords.length) {
+              resolve(Object.values(selections));
+              return;
+            }
+
+            const ambiguous = ambiguousWords[currentIndex];
+
+            Swal.fire({
+              title: `Select part of speech for "${ambiguous.value}"`,
+              html: `
+                <div style="text-align: left; margin-top: 10px;">
+                  ${ambiguous.variants
+                    .map(
+                      (variant) => `
+                    <div style="padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; transition: all 0.2s;"
+                         class="ambiguous-pos-option" data-id="${variant.id}" data-word="${ambiguous.value}"
+                         onmouseenter="this.style.backgroundColor='#f0f0f0'; this.style.borderColor='#999';"
+                         onmouseleave="this.style.backgroundColor='transparent'; this.style.borderColor='#ddd';">
+                      <strong>${variant.partOfSpeechName || "Unknown"}</strong>
+                    </div>
+                  `,
+                    )
+                    .join("")}
+                </div>
+              `,
+              didOpen: () => {
+                document
+                  .querySelectorAll(".ambiguous-pos-option")
+                  .forEach((el) => {
+                    el.addEventListener("click", () => {
+                      const selectedId = parseInt(el.dataset.id);
+                      const wordValue = el.dataset.word;
+                      selections[`${wordValue}-${currentIndex}`] = {
+                        wordValue,
+                        wordId: selectedId,
+                      };
+                      currentIndex++;
+                      Swal.close();
+                      showNextAmbiguousWord();
+                    });
+                  });
+              },
+              allowOutsideClick: false,
+              showCancelButton: true,
+              cancelButtonText: "Cancel",
+              confirmButtonText: "Select",
+            }).catch(() => {
+              resolve(null); // User cancelled
+            });
+          };
+
+          showNextAmbiguousWord();
+        });
+
+        if (!posSelections) {
+          return; // User cancelled
+        }
+
+        // Call the confirmation endpoint with POS selections
+        await api.post("/word/create/with-pos-selection", {
+          wordData: createResponse.data.data.pendingWordData,
+          posSelections,
+        });
+
+        await invalidateWordsCache();
+        setWordData(initialWordData);
+        setPOSSelections({});
+
+        Swal.fire({
+          title: "Created",
+          text: "The word created successfully.",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } else {
+        // Normal flow - word created without ambiguous words
+        const createdWordId = createResponse.data.data.id;
+
+        const addRelation = async (relatedWordValue, relationType) => {
+          // Use pre-selected variant from POS selection buttons
+          const selectedVariant =
+            posSelections[`${relatedWordValue}-${relationType}`] ||
+            (await handleShowPOSSelectionPopup(relatedWordValue));
+
+          if (selectedVariant && selectedVariant.id) {
+            await api.post("/word/relation/add", {
+              wordId: createdWordId,
+              relatedWordId: selectedVariant.id,
+              relationType,
+            });
+          }
+        };
+
+        if (newWordData.synonyms.length > 0) {
+          for (const synonym of newWordData.synonyms) {
+            await addRelation(synonym, "synonym");
+          }
+        }
+
+        if (newWordData.antonyms.length > 0) {
+          for (const antonym of newWordData.antonyms) {
+            await addRelation(antonym, "antonym");
+          }
+        }
+
+        if (newWordData.similarWords.length > 0) {
+          for (const similarWord of newWordData.similarWords) {
+            await addRelation(similarWord, "similarWord");
+          }
+        }
+
+        await invalidateWordsCache();
+        setWordData(initialWordData);
+        setPOSSelections({});
+
+        Swal.fire({
+          title: "Created",
+          text: "The word created successfully.",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      }
     } catch (error) {
       // catch (error) {
       //   Swal.fire({
@@ -839,14 +1115,34 @@ const WordForm = () => {
                   >
                     Synonyms (comma separated, Optional)
                   </label>
-                  <input
-                    type="text"
-                    id="synonyms"
-                    name="synonyms"
-                    value={wordData.synonyms}
-                    onChange={handleChange}
-                    className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-                  />
+                  <div className="flex gap-2 mt-2">
+                    <input
+                      type="text"
+                      id="synonyms"
+                      name="synonyms"
+                      value={wordData.synonyms}
+                      onChange={handleChange}
+                      className="input-md flex-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                    />
+                  </div>
+                  {wordsNeedingPOSSelection
+                    .filter((w) => w.relationType === "synonym")
+                    .map((w) => (
+                      <button
+                        key={w.uniqueKey}
+                        type="button"
+                        onClick={() => handlePOSSelection(w.word, "synonym")}
+                        className={`mt-2 px-3 py-1 text-sm rounded ${
+                          posSelections[`${w.word}-synonym`]
+                            ? "bg-green-500 text-white"
+                            : "bg-orange-500 text-white"
+                        }`}
+                      >
+                        {posSelections[`${w.word}-synonym`]
+                          ? `✓ ${w.word} (${posSelections[`${w.word}-synonym`].partOfSpeech.name})`
+                          : `Select POS for "${w.word}"`}
+                      </button>
+                    ))}
                 </div>
 
                 <div>
@@ -856,14 +1152,34 @@ const WordForm = () => {
                   >
                     Antonyms (comma separated, Optional)
                   </label>
-                  <input
-                    type="text"
-                    id="antonyms"
-                    name="antonyms"
-                    value={wordData.antonyms}
-                    onChange={handleChange}
-                    className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-                  />
+                  <div className="flex gap-2 mt-2">
+                    <input
+                      type="text"
+                      id="antonyms"
+                      name="antonyms"
+                      value={wordData.antonyms}
+                      onChange={handleChange}
+                      className="input-md flex-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                    />
+                  </div>
+                  {wordsNeedingPOSSelection
+                    .filter((w) => w.relationType === "antonym")
+                    .map((w) => (
+                      <button
+                        key={w.uniqueKey}
+                        type="button"
+                        onClick={() => handlePOSSelection(w.word, "antonym")}
+                        className={`mt-2 px-3 py-1 text-sm rounded ${
+                          posSelections[`${w.word}-antonym`]
+                            ? "bg-green-500 text-white"
+                            : "bg-orange-500 text-white"
+                        }`}
+                      >
+                        {posSelections[`${w.word}-antonym`]
+                          ? `✓ ${w.word} (${posSelections[`${w.word}-antonym`].partOfSpeech.name})`
+                          : `Select POS for "${w.word}"`}
+                      </button>
+                    ))}
                 </div>
 
                 <div>
@@ -873,14 +1189,36 @@ const WordForm = () => {
                   >
                     Word to Watch (comma separated, Optional)
                   </label>
-                  <input
-                    type="text"
-                    id="similarWords"
-                    name="similarWords"
-                    value={wordData.similarWords}
-                    onChange={handleChange}
-                    className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-                  />
+                  <div className="flex gap-2 mt-2">
+                    <input
+                      type="text"
+                      id="similarWords"
+                      name="similarWords"
+                      value={wordData.similarWords}
+                      onChange={handleChange}
+                      className="input-md flex-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                    />
+                  </div>
+                  {wordsNeedingPOSSelection
+                    .filter((w) => w.relationType === "similarWord")
+                    .map((w) => (
+                      <button
+                        key={w.uniqueKey}
+                        type="button"
+                        onClick={() =>
+                          handlePOSSelection(w.word, "similarWord")
+                        }
+                        className={`mt-2 px-3 py-1 text-sm rounded ${
+                          posSelections[`${w.word}-similarWord`]
+                            ? "bg-green-500 text-white"
+                            : "bg-orange-500 text-white"
+                        }`}
+                      >
+                        {posSelections[`${w.word}-similarWord`]
+                          ? `✓ ${w.word} (${posSelections[`${w.word}-similarWord`].partOfSpeech.name})`
+                          : `Select POS for "${w.word}"`}
+                      </button>
+                    ))}
                 </div>
               </div>
             </div>

@@ -9,6 +9,9 @@ import { invalidateWordsCache } from "../../../utils/storage";
 import {
   validateSingleRelationField,
   validateRelationWords,
+  detectWordsNeedingPOSSelection,
+  showPOSSelectionPopup,
+  fetchWordVariants,
 } from "../../../utils/wordValidation";
 import {
   DndContext,
@@ -362,6 +365,32 @@ const UpdateWord = () => {
   const [refetchTrigger, setRefetchTrigger] = useState(0);
   const [addingAt, setAddingAt] = useState(null); // { index: number, position: 'above' | 'below', field: string }
   const [newItemValue, setNewItemValue] = useState("");
+  const [wordsNeedingPOSSelection, setWordsNeedingPOSSelection] = useState([]);
+  const [posSelections, setPOSSelections] = useState({});
+  // Tracks POS overrides for EXISTING relation items (not new typed ones)
+  const [relPOSOverrides, setRelPOSOverrides] = useState({
+    synonym: {},
+    antonym: {},
+    similarWord: {},
+  });
+  // Which existing relation words have multiple POS variants (controls button visibility)
+  const [multiPOSExisting, setMultiPOSExisting] = useState({
+    synonym: new Set(),
+    antonym: new Set(),
+    similarWord: new Set(),
+  });
+  // The variant ID currently linked for each existing relation word
+  const [currentRelationIds, setCurrentRelationIds] = useState({
+    synonym: {},
+    antonym: {},
+    similarWord: {},
+  });
+  // The POS name currently linked for each multi-POS relation word (for display)
+  const [currentRelationPOSNames, setCurrentRelationPOSNames] = useState({
+    synonym: {},
+    antonym: {},
+    similarWord: {},
+  });
 
   // Setup DnD Kit sensors
   const sensors = useSensors(
@@ -385,6 +414,79 @@ const UpdateWord = () => {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
+
+  // Handle POS selection for a specific relation word
+  const handlePOSSelection = async (word, relationType) => {
+    const variants = await fetchWordVariants(word);
+
+    if (variants.length <= 1) {
+      setPOSSelections((prev) => ({
+        ...prev,
+        [`${word}-${relationType}`]: variants[0],
+      }));
+      return;
+    }
+
+    const selected = await showPOSSelectionPopup(
+      `${word} (${relationType})`,
+      variants,
+    );
+
+    if (selected) {
+      setPOSSelections((prev) => ({
+        ...prev,
+        [`${word}-${relationType}`]: selected,
+      }));
+    }
+  };
+
+  // Handle POS selection for existing relation items already saved to the word
+  const handleExistingPOSSelection = async (wordValue, relationType) => {
+    const variants = await fetchWordVariants(wordValue);
+    if (variants.length === 0) return;
+
+    let selected;
+    if (variants.length === 1) {
+      selected = variants[0];
+    } else {
+      const currentVariantId =
+        relPOSOverrides[relationType]?.[wordValue]?.variantId ??
+        currentRelationIds[relationType]?.[wordValue];
+      selected = await showPOSSelectionPopup(`${wordValue} (${relationType})`, variants, currentVariantId);
+    }
+
+    if (selected) {
+      setRelPOSOverrides((prev) => ({
+        ...prev,
+        [relationType]: {
+          ...prev[relationType],
+          [wordValue]: { variantId: selected.id, partOfSpeechName: selected.partOfSpeech.name },
+        },
+      }));
+    }
+  };
+
+  // Check for words needing POS selection when input relations change
+  useEffect(() => {
+    const checkRelations = async () => {
+      const newRelationWords = {
+        synonyms: normalizeFieldItems("synonyms", inputData.synonyms),
+        antonyms: normalizeFieldItems("antonyms", inputData.antonyms),
+        similarWords: normalizeFieldItems("similarWords", inputData.similarWords),
+      };
+
+      const wordsNeeding = await detectWordsNeedingPOSSelection(
+        newRelationWords,
+      );
+      const wordsWithIndex = wordsNeeding.map((w, idx) => ({
+        ...w,
+        uniqueKey: `${w.word}-${w.relationType}-${idx}`,
+      }));
+      setWordsNeedingPOSSelection(wordsWithIndex);
+    };
+
+    checkRelations();
+  }, [inputData.synonyms, inputData.antonyms, inputData.similarWords]);
 
   // Handle drag end
   const handleDragEnd = async (event) => {
@@ -530,10 +632,13 @@ const UpdateWord = () => {
   // Fetch existing word data and all dropdown options in parallel
   useEffect(() => {
     const fetchAllData = async () => {
+      let wordData = null;
+      let wordCurrentIds = null;
+
+      // --- Critical path: load form + dropdowns, show form immediately ---
       try {
         setInitialLoading(true);
 
-        // Fetch all data in parallel using Promise.all for faster loading
         const [
           wordResponse,
           levelsResponse,
@@ -549,8 +654,8 @@ const UpdateWord = () => {
         ]);
 
         const word = wordResponse.data.data;
+        wordData = word;
 
-        // Construct verbAttributes from individual DB columns (NULL = use defaults)
         const defaults = {
           conjugation: "REGULAR",
           isReflexive: false,
@@ -574,8 +679,8 @@ const UpdateWord = () => {
         setFormData({
           id: word.id,
           value: word.value,
-          meaning: word.meaning,
-          sentences: word.sentences,
+          meaning: word.meaning || [],
+          sentences: word.sentences || [],
           levelId: word.levelId || 1,
           topicId: word.topicId || 1,
           articleId: word.articleId || 4,
@@ -594,15 +699,47 @@ const UpdateWord = () => {
           partOfSpeech: word.partOfSpeech,
         });
 
+        wordCurrentIds = {
+          synonym: Object.fromEntries((word.synonyms || []).map((s) => [s.value, s.id])),
+          antonym: Object.fromEntries((word.antonyms || []).map((s) => [s.value, s.id])),
+          similarWord: Object.fromEntries((word.similarWords || []).map((s) => [s.value, s.id])),
+        };
+        setCurrentRelationIds(wordCurrentIds);
+
         setLevels(levelsResponse.data);
         setTopics(topicsResponse.data);
         setArticles(articlesResponse.data);
         setPartOfSpeeches(partOfSpeechResponse.data);
       } catch (error) {
-        // Error handled - form will show validation errors
         console.error("Error fetching data:", error);
       } finally {
         setInitialLoading(false);
+      }
+
+      // --- Background path: detect multi-POS relation words (slow, non-blocking) ---
+      if (!wordData || !wordCurrentIds) return;
+      try {
+        const existingRelations = {
+          synonyms: (wordData.synonyms || []).map((s) => s.value),
+          antonyms: (wordData.antonyms || []).map((s) => s.value),
+          similarWords: (wordData.similarWords || []).map((s) => s.value),
+        };
+        const multiPOSWords = await detectWordsNeedingPOSSelection(existingRelations);
+        setMultiPOSExisting({
+          synonym: new Set(multiPOSWords.filter((w) => w.relationType === "synonym").map((w) => w.word)),
+          antonym: new Set(multiPOSWords.filter((w) => w.relationType === "antonym").map((w) => w.word)),
+          similarWord: new Set(multiPOSWords.filter((w) => w.relationType === "similarWord").map((w) => w.word)),
+        });
+
+        const posNames = { synonym: {}, antonym: {}, similarWord: {} };
+        for (const { word: wordVal, relationType, variants } of multiPOSWords) {
+          const currentId = wordCurrentIds[relationType]?.[wordVal];
+          const match = variants.find((v) => v.id === currentId);
+          if (match) posNames[relationType][wordVal] = match.partOfSpeech.name;
+        }
+        setCurrentRelationPOSNames(posNames);
+      } catch (posError) {
+        console.error("Error detecting multi-POS existing relations:", posError);
       }
     };
 
@@ -907,6 +1044,12 @@ const UpdateWord = () => {
     setMessage("");
 
     // Ensure the necessary fields are arrays and remove empty strings
+    // New relation words (synonym/antonym/similarWord) are added separately
+    // after the update using /word/relation/add so posSelections can be applied.
+    const newSynonyms = normalizeFieldItems("synonyms", inputData.synonyms);
+    const newAntonyms = normalizeFieldItems("antonyms", inputData.antonyms);
+    const newSimilarWords = normalizeFieldItems("similarWords", inputData.similarWords);
+
     const dataToSend = {
       ...formData,
 
@@ -916,15 +1059,11 @@ const UpdateWord = () => {
       sentences: formData.sentences.concat(
         normalizeSentenceItems(inputData.sentences),
       ),
-      synonyms: formData.synonyms.concat(
-        normalizeFieldItems("synonyms", inputData.synonyms),
-      ),
-      antonyms: formData.antonyms.concat(
-        normalizeFieldItems("antonyms", inputData.antonyms),
-      ),
-      similarWords: formData.similarWords.concat(
-        normalizeFieldItems("similarWords", inputData.similarWords),
-      ),
+      // Exclude items whose POS has been overridden — they're re-added after the
+      // update via /word/relation/add so the correct variant ID is linked.
+      synonyms: formData.synonyms.filter((s) => !relPOSOverrides.synonym[s]),
+      antonyms: formData.antonyms.filter((s) => !relPOSOverrides.antonym[s]),
+      similarWords: formData.similarWords.filter((s) => !relPOSOverrides.similarWord[s]),
     };
 
     // Filter verbAttributes to only include non-default values
@@ -1035,6 +1174,25 @@ const UpdateWord = () => {
         setLoading(false);
         return; // User cancelled the operation
       }
+
+      // Check if all required POS selections have been made
+      if (wordsNeedingPOSSelection.length > 0) {
+        const allSelectionsComplete = wordsNeedingPOSSelection.every(
+          (w) => posSelections[`${w.word}-${w.relationType}`],
+        );
+
+        if (!allSelectionsComplete) {
+          setLoading(false);
+          Swal.fire({
+            title: "POS Selection Required",
+            text: "Please select the part of speech for all related words with multiple meanings.",
+            icon: "warning",
+            timer: 2000,
+            showConfirmButton: false,
+          });
+          return;
+        }
+      }
     }
 
     // Show SweetAlert confirmation
@@ -1054,6 +1212,57 @@ const UpdateWord = () => {
           dataToSend,
         );
         setMessage(response.data.message);
+
+        // Add new relation words using posSelections so the correct POS
+        // variant is linked instead of an arbitrary findFirst by value.
+        const addRelation = async (relatedWordValue, relationType) => {
+          const selectedVariant =
+            posSelections[`${relatedWordValue}-${relationType}`] ||
+            (await (async () => {
+              const variants = await fetchWordVariants(relatedWordValue);
+              if (variants.length <= 1) return variants[0] || null;
+              return showPOSSelectionPopup(
+                `${relatedWordValue} (${relationType})`,
+                variants,
+              );
+            })());
+
+          if (selectedVariant?.id) {
+            await api.post("/word/relation/add", {
+              wordId: formData.id,
+              relatedWordId: selectedVariant.id,
+              relationType,
+            });
+          }
+        };
+
+        for (const synonym of newSynonyms) await addRelation(synonym, "synonym");
+        for (const antonym of newAntonyms) await addRelation(antonym, "antonym");
+        for (const similarWord of newSimilarWords) await addRelation(similarWord, "similarWord");
+
+        // Re-add existing relations whose POS was overridden by the user
+        for (const [, info] of Object.entries(relPOSOverrides.synonym)) {
+          await api.post("/word/relation/add", {
+            wordId: formData.id,
+            relatedWordId: info.variantId,
+            relationType: "synonym",
+          });
+        }
+        for (const [, info] of Object.entries(relPOSOverrides.antonym)) {
+          await api.post("/word/relation/add", {
+            wordId: formData.id,
+            relatedWordId: info.variantId,
+            relationType: "antonym",
+          });
+        }
+        for (const [, info] of Object.entries(relPOSOverrides.similarWord)) {
+          await api.post("/word/relation/add", {
+            wordId: formData.id,
+            relatedWordId: info.variantId,
+            relationType: "similarWord",
+          });
+        }
+
         setInputData({
           meaning: "",
           sentences: "",
@@ -1061,6 +1270,9 @@ const UpdateWord = () => {
           antonyms: "",
           similarWords: "",
         });
+        setPOSSelections({});
+        setWordsNeedingPOSSelection([]);
+        setRelPOSOverrides({ synonym: {}, antonym: {}, similarWord: {} });
 
         // Clear the word list cache after successful update
         await invalidateWordsCache();
@@ -1583,6 +1795,24 @@ const UpdateWord = () => {
                     className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter synonyms"
                   />
+                  {wordsNeedingPOSSelection
+                    .filter((w) => w.relationType === "synonym")
+                    .map((w) => (
+                      <button
+                        key={w.uniqueKey}
+                        type="button"
+                        onClick={() => handlePOSSelection(w.word, "synonym")}
+                        className={`mt-2 px-3 py-1 text-sm rounded ${
+                          posSelections[`${w.word}-synonym`]
+                            ? "bg-green-500 text-white"
+                            : "bg-orange-500 text-white"
+                        }`}
+                      >
+                        {posSelections[`${w.word}-synonym`]
+                          ? `✓ ${w.word} (${posSelections[`${w.word}-synonym`].partOfSpeech.name})`
+                          : `Select POS for "${w.word}"`}
+                      </button>
+                    ))}
                   <div className="mt-2">
                     {formData.synonyms.map((item, index) => (
                       <div
@@ -1590,13 +1820,28 @@ const UpdateWord = () => {
                         className="flex items-center justify-between bg-slate-300 p-2 rounded-lg mb-2 shadow-sm"
                       >
                         <li>{item}</li>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveItem("synonyms", index)}
-                          className="btn btn-sm btn-error"
-                        >
-                          Remove
-                        </button>
+                        <div className="flex gap-2">
+                          {multiPOSExisting.synonym.has(item) && (
+                            <button
+                              type="button"
+                              onClick={() => handleExistingPOSSelection(item, "synonym")}
+                              className={`btn btn-sm ${relPOSOverrides.synonym[item] ? "bg-green-500 text-white" : "bg-orange-400 text-white"}`}
+                            >
+                              {relPOSOverrides.synonym[item]
+                                ? `✓ ${relPOSOverrides.synonym[item].partOfSpeechName}`
+                                : currentRelationPOSNames.synonym[item]
+                                  ? currentRelationPOSNames.synonym[item]
+                                  : "Select POS"}
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveItem("synonyms", index)}
+                            className="btn btn-sm btn-error"
+                          >
+                            Remove
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -1621,6 +1866,24 @@ const UpdateWord = () => {
                     className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter antonyms"
                   />
+                  {wordsNeedingPOSSelection
+                    .filter((w) => w.relationType === "antonym")
+                    .map((w) => (
+                      <button
+                        key={w.uniqueKey}
+                        type="button"
+                        onClick={() => handlePOSSelection(w.word, "antonym")}
+                        className={`mt-2 px-3 py-1 text-sm rounded ${
+                          posSelections[`${w.word}-antonym`]
+                            ? "bg-green-500 text-white"
+                            : "bg-orange-500 text-white"
+                        }`}
+                      >
+                        {posSelections[`${w.word}-antonym`]
+                          ? `✓ ${w.word} (${posSelections[`${w.word}-antonym`].partOfSpeech.name})`
+                          : `Select POS for "${w.word}"`}
+                      </button>
+                    ))}
                   <div className="mt-2">
                     {formData.antonyms.map((item, index) => (
                       <div
@@ -1628,13 +1891,28 @@ const UpdateWord = () => {
                         className="flex items-center justify-between bg-slate-300 p-2 rounded-lg mb-2 shadow-sm"
                       >
                         <li>{item}</li>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveItem("antonyms", index)}
-                          className="btn btn-sm btn-error"
-                        >
-                          Remove
-                        </button>
+                        <div className="flex gap-2">
+                          {multiPOSExisting.antonym.has(item) && (
+                            <button
+                              type="button"
+                              onClick={() => handleExistingPOSSelection(item, "antonym")}
+                              className={`btn btn-sm ${relPOSOverrides.antonym[item] ? "bg-green-500 text-white" : "bg-orange-400 text-white"}`}
+                            >
+                              {relPOSOverrides.antonym[item]
+                                ? `✓ ${relPOSOverrides.antonym[item].partOfSpeechName}`
+                                : currentRelationPOSNames.antonym[item]
+                                  ? currentRelationPOSNames.antonym[item]
+                                  : "Select POS"}
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveItem("antonyms", index)}
+                            className="btn btn-sm btn-error"
+                          >
+                            Remove
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -1659,6 +1937,24 @@ const UpdateWord = () => {
                     className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter similar words"
                   />
+                  {wordsNeedingPOSSelection
+                    .filter((w) => w.relationType === "similarWord")
+                    .map((w) => (
+                      <button
+                        key={w.uniqueKey}
+                        type="button"
+                        onClick={() => handlePOSSelection(w.word, "similarWord")}
+                        className={`mt-2 px-3 py-1 text-sm rounded ${
+                          posSelections[`${w.word}-similarWord`]
+                            ? "bg-green-500 text-white"
+                            : "bg-orange-500 text-white"
+                        }`}
+                      >
+                        {posSelections[`${w.word}-similarWord`]
+                          ? `✓ ${w.word} (${posSelections[`${w.word}-similarWord`].partOfSpeech.name})`
+                          : `Select POS for "${w.word}"`}
+                      </button>
+                    ))}
                   <div className="mt-2">
                     {formData.similarWords.map((item, index) => (
                       <div
@@ -1666,15 +1962,30 @@ const UpdateWord = () => {
                         className="flex items-center justify-between bg-slate-300 p-2 rounded-lg mb-2 shadow-sm"
                       >
                         <li>{item}</li>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleRemoveItem("similarWords", index)
-                          }
-                          className="btn btn-sm btn-error"
-                        >
-                          Remove
-                        </button>
+                        <div className="flex gap-2">
+                          {multiPOSExisting.similarWord.has(item) && (
+                            <button
+                              type="button"
+                              onClick={() => handleExistingPOSSelection(item, "similarWord")}
+                              className={`btn btn-sm ${relPOSOverrides.similarWord[item] ? "bg-green-500 text-white" : "bg-orange-400 text-white"}`}
+                            >
+                              {relPOSOverrides.similarWord[item]
+                                ? `✓ ${relPOSOverrides.similarWord[item].partOfSpeechName}`
+                                : currentRelationPOSNames.similarWord[item]
+                                  ? currentRelationPOSNames.similarWord[item]
+                                  : "Select POS"}
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleRemoveItem("similarWords", index)
+                            }
+                            className="btn btn-sm btn-error"
+                          >
+                            Remove
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>

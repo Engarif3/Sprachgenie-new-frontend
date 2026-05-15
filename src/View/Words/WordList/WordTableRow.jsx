@@ -346,7 +346,7 @@ const WordTableRow = ({
           {word.synonyms?.map((synonym, idx) => (
             <span
               key={idx}
-              onClick={() => openWordInModal(synonym.value)}
+              onClick={() => openWordInModal(synonym.value, synonym.id)}
               className="text-md px-3 py-1 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/50 rounded-full hover:from-blue-500/30 hover:to-cyan-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
             >
               {synonym.value}
@@ -361,7 +361,7 @@ const WordTableRow = ({
           {word.antonyms?.map((antonym, idx) => (
             <span
               key={idx}
-              onClick={() => openWordInModal(antonym.value)}
+              onClick={() => openWordInModal(antonym.value, antonym.id)}
               className="text-md  px-3 py-1 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 rounded-full hover:from-red-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
             >
               {antonym.value}
@@ -376,7 +376,7 @@ const WordTableRow = ({
           {word.similarWords?.map((similarword, idx) => (
             <span
               key={idx}
-              onClick={() => openWordInModal(similarword.value)}
+              onClick={() => openWordInModal(similarword.value, similarword.id)}
               className="text-md  px-3 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-full hover:from-purple-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
             >
               {similarword.value}

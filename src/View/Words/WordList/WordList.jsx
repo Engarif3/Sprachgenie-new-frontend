@@ -1048,7 +1048,27 @@ const WordList = () => {
   }, []);
 
   const openWordInModal = useCallback(
-    async (wordValue) => {
+    async (wordValue, wordId) => {
+      if (wordId) {
+        const exactIdMatch = paginatedWords.find((word) => word?.id === wordId);
+        if (exactIdMatch) {
+          openModal(exactIdMatch);
+          return;
+        }
+
+        try {
+          const response = await api.get(`/word/${wordId}`);
+          const fetchedWord = response.data?.data;
+          if (fetchedWord?.id) {
+            setSelectedWord(fetchedWord);
+            setIsModalOpen(true);
+            return;
+          }
+        } catch (error) {
+          console.error("Failed to fetch linked word by id:", error);
+        }
+      }
+
       const exactWordMatch = paginatedWords.find(
         (word) => word?.value === wordValue,
       );

@@ -191,3 +191,118 @@ export const validateSingleRelationField = async (words, fieldName) => {
     fieldLabels[fieldName] || "related words",
   );
 };
+
+/**
+ * Fetches word variants (multiple POS) for a word
+ * @param {string} wordValue - The word to check
+ * @returns {Promise<Array>} - Array of word variants or empty array
+ */
+export const fetchWordVariants = async (wordValue) => {
+  try {
+    const { data: response } = await api.get(
+      `/word/variants/${encodeURIComponent(wordValue)}`,
+    );
+    return response.data.variants || [];
+  } catch (error) {
+    console.error("Error fetching word variants:", error);
+    return [];
+  }
+};
+
+/**
+ * Shows POS selection popup for a word with multiple variants
+ * @param {string} wordValue - The word name
+ * @param {Array} variants - Array of word variants with POS info
+ * @param {number|null} currentVariantId - ID of the currently selected/linked variant to pre-check
+ * @returns {Promise<Object>} - Selected variant {id, partOfSpeech}
+ */
+export const showPOSSelectionPopup = async (wordValue, variants, currentVariantId = null) => {
+  if (!variants || variants.length <= 1) {
+    return variants?.[0] || null;
+  }
+
+  let selectedVariant = null;
+
+  await new Promise((resolve) => {
+    Swal.fire({
+      title: `Select part of speech for "${wordValue}"`,
+      html: `
+        <div style="text-align: left; margin-top: 10px;">
+          ${variants
+            .map(
+              (variant, index) => `
+            <div style="padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; transition: all 0.2s;"
+                 class="pos-selection-option" data-index="${index}"
+                 onmouseenter="this.style.backgroundColor='#f0f0f0'; this.style.borderColor='#999';"
+                 onmouseleave="this.style.backgroundColor='transparent'; this.style.borderColor='#ddd';">
+              <input type="radio" name="pos-option" value="${index}" style="margin-right: 8px;" ${variant.id === currentVariantId ? "checked" : ""}>
+              <strong>${variant.partOfSpeech.name}</strong>
+              ${variant.level ? ` (Level: ${variant.level.level})` : ""}
+            </div>
+          `,
+            )
+            .join("")}
+        </div>
+      `,
+      didOpen: () => {
+        document.querySelectorAll(".pos-selection-option").forEach((el) => {
+          el.addEventListener("click", () => {
+            const selectedIndex = parseInt(el.dataset.index);
+            selectedVariant = variants[selectedIndex];
+            Swal.close();
+            resolve();
+          });
+        });
+      },
+      allowOutsideClick: false,
+      showCancelButton: true,
+      confirmButtonText: "Select",
+      cancelButtonText: "Cancel",
+      didDestroy: () => {
+        resolve();
+      },
+    });
+  });
+
+  return selectedVariant;
+};
+
+/**
+ * Detects which relation words need POS selection
+ * Returns array of {word, relationType} that need selection
+ * @param {Object} relations - Object containing synonyms, antonyms, and similarWords arrays
+ * @returns {Promise<Array>} - Array of {word, relationType} that need POS selection
+ */
+export const detectWordsNeedingPOSSelection = async (relations) => {
+  const { synonyms = [], antonyms = [], similarWords = [] } = relations;
+
+  const relationTypes = [
+    { words: synonyms, type: "synonym" },
+    { words: antonyms, type: "antonym" },
+    { words: similarWords, type: "similarWord" },
+  ];
+
+  const wordsNeedingSelection = [];
+  const seen = new Set();
+
+  for (const { words, type } of relationTypes) {
+    for (const word of words) {
+      const key = `${word}-${type}`;
+      if (seen.has(key)) {
+        continue;
+      }
+      seen.add(key);
+
+      const variants = await fetchWordVariants(word);
+      if (variants.length > 1) {
+        wordsNeedingSelection.push({
+          word,
+          relationType: type,
+          variants,
+        });
+      }
+    }
+  }
+
+  return wordsNeedingSelection;
+};
