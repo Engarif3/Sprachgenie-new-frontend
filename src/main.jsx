@@ -7,6 +7,14 @@ import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "sonner";
 import Providers from "./lib/Providers/Providers";
 
+// When a new deployment changes chunk filenames, users with the old version
+// loaded will get a 404 on lazy-imported chunks. Reload automatically to
+// pick up the new build instead of showing a crash screen.
+window.addEventListener("vite:preloadError", (event) => {
+  event.preventDefault();
+  window.location.reload();
+});
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Providers>
