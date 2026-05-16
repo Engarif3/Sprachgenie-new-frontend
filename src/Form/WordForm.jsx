@@ -88,17 +88,20 @@ const WordForm = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const levelResponse = await api.get("/level/all");
-        const topicResponse = await api.get("/topic/all");
-        const articleResponse = await api.get("/articles");
-        const partOfSpeechResponse = await api.get("/part-of-speech");
+        const [levelResponse, topicResponse, articleResponse, partOfSpeechResponse] =
+          await Promise.all([
+            api.get("/level/all"),
+            api.get("/topic/all"),
+            api.get("/articles"),
+            api.get("/part-of-speech"),
+          ]);
 
         setLevels(levelResponse.data.data);
         setTopics(topicResponse.data.data);
         setArticles(articleResponse.data);
         setPartsOfSpeech(partOfSpeechResponse.data);
       } catch (error) {
-        console.error("Error fetching data:", error); // Log the error for debugging
+        console.error("Error fetching form data:", error);
       }
     };
 

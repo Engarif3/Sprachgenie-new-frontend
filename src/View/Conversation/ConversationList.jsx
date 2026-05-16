@@ -11,6 +11,7 @@ const ConversationsList = () => {
   const canAccess = userLoggedIn && userId && isAdmin;
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState("");
   const [editingConversation, setEditingConversation] = useState(null);
   const [formData, setFormData] = useState({});
   // Levels mapping
@@ -26,10 +27,12 @@ const ConversationsList = () => {
   const fetchConversations = async () => {
     try {
       setLoading(true);
+      setFetchError("");
       const response = await api.get("/conversation/all");
       setConversations(response.data.data);
     } catch (error) {
       console.error("Error fetching conversations:", error);
+      setFetchError("Failed to load conversations. Please refresh the page.");
     } finally {
       setLoading(false);
     }
@@ -182,6 +185,11 @@ const ConversationsList = () => {
       <h2 className="text-3xl font-bold font-mono text-white my-5 md:my-8 lg:my-8 text-center">
         Conversation Topics
       </h2>
+      {fetchError && (
+        <p className="text-center text-red-400 bg-red-900/30 border border-red-500/40 rounded-lg py-3 px-4 my-4">
+          {fetchError}
+        </p>
+      )}
       {loading ? (
         <p className="flex justify-center items-center  ">
           <span>
