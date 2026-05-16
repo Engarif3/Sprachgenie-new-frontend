@@ -220,9 +220,6 @@ const WordForm = () => {
           // Convert empty string to null for caseRequirement
           if (field === "caseRequirement") {
             newVerbAttrs[field] = value === "" ? null : value;
-            console.log("=== CASE REQUIREMENT CHANGE ===");
-            console.log("Selected value:", value);
-            console.log("Converted to:", newVerbAttrs[field]);
           } else {
             newVerbAttrs[field] = value;
           }
@@ -392,11 +389,6 @@ const WordForm = () => {
         verbAttributes[key] = wordData.verbAttributes[key];
       }
     });
-
-    // console.log("=== WORD FORM DEBUG ===");
-    // console.log("wordData.verbAttributes:", wordData.verbAttributes);
-    // console.log("defaults:", defaults);
-    // console.log("verbAttributes to send:", verbAttributes);
 
     // Only include verbAttributes if it has non-default values
     if (Object.keys(verbAttributes).length > 0) {
