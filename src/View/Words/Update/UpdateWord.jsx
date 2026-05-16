@@ -47,6 +47,8 @@ const DraggableItem = ({
   setEditValue,
   onAddAbove,
   onAddBelow,
+  isSelected,
+  onToggleSelect,
 }) => {
   const {
     attributes,
@@ -57,8 +59,6 @@ const DraggableItem = ({
     isDragging,
   } = useSortable({ id: id });
 
-  const [isSelected, setIsSelected] = useState(false);
-
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -68,20 +68,15 @@ const DraggableItem = ({
   const isEditing =
     editingField?.type === field && editingField?.index === index;
 
-  const handleItemClick = () => {
-    setIsSelected(!isSelected);
-  };
-
   return (
     <div
       ref={setNodeRef}
       style={style}
-      onClick={handleItemClick}
       className={`flex items-center justify-between p-3 rounded-lg mb-2 shadow-sm transition-all ${
         isDragging
           ? "shadow-lg scale-105 bg-blue-400"
           : isSelected
-            ? "bg-blue-300 shadow-md"
+            ? "bg-blue-200 shadow-md ring-2 ring-blue-400"
             : "bg-slate-300"
       }`}
     >
@@ -119,6 +114,13 @@ const DraggableItem = ({
         </div>
       ) : (
         <div className="flex items-center justify-between w-full gap-2">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={(e) => { e.stopPropagation(); onToggleSelect(index); }}
+            onClick={(e) => e.stopPropagation()}
+            className="h-4 w-4 flex-shrink-0 cursor-pointer rounded border-gray-500 accent-blue-600"
+          />
           <div
             className="flex-1 break-words font-medium cursor-grab active:cursor-grabbing touch-none"
             {...attributes}
@@ -365,6 +367,7 @@ const UpdateWord = () => {
   const [refetchTrigger, setRefetchTrigger] = useState(0);
   const [addingAt, setAddingAt] = useState(null); // { index: number, position: 'above' | 'below', field: string }
   const [newItemValue, setNewItemValue] = useState("");
+  const [selectedItems, setSelectedItems] = useState({ meaning: new Set(), sentences: new Set() });
   const [wordsNeedingPOSSelection, setWordsNeedingPOSSelection] = useState([]);
   const [posSelections, setPOSSelections] = useState({});
   // Tracks POS overrides for EXISTING relation items (not new typed ones)
@@ -696,6 +699,7 @@ const UpdateWord = () => {
       ...prev,
       [field]: updatedArray,
     }));
+    setSelectedItems((prev) => ({ ...prev, [field]: new Set() }));
 
     // Save to backend
     setLoading(true);
@@ -1078,6 +1082,7 @@ const UpdateWord = () => {
         ...prev,
         [field]: filteredArray,
       }));
+      setSelectedItems((prev) => ({ ...prev, [field]: new Set() }));
 
       try {
         // Send the updated data to the backend
@@ -1100,6 +1105,65 @@ const UpdateWord = () => {
         Swal.fire({
           title: "Error!",
           text: "Failed to update the backend. Please try again.",
+          icon: "error",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleToggleSelectItem = (field, index) => {
+    setSelectedItems((prev) => {
+      const newSet = new Set(prev[field]);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return { ...prev, [field]: newSet };
+    });
+  };
+
+  const handleRemoveSelected = async (field) => {
+    const indices = [...selectedItems[field]].sort((a, b) => b - a);
+    if (indices.length === 0) return;
+
+    const result = await Swal.fire({
+      title: `Remove ${indices.length} item${indices.length > 1 ? "s" : ""}?`,
+      text: "This action cannot be undone.",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+      confirmButtonText: `Remove ${indices.length}`,
+      reverseButtons: true,
+    });
+
+    if (result.isConfirmed) {
+      setLoading(true);
+      const updatedArray = [...formData[field]];
+      indices.forEach((idx) => updatedArray.splice(idx, 1));
+      const filteredArray = updatedArray.filter((item) => item.trim() !== "");
+
+      setFormData((prev) => ({ ...prev, [field]: filteredArray }));
+      setSelectedItems((prev) => ({ ...prev, [field]: new Set() }));
+
+      try {
+        await api.put(
+          `/word/update/${formData.id}`,
+          buildUpdatePayload(field, filteredArray),
+        );
+        Swal.fire({
+          title: "Removed!",
+          text: `${indices.length} item${indices.length > 1 ? "s" : ""} removed.`,
+          timer: 500,
+          showConfirmButton: false,
+          icon: "success",
+        });
+        setRefetchTrigger((prev) => prev + 1);
+      } catch {
+        Swal.fire({
+          title: "Error!",
+          text: "Failed to update. Please try again.",
           icon: "error",
         });
       } finally {
@@ -1137,6 +1201,7 @@ const UpdateWord = () => {
         ...prev,
         sentences: emptyArray,
       }));
+      setSelectedItems((prev) => ({ ...prev, sentences: new Set() }));
 
       try {
         // Send the updated data to the backend
@@ -1196,6 +1261,7 @@ const UpdateWord = () => {
         ...prev,
         meaning: emptyArray,
       }));
+      setSelectedItems((prev) => ({ ...prev, meaning: new Set() }));
 
       try {
         // Send the updated data to the backend
@@ -1718,16 +1784,28 @@ const UpdateWord = () => {
                       <span className="font-medium text-lg"> Meaning</span> (for
                       multiple input use comma)
                     </label>
-                    {formData.meaning.length > 0 && (
-                      <button
-                        type="button"
-                        onClick={handleClearAllMeanings}
-                        disabled={loading}
-                        className="btn btn-error btn-sm"
-                      >
-                        Clear All
-                      </button>
-                    )}
+                    <div className="flex gap-2">
+                      {selectedItems.meaning.size > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveSelected("meaning")}
+                          disabled={loading}
+                          className="btn btn-warning btn-sm"
+                        >
+                          Delete Selected ({selectedItems.meaning.size})
+                        </button>
+                      )}
+                      {formData.meaning.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={handleClearAllMeanings}
+                          disabled={loading}
+                          className="btn btn-error btn-sm"
+                        >
+                          Clear All
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <input
                     id="update-meaning-input"
@@ -1830,6 +1908,8 @@ const UpdateWord = () => {
                                   position: "below",
                                 })
                               }
+                              isSelected={selectedItems.meaning.has(index)}
+                              onToggleSelect={(idx) => handleToggleSelectItem("meaning", idx)}
                             />
                             {addingAt?.field === "meaning" &&
                               addingAt?.position === "below" &&
@@ -1897,16 +1977,28 @@ const UpdateWord = () => {
                       (for multiple input use "|". eg. sentence A. | Sentence
                       B.)
                     </label>
-                    {formData.sentences.length > 0 && (
-                      <button
-                        type="button"
-                        onClick={handleClearAllSentences}
-                        disabled={loading}
-                        className="btn btn-error btn-sm"
-                      >
-                        Clear All
-                      </button>
-                    )}
+                    <div className="flex gap-2">
+                      {selectedItems.sentences.size > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveSelected("sentences")}
+                          disabled={loading}
+                          className="btn btn-warning btn-sm"
+                        >
+                          Delete Selected ({selectedItems.sentences.size})
+                        </button>
+                      )}
+                      {formData.sentences.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={handleClearAllSentences}
+                          disabled={loading}
+                          className="btn btn-error btn-sm"
+                        >
+                          Clear All
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <input
                     id="update-sentences-input"
@@ -2009,6 +2101,8 @@ const UpdateWord = () => {
                                   position: "below",
                                 })
                               }
+                              isSelected={selectedItems.sentences.has(index)}
+                              onToggleSelect={(idx) => handleToggleSelectItem("sentences", idx)}
                             />
                             {addingAt?.field === "sentences" &&
                               addingAt?.position === "below" &&
