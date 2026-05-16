@@ -7,13 +7,24 @@ class ErrorBoundary extends React.Component {
   }
 
   static getDerivedStateFromError(error) {
+    // Chunk load errors happen when a new deployment changes filenames and the
+    // user still has the old version loaded. Reload silently to get the new build.
+    const isChunkError =
+      error?.name === "ChunkLoadError" ||
+      /loading chunk \d+ failed/i.test(error?.message) ||
+      /failed to fetch dynamically imported module/i.test(error?.message) ||
+      /importing a module script failed/i.test(error?.message);
+
+    if (isChunkError) {
+      window.location.reload();
+      return { hasError: false, error: null };
+    }
+
     return { hasError: true, error };
   }
 
   componentDidCatch(error, errorInfo) {
-    // Log error for monitoring (in production, send to error tracking service)
     console.error("ErrorBoundary caught an error:", error, errorInfo);
-    // Example: Sentry.captureException(error, { extra: errorInfo });
   }
 
   handleReset = () => {
