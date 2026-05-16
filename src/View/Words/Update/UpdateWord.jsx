@@ -1241,6 +1241,18 @@ const UpdateWord = () => {
       inputData.similarWords,
     );
 
+    // Collect specific variant IDs for multi-POS overridden relations so the
+    // backend connects the exact variant instead of guessing by word value.
+    const synonymIds = Object.values(relPOSOverrides.synonym).map((info) =>
+      Number(info.variantId),
+    );
+    const antonymIds = Object.values(relPOSOverrides.antonym).map((info) =>
+      Number(info.variantId),
+    );
+    const similarWordIds = Object.values(relPOSOverrides.similarWord).map(
+      (info) => Number(info.variantId),
+    );
+
     const dataToSend = {
       ...formData,
 
@@ -1250,13 +1262,16 @@ const UpdateWord = () => {
       sentences: formData.sentences.concat(
         normalizeSentenceItems(inputData.sentences),
       ),
-      // Exclude items whose POS has been overridden — they're re-added after the
-      // update via /word/relation/add so the correct variant ID is linked.
+      // Exclude overridden words from value-based processing — their specific
+      // variant IDs are sent separately via synonymIds/antonymIds/similarWordIds.
       synonyms: formData.synonyms.filter((s) => !relPOSOverrides.synonym[s]),
       antonyms: formData.antonyms.filter((s) => !relPOSOverrides.antonym[s]),
       similarWords: formData.similarWords.filter(
         (s) => !relPOSOverrides.similarWord[s],
       ),
+      ...(synonymIds.length > 0 && { synonymIds }),
+      ...(antonymIds.length > 0 && { antonymIds }),
+      ...(similarWordIds.length > 0 && { similarWordIds }),
     };
 
     // Filter verbAttributes to only include non-default values
@@ -1553,29 +1568,6 @@ const UpdateWord = () => {
           await addRelation(antonym, "antonym");
         for (const similarWord of newSimilarWords)
           await addRelation(similarWord, "similarWord");
-
-        // Re-add existing relations whose POS was overridden by the user
-        for (const [, info] of Object.entries(relPOSOverrides.synonym)) {
-          await api.post("/word/relation/add", {
-            wordId: formData.id,
-            relatedWordId: info.variantId,
-            relationType: "synonym",
-          });
-        }
-        for (const [, info] of Object.entries(relPOSOverrides.antonym)) {
-          await api.post("/word/relation/add", {
-            wordId: formData.id,
-            relatedWordId: info.variantId,
-            relationType: "antonym",
-          });
-        }
-        for (const [, info] of Object.entries(relPOSOverrides.similarWord)) {
-          await api.post("/word/relation/add", {
-            wordId: formData.id,
-            relatedWordId: info.variantId,
-            relationType: "similarWord",
-          });
-        }
 
         setInputData({
           meaning: "",
