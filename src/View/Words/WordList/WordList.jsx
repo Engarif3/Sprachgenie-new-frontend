@@ -1057,7 +1057,7 @@ const WordList = () => {
         }
 
         try {
-          const response = await api.get(`/word/${wordId}`);
+          const response = await api.get(`/word/${wordId}?_t=${Date.now()}`);
           const fetchedWord = response.data?.data;
           if (fetchedWord?.id) {
             setSelectedWord(fetchedWord);
@@ -1080,7 +1080,7 @@ const WordList = () => {
 
       try {
         const response = await api.get(
-          `/word/${encodeURIComponent(wordValue)}`,
+          `/word/${encodeURIComponent(wordValue)}?_t=${Date.now()}`,
         );
         const fetchedWord = response.data?.data;
 
