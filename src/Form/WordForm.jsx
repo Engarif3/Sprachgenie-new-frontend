@@ -45,58 +45,6 @@ const getSelfReferenceMessage = (value, relations) => {
   return `The word cannot reference itself as a ${invalidLabels.join(", ")}.`;
 };
 
-const handleShowPOSSelectionPopup = async (wordValue) => {
-  try {
-    const { data: response } = await api.get(
-      `/word/variants/${encodeURIComponent(wordValue)}`,
-    );
-
-    if (!response.data.variants || response.data.variants.length <= 1) {
-      return response.data.variants?.[0] || null;
-    }
-
-    return new Promise((resolve) => {
-      Swal.fire({
-        title: `Multiple meanings found for "${wordValue}"`,
-        html: `
-          <div style="text-align: left; margin-top: 10px;">
-            ${response.data.variants
-              .map(
-                (variant) => `
-              <div style="padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; transition: all 0.2s;"
-                   class="pos-option" data-id="${variant.id}"
-                   onmouseenter="this.style.backgroundColor='#f0f0f0'; this.style.borderColor='#999';"
-                   onmouseleave="this.style.backgroundColor='transparent'; this.style.borderColor='#ddd';">
-                <strong>${variant.partOfSpeech.name}</strong>
-                ${variant.level ? ` (Level: ${variant.level.level})` : ""}
-              </div>
-            `,
-              )
-              .join("")}
-          </div>
-        `,
-        didOpen: () => {
-          document.querySelectorAll(".pos-option").forEach((el) => {
-            el.addEventListener("click", () => {
-              const selectedId = parseInt(el.dataset.id);
-              const selectedVariant = response.data.variants.find(
-                (v) => v.id === selectedId,
-              );
-              Swal.close();
-              resolve(selectedVariant);
-            });
-          });
-        },
-        showCancelButton: true,
-        confirmButtonText: "Select",
-        allowOutsideClick: false,
-      });
-    });
-  } catch (error) {
-    console.error("Error fetching word variants:", error);
-    return null;
-  }
-};
 
 const WordForm = () => {
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
@@ -160,28 +108,54 @@ const WordForm = () => {
   // Handle POS selection for a specific relation word
   const handlePOSSelection = async (word, relationType) => {
     const variants = await fetchWordVariants(word);
+    if (variants.length === 0) return;
 
-    if (variants.length <= 1) {
-      // Only one variant, store it directly
-      setPOSSelections((prev) => ({
-        ...prev,
-        [`${word}-${relationType}`]: variants[0],
-      }));
+    let selected;
+    if (variants.length === 1) {
+      selected = variants[0];
+    } else {
+      // Disable the variant that has the same POS as the word being created
+      // (only relevant when the relation word has the same value as the new word)
+      let disabledVariantId = null;
+      if (
+        normalizeWordValue(word) === normalizeWordValue(wordData.value) &&
+        wordData.partOfSpeechId
+      ) {
+        const samePOSVariant = variants.find(
+          (v) => Number(v.partOfSpeechId) === parseInt(wordData.partOfSpeechId),
+        );
+        if (samePOSVariant) disabledVariantId = samePOSVariant.id;
+      }
+
+      selected = await showPOSSelectionPopup(
+        `${word} (${relationType})`,
+        variants,
+        null,
+        disabledVariantId,
+      );
+      if (!selected) return;
+    }
+
+    // Safety check: block same-value + same-POS (true self-reference)
+    if (
+      normalizeWordValue(word) === normalizeWordValue(wordData.value) &&
+      wordData.partOfSpeechId &&
+      Number(selected.partOfSpeechId) === parseInt(wordData.partOfSpeechId)
+    ) {
+      Swal.fire({
+        title: "Invalid relation",
+        text: `A word cannot reference itself as a ${relationType}.`,
+        icon: "warning",
+        timer: 2200,
+        showConfirmButton: false,
+      });
       return;
     }
 
-    // Show popup for user to select
-    const selected = await showPOSSelectionPopup(
-      `${word} (${relationType})`,
-      variants,
-    );
-
-    if (selected) {
-      setPOSSelections((prev) => ({
-        ...prev,
-        [`${word}-${relationType}`]: selected,
-      }));
-    }
+    setPOSSelections((prev) => ({
+      ...prev,
+      [`${word}-${relationType}`]: selected,
+    }));
   };
 
   // Check for words needing POS selection when relations change
@@ -282,10 +256,22 @@ const WordForm = () => {
         };
       });
     } else {
-      setWordData((prevData) => ({
-        ...prevData,
-        [name]: type === "checkbox" ? checked : value,
-      }));
+      setWordData((prevData) => {
+        const updated = {
+          ...prevData,
+          [name]: type === "checkbox" ? checked : value,
+        };
+        // Reset article when POS changes to something other than noun
+        if (name === "partOfSpeechId") {
+          const newPOS = partsOfSpeech.find(
+            (p) => p.id === parseInt(value),
+          );
+          if (!newPOS || newPOS.name.toLowerCase() !== "noun") {
+            updated.articleId = "";
+          }
+        }
+        return updated;
+      });
     }
   };
 
@@ -464,9 +450,25 @@ const WordForm = () => {
 
     newWordData.createdBy = userId;
 
+    // Skip multi-POS words from the value-level self-reference check — their
+    // POS is validated individually in addRelation via partOfSpeechId comparison.
+    const multiPOSValues = new Set(
+      wordsNeedingPOSSelection.map((w) => normalizeWordValue(w.word)),
+    );
+    const relationsForSelfRefCheck = {
+      synonyms: newWordData.synonyms.filter(
+        (v) => !multiPOSValues.has(normalizeWordValue(v)),
+      ),
+      antonyms: newWordData.antonyms.filter(
+        (v) => !multiPOSValues.has(normalizeWordValue(v)),
+      ),
+      similarWords: newWordData.similarWords.filter(
+        (v) => !multiPOSValues.has(normalizeWordValue(v)),
+      ),
+    };
     const selfReferenceMessage = getSelfReferenceMessage(
       newWordData.value,
-      newWordData,
+      relationsForSelfRefCheck,
     );
 
     if (selfReferenceMessage) {
@@ -522,14 +524,12 @@ const WordForm = () => {
             Swal.fire({
               title: `Select part of speech for "${ambiguous.value}"`,
               html: `
-                <div style="text-align: left; margin-top: 10px;">
+                <div class="text-left mt-2.5">
                   ${ambiguous.variants
                     .map(
                       (variant) => `
-                    <div style="padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; transition: all 0.2s;"
-                         class="ambiguous-pos-option" data-id="${variant.id}" data-word="${ambiguous.value}"
-                         onmouseenter="this.style.backgroundColor='#f0f0f0'; this.style.borderColor='#999';"
-                         onmouseleave="this.style.backgroundColor='transparent'; this.style.borderColor='#ddd';">
+                    <div class="ambiguous-pos-option p-3 my-2 border border-gray-300 rounded cursor-pointer transition-all duration-200 hover:bg-gray-100 hover:border-gray-400"
+                         data-id="${variant.id}" data-word="${ambiguous.value}">
                       <strong>${variant.partOfSpeechName || "Unknown"}</strong>
                     </div>
                   `,
@@ -592,18 +592,76 @@ const WordForm = () => {
         const createdWordId = createResponse.data.data.id;
 
         const addRelation = async (relatedWordValue, relationType) => {
-          // Use pre-selected variant from POS selection buttons
-          const selectedVariant =
-            posSelections[`${relatedWordValue}-${relationType}`] ||
-            (await handleShowPOSSelectionPopup(relatedWordValue));
+          let selectedVariant =
+            posSelections[`${relatedWordValue}-${relationType}`];
 
-          if (selectedVariant && selectedVariant.id) {
-            await api.post("/word/relation/add", {
-              wordId: createdWordId,
-              relatedWordId: selectedVariant.id,
-              relationType,
-            });
+          if (!selectedVariant) {
+            // Fallback for words that bypassed the POS selection buttons
+            const variants = await fetchWordVariants(relatedWordValue);
+            if (!variants || variants.length === 0) return;
+
+            if (variants.length === 1) {
+              selectedVariant = variants[0];
+            } else {
+              let disabledVariantId = null;
+              if (
+                normalizeWordValue(relatedWordValue) ===
+                  normalizeWordValue(wordData.value) &&
+                wordData.partOfSpeechId
+              ) {
+                const same = variants.find(
+                  (v) =>
+                    Number(v.partOfSpeechId) ===
+                    parseInt(wordData.partOfSpeechId),
+                );
+                if (same) disabledVariantId = same.id;
+              }
+              selectedVariant = await showPOSSelectionPopup(
+                `${relatedWordValue} (${relationType})`,
+                variants,
+                null,
+                disabledVariantId,
+              );
+            }
           }
+
+          if (!selectedVariant?.id) return;
+
+          // Block if the selected variant is the newly-created word itself
+          if (Number(selectedVariant.id) === Number(createdWordId)) {
+            await Swal.fire({
+              title: "Invalid relation",
+              text: `A word cannot reference itself as a ${relationType}.`,
+              icon: "warning",
+              timer: 2200,
+              showConfirmButton: false,
+            });
+            return;
+          }
+
+          // Block same-value + same-POS as the new word
+          if (
+            normalizeWordValue(relatedWordValue) ===
+              normalizeWordValue(wordData.value) &&
+            wordData.partOfSpeechId &&
+            Number(selectedVariant.partOfSpeechId) ===
+              parseInt(wordData.partOfSpeechId)
+          ) {
+            await Swal.fire({
+              title: "Invalid relation",
+              text: `A word cannot reference itself as a ${relationType}.`,
+              icon: "warning",
+              timer: 2200,
+              showConfirmButton: false,
+            });
+            return;
+          }
+
+          await api.post("/word/relation/add", {
+            wordId: createdWordId,
+            relatedWordId: selectedVariant.id,
+            relationType,
+          });
         };
 
         if (newWordData.synonyms.length > 0) {
@@ -669,6 +727,11 @@ const WordForm = () => {
     return <Navigate to="/" replace />;
   }
 
+  const isNounSelected =
+    partsOfSpeech
+      .find((p) => p.id === parseInt(wordData.partOfSpeechId))
+      ?.name?.toLowerCase() === "noun";
+
   return (
     <div className="w-full  p-0 md:p-6  lg:p-6 mt-4">
       <h2 className="text-2xl font-semibold text-white mb-6 text-center">
@@ -732,37 +795,6 @@ const WordForm = () => {
                   onChange={handleChange}
                   className=" input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
                 />
-              </div>
-
-              {/* Article Dropdown */}
-              <div>
-                <label
-                  htmlFor="articleId"
-                  className="block text-sm font-medium text-white"
-                >
-                  Article
-                </label>
-                <select
-                  id="articleId"
-                  name="articleId"
-                  value={wordData.articleId}
-                  onChange={handleChange}
-                  className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 "
-                >
-                  <option value="">Select Article</option>
-                  {articles && articles.length > 0 ? (
-                    articles.map((article) => (
-                      <option key={article.id} value={article.id}>
-                        {/* {article.name} */}
-                        {article.name.trim() === ""
-                          ? "No Article"
-                          : article.name}
-                      </option>
-                    ))
-                  ) : (
-                    <option disabled>No articles available</option>
-                  )}
-                </select>
               </div>
 
               {/* Plural Form Input */}
@@ -839,6 +871,42 @@ const WordForm = () => {
                     ))
                   ) : (
                     <option disabled>No parts of speech available</option>
+                  )}
+                </select>
+              </div>
+
+              {/* Article Dropdown — only relevant for nouns */}
+              <div>
+                <label
+                  htmlFor="articleId"
+                  className="block text-sm font-medium text-white"
+                >
+                  Article
+                  {!isNounSelected && (
+                    <span className="ml-2 text-xs text-gray-400">
+                      (only for nouns)
+                    </span>
+                  )}
+                </label>
+                <select
+                  id="articleId"
+                  name="articleId"
+                  value={wordData.articleId}
+                  onChange={handleChange}
+                  disabled={!isNounSelected}
+                  className={`input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 ${!isNounSelected ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  <option value="">Select Article</option>
+                  {articles && articles.length > 0 ? (
+                    articles.map((article) => (
+                      <option key={article.id} value={article.id}>
+                        {article.name.trim() === ""
+                          ? "No Article"
+                          : article.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>No articles available</option>
                   )}
                 </select>
               </div>

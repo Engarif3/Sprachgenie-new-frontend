@@ -88,16 +88,16 @@ export const showNonExistentWordConfirmation = async (
   const result = await Swal.fire({
     title: "Words Not Found",
     html: `
-      <div style="text-align: left;">
+      <div class="text-left">
         <p>The following ${fieldLabel} do not exist in the database:</p>
-        <p style="margin: 10px 0; color: #dc2626;">${wordsList}</p>
-        <p style="margin-top: 15px;">If you proceed, these words will be created automatically with default values:</p>
-        <ul style="text-align: left; margin: 10px 0 10px 20px; color: #666;">
+        <p class="my-2.5 text-red-600">${wordsList}</p>
+        <p class="mt-4">If you proceed, these words will be created automatically with default values:</p>
+        <ul class="text-left mt-2.5 ml-5 text-gray-500 list-disc">
           <li>Level: <strong>${DEFAULT_WORD_VALUES.LEVEL_NAME}</strong></li>
           <li>Topic: <strong>${DEFAULT_WORD_VALUES.TOPIC_NAME}</strong></li>
           <li>Part of Speech: <strong>${DEFAULT_WORD_VALUES.PART_OF_SPEECH_NAME}</strong></li>
         </ul>
-        <p style="margin-top: 15px; font-weight: bold;">Do you want to proceed?</p>
+        <p class="mt-4 font-bold">Do you want to proceed?</p>
       </div>
     `,
     icon: "warning",
@@ -216,7 +216,12 @@ export const fetchWordVariants = async (wordValue) => {
  * @param {number|null} currentVariantId - ID of the currently selected/linked variant to pre-check
  * @returns {Promise<Object>} - Selected variant {id, partOfSpeech}
  */
-export const showPOSSelectionPopup = async (wordValue, variants, currentVariantId = null) => {
+export const showPOSSelectionPopup = async (
+  wordValue,
+  variants,
+  currentVariantId = null,
+  disabledVariantId = null,
+) => {
   if (!variants || variants.length <= 1) {
     return variants?.[0] || null;
   }
@@ -227,26 +232,31 @@ export const showPOSSelectionPopup = async (wordValue, variants, currentVariantI
     Swal.fire({
       title: `Select part of speech for "${wordValue}"`,
       html: `
-        <div style="text-align: left; margin-top: 10px;">
+        <div class="text-left mt-2.5">
           ${variants
-            .map(
-              (variant, index) => `
-            <div style="padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; transition: all 0.2s;"
-                 class="pos-selection-option" data-index="${index}"
-                 onmouseenter="this.style.backgroundColor='#f0f0f0'; this.style.borderColor='#999';"
-                 onmouseleave="this.style.backgroundColor='transparent'; this.style.borderColor='#ddd';">
-              <input type="radio" name="pos-option" value="${index}" style="margin-right: 8px;" ${variant.id === currentVariantId ? "checked" : ""}>
+            .map((variant, index) => {
+              const isDisabled =
+                disabledVariantId !== null &&
+                Number(variant.id) === Number(disabledVariantId);
+              return `
+            <div class="pos-selection-option p-3 my-2 border rounded transition-all duration-200 ${isDisabled ? "border-gray-200 cursor-not-allowed bg-gray-300" : "border-gray-300 cursor-pointer hover:bg-green-400 hover:border-gray-400"}"
+                 data-index="${index}" data-disabled="${isDisabled}">
+              <input type="radio" name="pos-option" value="${index}" class="mr-2"
+                     ${variant.id === currentVariantId ? "checked" : ""}
+                     ${isDisabled ? "disabled" : ""}>
               <strong>${variant.partOfSpeech.name}</strong>
+              ${isDisabled ? ' <span class="text-orange-500 font-semibold text-sm ml-1">(same word)</span>' : ""}
               ${variant.level ? ` (Level: ${variant.level.level})` : ""}
             </div>
-          `,
-            )
+          `;
+            })
             .join("")}
         </div>
       `,
       didOpen: () => {
         document.querySelectorAll(".pos-selection-option").forEach((el) => {
           el.addEventListener("click", () => {
+            if (el.dataset.disabled === "true") return;
             const selectedIndex = parseInt(el.dataset.index);
             selectedVariant = variants[selectedIndex];
             Swal.close();

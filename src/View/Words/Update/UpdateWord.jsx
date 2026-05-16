@@ -415,32 +415,116 @@ const UpdateWord = () => {
     }),
   );
 
-  // Handle POS selection for a specific relation word
+  // Handle POS selection for a new relation word — auto-saves immediately.
   const handlePOSSelection = async (word, relationType) => {
     const variants = await fetchWordVariants(word);
+    if (variants.length === 0) return;
 
-    if (variants.length <= 1) {
-      setPOSSelections((prev) => ({
-        ...prev,
-        [`${word}-${relationType}`]: variants[0],
-      }));
+    let selected;
+    if (variants.length === 1) {
+      selected = variants[0];
+    } else {
+      selected = await showPOSSelectionPopup(
+        `${word} (${relationType})`,
+        variants,
+        null,
+        Number(formData.id),
+      );
+      if (!selected) return;
+    }
+
+    if (Number(selected.id) === Number(formData.id)) {
+      await showSelfReferenceAlert(
+        `A word cannot reference itself as a ${relationType}.`,
+      );
       return;
     }
 
-    const selected = await showPOSSelectionPopup(
-      `${word} (${relationType})`,
-      variants,
-    );
+    const relTypeToField = {
+      synonym: "synonyms",
+      antonym: "antonyms",
+      similarWord: "similarWords",
+    };
+    const fieldName = relTypeToField[relationType];
 
-    if (selected) {
+    try {
+      await api.post("/word/relation/add", {
+        wordId: formData.id,
+        relatedWordId: selected.id,
+        relationType,
+      });
+
+      // Remove from inputData so it won't be re-processed on submit
+      setInputData((prev) => {
+        const items = normalizeFieldItems(fieldName, prev[fieldName]);
+        const filtered = items.filter(
+          (w) => normalizeWordValue(w) !== normalizeWordValue(word),
+        );
+        return { ...prev, [fieldName]: filtered.join(", ") };
+      });
+
+      // Move to formData as a saved relation
+      setFormData((prev) => ({
+        ...prev,
+        [fieldName]: [...prev[fieldName], word],
+      }));
+
+      // Track the linked variant ID
+      setCurrentRelationIds((prev) => ({
+        ...prev,
+        [relationType]: { ...prev[relationType], [word]: selected.id },
+      }));
+
+      // For multi-POS words, show the POS button on the saved relation chip
+      if (variants.length > 1) {
+        setMultiPOSExisting((prev) => ({
+          ...prev,
+          [relationType]: new Set([...prev[relationType], word]),
+        }));
+        setCurrentRelationPOSNames((prev) => ({
+          ...prev,
+          [relationType]: {
+            ...prev[relationType],
+            [word]: selected.partOfSpeech.name,
+          },
+        }));
+      }
+
+      // Store in relPOSOverrides so the main submit strips it from the PUT body
+      // and re-adds it via /word/relation/add with the correct variant ID.
+      setRelPOSOverrides((prev) => ({
+        ...prev,
+        [relationType]: {
+          ...prev[relationType],
+          [word]: {
+            variantId: selected.id,
+            partOfSpeechName: selected.partOfSpeech.name,
+          },
+        },
+      }));
+
       setPOSSelections((prev) => ({
         ...prev,
         [`${word}-${relationType}`]: selected,
       }));
+
+      Swal.fire({
+        title: "Added!",
+        text: `"${word}" added as ${relationType} (${selected.partOfSpeech.name}).`,
+        timer: 800,
+        showConfirmButton: false,
+        icon: "success",
+      });
+    } catch {
+      Swal.fire({
+        title: "Error",
+        text: "Failed to add relation. Please try again.",
+        icon: "error",
+      });
     }
   };
 
-  // Handle POS selection for existing relation items already saved to the word
+  // Handle POS selection for existing relation items — saves immediately, no Submit needed.
   const handleExistingPOSSelection = async (wordValue, relationType) => {
     const variants = await fetchWordVariants(wordValue);
     if (variants.length === 0) return;
@@ -452,17 +536,85 @@ const UpdateWord = () => {
       const currentVariantId =
         relPOSOverrides[relationType]?.[wordValue]?.variantId ??
         currentRelationIds[relationType]?.[wordValue];
-      selected = await showPOSSelectionPopup(`${wordValue} (${relationType})`, variants, currentVariantId);
+      selected = await showPOSSelectionPopup(
+        `${wordValue} (${relationType})`,
+        variants,
+        currentVariantId,
+        Number(formData.id),
+      );
     }
 
-    if (selected) {
+    if (!selected) return;
+
+    // Self-reference check before any API call
+    if (Number(selected.id) === Number(formData.id)) {
+      await showSelfReferenceAlert(
+        `A word cannot reference itself as a ${relationType}.`,
+      );
+      return;
+    }
+
+    const oldVariantId =
+      relPOSOverrides[relationType]?.[wordValue]?.variantId ??
+      currentRelationIds[relationType]?.[wordValue];
+
+    // No change
+    if (oldVariantId && Number(oldVariantId) === Number(selected.id)) return;
+
+    try {
+      // Remove old link, then add new link
+      if (oldVariantId) {
+        await api.delete("/word/relation/remove", {
+          data: {
+            wordId: formData.id,
+            relatedWordId: oldVariantId,
+            relationType,
+          },
+        });
+      }
+      await api.post("/word/relation/add", {
+        wordId: formData.id,
+        relatedWordId: selected.id,
+        relationType,
+      });
+
+      // Update tracking state so the button reflects the new POS immediately
+      setCurrentRelationIds((prev) => ({
+        ...prev,
+        [relationType]: { ...prev[relationType], [wordValue]: selected.id },
+      }));
+      setCurrentRelationPOSNames((prev) => ({
+        ...prev,
+        [relationType]: {
+          ...prev[relationType],
+          [wordValue]: selected.partOfSpeech.name,
+        },
+      }));
+      // Keep relPOSOverrides in sync so main submit also uses the correct variant
       setRelPOSOverrides((prev) => ({
         ...prev,
         [relationType]: {
           ...prev[relationType],
-          [wordValue]: { variantId: selected.id, partOfSpeechName: selected.partOfSpeech.name },
+          [wordValue]: {
+            variantId: selected.id,
+            partOfSpeechName: selected.partOfSpeech.name,
+          },
         },
       }));
+
+      Swal.fire({
+        title: "Updated!",
+        text: `Part of speech changed to "${selected.partOfSpeech.name}".`,
+        timer: 800,
+        showConfirmButton: false,
+        icon: "success",
+      });
+    } catch {
+      Swal.fire({
+        title: "Error",
+        text: "Failed to update part of speech. Please try again.",
+        icon: "error",
+      });
     }
   };
 
@@ -472,12 +624,14 @@ const UpdateWord = () => {
       const newRelationWords = {
         synonyms: normalizeFieldItems("synonyms", inputData.synonyms),
         antonyms: normalizeFieldItems("antonyms", inputData.antonyms),
-        similarWords: normalizeFieldItems("similarWords", inputData.similarWords),
+        similarWords: normalizeFieldItems(
+          "similarWords",
+          inputData.similarWords,
+        ),
       };
 
-      const wordsNeeding = await detectWordsNeedingPOSSelection(
-        newRelationWords,
-      );
+      const wordsNeeding =
+        await detectWordsNeedingPOSSelection(newRelationWords);
       const wordsWithIndex = wordsNeeding.map((w, idx) => ({
         ...w,
         uniqueKey: `${w.word}-${w.relationType}-${idx}`,
@@ -487,6 +641,18 @@ const UpdateWord = () => {
 
     checkRelations();
   }, [inputData.synonyms, inputData.antonyms, inputData.similarWords]);
+
+  // Build PUT payload — omit relation arrays when the field being updated is not a
+  // relation field so the backend skips re-processing all relation DB writes.
+  const buildUpdatePayload = (field, overrideValue) => {
+    const payload = { ...formData, [field]: overrideValue };
+    if (!RELATION_FIELDS.includes(field)) {
+      delete payload.synonyms;
+      delete payload.antonyms;
+      delete payload.similarWords;
+    }
+    return payload;
+  };
 
   // Handle drag end
   const handleDragEnd = async (event) => {
@@ -534,10 +700,10 @@ const UpdateWord = () => {
     // Save to backend
     setLoading(true);
     try {
-      await api.put(`/word/update/${formData.id}`, {
-        ...formData,
-        [field]: updatedArray,
-      });
+      await api.put(
+        `/word/update/${formData.id}`,
+        buildUpdatePayload(field, updatedArray),
+      );
 
       Swal.fire({
         title: "Reordered!",
@@ -602,10 +768,10 @@ const UpdateWord = () => {
     // Save to backend
     setLoading(true);
     try {
-      await api.put(`/word/update/${formData.id}`, {
-        ...formData,
-        [field]: updatedArray,
-      });
+      await api.put(
+        `/word/update/${formData.id}`,
+        buildUpdatePayload(field, updatedArray),
+      );
 
       Swal.fire({
         title: "Added!",
@@ -700,9 +866,15 @@ const UpdateWord = () => {
         });
 
         wordCurrentIds = {
-          synonym: Object.fromEntries((word.synonyms || []).map((s) => [s.value, s.id])),
-          antonym: Object.fromEntries((word.antonyms || []).map((s) => [s.value, s.id])),
-          similarWord: Object.fromEntries((word.similarWords || []).map((s) => [s.value, s.id])),
+          synonym: Object.fromEntries(
+            (word.synonyms || []).map((s) => [s.value, s.id]),
+          ),
+          antonym: Object.fromEntries(
+            (word.antonyms || []).map((s) => [s.value, s.id]),
+          ),
+          similarWord: Object.fromEntries(
+            (word.similarWords || []).map((s) => [s.value, s.id]),
+          ),
         };
         setCurrentRelationIds(wordCurrentIds);
 
@@ -724,11 +896,24 @@ const UpdateWord = () => {
           antonyms: (wordData.antonyms || []).map((s) => s.value),
           similarWords: (wordData.similarWords || []).map((s) => s.value),
         };
-        const multiPOSWords = await detectWordsNeedingPOSSelection(existingRelations);
+        const multiPOSWords =
+          await detectWordsNeedingPOSSelection(existingRelations);
         setMultiPOSExisting({
-          synonym: new Set(multiPOSWords.filter((w) => w.relationType === "synonym").map((w) => w.word)),
-          antonym: new Set(multiPOSWords.filter((w) => w.relationType === "antonym").map((w) => w.word)),
-          similarWord: new Set(multiPOSWords.filter((w) => w.relationType === "similarWord").map((w) => w.word)),
+          synonym: new Set(
+            multiPOSWords
+              .filter((w) => w.relationType === "synonym")
+              .map((w) => w.word),
+          ),
+          antonym: new Set(
+            multiPOSWords
+              .filter((w) => w.relationType === "antonym")
+              .map((w) => w.word),
+          ),
+          similarWord: new Set(
+            multiPOSWords
+              .filter((w) => w.relationType === "similarWord")
+              .map((w) => w.word),
+          ),
         });
 
         const posNames = { synonym: {}, antonym: {}, similarWord: {} };
@@ -739,7 +924,10 @@ const UpdateWord = () => {
         }
         setCurrentRelationPOSNames(posNames);
       } catch (posError) {
-        console.error("Error detecting multi-POS existing relations:", posError);
+        console.error(
+          "Error detecting multi-POS existing relations:",
+          posError,
+        );
       }
     };
 
@@ -893,10 +1081,10 @@ const UpdateWord = () => {
 
       try {
         // Send the updated data to the backend
-        await api.put(`/word/update/${formData.id}`, {
-          ...formData,
-          [field]: filteredArray, // Send the updated list to the backend
-        });
+        await api.put(
+          `/word/update/${formData.id}`,
+          buildUpdatePayload(field, filteredArray),
+        );
 
         Swal.fire({
           title: "Removed!",
@@ -952,10 +1140,10 @@ const UpdateWord = () => {
 
       try {
         // Send the updated data to the backend
-        await api.put(`/word/update/${formData.id}`, {
-          ...formData,
-          sentences: emptyArray,
-        });
+        await api.put(
+          `/word/update/${formData.id}`,
+          buildUpdatePayload("sentences", emptyArray),
+        );
 
         Swal.fire({
           title: "Cleared!",
@@ -1011,10 +1199,10 @@ const UpdateWord = () => {
 
       try {
         // Send the updated data to the backend
-        await api.put(`/word/update/${formData.id}`, {
-          ...formData,
-          meaning: emptyArray,
-        });
+        await api.put(
+          `/word/update/${formData.id}`,
+          buildUpdatePayload("meaning", emptyArray),
+        );
 
         Swal.fire({
           title: "Cleared!",
@@ -1048,7 +1236,10 @@ const UpdateWord = () => {
     // after the update using /word/relation/add so posSelections can be applied.
     const newSynonyms = normalizeFieldItems("synonyms", inputData.synonyms);
     const newAntonyms = normalizeFieldItems("antonyms", inputData.antonyms);
-    const newSimilarWords = normalizeFieldItems("similarWords", inputData.similarWords);
+    const newSimilarWords = normalizeFieldItems(
+      "similarWords",
+      inputData.similarWords,
+    );
 
     const dataToSend = {
       ...formData,
@@ -1063,7 +1254,9 @@ const UpdateWord = () => {
       // update via /word/relation/add so the correct variant ID is linked.
       synonyms: formData.synonyms.filter((s) => !relPOSOverrides.synonym[s]),
       antonyms: formData.antonyms.filter((s) => !relPOSOverrides.antonym[s]),
-      similarWords: formData.similarWords.filter((s) => !relPOSOverrides.similarWord[s]),
+      similarWords: formData.similarWords.filter(
+        (s) => !relPOSOverrides.similarWord[s],
+      ),
     };
 
     // Filter verbAttributes to only include non-default values
@@ -1143,9 +1336,33 @@ const UpdateWord = () => {
       }
     }
 
+    // Build relations for the self-reference check, excluding saved same-value entries
+    // that are known multi-POS variants (different POS, same word value — not a real self-reference).
+    const wordNorm = normalizeWordValue(dataToSend.value);
+    const filterKnownMultiPOS = (arr, savedIds) =>
+      (arr || []).filter(
+        (v) =>
+          normalizeWordValue(v) !== wordNorm ||
+          !(normalizeWordValue(v) in savedIds),
+      );
+    const relationsForSelfRefCheck = {
+      synonyms: filterKnownMultiPOS(
+        dataToSend.synonyms,
+        currentRelationIds.synonym,
+      ),
+      antonyms: filterKnownMultiPOS(
+        dataToSend.antonyms,
+        currentRelationIds.antonym,
+      ),
+      similarWords: filterKnownMultiPOS(
+        dataToSend.similarWords,
+        currentRelationIds.similarWord,
+      ),
+    };
+
     const selfReferenceMessage = getSelfReferenceMessage(
       dataToSend.value,
-      dataToSend,
+      relationsForSelfRefCheck,
     );
 
     if (selfReferenceMessage) {
@@ -1160,6 +1377,33 @@ const UpdateWord = () => {
       antonyms: normalizeFieldItems("antonyms", inputData.antonyms),
       similarWords: normalizeFieldItems("similarWords", inputData.similarWords),
     };
+
+    // Value-level self-reference check for new relations.
+    // Skip words that need POS selection (multi-POS) — for those, the ID check
+    // in addRelation handles it after the user picks a specific variant.
+    const multiPOSValues = new Set(
+      wordsNeedingPOSSelection.map((w) => normalizeWordValue(w.word)),
+    );
+    const singlePOSNewRelations = {
+      synonyms: newRelationWords.synonyms.filter(
+        (v) => !multiPOSValues.has(normalizeWordValue(v)),
+      ),
+      antonyms: newRelationWords.antonyms.filter(
+        (v) => !multiPOSValues.has(normalizeWordValue(v)),
+      ),
+      similarWords: newRelationWords.similarWords.filter(
+        (v) => !multiPOSValues.has(normalizeWordValue(v)),
+      ),
+    };
+    const newRelationSelfRefMessage = getSelfReferenceMessage(
+      dataToSend.value,
+      singlePOSNewRelations,
+    );
+    if (newRelationSelfRefMessage) {
+      setLoading(false);
+      await showSelfReferenceAlert(newRelationSelfRefMessage);
+      return;
+    }
 
     // Only validate if there are new relation words to add
     const hasNewRelationWords =
@@ -1192,7 +1436,62 @@ const UpdateWord = () => {
           });
           return;
         }
+
+        // Pre-validate that none of the selected POS variants is the word itself.
+        // If it is, clear that selection so the user can pick a different POS.
+        const selfRefKeys = wordsNeedingPOSSelection
+          .filter((w) => {
+            const variant = posSelections[`${w.word}-${w.relationType}`];
+            return variant && Number(variant.id) === Number(formData.id);
+          })
+          .map((w) => `${w.word}-${w.relationType}`);
+
+        if (selfRefKeys.length > 0) {
+          const clearedSelections = { ...posSelections };
+          selfRefKeys.forEach((k) => delete clearedSelections[k]);
+          setPOSSelections(clearedSelections);
+          setLoading(false);
+          await showSelfReferenceAlert(
+            "A word cannot reference itself. Please select a different part of speech.",
+          );
+          return;
+        }
       }
+    }
+
+    // Validate that no POS override for existing relations points to the word itself.
+    const overrideEntries = [
+      ...Object.entries(relPOSOverrides.synonym).map(([word, info]) => ({
+        word,
+        info,
+        relationType: "synonym",
+      })),
+      ...Object.entries(relPOSOverrides.antonym).map(([word, info]) => ({
+        word,
+        info,
+        relationType: "antonym",
+      })),
+      ...Object.entries(relPOSOverrides.similarWord).map(([word, info]) => ({
+        word,
+        info,
+        relationType: "similar word",
+      })),
+    ];
+    const selfRefOverride = overrideEntries.find(
+      ({ info }) => Number(info.variantId) === Number(formData.id),
+    );
+    if (selfRefOverride) {
+      setRelPOSOverrides((prev) => {
+        const relType = selfRefOverride.relationType.replace(" ", "");
+        const updated = { ...prev[relType] };
+        delete updated[selfRefOverride.word];
+        return { ...prev, [relType]: updated };
+      });
+      setLoading(false);
+      await showSelfReferenceAlert(
+        `A word cannot reference itself as a ${selfRefOverride.relationType}. Please select a different part of speech.`,
+      );
+      return;
     }
 
     // Show SweetAlert confirmation
@@ -1224,10 +1523,22 @@ const UpdateWord = () => {
               return showPOSSelectionPopup(
                 `${relatedWordValue} (${relationType})`,
                 variants,
+                null,
+                Number(formData.id),
               );
             })());
 
           if (selectedVariant?.id) {
+            if (Number(selectedVariant.id) === Number(formData.id)) {
+              await Swal.fire({
+                title: "Invalid relation",
+                text: `A word cannot reference itself as a ${relationType}.`,
+                icon: "warning",
+                timer: 2200,
+                showConfirmButton: false,
+              });
+              return;
+            }
             await api.post("/word/relation/add", {
               wordId: formData.id,
               relatedWordId: selectedVariant.id,
@@ -1236,9 +1547,12 @@ const UpdateWord = () => {
           }
         };
 
-        for (const synonym of newSynonyms) await addRelation(synonym, "synonym");
-        for (const antonym of newAntonyms) await addRelation(antonym, "antonym");
-        for (const similarWord of newSimilarWords) await addRelation(similarWord, "similarWord");
+        for (const synonym of newSynonyms)
+          await addRelation(synonym, "synonym");
+        for (const antonym of newAntonyms)
+          await addRelation(antonym, "antonym");
+        for (const similarWord of newSimilarWords)
+          await addRelation(similarWord, "similarWord");
 
         // Re-add existing relations whose POS was overridden by the user
         for (const [, info] of Object.entries(relPOSOverrides.synonym)) {
@@ -1332,10 +1646,10 @@ const UpdateWord = () => {
     }));
 
     try {
-      await api.put(`/word/update/${formData.id}`, {
-        ...formData,
-        [field]: updatedArray,
-      });
+      await api.put(
+        `/word/update/${formData.id}`,
+        buildUpdatePayload(field, updatedArray),
+      );
 
       Swal.fire({
         title: "Updated!",
@@ -1824,7 +2138,9 @@ const UpdateWord = () => {
                           {multiPOSExisting.synonym.has(item) && (
                             <button
                               type="button"
-                              onClick={() => handleExistingPOSSelection(item, "synonym")}
+                              onClick={() =>
+                                handleExistingPOSSelection(item, "synonym")
+                              }
                               className={`btn btn-sm ${relPOSOverrides.synonym[item] ? "bg-green-500 text-white" : "bg-orange-400 text-white"}`}
                             >
                               {relPOSOverrides.synonym[item]
@@ -1895,7 +2211,9 @@ const UpdateWord = () => {
                           {multiPOSExisting.antonym.has(item) && (
                             <button
                               type="button"
-                              onClick={() => handleExistingPOSSelection(item, "antonym")}
+                              onClick={() =>
+                                handleExistingPOSSelection(item, "antonym")
+                              }
                               className={`btn btn-sm ${relPOSOverrides.antonym[item] ? "bg-green-500 text-white" : "bg-orange-400 text-white"}`}
                             >
                               {relPOSOverrides.antonym[item]
@@ -1943,7 +2261,9 @@ const UpdateWord = () => {
                       <button
                         key={w.uniqueKey}
                         type="button"
-                        onClick={() => handlePOSSelection(w.word, "similarWord")}
+                        onClick={() =>
+                          handlePOSSelection(w.word, "similarWord")
+                        }
                         className={`mt-2 px-3 py-1 text-sm rounded ${
                           posSelections[`${w.word}-similarWord`]
                             ? "bg-green-500 text-white"
@@ -1966,8 +2286,10 @@ const UpdateWord = () => {
                           {multiPOSExisting.similarWord.has(item) && (
                             <button
                               type="button"
-                              onClick={() => handleExistingPOSSelection(item, "similarWord")}
-                              className={`btn btn-sm ${relPOSOverrides.similarWord[item] ? "bg-green-500 text-white" : "bg-orange-400 text-white"}`}
+                              onClick={() =>
+                                handleExistingPOSSelection(item, "similarWord")
+                              }
+                              className={`btn btn-sm  ${relPOSOverrides.similarWord[item] ? "btn-success" : "btn-info"}`}
                             >
                               {relPOSOverrides.similarWord[item]
                                 ? `✓ ${relPOSOverrides.similarWord[item].partOfSpeechName}`
