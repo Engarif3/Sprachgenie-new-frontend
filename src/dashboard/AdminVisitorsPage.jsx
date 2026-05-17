@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import { toast } from "sonner";
 import api, { externalApi } from "../axios";
 
 const GEOCODING_ENDPOINT = "https://nominatim.openstreetmap.org/search";
@@ -137,6 +138,7 @@ const AdminVisitorsPage = () => {
       setRecentPage(page);
     } catch (error) {
       console.error("Failed to fetch recent visitors:", error);
+      toast.error("Failed to load recent visitors. Please try again.");
     } finally {
       setRecentLoading(false);
     }
@@ -155,6 +157,7 @@ const AdminVisitorsPage = () => {
       setLocationPage(page);
     } catch (error) {
       console.error("Failed to fetch visitors by location:", error);
+      toast.error("Failed to load visitor locations. Please try again.");
     } finally {
       setLocationLoading(false);
     }

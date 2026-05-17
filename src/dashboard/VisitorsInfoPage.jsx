@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 import api from "../axios";
 
 const VisitorsInfoPage = () => {
@@ -26,6 +27,7 @@ const VisitorsInfoPage = () => {
       setUniqueVisitors(response.data?.data?.uniqueCount || 0);
     } catch (error) {
       console.error("Failed to fetch unique visitors:", error);
+      toast.error("Failed to load visitor count. Please try again.");
     } finally {
       setVisitorsLoading(false);
     }
@@ -37,6 +39,7 @@ const VisitorsInfoPage = () => {
       setAnalytics(response.data?.data || {});
     } catch (error) {
       console.error("Failed to fetch analytics:", error);
+      toast.error("Failed to load visitor analytics. Please try again.");
     } finally {
       setAnalyticsLoading(false);
     }
