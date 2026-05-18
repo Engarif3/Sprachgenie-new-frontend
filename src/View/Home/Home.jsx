@@ -354,7 +354,7 @@ const Home = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-transparent">
       {/* Hero Section */}
       <Container className="flex flex-col">
-        {!userLoggedIn && (
+        {/* {!userLoggedIn && (
           <div className="text-orange-600 text-lg md:text-2xl lg:text-2xl flex justify-center py-8 md:mb-8 lg:mb-8 overflow-hidden ">
             <div className="w-11/12 md:w-7/12 lg:w-7/12">
               <Marquee
@@ -372,7 +372,7 @@ const Home = () => {
               </Marquee>
             </div>
           </div>
-        )}
+        )} */}
         <CircularText
           text="PRACTICE *MAKES *PERFECT *"
           centerText1="Sprach"
@@ -383,7 +383,7 @@ const Home = () => {
         />
 
         {/* Hero Content */}
-        <div className="text-center pt-6 pb-24 md:pb-[280px] px-4">
+        <div className="text-center pt-6 md:pt-0 lg:pt-0 pb-24 md:pb-[280px] px-4">
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-800 dark:text-white mb-6 leading-tight">
             {t("heroTitle")}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">
@@ -392,7 +392,7 @@ const Home = () => {
             </span>
             {t("heroTitleEnd")}
           </h1>
-          <p className="text-sm md:text-2xl text-gray-800 dark:text-gray-300 mb-12 max-w-3xl mx-auto">
+          <p className="text-sm md:text-2xl text-gray-800 dark:text-gray-300 mb-1 max-w-3xl mx-auto">
             {t("heroDescription")}
           </p>
 
@@ -400,7 +400,7 @@ const Home = () => {
 
           {/* Benefits Section */}
           {!userLoggedIn && (
-            <div className="mb-16 max-w-4xl mx-auto">
+            <div className="mb-16 mt-8 max-w-4xl mx-auto">
               <p className="text-lg text-cyan-500 dark:text-cyan-400 font-semibold mb-8">
                 {t("featuresUnlocked")}
               </p>

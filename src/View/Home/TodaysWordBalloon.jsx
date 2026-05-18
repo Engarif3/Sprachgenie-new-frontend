@@ -229,7 +229,7 @@ const TodaysWordBalloon = () => {
   };
 
   return (
-    <div className="relative mx-auto mt-10 flex min-h-[26rem] w-full max-w-3xl items-center justify-center overflow-visible px-4">
+    <div className="relative mx-auto mt-10 flex min-h-[24rem] w-full max-w-3xl items-center justify-center overflow-visible px-4">
       <div
         className={`relative flex min-h-[22rem] w-full items-center justify-center transition-all duration-300 ${
           phase === "revealed" ? "scale-100 opacity-100" : ""

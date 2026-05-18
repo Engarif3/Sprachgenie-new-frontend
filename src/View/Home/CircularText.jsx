@@ -99,7 +99,7 @@ const CircularText = ({
   return (
     // <div className={`relative w-[200px] h-[200px] m-0 mx-auto ${className}`}>
     <div
-      className={`m-0 rounded-full w-[200px] h-[200px] relative font-black text-center cursor-pointer origin-center hidden md:block lg:block ${className}`}
+      className={`m-0 rounded-full w-[200px] h-[190px] relative font-black text-center cursor-pointer origin-center hidden md:block lg:block ${className}`}
     >
       <motion.div
         className="absolute inset-0 rounded-full font-black text-center cursor-pointer origin-center "
