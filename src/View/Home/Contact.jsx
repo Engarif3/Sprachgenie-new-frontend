@@ -134,6 +134,7 @@ const Contact = () => {
                 </label>
                 <input
                   id="contact-name"
+                  autoComplete="name"
                   className={`w-full bg-gray-700/50 border-2 ${
                     errors.name ? "border-red-500" : "border-gray-600"
                   } rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none transition-all duration-300`}
@@ -157,6 +158,7 @@ const Contact = () => {
                 </label>
                 <input
                   id="contact-email"
+                  autoComplete="email"
                   className={`w-full bg-gray-700/50 border-2 ${
                     errors.email ? "border-red-500" : "border-gray-600"
                   } rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none transition-all duration-300`}
