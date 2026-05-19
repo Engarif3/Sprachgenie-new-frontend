@@ -9,6 +9,27 @@ import {
 const backendBaseURL =
   import.meta.env.VITE_BACKEND_API_URL || "https://api.simplegerman.de/api/v1";
 
+// Stable per-browser UUID stored in localStorage so the backend can identify
+// returning visitors accurately even when multiple users share the same IP.
+const getOrCreateVisitorId = () => {
+  try {
+    const KEY = "sg_vid";
+    let id = localStorage.getItem(KEY);
+    if (!id) {
+      id = crypto.randomUUID
+        ? crypto.randomUUID()
+        : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+            const r = crypto.getRandomValues(new Uint8Array(1))[0] & 15;
+            return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
+          });
+      localStorage.setItem(KEY, id);
+    }
+    return id;
+  } catch {
+    return null; // private/incognito mode may block localStorage
+  }
+};
+
 const applyFormDataInterceptor = (client) => {
   client.interceptors.request.use(
     (config) => {
@@ -52,13 +73,20 @@ api.interceptors.request.use(
     if (token && token !== "null") {
       config.headers.Authorization = `Bearer ${token}`;
     }
-
+    const visitorId = getOrCreateVisitorId();
+    if (visitorId) config.headers["x-visitor-id"] = visitorId;
     return config;
   },
   (error) => {
     return Promise.reject(error);
   },
 );
+
+publicApi.interceptors.request.use((config) => {
+  const visitorId = getOrCreateVisitorId();
+  if (visitorId) config.headers["x-visitor-id"] = visitorId;
+  return config;
+});
 
 applyFormDataInterceptor(api);
 
