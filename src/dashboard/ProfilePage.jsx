@@ -442,6 +442,7 @@ const ProfilePage = () => {
                 <input
                   type="text"
                   name="name"
+                  autoComplete="name"
                   value={formState.name}
                   onChange={handleInputChange}
                   className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
@@ -485,6 +486,7 @@ const ProfilePage = () => {
                               setIsCountryDropdownOpen(true);
                             }}
                             onFocus={() => setIsCountryDropdownOpen(true)}
+                            autoComplete="off"
                             className="w-full border-0 bg-white px-4 py-3.5 pr-36 text-sm font-medium text-gray-900 outline-none placeholder:text-gray-400 focus:ring-0 dark:bg-slate-950 dark:text-gray-100 dark:placeholder:text-gray-500"
                             placeholder="Search country or code"
                             aria-label="Search country"
@@ -570,6 +572,7 @@ const ProfilePage = () => {
                     <input
                       type="tel"
                       name="phoneNumber"
+                      autoComplete="tel-national"
                       value={formState.phoneNumber}
                       onChange={handlePhoneNumberChange}
                       onBlur={() =>
@@ -602,6 +605,7 @@ const ProfilePage = () => {
                   <input
                     type="text"
                     name="address"
+                    autoComplete="street-address"
                     value={formState.address}
                     onChange={handleInputChange}
                     className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white"

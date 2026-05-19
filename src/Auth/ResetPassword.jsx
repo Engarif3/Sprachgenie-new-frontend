@@ -203,6 +203,7 @@ const ResetPassword = () => {
             <div className="relative mb-4">
               <input
                 type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -223,6 +224,7 @@ const ResetPassword = () => {
             <div className="relative mb-4">
               <input
                 type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
                 value={repeatPassword}
                 onChange={(e) => setRepeatPassword(e.target.value)}
                 required

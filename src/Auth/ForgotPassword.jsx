@@ -143,6 +143,7 @@ const ForgotPassword = () => {
         <p className="flex justify-center items-center gap-4">
           <input
             type="email"
+            autoComplete="email"
             placeholder="Enter your email"
             className="border border-purple-600 rounded text-lg p-2"
             value={email}
