@@ -33,6 +33,7 @@ import PartOfSpeechDropdown from "./PartOfSpeechDropdown";
 const WordListModal = lazy(() => import("../Modals/WordListModal"));
 const HistoryModal = lazy(() => import("../Modals/HistoryModal"));
 const AIModal = lazy(() => import("../Modals/AIModal"));
+const ConjugationModal = lazy(() => import("./ConjugationModal"));
 
 // Cache key constants
 const CACHE_KEY = WORD_LIST_PAGE_CACHE_KEY;
@@ -450,6 +451,16 @@ const WordList = () => {
   const [selectedParagraph, setSelectedParagraph] = useState("");
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   // 	=========AI ===============
+
+  // =========Conjugation ===============
+  const [loadingConjugations, setLoadingConjugations] = useState({});
+  const [isConjugationModalOpen, setIsConjugationModalOpen] = useState(false);
+  const [conjugationWord, setConjugationWord] = useState(null);
+  const [conjugationData, setConjugationData] = useState(null);
+  const [conjugationError, setConjugationError] = useState(null);
+  // Session-level cache: avoids re-calling AI for the same verb twice
+  const conjugationCache = useRef({});
+  // =========Conjugation ===============
 
   const debouncedSearchValue = useDebounce(searchValue, 300);
   const debouncedCurrentPage = useDebounce(currentPage, 180);
@@ -1464,6 +1475,43 @@ const WordList = () => {
   };
 
   // 	==============AI===============
+
+  // ==============Conjugation===============
+  const handleConjugate = useCallback(async (word) => {
+    const cacheKey = word.value?.toLowerCase().trim();
+
+    // Open modal immediately so the user sees the loading state right away
+    setConjugationWord(word);
+    setConjugationError(null);
+    setIsConjugationModalOpen(true);
+
+    // Return cached result if we already fetched it this session
+    if (conjugationCache.current[cacheKey]) {
+      setConjugationData(conjugationCache.current[cacheKey]);
+      return;
+    }
+
+    setConjugationData(null);
+    setLoadingConjugations((prev) => ({ ...prev, [word.id]: true }));
+
+    try {
+      const response = await aiApi.post("/api/conjugations/generate", {
+        word: cacheKey,
+      });
+      const data = response.data?.data;
+      conjugationCache.current[cacheKey] = data;
+      setConjugationData(data);
+    } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        "Failed to generate conjugation. Please try again.";
+      setConjugationError(message);
+    } finally {
+      setLoadingConjugations((prev) => ({ ...prev, [word.id]: false }));
+    }
+  }, []);
+  // ==============Conjugation===============
+
   const handleResetFilters = useCallback(() => {
     // Reset all filter-related states
     setSearchValue("");
@@ -1868,10 +1916,12 @@ const WordList = () => {
                       favorites={favorites}
                       loadingFavorites={loadingFavorites}
                       loadingParagraphs={loadingParagraphs}
+                      loadingConjugations={loadingConjugations}
                       focusElement={focusElement}
                       revealMeaning={revealMeaning}
                       openModal={openModal}
                       generateParagraph={generateParagraph}
+                      handleConjugate={handleConjugate}
                       handleArrowKeyPress={handleArrowKeyPress}
                       openWordInModal={openWordInModal}
                       handleDelete={handleDelete}
@@ -1943,6 +1993,26 @@ const WordList = () => {
             selectedParagraph={selectedParagraph}
             onWordUpdated={handleAiWordUpdated}
             onClose={() => setIsAIModalOpen(false)}
+          />
+        </Suspense>
+      )}
+
+      {/* =======Conjugation modal=============== */}
+      {isConjugationModalOpen && (
+        <Suspense fallback={<div />}>
+          <ConjugationModal
+            isOpen={isConjugationModalOpen}
+            word={conjugationWord}
+            data={conjugationData}
+            isLoading={
+              conjugationWord ? !!loadingConjugations[conjugationWord.id] : false
+            }
+            error={conjugationError}
+            onClose={() => {
+              setIsConjugationModalOpen(false);
+              setConjugationData(null);
+              setConjugationError(null);
+            }}
           />
         </Suspense>
       )}
