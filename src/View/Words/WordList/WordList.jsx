@@ -2022,7 +2022,7 @@ const WordList = () => {
             onReported={(verb) => reportedConjugations.current.add(verb)}
             onAdminRegenerate={
               isAdmin
-                ? async () => {
+                ? async (customPrompt) => {
                     if (!conjugationWord) return;
                     const cacheKey = conjugationWord.value?.toLowerCase().trim();
                     delete conjugationCache.current[cacheKey];
@@ -2035,6 +2035,7 @@ const WordList = () => {
                     try {
                       const res = await aiApi.post("/conjugations/regenerate", {
                         verb: cacheKey,
+                        customPrompt: customPrompt || undefined,
                       });
                       const data = res.data?.data;
                       conjugationCache.current[cacheKey] = data;

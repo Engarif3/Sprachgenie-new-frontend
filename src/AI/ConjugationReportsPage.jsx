@@ -13,6 +13,8 @@ const ConjugationReportsPage = () => {
   const [loading, setLoading] = useState(true);
   const [regenerating, setRegenerating] = useState({});
   const [expandedVerb, setExpandedVerb] = useState(null);
+  // per-verb custom prompt inputs
+  const [customPrompts, setCustomPrompts] = useState({});
 
   const fetchReports = async () => {
     try {
@@ -32,10 +34,13 @@ const ConjugationReportsPage = () => {
 
   const handleRegenerate = async (verb) => {
     setRegenerating((prev) => ({ ...prev, [verb]: true }));
+    const customPrompt = (customPrompts[verb] || "").trim();
     try {
-      const res = await aiApi.post("/conjugations/regenerate", { verb });
+      const res = await aiApi.post("/conjugations/regenerate", {
+        verb,
+        customPrompt: customPrompt || undefined,
+      });
       const newData = res.data?.data;
-      // Update the report row with the new conjugation data and clear reports
       setReports((prev) =>
         prev.map((r) =>
           r.verb === verb
@@ -43,6 +48,8 @@ const ConjugationReportsPage = () => {
             : r,
         ),
       );
+      // Clear the prompt after a successful regeneration
+      setCustomPrompts((prev) => ({ ...prev, [verb]: "" }));
       toast.success(`"${verb}" regenerated successfully.`);
     } catch {
       toast.error(`Failed to regenerate "${verb}". Please try again.`);
@@ -79,15 +86,15 @@ const ConjugationReportsPage = () => {
               className="rounded-2xl border border-gray-700 bg-gray-800/60 overflow-hidden"
             >
               {/* Row header */}
-              <div className="flex items-center justify-between gap-4 px-5 py-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-xl font-bold text-white">{item.verb}</span>
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
-                    {item.reportCount} report{item.reportCount !== 1 ? "s" : ""}
-                  </span>
-                </div>
+              <div className="px-5 py-4 space-y-3">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl font-bold text-white">{item.verb}</span>
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
+                      {item.reportCount} report{item.reportCount !== 1 ? "s" : ""}
+                    </span>
+                  </div>
 
-                <div className="flex items-center gap-3">
                   <button
                     onClick={() =>
                       setExpandedVerb(expandedVerb === item.verb ? null : item.verb)
@@ -96,10 +103,26 @@ const ConjugationReportsPage = () => {
                   >
                     {expandedVerb === item.verb ? "Hide details" : "View details"}
                   </button>
+                </div>
+
+                {/* Custom prompt + regenerate */}
+                <div className="flex gap-2 items-start">
+                  <textarea
+                    rows={2}
+                    value={customPrompts[item.verb] || ""}
+                    onChange={(e) =>
+                      setCustomPrompts((prev) => ({
+                        ...prev,
+                        [item.verb]: e.target.value,
+                      }))
+                    }
+                    placeholder={`Optional: custom instruction for AI (e.g. "Use sein not haben — ${item.verb} is a movement verb")`}
+                    className="flex-1 rounded-lg bg-gray-900 border border-gray-600 text-sm text-white px-3 py-2 placeholder-gray-600 focus:outline-none focus:border-violet-500 resize-none"
+                  />
                   <button
                     onClick={() => handleRegenerate(item.verb)}
                     disabled={!!regenerating[item.verb]}
-                    className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-semibold transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-semibold transition-colors shrink-0"
                   >
                     {regenerating[item.verb] ? (
                       <>
