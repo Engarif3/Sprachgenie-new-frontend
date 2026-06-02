@@ -1495,7 +1495,7 @@ const WordList = () => {
     setLoadingConjugations((prev) => ({ ...prev, [word.id]: true }));
 
     try {
-      const response = await aiApi.post("/api/conjugations/generate", {
+      const response = await aiApi.post("/conjugations/generate", {
         word: cacheKey,
       });
       const data = response.data?.data;
