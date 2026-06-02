@@ -113,7 +113,7 @@ const ConjugationModal = ({
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
       <div
-        className="relative z-10 w-full max-w-lg max-h-[90vh] flex flex-col rounded-2xl border border-gray-700 bg-gray-900 shadow-2xl shadow-black/50"
+        className="relative z-10 w-full max-w-lg md:max-w-4xl max-h-[90vh] flex flex-col rounded-2xl border border-gray-700 bg-gray-900 shadow-2xl shadow-black/50"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -161,25 +161,28 @@ const ConjugationModal = ({
 
           {data && !isLoading && (
             <>
-              <TenseSection label={TENSE_LABELS.präsens}>
-                <ConjugationTable rows={data.präsens} />
-              </TenseSection>
+              {/* 3-column on md+, single column on mobile */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <TenseSection label={TENSE_LABELS.präsens}>
+                  <ConjugationTable rows={data.präsens} />
+                </TenseSection>
 
-              <TenseSection label={TENSE_LABELS.perfekt}>
-                {data.perfekt?.auxiliary && data.perfekt?.participleForm && (
-                  <div className="px-4 py-2.5 bg-violet-900/20 border-b border-gray-800 text-sm">
-                    <span className="text-gray-400">Auxiliary: </span>
-                    <span className="text-violet-300 font-bold">{data.perfekt.auxiliary}</span>
-                    <span className="text-gray-500 mx-2">+</span>
-                    <span className="text-emerald-300 font-bold">{data.perfekt.participleForm}</span>
-                  </div>
-                )}
-                <ConjugationTable rows={data.perfekt?.conjugations ?? []} />
-              </TenseSection>
+                <TenseSection label={TENSE_LABELS.perfekt}>
+                  {data.perfekt?.auxiliary && data.perfekt?.participleForm && (
+                    <div className="px-4 py-2.5 bg-violet-900/20 border-b border-gray-800 text-sm">
+                      <span className="text-gray-400">Auxiliary: </span>
+                      <span className="text-violet-300 font-bold">{data.perfekt.auxiliary}</span>
+                      <span className="text-gray-500 mx-2">+</span>
+                      <span className="text-emerald-300 font-bold">{data.perfekt.participleForm}</span>
+                    </div>
+                  )}
+                  <ConjugationTable rows={data.perfekt?.conjugations ?? []} />
+                </TenseSection>
 
-              <TenseSection label={TENSE_LABELS.präteritum}>
-                <ConjugationTable rows={data.präteritum} />
-              </TenseSection>
+                <TenseSection label={TENSE_LABELS.präteritum}>
+                  <ConjugationTable rows={data.präteritum} />
+                </TenseSection>
+              </div>
 
               {/* Admin regenerate panel */}
               {isAdmin && adminPromptOpen && (
