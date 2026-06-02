@@ -252,170 +252,170 @@ const FavoriteWordsTable = ({
 
   return (
     <>
-    <div className="overflow-hidden rounded-2xl  shadow-xl dark:border-gray-700/50 dark:shadow-2xl">
-      <table className="w-full border-collapse text-xs sm:text-sm md:text-base">
-        <thead>
-          <tr className="bg-slate-900 text-sm text-white md:text-xl lg:text-xl dark:bg-gradient-to-r dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
-            <th className="rounded-tl-xl border-l border-slate-200 py-3 text-center text-sm font-bold text-orange-400 md:text-lg lg:text-lg dark:border-gray-700 w-[5%] md:w-[3%] lg:w-[3%]">
-              {/* Art. */}
-            </th>
-            <th className="border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-blue-400 dark:border-gray-700 w-[15%] md:w-[10%] lg:w-[10%]">
-              Word
-            </th>
-            <th className="border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-purple-400 dark:border-gray-700 w-[10%] md:w-[25%] lg:w-[25%]">
-              Meaning
-            </th>
-            <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-cyan-400 dark:border-gray-700 md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
-              Synonym
-            </th>
-            <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-pink-400 dark:border-gray-700  lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
-              Antonym
-            </th>
-            <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-green-400 dark:border-gray-700 lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
-              Word to Watch
-            </th>
-            <th className="rounded-tr-xl border-l border-r border-dotted border-slate-200 py-3 text-center text-sm font-bold text-red-400 dark:border-gray-700 md:text-lg lg:text-lg w-[3%] md:w-[3%] lg:w-[3%]"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {paginatedFavorites.map((word, index) => {
-            const articleColumnDisplay = getArticleColumnDisplay(word);
+      <div className="overflow-hidden rounded-2xl  shadow-xl dark:border-gray-700/50 dark:shadow-2xl">
+        <table className="w-full border-collapse text-xs sm:text-sm md:text-base">
+          <thead>
+            <tr className="bg-slate-900 text-sm text-white md:text-xl lg:text-xl dark:bg-gradient-to-r dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
+              <th className="rounded-tl-xl border-l border-slate-200 py-3 text-center text-sm font-bold text-orange-400 md:text-lg lg:text-lg dark:border-gray-700 w-[5%] md:w-[3%] lg:w-[3%]">
+                {/* Art. */}
+              </th>
+              <th className="border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-blue-400 dark:border-gray-700 w-[15%] md:w-[10%] lg:w-[10%]">
+                Word
+              </th>
+              <th className="border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-purple-400 dark:border-gray-700 w-[10%] md:w-[25%] lg:w-[25%]">
+                Meaning
+              </th>
+              <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-cyan-400 dark:border-gray-700 md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                Synonym
+              </th>
+              <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-pink-400 dark:border-gray-700  lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                Antonym
+              </th>
+              <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-green-400 dark:border-gray-700 lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+                Word to Watch
+              </th>
+              <th className="rounded-tr-xl border-l border-r border-dotted border-slate-200 py-3 text-center text-sm font-bold text-red-400 dark:border-gray-700 md:text-lg lg:text-lg w-[3%] md:w-[3%] lg:w-[3%]"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedFavorites.map((word, index) => {
+              const articleColumnDisplay = getArticleColumnDisplay(word);
 
-            return (
-              <tr
-                key={word.id}
-                className={`${
-                  index % 2 === 0
-                    ? "bg-white hover:bg-sky-50/70 dark:bg-gray-800 dark:hover:bg-gray-700"
-                    : "bg-slate-50/80 hover:bg-sky-50 dark:bg-gray-900 dark:hover:bg-gray-800"
-                } border-b border-slate-200 transition-all duration-300 dark:border-gray-700`}
-              >
-                <td className={tableVariant.articleCell}>
-                  <PartOfSpeechBadge
-                    text={articleColumnDisplay.text}
-                    className={articleColumnDisplay.className}
-                    tooltipText={articleColumnDisplay.tooltipText}
-                  />
-                </td>
-                <td className={tableVariant.wordCell}>
-                  <div className="flex justify-between gap-1 md:gap-4 items-center">
-                    <span
-                      className={tableVariant.wordText}
-                      onClick={() => openModal(word)}
-                    >
-                      {renderWordWithPrefix(word)}
-                    </span>
-
-                    <div className="flex gap-1 md:gap-2 lg:gap-2">
-                      <button
-                        onClick={() => pronounceWord(word.value)}
-                        className={tableVariant.pronounceButton}
+              return (
+                <tr
+                  key={word.id}
+                  className={`${
+                    index % 2 === 0
+                      ? "bg-white hover:bg-sky-50/70 dark:bg-gray-800 dark:hover:bg-gray-700"
+                      : "bg-slate-50/80 hover:bg-sky-50 dark:bg-gray-900 dark:hover:bg-gray-800"
+                  } border-b border-slate-200 transition-all duration-300 dark:border-gray-700`}
+                >
+                  <td className={tableVariant.articleCell}>
+                    <PartOfSpeechBadge
+                      text={articleColumnDisplay.text}
+                      className={articleColumnDisplay.className}
+                      tooltipText={articleColumnDisplay.tooltipText}
+                    />
+                  </td>
+                  <td className={tableVariant.wordCell}>
+                    <div className="flex justify-between gap-1 md:gap-4 items-center">
+                      <span
+                        className={tableVariant.wordText}
+                        onClick={() => openModal(word)}
                       >
-                        🔊
-                      </button>
+                        {renderWordWithPrefix(word)}
+                      </span>
 
-                      <div
-                        onClick={() => generateParagraph(word)}
-                        className="relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 border-emerald-300 bg-gradient-to-r from-emerald-50 to-green-50 px-2 py-1 text-sm italic text-emerald-700 shadow-sm transition-all duration-300 hover:scale-110 hover:border-emerald-400 hover:from-emerald-500 hover:to-green-500 hover:text-white dark:border-green-500/50 dark:from-green-500/20 dark:to-emerald-500/20 dark:text-white dark:hover:border-green-400 dark:hover:from-green-500 dark:hover:to-emerald-500"
-                      >
-                        {loadingParagraphs[word.id] && (
-                          <span className="absolute inset-0 flex items-center justify-center z-10">
-                            <PuffLoader size={20} color="#10b981" />
-                          </span>
-                        )}
-                        <span
-                          className={`${
-                            loadingParagraphs[word.id]
-                              ? "invisible"
-                              : "text-xs font-bold "
-                          }`}
+                      <div className="flex gap-1 md:gap-2 lg:gap-2">
+                        <button
+                          onClick={() => pronounceWord(word.value)}
+                          className={tableVariant.pronounceButton}
                         >
-                          ai
-                        </span>
-                      </div>
+                          🔊
+                        </button>
 
-                      {/* Conjugation button — verbs only */}
-                      {normalizeText(word?.partOfSpeech?.name) === "verb" && (
                         <div
-                          onClick={() => handleConjugate?.(word)}
-                          className="relative flex h-7 cursor-pointer items-center justify-center rounded-full border-2 border-violet-400 bg-gradient-to-r from-violet-500 to-purple-500 px-2 py-1 text-[10px] font-bold text-white shadow-sm transition-all duration-300 hover:scale-110 hover:from-violet-400 hover:to-purple-400 dark:border-violet-500/50"
-                          title="Show conjugation table"
+                          onClick={() => generateParagraph(word)}
+                          className="relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 border-emerald-300 bg-gradient-to-r from-emerald-50 to-green-50 px-2 py-1 text-sm italic text-emerald-700 shadow-sm transition-all duration-300 hover:scale-110 hover:border-emerald-400 hover:from-emerald-500 hover:to-green-500 hover:text-white dark:border-green-500/50 dark:from-green-500/20 dark:to-emerald-500/20 dark:text-white dark:hover:border-green-400 dark:hover:from-green-500 dark:hover:to-emerald-500"
                         >
-                          {loadingConjugations?.[word.id] ? (
-                            <PuffLoader size={14} color="#c4b5fd" />
-                          ) : (
-                            "Conj"
+                          {loadingParagraphs[word.id] && (
+                            <span className="absolute inset-0 flex items-center justify-center z-10">
+                              <PuffLoader size={20} color="#10b981" />
+                            </span>
                           )}
+                          <span
+                            className={`${
+                              loadingParagraphs[word.id]
+                                ? "invisible"
+                                : "text-xs font-bold "
+                            }`}
+                          >
+                            ai
+                          </span>
                         </div>
-                      )}
+
+                        {/* Conjugation button — verbs only */}
+                        {normalizeText(word?.partOfSpeech?.name) === "verb" && (
+                          <div
+                            onClick={() => handleConjugate?.(word)}
+                            className="relative flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-2 border-violet-400 bg-gradient-to-r from-violet-500 to-purple-500 px-1 py-1 text-[10px] font-bold text-white shadow-sm transition-all duration-300 hover:scale-110 hover:from-violet-400 hover:to-purple-400 dark:border-violet-500/50"
+                            title="Show conjugation table"
+                          >
+                            {loadingConjugations?.[word.id] ? (
+                              <PuffLoader size={14} color="#c4b5fd" />
+                            ) : (
+                              "C"
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td className={tableVariant.meaningCell}>
-                  <span className={tableVariant.meaningText}>
-                    {word.meaning?.join(", ")}
-                  </span>
-                </td>
-                <td className={tableVariant.synonymsCell}>
-                  <div className="flex flex-wrap gap-1.5">
-                    {word.synonyms?.map((synonym, synonymIndex) => (
-                      <span
-                        key={synonymIndex}
-                        onClick={() => openWordInModal(synonym.value)}
-                        className={tableVariant.synonymsTag}
-                      >
-                        {synonym.value}
-                      </span>
-                    ))}
-                  </div>
-                </td>
+                  </td>
+                  <td className={tableVariant.meaningCell}>
+                    <span className={tableVariant.meaningText}>
+                      {word.meaning?.join(", ")}
+                    </span>
+                  </td>
+                  <td className={tableVariant.synonymsCell}>
+                    <div className="flex flex-wrap gap-1.5">
+                      {word.synonyms?.map((synonym, synonymIndex) => (
+                        <span
+                          key={synonymIndex}
+                          onClick={() => openWordInModal(synonym.value)}
+                          className={tableVariant.synonymsTag}
+                        >
+                          {synonym.value}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
 
-                <td className={tableVariant.antonymsCell}>
-                  <div className="flex flex-wrap gap-1.5">
-                    {word.antonyms?.map((antonym, antonymIndex) => (
-                      <span
-                        key={antonymIndex}
-                        onClick={() => openWordInModal(antonym.value)}
-                        className={tableVariant.antonymsTag}
-                      >
-                        {antonym.value}
-                      </span>
-                    ))}
-                  </div>
-                </td>
-                <td className={tableVariant.similarCell}>
-                  <div className="flex flex-wrap gap-1.5">
-                    {word.similarWords?.map((similarWord, similarIndex) => (
-                      <span
-                        key={similarIndex}
-                        onClick={() => openWordInModal(similarWord.value)}
-                        className={tableVariant.similarTag}
-                      >
-                        {similarWord.value}
-                      </span>
-                    ))}
-                  </div>
-                </td>
+                  <td className={tableVariant.antonymsCell}>
+                    <div className="flex flex-wrap gap-1.5">
+                      {word.antonyms?.map((antonym, antonymIndex) => (
+                        <span
+                          key={antonymIndex}
+                          onClick={() => openWordInModal(antonym.value)}
+                          className={tableVariant.antonymsTag}
+                        >
+                          {antonym.value}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+                  <td className={tableVariant.similarCell}>
+                    <div className="flex flex-wrap gap-1.5">
+                      {word.similarWords?.map((similarWord, similarIndex) => (
+                        <span
+                          key={similarIndex}
+                          onClick={() => openWordInModal(similarWord.value)}
+                          className={tableVariant.similarTag}
+                        >
+                          {similarWord.value}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
 
-                <td className={tableVariant.removeCell}>
-                  <button
-                    onClick={() => handleRemoveFavorite(word.id)}
-                    className="rounded-xl border border-rose-300 bg-gradient-to-r from-rose-50 to-pink-50 p-2.5 font-bold text-rose-700 shadow-sm transition-all duration-300 hover:scale-110 hover:from-red-600 hover:to-pink-600 hover:text-white dark:border-red-500/50 dark:from-red-500/20 dark:to-pink-500/20 dark:text-red-300 dark:shadow-lg dark:hover:shadow-red-500/50"
-                  >
-                    <ImBin size={12} />
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+                  <td className={tableVariant.removeCell}>
+                    <button
+                      onClick={() => handleRemoveFavorite(word.id)}
+                      className="rounded-xl border border-rose-300 bg-gradient-to-r from-rose-50 to-pink-50 p-2.5 font-bold text-rose-700 shadow-sm transition-all duration-300 hover:scale-110 hover:from-red-600 hover:to-pink-600 hover:text-white dark:border-red-500/50 dark:from-red-500/20 dark:to-pink-500/20 dark:text-red-300 dark:shadow-lg dark:hover:shadow-red-500/50"
+                    >
+                      <ImBin size={12} />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
-    {/* Conjugation modal */}
-    {conjugationModalProps?.isOpen && (
-      <ConjugationModal {...conjugationModalProps} />
-    )}
+      {/* Conjugation modal */}
+      {conjugationModalProps?.isOpen && (
+        <ConjugationModal {...conjugationModalProps} />
+      )}
     </>
   );
 };
