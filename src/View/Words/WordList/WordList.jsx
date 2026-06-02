@@ -458,8 +458,10 @@ const WordList = () => {
   const [conjugationWord, setConjugationWord] = useState(null);
   const [conjugationData, setConjugationData] = useState(null);
   const [conjugationError, setConjugationError] = useState(null);
-  // Session-level cache: avoids re-calling AI for the same verb twice
+  // Session-level cache: avoids hitting the backend for a verb already fetched this session
   const conjugationCache = useRef({});
+  // Track which verbs the current user has already reported this session
+  const reportedConjugations = useRef(new Set());
   // =========Conjugation ===============
 
   const debouncedSearchValue = useDebounce(searchValue, 300);
@@ -2008,6 +2010,48 @@ const WordList = () => {
               conjugationWord ? !!loadingConjugations[conjugationWord.id] : false
             }
             error={conjugationError}
+            userId={userId}
+            isAdmin={isAdmin}
+            alreadyReported={
+              conjugationWord
+                ? reportedConjugations.current.has(
+                    conjugationWord.value?.toLowerCase().trim(),
+                  )
+                : false
+            }
+            onReported={(verb) => reportedConjugations.current.add(verb)}
+            onAdminRegenerate={
+              isAdmin
+                ? async () => {
+                    if (!conjugationWord) return;
+                    const cacheKey = conjugationWord.value?.toLowerCase().trim();
+                    delete conjugationCache.current[cacheKey];
+                    setConjugationData(null);
+                    setConjugationError(null);
+                    setLoadingConjugations((prev) => ({
+                      ...prev,
+                      [conjugationWord.id]: true,
+                    }));
+                    try {
+                      const res = await aiApi.post("/conjugations/regenerate", {
+                        verb: cacheKey,
+                      });
+                      const data = res.data?.data;
+                      conjugationCache.current[cacheKey] = data;
+                      setConjugationData(data);
+                    } catch {
+                      setConjugationError(
+                        "Regeneration failed. Please try again.",
+                      );
+                    } finally {
+                      setLoadingConjugations((prev) => ({
+                        ...prev,
+                        [conjugationWord.id]: false,
+                      }));
+                    }
+                  }
+                : undefined
+            }
             onClose={() => {
               setIsConjugationModalOpen(false);
               setConjugationData(null);

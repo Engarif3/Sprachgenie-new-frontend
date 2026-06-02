@@ -343,6 +343,14 @@ const DashboardLayout = () => {
                       <span>📋</span>
                       <span>Reports</span>
                     </NavLink>
+                    <NavLink
+                      to="/dashboard/conjugation-reports"
+                      className={({ isActive }) => navItemClass(isActive)}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>🔤</span>
+                      <span>Conj. Reports</span>
+                    </NavLink>
                   </div>
                 )}
 

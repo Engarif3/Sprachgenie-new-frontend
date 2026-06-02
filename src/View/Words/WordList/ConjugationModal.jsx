@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import aiApi from "../../../AI_axios";
 
 const TENSE_LABELS = {
   präsens: "Präsens",
@@ -43,7 +44,33 @@ const TenseSection = ({ label, children }) => (
   </div>
 );
 
-const ConjugationModal = ({ isOpen, onClose, word, data, isLoading, error }) => {
+const ConjugationModal = ({
+  isOpen,
+  onClose,
+  word,
+  data,
+  isLoading,
+  error,
+  userId,
+  isAdmin,
+  alreadyReported,
+  onReported,
+  onAdminRegenerate,
+}) => {
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportMessage, setReportMessage] = useState("");
+  const [reportSubmitting, setReportSubmitting] = useState(false);
+  const [reportDone, setReportDone] = useState(alreadyReported ?? false);
+  const [reportError, setReportError] = useState("");
+
+  // Sync external "already reported" flag when modal re-opens for a new verb
+  useEffect(() => {
+    setReportDone(alreadyReported ?? false);
+    setReportOpen(false);
+    setReportMessage("");
+    setReportError("");
+  }, [alreadyReported, data]);
+
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e) => e.key === "Escape" && onClose();
@@ -56,15 +83,33 @@ const ConjugationModal = ({ isOpen, onClose, word, data, isLoading, error }) => 
   const verbLabel = data?.verb || word?.value || "";
   const meaning = data?.meaning ? `(${data.meaning})` : "";
 
+  const submitReport = async () => {
+    setReportSubmitting(true);
+    setReportError("");
+    try {
+      await aiApi.post("/conjugations/report", {
+        verb: verbLabel,
+        userId: userId ?? null,
+        message: reportMessage.trim() || null,
+      });
+      setReportDone(true);
+      setReportOpen(false);
+      if (onReported) onReported(verbLabel);
+    } catch (err) {
+      const msg = err.response?.data?.message || "Failed to submit report.";
+      setReportError(msg);
+    } finally {
+      setReportSubmitting(false);
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
-      {/* Panel */}
       <div
         className="relative z-10 w-full max-w-lg max-h-[90vh] flex flex-col rounded-2xl border border-gray-700 bg-gray-900 shadow-2xl shadow-black/50"
         onClick={(e) => e.stopPropagation()}
@@ -89,12 +134,7 @@ const ConjugationModal = ({ isOpen, onClose, word, data, isLoading, error }) => 
             className="mt-1 flex-shrink-0 rounded-full p-1.5 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
             aria-label="Close"
           >
-            <svg
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="w-5 h-5"
-              aria-hidden="true"
-            >
+            <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden="true">
               <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
             </svg>
           </button>
@@ -105,66 +145,116 @@ const ConjugationModal = ({ isOpen, onClose, word, data, isLoading, error }) => 
           {isLoading && (
             <div className="flex flex-col items-center justify-center py-16 gap-4">
               <div className="w-10 h-10 rounded-full border-4 border-violet-500 border-t-transparent animate-spin" />
-              <p className="text-gray-400 text-sm">
-                Generating conjugation table…
-              </p>
+              <p className="text-gray-400 text-sm">Generating conjugation table…</p>
             </div>
           )}
 
           {error && !isLoading && (
             <div className="flex flex-col items-center justify-center py-12 gap-3 text-center">
               <span className="text-3xl">⚠️</span>
-              <p className="text-red-400 font-semibold">
-                Failed to generate conjugation
-              </p>
+              <p className="text-red-400 font-semibold">Failed to generate conjugation</p>
               <p className="text-gray-500 text-sm">{error}</p>
             </div>
           )}
 
           {data && !isLoading && (
             <>
-              {/* Präsens */}
               <TenseSection label={TENSE_LABELS.präsens}>
                 <ConjugationTable rows={data.präsens} />
               </TenseSection>
 
-              {/* Perfekt */}
               <TenseSection label={TENSE_LABELS.perfekt}>
                 {data.perfekt?.auxiliary && data.perfekt?.participleForm && (
                   <div className="px-4 py-2.5 bg-violet-900/20 border-b border-gray-800 text-sm">
                     <span className="text-gray-400">Auxiliary: </span>
-                    <span className="text-violet-300 font-bold">
-                      {data.perfekt.auxiliary}
-                    </span>
+                    <span className="text-violet-300 font-bold">{data.perfekt.auxiliary}</span>
                     <span className="text-gray-500 mx-2">+</span>
-                    <span className="text-emerald-300 font-bold">
-                      {data.perfekt.participleForm}
-                    </span>
+                    <span className="text-emerald-300 font-bold">{data.perfekt.participleForm}</span>
                   </div>
                 )}
                 <ConjugationTable rows={data.perfekt?.conjugations ?? []} />
               </TenseSection>
 
-              {/* Präteritum */}
               <TenseSection label={TENSE_LABELS.präteritum}>
                 <ConjugationTable rows={data.präteritum} />
               </TenseSection>
+
+              {/* Report form */}
+              {reportOpen && (
+                <div className="rounded-xl border border-red-500/30 bg-red-950/20 p-4 space-y-3">
+                  <p className="text-sm font-semibold text-red-300">
+                    Report incorrect conjugation
+                  </p>
+                  <textarea
+                    className="w-full rounded-lg bg-gray-800 border border-gray-600 text-sm text-white px-3 py-2 placeholder-gray-500 focus:outline-none focus:border-red-400 resize-none"
+                    rows={2}
+                    placeholder="Optional: describe the error (e.g. wrong haben/sein)"
+                    value={reportMessage}
+                    onChange={(e) => setReportMessage(e.target.value)}
+                  />
+                  {reportError && (
+                    <p className="text-xs text-red-400">{reportError}</p>
+                  )}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={submitReport}
+                      disabled={reportSubmitting}
+                      className="px-4 py-1.5 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors"
+                    >
+                      {reportSubmitting ? "Submitting…" : "Submit report"}
+                    </button>
+                    <button
+                      onClick={() => { setReportOpen(false); setReportError(""); }}
+                      className="px-4 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>
 
         {/* Footer */}
         {data && !isLoading && (
-          <div className="px-6 py-3 border-t border-gray-800 flex items-center justify-between">
+          <div className="px-6 py-3 border-t border-gray-800 flex items-center justify-between gap-3">
             <span className="text-xs text-gray-600">
               Generated by AI · verify with a grammar reference
             </span>
-            <button
-              onClick={onClose}
-              className="text-xs text-gray-400 hover:text-white transition-colors"
-            >
-              Close
-            </button>
+            <div className="flex items-center gap-3 shrink-0">
+              {/* Admin: regenerate button */}
+              {isAdmin && onAdminRegenerate && (
+                <button
+                  onClick={onAdminRegenerate}
+                  className="text-xs text-amber-400 hover:text-amber-200 transition-colors"
+                  title="Admin: clear cache and regenerate from AI"
+                >
+                  Regenerate
+                </button>
+              )}
+
+              {/* Regular users: report button */}
+              {userId && !isAdmin && !reportOpen && (
+                reportDone ? (
+                  <span className="text-xs text-green-500">✓ Reported</span>
+                ) : (
+                  <button
+                    onClick={() => setReportOpen(true)}
+                    className="text-xs text-red-400 hover:text-red-200 transition-colors"
+                  >
+                    Report error
+                  </button>
+                )
+              )}
+
+              <button
+                onClick={onClose}
+                className="text-xs text-gray-400 hover:text-white transition-colors"
+              >
+                Close
+              </button>
+            </div>
           </div>
         )}
       </div>

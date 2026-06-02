@@ -86,6 +86,7 @@ const GlobalLimits = lazy(() => import("../AI/GlobalLimits"));
 const UserLimits = lazy(() => import("../AI/UserLimits"));
 const Usage = lazy(() => import("../AI/Usage"));
 const ReportsByUsers = lazy(() => import("../AI/ReportsByUsers"));
+const ConjugationReportsPage = lazy(() => import("../AI/ConjugationReportsPage"));
 
 //translator
 const Translator = lazy(() => import("../Translate/Translator"));
@@ -155,6 +156,7 @@ const GlobalLimitsWithSuspense = withSuspense(GlobalLimits);
 const UserLimitsWithSuspense = withSuspense(UserLimits);
 const UsageWithSuspense = withSuspense(Usage);
 const ReportsByUsersWithSuspense = withSuspense(ReportsByUsers);
+const ConjugationReportsPageWithSuspense = withSuspense(ConjugationReportsPage);
 
 //translator
 const TranslatorWithSuspense = withSuspense(Translator);
@@ -369,6 +371,13 @@ export const router = createBrowserRouter(
               path: "get-reports",
               element: protectRoute(
                 <ReportsByUsersWithSuspense />,
+                ADMIN_ROLES,
+              ),
+            },
+            {
+              path: "conjugation-reports",
+              element: protectRoute(
+                <ConjugationReportsPageWithSuspense />,
                 ADMIN_ROLES,
               ),
             },
