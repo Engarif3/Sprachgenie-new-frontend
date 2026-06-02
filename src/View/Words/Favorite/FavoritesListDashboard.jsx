@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "../../../axios";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -34,8 +34,17 @@ const FavoritesListDashboard = () => {
   const [loadingParagraphs, setLoadingParagraphs] = useState({});
   const [selectedParagraph, setSelectedParagraph] = useState("");
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
-
   // =================ai===========================
+
+  // =================conjugation===========================
+  const [loadingConjugations, setLoadingConjugations] = useState({});
+  const [isConjugationModalOpen, setIsConjugationModalOpen] = useState(false);
+  const [conjugationWord, setConjugationWord] = useState(null);
+  const [conjugationData, setConjugationData] = useState(null);
+  const [conjugationError, setConjugationError] = useState(null);
+  const conjugationCache = useRef({});
+  const reportedConjugations = useRef(new Set());
+  // =================conjugation===========================
 
   const handleAiWordUpdated = useCallback((updatedWord, updatedParagraph) => {
     setFavoriteWords((prev) =>
@@ -452,6 +461,37 @@ const FavoritesListDashboard = () => {
 
   //   ==============AI===============
 
+  // ==============Conjugation===============
+  const handleConjugate = useCallback(async (word) => {
+    const cacheKey = word.value?.toLowerCase().trim();
+    setConjugationWord(word);
+    setConjugationError(null);
+    setIsConjugationModalOpen(true);
+    if (conjugationCache.current[cacheKey]) {
+      setConjugationData(conjugationCache.current[cacheKey]);
+      return;
+    }
+    setConjugationData(null);
+    setLoadingConjugations((prev) => ({ ...prev, [word.id]: true }));
+    try {
+      const response = await aiApi.post("/conjugations/generate", {
+        word: cacheKey,
+        wordId: word.id,
+      });
+      const data = response.data?.data;
+      conjugationCache.current[cacheKey] = data;
+      setConjugationData(data);
+    } catch (error) {
+      setConjugationError(
+        error.response?.data?.message ||
+          "Failed to generate conjugation. Please try again.",
+      );
+    } finally {
+      setLoadingConjugations((prev) => ({ ...prev, [word.id]: false }));
+    }
+  }, []);
+  // ==============Conjugation===============
+
   return (
     <div className="w-full">
       <div className="text-center mb-8">
@@ -506,6 +546,30 @@ const FavoritesListDashboard = () => {
                     openWordInModal={openWordInModal}
                     generateParagraph={generateParagraph}
                     loadingParagraphs={loadingParagraphs}
+                    handleConjugate={handleConjugate}
+                    loadingConjugations={loadingConjugations}
+                    conjugationModalProps={{
+                      isOpen: isConjugationModalOpen,
+                      word: conjugationWord,
+                      data: conjugationData,
+                      isLoading: conjugationWord
+                        ? !!loadingConjugations[conjugationWord.id]
+                        : false,
+                      error: conjugationError,
+                      userId,
+                      alreadyReported: conjugationWord
+                        ? reportedConjugations.current.has(
+                            conjugationWord.value?.toLowerCase().trim(),
+                          )
+                        : false,
+                      onReported: (verb) =>
+                        reportedConjugations.current.add(verb),
+                      onClose: () => {
+                        setIsConjugationModalOpen(false);
+                        setConjugationData(null);
+                        setConjugationError(null);
+                      },
+                    }}
                     handleRemoveFavorite={handleRemoveFavorite}
                     variant="dashboard"
                   />

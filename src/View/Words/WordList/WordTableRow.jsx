@@ -323,13 +323,13 @@ const WordTableRow = ({
             {isVerb && (
               <div
                 onClick={() => handleConjugate(word)}
-                className="relative border-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white px-2 py-1 text-[10px] font-bold rounded-full mt-4 h-6 w-auto min-w-[28px] cursor-pointer hover:scale-110 border-violet-400 transition-all duration-200 shadow-lg hover:shadow-violet-500/50 flex items-center justify-center"
+                className="relative border-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white px-1 py-1 text-[10px] font-bold rounded-full mt-4 h-6  w-6 cursor-pointer hover:scale-110 border-violet-400 transition-all duration-200 shadow-lg hover:shadow-violet-500/50 flex items-center justify-center"
                 title="Show conjugation table"
               >
                 {loadingConjugations?.[word.id] ? (
                   <PuffLoader size={14} color="#c4b5fd" />
                 ) : (
-                  <span className="leading-none">Conj</span>
+                  <span className="leading-none">C</span>
                 )}
               </div>
             )}

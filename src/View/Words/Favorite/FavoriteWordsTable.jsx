@@ -2,6 +2,7 @@ import React from "react";
 import { pronounceWord } from "../../../utils/wordPronounciation";
 import { PuffLoader } from "react-spinners";
 import { ImBin } from "react-icons/im";
+import ConjugationModal from "../WordList/ConjugationModal";
 
 const normalizeText = (value) =>
   String(value ?? "")
@@ -241,12 +242,16 @@ const FavoriteWordsTable = ({
   openWordInModal,
   generateParagraph,
   loadingParagraphs,
+  handleConjugate,
+  loadingConjugations,
+  conjugationModalProps,
   handleRemoveFavorite,
   variant = "page",
 }) => {
   const tableVariant = TABLE_VARIANTS[variant] ?? TABLE_VARIANTS.page;
 
   return (
+    <>
     <div className="overflow-hidden rounded-2xl  shadow-xl dark:border-gray-700/50 dark:shadow-2xl">
       <table className="w-full border-collapse text-xs sm:text-sm md:text-base">
         <thead>
@@ -328,6 +333,21 @@ const FavoriteWordsTable = ({
                           ai
                         </span>
                       </div>
+
+                      {/* Conjugation button — verbs only */}
+                      {normalizeText(word?.partOfSpeech?.name) === "verb" && (
+                        <div
+                          onClick={() => handleConjugate?.(word)}
+                          className="relative flex h-7 cursor-pointer items-center justify-center rounded-full border-2 border-violet-400 bg-gradient-to-r from-violet-500 to-purple-500 px-2 py-1 text-[10px] font-bold text-white shadow-sm transition-all duration-300 hover:scale-110 hover:from-violet-400 hover:to-purple-400 dark:border-violet-500/50"
+                          title="Show conjugation table"
+                        >
+                          {loadingConjugations?.[word.id] ? (
+                            <PuffLoader size={14} color="#c4b5fd" />
+                          ) : (
+                            "Conj"
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </td>
@@ -391,6 +411,12 @@ const FavoriteWordsTable = ({
         </tbody>
       </table>
     </div>
+
+    {/* Conjugation modal */}
+    {conjugationModalProps?.isOpen && (
+      <ConjugationModal {...conjugationModalProps} />
+    )}
+    </>
   );
 };
 
