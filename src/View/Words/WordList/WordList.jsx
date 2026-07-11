@@ -1482,18 +1482,18 @@ const WordList = () => {
   const handleConjugate = useCallback(async (word) => {
     const cacheKey = word.value?.toLowerCase().trim();
 
-    // Open modal immediately so the user sees the loading state right away
-    setConjugationWord(word);
-    setConjugationError(null);
-    setIsConjugationModalOpen(true);
-
-    // Return cached result if we already fetched it this session
+    // Return cached result instantly if we already fetched it this session
     if (conjugationCache.current[cacheKey]) {
+      setConjugationWord(word);
+      setConjugationError(null);
       setConjugationData(conjugationCache.current[cacheKey]);
+      setIsConjugationModalOpen(true);
       return;
     }
 
-    setConjugationData(null);
+    // Show the loading spinner on the button only — don't open the modal
+    // until data (cached or freshly generated) is actually ready, so a
+    // fast DB-cache hit never flashes a "Generating..." screen.
     setLoadingConjugations((prev) => ({ ...prev, [word.id]: true }));
 
     try {
@@ -1502,12 +1502,18 @@ const WordList = () => {
       });
       const data = response.data?.data;
       conjugationCache.current[cacheKey] = data;
+      setConjugationWord(word);
+      setConjugationError(null);
       setConjugationData(data);
+      setIsConjugationModalOpen(true);
     } catch (error) {
       const message =
         error.response?.data?.message ||
         "Failed to generate conjugation. Please try again.";
+      setConjugationWord(word);
+      setConjugationData(null);
       setConjugationError(message);
+      setIsConjugationModalOpen(true);
     } finally {
       setLoadingConjugations((prev) => ({ ...prev, [word.id]: false }));
     }
