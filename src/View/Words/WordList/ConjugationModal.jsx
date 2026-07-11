@@ -201,7 +201,10 @@ const ConjugationModal = ({
                   <ConjugationTable rows={data.präsens} />
                 </TenseSection>
 
-                <TenseSection label={TENSE_LABELS.perfekt}>
+                {/* <TenseSection label={TENSE_LABELS.perfekt}> */}
+                <TenseSection
+                  label={`${TENSE_LABELS.perfekt} (${data.perfekt.auxiliary} + ${data.perfekt.participleForm})`}
+                >
                   {/* {data.perfekt?.auxiliary && data.perfekt?.participleForm && (
                     <div className="px-4 py-2.5 bg-violet-900/20 border-b border-gray-800 text-sm">
                       <span className="text-gray-400">Auxiliary: </span>
