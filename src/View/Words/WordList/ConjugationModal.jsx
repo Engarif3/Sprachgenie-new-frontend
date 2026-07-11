@@ -7,22 +7,34 @@ const TENSE_LABELS = {
   präteritum: "Präteritum",
 };
 
+// Finite sein/haben forms — matched wherever they appear in the row, not
+// just the first word, since impersonal verbs (e.g. "es hat wehgetan")
+// lead with a filler pronoun before the actual auxiliary.
+const AUXILIARY_FORMS = new Set([
+  "bin", "bist", "ist", "sind", "seid",
+  "habe", "hast", "hat", "haben", "habt",
+]);
+
 const ConjugationCell = ({ conjugation, highlightAuxiliary }) => {
   if (!highlightAuxiliary || typeof conjugation !== "string") {
     return conjugation;
   }
 
-  const spaceIndex = conjugation.indexOf(" ");
-  if (spaceIndex === -1) {
+  const words = conjugation.split(" ");
+  const auxIndex = words.findIndex((w) => AUXILIARY_FORMS.has(w.toLowerCase()));
+  if (auxIndex === -1) {
     return conjugation;
   }
 
-  const auxiliary = conjugation.slice(0, spaceIndex);
-  const rest = conjugation.slice(spaceIndex);
+  const before = words.slice(0, auxIndex).join(" ");
+  const after = words.slice(auxIndex + 1).join(" ");
   return (
     <>
-      <span className="text-orange-400">{auxiliary}</span>
-      {rest}
+      {before}
+      {before && " "}
+      <span className="text-orange-400">{words[auxIndex]}</span>
+      {after && " "}
+      {after}
     </>
   );
 };
