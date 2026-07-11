@@ -7,7 +7,27 @@ const TENSE_LABELS = {
   präteritum: "Präteritum",
 };
 
-const ConjugationTable = ({ rows }) => (
+const ConjugationCell = ({ conjugation, highlightAuxiliary }) => {
+  if (!highlightAuxiliary || typeof conjugation !== "string") {
+    return conjugation;
+  }
+
+  const spaceIndex = conjugation.indexOf(" ");
+  if (spaceIndex === -1) {
+    return conjugation;
+  }
+
+  const auxiliary = conjugation.slice(0, spaceIndex);
+  const rest = conjugation.slice(spaceIndex);
+  return (
+    <>
+      <span className="text-orange-400">{auxiliary}</span>
+      {rest}
+    </>
+  );
+};
+
+const ConjugationTable = ({ rows, highlightAuxiliary = false }) => (
   <table className="w-full text-sm border-collapse">
     <thead>
       <tr className="border-b border-gray-700">
@@ -26,7 +46,12 @@ const ConjugationTable = ({ rows }) => (
           className="border-b border-gray-800 hover:bg-white/5 transition-colors"
         >
           <td className="py-2 px-3 text-cyan-400 font-medium">{pronoun}</td>
-          <td className="py-2 px-3 text-white font-semibold">{conjugation}</td>
+          <td className="py-2 px-3 text-white font-semibold">
+            <ConjugationCell
+              conjugation={conjugation}
+              highlightAuxiliary={highlightAuxiliary}
+            />
+          </td>
         </tr>
       ))}
     </tbody>
@@ -185,7 +210,10 @@ const ConjugationModal = ({
                       <span className="text-emerald-300 font-bold">{data.perfekt.participleForm}</span>
                     </div>
                   )} */}
-                  <ConjugationTable rows={data.perfekt?.conjugations ?? []} />
+                  <ConjugationTable
+                    rows={data.perfekt?.conjugations ?? []}
+                    highlightAuxiliary
+                  />
                 </TenseSection>
 
                 <TenseSection label={TENSE_LABELS.präteritum}>
