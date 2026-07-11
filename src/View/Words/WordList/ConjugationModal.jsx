@@ -136,7 +136,12 @@ const ConjugationModal = ({
             className="mt-1 flex-shrink-0 rounded-full p-1.5 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
             aria-label="Close"
           >
-            <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5" aria-hidden="true">
+            <svg
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="w-5 h-5"
+              aria-hidden="true"
+            >
               <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
             </svg>
           </button>
@@ -147,14 +152,18 @@ const ConjugationModal = ({
           {isLoading && (
             <div className="flex flex-col items-center justify-center py-16 gap-4">
               <div className="w-10 h-10 rounded-full border-4 border-violet-500 border-t-transparent animate-spin" />
-              <p className="text-gray-400 text-sm">Generating conjugation table…</p>
+              <p className="text-gray-400 text-sm">
+                Generating conjugation table…
+              </p>
             </div>
           )}
 
           {error && !isLoading && (
             <div className="flex flex-col items-center justify-center py-12 gap-3 text-center">
               <span className="text-3xl">⚠️</span>
-              <p className="text-red-400 font-semibold">Failed to generate conjugation</p>
+              <p className="text-red-400 font-semibold">
+                Failed to generate conjugation
+              </p>
               <p className="text-gray-500 text-sm">{error}</p>
             </div>
           )}
@@ -168,14 +177,14 @@ const ConjugationModal = ({
                 </TenseSection>
 
                 <TenseSection label={TENSE_LABELS.perfekt}>
-                  {data.perfekt?.auxiliary && data.perfekt?.participleForm && (
+                  {/* {data.perfekt?.auxiliary && data.perfekt?.participleForm && (
                     <div className="px-4 py-2.5 bg-violet-900/20 border-b border-gray-800 text-sm">
                       <span className="text-gray-400">Auxiliary: </span>
                       <span className="text-violet-300 font-bold">{data.perfekt.auxiliary}</span>
                       <span className="text-gray-500 mx-2">+</span>
                       <span className="text-emerald-300 font-bold">{data.perfekt.participleForm}</span>
                     </div>
-                  )}
+                  )} */}
                   <ConjugationTable rows={data.perfekt?.conjugations ?? []} />
                 </TenseSection>
 
@@ -209,7 +218,10 @@ const ConjugationModal = ({
                       Regenerate
                     </button>
                     <button
-                      onClick={() => { setAdminPromptOpen(false); setAdminPrompt(""); }}
+                      onClick={() => {
+                        setAdminPromptOpen(false);
+                        setAdminPrompt("");
+                      }}
                       className="px-4 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
                     >
                       Cancel
@@ -243,7 +255,10 @@ const ConjugationModal = ({
                       {reportSubmitting ? "Submitting…" : "Submit report"}
                     </button>
                     <button
-                      onClick={() => { setReportOpen(false); setReportError(""); }}
+                      onClick={() => {
+                        setReportOpen(false);
+                        setReportError("");
+                      }}
                       className="px-4 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
                     >
                       Cancel
@@ -273,8 +288,10 @@ const ConjugationModal = ({
               )}
 
               {/* Regular users: report button */}
-              {userId && !isAdmin && !reportOpen && (
-                reportDone ? (
+              {userId &&
+                !isAdmin &&
+                !reportOpen &&
+                (reportDone ? (
                   <span className="text-xs text-green-500">✓ Reported</span>
                 ) : (
                   <button
@@ -283,8 +300,7 @@ const ConjugationModal = ({
                   >
                     Report error
                   </button>
-                )
-              )}
+                ))}
 
               <button
                 onClick={onClose}
