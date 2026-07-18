@@ -1,5 +1,6 @@
 .env
 .env.*
+!.env.example
 # Logs
 logs
 *.log
@@ -19,6 +20,7 @@ dist-ssr
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
@@ -29,6 +31,20 @@ dist-ssr
 
 # Local Netlify folder
 .netlify
+
+# Build/type-check artifacts
+*.tsbuildinfo
+coverage
+.eslintcache
+
+# Scratch/verification scripts and screenshots from local debugging
+# sessions — never meant to be committed. Root-anchored so it can't catch
+# legitimate underscore-prefixed files elsewhere (e.g. public/_headers).
+/_*.mjs
+/_*.png
+/_*.log
+*_tmp.js
+*_tmp.mjs
 
 # Ignore all markdown files except README.md
 *.md

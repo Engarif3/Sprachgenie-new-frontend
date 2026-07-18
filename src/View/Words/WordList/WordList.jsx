@@ -440,6 +440,22 @@ const WordList = () => {
   const [isRefreshingPage, setIsRefreshingPage] = useState(false);
   const [pageCacheReady, setPageCacheReady] = useState(false);
 
+  // =========Search suggestions ===============
+  // Purely additive: fetches from a separate lightweight endpoint on its
+  // own debounce/abort cycle. Never touches searchValue/debouncedSearchValue
+  // or the table-fetch pipeline above, so it cannot slow down or break the
+  // existing search-to-table flow.
+  const [suggestions, setSuggestions] = useState([]);
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+  const [highlightedSuggestionIndex, setHighlightedSuggestionIndex] =
+    useState(-1);
+  const suggestionsAbortRef = useRef(null);
+  const searchInputRef = useRef(null);
+  // Timestamp (ms) until which suggestion-fetch effect firings are ignored;
+  // see selectSuggestion.
+  const suppressSuggestionsUntilRef = useRef(0);
+  // =========Search suggestions ===============
+
   // ===================
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
 
@@ -465,6 +481,7 @@ const WordList = () => {
   // =========Conjugation ===============
 
   const debouncedSearchValue = useDebounce(searchValue, 300);
+  const debouncedSuggestionQuery = useDebounce(searchValue, 200);
   const debouncedCurrentPage = useDebounce(currentPage, 180);
   const cacheDebounceTimer = useRef(null);
   const aiAbortControllers = useRef(new Map());
@@ -1031,12 +1048,139 @@ const WordList = () => {
     const value = event.target.value;
     setSearchValue(value);
     setCurrentPage(1);
+    setHighlightedSuggestionIndex(-1);
   }, []);
 
   const handleSearchTypeChange = useCallback((event) => {
     setSearchType(event.target.value);
     setCurrentPage(1);
   }, []);
+
+  // =========Search suggestions ===============
+  // Own debounce, own abort-controlled request, own lightweight endpoint —
+  // fully decoupled from debouncedSearchValue and the table-fetch pipeline,
+  // so it can never slow down or interfere with the actual search.
+  useEffect(() => {
+    const trimmed = debouncedSuggestionQuery.trim();
+
+    if (suggestionsAbortRef.current) {
+      suggestionsAbortRef.current.abort();
+      suggestionsAbortRef.current = null;
+    }
+
+    // Selecting a suggestion sets searchValue (and possibly searchType) at
+    // once, which would otherwise re-trigger this same effect and pop the
+    // dropdown back open (the selected word matches itself). searchType
+    // changes immediately while debouncedSuggestionQuery only catches up
+    // ~200ms later, so this effect can fire twice for one selection — a
+    // time window (rather than a one-shot flag) suppresses every firing
+    // that lands inside it, however many there are.
+    if (Date.now() < suppressSuggestionsUntilRef.current) {
+      setSuggestions([]);
+      setSuggestionsOpen(false);
+      setHighlightedSuggestionIndex(-1);
+      return;
+    }
+
+    if (trimmed.length < 2) {
+      setSuggestions([]);
+      setSuggestionsOpen(false);
+      setHighlightedSuggestionIndex(-1);
+      return;
+    }
+
+    const controller = new AbortController();
+    suggestionsAbortRef.current = controller;
+
+    api
+      .get(
+        `/word/suggest?search=${encodeURIComponent(trimmed)}&searchType=${searchType}&limit=8`,
+        { signal: controller.signal },
+      )
+      .then((response) => {
+        const results = Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
+        setSuggestions(results);
+        setSuggestionsOpen(results.length > 0);
+        setHighlightedSuggestionIndex(-1);
+      })
+      .catch((error) => {
+        if (error.name === "CanceledError" || error.name === "AbortError") {
+          return;
+        }
+        // Suggestions are a convenience layer only — a failure here must
+        // never surface to the user or affect the main search/table.
+        setSuggestions([]);
+        setSuggestionsOpen(false);
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, [debouncedSuggestionQuery, searchType]);
+
+  const selectSuggestion = useCallback(
+    (suggestion) => {
+      // Covers the debounced searchValue-change firing that follows the
+      // state update below by ~200ms.
+      suppressSuggestionsUntilRef.current = Date.now() + 350;
+      // Fill the box with whatever is valid in the CURRENT mode, rather
+      // than switching mode out from under the user. In word mode that's
+      // the word itself; in meaning mode it's the matched meaning text —
+      // searching for the word's German spelling while still in meaning
+      // mode would search for it inside meaning text and match nothing.
+      const nextSearchValue =
+        searchType === "meaning" && suggestion.meaning?.[0]
+          ? suggestion.meaning[0]
+          : suggestion.value;
+      setSearchValue(nextSearchValue);
+      setCurrentPage(1);
+      setSuggestions([]);
+      setSuggestionsOpen(false);
+      setHighlightedSuggestionIndex(-1);
+      searchInputRef.current?.focus();
+    },
+    [searchType],
+  );
+
+  const handleSearchInputKeyDown = useCallback(
+    (event) => {
+      if (!suggestionsOpen || suggestions.length === 0) {
+        return;
+      }
+
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        setHighlightedSuggestionIndex((prev) =>
+          prev < suggestions.length - 1 ? prev + 1 : 0,
+        );
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        setHighlightedSuggestionIndex((prev) =>
+          prev > 0 ? prev - 1 : suggestions.length - 1,
+        );
+      } else if (event.key === "Enter") {
+        if (highlightedSuggestionIndex >= 0) {
+          event.preventDefault();
+          selectSuggestion(suggestions[highlightedSuggestionIndex]);
+        } else {
+          setSuggestionsOpen(false);
+        }
+      } else if (event.key === "Escape") {
+        setSuggestionsOpen(false);
+        setHighlightedSuggestionIndex(-1);
+      }
+    },
+    [suggestionsOpen, suggestions, highlightedSuggestionIndex, selectSuggestion],
+  );
+
+  const handleSearchInputBlur = useCallback(() => {
+    // Delay so a click on a suggestion (which fires mousedown/click before
+    // blur settles) has a chance to register before the dropdown closes.
+    setTimeout(() => setSuggestionsOpen(false), 150);
+  }, []);
+  // =========Search suggestions ===============
 
   const openModal = useCallback(
     (word) => {
@@ -1728,16 +1872,29 @@ const WordList = () => {
             </label>
             <input
               id="word-search"
+              ref={searchInputRef}
               type="text"
               placeholder={
                 searchType === "word" ? "Search by word" : "Search by meaning"
               }
               value={searchValue}
               onChange={handleSearchInputChange}
+              onKeyDown={handleSearchInputKeyDown}
+              onBlur={handleSearchInputBlur}
+              onFocus={() => {
+                if (suggestions.length > 0 && searchValue.trim().length >= 2) {
+                  setSuggestionsOpen(true);
+                }
+              }}
               className="border border-gray-600 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl px-4 py-3 w-full pl-12 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all"
               aria-label={
                 searchType === "word" ? "Search by word" : "Search by meaning "
               }
+              role="combobox"
+              aria-expanded={suggestionsOpen}
+              aria-controls="word-search-suggestions"
+              aria-autocomplete="list"
+              autoComplete="off"
             />
             <IoSearch
               className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-400"
@@ -1745,6 +1902,58 @@ const WordList = () => {
               aria-hidden="true"
             />
           </div>
+
+          {/* In normal document flow (not absolutely positioned) so it pushes
+              the table down instead of floating over it and hiding rows. */}
+          {suggestionsOpen && suggestions.length > 0 && (
+            <ul
+              id="word-search-suggestions"
+              role="listbox"
+              className="relative z-30 max-h-60 overflow-y-auto rounded-xl border border-gray-600 bg-gray-900/95 backdrop-blur-sm shadow-xl"
+            >
+                {suggestions.map((suggestion, index) => (
+                  <li
+                    key={suggestion.id}
+                    role="option"
+                    aria-selected={index === highlightedSuggestionIndex}
+                    onMouseDown={(event) => {
+                      // preventDefault keeps the input focused so blur never
+                      // fires, avoiding any race with the click.
+                      event.preventDefault();
+                      selectSuggestion(suggestion);
+                    }}
+                    onMouseEnter={() => setHighlightedSuggestionIndex(index)}
+                    className={`px-4 py-2 cursor-pointer text-sm truncate ${
+                      index === highlightedSuggestionIndex
+                        ? "bg-blue-600/30 text-white"
+                        : "text-gray-200 hover:bg-white/5"
+                    }`}
+                  >
+                    {suggestion.isFuzzy ? (
+                      <span className="italic text-amber-300">
+                        Did you mean{" "}
+                        <span className="font-semibold not-italic text-amber-200">
+                          {suggestion.value}
+                        </span>
+                        ?
+                      </span>
+                    ) : (
+                      <>
+                        <span className="font-semibold">
+                          {suggestion.value}
+                        </span>
+                        {suggestion.meaning?.[0] && (
+                          <span className="text-gray-400">
+                            {" "}
+                            — {suggestion.meaning[0]}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
         </div>
 
         {/* =====select search type======== */}
