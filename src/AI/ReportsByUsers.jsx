@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import api from "../axios";
 import aiApi from "../AI_axios";
-import { ScaleLoader } from "react-spinners";
+import { ScaleLoader, PuffLoader } from "react-spinners";
 import { useAuth } from "../services/auth.services";
 import AIModal from "../View/Words/Modals/AIModal";
 
@@ -335,13 +335,38 @@ const ReportsByUsers = () => {
               <th className="px-4 py-2 border">Total Reports</th>
               <th className="px-4 py-2 border">Reported By</th>
               <th className="px-4 py-2 border">Message</th>
-              <th className="px-4 py-2 border">AI Details</th>
             </tr>
           </thead>
           <tbody>
             {reports.map((r, index) => (
               <tr key={index} className="hover:bg-gray-50 align-top">
-                <td className="px-4 py-2 border">{r.word}</td>
+                <td className="px-4 py-2 border">
+                  <div className="flex justify-between gap-2">
+                    <span>{r.word}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenAiModal(r)}
+                      className={`relative flex h-6 w-6 items-center justify-center rounded-full border-2 text-xs font-bold text-white shadow-lg transition-all duration-200 hover:scale-110 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100 ${
+                        r.regenerationRequired === false
+                          ? "border-emerald-400 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 hover:shadow-green-500/50"
+                          : "border-red-400 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 hover:shadow-red-500/50"
+                      }`}
+                      disabled={openingWordId === r.wordId}
+                      title={
+                        r.regenerationRequired === false
+                          ? "View current AI content"
+                          : "Needs regeneration — view AI content"
+                      }
+                      aria-label="View current AI content"
+                    >
+                      {openingWordId === r.wordId ? (
+                        <PuffLoader size={14} color="#ffffff" />
+                      ) : (
+                        "ai"
+                      )}
+                    </button>
+                  </div>
+                </td>
                 <td className="px-4 py-2 border">{r.reportCount}</td>
                 <td className="px-4 py-2 border">
                   {r.reports.map((rep, i) => (
@@ -377,22 +402,6 @@ const ReportsByUsers = () => {
                       )}
                     </div>
                   ))}
-                </td>
-                <td className="px-4 py-2 border text-center">
-                  <button
-                    onClick={() => handleOpenAiModal(r)}
-                    className={`btn btn-sm ${
-                      r.regenerationRequired === false
-                        ? "bg-cyan-700 text-white "
-                        : "bg-red-600 text-white"
-                    }`}
-                  >
-                    {openingWordId === r.wordId
-                      ? "Opening..."
-                      : r.regenerationRequired === false
-                        ? "Generated"
-                        : "Re-generate"}
-                  </button>
                 </td>
               </tr>
             ))}

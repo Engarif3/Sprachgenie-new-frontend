@@ -412,6 +412,7 @@ const FavoritesList = () => {
         userId,
         wordId: word.id,
         word: word.value,
+        meaning: word.meaning,
         level: word.level?.level || "A1",
         language: "de",
       });

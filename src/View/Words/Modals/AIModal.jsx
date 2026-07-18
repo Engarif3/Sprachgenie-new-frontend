@@ -249,6 +249,7 @@ const AIModal = ({
         `/word/paragraph/regenerate-with-prompt-preview/${activeWord.id}`,
         {
           word: activeWord.value,
+          meaning: activeWord.meaning,
           level: getWordLevelValue(activeWord),
           language: "de",
           prompt: normalizedPrompt,

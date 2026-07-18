@@ -323,24 +323,6 @@ const WordTableRow = ({
                 </span>
               </button>
             )}
-
-            {/* Conjugation button — verbs only */}
-            {isVerb && (
-              <button
-                type="button"
-                onClick={() => handleConjugate(word)}
-                className="relative border-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white px-1 py-1 text-[10px] font-bold rounded-full mt-4 h-6  w-6 cursor-pointer hover:scale-110 border-violet-400 transition-all duration-200 shadow-lg hover:shadow-violet-500/50 flex items-center justify-center disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
-                disabled={!!loadingConjugations?.[word.id]}
-                title="Show conjugation table"
-                aria-label="Show conjugation table"
-              >
-                {loadingConjugations?.[word.id] ? (
-                  <PuffLoader size={14} color="#c4b5fd" />
-                ) : (
-                  <span className="leading-none">C</span>
-                )}
-              </button>
-            )}
           </div>
         </div>
       </td>
@@ -363,6 +345,31 @@ const WordTableRow = ({
           <span className="line-clamp-2 hover:line-clamp-none break-words max-w-[120px] md:max-w-full">
             {word.meaning?.join(", ")}
           </span>
+        )}
+      </td>
+
+      {/* Conjugate — verbs only */}
+      <td className="border border-gray-700 border-dotted p-1 md:p-2 text-center">
+        {isVerb ? (
+          <button
+            type="button"
+            onClick={() => handleConjugate(word)}
+            className="inline-flex items-center justify-center gap-1 rounded-full border-2 border-violet-400 bg-gradient-to-r from-violet-600 to-purple-600 px-2 py-1.5 md:px-3 text-[11px] md:text-xs font-bold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-violet-500 hover:to-purple-500 hover:shadow-violet-500/50 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
+            disabled={!!loadingConjugations?.[word.id]}
+            title="Show conjugation table"
+            aria-label="Show conjugation table"
+          >
+            {loadingConjugations?.[word.id] ? (
+              <PuffLoader size={14} color="#ffffff" />
+            ) : (
+              <span className="hidden md:inline">Conju.</span>
+            )}
+            {!loadingConjugations?.[word.id] && (
+              <span className="md:hidden leading-none">C</span>
+            )}
+          </button>
+        ) : (
+          <span className="text-gray-600">—</span>
         )}
       </td>
 
