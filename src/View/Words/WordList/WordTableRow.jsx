@@ -286,10 +286,13 @@ const WordTableRow = ({
             </button>
 
             {userLoggedIn ? (
-              <div
+              <button
+                type="button"
                 onClick={() => generateParagraph(word)}
-                className="relative border-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white italic px-2 py-1 text-xs font-semibold md:font-bold lg:font-bold rounded-full mt-4 h-6 w-6 cursor-pointer hover:scale-110 border-emerald-400 transition-all duration-200 shadow-lg hover:shadow-green-500/50"
+                className="relative border-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white italic px-2 py-1 text-xs font-semibold md:font-bold lg:font-bold rounded-full mt-4 h-6 w-6 cursor-pointer hover:scale-110 border-emerald-400 transition-all duration-200 shadow-lg hover:shadow-green-500/50 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
                 disabled={loadingParagraphs[word.id]}
+                title="Generate AI paragraph"
+                aria-label="Generate AI paragraph"
               >
                 {loadingParagraphs[word.id] && (
                   <span className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
@@ -306,32 +309,37 @@ const WordTableRow = ({
                 >
                   ai
                 </span>
-              </div>
+              </button>
             ) : (
-              <div
+              <button
+                type="button"
                 onClick={handleAIGenerationLocked}
                 className="relative border-2 bg-gradient-to-r from-gray-500 to-gray-500 text-gray-100 italic px-2 py-1 text-xs font-semibold md:font-bold lg:font-bold rounded-full mt-4 h-6 w-6 cursor-pointer border-gray-400 hover:from-gray-400 hover:to-gray-400 transition-all duration-200"
                 title="Sign in to generate paragraphs"
+                aria-label="Sign in to generate paragraphs"
               >
                 <span className="flex items-center justify-center relative bottom-1">
                   ai
                 </span>
-              </div>
+              </button>
             )}
 
             {/* Conjugation button — verbs only */}
             {isVerb && (
-              <div
+              <button
+                type="button"
                 onClick={() => handleConjugate(word)}
-                className="relative border-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white px-1 py-1 text-[10px] font-bold rounded-full mt-4 h-6  w-6 cursor-pointer hover:scale-110 border-violet-400 transition-all duration-200 shadow-lg hover:shadow-violet-500/50 flex items-center justify-center"
+                className="relative border-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white px-1 py-1 text-[10px] font-bold rounded-full mt-4 h-6  w-6 cursor-pointer hover:scale-110 border-violet-400 transition-all duration-200 shadow-lg hover:shadow-violet-500/50 flex items-center justify-center disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
+                disabled={!!loadingConjugations?.[word.id]}
                 title="Show conjugation table"
+                aria-label="Show conjugation table"
               >
                 {loadingConjugations?.[word.id] ? (
                   <PuffLoader size={14} color="#c4b5fd" />
                 ) : (
                   <span className="leading-none">C</span>
                 )}
-              </div>
+              </button>
             )}
           </div>
         </div>

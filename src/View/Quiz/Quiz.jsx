@@ -125,7 +125,12 @@ const Quiz = () => {
     }
 
     const loadForDifficulty = async () => {
-      dispatch({ type: "SET_LOADING", payload: true });
+      // Clear stale counts so the existing inline loading states (the
+      // "Available Words" figure and the disabled Start Quiz button)
+      // reflect the new selection — without hiding the whole level
+      // picker behind the full-page loader, which looked like a reload.
+      dispatch({ type: "SET_PREPARED_QUIZ_WORDS", payload: [] });
+      dispatch({ type: "SET_AVAILABLE_WORDS_COUNT", payload: 0 });
       try {
         const data = await loadQuizWords(difficulty);
         dispatch({ type: "SET_PREPARED_QUIZ_WORDS", payload: data.words });
@@ -137,8 +142,6 @@ const Quiz = () => {
         console.error(error);
         dispatch({ type: "SET_PREPARED_QUIZ_WORDS", payload: [] });
         dispatch({ type: "SET_AVAILABLE_WORDS_COUNT", payload: 0 });
-      } finally {
-        dispatch({ type: "SET_LOADING", payload: false });
       }
     };
 
