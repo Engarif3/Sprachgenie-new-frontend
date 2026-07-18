@@ -235,7 +235,6 @@
     inset: 0;
     overflow: hidden;
     border-radius: 52% 48% 46% 54% / 43% 42% 58% 57%;
-    border: 2px solid rgba(255, 255, 255, 0.72);
     background:
       radial-gradient(
         circle at 28% 24%,
