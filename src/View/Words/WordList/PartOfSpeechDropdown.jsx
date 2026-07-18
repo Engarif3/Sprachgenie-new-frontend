@@ -409,7 +409,7 @@ const PartOfSpeechDropdown = ({
             <button
               onClick={() => handleSelect("")}
               className={`
-                w-full px-4 py-2.5 text-left text-sm transition-colors duration-150
+                w-full px-4 py-2.5 text-left text-base transition-colors duration-150
                 hover:bg-cyan-500/20 border-b border-gray-700/30
                 ${!selectedPartOfSpeech ? "bg-cyan-500/20 text-cyan-400" : "text-gray-300"}
               `}
@@ -507,13 +507,13 @@ const PartOfSpeechDropdown = ({
                   <button
                     onClick={() => handleSelect(option.value)}
                     // className={`
-                    //   w-full px-4 py-2.5 text-left text-sm transition-colors duration-150
+                    //   w-full px-4 py-2.5 text-left text-base transition-colors duration-150
                     //   hover:bg-cyan-500/20 border-b border-gray-700/30
                     //   ${isSelected ? "bg-cyan-500/20 text-cyan-400" : "text-gray-300"}
                     //   ${isVerb || isPreposition || isAdjective ? "flex items-center justify-between" : ""}
                     // `}
                     className={`
-                      w-full px-4 py-2.5 text-left text-sm transition-colors duration-150
+                      w-full px-4 py-2.5 text-left text-base transition-colors duration-150
                       hover:bg-cyan-500/20 border-b border-gray-700/30
                       ${
                         isSelected
@@ -587,7 +587,7 @@ const PartOfSpeechDropdown = ({
                             `}
                             role="menuitem"
                           >
-                            <div className="font-semibold text-sm">
+                            <div className="font-semibold text-base">
                               All Verbs
                             </div>
                             <div className="text-xs text-gray-500 mt-0.5">
@@ -612,7 +612,7 @@ const PartOfSpeechDropdown = ({
                               role="menuitem"
                             >
                               <div
-                                className={`font-semibold text-sm ${
+                                className={`font-semibold text-base ${
                                   selectedVerbFilter === filter.value
                                     ? "text-cyan-400"
                                     : ""
@@ -677,7 +677,7 @@ const PartOfSpeechDropdown = ({
                               `}
                               role="menuitem"
                             >
-                              <div className="font-semibold text-sm">
+                              <div className="font-semibold text-base">
                                 All Prepositions
                               </div>
                               <div className="text-xs text-gray-500 mt-0.5">
@@ -702,7 +702,7 @@ const PartOfSpeechDropdown = ({
                                 role="menuitem"
                               >
                                 <div
-                                  className={`font-semibold text-sm ${
+                                  className={`font-semibold text-base ${
                                     selectedPrepositionFilter === filter.value
                                       ? "text-cyan-400"
                                       : ""
@@ -765,7 +765,7 @@ const PartOfSpeechDropdown = ({
                               `}
                               role="menuitem"
                             >
-                              <div className="font-semibold text-sm">
+                              <div className="font-semibold text-base">
                                 All Adjectives
                               </div>
                               <div className="text-xs text-gray-500 mt-0.5">
@@ -790,7 +790,7 @@ const PartOfSpeechDropdown = ({
                                 role="menuitem"
                               >
                                 <div
-                                  className={`font-semibold text-sm ${
+                                  className={`font-semibold text-base ${
                                     selectedAdjectiveFilter === filter.value
                                       ? "text-cyan-400"
                                       : ""
@@ -815,7 +815,7 @@ const PartOfSpeechDropdown = ({
             <button
               onClick={() => handleSelect(notSpecifiedValue)}
               className={`
-                w-full px-4 py-2.5 text-left text-sm transition-colors duration-150
+                w-full px-4 py-2.5 text-left text-base transition-colors duration-150
                 hover:bg-cyan-500/20
                 ${selectedPartOfSpeech === notSpecifiedValue ? "bg-cyan-500/20 text-cyan-400" : "text-gray-300"}
               `}

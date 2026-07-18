@@ -28,6 +28,7 @@ import useDebounce from "../../../hooks/useDebounce";
 import WordTableRow from "./WordTableRow";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import PartOfSpeechDropdown from "./PartOfSpeechDropdown";
+import SimpleFilterDropdown from "./SimpleFilterDropdown";
 
 // Lazy load modals for better performance
 const WordListModal = lazy(() => import("../Modals/WordListModal"));
@@ -1101,8 +1102,17 @@ const WordList = () => {
         const results = Array.isArray(response.data?.data)
           ? response.data.data
           : [];
-        setSuggestions(results);
-        setSuggestionsOpen(results.length > 0);
+
+        // Regular autocomplete suggestions are commented out — the table
+        // itself already re-sorts/filters live as you type, so a second
+        // list showing the same matches was redundant. "Did you mean"
+        // (typo correction) stays on, since the table can't tell the user
+        // "you meant X" on its own. To restore the regular dropdown,
+        // pass `results` directly instead of filtering here.
+        const displayResults = results.filter((item) => item.isFuzzy);
+
+        setSuggestions(displayResults);
+        setSuggestionsOpen(displayResults.length > 0);
         setHighlightedSuggestionIndex(-1);
       })
       .catch((error) => {
@@ -1172,7 +1182,12 @@ const WordList = () => {
         setHighlightedSuggestionIndex(-1);
       }
     },
-    [suggestionsOpen, suggestions, highlightedSuggestionIndex, selectSuggestion],
+    [
+      suggestionsOpen,
+      suggestions,
+      highlightedSuggestionIndex,
+      selectSuggestion,
+    ],
   );
 
   const handleSearchInputBlur = useCallback(() => {
@@ -1272,15 +1287,14 @@ const WordList = () => {
     [openModal, paginatedWords],
   );
 
-  const handleLevelChange = useCallback((e) => {
-    const selected = e.target.value;
+  const handleLevelChange = useCallback((selected) => {
     setSelectedLevel(selected);
     setSelectedTopic("");
     setCurrentPage(1);
   }, []);
 
-  const handleTopicChange = useCallback((e) => {
-    setSelectedTopic(e.target.value);
+  const handleTopicChange = useCallback((selected) => {
+    setSelectedTopic(selected);
     setCurrentPage(1); // Reset page on filter change
   }, []);
 
@@ -1432,17 +1446,13 @@ const WordList = () => {
     [levels, isAdmin],
   );
 
-  const levelOptions = useMemo(
+  const levelItems = useMemo(
     () =>
-      allowedLevels.map((level) => (
-        <option
-          key={level.id}
-          value={level.level}
-          className="text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white"
-        >
-          {level.level}
-        </option>
-      )),
+      allowedLevels.map((level) => ({
+        type: "item",
+        value: level.level,
+        label: level.level,
+      })),
     [allowedLevels],
   );
 
@@ -1468,66 +1478,42 @@ const WordList = () => {
     return { sorted, levelIdToLevelMap };
   }, [filteredTopics, levels]);
 
-  // Create JSX options separately - still memoized but simpler
-  const topicOptions = useMemo(() => {
+  // Data for the topic dropdown — grouped by level, with separators
+  // between groups (mirrors the previous native <select> option list).
+  const topicItems = useMemo(() => {
     const { sorted: sortedTopics, levelIdToLevelMap } = sortedTopicData;
-    const baseClass =
-      "text-md md:text-xl lg:text-lg font-custom1 bg-gray-700 text-white";
 
     let lastLevelId = null;
-    const optionsWithSeparators = [];
+    const rows = [];
 
     sortedTopics.forEach((topic) => {
       const level = levelIdToLevelMap.get(topic.levelId);
 
-      // Add separator when level changes
       if (level && level.id !== lastLevelId && lastLevelId !== null) {
-        optionsWithSeparators.push(
-          <option
-            key={`separator-${level.id}`}
-            disabled
-            className="bg-gray-700 text-gray-400 text-center border-t border-gray-500 cursor-default"
-          >
-            -------------------------------------
-          </option>,
-        );
+        rows.push({ type: "separator" });
       }
 
       lastLevelId = level ? level.id : null;
 
-      // Special handling for Unknown topic
       if (topic.id === UNKNOWN_TOPIC_ID) {
         const displayLevel = selectedLevel ? selectedLevel : "All";
-        optionsWithSeparators.push(
-          <option key={topic.id} value={topic.name} className={baseClass}>
-            {displayLevel} ➡️ {topic.name}
-          </option>,
-        );
+        rows.push({
+          type: "item",
+          value: topic.name,
+          label: `${displayLevel} ➡️ ${topic.name}`,
+        });
         return;
       }
 
       const levelName = level ? level.level : "Unknown Level";
-      optionsWithSeparators.push(
-        <option key={topic.id} value={topic.name} className={baseClass}>
-          {levelName} {level ? " ➡️" : ""} {topic.name}
-        </option>,
-      );
+      rows.push({
+        type: "item",
+        value: topic.name,
+        label: `${levelName}${level ? " ➡️" : ""} ${topic.name}`,
+      });
     });
 
-    // Add spacing option
-    if (optionsWithSeparators.length > 0) {
-      optionsWithSeparators.push(
-        <option
-          key="bottom-space"
-          disabled
-          className="bg-gray-700 h-4 cursor-default"
-        >
-          &nbsp;
-        </option>,
-      );
-    }
-
-    return optionsWithSeparators;
+    return rows;
   }, [sortedTopicData, selectedLevel]);
 
   // 	==============AI===============
@@ -1561,6 +1547,7 @@ const WordList = () => {
           userId,
           wordId: word.id,
           word: word.value,
+          meaning: word.meaning,
           level: word.level?.level || "A1",
           language: "de",
         },
@@ -1911,49 +1898,49 @@ const WordList = () => {
               role="listbox"
               className="relative z-30 max-h-60 overflow-y-auto rounded-xl border border-gray-600 bg-gray-900/95 backdrop-blur-sm shadow-xl"
             >
-                {suggestions.map((suggestion, index) => (
-                  <li
-                    key={suggestion.id}
-                    role="option"
-                    aria-selected={index === highlightedSuggestionIndex}
-                    onMouseDown={(event) => {
-                      // preventDefault keeps the input focused so blur never
-                      // fires, avoiding any race with the click.
-                      event.preventDefault();
-                      selectSuggestion(suggestion);
-                    }}
-                    onMouseEnter={() => setHighlightedSuggestionIndex(index)}
-                    className={`px-4 py-2 cursor-pointer text-sm truncate ${
-                      index === highlightedSuggestionIndex
-                        ? "bg-blue-600/30 text-white"
-                        : "text-gray-200 hover:bg-white/5"
-                    }`}
-                  >
-                    {suggestion.isFuzzy ? (
-                      <span className="italic text-amber-300">
-                        Did you mean{" "}
-                        <span className="font-semibold not-italic text-amber-200">
-                          {suggestion.value}
-                        </span>
-                        ?
+              {suggestions.map((suggestion, index) => (
+                <li
+                  key={suggestion.id}
+                  role="option"
+                  aria-selected={index === highlightedSuggestionIndex}
+                  onMouseDown={(event) => {
+                    // preventDefault keeps the input focused so blur never
+                    // fires, avoiding any race with the click.
+                    event.preventDefault();
+                    selectSuggestion(suggestion);
+                  }}
+                  onMouseEnter={() => setHighlightedSuggestionIndex(index)}
+                  className={`px-4 py-2 cursor-pointer text-sm truncate ${
+                    index === highlightedSuggestionIndex
+                      ? "bg-blue-600/30 text-white"
+                      : "text-gray-200 hover:bg-white/5"
+                  }`}
+                >
+                  {suggestion.isFuzzy ? (
+                    <span className="italic text-amber-300">
+                      Did you mean{" "}
+                      <span className="font-semibold not-italic text-amber-200">
+                        {searchType === "meaning" && suggestion.meaning?.[0]
+                          ? suggestion.meaning[0]
+                          : suggestion.value}
                       </span>
-                    ) : (
-                      <>
-                        <span className="font-semibold">
-                          {suggestion.value}
+                      ?
+                    </span>
+                  ) : (
+                    <>
+                      <span className="font-semibold">{suggestion.value}</span>
+                      {suggestion.meaning?.[0] && (
+                        <span className="text-gray-400">
+                          {" "}
+                          — {suggestion.meaning[0]}
                         </span>
-                        {suggestion.meaning?.[0] && (
-                          <span className="text-gray-400">
-                            {" "}
-                            — {suggestion.meaning[0]}
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
+                      )}
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {/* =====select search type======== */}
@@ -1964,16 +1951,15 @@ const WordList = () => {
             <label htmlFor="level-select" className="sr-only">
               Filter by level
             </label>
-            <select
+            <SimpleFilterDropdown
               id="level-select"
-              value={selectedLevel}
-              onChange={handleLevelChange}
-              className="border  border-gray-600 dark:bg-gray-800 backdrop-blur-sm rounded-xl px-4 py-3 w-full dark:text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50 transition-all"
-              aria-label="Filter words by level"
-            >
-              <option value="">All Levels</option>
-              {levelOptions}
-            </select>
+              ariaLabel="Filter words by level"
+              placeholder="All Levels"
+              displayLabel={selectedLevel || "All Levels"}
+              selectedValue={selectedLevel}
+              onSelect={handleLevelChange}
+              items={levelItems}
+            />
           </div>
         </div>
 
@@ -1983,21 +1969,22 @@ const WordList = () => {
             <label htmlFor="topic-select" className="sr-only">
               Filter by topic
             </label>
-            <select
+            <SimpleFilterDropdown
               id="topic-select"
-              value={selectedTopic}
-              onChange={handleTopicChange}
-              className="border border-gray-600 dark:bg-gray-800 backdrop-blur-sm rounded-xl px-4 py-3 w-full dark:text-white focus:border-pink-500 focus:ring-2 focus:ring-pink-500/50 transition-all"
-              aria-label="Filter words by topic"
-            >
-              {/* <option value=""> `All Topics for {selectedLevel} Level`</option> */}
-              <option value="">
-                {" "}
-                {selectedLevel ? `Topics for  ${selectedLevel} ` : "All Topics"}
-              </option>
-
-              {topicOptions}
-            </select>
+              ariaLabel="Filter words by topic"
+              placeholder={
+                selectedLevel
+                  ? `Topics for ${selectedLevel}`
+                  : "All Topics (TELC)"
+              }
+              displayLabel={
+                selectedTopic ||
+                (selectedLevel ? `Topics for ${selectedLevel}` : "All Topics ")
+              }
+              selectedValue={selectedTopic}
+              onSelect={handleTopicChange}
+              items={topicItems}
+            />
           </div>
         </div>
 
@@ -2079,6 +2066,9 @@ const WordList = () => {
 
                   <th className="border-l py-3 border-gray-700 border-dotted text-center text-purple-400 font-bold w-[10%] md:w-[25%] lg:w-[25%] border-b">
                     Meaning
+                  </th>
+                  <th className="border-l py-3 border-gray-700 border-dotted text-center text-violet-400 font-bold w-[3%] md:w-[5%] lg:w-[5%] border-b">
+                    Conju.
                   </th>
                   <th className="border-l py-3 border-gray-700 border-dotted text-center text-cyan-400 font-bold hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b">
                     Synonym
@@ -2222,7 +2212,9 @@ const WordList = () => {
             word={conjugationWord}
             data={conjugationData}
             isLoading={
-              conjugationWord ? !!loadingConjugations[conjugationWord.id] : false
+              conjugationWord
+                ? !!loadingConjugations[conjugationWord.id]
+                : false
             }
             error={conjugationError}
             userId={userId}
@@ -2239,7 +2231,9 @@ const WordList = () => {
               isAdmin
                 ? async (customPrompt) => {
                     if (!conjugationWord) return;
-                    const cacheKey = conjugationWord.value?.toLowerCase().trim();
+                    const cacheKey = conjugationWord.value
+                      ?.toLowerCase()
+                      .trim();
                     delete conjugationCache.current[cacheKey];
                     setConjugationData(null);
                     setConjugationError(null);

@@ -191,6 +191,8 @@ const TABLE_VARIANTS = {
       "border border-slate-200 border-dotted p-0 pl-2 dark:border-gray-700 md:p-2 lg:p-2",
     meaningText:
       "max-w-[120px] break-words text-sm font-medium text-slate-700 line-clamp-2 hover:line-clamp-none dark:text-white md:max-w-full md:text-base lg:text-base",
+    conjugateCell:
+      "border border-slate-200 border-dotted p-1 text-center dark:border-gray-700 md:p-2 lg:p-2",
     synonymsCell:
       "hidden border border-slate-200 border-dotted p-1 dark:border-gray-700 md:table-cell md:p-2 lg:p-2",
     synonymsTag:
@@ -219,6 +221,8 @@ const TABLE_VARIANTS = {
       "border border-slate-200 border-dotted p-2 dark:border-gray-700 md:p-2 lg:p-2",
     meaningText:
       "max-w-[120px] break-words text-xs font-medium text-slate-700 line-clamp-2 hover:line-clamp-none dark:text-white md:max-w-full md:text-sm lg:text-base",
+    conjugateCell:
+      "border border-slate-200 border-dotted p-1 text-center dark:border-gray-700 md:p-2 lg:p-2",
     synonymsCell:
       "hidden border border-slate-200 border-dotted p-2 dark:border-gray-700 md:table-cell md:p-2 lg:p-2",
     synonymsTag:
@@ -264,6 +268,9 @@ const FavoriteWordsTable = ({
               </th>
               <th className="border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-purple-400 dark:border-gray-700 w-[10%] md:w-[25%] lg:w-[25%]">
                 Meaning
+              </th>
+              <th className="border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-violet-400 dark:border-gray-700 w-[3%] md:w-[5%] lg:w-[5%]">
+                Conju.
               </th>
               <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-cyan-400 dark:border-gray-700 md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
                 Synonym
@@ -333,21 +340,6 @@ const FavoriteWordsTable = ({
                             ai
                           </span>
                         </div>
-
-                        {/* Conjugation button — verbs only */}
-                        {normalizeText(word?.partOfSpeech?.name) === "verb" && (
-                          <div
-                            onClick={() => handleConjugate?.(word)}
-                            className="relative flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-2 border-violet-400 bg-gradient-to-r from-violet-500 to-purple-500 px-1 py-1 text-[10px] font-bold text-white shadow-sm transition-all duration-300 hover:scale-110 hover:from-violet-400 hover:to-purple-400 dark:border-violet-500/50"
-                            title="Show conjugation table"
-                          >
-                            {loadingConjugations?.[word.id] ? (
-                              <PuffLoader size={14} color="#c4b5fd" />
-                            ) : (
-                              "C"
-                            )}
-                          </div>
-                        )}
                       </div>
                     </div>
                   </td>
@@ -355,6 +347,31 @@ const FavoriteWordsTable = ({
                     <span className={tableVariant.meaningText}>
                       {word.meaning?.join(", ")}
                     </span>
+                  </td>
+                  <td className={tableVariant.conjugateCell}>
+                    {normalizeText(word?.partOfSpeech?.name) === "verb" ? (
+                      <button
+                        type="button"
+                        onClick={() => handleConjugate?.(word)}
+                        className="inline-flex items-center justify-center gap-1 rounded-full border-2 border-violet-400 bg-gradient-to-r from-violet-600 to-purple-600 px-2 py-1.5 md:px-3 text-[11px] md:text-xs font-bold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-violet-500 hover:to-purple-500 hover:shadow-violet-500/50 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
+                        disabled={!!loadingConjugations?.[word.id]}
+                        title="Show conjugation table"
+                        aria-label="Show conjugation table"
+                      >
+                        {loadingConjugations?.[word.id] ? (
+                          <PuffLoader size={14} color="#ffffff" />
+                        ) : (
+                          <span className="hidden md:inline">Conju.</span>
+                        )}
+                        {!loadingConjugations?.[word.id] && (
+                          <span className="md:hidden leading-none">C</span>
+                        )}
+                      </button>
+                    ) : (
+                      <span className="text-gray-400 dark:text-gray-600">
+                        —
+                      </span>
+                    )}
                   </td>
                   <td className={tableVariant.synonymsCell}>
                     <div className="flex flex-wrap gap-1.5">
