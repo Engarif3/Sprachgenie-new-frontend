@@ -309,7 +309,7 @@ const NavBar = () => {
               </Link>
 
               <div className="ml-auto flex items-center md:hidden">
-                <div className="mr-3 flex items-center gap-3">
+                <div className="mr-2 flex items-center gap-2">
                   {location.pathname !== "/words" && (
                     <Link
                       to="/words"
