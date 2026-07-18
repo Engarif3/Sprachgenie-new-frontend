@@ -293,7 +293,7 @@ const Home = () => {
       link: "/conversation-titles",
       eyebrow: "Speaking Flows",
       index: "06",
-      tone: "rose",
+      tone: "indigo",
       icon: (
         <svg
           viewBox="0 0 24 24"
@@ -699,18 +699,41 @@ const Home = () => {
                 : "opacity-0 translate-y-10"
             }`}
           >
-            {resourceCards.map((card) => (
-              <HomeCard
-                key={card.title}
-                title={card.title}
-                text={card.text}
-                link={card.link}
-                icon={card.icon}
-                eyebrow={card.eyebrow}
-                index={card.index}
-                tone={card.tone}
-              />
-            ))}
+            {resourceCards.map((card, cardIndex) => {
+              if (cardIndex !== resourceCards.length - 1) {
+                return (
+                  <HomeCard
+                    key={card.title}
+                    title={card.title}
+                    text={card.text}
+                    link={card.link}
+                    icon={card.icon}
+                    eyebrow={card.eyebrow}
+                    index={card.index}
+                    tone={card.tone}
+                  />
+                );
+              }
+
+              // 7 cards in a 2/3-column grid always leaves the last card
+              // alone in the final row — span the full row and center it
+              // instead of leaving it flush-left with empty space beside it.
+              return (
+                <div key={card.title} className="md:col-span-2 lg:col-span-3">
+                  <div className="mx-auto w-full max-w-md">
+                    <HomeCard
+                      title={card.title}
+                      text={card.text}
+                      link={card.link}
+                      icon={card.icon}
+                      eyebrow={card.eyebrow}
+                      index={card.index}
+                      tone={card.tone}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </Container>
       </div>
