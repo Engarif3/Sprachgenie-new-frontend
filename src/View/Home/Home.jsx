@@ -587,13 +587,13 @@ const Home = () => {
                 }`}
               >
                 <span
-                  className={`flex h-10 w-10 items-center justify-center rounded-full text-xl ${
-                    theme === "light"
-                      ? "bg-sky-50 text-sky-700"
-                      : "bg-white/10 text-white"
-                  }`}
+                // className={`flex h-10 w-10 items-center justify-center text-xl ${
+                //   theme === "light"
+                //     ? "bg-sky-50 text-sky-700"
+                //     : "bg-white/10 text-white"
+                // }`}
                 >
-                  📚
+                  📖
                 </span>
                 <span
                   className={
@@ -616,19 +616,19 @@ const Home = () => {
 
           {!userLoggedIn && (
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link
+              {/* <Link
                 to="/register"
-                className={`px-8 py-4 font-bold rounded-full transition-all duration-300 text-lg hover:scale-[1.03] ${
+                className={`px-8 py-3 font-bold rounded-full transition-all duration-300 text-lg hover:scale-[1.03] ${
                   theme === "light"
                     ? "bg-[linear-gradient(135deg,#f97316,#ec4899)] text-white shadow-[0_18px_34px_rgba(244,114,182,0.22)] hover:shadow-[0_22px_42px_rgba(244,114,182,0.28)]"
                     : "bg-gradient-to-r from-red-500 to-blue-900 text-white hover:shadow-2xl"
                 }`}
               >
                 {t("startLearning")}
-              </Link>
+              </Link> */}
               <Link
                 to="/login"
-                className={`px-8 py-4 bg-transparent border-2 border-orange-500 ${theme === "dark" ? "text-white" : "text-black"} font-bold rounded-full hover:bg-orange-500 hover:text-white transition-all duration-300 text-lg`}
+                className={`px-8 py-2 bg-transparent border-2 border-sky-500 ${theme === "dark" ? "text-white" : "text-black"} font-bold rounded-full hover:bg-sky-700 hover:text-white transition-all duration-300 text-lg capitalize`}
               >
                 {t("login")}
               </Link>
