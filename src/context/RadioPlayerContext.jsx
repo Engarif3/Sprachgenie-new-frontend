@@ -253,7 +253,6 @@ export const RadioPlayerProvider = ({ children }) => {
 
       return playSelection(nextStation, nextStream, {
         autoplay: true,
-        openMiniPlayer: true,
       });
     },
     [playSelection],
