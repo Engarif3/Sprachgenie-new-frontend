@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   ChevronLeft,
   ChevronRight,
@@ -24,6 +24,7 @@ const stopEventPropagation = (event) => {
 
 const RadioMiniPlayer = () => {
   const { theme } = useTheme();
+  const location = useLocation();
   const {
     currentStation,
     currentStream,
@@ -103,10 +104,13 @@ const RadioMiniPlayer = () => {
   }, [clampPosition, isMiniPlayerExpanded]);
 
   const handleCloseMiniPlayer = useCallback(() => {
-    stopPlayback();
+    if (location.pathname !== "/radio") {
+      stopPlayback();
+    }
+
     setMiniPlayerExpanded(false);
     setMiniPlayerVisible(false);
-  }, [setMiniPlayerExpanded, setMiniPlayerVisible, stopPlayback]);
+  }, [location.pathname, setMiniPlayerExpanded, setMiniPlayerVisible, stopPlayback]);
 
   const runFoldedAction = useCallback(
     (action) => {
