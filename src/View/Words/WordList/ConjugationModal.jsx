@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import aiApi from "../../../AI_axios";
+import { useLockBodyScroll } from "../Modals/ModalScrolling";
 
 const TENSE_LABELS = {
   präsens: "Präsens",
@@ -116,6 +117,8 @@ const ConjugationModal = ({
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [isOpen, onClose]);
+
+  useLockBodyScroll(isOpen);
 
   if (!isOpen) return null;
 
