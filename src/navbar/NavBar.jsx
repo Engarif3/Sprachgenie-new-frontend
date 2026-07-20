@@ -12,6 +12,7 @@ import Container from "../utils/Container";
 import ENFlag from "../assets/EN.svg";
 import DEFlag from "../assets/DE.svg";
 import ShareSiteModal from "./ShareSiteModal";
+import { useChallengeStreak } from "../hooks/useChallengeStreak";
 
 const getUserInitials = (name, email) => {
   const source = (name || email || "User").trim();
@@ -43,6 +44,7 @@ const NavBar = () => {
   const mobileVisitorToggleRef = useRef(null);
   const { theme, toggleTheme } = useTheme();
   const { language, toggleLanguage } = useLanguage();
+  const { currentStreak } = useChallengeStreak();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -162,6 +164,27 @@ const NavBar = () => {
             className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30 flex items-center gap-2"
           >
             ❤️ {t("navbar.favorites")}
+          </Link>
+        )}
+        {userLoggedIn && (
+          <Link
+            to="/challenge"
+            onClick={() => setIsProfileMenuOpen(false)}
+            className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30 flex items-center justify-between gap-2"
+          >
+            <span className="flex items-center gap-2">🎯 Daily Challenge</span>
+            {currentStreak > 0 ? (
+              <span className="text-xs text-slate-400">🔥{currentStreak}</span>
+            ) : null}
+          </Link>
+        )}
+        {userLoggedIn && (
+          <Link
+            to="/challenge/leaderboard"
+            onClick={() => setIsProfileMenuOpen(false)}
+            className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30 flex items-center gap-2"
+          >
+            🏆 Leaderboard
           </Link>
         )}
         {/* ========================================== */}

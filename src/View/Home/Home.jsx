@@ -346,6 +346,32 @@ const Home = () => {
         </svg>
       ),
     },
+    {
+      title: t("challengeCardTitle"),
+      text: t("challengeCardDesc"),
+      link: "/challenge",
+      eyebrow: "Daily Challenge",
+      index: "08",
+      tone: "cyan",
+      icon: (
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          className="h-7 w-7"
+          aria-hidden="true"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h5" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M20 20v-5h-5" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M5.5 15a7 7 0 0 0 12.6 2.5M18.5 9a7 7 0 0 0-12.6-2.5"
+          />
+        </svg>
+      ),
+    },
   ];
 
   return (
@@ -700,7 +726,18 @@ const Home = () => {
             }`}
           >
             {resourceCards.map((card, cardIndex) => {
-              if (cardIndex !== resourceCards.length - 1) {
+              // Only the LAST card of the LAST row needs special treatment,
+              // and only when it's truly alone in that row (a 3-column grid
+              // leaves exactly one card stranded when the total count % 3
+              // === 1). At any other remainder (0 = full rows, 2 = a normal
+              // two-card row), every card renders as a plain grid item —
+              // forcing the solo-center treatment there was what made an
+              // 8-card grid (2 leftover) look broken, with the 7th card
+              // sitting alone above a full-width-centered 8th card.
+              const isLastCard = cardIndex === resourceCards.length - 1;
+              const isStrandedAlone = resourceCards.length % 3 === 1;
+
+              if (!isLastCard || !isStrandedAlone) {
                 return (
                   <HomeCard
                     key={card.title}
@@ -715,9 +752,6 @@ const Home = () => {
                 );
               }
 
-              // 7 cards in a 2/3-column grid always leaves the last card
-              // alone in the final row — span the full row and center it
-              // instead of leaving it flush-left with empty space beside it.
               return (
                 <div key={card.title} className="md:col-span-2 lg:col-span-3">
                   <div className="mx-auto w-full max-w-md">
