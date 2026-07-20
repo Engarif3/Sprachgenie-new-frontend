@@ -113,7 +113,7 @@ const UnlockCountdown = ({ isLight }) => {
 const ChallengeSession = () => {
   const { theme } = useTheme();
   const isLight = theme === "light";
-  const { isSuperAdmin } = useAuth();
+  const { isSuperAdmin, isLoggedIn } = useAuth();
 
   const [view, setView] = useState("levels"); // "levels" | "challenge"
   const [loadingLevels, setLoadingLevels] = useState(true);
@@ -136,6 +136,14 @@ const ChallengeSession = () => {
   const localDate = useMemo(() => getLocalDateKey(), []);
 
   const refreshLevelStatus = useCallback(async () => {
+    // Anonymous visitors can browse the level cards, but there's no
+    // progress to fetch for them — skip the (otherwise-401) request.
+    if (!isLoggedIn) {
+      setLevelStatus(null);
+      setLoadingLevels(false);
+      return;
+    }
+
     setLoadingLevels(true);
 
     try {
@@ -148,11 +156,30 @@ const ChallengeSession = () => {
     } finally {
       setLoadingLevels(false);
     }
-  }, [localDate]);
+  }, [localDate, isLoggedIn]);
 
   useEffect(() => {
     void refreshLevelStatus();
   }, [refreshLevelStatus]);
+
+  // Shown instead of the login-only actions (Start/Continue, Leaderboard)
+  // when browsing without an account — friendlier than the silent
+  // redirect-to-/login the route itself used to do.
+  const handleLoginRequired = (message) => {
+    Swal.fire({
+      icon: "info",
+      title: "Login to enjoy this feature",
+      text: message,
+      confirmButtonText: "Go to Login",
+      confirmButtonColor: "#123456",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = "/login";
+      }
+    });
+  };
 
   const startLevel = async (levelKey) => {
     setLoadingChallenge(true);
@@ -366,10 +393,18 @@ const ChallengeSession = () => {
                 <Check size={13} className="shrink-0 text-emerald-500" />
                 Correct after 10s: <b>+9 XP</b>
               </li>
-              <li className="flex items-center gap-2">
+              <li className="hidden md:flex items-center gap-2 ">
                 <X size={13} className="shrink-0 text-rose-500" />
-                Wrong answer: <b>-2 XP</b>, +1 more for each miss in a row (-2,
-                -3, -4…)
+                Wrong answer: <b>-2 XP</b>, +1 more for each consecutive wrong
+                answer in a row (-2, -3, -4…)
+              </li>
+              <li className="flex md:hidden items-center gap-2 ">
+                <X size={13} className="shrink-0 text-rose-500" />
+                Wrong answer: <b>-2 XP</b>
+              </li>
+              <li className="flex md:hidden items-center gap-2 ">
+                <X size={13} className="shrink-0 text-rose-500" />
+                +1 more for each consecutive wrong answer in a row (-2, -3, -4…)
               </li>
               <li className="flex items-center gap-2">
                 <Clock size={13} className="shrink-0 text-rose-500" />
@@ -377,7 +412,7 @@ const ChallengeSession = () => {
               </li>
               <li className="flex items-center gap-2">
                 <Sparkles size={13} className="shrink-0 text-amber-500" />A
-                correct answer or a timeout resets the wrong answers streak
+                correct answer or a timeout resets the wrong answer streak
               </li>
             </ul>
           </div>
@@ -453,7 +488,13 @@ const ChallengeSession = () => {
                       ) : (
                         <button
                           type="button"
-                          onClick={() => startLevel(key)}
+                          onClick={() =>
+                            isLoggedIn
+                              ? startLevel(key)
+                              : handleLoginRequired(
+                                  "Sign in to play the Daily Challenge",
+                                )
+                          }
                           disabled={loadingChallenge}
                           className={`w-full rounded-xl bg-gradient-to-r px-4 py-3.5 text-base font-bold text-white shadow-md transition-transform hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 ${levelTheme.gradient}`}
                         >
@@ -461,12 +502,26 @@ const ChallengeSession = () => {
                         </button>
                       )}
 
-                      <Link
-                        to={`/challenge/leaderboard?level=${key}`}
-                        className={`mt-3 inline-flex items-center justify-center gap-1 text-xs font-semibold hover:underline ${levelTheme.text}`}
-                      >
-                        <Trophy size={12} /> {label} leaderboard
-                      </Link>
+                      {isLoggedIn ? (
+                        <Link
+                          to={`/challenge/leaderboard?level=${key}`}
+                          className={`mt-3 inline-flex items-center justify-center gap-1 text-xs font-semibold hover:underline ${levelTheme.text}`}
+                        >
+                          <Trophy size={12} /> {label} leaderboard
+                        </Link>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleLoginRequired(
+                              "Sign in to view the leaderboard",
+                            )
+                          }
+                          className={`mt-3 inline-flex items-center justify-center gap-1 text-xs font-semibold hover:underline ${levelTheme.text}`}
+                        >
+                          <Trophy size={12} /> {label} leaderboard
+                        </button>
+                      )}
 
                       {isSuperAdmin ? (
                         <button

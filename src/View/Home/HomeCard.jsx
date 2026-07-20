@@ -246,6 +246,7 @@ const HomeCard = ({
   link,
   icon,
   eyebrow,
+  index,
   tone = "blue",
 }) => {
   const { t } = useTranslation("home");
@@ -310,7 +311,9 @@ const HomeCard = ({
           <div className="flex items-center gap-2">
             <div
               className={`inline-flex h-14 w-14 items-center justify-center rounded-[18px] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] ${
-                isLight ? "border border-gray-200 bg-white/60" : "bg-white/[0.07]"
+                isLight
+                  ? "border border-gray-200 bg-white/60"
+                  : "bg-white/[0.07]"
               } ${palette.iconRing}`}
             >
               <div

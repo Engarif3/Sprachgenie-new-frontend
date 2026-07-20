@@ -1713,22 +1713,6 @@ const WordList = () => {
   const wordCountLabel = hasActiveFilters ? "Filtered" : "Total";
   const showAdminControls = userLoggedIn && isAdmin;
 
-  const handleChallengeLocked = () => {
-    Swal.fire({
-      icon: "info",
-      title: "Login to enjoy this feature",
-      text: "Sign in to play the Daily Challenge",
-      confirmButtonText: "Go to Login",
-      confirmButtonColor: "#123456",
-      showCancelButton: true,
-      cancelButtonText: "Cancel",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        window.location.href = "/login";
-      }
-    });
-  };
-
   return (
     <Container>
       {/* Modern Header Section */}
@@ -1742,22 +1726,12 @@ const WordList = () => {
               🎮 Play Quiz
             </Link>
 
-            {userLoggedIn ? (
-              <Link
-                to="/challenge"
-                className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 px-1 md:px-2 lg:px-2 py-1 md:py-1 lg:py-1 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-emerald-500/50"
-              >
-                🎯 Daily Challenge
-              </Link>
-            ) : (
-              <button
-                type="button"
-                onClick={handleChallengeLocked}
-                className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 px-1 md:px-2 lg:px-2 py-1 md:py-1 lg:py-1 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-emerald-500/50"
-              >
-                🎯 Daily Challenge
-              </button>
-            )}
+            <Link
+              to="/challenge"
+              className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 px-1 md:px-2 lg:px-2 py-1 md:py-1 lg:py-1 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-emerald-500/50"
+            >
+              🎯 Daily Challenge
+            </Link>
           </div>
 
           <span className="text-sm block md:hidden lg:hidden text-pink-400 font-bold mr-2">
