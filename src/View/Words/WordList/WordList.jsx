@@ -1718,12 +1718,21 @@ const WordList = () => {
       {/* Modern Header Section */}
       <div className="text-center my-2 md:my-8 lg:my-8 ">
         <div className="flex justify-between items-center mb-2 md:mb-6 lg:mb-6 ml-2">
-          <Link
-            to="/quiz"
-            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-1.5 md:px-6 lg:px-6 py-1.5 md:py-2 lg:py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/50"
-          >
-            🎮 Play Quiz
-          </Link>
+          <div className="flex items-center gap-1.5 md:gap-3 lg:gap-3">
+            <Link
+              to="/quiz"
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-1.5 md:px-6 lg:px-6 py-1.5 md:py-2 lg:py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/50"
+            >
+              🎮 Play Quiz
+            </Link>
+
+            <Link
+              to="/challenge"
+              className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 px-1.5 md:px-6 lg:px-6 py-1.5 md:py-2 lg:py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-emerald-500/50"
+            >
+              🎯 Daily Challenge
+            </Link>
+          </div>
 
           <span className="text-sm block md:hidden lg:hidden text-pink-400 font-bold mr-2">
             {wordCountLabel}: {displayedWordsCount} words

@@ -150,6 +150,16 @@ const DashboardLayout = () => {
               <span>Favorites</span>
             </NavLink>
 
+            <NavLink
+              to="/challenge/leaderboard"
+              className={({ isActive }) => navItemClass(isActive)}
+              onClick={() => setIsOpen(false)}
+              title="Weekly XP Leaderboard"
+            >
+              <span className="text-lg">🏆</span>
+              <span>Leaderboard</span>
+            </NavLink>
+
             {(role === "admin" || role === "super_admin") && (
               <>
                 <div className="my-4 px-2">

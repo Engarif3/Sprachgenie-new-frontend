@@ -328,7 +328,10 @@ const WordForm = () => {
       value: wordData.value,
       meaning:
         typeof wordData.meaning === "string"
-          ? wordData.meaning.split(",").map((item) => item.trim())
+          ? wordData.meaning
+              .split(",")
+              .map((item) => item.trim())
+              .filter((item) => item) // Removes empty strings
           : [],
       sentences:
         typeof wordData.sentences === "string"

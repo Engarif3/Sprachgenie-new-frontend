@@ -66,6 +66,8 @@ const PerfectAndPastForm = lazy(
 );
 const Stories = lazy(() => import("../View/Stories/Stories"));
 const RadioChannels = lazy(() => import("../View/Radio/RadioChannels"));
+const ChallengeSession = lazy(() => import("../View/Challenge/ChallengeSession"));
+const Leaderboard = lazy(() => import("../View/Challenge/Leaderboard"));
 const UsersFavoriteCount = lazy(
   () => import("../AdminActions/Admin/UsersFavoriteCount"),
 );
@@ -142,6 +144,8 @@ const StoriesManagementWithSuspense = withSuspense(StoriesManagement);
 const PerfectAndPastFormWithSuspense = withSuspense(PerfectAndPastForm);
 const StoriesWithSuspense = withSuspense(Stories);
 const RadioChannelsWithSuspense = withSuspense(RadioChannels);
+const ChallengeSessionWithSuspense = withSuspense(ChallengeSession);
+const LeaderboardWithSuspense = withSuspense(Leaderboard);
 const UsersFavoriteCountWithSuspense = withSuspense(UsersFavoriteCount);
 const DashboardLayoutWithSuspense = withSuspense(DashboardLayout);
 const DashboardHomeWithSuspense = withSuspense(DashboardHome);
@@ -262,6 +266,16 @@ export const router = createBrowserRouter(
 
         //Quiz
         { path: "/quiz", element: <QuizWithSuspense /> },
+
+        //Daily Challenge
+        {
+          path: "/challenge",
+          element: protectRoute(<ChallengeSessionWithSuspense />),
+        },
+        {
+          path: "/challenge/leaderboard",
+          element: protectRoute(<LeaderboardWithSuspense />),
+        },
 
         {
           path: "/dashboard",

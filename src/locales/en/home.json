@@ -110,6 +110,8 @@
   "conversationCardDesc": "Practice real-world dialogues on diverse topics to build fluency",
   "quizCardTitle": "Play Quiz",
   "quizCardDesc": "Test your knowledge with interactive quizzes and challenges",
+  "challengeCardTitle": "Daily Challenge",
+  "challengeCardDesc": "Answer 20 timed multiple-choice questions a day per level, earn XP, and climb the leaderboard",
   "exploreNow": "Explore Now",
   "scrollToExplore": "Scroll to explore more",
   "welcome": "Welcome!"

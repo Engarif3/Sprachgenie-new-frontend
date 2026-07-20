@@ -209,6 +209,35 @@ const tones = {
       openText: "text-white",
     },
   },
+  cyan: {
+    dark: {
+      shell:
+        "bg-[linear-gradient(160deg,rgba(8,40,45,0.98),rgba(14,72,80,0.96),rgba(21,130,140,0.9))]",
+      glow: "bg-cyan-400/20",
+      icon: "from-cyan-300/35 to-teal-500/20",
+      accent: "bg-cyan-300/90",
+      label: "text-cyan-100",
+      eyebrow: "text-white/85",
+      iconRing: "text-slate-50",
+      title: "text-white",
+      openBg: "bg-white/[0.08]",
+      openHoverBg: "group-hover:bg-white/[0.12]",
+      openText: "text-white/90",
+    },
+    light: {
+      shell: "bg-gradient-to-br from-white via-cyan-50 to-cyan-100",
+      glow: "bg-cyan-300/40",
+      icon: "from-cyan-100 to-cyan-200",
+      accent: "bg-cyan-500",
+      label: "text-cyan-700",
+      eyebrow: "text-cyan-600",
+      iconRing: "text-cyan-600",
+      title: "text-cyan-900",
+      openBg: "bg-cyan-500",
+      openHoverBg: "group-hover:bg-cyan-600",
+      openText: "text-white",
+    },
+  },
 };
 
 const HomeCard = ({
@@ -217,7 +246,6 @@ const HomeCard = ({
   link,
   icon,
   eyebrow,
-  index,
   tone = "blue",
 }) => {
   const { t } = useTranslation("home");
