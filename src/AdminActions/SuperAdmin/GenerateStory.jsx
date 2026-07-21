@@ -228,6 +228,18 @@ const GenerateStory = () => {
     }
   };
 
+  const handlePreviewFieldChange = (field, value) => {
+    setPreview((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleVocabChange = (listName, index, field, value) => {
+    setPreview((prev) => {
+      const list = [...(prev[listName] || [])];
+      list[index] = { ...list[index], [field]: value };
+      return { ...prev, [listName]: list };
+    });
+  };
+
   const handleRegenerate = () => {
     setPreview(null);
     setUploadedImage(null);
@@ -349,13 +361,29 @@ const GenerateStory = () => {
             <h2 className="text-2xl font-bold text-green-400 mb-6">
               Preview - Story Generated! 🎉
             </h2>
+            <p className="text-gray-400 text-sm mb-6">
+              You can edit the title, story text, and vocabulary below before
+              saving.
+            </p>
 
             {/* Title */}
             <div className="mb-6">
-              <h3 className="text-xl font-bold text-white mb-2">
-                {preview.title}
-              </h3>
-              <p className="text-gray-400 text-sm">
+              <label
+                htmlFor="preview-title"
+                className="block text-white font-semibold mb-2"
+              >
+                Title
+              </label>
+              <input
+                id="preview-title"
+                type="text"
+                value={preview.title}
+                onChange={(e) =>
+                  handlePreviewFieldChange("title", e.target.value)
+                }
+                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-xl font-bold focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+              />
+              <p className="text-gray-400 text-sm mt-2">
                 Level:{" "}
                 {levels.find((l) => l.id === parseInt(formData.levelId))
                   ?.level || "A2"}
@@ -364,10 +392,21 @@ const GenerateStory = () => {
 
             {/* Story Description */}
             <div className="mb-6 bg-gray-700/50 p-6 rounded-lg border border-gray-600">
-              <h4 className="text-white font-semibold mb-3">Story</h4>
-              <p className="text-gray-200 leading-relaxed whitespace-pre-wrap">
-                {preview.description}
-              </p>
+              <label
+                htmlFor="preview-description"
+                className="block text-white font-semibold mb-3"
+              >
+                Story
+              </label>
+              <textarea
+                id="preview-description"
+                value={preview.description}
+                onChange={(e) =>
+                  handlePreviewFieldChange("description", e.target.value)
+                }
+                rows={10}
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-gray-200 leading-relaxed focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 resize-y"
+              />
             </div>
 
             {/* Passage Vocabulary */}
@@ -379,10 +418,34 @@ const GenerateStory = () => {
                 {preview.passageVocabulary?.map((item, index) => (
                   <div
                     key={index}
-                    className="p-3 bg-gray-700/50 border border-gray-600 rounded"
+                    className="p-3 bg-gray-700/50 border border-gray-600 rounded space-y-1"
                   >
-                    <p className="text-orange-400 font-semibold">{item.word}</p>
-                    <p className="text-gray-300 text-sm">{item.meaning}</p>
+                    <input
+                      type="text"
+                      value={item.word}
+                      onChange={(e) =>
+                        handleVocabChange(
+                          "passageVocabulary",
+                          index,
+                          "word",
+                          e.target.value,
+                        )
+                      }
+                      className="w-full bg-transparent text-orange-400 font-semibold focus:outline-none focus:ring-1 focus:ring-orange-500/40 rounded px-1"
+                    />
+                    <input
+                      type="text"
+                      value={item.meaning}
+                      onChange={(e) =>
+                        handleVocabChange(
+                          "passageVocabulary",
+                          index,
+                          "meaning",
+                          e.target.value,
+                        )
+                      }
+                      className="w-full bg-transparent text-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500/40 rounded px-1"
+                    />
                   </div>
                 ))}
               </div>
@@ -397,10 +460,34 @@ const GenerateStory = () => {
                 {preview.vocabulary?.map((item, index) => (
                   <div
                     key={index}
-                    className="p-3 bg-gray-700/50 border border-gray-600 rounded"
+                    className="p-3 bg-gray-700/50 border border-gray-600 rounded space-y-1"
                   >
-                    <p className="text-blue-400 font-semibold">{item.word}</p>
-                    <p className="text-gray-300 text-sm">{item.meaning}</p>
+                    <input
+                      type="text"
+                      value={item.word}
+                      onChange={(e) =>
+                        handleVocabChange(
+                          "vocabulary",
+                          index,
+                          "word",
+                          e.target.value,
+                        )
+                      }
+                      className="w-full bg-transparent text-blue-400 font-semibold focus:outline-none focus:ring-1 focus:ring-blue-500/40 rounded px-1"
+                    />
+                    <input
+                      type="text"
+                      value={item.meaning}
+                      onChange={(e) =>
+                        handleVocabChange(
+                          "vocabulary",
+                          index,
+                          "meaning",
+                          e.target.value,
+                        )
+                      }
+                      className="w-full bg-transparent text-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/40 rounded px-1"
+                    />
                   </div>
                 ))}
               </div>
