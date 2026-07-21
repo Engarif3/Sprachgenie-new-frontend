@@ -13,7 +13,13 @@ import "@fontsource/roboto/500.css";
 
 const Stories = () => {
   // Modal state removed
-  const [allStories, setAllStories] = useState(stories);
+  // Starts as null ("not loaded yet") rather than seeding with the local
+  // fallback `stories` — rendering the local images immediately and then
+  // replacing them with the real API images a moment later is exactly
+  // what caused the visible flicker/flash on this page. The fallback is
+  // now only ever shown once we actually know the API has nothing (empty
+  // response or a failed request), not optimistically up front.
+  const [allStories, setAllStories] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -182,10 +188,10 @@ const Stories = () => {
         )}
 
         <div className="text-2xl dark:dark:text-white p-2 md:p-4">
-          {allStories.map(
-            ({ title, image, description, vocabulary }, index) => (
+          {allStories?.map(
+            ({ id, title, image, description, vocabulary }, index) => (
               <div
-                key={index}
+                key={id ?? index}
                 className={`mb-12 ${
                   index === allStories.length - 1
                     ? ""
