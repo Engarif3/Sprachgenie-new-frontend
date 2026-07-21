@@ -5,6 +5,7 @@ import {
   clearUserInfo,
   queueForcedLogoutNotice,
 } from "./services/auth.services";
+import { reportClientError } from "./utils/reportClientError";
 
 const backendBaseURL =
   import.meta.env.VITE_BACKEND_API_URL || "https://api.simplegerman.de/api/v1";
@@ -96,6 +97,16 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
+    // The request never reached the backend (network error, timeout, CORS
+    // failure) — the backend can't log what it never saw, so only the
+    // frontend knows this happened.
+    if (!error.response) {
+      reportClientError({
+        message: `Network error calling ${error.config?.url || "unknown endpoint"}: ${error.message || "request failed"}`,
+        path: error.config?.url,
+      });
+    }
+
     // Handle 401 Unauthorized - redirect to login with SPA-friendly navigation
     if (error.response?.status === 401) {
       queueForcedLogoutNotice({

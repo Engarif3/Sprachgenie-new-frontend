@@ -78,6 +78,7 @@ const AdminVisitorsPage = lazy(() => import("../dashboard/AdminVisitorsPage"));
 const AdminRegistrationMetadataPage = lazy(
   () => import("../dashboard/AdminRegistrationMetadataPage"),
 );
+const ErrorLogsPage = lazy(() => import("../dashboard/ErrorLogsPage"));
 const FavoritesListDashboard = lazy(
   () => import("../View/Words/Favorite/FavoritesListDashboard"),
 );
@@ -154,6 +155,7 @@ const AdminVisitorsPageWithSuspense = withSuspense(AdminVisitorsPage);
 const AdminRegistrationMetadataPageWithSuspense = withSuspense(
   AdminRegistrationMetadataPage,
 );
+const ErrorLogsPageWithSuspense = withSuspense(ErrorLogsPage);
 const FavoritesListDashboardWithSuspense = withSuspense(FavoritesListDashboard);
 const BackendWithSuspense = withSuspense(Backend);
 const GlobalLimitsWithSuspense = withSuspense(GlobalLimits);
@@ -300,6 +302,13 @@ export const router = createBrowserRouter(
               path: "registration-metadata",
               element: protectRoute(
                 <AdminRegistrationMetadataPageWithSuspense />,
+                ADMIN_ROLES,
+              ),
+            },
+            {
+              path: "error-logs",
+              element: protectRoute(
+                <ErrorLogsPageWithSuspense />,
                 ADMIN_ROLES,
               ),
             },
