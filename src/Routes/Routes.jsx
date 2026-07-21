@@ -64,7 +64,8 @@ const StoriesManagement = lazy(
 const PerfectAndPastForm = lazy(
   () => import("../View/Grammar/PerfectAndPastForm/PerfectAndPastForm"),
 );
-const Stories = lazy(() => import("../View/Stories/Stories"));
+const StoryTitleList = lazy(() => import("../View/Stories/StoryTitleList"));
+const StoryDetail = lazy(() => import("../View/Stories/StoryDetail"));
 const RadioChannels = lazy(() => import("../View/Radio/RadioChannels"));
 const ChallengeSession = lazy(() => import("../View/Challenge/ChallengeSession"));
 const Leaderboard = lazy(() => import("../View/Challenge/Leaderboard"));
@@ -143,7 +144,8 @@ const UpdateUserStatusWithSuspense = withSuspense(UpdateUserStatus);
 const GenerateStoryWithSuspense = withSuspense(GenerateStory);
 const StoriesManagementWithSuspense = withSuspense(StoriesManagement);
 const PerfectAndPastFormWithSuspense = withSuspense(PerfectAndPastForm);
-const StoriesWithSuspense = withSuspense(Stories);
+const StoryTitleListWithSuspense = withSuspense(StoryTitleList);
+const StoryDetailWithSuspense = withSuspense(StoryDetail);
 const RadioChannelsWithSuspense = withSuspense(RadioChannels);
 const ChallengeSessionWithSuspense = withSuspense(ChallengeSession);
 const LeaderboardWithSuspense = withSuspense(Leaderboard);
@@ -239,7 +241,8 @@ export const router = createBrowserRouter(
         { path: "/grammar/:id", element: <GrammarTopicWithSuspense /> },
         { path: "/clauses", element: <ClausesWithSuspense /> },
         { path: "/clause/:id", element: <ClauseWithSuspense /> },
-        { path: "/stories", element: <StoriesWithSuspense /> },
+        { path: "/stories", element: <StoryTitleListWithSuspense /> },
+        { path: "/stories/:id", element: <StoryDetailWithSuspense /> },
         { path: "/radio", element: <RadioChannelsWithSuspense /> },
         {
           path: "/update-user-status",
