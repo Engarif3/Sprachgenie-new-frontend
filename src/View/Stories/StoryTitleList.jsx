@@ -214,16 +214,23 @@ const StoryTitleList = () => {
                     >
                       {story.title}
                     </h3>
-                    {story.publishedAt && (
+                    {/* {story.publishedAt && (
                       <p
                         className={`mb-3 text-xs ${isLight ? "text-slate-500" : "text-slate-400"}`}
                       >
                         Published {formatPublishedDate(story.publishedAt)}
                       </p>
-                    )}
-                    <div className="mt-auto flex items-center gap-1 text-sm font-semibold text-orange-500 transition-transform group-hover:gap-2 dark:text-orange-400">
+                    )} */}
+                    <div className="mt-auto flex justify-between items-center gap-1 text-sm font-semibold text-orange-500 transition-transform group-hover:gap-2 dark:text-orange-400">
                       <span>Read this story</span>
                       <ChevronRight size={16} />
+                      {story.publishedAt && (
+                        <p
+                          className={` text-xs ${isLight ? "text-slate-500" : "text-slate-400"}`}
+                        >
+                          Published {formatPublishedDate(story.publishedAt)}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </button>
