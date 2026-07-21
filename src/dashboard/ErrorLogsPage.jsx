@@ -31,6 +31,23 @@ const getCategoryLabel = (category) =>
   CATEGORY_OPTIONS.find((option) => option.value === category)?.label ||
   category;
 
+const ENVIRONMENT_OPTIONS = [
+  { value: "", label: "All environments" },
+  { value: "DEVELOPMENT", label: "Development" },
+  { value: "PRODUCTION", label: "Production" },
+];
+
+const HAS_USER_OPTIONS = [
+  { value: "", label: "All logs" },
+  { value: "true", label: "Linked to a user" },
+  { value: "false", label: "No user" },
+];
+
+const getEnvironmentBadgeClass = (environment) =>
+  environment === "DEVELOPMENT"
+    ? "border-fuchsia-300/60 bg-fuchsia-50 text-fuchsia-700 dark:border-fuchsia-500/20 dark:bg-fuchsia-500/10 dark:text-fuchsia-200"
+    : "border-emerald-300/60 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200";
+
 const formatDate = (value) => {
   if (!value) {
     return "Unknown";
@@ -49,11 +66,43 @@ const buildQueryParams = (filters, page) => {
     params.category = filters.category;
   }
 
+  if (filters.environment) {
+    params.environment = filters.environment;
+  }
+
+  if (filters.hasUser) {
+    params.hasUser = filters.hasUser;
+  }
+
   if (filters.search.trim()) {
     params.search = filters.search.trim();
   }
 
   return params;
+};
+
+// A destructive bulk action only proceeds once the admin types "OK" —
+// a plain confirm dialog is too easy to click through by habit for
+// something as irreversible as deleting logs.
+const confirmDestructiveAction = async ({ title, text }) => {
+  const result = await Swal.fire({
+    icon: "warning",
+    title,
+    text,
+    input: "text",
+    inputPlaceholder: 'Type "OK" to confirm',
+    showCancelButton: true,
+    confirmButtonText: "Delete",
+    confirmButtonColor: "#e11d48",
+    inputValidator: (value) => {
+      if ((value || "").trim().toUpperCase() !== "OK") {
+        return 'You must type "OK" to confirm this action.';
+      }
+      return undefined;
+    },
+  });
+
+  return result.isConfirmed;
 };
 
 const MIN_RETENTION_DAYS = 7;
@@ -64,12 +113,19 @@ const ErrorLogsPage = () => {
   const canAccess = role === "admin" || role === "super_admin";
   const isSuperAdmin = role === "super_admin";
 
-  const [filters, setFilters] = useState({ category: "", search: "" });
+  const [filters, setFilters] = useState({
+    category: "",
+    environment: "",
+    hasUser: "",
+    search: "",
+  });
   const [records, setRecords] = useState([]);
   const [meta, setMeta] = useState({ page: 1, limit: 20, total: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedRecord, setSelectedRecord] = useState(null);
+  const [selectedIds, setSelectedIds] = useState(() => new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
 
   const [settings, setSettings] = useState(null);
   const [settingsLoading, setSettingsLoading] = useState(false);
@@ -79,6 +135,9 @@ const ErrorLogsPage = () => {
   const fetchRecords = async (page = 1, nextFilters = filters) => {
     setLoading(true);
     setError("");
+    // A prior selection almost never still makes sense against a new page
+    // or filter set (some selected rows may no longer even be visible).
+    setSelectedIds(new Set());
 
     try {
       const response = await api.get("/error-logs", {
@@ -135,9 +194,90 @@ const ErrorLogsPage = () => {
   };
 
   const handleResetFilters = async () => {
-    const nextFilters = { category: "", search: "" };
+    const nextFilters = { category: "", environment: "", hasUser: "", search: "" };
     setFilters(nextFilters);
     await fetchRecords(1, nextFilters);
+  };
+
+  const toggleSelected = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const allOnPageSelected =
+    records.length > 0 && records.every((record) => selectedIds.has(record.id));
+
+  const toggleSelectAllOnPage = () => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allOnPageSelected) {
+        records.forEach((record) => next.delete(record.id));
+      } else {
+        records.forEach((record) => next.add(record.id));
+      }
+      return next;
+    });
+  };
+
+  const BULK_DELETE_LABELS = {
+    all: "ALL error logs",
+    development: "all logs tagged Development",
+    users: "all logs linked to a user account",
+    selected: `${selectedIds.size} selected log(s)`,
+  };
+
+  const performBulkDelete = async (scope) => {
+    const ids = scope === "selected" ? [...selectedIds] : undefined;
+
+    if (scope === "selected" && ids.length === 0) {
+      return;
+    }
+
+    const confirmed = await confirmDestructiveAction({
+      title: "Delete error logs?",
+      text: `This will permanently delete ${BULK_DELETE_LABELS[scope]}. This cannot be undone.`,
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
+    setBulkDeleting(true);
+
+    try {
+      const response = await api.post("/error-logs/bulk-delete", {
+        scope,
+        ids,
+      });
+
+      Swal.fire({
+        icon: "success",
+        title: "Deleted",
+        text: `${response.data?.data?.deletedCount ?? 0} log(s) removed.`,
+        timer: 1800,
+        showConfirmButton: false,
+      });
+
+      await fetchRecords(1, filters);
+    } catch (requestError) {
+      console.error("Bulk delete failed:", requestError);
+      Swal.fire({
+        icon: "error",
+        title: "Delete failed",
+        text:
+          requestError.response?.data?.message ||
+          "Please try again in a moment.",
+      });
+    } finally {
+      setBulkDeleting(false);
+    }
   };
 
   const handleToggleAutoDelete = async () => {
@@ -321,10 +461,10 @@ const ErrorLogsPage = () => {
 
         <section className="rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-lg shadow-slate-900/5 dark:border-slate-800 dark:bg-slate-900/85 dark:shadow-black/20">
           <form
-            className="grid gap-4 lg:grid-cols-6"
+            className="grid gap-4 lg:grid-cols-12"
             onSubmit={handleApplyFilters}
           >
-            <label className="lg:col-span-3">
+            <label className="lg:col-span-4">
               <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                 Search
               </span>
@@ -356,7 +496,43 @@ const ErrorLogsPage = () => {
               </select>
             </label>
 
-            <div className="flex items-end gap-3 lg:col-span-1">
+            <label className="lg:col-span-2">
+              <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+                Environment
+              </span>
+              <select
+                name="environment"
+                value={filters.environment}
+                onChange={handleFilterChange}
+                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 dark:border-slate-700 dark:bg-slate-950/70 dark:text-white dark:focus:border-sky-400"
+              >
+                {ENVIRONMENT_OPTIONS.map((option) => (
+                  <option key={option.value || "all"} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="lg:col-span-2">
+              <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+                User
+              </span>
+              <select
+                name="hasUser"
+                value={filters.hasUser}
+                onChange={handleFilterChange}
+                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 dark:border-slate-700 dark:bg-slate-950/70 dark:text-white dark:focus:border-sky-400"
+              >
+                {HAS_USER_OPTIONS.map((option) => (
+                  <option key={option.value || "all"} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <div className="flex items-end gap-3 lg:col-span-2">
               <button
                 type="submit"
                 className="rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-sky-700"
@@ -389,11 +565,63 @@ const ErrorLogsPage = () => {
             </div>
           ) : (
             <>
+              {isSuperAdmin && (
+                <div className="mb-4 flex flex-wrap items-center gap-2 rounded-2xl border border-rose-200 bg-rose-50/60 p-3 dark:border-rose-500/20 dark:bg-rose-500/5">
+                  <span className="mr-1 text-xs font-semibold uppercase tracking-wide text-rose-700 dark:text-rose-300">
+                    Bulk delete
+                  </span>
+                  <button
+                    type="button"
+                    disabled={selectedIds.size === 0 || bulkDeleting}
+                    onClick={() => performBulkDelete("selected")}
+                    className="rounded-xl bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Delete Selected ({selectedIds.size})
+                  </button>
+                  <button
+                    type="button"
+                    disabled={bulkDeleting}
+                    onClick={() => performBulkDelete("development")}
+                    className="rounded-xl border border-rose-300 px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-rose-500/30 dark:text-rose-300 dark:hover:bg-rose-500/10"
+                  >
+                    Delete All Development Logs
+                  </button>
+                  <button
+                    type="button"
+                    disabled={bulkDeleting}
+                    onClick={() => performBulkDelete("users")}
+                    className="rounded-xl border border-rose-300 px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-rose-500/30 dark:text-rose-300 dark:hover:bg-rose-500/10"
+                  >
+                    Delete All Logs Linked to Users
+                  </button>
+                  <button
+                    type="button"
+                    disabled={bulkDeleting}
+                    onClick={() => performBulkDelete("all")}
+                    className="rounded-xl bg-rose-700 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-rose-800 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Delete ALL Logs
+                  </button>
+                </div>
+              )}
+
               <div className="hidden overflow-x-auto lg:block">
                 <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
                   <thead>
                     <tr className="text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                      {isSuperAdmin && (
+                        <th className="px-4 py-3">
+                          <input
+                            type="checkbox"
+                            checked={allOnPageSelected}
+                            onChange={toggleSelectAllOnPage}
+                            aria-label="Select all logs on this page"
+                            className="h-4 w-4 rounded border-slate-300 accent-rose-600"
+                          />
+                        </th>
+                      )}
                       <th className="px-4 py-3">Category</th>
+                      <th className="px-4 py-3">Env</th>
                       <th className="px-4 py-3">Message</th>
                       <th className="px-4 py-3">Email</th>
                       <th className="px-4 py-3">Path</th>
@@ -408,11 +636,29 @@ const ErrorLogsPage = () => {
                         key={record.id}
                         className="transition hover:bg-slate-50 dark:hover:bg-slate-950/60"
                       >
+                        {isSuperAdmin && (
+                          <td className="px-4 py-4">
+                            <input
+                              type="checkbox"
+                              checked={selectedIds.has(record.id)}
+                              onChange={() => toggleSelected(record.id)}
+                              aria-label={`Select log ${record.id}`}
+                              className="h-4 w-4 rounded border-slate-300 accent-rose-600"
+                            />
+                          </td>
+                        )}
                         <td className="px-4 py-4">
                           <span
                             className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${getCategoryBadgeClass(record.category)}`}
                           >
                             {getCategoryLabel(record.category)}
+                          </span>
+                        </td>
+                        <td className="px-4 py-4">
+                          <span
+                            className={`inline-flex rounded-full border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${getEnvironmentBadgeClass(record.environment)}`}
+                          >
+                            {record.environment === "DEVELOPMENT" ? "Dev" : "Prod"}
                           </span>
                         </td>
                         <td className="max-w-xs truncate px-4 py-4 text-slate-700 dark:text-slate-200">
@@ -452,11 +698,27 @@ const ErrorLogsPage = () => {
                     className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-slate-800 dark:bg-slate-950/50"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <span
-                        className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${getCategoryBadgeClass(record.category)}`}
-                      >
-                        {getCategoryLabel(record.category)}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {isSuperAdmin && (
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.has(record.id)}
+                            onChange={() => toggleSelected(record.id)}
+                            aria-label={`Select log ${record.id}`}
+                            className="h-4 w-4 rounded border-slate-300 accent-rose-600"
+                          />
+                        )}
+                        <span
+                          className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${getCategoryBadgeClass(record.category)}`}
+                        >
+                          {getCategoryLabel(record.category)}
+                        </span>
+                        <span
+                          className={`inline-flex rounded-full border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${getEnvironmentBadgeClass(record.environment)}`}
+                        >
+                          {record.environment === "DEVELOPMENT" ? "Dev" : "Prod"}
+                        </span>
+                      </div>
                       <button
                         type="button"
                         onClick={() => setSelectedRecord(record)}
@@ -509,11 +771,20 @@ const ErrorLogsPage = () => {
             <div className="max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900">
               <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5 dark:border-slate-800">
                 <div>
-                  <span
-                    className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${getCategoryBadgeClass(selectedRecord.category)}`}
-                  >
-                    {getCategoryLabel(selectedRecord.category)}
-                  </span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span
+                      className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${getCategoryBadgeClass(selectedRecord.category)}`}
+                    >
+                      {getCategoryLabel(selectedRecord.category)}
+                    </span>
+                    <span
+                      className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.12em] ${getEnvironmentBadgeClass(selectedRecord.environment)}`}
+                    >
+                      {selectedRecord.environment === "DEVELOPMENT"
+                        ? "Development"
+                        : "Production"}
+                    </span>
+                  </div>
                   <h2 className="mt-3 text-lg font-bold text-slate-900 dark:text-white">
                     {selectedRecord.message}
                   </h2>
@@ -580,6 +851,40 @@ const ErrorLogsPage = () => {
                       {selectedRecord.userAgent || "—"}
                     </p>
                   </div>
+                </div>
+
+                <div className="mt-4 rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                    User Account
+                  </p>
+                  {selectedRecord.user ? (
+                    <div className="mt-2 grid gap-2 sm:grid-cols-3">
+                      <p className="text-sm text-slate-900 dark:text-white">
+                        <span className="text-slate-500 dark:text-slate-400">
+                          Name:{" "}
+                        </span>
+                        {selectedRecord.user.name || "—"}
+                      </p>
+                      <p className="text-sm text-slate-900 dark:text-white">
+                        <span className="text-slate-500 dark:text-slate-400">
+                          Role:{" "}
+                        </span>
+                        {selectedRecord.user.role}
+                      </p>
+                      <p className="text-sm text-slate-900 dark:text-white">
+                        <span className="text-slate-500 dark:text-slate-400">
+                          Status:{" "}
+                        </span>
+                        {selectedRecord.user.status}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                      {selectedRecord.email
+                        ? "No matching user account found for this email (may have been deleted since)."
+                        : "This log has no associated user."}
+                    </p>
+                  )}
                 </div>
 
                 {selectedRecord.stack && (
