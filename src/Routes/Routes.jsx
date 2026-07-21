@@ -267,17 +267,17 @@ export const router = createBrowserRouter(
         //Quiz
         { path: "/quiz", element: <QuizWithSuspense /> },
 
-        //Daily Challenge — publicly viewable (browse the level cards),
-        // login is only required to actually play or view the
-        // leaderboard, gated inline inside ChallengeSession with a
-        // friendly prompt instead of a silent redirect.
+        //Daily Challenge — publicly viewable and playable (practice mode
+        // for guests, gated inline inside ChallengeSession). The
+        // leaderboard page is also public, but shows a blurred placeholder
+        // + login prompt to logged-out visitors instead of real data.
         {
           path: "/challenge",
           element: <ChallengeSessionWithSuspense />,
         },
         {
           path: "/challenge/leaderboard",
-          element: protectRoute(<LeaderboardWithSuspense />),
+          element: <LeaderboardWithSuspense />,
         },
 
         {

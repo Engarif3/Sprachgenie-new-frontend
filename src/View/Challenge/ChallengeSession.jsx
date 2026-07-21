@@ -20,6 +20,16 @@ import CountdownRing from "./CountdownRing";
 
 const QUESTION_TIME_SECONDS = 15;
 
+// Mirrors the backend's scoring constants (challenge.constant.ts) so a
+// guest's practice run can show the same live XP feedback the real,
+// persisted challenge would — the guest score itself is never sent
+// anywhere, so this is purely for display until they log in.
+const CORRECT_FAST_THRESHOLD_SECONDS = 10;
+const XP_PER_CORRECT_ANSWER = 10;
+const XP_CORRECT_SLOW_ANSWER = 9;
+const XP_WRONG_ANSWER_BASE_PENALTY = 2;
+const XP_TIMEOUT_PENALTY = 2;
+
 const LEVELS = [
   { key: "easy", label: "Easy", cefr: "A1 · A2" },
   { key: "intermediate", label: "Intermediate", cefr: "A2 · B1" },
@@ -128,6 +138,16 @@ const ChallengeSession = () => {
   const [xpEarned, setXpEarned] = useState(0);
   const [answerFeedback, setAnswerFeedback] = useState(null);
   const [loadingChallenge, setLoadingChallenge] = useState(false);
+  // Guest-only wrong-answer streak, kept client-side since a guest's
+  // progress is never persisted server-side (mirrors challenge.wrongStreak
+  // in the real, logged-in flow).
+  const [guestWrongStreak, setGuestWrongStreak] = useState(0);
+  // True from the moment the last question is answered until the level
+  // summary is dismissed. Keeps the countdown ring frozen during that
+  // window — otherwise it un-pauses as soon as the feedback flash clears
+  // and keeps ticking down (visibly, behind the summary popup) using
+  // whatever deadline the last question happened to have.
+  const [levelFinished, setLevelFinished] = useState(false);
   // Absolute epoch-ms deadline for the current question, derived from the
   // server's own currentQuestionStartedAt/nextQuestionStartedAt — never
   // reset locally, so refreshing mid-question doesn't grant extra time.
@@ -162,29 +182,31 @@ const ChallengeSession = () => {
     void refreshLevelStatus();
   }, [refreshLevelStatus]);
 
-  // Shown instead of the login-only actions (Start/Continue, Leaderboard)
-  // when browsing without an account — friendlier than the silent
-  // redirect-to-/login the route itself used to do.
-  const handleLoginRequired = (message) => {
-    Swal.fire({
-      icon: "info",
-      title: "Login to enjoy this feature",
-      text: message,
-      confirmButtonText: "Go to Login",
-      confirmButtonColor: "#123456",
-      showCancelButton: true,
-      cancelButtonText: "Cancel",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        window.location.href = "/login";
-      }
-    });
-  };
-
   const startLevel = async (levelKey) => {
     setLoadingChallenge(true);
 
     try {
+      // Anonymous visitors can actually play — a lightweight "practice"
+      // question set that's generated fresh each time and never persisted.
+      // Login is only required to save a real, scored attempt (see
+      // finishLevel).
+      if (!isLoggedIn) {
+        const response = await api.get(`/challenge/practice/${levelKey}/words`);
+        const data = response.data?.data;
+
+        setActiveLevel(levelKey);
+        setQuestions(data?.questions || []);
+        setCurrentIndex(0);
+        setCorrectCount(0);
+        setXpEarned(0);
+        setAnswerFeedback(null);
+        setGuestWrongStreak(0);
+        setLevelFinished(false);
+        setDeadlineAt(Date.now() + QUESTION_TIME_SECONDS * 1000);
+        setView("challenge");
+        return;
+      }
+
       const response = await api.get(
         `/challenge/levels/${levelKey}/words?localDate=${localDate}`,
       );
@@ -201,6 +223,8 @@ const ChallengeSession = () => {
       setCorrectCount(data.correctAnswers);
       setXpEarned(0);
       setAnswerFeedback(null);
+      setGuestWrongStreak(0);
+      setLevelFinished(false);
       setDeadlineAt(
         data.currentQuestionStartedAt
           ? new Date(data.currentQuestionStartedAt).getTime() +
@@ -251,9 +275,31 @@ const ChallengeSession = () => {
 
   const finishLevel = useCallback(
     async (finalCorrectCount, finalXpEarned, totalQuestions) => {
-      await refreshLevelStatus();
-
       const signedXp = finalXpEarned >= 0 ? `+${finalXpEarned}` : finalXpEarned;
+
+      // A guest's score was never saved anywhere — invite them to log in
+      // and play for real instead of the normal "Level complete!" summary.
+      if (!isLoggedIn) {
+        Swal.fire({
+          title: "Nice work!",
+          icon: "success",
+          html: `You got <b>${finalCorrectCount} / ${totalQuestions}</b> right — <b>${signedXp} XP</b><br/><br/>This was just practice. Login to save your score and join the leaderboard.`,
+          confirmButtonText: "Login",
+          confirmButtonColor: "#123456",
+          showCancelButton: true,
+          cancelButtonText: "Maybe later",
+        }).then((result) => {
+          setView("levels");
+          setActiveLevel(null);
+
+          if (result.isConfirmed) {
+            window.location.href = "/login";
+          }
+        });
+        return;
+      }
+
+      await refreshLevelStatus();
 
       Swal.fire({
         title: "Level complete!",
@@ -265,7 +311,7 @@ const ChallengeSession = () => {
         setActiveLevel(null);
       });
     },
-    [refreshLevelStatus],
+    [isLoggedIn, refreshLevelStatus],
   );
 
   const handleAnswer = useCallback(
@@ -277,6 +323,69 @@ const ChallengeSession = () => {
       }
 
       try {
+        if (!isLoggedIn) {
+          const response = await api.post(
+            `/challenge/practice/${activeLevel}/check-answer`,
+            { wordId: currentWord.id, selectedAnswer: selectedOption },
+          );
+          const result = response.data?.data;
+          const timedOut = selectedOption === "";
+          const isCorrect = Boolean(result?.correct) && !timedOut;
+
+          // Mirrors the server's scoring rules (challenge.service.ts) using
+          // our own countdown deadline, since nothing here is persisted.
+          const elapsedMs = deadlineAt
+            ? Math.max(0, Date.now() - (deadlineAt - QUESTION_TIME_SECONDS * 1000))
+            : 0;
+          const answeredFast = elapsedMs <= CORRECT_FAST_THRESHOLD_SECONDS * 1000;
+
+          let xpDelta;
+          let nextWrongStreak;
+
+          if (isCorrect) {
+            xpDelta = answeredFast ? XP_PER_CORRECT_ANSWER : XP_CORRECT_SLOW_ANSWER;
+            nextWrongStreak = 0;
+          } else if (timedOut) {
+            xpDelta = -XP_TIMEOUT_PENALTY;
+            nextWrongStreak = 0;
+          } else {
+            nextWrongStreak = guestWrongStreak + 1;
+            xpDelta = -(XP_WRONG_ANSWER_BASE_PENALTY + (nextWrongStreak - 1));
+          }
+
+          const nextCorrectCount = isCorrect ? correctCount + 1 : correctCount;
+          const nextXpEarned = xpEarned + xpDelta;
+
+          setGuestWrongStreak(nextWrongStreak);
+          setCorrectCount(nextCorrectCount);
+          setXpEarned(nextXpEarned);
+          setAnswerFeedback({
+            selectedOption,
+            correct: isCorrect,
+            correctAnswer: result?.correctAnswer,
+            timedOut,
+            xpDelta,
+          });
+
+          const isLastQuestion = currentIndex + 1 >= questions.length;
+
+          if (!isLastQuestion) {
+            setDeadlineAt(Date.now() + QUESTION_TIME_SECONDS * 1000);
+          }
+
+          setTimeout(() => {
+            setAnswerFeedback(null);
+
+            if (!isLastQuestion) {
+              setCurrentIndex((index) => index + 1);
+            } else {
+              setLevelFinished(true);
+              void finishLevel(nextCorrectCount, nextXpEarned, questions.length);
+            }
+          }, 1100);
+          return;
+        }
+
         const response = await api.post(
           `/challenge/levels/${activeLevel}/answer`,
           {
@@ -325,6 +434,7 @@ const ChallengeSession = () => {
           if (!isLastQuestion) {
             setCurrentIndex((index) => index + 1);
           } else {
+            setLevelFinished(true);
             void finishLevel(nextCorrectCount, nextXpEarned, questions.length);
           }
         }, 1100);
@@ -333,6 +443,7 @@ const ChallengeSession = () => {
       }
     },
     [
+      isLoggedIn,
       questions,
       currentIndex,
       answerFeedback,
@@ -341,6 +452,8 @@ const ChallengeSession = () => {
       correctCount,
       xpEarned,
       streakLoggedToday,
+      guestWrongStreak,
+      deadlineAt,
       finishLevel,
     ],
   );
@@ -488,13 +601,7 @@ const ChallengeSession = () => {
                       ) : (
                         <button
                           type="button"
-                          onClick={() =>
-                            isLoggedIn
-                              ? startLevel(key)
-                              : handleLoginRequired(
-                                  "Sign in to play the Daily Challenge",
-                                )
-                          }
+                          onClick={() => startLevel(key)}
                           disabled={loadingChallenge}
                           className={`w-full rounded-xl bg-gradient-to-r px-4 py-3.5 text-base font-bold text-white shadow-md transition-transform hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 ${levelTheme.gradient}`}
                         >
@@ -502,26 +609,12 @@ const ChallengeSession = () => {
                         </button>
                       )}
 
-                      {isLoggedIn ? (
-                        <Link
-                          to={`/challenge/leaderboard?level=${key}`}
-                          className={`mt-3 inline-flex items-center justify-center gap-1 text-xs font-semibold hover:underline ${levelTheme.text}`}
-                        >
-                          <Trophy size={12} /> {label} leaderboard
-                        </Link>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleLoginRequired(
-                              "Sign in to view the leaderboard",
-                            )
-                          }
-                          className={`mt-3 inline-flex items-center justify-center gap-1 text-xs font-semibold hover:underline ${levelTheme.text}`}
-                        >
-                          <Trophy size={12} /> {label} leaderboard
-                        </button>
-                      )}
+                      <Link
+                        to={`/challenge/leaderboard?level=${key}`}
+                        className={`mt-3 inline-flex items-center justify-center gap-1 text-xs font-semibold hover:underline ${levelTheme.text}`}
+                      >
+                        <Trophy size={12} /> {label} leaderboard
+                      </Link>
 
                       {isSuperAdmin ? (
                         <button
@@ -611,7 +704,7 @@ const ChallengeSession = () => {
           totalSeconds={QUESTION_TIME_SECONDS}
           deadlineAt={deadlineAt}
           onExpire={handleTimeout}
-          paused={Boolean(answerFeedback)}
+          paused={Boolean(answerFeedback) || levelFinished}
         />
 
         <div
