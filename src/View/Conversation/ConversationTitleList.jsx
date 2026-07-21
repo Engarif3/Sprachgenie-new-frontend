@@ -1,20 +1,40 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { MessageCircle, ChevronRight } from "lucide-react";
 import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
 import api from "../../axios";
+import { useTheme } from "../../context/ThemeContext";
+
+// Color identity per CEFR level, consistent with the badge/chip style used
+// elsewhere in the app (Leaderboard, ChallengeSession) — anything outside
+// this known set (shouldn't normally happen) falls back to a neutral chip.
+const LEVEL_BADGES = {
+  A1: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300",
+  A2: "bg-teal-100 text-teal-700 dark:bg-teal-500/15 dark:text-teal-300",
+  B1: "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300",
+  B2: "bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300",
+  C1: "bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-500/15 dark:text-fuchsia-300",
+  C2: "bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300",
+};
+const DEFAULT_BADGE =
+  "bg-slate-100 text-slate-700 dark:bg-slate-500/15 dark:text-slate-300";
+const CEFR_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 const ConversationTitleList = () => {
+  const { theme } = useTheme();
+  const isLight = theme === "light";
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
-  // Fetch all conversations
   const fetchConversations = async () => {
     try {
       setLoading(true);
       const response = await api.get("/conversation/all");
-      setConversations(response.data.data);
+      setConversations(response.data.data || []);
     } catch (error) {
       console.error("Error fetching conversations:", error);
     } finally {
@@ -26,71 +46,145 @@ const ConversationTitleList = () => {
     fetchConversations();
   }, []);
 
+  // Only the levels that actually have at least one topic get a tab, in
+  // standard CEFR order (any unexpected level string is appended, sorted).
+  const availableLevels = useMemo(() => {
+    const present = new Set(
+      conversations.map((c) => c.levels?.level).filter(Boolean),
+    );
+    const known = CEFR_ORDER.filter((level) => present.has(level));
+    const unknown = [...present]
+      .filter((level) => !CEFR_ORDER.includes(level))
+      .sort();
+    return [...known, ...unknown];
+  }, [conversations]);
+
+  const requestedLevel = searchParams.get("level") || "";
+  const activeLevel = availableLevels.includes(requestedLevel)
+    ? requestedLevel
+    : "";
+
+  const filteredConversations = activeLevel
+    ? conversations.filter((c) => c.levels?.level === activeLevel)
+    : conversations;
+
+  const handleSelectLevel = (level) => {
+    setSearchParams(level ? { level } : {});
+  };
+
+  const tabClass = (isActive) =>
+    `rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+      isActive
+        ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-md"
+        : isLight
+          ? "border border-slate-200 bg-white text-slate-600 hover:border-orange-300"
+          : "border border-slate-700 bg-slate-900 text-slate-300 hover:border-orange-500/50"
+    }`;
+
   return (
     <Container>
-      <div className="max-w-7xl mx-auto p-4 mb-4 min-h-screen">
-        {/* Header Section */}
-        <div className="text-center mb-12 mt-8">
-          <div className="mb-4">
-            <span className="inline-block px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
-              💬 Practice German
-            </span>
-          </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-4">
+      <div className="mx-auto min-h-screen max-w-6xl p-4 pb-12">
+        {/* Header */}
+        <div className="mb-10 mt-8 text-center">
+          <span className="mb-4 inline-block rounded-full border border-orange-500/50 bg-gradient-to-r from-orange-500/20 to-pink-500/20 px-6 py-2 text-sm font-semibold text-orange-500 dark:text-orange-400">
+            💬 Practice German
+          </span>
+          <h2 className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-4xl font-bold text-transparent md:text-5xl">
             Conversation Topics
           </h2>
-          <p className="text-xl dark:text-gray-300 max-w-2xl mx-auto">
-            Select a topic to practice real-world German dialogues
+          <p
+            className={`mx-auto mt-3 max-w-2xl text-lg ${isLight ? "text-slate-600" : "text-slate-300"}`}
+          >
+            Choose a level, then pick a topic to practice a real-world German
+            dialogue.
           </p>
-          <div className="flex justify-center mt-6">
-            <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
-          </div>
         </div>
 
+        {/* Level tabs */}
+        {!loading && conversations.length > 0 && (
+          <div className="mb-8 flex flex-wrap justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleSelectLevel("")}
+              className={tabClass(!activeLevel)}
+            >
+              All ({conversations.length})
+            </button>
+            {availableLevels.map((level) => {
+              const count = conversations.filter(
+                (c) => c.levels?.level === level,
+              ).length;
+
+              return (
+                <button
+                  key={level}
+                  type="button"
+                  onClick={() => handleSelectLevel(level)}
+                  className={tabClass(activeLevel === level)}
+                >
+                  {level} ({count})
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {loading ? (
-          <div className="flex justify-center items-center min-h-[50vh]">
+          <div className="flex min-h-[50vh] items-center justify-center">
             <Loader loading={loading} />
           </div>
+        ) : conversations.length === 0 ? (
+          <p
+            className={`text-center ${isLight ? "text-slate-500" : "text-slate-400"}`}
+          >
+            No conversation topics yet.
+          </p>
+        ) : filteredConversations.length === 0 ? (
+          <p
+            className={`text-center ${isLight ? "text-slate-500" : "text-slate-400"}`}
+          >
+            No topics yet for {activeLevel}.
+          </p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {conversations.map((conversation, index) => (
-              <div
-                key={conversation.id}
-                className="group relative bg-gradient-to-br from-gray-800/80 via-gray-900 to-black border-2 border-gray-700/50 hover:border-orange-500 p-6 rounded-2xl transition-all duration-500 cursor-pointer hover:-translate-y-3 hover:scale-105 overflow-hidden shadow-xl hover:shadow-[0_0_50px_rgba(249,115,22,0.5)]"
-                onClick={() => navigate(`/conversation/${conversation.id}`)}
-              >
-                {/* Animated gradient background on hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/0 via-pink-500/0 to-purple-500/0 group-hover:from-orange-500/10 group-hover:via-pink-500/10 group-hover:to-purple-500/10 transition-all duration-500 rounded-2xl"></div>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {filteredConversations.map((conversation) => {
+              const level = conversation.levels?.level;
+              const badgeClass = LEVEL_BADGES[level] || DEFAULT_BADGE;
 
-                {/* Shine effect */}
-                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12"></div>
-
-                <div className="relative z-10">
-                  {/* Topic Number Badge */}
-                  <div className="absolute -top-2 -right-2 w-10 h-10 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                    {index + 1}
+              return (
+                <button
+                  key={conversation.id}
+                  type="button"
+                  onClick={() => navigate(`/conversation/${conversation.id}`)}
+                  className={`group flex flex-col items-start rounded-2xl border p-5 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${
+                    isLight
+                      ? "border-slate-200 bg-white hover:border-orange-300"
+                      : "border-slate-800 bg-slate-900/70 hover:border-orange-500/40"
+                  }`}
+                >
+                  <div className="mb-3 flex w-full items-center justify-between">
+                    <span
+                      className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide ${badgeClass}`}
+                    >
+                      {level || "General"}
+                    </span>
+                    <MessageCircle
+                      size={18}
+                      className={isLight ? "text-slate-300" : "text-slate-600"}
+                    />
                   </div>
-
-                  {/* Icon */}
-                  <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                    💬
-                  </div>
-
-                  {/* Topic Title */}
-                  <h3 className="text-xl font-bold text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-orange-400 group-hover:to-pink-400 transition-all duration-300 mb-3">
+                  <h3
+                    className={`mb-4 text-lg font-bold ${isLight ? "text-slate-900" : "text-white"}`}
+                  >
                     {conversation.topic}
                   </h3>
-
-                  {/* View Button */}
-                  <div className="flex items-center gap-2 text-orange-500 font-semibold text-sm group-hover:gap-3 transition-all duration-300">
-                    <span>Read the conversation</span>
-                    <span className="text-lg transform group-hover:translate-x-1 transition-transform duration-300">
-                      →
-                    </span>
+                  <div className="mt-auto flex items-center gap-1 text-sm font-semibold text-orange-500 transition-transform group-hover:gap-2 dark:text-orange-400">
+                    <span>Practice this dialogue</span>
+                    <ChevronRight size={16} />
                   </div>
-                </div>
-              </div>
-            ))}
+                </button>
+              );
+            })}
           </div>
         )}
       </div>

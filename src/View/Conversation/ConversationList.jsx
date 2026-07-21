@@ -1,6 +1,6 @@
 //for admin
-import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Navigate, useSearchParams } from "react-router-dom";
 import Swal from "sweetalert2"; // Ensure SweetAlert2 is imported
 import { useAuth } from "../../services/auth.services";
 import { ScaleLoader } from "react-spinners";
@@ -9,11 +9,15 @@ import api from "../../axios"; // Use configured axios instance
 const ConversationsList = () => {
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
   const canAccess = userLoggedIn && userId && isAdmin;
+  const [searchParams, setSearchParams] = useSearchParams();
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState("");
   const [editingConversation, setEditingConversation] = useState(null);
   const [formData, setFormData] = useState({});
+  // Guards against re-opening the modal if the admin closes it manually —
+  // only ever auto-opens once per ?edit= deep link.
+  const hasAutoOpenedRef = useRef(false);
   // Levels mapping
   const levels = [
     { value: 1, label: "A1" },
@@ -175,6 +179,32 @@ const ConversationsList = () => {
   useEffect(() => {
     fetchConversations();
   }, []);
+
+  // Deep link from the conversation detail page's Edit button
+  // (?edit=<conversationId>) — auto-opens that conversation's edit modal
+  // once the list has loaded, instead of making the admin find it again.
+  useEffect(() => {
+    if (hasAutoOpenedRef.current || conversations.length === 0) {
+      return;
+    }
+
+    const editId = searchParams.get("edit");
+    if (!editId) {
+      return;
+    }
+
+    const targetConversation = conversations.find(
+      (conversation) => String(conversation.id) === editId,
+    );
+
+    if (targetConversation) {
+      openEditModal(targetConversation);
+    }
+
+    hasAutoOpenedRef.current = true;
+    setSearchParams({}, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversations, searchParams]);
 
   if (!canAccess) {
     return <Navigate to="/" replace />;
