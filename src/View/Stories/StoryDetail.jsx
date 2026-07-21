@@ -243,13 +243,35 @@ const StoryDetail = () => {
           ))}
         </div>
 
-        {vocabulary.length > 0 && (
+        {(vocabulary.length > 0 || isSuperAdmin) && (
           <div className="mt-10">
-            <h2
-              className={`mb-4 text-lg font-bold uppercase tracking-wide ${isLight ? "text-slate-900" : "text-white"}`}
-            >
-              Vocabulary
-            </h2>
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h2
+                className={`text-lg font-bold uppercase tracking-wide ${isLight ? "text-slate-900" : "text-white"}`}
+              >
+                Vocabulary
+              </h2>
+              {isSuperAdmin && (
+                <Link
+                  to={`/dashboard/stories-management?edit=${id}`}
+                  className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    isLight
+                      ? "border-slate-200 bg-white text-slate-700 hover:border-orange-300 hover:text-orange-600"
+                      : "border-slate-700 bg-slate-900 text-slate-200 hover:border-orange-500/50 hover:text-orange-400"
+                  }`}
+                >
+                  <FaPen size={11} />
+                  Edit vocabulary
+                </Link>
+              )}
+            </div>
+            {vocabulary.length === 0 && (
+              <p
+                className={`mb-4 text-sm ${isLight ? "text-slate-500" : "text-slate-400"}`}
+              >
+                No vocabulary added yet.
+              </p>
+            )}
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               {vocabulary.map((item, index) => (
                 <div
