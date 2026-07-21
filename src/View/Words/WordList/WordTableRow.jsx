@@ -264,7 +264,7 @@ const WordTableRow = ({
       {/* Previous version with CSS capitalize - capitalizes every word */}
       {/* <td className="border-l border-gray-400  p-2 capitalize border-dotted"> */}
       <td className="border border-gray-700 border-dotted p-1 md:p-3">
-        <div className="flex justify-between">
+        <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
           <span
             tabIndex={learningMode ? 0 : -1}
             ref={learningMode && index === currentIndex ? focusElement : null}
@@ -276,7 +276,13 @@ const WordTableRow = ({
             {renderWordWithPrefix(word)}
           </span>
 
-          <div className="flex gap-1 md:gap-4 lg:gap-4 ">
+          {/* Stacked below the word on mobile instead of beside it — side by
+          side, this row's own min-content width added onto the word's,
+          forcing the column (and the whole table) wider than the viewport
+          on phones. Stacking keeps the column's width to whichever of the
+          two is wider, not their sum. Right-aligned (self-end) so it sits
+          under the end of the word, not the start. */}
+          <div className="flex gap-1 self-end md:gap-4 md:self-auto lg:gap-4">
             <button
               onClick={() => pronounceWord(word.value)}
               className="text-md md:text-2xl lg:text-2xl hover:scale-110 transition-transform duration-200 hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]"
@@ -289,7 +295,7 @@ const WordTableRow = ({
               <button
                 type="button"
                 onClick={() => generateParagraph(word)}
-                className="relative border-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white italic px-2 py-1 text-xs font-semibold md:font-bold lg:font-bold rounded-full mt-4 h-6 w-6 cursor-pointer hover:scale-110 border-emerald-400 transition-all duration-200 shadow-lg hover:shadow-green-500/50 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
+                className="relative border-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white italic px-2 py-1 text-xs font-semibold md:font-bold lg:font-bold rounded-full md:mt-4 h-6 w-6 cursor-pointer hover:scale-110 border-emerald-400 transition-all duration-200 shadow-lg hover:shadow-green-500/50 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
                 disabled={loadingParagraphs[word.id]}
                 title="Generate AI paragraph"
                 aria-label="Generate AI paragraph"
@@ -314,7 +320,7 @@ const WordTableRow = ({
               <button
                 type="button"
                 onClick={handleAIGenerationLocked}
-                className="relative border-2 bg-gradient-to-r from-gray-500 to-gray-500 text-gray-100 italic px-2 py-1 text-xs font-semibold md:font-bold lg:font-bold rounded-full mt-4 h-6 w-6 cursor-pointer border-gray-400 hover:from-gray-400 hover:to-gray-400 transition-all duration-200"
+                className="relative border-2 bg-gradient-to-r from-gray-500 to-gray-500 text-gray-100 italic px-2 py-1 text-xs font-semibold md:font-bold lg:font-bold rounded-full md:mt-4 h-6 w-6 cursor-pointer border-gray-400 hover:from-gray-400 hover:to-gray-400 transition-all duration-200"
                 title="Sign in to generate paragraphs"
                 aria-label="Sign in to generate paragraphs"
               >
@@ -380,7 +386,7 @@ const WordTableRow = ({
             <span
               key={idx}
               onClick={() => openWordInModal(synonym.value, synonym.id)}
-              className="text-md px-3 py-1 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/50 rounded-full hover:from-blue-500/30 hover:to-cyan-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
+              className="text-md max-w-full break-words px-3 py-1 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/50 rounded-full hover:from-blue-500/30 hover:to-cyan-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
             >
               {synonym.value}
             </span>
@@ -395,7 +401,7 @@ const WordTableRow = ({
             <span
               key={idx}
               onClick={() => openWordInModal(antonym.value, antonym.id)}
-              className="text-md  px-3 py-1 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 rounded-full hover:from-red-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
+              className="text-md max-w-full break-words px-3 py-1 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 rounded-full hover:from-red-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
             >
               {antonym.value}
             </span>
@@ -410,7 +416,7 @@ const WordTableRow = ({
             <span
               key={idx}
               onClick={() => openWordInModal(similarword.value, similarword.id)}
-              className="text-md  px-3 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-full hover:from-purple-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
+              className="text-md max-w-full break-words px-3 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-full hover:from-purple-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
             >
               {similarword.value}
             </span>

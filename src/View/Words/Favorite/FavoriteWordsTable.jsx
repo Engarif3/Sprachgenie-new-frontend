@@ -196,15 +196,15 @@ const TABLE_VARIANTS = {
     synonymsCell:
       "hidden border border-slate-200 border-dotted p-1 dark:border-gray-700 md:table-cell md:p-2 lg:p-2",
     synonymsTag:
-      "inline-flex cursor-pointer items-center gap-1 rounded-full border border-blue-300 bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-1.5 text-md font-semibold text-blue-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-blue-100 hover:to-indigo-100 dark:border-blue-500/50 dark:from-blue-500/20 dark:to-purple-500/20 dark:text-blue-300 dark:hover:from-blue-500/40 dark:hover:to-purple-500/40 dark:hover:shadow-blue-500/50",
+      "inline-flex max-w-full cursor-pointer items-center gap-1 break-words rounded-full border border-blue-300 bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-1.5 text-md font-semibold text-blue-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-blue-100 hover:to-indigo-100 dark:border-blue-500/50 dark:from-blue-500/20 dark:to-purple-500/20 dark:text-blue-300 dark:hover:from-blue-500/40 dark:hover:to-purple-500/40 dark:hover:shadow-blue-500/50",
     antonymsCell:
       "hidden border border-slate-200 p-1 dark:border-gray-700/50 lg:table-cell md:p-2 lg:p-2",
     antonymsTag:
-      "inline-flex cursor-pointer items-center gap-1 rounded-full border border-rose-300 bg-gradient-to-r from-rose-50 to-pink-50 px-3 py-1.5 text-md font-semibold text-rose-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-rose-100 hover:to-pink-100 dark:border-red-500/50 dark:from-red-500/20 dark:to-pink-500/20 dark:text-red-300 dark:hover:from-red-500/40 dark:hover:to-pink-500/40 dark:hover:shadow-red-500/50",
+      "inline-flex max-w-full cursor-pointer items-center gap-1 break-words rounded-full border border-rose-300 bg-gradient-to-r from-rose-50 to-pink-50 px-3 py-1.5 text-md font-semibold text-rose-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-rose-100 hover:to-pink-100 dark:border-red-500/50 dark:from-red-500/20 dark:to-pink-500/20 dark:text-red-300 dark:hover:from-red-500/40 dark:hover:to-pink-500/40 dark:hover:shadow-red-500/50",
     similarCell:
       "hidden border border-slate-200 border-dotted p-1 dark:border-gray-700 lg:table-cell md:p-2 lg:p-2",
     similarTag:
-      "inline-flex cursor-pointer items-center gap-1 rounded-full border border-violet-300 bg-gradient-to-r from-violet-50 to-fuchsia-50 px-3 py-1.5 text-md font-semibold text-violet-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-violet-100 hover:to-fuchsia-100 dark:border-purple-500/50 dark:from-purple-500/20 dark:to-pink-500/20 dark:text-purple-300 dark:hover:from-purple-500/40 dark:hover:to-pink-500/40 dark:hover:shadow-purple-500/50",
+      "inline-flex max-w-full cursor-pointer items-center gap-1 break-words rounded-full border border-violet-300 bg-gradient-to-r from-violet-50 to-fuchsia-50 px-3 py-1.5 text-md font-semibold text-violet-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-violet-100 hover:to-fuchsia-100 dark:border-purple-500/50 dark:from-purple-500/20 dark:to-pink-500/20 dark:text-purple-300 dark:hover:from-purple-500/40 dark:hover:to-pink-500/40 dark:hover:shadow-purple-500/50",
     removeCell:
       "border border-slate-200 border-dotted p-1 text-center dark:border-gray-700 md:p-2 lg:p-2",
   },
@@ -226,15 +226,15 @@ const TABLE_VARIANTS = {
     synonymsCell:
       "hidden border border-slate-200 border-dotted p-2 dark:border-gray-700 md:table-cell md:p-2 lg:p-2",
     synonymsTag:
-      "inline-flex cursor-pointer items-center gap-1 rounded-full border border-blue-300 bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-1.5 text-xs font-semibold text-blue-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-blue-100 hover:to-indigo-100 dark:border-blue-500/50 dark:from-blue-500/20 dark:to-purple-500/20 dark:text-blue-300 dark:hover:from-blue-500/40 dark:hover:to-purple-500/40 dark:hover:shadow-blue-500/50 md:text-sm",
+      "inline-flex max-w-full cursor-pointer items-center gap-1 break-words rounded-full border border-blue-300 bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-1.5 text-xs font-semibold text-blue-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-blue-100 hover:to-indigo-100 dark:border-blue-500/50 dark:from-blue-500/20 dark:to-purple-500/20 dark:text-blue-300 dark:hover:from-blue-500/40 dark:hover:to-purple-500/40 dark:hover:shadow-blue-500/50 md:text-sm",
     antonymsCell:
       "hidden border border-slate-200 border-dotted p-2 dark:border-gray-700 lg:table-cell md:p-2 lg:p-2",
     antonymsTag:
-      "inline-flex cursor-pointer items-center gap-1 rounded-full border border-rose-300 bg-gradient-to-r from-rose-50 to-pink-50 px-3 py-1.5 text-xs font-semibold text-rose-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-rose-100 hover:to-pink-100 dark:border-red-500/50 dark:from-red-500/20 dark:to-pink-500/20 dark:text-red-300 dark:hover:from-red-500/40 dark:hover:to-pink-500/40 dark:hover:shadow-red-500/50 md:text-sm",
+      "inline-flex max-w-full cursor-pointer items-center gap-1 break-words rounded-full border border-rose-300 bg-gradient-to-r from-rose-50 to-pink-50 px-3 py-1.5 text-xs font-semibold text-rose-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-rose-100 hover:to-pink-100 dark:border-red-500/50 dark:from-red-500/20 dark:to-pink-500/20 dark:text-red-300 dark:hover:from-red-500/40 dark:hover:to-pink-500/40 dark:hover:shadow-red-500/50 md:text-sm",
     similarCell:
       "hidden border border-slate-200 border-dotted p-2 dark:border-gray-700 lg:table-cell md:p-2 lg:p-2",
     similarTag:
-      "inline-flex cursor-pointer items-center gap-1 rounded-full border border-violet-300 bg-gradient-to-r from-violet-50 to-fuchsia-50 px-3 py-1.5 text-xs font-semibold text-violet-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-violet-100 hover:to-fuchsia-100 dark:border-purple-500/50 dark:from-purple-500/20 dark:to-pink-500/20 dark:text-purple-300 dark:hover:from-purple-500/40 dark:hover:to-pink-500/40 dark:hover:shadow-purple-500/50 md:text-sm",
+      "inline-flex max-w-full cursor-pointer items-center gap-1 break-words rounded-full border border-violet-300 bg-gradient-to-r from-violet-50 to-fuchsia-50 px-3 py-1.5 text-xs font-semibold text-violet-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-violet-100 hover:to-fuchsia-100 dark:border-purple-500/50 dark:from-purple-500/20 dark:to-pink-500/20 dark:text-purple-300 dark:hover:from-purple-500/40 dark:hover:to-pink-500/40 dark:hover:shadow-purple-500/50 md:text-sm",
     removeCell:
       "border border-slate-200 border-dotted p-2 text-center dark:border-gray-700 md:p-2 lg:p-2",
   },
@@ -305,7 +305,7 @@ const FavoriteWordsTable = ({
                     />
                   </td>
                   <td className={tableVariant.wordCell}>
-                    <div className="flex justify-between gap-1 md:gap-4 items-center">
+                    <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between md:gap-4">
                       <span
                         className={tableVariant.wordText}
                         onClick={() => openModal(word)}
@@ -313,7 +313,7 @@ const FavoriteWordsTable = ({
                         {renderWordWithPrefix(word)}
                       </span>
 
-                      <div className="flex gap-1 md:gap-2 lg:gap-2">
+                      <div className="flex gap-1 self-end md:gap-2 md:self-auto lg:gap-2">
                         <button
                           onClick={() => pronounceWord(word.value)}
                           className={tableVariant.pronounceButton}
