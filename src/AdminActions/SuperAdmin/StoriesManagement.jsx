@@ -18,6 +18,9 @@ const StoriesManagement = () => {
   const [editImage, setEditImage] = useState(null);
   const [editImagePreview, setEditImagePreview] = useState(null);
   const [uploadingEditImage, setUploadingEditImage] = useState(false);
+  const [editVocabulary, setEditVocabulary] = useState([]);
+  const [newVocabWord, setNewVocabWord] = useState("");
+  const [newVocabMeaning, setNewVocabMeaning] = useState("");
   const [regenerateModal, setRegenerateModal] = useState(false);
   const [regenerateStoryId, setRegenerateStoryId] = useState(null);
   const [regeneratePrompt, setRegeneratePrompt] = useState("");
@@ -129,6 +132,13 @@ const StoriesManagement = () => {
     setEditDescription(story.description);
     setEditImagePreview(story.image || null);
     setEditImage(null);
+    setEditVocabulary(
+      Array.isArray(story.vocabulary)
+        ? story.vocabulary.map((item) => ({ ...item }))
+        : [],
+    );
+    setNewVocabWord("");
+    setNewVocabMeaning("");
   };
 
   const closeEditModal = () => {
@@ -137,6 +147,35 @@ const StoriesManagement = () => {
     setEditDescription("");
     setEditImage(null);
     setEditImagePreview(null);
+    setEditVocabulary([]);
+    setNewVocabWord("");
+    setNewVocabMeaning("");
+  };
+
+  const handleVocabItemChange = (index, field, value) => {
+    setEditVocabulary((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
+  const handleDeleteVocabItem = (index) => {
+    setEditVocabulary((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleAddVocabItem = () => {
+    if (!newVocabWord.trim() || !newVocabMeaning.trim()) {
+      setError("Enter both a word and a meaning to add vocabulary");
+      return;
+    }
+
+    setEditVocabulary((prev) => [
+      ...prev,
+      { word: newVocabWord.trim(), meaning: newVocabMeaning.trim() },
+    ]);
+    setNewVocabWord("");
+    setNewVocabMeaning("");
   };
 
   const handleSaveEdit = async () => {
@@ -152,6 +191,7 @@ const StoriesManagement = () => {
       await api.put(`/stories/${editingStoryId}/update`, {
         title: editTitle.trim(),
         description: editDescription.trim(),
+        vocabulary: editVocabulary,
       });
 
       // If there's a new image, upload it
@@ -507,6 +547,77 @@ const StoriesManagement = () => {
                   placeholder="Story description..."
                   rows="6"
                 />
+              </div>
+
+              {/* Vocabulary Editor */}
+              <div className="mb-6 bg-gray-700/50 p-4 rounded-lg border border-gray-600">
+                <h4 className="text-white font-semibold mb-3">
+                  📖 Vocabulary
+                </h4>
+
+                {editVocabulary.length > 0 && (
+                  <div className="space-y-2 mb-4">
+                    {editVocabulary.map((item, index) => (
+                      <div key={index} className="flex gap-2 items-start">
+                        <input
+                          type="text"
+                          value={item.word}
+                          onChange={(e) =>
+                            handleVocabItemChange(index, "word", e.target.value)
+                          }
+                          placeholder="Word"
+                          className="w-1/3 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                        />
+                        <input
+                          type="text"
+                          value={item.meaning}
+                          onChange={(e) =>
+                            handleVocabItemChange(
+                              index,
+                              "meaning",
+                              e.target.value,
+                            )
+                          }
+                          placeholder="Meaning"
+                          className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteVocabItem(index)}
+                          className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition"
+                          title="Delete this word"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Add new vocabulary item */}
+                <div className="flex gap-2 items-start pt-2 border-t border-gray-600">
+                  <input
+                    type="text"
+                    value={newVocabWord}
+                    onChange={(e) => setNewVocabWord(e.target.value)}
+                    placeholder="New word"
+                    className="w-1/3 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                  />
+                  <input
+                    type="text"
+                    value={newVocabMeaning}
+                    onChange={(e) => setNewVocabMeaning(e.target.value)}
+                    placeholder="Meaning"
+                    className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddVocabItem}
+                    className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition"
+                  >
+                    + Add
+                  </button>
+                </div>
               </div>
 
               {/* Image Upload Section */}
