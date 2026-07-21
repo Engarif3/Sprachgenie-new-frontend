@@ -391,6 +391,14 @@ const DashboardLayout = () => {
                   <span>🌍</span>
                   <span>Visitors Detail</span>
                 </NavLink>
+                <NavLink
+                  to="/dashboard/error-logs"
+                  className={({ isActive }) => navItemClass(isActive)}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <span>🚨</span>
+                  <span>Error Logs</span>
+                </NavLink>
               </>
             )}
           </nav>
