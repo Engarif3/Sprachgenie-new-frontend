@@ -627,7 +627,9 @@ const ErrorLogsPage = () => {
                       <th className="px-4 py-3">Path</th>
                       <th className="px-4 py-3">IP</th>
                       <th className="px-4 py-3">Time</th>
-                      <th className="px-4 py-3">Action</th>
+                      <th className="sticky right-0 border-l border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900">
+                        Action
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
@@ -676,7 +678,7 @@ const ErrorLogsPage = () => {
                         <td className="whitespace-nowrap px-4 py-4 text-slate-600 dark:text-slate-300">
                           {formatDate(record.createdAt)}
                         </td>
-                        <td className="px-4 py-4">
+                        <td className="sticky right-0 border-l border-slate-200 bg-white px-4 py-4 dark:border-slate-800 dark:bg-slate-900">
                           <button
                             type="button"
                             onClick={() => setSelectedRecord(record)}
