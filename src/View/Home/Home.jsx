@@ -12,6 +12,19 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "../../context/ThemeContext";
 import ScrollStack, { ScrollStackItem } from "./ScrollStack";
 import TodaysWordBalloon from "./TodaysWordBalloon";
+import { publicApi } from "../../axios";
+
+// Rounds down to the nearest hundred and appends "+", so the displayed
+// count never needs a manual edit as the vocabulary grows (4680 -> "4600+",
+// 5145 -> "5100+") and never overstates how many words actually exist.
+const formatWordCountLabel = (totalWords) => {
+  if (!Number.isFinite(totalWords) || totalWords <= 0) {
+    return null;
+  }
+
+  const rounded = Math.floor(totalWords / 100) * 100;
+  return `${rounded}+`;
+};
 
 const Home = () => {
   const { isLoggedIn: userLoggedIn } = useAuth();
@@ -20,6 +33,28 @@ const Home = () => {
   const { theme } = useTheme();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+  // Falls back to "many" until the real count loads (or if the request
+  // ever fails) rather than showing a blank/undefined number.
+  const [wordCountLabel, setWordCountLabel] = useState(null);
+  const wordCountText = wordCountLabel || "many";
+
+  useEffect(() => {
+    let isMounted = true;
+
+    publicApi
+      .get("/word/all", { params: { limit: 1 } })
+      .then((response) => {
+        if (!isMounted) return;
+        setWordCountLabel(formatWordCountLabel(response.data?.data?.totalWords));
+      })
+      .catch((error) => {
+        console.error("Failed to load total word count:", error);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -74,7 +109,7 @@ const Home = () => {
     {
       icon: "📚",
       eyebrow: "Vocabulary System",
-      title: t("wordsLibrary"),
+      title: t("wordsLibrary", { count: wordCountText }),
       description: t("wordsLibraryDesc"),
       accent: "from-blue-200 via-indigo-300 to-sky-400",
       shell:
@@ -136,7 +171,7 @@ const Home = () => {
   const resourceCards = [
     {
       title: t("vocabCardTitle"),
-      text: t("vocabCardDesc"),
+      text: t("vocabCardDesc", { count: wordCountText }),
       link: "/words",
       eyebrow: "Core Library",
       index: "01",
@@ -626,7 +661,7 @@ const Home = () => {
                     theme === "light" ? "text-slate-900" : "text-white"
                   }
                 >
-                  {t("exploreVocabulary")}
+                  {t("exploreVocabulary", { count: wordCountText })}
                 </span>
                 <span
                   className={`text-xl transition-transform group-hover:translate-x-1 ${
@@ -996,7 +1031,7 @@ const Home = () => {
           >
             <div className="text-center">
               <div className="text-4xl md:text-6xl lg:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-3">
-                {t("wordCount")}
+                {t("wordCount", { count: wordCountText })}
               </div>
               <p className="text-white dark:text-gray-300 text-lg font-semibold">
                 {t("words")}
