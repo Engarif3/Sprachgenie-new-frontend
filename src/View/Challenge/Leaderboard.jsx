@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { Bot, Crown, LoaderCircle, Pencil, Rocket, Trophy } from "lucide-react";
+import { Bot, Crown, LoaderCircle, Lock, Pencil, Rocket, Trophy } from "lucide-react";
 import Container from "../../utils/Container";
 import api from "../../axios";
 import { useTheme } from "../../context/ThemeContext";
@@ -97,6 +97,15 @@ const MAX_WEEKLY_XP_PER_LEVEL = 20 * 10 * 7;
 
 const isValidLevel = (value) => LEVELS.some((level) => level.key === value);
 
+// Fake rows shown (blurred, behind a login overlay) to logged-out visitors
+// so the page still communicates "there's a leaderboard here" without ever
+// sending the real names/scores to an unauthenticated request.
+const BLUR_PLACEHOLDER_ENTRIES = Array.from({ length: 8 }, (_, index) => ({
+  rank: index + 1,
+  displayName: "Anonymous learner",
+  weeklyXp: 260 - index * 24,
+}));
+
 const loadLeaderboard = async (level) => {
   const response = await api.get(
     `/challenge/levels/${level}/leaderboard?limit=20`,
@@ -112,7 +121,7 @@ const loadLeaderboard = async (level) => {
 const Leaderboard = () => {
   const { theme } = useTheme();
   const isLight = theme === "light";
-  const { isSuperAdmin, userId } = useAuth();
+  const { isSuperAdmin, userId, isLoggedIn } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const requestedLevel = searchParams.get("level");
@@ -133,6 +142,15 @@ const Leaderboard = () => {
 
   const refresh = useCallback(
     async (signal) => {
+      // The leaderboard endpoint requires auth — never call it for a
+      // logged-out visitor, who instead sees a blurred placeholder (see the
+      // render below).
+      if (!isLoggedIn) {
+        setLoading(false);
+        setHasLoadedOnce(true);
+        return;
+      }
+
       setLoading(true);
 
       try {
@@ -155,7 +173,7 @@ const Leaderboard = () => {
         }
       }
     },
-    [activeLevel],
+    [activeLevel, isLoggedIn],
   );
 
   useEffect(() => {
@@ -410,136 +428,256 @@ const Leaderboard = () => {
           </span>
         </p>
 
-        <div
-          className={`relative flex items-center justify-between overflow-hidden rounded-2xl border p-4 ring-1 ${cardClass} ${levelTheme.ring}`}
-        >
-          <div
-            className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${levelTheme.glow}`}
-          />
-          <div className="relative">
-            <p
-              className={`text-xs  font-semibold uppercase tracking-wide ${isLight ? "text-slate-500" : "text-slate-400"}`}
+        {isLoggedIn ? (
+          <>
+            <div
+              className={`relative flex items-center justify-between overflow-hidden rounded-2xl border p-4 ring-1 ${cardClass} ${levelTheme.ring}`}
             >
-              Your rank this week
-            </p>
-            <p
-              className={`text-lg font-bold ${isLight ? "text-slate-900" : "text-white"}`}
-            >
-              {me.rank ? (
-                <>
-                  <span className={levelTheme.text}>#{me.rank}</span> ·{" "}
-                  {me.weeklyXp} XP
-                </>
-              ) : (
-                "Unranked"
-              )}
-            </p>
-          </div>
-          {isSuperAdmin ? (
-            <button
-              type="button"
-              onClick={() => editOwnXp(me.weeklyXp)}
-              className={`relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors ${
-                isLight
-                  ? "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                  : "text-slate-500 hover:bg-slate-800 hover:text-slate-300"
-              }`}
-              aria-label="Edit your XP"
-            >
-              <Pencil size={14} />
-            </button>
-          ) : null}
-        </div>
-
-        {isSuperAdmin && botsEnabled !== null ? (
-          <button
-            type="button"
-            onClick={toggleBots}
-            disabled={togglingBots}
-            className={`flex items-center justify-between gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${cardClass}`}
-          >
-            <span
-              className={`flex items-center gap-2 ${isLight ? "text-slate-700" : "text-slate-200"}`}
-            >
-              <Bot size={16} />
-              Leaderboard bots (
-              {LEVELS.find((level) => level.key === activeLevel)?.label})
-            </span>
-            <span
-              className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
-                botsEnabled
-                  ? "bg-emerald-500"
-                  : isLight
-                    ? "bg-slate-300"
-                    : "bg-slate-700"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-                  botsEnabled ? "translate-x-6" : "translate-x-1"
-                }`}
-              />
-            </span>
-          </button>
-        ) : null}
-
-        {isSuperAdmin && botsEnabled ? (
-          <button
-            type="button"
-            onClick={deployBots}
-            disabled={deployingBots}
-            className={`flex items-center justify-center gap-2 rounded-xl border border-dashed px-4 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-              isLight
-                ? "border-slate-300 text-slate-600 hover:bg-slate-50"
-                : "border-slate-700 text-slate-300 hover:bg-slate-800"
-            }`}
-          >
-            <Rocket size={16} />
-            {deployingBots ? "Deploying…" : "Deploy dormant bots now"}
-          </button>
-        ) : null}
-
-        {loading && !hasLoadedOnce ? (
-          <p className={isLight ? "text-slate-600" : "text-slate-300"}>
-            Loading leaderboard…
-          </p>
-        ) : (
-          <div
-            className={`flex flex-col gap-6 transition-opacity duration-200 ${loading ? "pointer-events-none opacity-40" : "opacity-100"}`}
-          >
-            {entries.length === 0 ? (
               <div
-                className={`overflow-hidden rounded-2xl border ${cardClass}`}
-              >
+                className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${levelTheme.glow}`}
+              />
+              <div className="relative">
                 <p
-                  className={`p-6 text-center text-sm ${isLight ? "text-slate-500" : "text-slate-400"}`}
+                  className={`text-xs  font-semibold uppercase tracking-wide ${isLight ? "text-slate-500" : "text-slate-400"}`}
                 >
-                  No one has earned XP at this level yet this week. Be the first
-                  —{" "}
-                  <Link to="/challenge" className="underline">
-                    start a challenge
-                  </Link>
-                  .
+                  Your rank this week
+                </p>
+                <p
+                  className={`text-lg font-bold ${isLight ? "text-slate-900" : "text-white"}`}
+                >
+                  {me.rank ? (
+                    <>
+                      <span className={levelTheme.text}>#{me.rank}</span> ·{" "}
+                      {me.weeklyXp} XP
+                    </>
+                  ) : (
+                    "Unranked"
+                  )}
                 </p>
               </div>
+              {isSuperAdmin ? (
+                <button
+                  type="button"
+                  onClick={() => editOwnXp(me.weeklyXp)}
+                  className={`relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors ${
+                    isLight
+                      ? "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                      : "text-slate-500 hover:bg-slate-800 hover:text-slate-300"
+                  }`}
+                  aria-label="Edit your XP"
+                >
+                  <Pencil size={14} />
+                </button>
+              ) : null}
+            </div>
+
+            {isSuperAdmin && botsEnabled !== null ? (
+              <button
+                type="button"
+                onClick={toggleBots}
+                disabled={togglingBots}
+                className={`flex items-center justify-between gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${cardClass}`}
+              >
+                <span
+                  className={`flex items-center gap-2 ${isLight ? "text-slate-700" : "text-slate-200"}`}
+                >
+                  <Bot size={16} />
+                  Leaderboard bots (
+                  {LEVELS.find((level) => level.key === activeLevel)?.label})
+                </span>
+                <span
+                  className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
+                    botsEnabled
+                      ? "bg-emerald-500"
+                      : isLight
+                        ? "bg-slate-300"
+                        : "bg-slate-700"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                      botsEnabled ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </span>
+              </button>
+            ) : null}
+
+            {isSuperAdmin && botsEnabled ? (
+              <button
+                type="button"
+                onClick={deployBots}
+                disabled={deployingBots}
+                className={`flex items-center justify-center gap-2 rounded-xl border border-dashed px-4 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                  isLight
+                    ? "border-slate-300 text-slate-600 hover:bg-slate-50"
+                    : "border-slate-700 text-slate-300 hover:bg-slate-800"
+                }`}
+              >
+                <Rocket size={16} />
+                {deployingBots ? "Deploying…" : "Deploy dormant bots now"}
+              </button>
+            ) : null}
+
+            {loading && !hasLoadedOnce ? (
+              <p className={isLight ? "text-slate-600" : "text-slate-300"}>
+                Loading leaderboard…
+              </p>
             ) : (
+              <div
+                className={`flex flex-col gap-6 transition-opacity duration-200 ${loading ? "pointer-events-none opacity-40" : "opacity-100"}`}
+              >
+                {entries.length === 0 ? (
+                  <div
+                    className={`overflow-hidden rounded-2xl border ${cardClass}`}
+                  >
+                    <p
+                      className={`p-6 text-center text-sm ${isLight ? "text-slate-500" : "text-slate-400"}`}
+                    >
+                      No one has earned XP at this level yet this week. Be the first
+                      —{" "}
+                      <Link to="/challenge" className="underline">
+                        start a challenge
+                      </Link>
+                      .
+                    </p>
+                  </div>
+                ) : (
+                  <div
+                    className={`overflow-hidden rounded-2xl border ${cardClass}`}
+                  >
+                    <ul>
+                      {entries.map((entry) => {
+                        const badge = RANK_BADGE[entry.rank];
+                        // Match by userId, not rank — entry.rank is a
+                        // positional index while me.rank comes from a
+                        // separate count query, so tied XP values can make
+                        // the two numbers legitimately disagree.
+                        const isMe = !entry.isBot && entry.userId === userId;
+                        return (
+                          <li
+                            key={entry.userId}
+                            className={`flex items-center justify-between gap-3 border-b px-4 py-3 last:border-b-0 ${
+                              isLight ? "border-slate-100" : "border-slate-800"
+                            } ${isMe ? `bg-gradient-to-r ${levelTheme.glow}` : ""}`}
+                          >
+                            <div className="flex min-w-0 items-center gap-3">
+                              <div className="relative shrink-0">
+                                <div
+                                  className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold ${
+                                    badge
+                                      ? `${badge.badgeBg} ${badge.ring} text-white`
+                                      : isLight
+                                        ? "bg-slate-100 text-slate-500"
+                                        : "bg-slate-800 text-slate-400"
+                                  }`}
+                                >
+                                  {entry.rank}
+                                </div>
+                                {badge ? (
+                                  <Crown
+                                    size={14}
+                                    fill="currentColor"
+                                    className={`absolute -right-1.5 -top-1.5 drop-shadow-sm ${badge.crownColor}`}
+                                  />
+                                ) : null}
+                              </div>
+                              <p className="h-6 border-dotted border-l-[2px] border-pink-600"></p>
+                              <div
+                                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md  text-xs font-bold text-white ${getAvatarClass(entry.displayName || String(entry.userId))}`}
+                              >
+                                {getInitials(entry.displayName)}
+                              </div>
+                              <span
+                                className={`truncate text-sm font-medium ${isLight ? "text-slate-800" : "text-slate-100"}`}
+                              >
+                                {entry.displayName}
+                              </span>
+                              {isMe ? (
+                                <span
+                                  className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${levelTheme.chip}`}
+                                >
+                                  You
+                                </span>
+                              ) : null}
+                              {entry.isBot ? (
+                                <span
+                                  className={`flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
+                                    isLight
+                                      ? "bg-slate-200 text-slate-500"
+                                      : "bg-slate-700 text-slate-400"
+                                  }`}
+                                >
+                                  <Bot size={10} /> Bot
+                                </span>
+                              ) : null}
+                            </div>
+                            <div className="flex shrink-0 items-center gap-2">
+                              {isSuperAdmin && (entry.isBot || isMe) ? (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    entry.isBot
+                                      ? editBot(entry)
+                                      : editOwnXp(entry.weeklyXp)
+                                  }
+                                  className={`flex h-6 w-6 items-center justify-center rounded-full transition-colors ${
+                                    isLight
+                                      ? "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                                      : "text-slate-500 hover:bg-slate-800 hover:text-slate-300"
+                                  }`}
+                                  aria-label={`Edit ${entry.displayName}`}
+                                >
+                                  <Pencil size={12} />
+                                </button>
+                              ) : null}
+                              <span
+                                className={`rounded-full px-2.5 py-1 text-xs font-bold ${levelTheme.chip}`}
+                              >
+                                {entry.weeklyXp} XP
+                              </span>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="relative">
+            <div className="pointer-events-none select-none space-y-6 blur-sm">
+              <div
+                className={`flex items-center justify-between rounded-2xl border p-4 ${cardClass}`}
+              >
+                <div>
+                  <p
+                    className={`text-xs font-semibold uppercase tracking-wide ${isLight ? "text-slate-500" : "text-slate-400"}`}
+                  >
+                    Your rank this week
+                  </p>
+                  <p
+                    className={`text-lg font-bold ${isLight ? "text-slate-900" : "text-white"}`}
+                  >
+                    <span className={levelTheme.text}>#12</span> · 180 XP
+                  </p>
+                </div>
+              </div>
+
               <div
                 className={`overflow-hidden rounded-2xl border ${cardClass}`}
               >
                 <ul>
-                  {entries.map((entry) => {
+                  {BLUR_PLACEHOLDER_ENTRIES.map((entry) => {
                     const badge = RANK_BADGE[entry.rank];
-                    // Match by userId, not rank — entry.rank is a
-                    // positional index while me.rank comes from a
-                    // separate count query, so tied XP values can make
-                    // the two numbers legitimately disagree.
-                    const isMe = !entry.isBot && entry.userId === userId;
                     return (
                       <li
-                        key={entry.userId}
+                        key={entry.rank}
                         className={`flex items-center justify-between gap-3 border-b px-4 py-3 last:border-b-0 ${
                           isLight ? "border-slate-100" : "border-slate-800"
-                        } ${isMe ? `bg-gradient-to-r ${levelTheme.glow}` : ""}`}
+                        }`}
                       >
                         <div className="flex min-w-0 items-center gap-3">
                           <div className="relative shrink-0">
@@ -554,17 +692,9 @@ const Leaderboard = () => {
                             >
                               {entry.rank}
                             </div>
-                            {badge ? (
-                              <Crown
-                                size={14}
-                                fill="currentColor"
-                                className={`absolute -right-1.5 -top-1.5 drop-shadow-sm ${badge.crownColor}`}
-                              />
-                            ) : null}
                           </div>
-                          <p className="h-6 border-dotted border-l-[2px] border-pink-600"></p>
                           <div
-                            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md  text-xs font-bold text-white ${getAvatarClass(entry.displayName || String(entry.userId))}`}
+                            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-xs font-bold text-white ${getAvatarClass(`${entry.displayName}${entry.rank}`)}`}
                           >
                             {getInitials(entry.displayName)}
                           </div>
@@ -573,56 +703,43 @@ const Leaderboard = () => {
                           >
                             {entry.displayName}
                           </span>
-                          {isMe ? (
-                            <span
-                              className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${levelTheme.chip}`}
-                            >
-                              You
-                            </span>
-                          ) : null}
-                          {entry.isBot ? (
-                            <span
-                              className={`flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
-                                isLight
-                                  ? "bg-slate-200 text-slate-500"
-                                  : "bg-slate-700 text-slate-400"
-                              }`}
-                            >
-                              <Bot size={10} /> Bot
-                            </span>
-                          ) : null}
                         </div>
-                        <div className="flex shrink-0 items-center gap-2">
-                          {isSuperAdmin && (entry.isBot || isMe) ? (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                entry.isBot
-                                  ? editBot(entry)
-                                  : editOwnXp(entry.weeklyXp)
-                              }
-                              className={`flex h-6 w-6 items-center justify-center rounded-full transition-colors ${
-                                isLight
-                                  ? "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                                  : "text-slate-500 hover:bg-slate-800 hover:text-slate-300"
-                              }`}
-                              aria-label={`Edit ${entry.displayName}`}
-                            >
-                              <Pencil size={12} />
-                            </button>
-                          ) : null}
-                          <span
-                            className={`rounded-full px-2.5 py-1 text-xs font-bold ${levelTheme.chip}`}
-                          >
-                            {entry.weeklyXp} XP
-                          </span>
-                        </div>
+                        <span
+                          className={`rounded-full px-2.5 py-1 text-xs font-bold ${levelTheme.chip}`}
+                        >
+                          {entry.weeklyXp} XP
+                        </span>
                       </li>
                     );
                   })}
                 </ul>
               </div>
-            )}
+            </div>
+
+            <div
+              className={`absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-2xl px-6 text-center backdrop-blur-[1px] ${
+                isLight ? "bg-white/70" : "bg-slate-950/70"
+              }`}
+            >
+              <Lock
+                size={28}
+                className={isLight ? "text-slate-500" : "text-slate-300"}
+              />
+              <p
+                className={`text-sm font-semibold ${isLight ? "text-slate-700" : "text-slate-200"}`}
+              >
+                Login to see the leaderboard
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  window.location.href = "/login";
+                }}
+                className="rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 text-sm font-bold text-white shadow-md transition-transform hover:scale-105 active:scale-95"
+              >
+                Login
+              </button>
+            </div>
           </div>
         )}
       </div>
