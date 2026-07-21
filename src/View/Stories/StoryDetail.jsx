@@ -185,7 +185,7 @@ const StoryDetail = () => {
 
   return (
     <Container>
-      <div className="mx-auto min-h-screen max-w-3xl px-4 py-8">
+      <div className="mx-auto min-h-screen max-w-5xl px-4 py-8">
         {backLink}
 
         <div className="mb-8 text-center">
@@ -216,23 +216,24 @@ const StoryDetail = () => {
             </Link>
           )}
         </div>
-        <div className="flex items-center mb-2 mr-1">
+
+        <div className=" flex justify-center">
+          {story.image && (
+            <img
+              src={story.image}
+              alt={story.title}
+              className=" mb-2 w-full md:max-w-3xl  rounded-2xl object-cover shadow-lg"
+              style={{ maxHeight: 420 }}
+            />
+          )}
+        </div>
+        <div className="flex items-center mb-2 mr-2 ">
           <span className="inline-block rounded-full border border-orange-500/50 bg-gradient-to-r from-orange-500/20 to-pink-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-orange-600 dark:text-orange-300 ml-auto">
             {story.level?.level || "General"}
           </span>
         </div>
-
-        {story.image && (
-          <img
-            src={story.image}
-            alt={story.title}
-            className="mb-8 w-full rounded-2xl object-cover shadow-lg"
-            style={{ maxHeight: 420 }}
-          />
-        )}
-
         <div
-          className={`[font-family:'Roboto',sans-serif] rounded-2xl border p-2 text-lg leading-8 shadow-sm md:p-4 ${
+          className={`[font-family:'Roboto',sans-serif]  rounded-2xl border p-2 text-lg leading-8 shadow-sm md:p-4 ${
             isLight
               ? "border-slate-200 bg-white text-slate-800"
               : "border-slate-800 bg-slate-900/60 text-slate-200"
