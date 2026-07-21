@@ -292,7 +292,7 @@ const DashboardLayout = () => {
                       onClick={() => setIsOpen(false)}
                     >
                       <span>➕</span>
-                      <span>Create Chat</span>
+                      <span>Create Conversation</span>
                     </NavLink>
                     <NavLink
                       to="/dashboard/update-conversation"
@@ -300,7 +300,7 @@ const DashboardLayout = () => {
                       onClick={() => setIsOpen(false)}
                     >
                       <span>✏️</span>
-                      <span>Update Chat</span>
+                      <span>Update Conversation</span>
                     </NavLink>
                   </div>
                 )}

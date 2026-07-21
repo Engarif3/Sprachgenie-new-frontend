@@ -5,23 +5,60 @@ import Loader from "../../utils/Loader";
 import api from "../../axios";
 import { useTheme } from "../../context/ThemeContext";
 
-// The first speaker encountered in a conversation always renders on the
-// left in a neutral bubble; the second (and any further speaker, cycling)
-// renders on the right in an accent-colored bubble — the same left/right
-// convention every chat app uses, so who's-talking-to-whom reads from
-// alignment alone, not just the name label.
-const ACCENT_BUBBLES = [
-  "from-sky-500 to-blue-600",
-  "from-fuchsia-500 to-pink-600",
-  "from-emerald-500 to-teal-600",
-  "from-amber-500 to-orange-600",
-];
-
-const AVATAR_COLORS = [
-  "bg-gradient-to-br from-slate-500 to-slate-600",
-  "bg-gradient-to-br from-sky-500 to-blue-600",
-  "bg-gradient-to-br from-fuchsia-500 to-pink-600",
-  "bg-gradient-to-br from-emerald-500 to-teal-600",
+// One visual identity per speaker (avatar + bubble tint + name color),
+// cycled by order of first appearance. Index 0 is deliberately neutral —
+// in exactly-two-speaker mode it's the plain "left" bubble; in group mode
+// (3+ speakers) every speaker gets a tint from this same palette, so no
+// two people are ever visually merged together.
+const SPEAKER_THEMES = [
+  {
+    avatar: "bg-gradient-to-br from-slate-500 to-slate-600",
+    bubbleLight: "border-slate-200 bg-white text-slate-800",
+    bubbleDark: "border-slate-700 bg-slate-800 text-slate-100",
+    nameLight: "text-slate-500",
+    nameDark: "text-slate-400",
+    accent: "from-sky-500 to-blue-600",
+  },
+  {
+    avatar: "bg-gradient-to-br from-sky-500 to-blue-600",
+    bubbleLight: "border-sky-200 bg-sky-50 text-slate-800",
+    bubbleDark: "border-sky-500/20 bg-sky-500/10 text-slate-100",
+    nameLight: "text-sky-600",
+    nameDark: "text-sky-300",
+    accent: "from-sky-500 to-blue-600",
+  },
+  {
+    avatar: "bg-gradient-to-br from-fuchsia-500 to-pink-600",
+    bubbleLight: "border-pink-200 bg-pink-50 text-slate-800",
+    bubbleDark: "border-pink-500/20 bg-pink-500/10 text-slate-100",
+    nameLight: "text-pink-600",
+    nameDark: "text-pink-300",
+    accent: "from-fuchsia-500 to-pink-600",
+  },
+  {
+    avatar: "bg-gradient-to-br from-emerald-500 to-teal-600",
+    bubbleLight: "border-emerald-200 bg-emerald-50 text-slate-800",
+    bubbleDark: "border-emerald-500/20 bg-emerald-500/10 text-slate-100",
+    nameLight: "text-emerald-600",
+    nameDark: "text-emerald-300",
+    accent: "from-emerald-500 to-teal-600",
+  },
+  {
+    avatar: "bg-gradient-to-br from-amber-500 to-orange-600",
+    bubbleLight: "border-amber-200 bg-amber-50 text-slate-800",
+    bubbleDark: "border-amber-500/20 bg-amber-500/10 text-slate-100",
+    nameLight: "text-amber-600",
+    nameDark: "text-amber-300",
+    accent: "from-amber-500 to-orange-600",
+  },
+  {
+    avatar: "bg-gradient-to-br from-violet-500 to-purple-600",
+    bubbleLight: "border-violet-200 bg-violet-50 text-slate-800",
+    bubbleDark: "border-violet-500/20 bg-violet-500/10 text-slate-100",
+    nameLight: "text-violet-600",
+    nameDark: "text-violet-300",
+    accent: "from-violet-500 to-purple-600",
+  },
 ];
 
 const getInitials = (name) =>
@@ -78,9 +115,9 @@ const ConversationPage = () => {
     );
   }
 
-  // Assigns a stable left/right side per speaker name (not per message
-  // index), so the same person always renders on the same side even if
-  // they speak twice in a row.
+  // Assigns a stable index per speaker name (not per message index), so the
+  // same person always gets the same side/theme even if they speak twice
+  // in a row.
   const speakerOrder = [];
   const getSpeakerIndex = (speaker) => {
     let index = speakerOrder.indexOf(speaker);
@@ -90,6 +127,18 @@ const ConversationPage = () => {
     }
     return index;
   };
+
+  // Left/right alternation (the classic two-party chat look) only makes
+  // sense for exactly two speakers. With 3+, alternating by parity puts
+  // two different people on the same side in the same neutral bubble
+  // style — indistinguishable except by name. Group conversations instead
+  // render as a single left-aligned, Slack-style stacked transcript, where
+  // every speaker gets their own tinted bubble from SPEAKER_THEMES so
+  // nobody blends together.
+  const uniqueSpeakerCount = new Set(
+    conversation.text.map((message) => message.speaker),
+  ).size;
+  const isTwoSpeakerMode = uniqueSpeakerCount <= 2;
 
   return (
     <Container>
@@ -116,16 +165,12 @@ const ConversationPage = () => {
             <div className="flex flex-col">
               {conversation.text.map((message, index) => {
                 const speakerIndex = getSpeakerIndex(message.speaker);
-                const isRight = speakerIndex % 2 === 1;
+                const speakerTheme =
+                  SPEAKER_THEMES[speakerIndex % SPEAKER_THEMES.length];
+                const isRight = isTwoSpeakerMode && speakerIndex % 2 === 1;
                 const previousMessage = conversation.text[index - 1];
                 const isContinuation =
                   previousMessage?.speaker === message.speaker;
-                const accent =
-                  ACCENT_BUBBLES[
-                    Math.floor(speakerIndex / 2) % ACCENT_BUBBLES.length
-                  ];
-                const avatarColor =
-                  AVATAR_COLORS[speakerIndex % AVATAR_COLORS.length];
 
                 return (
                   <div
@@ -139,7 +184,7 @@ const ConversationPage = () => {
                     <div className="w-9 shrink-0">
                       {!isContinuation && (
                         <div
-                          className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white shadow-md ${avatarColor}`}
+                          className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white shadow-md ${speakerTheme.avatar}`}
                         >
                           {getInitials(message.speaker)}
                         </div>
@@ -154,7 +199,7 @@ const ConversationPage = () => {
                       {!isContinuation && (
                         <span
                           className={`px-1 text-xs font-semibold ${
-                            isLight ? "text-slate-500" : "text-slate-400"
+                            isLight ? speakerTheme.nameLight : speakerTheme.nameDark
                           }`}
                         >
                           {message.speaker}
@@ -163,10 +208,12 @@ const ConversationPage = () => {
                       <div
                         className={`px-4 py-2.5 text-[15px] leading-relaxed shadow-sm ${
                           isRight
-                            ? `rounded-2xl rounded-br-sm bg-gradient-to-br text-white ${accent}`
-                            : isLight
-                              ? "rounded-2xl rounded-bl-sm border border-slate-200 bg-white text-slate-800"
-                              : "rounded-2xl rounded-bl-sm border border-slate-700 bg-slate-800 text-slate-100"
+                            ? `rounded-2xl rounded-br-sm bg-gradient-to-br text-white ${speakerTheme.accent}`
+                            : `rounded-2xl rounded-bl-sm border ${
+                                isLight
+                                  ? speakerTheme.bubbleLight
+                                  : speakerTheme.bubbleDark
+                              }`
                         }`}
                       >
                         {message.message}
