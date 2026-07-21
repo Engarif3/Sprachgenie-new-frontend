@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import api from "../../axios";
 import aiApi from "../../AI_axios";
 
 const StoriesManagement = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -21,10 +23,36 @@ const StoriesManagement = () => {
   const [regeneratePrompt, setRegeneratePrompt] = useState("");
   const [regenerateLevel, setRegenerateLevel] = useState("A2");
   const [regenerateLoading, setRegenerateLoading] = useState(false);
+  // Guards against re-opening the modal if the admin closes it manually —
+  // only ever auto-opens once per ?edit= deep link.
+  const hasAutoOpenedRef = useRef(false);
 
   useEffect(() => {
     fetchStories();
   }, []);
+
+  // Deep link from the story detail page's "Edit this story" button
+  // (?edit=<storyId>) — auto-opens that story's edit modal once the list
+  // has loaded, instead of making the admin find it again.
+  useEffect(() => {
+    if (hasAutoOpenedRef.current || stories.length === 0) {
+      return;
+    }
+
+    const editId = searchParams.get("edit");
+    if (!editId) {
+      return;
+    }
+
+    const targetStory = stories.find((story) => story.id === editId);
+    if (targetStory) {
+      openEditModal(targetStory);
+    }
+
+    hasAutoOpenedRef.current = true;
+    setSearchParams({}, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stories, searchParams]);
 
   const fetchStories = async () => {
     setLoading(true);
