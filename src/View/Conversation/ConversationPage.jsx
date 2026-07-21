@@ -10,6 +10,7 @@ import { MdOutlineDoubleArrow } from "react-icons/md";
 import { SiGoogletranslate } from "react-icons/si";
 import { FaSpinner } from "react-icons/fa";
 import { FaPen } from "react-icons/fa6";
+import { splitConversationTopic } from "../../utils/splitConversationTopic";
 
 // One visual identity per speaker (avatar + bubble tint + name color),
 // cycled by order of first appearance, independent of which side (left or
@@ -182,6 +183,9 @@ const ConversationPage = () => {
     return index;
   };
 
+  const { english: topicEnglish, german: topicGerman } =
+    splitConversationTopic(conversation.topic);
+
   return (
     <Container>
       <div className="min-h-screen py-8">
@@ -191,9 +195,18 @@ const ConversationPage = () => {
             <span className="mb-4 inline-block rounded-full border border-orange-500/50 bg-gradient-to-r from-orange-500/20 to-pink-500/20 px-6 py-2 text-sm font-semibold text-orange-500 dark:text-orange-400">
               💬 Conversation
             </span>
-            <h2 className="mt-4 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-3xl font-bold text-transparent md:text-4xl">
-              {conversation.topic}
+            <h2
+              className={`mt-4 text-3xl font-bold md:text-4xl ${isLight ? "text-slate-900" : "text-white"}`}
+            >
+              {topicEnglish}
             </h2>
+            {topicGerman && (
+              <p
+                className={`mt-2 text-lg font-semibold italic md:text-xl ${isLight ? "text-teal-600" : "text-teal-400"}`}
+              >
+                {topicGerman}
+              </p>
+            )}
 
             {isSuperAdmin && (
               <Link

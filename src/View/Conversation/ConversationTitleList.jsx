@@ -5,6 +5,7 @@ import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
 import api from "../../axios";
 import { useTheme } from "../../context/ThemeContext";
+import { splitConversationTopic } from "../../utils/splitConversationTopic";
 
 // Color identity per CEFR level, consistent with the badge/chip style used
 // elsewhere in the app (Leaderboard, ChallengeSession) — anything outside
@@ -150,6 +151,9 @@ const ConversationTitleList = () => {
             {filteredConversations.map((conversation) => {
               const level = conversation.levels?.level;
               const badgeClass = LEVEL_BADGES[level] || DEFAULT_BADGE;
+              const { english, german } = splitConversationTopic(
+                conversation.topic,
+              );
 
               return (
                 <button
@@ -173,11 +177,20 @@ const ConversationTitleList = () => {
                       className={isLight ? "text-slate-300" : "text-slate-600"}
                     />
                   </div>
-                  <h3
-                    className={`mb-4 text-lg font-bold ${isLight ? "text-slate-900" : "text-white"}`}
-                  >
-                    {conversation.topic}
-                  </h3>
+                  <div className="mb-4">
+                    <p
+                      className={`text-lg font-bold ${isLight ? "text-slate-900" : "text-white"}`}
+                    >
+                      {english}
+                    </p>
+                    {german && (
+                      <p
+                        className={`mt-1 text-sm font-medium italic ${isLight ? "text-teal-600" : "text-teal-400"}`}
+                      >
+                        {german}
+                      </p>
+                    )}
+                  </div>
                   <div className="mt-auto flex items-center gap-1 text-sm font-semibold text-orange-500 transition-transform group-hover:gap-2 dark:text-orange-400">
                     <span>Practice this dialogue</span>
                     <ChevronRight size={16} />

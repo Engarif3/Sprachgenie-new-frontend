@@ -255,11 +255,40 @@ const Home = () => {
       ),
     },
     {
+      title: t("conversationCardTitle"),
+      text: t("conversationCardDesc"),
+      link: "/conversation-titles",
+      eyebrow: "Speaking Flows",
+      index: "05",
+      tone: "indigo",
+      icon: (
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          className="h-7 w-7"
+          aria-hidden="true"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M7 17.5c-2.485 0-4.5-1.79-4.5-4V8.5c0-2.21 2.015-4 4.5-4h10c2.485 0 4.5 1.79 4.5 4v5c0 2.21-2.015 4-4.5 4H12l-4 3v-3H7Z"
+          />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M8 10h8M8 13h5"
+          />
+        </svg>
+      ),
+    },
+    {
       title: t("grammarCardTitle"),
       text: t("grammarCardDesc"),
       link: "/grammar",
       eyebrow: "Rule System",
-      index: "05",
+      index: "06",
       tone: "violet",
       icon: (
         <svg
@@ -283,7 +312,7 @@ const Home = () => {
       text: t("prefixCardDesc"),
       link: "/prefix-types",
       eyebrow: "Word Building",
-      index: "06",
+      index: "07",
       tone: "amber",
       icon: (
         <svg
@@ -309,35 +338,6 @@ const Home = () => {
             strokeLinecap="round"
             strokeLinejoin="round"
             d="M12 12h4M18 8v8"
-          />
-        </svg>
-      ),
-    },
-    {
-      title: t("conversationCardTitle"),
-      text: t("conversationCardDesc"),
-      link: "/conversation-titles",
-      eyebrow: "Speaking Flows",
-      index: "07",
-      tone: "indigo",
-      icon: (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          className="h-7 w-7"
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M7 17.5c-2.485 0-4.5-1.79-4.5-4V8.5c0-2.21 2.015-4 4.5-4h10c2.485 0 4.5 1.79 4.5 4v5c0 2.21-2.015 4-4.5 4H12l-4 3v-3H7Z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M8 10h8M8 13h5"
           />
         </svg>
       ),
