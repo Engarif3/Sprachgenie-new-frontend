@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { BookOpen, ChevronRight } from "lucide-react";
+import { BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
 import api from "../../axios";
@@ -9,16 +9,17 @@ import { useTheme } from "../../context/ThemeContext";
 // Color identity per CEFR level, consistent with the badge/chip style used
 // elsewhere in the app (Leaderboard, ChallengeSession, ConversationTitleList).
 const LEVEL_BADGES = {
-  A1: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300",
-  A2: "bg-black text-teal-200",
-  B1: "bg-black text-amber-300",
-  B2: "bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300",
+  A1: "bg-black text-sky-400",
+  A2: "bg-black text-teal-400",
+  B1: "bg-black text-orange-400",
+  B2: "bg-black text-pink-500",
   C1: "bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-500/15 dark:text-fuchsia-300",
   C2: "bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300",
 };
 const DEFAULT_BADGE =
   "bg-slate-100 text-slate-700 dark:bg-slate-500/15 dark:text-slate-300";
 const CEFR_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"];
+const STORIES_PER_PAGE = 9;
 
 const formatPublishedDate = (dateValue) => {
   if (!dateValue) return null;
@@ -81,8 +82,26 @@ const StoryTitleList = () => {
     ? stories.filter((story) => story.level?.level === activeLevel)
     : stories;
 
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredStories.length / STORIES_PER_PAGE),
+  );
+  const requestedPage = parseInt(searchParams.get("page") || "1", 10);
+  const currentPage = Math.min(Math.max(requestedPage || 1, 1), totalPages);
+  const paginatedStories = filteredStories.slice(
+    (currentPage - 1) * STORIES_PER_PAGE,
+    currentPage * STORIES_PER_PAGE,
+  );
+
   const handleSelectLevel = (level) => {
     setSearchParams(level ? { level } : {});
+  };
+
+  const handleGoToPage = (page) => {
+    const params = {};
+    if (activeLevel) params.level = activeLevel;
+    if (page > 1) params.page = String(page);
+    setSearchParams(params);
   };
 
   const tabClass = (isActive) =>
@@ -165,7 +184,7 @@ const StoryTitleList = () => {
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredStories.map((story) => {
+            {paginatedStories.map((story) => {
               const level = story.level?.level;
               const badgeClass = LEVEL_BADGES[level] || DEFAULT_BADGE;
 
@@ -215,14 +234,19 @@ const StoryTitleList = () => {
                       {story.title}
                     </h3>
 
-                    <div className="mt-4 flex justify-between items-center gap-1 text-sm font-semibold text-orange-500 transition-transform group-hover:gap-2 dark:text-orange-400">
-                      <span>Read this story</span>
-                      <ChevronRight size={16} />
+                    <div className="mt-auto pt-4 flex items-center justify-between text-sm font-semibold text-orange-500 dark:text-orange-400">
+                      <span className="flex items-center gap-1">
+                        Read this story
+                        <ChevronRight size={16} />
+                      </span>
+
                       {story.publishedAt && (
                         <p
-                          className={` text-xs ${isLight ? "text-slate-500" : "text-slate-400"}`}
+                          className={`text-xs font-normal ${
+                            isLight ? "text-slate-500" : "text-slate-400"
+                          }`}
                         >
-                          Published {formatPublishedDate(story.publishedAt)}
+                          {formatPublishedDate(story.publishedAt)}
                         </p>
                       )}
                     </div>
@@ -230,6 +254,40 @@ const StoryTitleList = () => {
                 </button>
               );
             })}
+          </div>
+        )}
+
+        {!loading && !error && totalPages > 1 && (
+          <div className="mt-10 flex items-center justify-center gap-4">
+            <button
+              type="button"
+              onClick={() => handleGoToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`inline-flex items-center gap-1 rounded-full border px-4 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+                isLight
+                  ? "border-slate-200 bg-white text-slate-600 hover:border-orange-300"
+                  : "border-slate-700 bg-slate-900 text-slate-300 hover:border-orange-500/50"
+              }`}
+            >
+              <ChevronLeft size={16} /> Previous
+            </button>
+            <span
+              className={`text-sm font-semibold ${isLight ? "text-slate-600" : "text-slate-300"}`}
+            >
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={() => handleGoToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`inline-flex items-center gap-1 rounded-full border px-4 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+                isLight
+                  ? "border-slate-200 bg-white text-slate-600 hover:border-orange-300"
+                  : "border-slate-700 bg-slate-900 text-slate-300 hover:border-orange-500/50"
+              }`}
+            >
+              Next <ChevronRight size={16} />
+            </button>
           </div>
         )}
       </div>
