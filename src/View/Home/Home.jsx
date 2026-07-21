@@ -169,11 +169,37 @@ const Home = () => {
       ),
     },
     {
+      title: t("challengeCardTitle"),
+      text: t("challengeCardDesc"),
+      link: "/challenge",
+      eyebrow: "Daily Challenge",
+      index: "02",
+      tone: "cyan",
+      icon: (
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          className="h-7 w-7"
+          aria-hidden="true"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h5" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M20 20v-5h-5" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M5.5 15a7 7 0 0 0 12.6 2.5M18.5 9a7 7 0 0 0-12.6-2.5"
+          />
+        </svg>
+      ),
+    },
+    {
       title: t("radioCardTitle"),
       text: t("radioCardDesc"),
       link: "/radio",
       eyebrow: "Live Listening",
-      index: "02",
+      index: "03",
       tone: "rose",
       icon: (
         <svg
@@ -204,7 +230,7 @@ const Home = () => {
       text: t("storiesCardDesc"),
       link: "/stories",
       eyebrow: "Narrative Practice",
-      index: "03",
+      index: "04",
       tone: "teal",
       icon: (
         <svg
@@ -233,7 +259,7 @@ const Home = () => {
       text: t("grammarCardDesc"),
       link: "/grammar",
       eyebrow: "Rule System",
-      index: "04",
+      index: "05",
       tone: "violet",
       icon: (
         <svg
@@ -257,7 +283,7 @@ const Home = () => {
       text: t("prefixCardDesc"),
       link: "/prefix-types",
       eyebrow: "Word Building",
-      index: "05",
+      index: "06",
       tone: "amber",
       icon: (
         <svg
@@ -292,7 +318,7 @@ const Home = () => {
       text: t("conversationCardDesc"),
       link: "/conversation-titles",
       eyebrow: "Speaking Flows",
-      index: "06",
+      index: "07",
       tone: "indigo",
       icon: (
         <svg
@@ -321,7 +347,7 @@ const Home = () => {
       text: t("quizCardDesc"),
       link: "/quiz",
       eyebrow: "Retention Check",
-      index: "07",
+      index: "08",
       tone: "emerald",
       icon: (
         <svg
@@ -342,32 +368,6 @@ const Home = () => {
             strokeLinecap="round"
             strokeLinejoin="round"
             d="M6.5 6.5l2.1 2.1M15.4 15.4l2.1 2.1M17.5 6.5l-2.1 2.1M8.6 15.4l-2.1 2.1"
-          />
-        </svg>
-      ),
-    },
-    {
-      title: t("challengeCardTitle"),
-      text: t("challengeCardDesc"),
-      link: "/challenge",
-      eyebrow: "Daily Challenge",
-      index: "08",
-      tone: "cyan",
-      icon: (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          className="h-7 w-7"
-          aria-hidden="true"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h5" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M20 20v-5h-5" />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M5.5 15a7 7 0 0 0 12.6 2.5M18.5 9a7 7 0 0 0-12.6-2.5"
           />
         </svg>
       ),
