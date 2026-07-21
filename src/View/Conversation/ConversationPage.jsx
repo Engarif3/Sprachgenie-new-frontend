@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import Swal from "sweetalert2";
 import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
-import api from "../../axios";
+import api, { publicApi } from "../../axios";
 import { useTheme } from "../../context/ThemeContext";
+import { useAuth } from "../../services/auth.services";
+import { MdOutlineDoubleArrow } from "react-icons/md";
+import { SiGoogletranslate } from "react-icons/si";
+import { FaSpinner } from "react-icons/fa";
 
 // One visual identity per speaker (avatar + bubble tint + name color),
-// cycled by order of first appearance. Index 0 is deliberately neutral —
-// in exactly-two-speaker mode it's the plain "left" bubble; in group mode
-// (3+ speakers) every speaker gets a tint from this same palette, so no
-// two people are ever visually merged together.
+// cycled by order of first appearance, independent of which side (left or
+// right) a speaker lands on — so even two speakers sharing a side are
+// never confused for one another.
 const SPEAKER_THEMES = [
   {
     avatar: "bg-gradient-to-br from-slate-500 to-slate-600",
@@ -72,10 +76,17 @@ const getInitials = (name) =>
 const ConversationPage = () => {
   const { id } = useParams(); // Get conversation ID from the URL
   const { theme } = useTheme();
+  const { isLoggedIn } = useAuth();
   const isLight = theme === "light";
   const [conversation, setConversation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Keyed by the original message text, same pattern as the word-list
+  // modal's sentence translator — identical text (e.g. a repeated "Ja.")
+  // reuses the same translation instead of re-fetching it.
+  const [translations, setTranslations] = useState({});
+  const [loadingTranslations, setLoadingTranslations] = useState({});
 
   useEffect(() => {
     setLoading(true);
@@ -96,6 +107,48 @@ const ConversationPage = () => {
         setLoading(false);
       });
   }, [id]);
+
+  const translateMessage = async (text) => {
+    if (translations[text]) return; // avoid re-translation
+
+    setLoadingTranslations((prev) => ({ ...prev, [text]: true }));
+
+    try {
+      const response = await publicApi.post("/translate", {
+        text,
+        source: "de",
+        target: "en",
+      });
+      const data = response.data;
+
+      if (!data.data?.translated) {
+        throw new Error("No translation received");
+      }
+
+      setTranslations((prev) => ({ ...prev, [text]: data.data.translated }));
+    } catch (err) {
+      console.error("Translation failed:", err);
+      setTranslations((prev) => ({ ...prev, [text]: `❌ ${err.message}` }));
+    } finally {
+      setLoadingTranslations((prev) => ({ ...prev, [text]: false }));
+    }
+  };
+
+  const handleTranslateLocked = () => {
+    Swal.fire({
+      icon: "info",
+      title: "Login to enjoy this feature",
+      text: "Sign in to use the translation feature",
+      confirmButtonText: "Go to Login",
+      confirmButtonColor: "#123456",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = "/login";
+      }
+    });
+  };
 
   if (error) {
     return (
@@ -128,18 +181,6 @@ const ConversationPage = () => {
     return index;
   };
 
-  // Left/right alternation (the classic two-party chat look) only makes
-  // sense for exactly two speakers. With 3+, alternating by parity puts
-  // two different people on the same side in the same neutral bubble
-  // style — indistinguishable except by name. Group conversations instead
-  // render as a single left-aligned, Slack-style stacked transcript, where
-  // every speaker gets their own tinted bubble from SPEAKER_THEMES so
-  // nobody blends together.
-  const uniqueSpeakerCount = new Set(
-    conversation.text.map((message) => message.speaker),
-  ).size;
-  const isTwoSpeakerMode = uniqueSpeakerCount <= 2;
-
   return (
     <Container>
       <div className="min-h-screen py-8">
@@ -167,10 +208,16 @@ const ConversationPage = () => {
                 const speakerIndex = getSpeakerIndex(message.speaker);
                 const speakerTheme =
                   SPEAKER_THEMES[speakerIndex % SPEAKER_THEMES.length];
-                const isRight = isTwoSpeakerMode && speakerIndex % 2 === 1;
+                // Left/right alternates by speaker (not by message index),
+                // regardless of how many distinct speakers there are — the
+                // per-speaker theme above is what keeps two people sharing
+                // a side from being confused for one another.
+                const isRight = speakerIndex % 2 === 1;
                 const previousMessage = conversation.text[index - 1];
                 const isContinuation =
                   previousMessage?.speaker === message.speaker;
+                const translation = translations[message.message];
+                const isTranslating = loadingTranslations[message.message];
 
                 return (
                   <div
@@ -218,6 +265,49 @@ const ConversationPage = () => {
                       >
                         {message.message}
                       </div>
+
+                      {/* Translate — same publicApi /translate (de -> en)
+                          pattern used in the word-list modal. */}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          isLoggedIn
+                            ? translateMessage(message.message)
+                            : handleTranslateLocked()
+                        }
+                        disabled={isTranslating}
+                        title={isLoggedIn ? "Translate" : "Sign in to use translation feature"}
+                        className="flex items-center gap-1 px-1 text-xs transition-transform hover:scale-110 disabled:cursor-not-allowed"
+                      >
+                        {isTranslating ? (
+                          <FaSpinner size={12} className="animate-spin" />
+                        ) : (
+                          <SiGoogletranslate
+                            size={12}
+                            className={
+                              isLoggedIn
+                                ? "text-sky-500 hover:text-green-500"
+                                : isLight
+                                  ? "text-slate-400"
+                                  : "text-slate-500"
+                            }
+                          />
+                        )}
+                      </button>
+
+                      {translation && (
+                        <p
+                          className={`flex items-center gap-2 px-1 text-xs italic ${
+                            isLight ? "text-sky-600" : "text-sky-400"
+                          }`}
+                        >
+                          <MdOutlineDoubleArrow
+                            size={14}
+                            className="shrink-0 text-pink-600"
+                          />
+                          <span>{translation}</span>
+                        </p>
+                      )}
                     </div>
                   </div>
                 );
