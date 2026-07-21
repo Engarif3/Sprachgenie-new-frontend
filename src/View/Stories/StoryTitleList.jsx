@@ -10,8 +10,8 @@ import { useTheme } from "../../context/ThemeContext";
 // elsewhere in the app (Leaderboard, ChallengeSession, ConversationTitleList).
 const LEVEL_BADGES = {
   A1: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300",
-  A2: "bg-black text-teal-200 dark:bg-black dark:text-teal-200",
-  B1: "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300",
+  A2: "bg-black text-teal-200",
+  B1: "bg-black text-amber-300",
   B2: "bg-orange-100 text-orange-700 dark:bg-orange-500/15 dark:text-orange-300",
   C1: "bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-500/15 dark:text-fuchsia-300",
   C2: "bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300",
@@ -19,6 +19,15 @@ const LEVEL_BADGES = {
 const DEFAULT_BADGE =
   "bg-slate-100 text-slate-700 dark:bg-slate-500/15 dark:text-slate-300";
 const CEFR_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"];
+
+const formatPublishedDate = (dateValue) => {
+  if (!dateValue) return null;
+  return new Date(dateValue).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+};
 
 const StoryTitleList = () => {
   const { theme } = useTheme();
@@ -201,10 +210,17 @@ const StoryTitleList = () => {
 
                   <div className="flex flex-1 flex-col p-4">
                     <h3
-                      className={`mb-3 text-lg font-bold ${isLight ? "text-slate-900" : "text-white"}`}
+                      className={`mb-1 text-lg font-bold ${isLight ? "text-slate-900" : "text-white"}`}
                     >
                       {story.title}
                     </h3>
+                    {story.publishedAt && (
+                      <p
+                        className={`mb-3 text-xs ${isLight ? "text-slate-500" : "text-slate-400"}`}
+                      >
+                        Published {formatPublishedDate(story.publishedAt)}
+                      </p>
+                    )}
                     <div className="mt-auto flex items-center gap-1 text-sm font-semibold text-orange-500 transition-transform group-hover:gap-2 dark:text-orange-400">
                       <span>Read this story</span>
                       <ChevronRight size={16} />

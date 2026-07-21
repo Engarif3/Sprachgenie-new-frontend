@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { FaPen } from "react-icons/fa6";
 import { ChevronLeft } from "lucide-react";
 import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
 import api from "../../axios";
 import { useTheme } from "../../context/ThemeContext";
+import { useAuth } from "../../services/auth.services";
 import { getBestGermanVoice } from "../../utils/voiceSettings";
 
 import "@fontsource/roboto";
@@ -81,6 +83,15 @@ const splitIntoParagraphs = (text) => {
   return paragraphs.filter((p) => p.trim().length > 0);
 };
 
+const formatPublishedDate = (dateValue) => {
+  if (!dateValue) return null;
+  return new Date(dateValue).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+};
+
 const pronounceWord = async (word) => {
   const utterance = new SpeechSynthesisUtterance(word);
   utterance.lang = "de-DE";
@@ -100,6 +111,7 @@ const pronounceWord = async (word) => {
 const StoryDetail = () => {
   const { id } = useParams();
   const { theme } = useTheme();
+  const { isSuperAdmin } = useAuth();
   const isLight = theme === "light";
   const [story, setStory] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -185,6 +197,27 @@ const StoryDetail = () => {
           >
             {story.title}
           </h1>
+          {story.publishedAt && (
+            <p
+              className={`mt-2 text-sm ${isLight ? "text-slate-500" : "text-slate-400"}`}
+            >
+              Published {formatPublishedDate(story.publishedAt)}
+            </p>
+          )}
+
+          {isSuperAdmin && (
+            <Link
+              to={`/dashboard/stories-management?edit=${id}`}
+              className={`mt-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+                isLight
+                  ? "border-slate-200 bg-white text-slate-700 hover:border-orange-300 hover:text-orange-600"
+                  : "border-slate-700 bg-slate-900 text-slate-200 hover:border-orange-500/50 hover:text-orange-400"
+              }`}
+            >
+              <FaPen size={13} />
+              Edit this story
+            </Link>
+          )}
         </div>
 
         {story.image && (
@@ -197,7 +230,7 @@ const StoryDetail = () => {
         )}
 
         <div
-          className={`[font-family:'Roboto',sans-serif] rounded-2xl border p-6 text-lg leading-8 shadow-sm md:p-8 ${
+          className={`[font-family:'Roboto',sans-serif] rounded-2xl border p-2 text-lg leading-8 shadow-sm md:p-4 ${
             isLight
               ? "border-slate-200 bg-white text-slate-800"
               : "border-slate-800 bg-slate-900/60 text-slate-200"
