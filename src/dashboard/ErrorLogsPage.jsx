@@ -647,16 +647,16 @@ const ErrorLogsPage = () => {
                             />
                           </td>
                         )}
-                        <td className="px-4 py-4">
+                        <td className="whitespace-nowrap px-4 py-4">
                           <span
-                            className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${getCategoryBadgeClass(record.category)}`}
+                            className={`inline-flex whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${getCategoryBadgeClass(record.category)}`}
                           >
                             {getCategoryLabel(record.category)}
                           </span>
                         </td>
-                        <td className="px-4 py-4">
+                        <td className="whitespace-nowrap px-4 py-4">
                           <span
-                            className={`inline-flex rounded-full border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${getEnvironmentBadgeClass(record.environment)}`}
+                            className={`inline-flex whitespace-nowrap rounded-full border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${getEnvironmentBadgeClass(record.environment)}`}
                           >
                             {record.environment === "DEVELOPMENT" ? "Dev" : "Prod"}
                           </span>
@@ -664,16 +664,16 @@ const ErrorLogsPage = () => {
                         <td className="max-w-xs truncate px-4 py-4 text-slate-700 dark:text-slate-200">
                           {record.message}
                         </td>
-                        <td className="px-4 py-4 text-slate-600 dark:text-slate-300">
+                        <td className="whitespace-nowrap px-4 py-4 text-slate-600 dark:text-slate-300">
                           {record.email || "—"}
                         </td>
-                        <td className="px-4 py-4 font-mono text-xs text-slate-500 dark:text-slate-400">
+                        <td className="max-w-[16rem] truncate px-4 py-4 font-mono text-xs text-slate-500 dark:text-slate-400">
                           {record.path || "—"}
                         </td>
-                        <td className="px-4 py-4 font-mono text-xs text-slate-500 dark:text-slate-400">
+                        <td className="whitespace-nowrap px-4 py-4 font-mono text-xs text-slate-500 dark:text-slate-400">
                           {record.ipAddress || "—"}
                         </td>
-                        <td className="px-4 py-4 text-slate-600 dark:text-slate-300">
+                        <td className="whitespace-nowrap px-4 py-4 text-slate-600 dark:text-slate-300">
                           {formatDate(record.createdAt)}
                         </td>
                         <td className="px-4 py-4">
@@ -709,12 +709,12 @@ const ErrorLogsPage = () => {
                           />
                         )}
                         <span
-                          className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${getCategoryBadgeClass(record.category)}`}
+                          className={`inline-flex whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ${getCategoryBadgeClass(record.category)}`}
                         >
                           {getCategoryLabel(record.category)}
                         </span>
                         <span
-                          className={`inline-flex rounded-full border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${getEnvironmentBadgeClass(record.environment)}`}
+                          className={`inline-flex whitespace-nowrap rounded-full border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${getEnvironmentBadgeClass(record.environment)}`}
                         >
                           {record.environment === "DEVELOPMENT" ? "Dev" : "Prod"}
                         </span>
