@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
@@ -9,6 +9,7 @@ import { useAuth } from "../../services/auth.services";
 import { MdOutlineDoubleArrow } from "react-icons/md";
 import { SiGoogletranslate } from "react-icons/si";
 import { FaSpinner } from "react-icons/fa";
+import { FaPen } from "react-icons/fa6";
 
 // One visual identity per speaker (avatar + bubble tint + name color),
 // cycled by order of first appearance, independent of which side (left or
@@ -76,7 +77,7 @@ const getInitials = (name) =>
 const ConversationPage = () => {
   const { id } = useParams(); // Get conversation ID from the URL
   const { theme } = useTheme();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isSuperAdmin } = useAuth();
   const isLight = theme === "light";
   const [conversation, setConversation] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -193,6 +194,20 @@ const ConversationPage = () => {
             <h2 className="mt-4 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-3xl font-bold text-transparent md:text-4xl">
               {conversation.topic}
             </h2>
+
+            {isSuperAdmin && (
+              <Link
+                to={`/dashboard/update-conversation?edit=${id}`}
+                className={`mt-4 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+                  isLight
+                    ? "border-slate-200 bg-white text-slate-700 hover:border-orange-300 hover:text-orange-600"
+                    : "border-slate-700 bg-slate-900 text-slate-200 hover:border-orange-500/50 hover:text-orange-400"
+                }`}
+              >
+                <FaPen size={13} />
+                Edit this conversation
+              </Link>
+            )}
           </div>
 
           {/* Chat Messages */}
