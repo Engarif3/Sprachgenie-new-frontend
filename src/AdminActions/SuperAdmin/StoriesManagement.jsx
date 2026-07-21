@@ -6,6 +6,7 @@ import aiApi from "../../AI_axios";
 const StoriesManagement = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [stories, setStories] = useState([]);
+  const [levels, setLevels] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -14,6 +15,7 @@ const StoriesManagement = () => {
   const [editingStoryId, setEditingStoryId] = useState(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
+  const [editLevelId, setEditLevelId] = useState("");
   const [editLoading, setEditLoading] = useState(false);
   const [editImage, setEditImage] = useState(null);
   const [editImagePreview, setEditImagePreview] = useState(null);
@@ -36,7 +38,17 @@ const StoriesManagement = () => {
 
   useEffect(() => {
     fetchStories();
+    fetchLevels();
   }, []);
+
+  const fetchLevels = async () => {
+    try {
+      const response = await api.get("/level/all");
+      setLevels(response.data?.data || []);
+    } catch (err) {
+      console.error("Error fetching levels:", err);
+    }
+  };
 
   // Deep link from the story detail page's "Edit this story" button
   // (?edit=<storyId>) — auto-opens that story's edit modal once the list
@@ -137,6 +149,7 @@ const StoriesManagement = () => {
     setEditingStoryId(story.id);
     setEditTitle(story.title);
     setEditDescription(story.description);
+    setEditLevelId(story.levelId != null ? String(story.levelId) : "");
     setEditImagePreview(story.image || null);
     setEditImage(null);
     setEditVocabulary(
@@ -153,6 +166,7 @@ const StoriesManagement = () => {
     setEditingStoryId(null);
     setEditTitle("");
     setEditDescription("");
+    setEditLevelId("");
     setEditImage(null);
     setEditImagePreview(null);
     setEditVocabulary([]);
@@ -201,6 +215,7 @@ const StoriesManagement = () => {
         title: editTitle.trim(),
         description: editDescription.trim(),
         vocabulary: editVocabulary,
+        ...(editLevelId && { levelId: parseInt(editLevelId, 10) }),
       });
 
       // If there's a new image, upload it
@@ -542,6 +557,28 @@ const StoriesManagement = () => {
                       className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
                       placeholder="Story title..."
                     />
+                  </div>
+
+                  {/* Level Selection */}
+                  <div className="mb-6">
+                    <label
+                      htmlFor="edit-story-level"
+                      className="block text-white font-semibold mb-2"
+                    >
+                      Language Level
+                    </label>
+                    <select
+                      id="edit-story-level"
+                      value={editLevelId}
+                      onChange={(e) => setEditLevelId(e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                    >
+                      {levels.map((level) => (
+                        <option key={level.id} value={level.id}>
+                          {level.level}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   {/* Description Input */}

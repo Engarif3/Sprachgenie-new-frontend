@@ -181,7 +181,7 @@ const StoryTitleList = () => {
                   }`}
                 >
                   <div
-                    className={`relative h-44 w-full overflow-hidden ${
+                    className={`relative h-48 w-full overflow-hidden ${
                       isLight ? "bg-slate-100" : "bg-slate-800"
                     }`}
                   >
@@ -208,20 +208,14 @@ const StoryTitleList = () => {
                     </span>
                   </div>
 
-                  <div className="flex flex-1 flex-col p-4">
+                  <div className="flex flex-1 flex-col p-4 ">
                     <h3
-                      className={`mb-1 text-lg font-bold ${isLight ? "text-slate-900" : "text-white"}`}
+                      className={`mb-1  text-lg font-bold ${isLight ? "text-slate-900" : "text-white"}`}
                     >
                       {story.title}
                     </h3>
-                    {/* {story.publishedAt && (
-                      <p
-                        className={`mb-3 text-xs ${isLight ? "text-slate-500" : "text-slate-400"}`}
-                      >
-                        Published {formatPublishedDate(story.publishedAt)}
-                      </p>
-                    )} */}
-                    <div className="mt-auto flex justify-between items-center gap-1 text-sm font-semibold text-orange-500 transition-transform group-hover:gap-2 dark:text-orange-400">
+
+                    <div className="mt-4 flex justify-between items-center gap-1 text-sm font-semibold text-orange-500 transition-transform group-hover:gap-2 dark:text-orange-400">
                       <span>Read this story</span>
                       <ChevronRight size={16} />
                       {story.publishedAt && (
