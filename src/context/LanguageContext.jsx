@@ -7,7 +7,10 @@ export const LanguageProvider = ({ children }) => {
   const { i18n } = useTranslation();
 
   const toggleLanguage = () => {
-    const newLang = i18n.language === "en" ? "de" : "en";
+    // i18n.language can be a raw, unnormalized code (e.g. "en-US", or an
+    // unsupported browser locale like "fr"); resolvedLanguage is always the
+    // actual bare code ("en"/"de") the UI is rendering, so toggle off that.
+    const newLang = i18n.resolvedLanguage === "en" ? "de" : "en";
     i18n.changeLanguage(newLang);
     localStorage.setItem("language", newLang);
   };
@@ -22,7 +25,7 @@ export const LanguageProvider = ({ children }) => {
   return (
     <LanguageContext.Provider
       value={{
-        language: i18n.language,
+        language: i18n.resolvedLanguage,
         toggleLanguage,
         setLanguageTo,
       }}

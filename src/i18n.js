@@ -24,10 +24,10 @@ i18n
   .init({
     resources,
     fallbackLng: "en",
-    // Region-qualified browser locales (e.g. "en-US", "de-AT") get
-    // normalized to their bare language code ("en", "de") so i18n.language
-    // always matches the navbar's active-flag comparisons on first visit.
-    load: "languageOnly",
+    // Only en/de are supported; visitors with any other browser language
+    // (e.g. "fr") fall through to fallbackLng instead of leaving
+    // i18n.resolvedLanguage stuck on an unsupported code.
+    supportedLngs: ["en", "de"],
     debug: false,
     showSupportNotice: false,
     interpolation: {
