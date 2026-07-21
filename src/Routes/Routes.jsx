@@ -195,7 +195,7 @@ export const router = createBrowserRouter(
         },
         {
           path: "/topic",
-          element: protectRoute(<TopicFormWithSuspense />, ADMIN_ROLES),
+          element: protectRoute(<TopicFormWithSuspense />, SUPER_ADMIN_ROLES),
         },
         {
           path: "/article",
@@ -332,13 +332,16 @@ export const router = createBrowserRouter(
             },
             {
               path: "topic",
-              element: protectRoute(<TopicFormWithSuspense />, ADMIN_ROLES),
+              element: protectRoute(
+                <TopicFormWithSuspense />,
+                SUPER_ADMIN_ROLES,
+              ),
             },
             {
               path: "update-topic",
               element: protectRoute(
                 <UpdateTopicFormWithSuspense />,
-                ADMIN_ROLES,
+                SUPER_ADMIN_ROLES,
               ),
             },
             {
