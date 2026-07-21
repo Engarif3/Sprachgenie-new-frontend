@@ -32,7 +32,9 @@ const DashboardLayout = () => {
   const [expandedSections, setExpandedSections] = useState({
     admin: false,
     content: false,
+    settings: false,
     analytics: false,
+    monitoring: false,
   });
 
   const { safeUserInfo: userInfo, userId, userRole: role } = useAuth();
@@ -169,6 +171,9 @@ const DashboardLayout = () => {
                   Management
                 </p>
 
+                {/* Accounts: who can access the app and at what role.
+                    Nav visibility intentionally mirrors each route's actual
+                    role check (see Routes.jsx) — do not widen these. */}
                 <div
                   onClick={() => toggleSection("admin")}
                   className={sectionHeaderClass}
@@ -190,32 +195,14 @@ const DashboardLayout = () => {
                 {expandedSections.admin && (
                   <div className="ml-3 space-y-1 border-l border-slate-200 py-2 pl-4 animate-in fade-in slide-in-from-top-2 duration-200 dark:border-slate-700/60">
                     {role === "super_admin" && (
-                      <>
-                        <NavLink
-                          to="/dashboard/update-user-status"
-                          className={({ isActive }) => navItemClass(isActive)}
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <span>👤</span>
-                          <span>All Users</span>
-                        </NavLink>
-                        <NavLink
-                          to="/dashboard/topic"
-                          className={({ isActive }) => navItemClass(isActive)}
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <span>📚</span>
-                          <span>Create Topic</span>
-                        </NavLink>
-                        <NavLink
-                          to="/dashboard/update-topic"
-                          className={({ isActive }) => navItemClass(isActive)}
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <span>✏️</span>
-                          <span>Update Topic</span>
-                        </NavLink>
-                      </>
+                      <NavLink
+                        to="/dashboard/update-user-status"
+                        className={({ isActive }) => navItemClass(isActive)}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <span>👤</span>
+                        <span>All Users</span>
+                      </NavLink>
                     )}
                     {role === "admin" && (
                       <NavLink
@@ -230,6 +217,11 @@ const DashboardLayout = () => {
                   </div>
                 )}
 
+                {/* Content: creating/editing what learners see (words,
+                    topics, stories, conversations). Topic management stays
+                    super_admin-only in the nav, same as before this
+                    reorganization — only its section changed, not who can
+                    see it. */}
                 <div
                   onClick={() => toggleSection("content")}
                   className={sectionHeaderClass}
@@ -258,6 +250,26 @@ const DashboardLayout = () => {
                       <span>➕</span>
                       <span>Create Word</span>
                     </NavLink>
+                    {role === "super_admin" && (
+                      <>
+                        <NavLink
+                          to="/dashboard/topic"
+                          className={({ isActive }) => navItemClass(isActive)}
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <span>📚</span>
+                          <span>Create Topic</span>
+                        </NavLink>
+                        <NavLink
+                          to="/dashboard/update-topic"
+                          className={({ isActive }) => navItemClass(isActive)}
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <span>✏️</span>
+                          <span>Update Topic</span>
+                        </NavLink>
+                      </>
+                    )}
                     <NavLink
                       to="/dashboard/generate-story"
                       className={({ isActive }) => navItemClass(isActive)}
@@ -265,6 +277,14 @@ const DashboardLayout = () => {
                     >
                       <span>📖</span>
                       <span>Generate Story</span>
+                    </NavLink>
+                    <NavLink
+                      to="/dashboard/stories-management"
+                      className={({ isActive }) => navItemClass(isActive)}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>🗂️</span>
+                      <span>Stories Management</span>
                     </NavLink>
                     <NavLink
                       to="/dashboard/create-conversation"
@@ -285,6 +305,48 @@ const DashboardLayout = () => {
                   </div>
                 )}
 
+                {/* Settings: numeric caps/config you set, not data you
+                    view — separated from Analytics below. */}
+                <div
+                  onClick={() => toggleSection("settings")}
+                  className={sectionHeaderClass}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <span className="flex items-center gap-2">
+                    <span>⚙️</span>
+                    <span>Settings</span>
+                  </span>
+                  <span
+                    className={`text-sm transition-transform duration-300 ${
+                      expandedSections.settings ? "rotate-180" : ""
+                    }`}
+                  >
+                    ▼
+                  </span>
+                </div>
+                {expandedSections.settings && (
+                  <div className="ml-3 space-y-1 border-l border-slate-200 py-2 pl-4 animate-in fade-in slide-in-from-top-2 duration-200 dark:border-slate-700/60">
+                    <NavLink
+                      to="/dashboard/global-limits"
+                      className={({ isActive }) => navItemClass(isActive)}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>🌍</span>
+                      <span>Global Limits</span>
+                    </NavLink>
+                    <NavLink
+                      to="/dashboard/user-limits"
+                      className={({ isActive }) => navItemClass(isActive)}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>⚙️</span>
+                      <span>User Limits</span>
+                    </NavLink>
+                  </div>
+                )}
+
+                {/* Analytics: data you view (usage/report stats). */}
                 <div
                   onClick={() => toggleSection("analytics")}
                   className={sectionHeaderClass}
@@ -306,36 +368,12 @@ const DashboardLayout = () => {
                 {expandedSections.analytics && (
                   <div className="ml-3 space-y-1 border-l border-slate-200 py-2 pl-4 animate-in fade-in slide-in-from-top-2 duration-200 dark:border-slate-700/60">
                     <NavLink
-                      to="/dashboard/registration-metadata"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>🛡️</span>
-                      <span>Registration Signals</span>
-                    </NavLink>
-                    <NavLink
                       to="/dashboard/users-favorite-count"
                       className={({ isActive }) => navItemClass(isActive)}
                       onClick={() => setIsOpen(false)}
                     >
                       <span>❤️</span>
-                      <span>Favorites</span>
-                    </NavLink>
-                    <NavLink
-                      to="/dashboard/global-limits"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>🌍</span>
-                      <span>Global Limits</span>
-                    </NavLink>
-                    <NavLink
-                      to="/dashboard/user-limits"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>⚙️</span>
-                      <span>User Limits</span>
+                      <span>Favorites Stats</span>
                     </NavLink>
                     <NavLink
                       to="/dashboard/get-usage"
@@ -364,41 +402,71 @@ const DashboardLayout = () => {
                   </div>
                 )}
 
-                <div className="my-4 px-2">
-                  <div className="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent dark:via-slate-700/50" />
+                {/* Monitoring: security/traffic/health signals — grouped
+                    together instead of split between Analytics and an
+                    unlabeled trailing list. */}
+                <div
+                  onClick={() => toggleSection("monitoring")}
+                  className={sectionHeaderClass}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <span className="flex items-center gap-2">
+                    <span>🩺</span>
+                    <span>Monitoring</span>
+                  </span>
+                  <span
+                    className={`text-sm transition-transform duration-300 ${
+                      expandedSections.monitoring ? "rotate-180" : ""
+                    }`}
+                  >
+                    ▼
+                  </span>
                 </div>
-                <NavLink
-                  to="/dashboard/system-status"
-                  className={({ isActive }) => navItemClass(isActive)}
-                  onClick={() => setIsOpen(false)}
-                >
-                  <span>🖥️</span>
-                  <span>System Status</span>
-                </NavLink>
-                <NavLink
-                  to="/dashboard/visitors-info"
-                  className={({ isActive }) => navItemClass(isActive)}
-                  onClick={() => setIsOpen(false)}
-                >
-                  <span>👥</span>
-                  <span>Visitors Info</span>
-                </NavLink>
-                <NavLink
-                  to="/dashboard/visitors"
-                  className={({ isActive }) => navItemClass(isActive)}
-                  onClick={() => setIsOpen(false)}
-                >
-                  <span>🌍</span>
-                  <span>Visitors Detail</span>
-                </NavLink>
-                <NavLink
-                  to="/dashboard/error-logs"
-                  className={({ isActive }) => navItemClass(isActive)}
-                  onClick={() => setIsOpen(false)}
-                >
-                  <span>🚨</span>
-                  <span>Error Logs</span>
-                </NavLink>
+                {expandedSections.monitoring && (
+                  <div className="ml-3 space-y-1 border-l border-slate-200 py-2 pl-4 animate-in fade-in slide-in-from-top-2 duration-200 dark:border-slate-700/60">
+                    <NavLink
+                      to="/dashboard/registration-metadata"
+                      className={({ isActive }) => navItemClass(isActive)}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>🛡️</span>
+                      <span>Registration Signals</span>
+                    </NavLink>
+                    <NavLink
+                      to="/dashboard/system-status"
+                      className={({ isActive }) => navItemClass(isActive)}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>🖥️</span>
+                      <span>System Status</span>
+                    </NavLink>
+                    <NavLink
+                      to="/dashboard/visitors-info"
+                      className={({ isActive }) => navItemClass(isActive)}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>👥</span>
+                      <span>Visitors Info</span>
+                    </NavLink>
+                    <NavLink
+                      to="/dashboard/visitors"
+                      className={({ isActive }) => navItemClass(isActive)}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>🌍</span>
+                      <span>Visitors Detail</span>
+                    </NavLink>
+                    <NavLink
+                      to="/dashboard/error-logs"
+                      className={({ isActive }) => navItemClass(isActive)}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>🚨</span>
+                      <span>Error Logs</span>
+                    </NavLink>
+                  </div>
+                )}
               </>
             )}
           </nav>
