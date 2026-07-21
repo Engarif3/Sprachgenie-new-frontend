@@ -189,11 +189,8 @@ const StoryDetail = () => {
         {backLink}
 
         <div className="mb-8 text-center">
-          <span className="mb-4 inline-block rounded-full border border-orange-500/50 bg-gradient-to-r from-orange-500/20 to-pink-500/20 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-orange-600 dark:text-orange-300">
-            {story.level?.level || "General"}
-          </span>
           <h1
-            className={`mt-3 text-3xl font-bold md:text-4xl ${isLight ? "text-slate-900" : "text-white"}`}
+            className={`mt-3 text-2xl font-bold md:text-3xl ${isLight ? "text-slate-900" : "text-white"}`}
           >
             {story.title}
           </h1>
@@ -218,6 +215,11 @@ const StoryDetail = () => {
               Edit this story
             </Link>
           )}
+        </div>
+        <div className="flex items-center mb-2 mr-1">
+          <span className="inline-block rounded-full border border-orange-500/50 bg-gradient-to-r from-orange-500/20 to-pink-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-orange-600 dark:text-orange-300 ml-auto">
+            {story.level?.level || "General"}
+          </span>
         </div>
 
         {story.image && (
@@ -253,7 +255,7 @@ const StoryDetail = () => {
               </h2>
               {isSuperAdmin && (
                 <Link
-                  to={`/dashboard/stories-management?edit=${id}`}
+                  to={`/dashboard/stories-management?edit=${id}&section=vocabulary`}
                   className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                     isLight
                       ? "border-slate-200 bg-white text-slate-700 hover:border-orange-300 hover:text-orange-600"
