@@ -21,6 +21,10 @@ const StoriesManagement = () => {
   const [editVocabulary, setEditVocabulary] = useState([]);
   const [newVocabWord, setNewVocabWord] = useState("");
   const [newVocabMeaning, setNewVocabMeaning] = useState("");
+  // "full" shows title/description/image + vocabulary; "vocabulary" shows
+  // only the vocabulary editor (deep-linked from the story page's
+  // "Edit vocabulary" button, which shouldn't dump admins into the whole form).
+  const [editSection, setEditSection] = useState("full");
   const [regenerateModal, setRegenerateModal] = useState(false);
   const [regenerateStoryId, setRegenerateStoryId] = useState(null);
   const [regeneratePrompt, setRegeneratePrompt] = useState("");
@@ -49,7 +53,10 @@ const StoriesManagement = () => {
 
     const targetStory = stories.find((story) => story.id === editId);
     if (targetStory) {
-      openEditModal(targetStory);
+      const section = searchParams.get("section") === "vocabulary"
+        ? "vocabulary"
+        : "full";
+      openEditModal(targetStory, section);
     }
 
     hasAutoOpenedRef.current = true;
@@ -126,7 +133,7 @@ const StoriesManagement = () => {
     }
   };
 
-  const openEditModal = (story) => {
+  const openEditModal = (story, section = "full") => {
     setEditingStoryId(story.id);
     setEditTitle(story.title);
     setEditDescription(story.description);
@@ -139,6 +146,7 @@ const StoriesManagement = () => {
     );
     setNewVocabWord("");
     setNewVocabMeaning("");
+    setEditSection(section);
   };
 
   const closeEditModal = () => {
@@ -150,6 +158,7 @@ const StoriesManagement = () => {
     setEditVocabulary([]);
     setNewVocabWord("");
     setNewVocabMeaning("");
+    setEditSection("full");
   };
 
   const handleVocabItemChange = (index, field, value) => {
@@ -511,43 +520,49 @@ const StoriesManagement = () => {
         {editingStoryId && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-gray-800 rounded-lg p-8 max-w-2xl w-full border border-gray-700 max-h-[90vh] overflow-y-auto">
-              <h2 className="text-2xl font-bold text-white mb-6">Edit Story</h2>
+              <h2 className="text-2xl font-bold text-white mb-6">
+                {editSection === "vocabulary" ? "Edit Vocabulary" : "Edit Story"}
+              </h2>
 
-              {/* Title Input */}
-              <div className="mb-6">
-                <label
-                  htmlFor="edit-story-title"
-                  className="block text-white font-semibold mb-2"
-                >
-                  Title
-                </label>
-                <input
-                  id="edit-story-title"
-                  type="text"
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
-                  placeholder="Story title..."
-                />
-              </div>
+              {editSection === "full" && (
+                <>
+                  {/* Title Input */}
+                  <div className="mb-6">
+                    <label
+                      htmlFor="edit-story-title"
+                      className="block text-white font-semibold mb-2"
+                    >
+                      Title
+                    </label>
+                    <input
+                      id="edit-story-title"
+                      type="text"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                      placeholder="Story title..."
+                    />
+                  </div>
 
-              {/* Description Input */}
-              <div className="mb-6">
-                <label
-                  htmlFor="edit-story-description"
-                  className="block text-white font-semibold mb-2"
-                >
-                  Description
-                </label>
-                <textarea
-                  id="edit-story-description"
-                  value={editDescription}
-                  onChange={(e) => setEditDescription(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 resize-none"
-                  placeholder="Story description..."
-                  rows="6"
-                />
-              </div>
+                  {/* Description Input */}
+                  <div className="mb-6">
+                    <label
+                      htmlFor="edit-story-description"
+                      className="block text-white font-semibold mb-2"
+                    >
+                      Description
+                    </label>
+                    <textarea
+                      id="edit-story-description"
+                      value={editDescription}
+                      onChange={(e) => setEditDescription(e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 resize-none"
+                      placeholder="Story description..."
+                      rows="6"
+                    />
+                  </div>
+                </>
+              )}
 
               {/* Vocabulary Editor */}
               <div className="mb-6 bg-gray-700/50 p-4 rounded-lg border border-gray-600">
@@ -621,47 +636,49 @@ const StoriesManagement = () => {
               </div>
 
               {/* Image Upload Section */}
-              <div className="mb-6 bg-gray-700/50 p-4 rounded-lg border border-gray-600">
-                <h4 className="text-white font-semibold mb-3">
-                  📸 Story Image
-                </h4>
-                {editImagePreview ? (
-                  <div className="space-y-3">
-                    <img
-                      src={editImagePreview}
-                      alt="Preview"
-                      className="w-full max-h-48 object-cover rounded-lg"
-                    />
-                    <div className="flex gap-2">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageInputChange}
-                        disabled={uploadingEditImage}
-                        className="flex-1 text-sm text-gray-300 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-orange-500 file:text-white hover:file:bg-orange-600 disabled:opacity-50"
+              {editSection === "full" && (
+                <div className="mb-6 bg-gray-700/50 p-4 rounded-lg border border-gray-600">
+                  <h4 className="text-white font-semibold mb-3">
+                    📸 Story Image
+                  </h4>
+                  {editImagePreview ? (
+                    <div className="space-y-3">
+                      <img
+                        src={editImagePreview}
+                        alt="Preview"
+                        className="w-full max-h-48 object-cover rounded-lg"
                       />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditImagePreview(null);
-                          setEditImage(null);
-                        }}
-                        className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition"
-                      >
-                        Remove
-                      </button>
+                      <div className="flex gap-2">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageInputChange}
+                          disabled={uploadingEditImage}
+                          className="flex-1 text-sm text-gray-300 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-orange-500 file:text-white hover:file:bg-orange-600 disabled:opacity-50"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditImagePreview(null);
+                            setEditImage(null);
+                          }}
+                          className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition"
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageInputChange}
-                    disabled={uploadingEditImage}
-                    className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-orange-500 file:text-white hover:file:bg-orange-600 disabled:opacity-50"
-                  />
-                )}
-              </div>
+                  ) : (
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageInputChange}
+                      disabled={uploadingEditImage}
+                      className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-orange-500 file:text-white hover:file:bg-orange-600 disabled:opacity-50"
+                    />
+                  )}
+                </div>
+              )}
 
               {/* Error Message */}
               {error && (
