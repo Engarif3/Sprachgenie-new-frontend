@@ -208,11 +208,14 @@ const ConversationPage = () => {
                 const speakerIndex = getSpeakerIndex(message.speaker);
                 const speakerTheme =
                   SPEAKER_THEMES[speakerIndex % SPEAKER_THEMES.length];
-                // Left/right alternates by speaker (not by message index),
-                // regardless of how many distinct speakers there are — the
-                // per-speaker theme above is what keeps two people sharing
-                // a side from being confused for one another.
-                const isRight = speakerIndex % 2 === 1;
+                // Strict left/right alternation by message order, not by
+                // speaker — every line flips sides, always, regardless of
+                // who's talking or how many speakers there are. Since
+                // position no longer tracks identity, the per-speaker
+                // theme (avatar/bubble/name color) is what tells people
+                // apart, and the avatar+name are shown on every line
+                // rather than only the first of a same-speaker run.
+                const isRight = index % 2 === 1;
                 const previousMessage = conversation.text[index - 1];
                 const isContinuation =
                   previousMessage?.speaker === message.speaker;
@@ -226,16 +229,15 @@ const ConversationPage = () => {
                       isContinuation ? "mt-1.5" : "mt-4"
                     } ${isRight ? "flex-row-reverse" : "flex-row"}`}
                   >
-                    {/* Avatar — shown once per consecutive run from the
-                        same speaker, not on every single line. */}
+                    {/* Avatar — shown on every line (not just the first of
+                        a same-speaker run), since side alone no longer
+                        signals who's talking under strict alternation. */}
                     <div className="w-9 shrink-0">
-                      {!isContinuation && (
-                        <div
-                          className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white shadow-md ${speakerTheme.avatar}`}
-                        >
-                          {getInitials(message.speaker)}
-                        </div>
-                      )}
+                      <div
+                        className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white shadow-md ${speakerTheme.avatar}`}
+                      >
+                        {getInitials(message.speaker)}
+                      </div>
                     </div>
 
                     <div
@@ -243,15 +245,13 @@ const ConversationPage = () => {
                         isRight ? "items-end" : "items-start"
                       }`}
                     >
-                      {!isContinuation && (
-                        <span
-                          className={`px-1 text-xs font-semibold ${
-                            isLight ? speakerTheme.nameLight : speakerTheme.nameDark
-                          }`}
-                        >
-                          {message.speaker}
-                        </span>
-                      )}
+                      <span
+                        className={`px-1 text-xs font-semibold ${
+                          isLight ? speakerTheme.nameLight : speakerTheme.nameDark
+                        }`}
+                      >
+                        {message.speaker}
+                      </span>
                       <div
                         className={`px-4 py-2.5 text-[15px] leading-relaxed shadow-sm ${
                           isRight
