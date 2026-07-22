@@ -14,6 +14,8 @@ import DEFlag from "../assets/DE.svg";
 import ShareSiteModal from "./ShareSiteModal";
 import { useChallengeStreak } from "../hooks/useChallengeStreak";
 import { useNotifications } from "../hooks/useNotifications";
+import { useProfileSettings } from "../hooks/useProfileSettings";
+import { getAvatarUrl } from "../utils/avatar";
 
 const getUserInitials = (name, email) => {
   const source = (name || email || "User").trim();
@@ -47,6 +49,8 @@ const NavBar = () => {
   const { language, toggleLanguage } = useLanguage();
   const { currentStreak } = useChallengeStreak();
   const { unreadCount } = useNotifications();
+  const { allowImageUpload } = useProfileSettings();
+  const avatarUrl = getAvatarUrl(userInfo, allowImageUpload);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -402,9 +406,9 @@ const NavBar = () => {
                         className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-sky-400/70 bg-gradient-to-br from-sky-500 to-indigo-600 text-xs font-bold text-white shadow-md transition-transform duration-300 hover:scale-105"
                         title="Open account menu"
                       >
-                        {userInfo?.profilePhoto ? (
+                        {avatarUrl ? (
                           <img
-                            src={userInfo.profilePhoto}
+                            src={avatarUrl}
                             alt={userInfo?.name || "Profile"}
                             className="h-full w-full rounded-full object-cover"
                           />
@@ -564,9 +568,9 @@ const NavBar = () => {
                       className="hidden h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-sky-400/70 bg-gradient-to-br from-sky-500 to-indigo-600 text-sm font-bold text-white shadow-md transition-transform duration-300 hover:scale-105 md:flex"
                       title="Open account menu"
                     >
-                      {userInfo?.profilePhoto ? (
+                      {avatarUrl ? (
                         <img
-                          src={userInfo.profilePhoto}
+                          src={avatarUrl}
                           alt={userInfo?.name || "Profile"}
                           className="h-full w-full rounded-full object-cover"
                         />

@@ -5,6 +5,8 @@ import {
   formatRoleLabel,
   formatStatusLabel,
 } from "./userManagementDisplay";
+import { useProfileSettings } from "../hooks/useProfileSettings";
+import { getAvatarUrl } from "../utils/avatar";
 
 const getStatusBadgeClass = (status) => {
   switch (String(status || "").toUpperCase()) {
@@ -40,6 +42,8 @@ const UserManagementTable = ({
   onPermanentDelete,
   emptyStateText = "No users found for the current selection.",
 }) => {
+  const { allowImageUpload } = useProfileSettings();
+
   const statusFilterMarkup = showFilter ? (
     <div className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50 px-8 py-2 md:flex-row md:items-center md:justify-between">
       <div>
@@ -130,9 +134,9 @@ const UserManagementTable = ({
                       <td className="px-4 py-2.5 align-top">
                         <div className="flex items-center gap-2.5">
                           <div className="mr-2 flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md border border-slate-400 bg-slate-700 text-xs font-bold text-white">
-                            {user.profilePhoto ? (
+                            {getAvatarUrl(user, allowImageUpload) ? (
                               <img
-                                src={user.profilePhoto}
+                                src={getAvatarUrl(user, allowImageUpload)}
                                 alt={user.name || user.email}
                                 className="h-full w-full object-cover"
                               />

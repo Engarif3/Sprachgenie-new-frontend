@@ -94,6 +94,9 @@ const Backend = lazy(() => import("../Backend/Backend"));
 // AI Pages
 const GlobalLimits = lazy(() => import("../AI/GlobalLimits"));
 const UserLimits = lazy(() => import("../AI/UserLimits"));
+const ProfilePhotoSettings = lazy(
+  () => import("../AdminActions/SuperAdmin/ProfilePhotoSettings"),
+);
 const Usage = lazy(() => import("../AI/Usage"));
 const ReportsByUsers = lazy(() => import("../AI/ReportsByUsers"));
 const ConjugationReportsPage = lazy(() => import("../AI/ConjugationReportsPage"));
@@ -172,6 +175,7 @@ const FavoritesListDashboardWithSuspense = withSuspense(FavoritesListDashboard);
 const BackendWithSuspense = withSuspense(Backend);
 const GlobalLimitsWithSuspense = withSuspense(GlobalLimits);
 const UserLimitsWithSuspense = withSuspense(UserLimits);
+const ProfilePhotoSettingsWithSuspense = withSuspense(ProfilePhotoSettings);
 const UsageWithSuspense = withSuspense(Usage);
 const ReportsByUsersWithSuspense = withSuspense(ReportsByUsers);
 const ConjugationReportsPageWithSuspense = withSuspense(ConjugationReportsPage);
@@ -415,6 +419,13 @@ export const router = createBrowserRouter(
             {
               path: "user-limits",
               element: protectRoute(<UserLimitsWithSuspense />, ADMIN_ROLES),
+            },
+            {
+              path: "profile-photo-settings",
+              element: protectRoute(
+                <ProfilePhotoSettingsWithSuspense />,
+                SUPER_ADMIN_ROLES,
+              ),
             },
             {
               path: "get-usage",

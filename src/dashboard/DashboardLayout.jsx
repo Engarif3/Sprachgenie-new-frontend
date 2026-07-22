@@ -1,6 +1,8 @@
 import { Link, Navigate, Outlet, NavLink } from "react-router-dom";
 import { useAuth } from "../services/auth.services";
 import { useNotifications } from "../hooks/useNotifications";
+import { useProfileSettings } from "../hooks/useProfileSettings";
+import { getAvatarUrl } from "../utils/avatar";
 import Container from "../utils/Container";
 import { useState } from "react";
 import { IoClose, IoMenu } from "react-icons/io5";
@@ -33,7 +35,6 @@ const DashboardLayout = () => {
   const [expandedSections, setExpandedSections] = useState({
     admin: false,
     content: false,
-    notificationManagement: false,
     settings: false,
     analytics: false,
     monitoring: false,
@@ -41,6 +42,8 @@ const DashboardLayout = () => {
 
   const { safeUserInfo: userInfo, userId, userRole: role } = useAuth();
   const { unreadCount } = useNotifications();
+  const { allowImageUpload } = useProfileSettings();
+  const avatarUrl = getAvatarUrl(userInfo, allowImageUpload);
 
   const toggleSection = (section) => {
     setExpandedSections((prev) => ({
@@ -89,9 +92,9 @@ const DashboardLayout = () => {
           <div className="sticky top-0 border-b border-slate-200/80 bg-white/90 px-6 py-5 backdrop-blur-md dark:border-slate-800/60 dark:bg-slate-900/90">
             <div className="mb-2 flex items-center gap-3">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-500 via-blue-500 to-indigo-600 text-sm font-bold text-white shadow-lg shadow-sky-900/20 dark:border-sky-500/20">
-                {userInfo?.profilePhoto ? (
+                {avatarUrl ? (
                   <img
-                    src={userInfo.profilePhoto}
+                    src={avatarUrl}
                     alt={userInfo?.name || "Profile"}
                     className="h-full w-full object-cover"
                   />
@@ -179,6 +182,18 @@ const DashboardLayout = () => {
                 </span>
               )}
             </NavLink>
+
+            {role === "super_admin" && (
+              <NavLink
+                to="/dashboard/broadcast-notifications"
+                className={({ isActive }) => navItemClass(isActive)}
+                onClick={() => setIsOpen(false)}
+                title="Broadcast an announcement to all users"
+              >
+                <span className="text-lg">📢</span>
+                <span>Broadcast Notifications</span>
+              </NavLink>
+            )}
 
             {(role === "admin" || role === "super_admin") && (
               <>
@@ -323,48 +338,6 @@ const DashboardLayout = () => {
                   </div>
                 )}
 
-                {/* Notification Management: broadcasting announcements to
-                    users — split out of Content into its own section since
-                    it's a distinct admin activity, not learner-facing
-                    content. Super-admin only, matching the route's own
-                    role check. */}
-                {role === "super_admin" && (
-                  <>
-                    <div
-                      onClick={() => toggleSection("notificationManagement")}
-                      className={sectionHeaderClass}
-                      role="button"
-                      tabIndex={0}
-                    >
-                      <span className="flex items-center gap-2">
-                        <span>🔔</span>
-                        <span>Notification Management</span>
-                      </span>
-                      <span
-                        className={`text-sm transition-transform duration-300 ${
-                          expandedSections.notificationManagement
-                            ? "rotate-180"
-                            : ""
-                        }`}
-                      >
-                        ▼
-                      </span>
-                    </div>
-                    {expandedSections.notificationManagement && (
-                      <div className="ml-3 space-y-1 border-l border-slate-200 py-2 pl-4 animate-in fade-in slide-in-from-top-2 duration-200 dark:border-slate-700/60">
-                        <NavLink
-                          to="/dashboard/broadcast-notifications"
-                          className={({ isActive }) => navItemClass(isActive)}
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <span>📢</span>
-                          <span>Broadcast Notifications</span>
-                        </NavLink>
-                      </div>
-                    )}
-                  </>
-                )}
-
                 {/* Settings: numeric caps/config you set, not data you
                     view — separated from Analytics below. */}
                 <div
@@ -403,6 +376,16 @@ const DashboardLayout = () => {
                       <span>⚙️</span>
                       <span>User Limits</span>
                     </NavLink>
+                    {role === "super_admin" && (
+                      <NavLink
+                        to="/dashboard/profile-photo-settings"
+                        className={({ isActive }) => navItemClass(isActive)}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <span>🖼️</span>
+                        <span>Profile Photo Settings</span>
+                      </NavLink>
+                    )}
                   </div>
                 )}
 
@@ -535,9 +518,9 @@ const DashboardLayout = () => {
             <div className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 to-sky-50/70 px-3 py-3 transition-colors duration-300 hover:border-sky-300/60 dark:border-sky-500/20 dark:from-sky-500/10 dark:to-indigo-500/10">
               <div className="flex items-center gap-3">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-sky-200 bg-gradient-to-br from-sky-500 to-indigo-600 text-sm font-bold text-white shadow-md dark:border-sky-500/20">
-                  {userInfo?.profilePhoto ? (
+                  {avatarUrl ? (
                     <img
-                      src={userInfo.profilePhoto}
+                      src={avatarUrl}
                       alt={userInfo?.name || "Profile"}
                       className="h-full w-full object-cover"
                     />

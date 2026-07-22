@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import Swal from "sweetalert2";
 import api from "../axios";
 import { storeUserInfo, useAuth } from "../services/auth.services";
+import { useProfileSettings } from "../hooks/useProfileSettings";
+import { AVATAR_IDS, avatarAssetUrl, getAvatarUrl } from "../utils/avatar";
 
 const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
 
@@ -87,6 +89,7 @@ const createInitials = (name, email) => {
 
 const ProfilePage = () => {
   const { safeUserInfo: cachedUser } = useAuth();
+  const { allowImageUpload } = useProfileSettings();
   const initialContact = parseContactNumber(cachedUser.contactNumber || "");
   const [profile, setProfile] = useState(null);
   const [formState, setFormState] = useState({
@@ -100,6 +103,11 @@ const ProfilePage = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [removeProfilePhoto, setRemoveProfilePhoto] = useState(false);
+  // undefined = no pending change to the preset avatar; "avatar-XX" = a
+  // newly picked preset (pending until Save); "" = explicitly switch back
+  // to the uploaded photo. Mirrors the backend's normalizeAvatarId — an
+  // empty string, not null, is what clears it (see user.sevice.ts).
+  const [selectedAvatarId, setSelectedAvatarId] = useState(undefined);
   const [showPhoneNumberError, setShowPhoneNumberError] = useState(false);
   const [countryQuery, setCountryQuery] = useState("");
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
@@ -159,6 +167,7 @@ const ProfilePage = () => {
           email: nextProfile.email || cachedUser.email,
           role: normalizeRole(cachedUser.role || nextProfile.role),
           profilePhoto: nextProfile.profilePhoto || "",
+          avatarId: nextProfile.avatarId || "",
         });
       } catch (error) {
         toast.error(
@@ -225,6 +234,23 @@ const ProfilePage = () => {
     setSelectedFile(nextFile);
     setPreviewUrl(URL.createObjectURL(nextFile));
     setRemoveProfilePhoto(false);
+    // A fresh upload is "show my photo" — drop any pending avatar pick so
+    // the preview doesn't keep showing a preset that's about to be replaced.
+    setSelectedAvatarId(undefined);
+  };
+
+  const handleSelectAvatar = (avatarId) => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setSelectedFile(null);
+    setPreviewUrl("");
+    setRemoveProfilePhoto(false);
+    setSelectedAvatarId(avatarId);
+  };
+
+  const handleUsePhotoInstead = () => {
+    setSelectedAvatarId("");
   };
 
   const handleRemoveImage = async () => {
@@ -267,19 +293,22 @@ const ProfilePage = () => {
 
     setIsSaving(true);
 
+    const dataPayload = {
+      name: formState.name,
+      contactNumber: formatContactNumber(
+        formState.countryCode,
+        formState.phoneNumber,
+      ),
+      address: formState.address,
+      removeProfilePhoto,
+    };
+
+    if (selectedAvatarId !== undefined) {
+      dataPayload.avatarId = selectedAvatarId;
+    }
+
     const payload = new FormData();
-    payload.append(
-      "data",
-      JSON.stringify({
-        name: formState.name,
-        contactNumber: formatContactNumber(
-          formState.countryCode,
-          formState.phoneNumber,
-        ),
-        address: formState.address,
-        removeProfilePhoto,
-      }),
-    );
+    payload.append("data", JSON.stringify(dataPayload));
 
     if (selectedFile) {
       payload.append("file", selectedFile);
@@ -303,6 +332,7 @@ const ProfilePage = () => {
       });
       setSelectedFile(null);
       setRemoveProfilePhoto(false);
+      setSelectedAvatarId(undefined);
 
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
@@ -317,6 +347,7 @@ const ProfilePage = () => {
         email: updatedProfile.email || cachedUser.email,
         role: normalizeRole(cachedUser.role || updatedProfile.role),
         profilePhoto: updatedProfile.profilePhoto || "",
+        avatarId: updatedProfile.avatarId || "",
       });
 
       toast.success(response?.data?.message || "Profile updated successfully.");
@@ -331,9 +362,27 @@ const ProfilePage = () => {
     }
   };
 
-  const displayedImage = removeProfilePhoto
-    ? ""
-    : previewUrl || profile?.profilePhoto || "";
+  // Precedence: a pending avatar pick or file preview (this session, not
+  // saved yet) wins; otherwise fall back to the server-confirmed effective
+  // avatar (preset avatar if one's set, else uploaded photo if uploads are
+  // allowed) — unless the user just hit "Delete Image" and has no avatar
+  // saved, in which case that blanks out to the initials fallback.
+  const pendingAvatarUrl = selectedAvatarId
+    ? avatarAssetUrl(selectedAvatarId)
+    : null;
+  const effectiveAvatarUrl = getAvatarUrl(profile, allowImageUpload);
+  const displayedImage =
+    pendingAvatarUrl ||
+    previewUrl ||
+    (removeProfilePhoto && !profile?.avatarId ? "" : effectiveAvatarUrl) ||
+    "";
+  // Which avatar (if any) the picker grid should highlight as selected.
+  const activeAvatarId =
+    selectedAvatarId !== undefined
+      ? selectedAvatarId
+      : previewUrl || removeProfilePhoto
+        ? ""
+        : profile?.avatarId || "";
   const role = normalizeRole(cachedUser.role || profile?.role);
   const isBasicUser = role === "basic_user";
   const selectedCountry =
@@ -615,37 +664,91 @@ const ProfilePage = () => {
               )}
             </div>
 
+            {allowImageUpload && (
+              <div className="rounded-3xl border border-dashed border-gray-300 bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-950/50">
+                <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                  <div>
+                    <h2 className="text-lg font-bold">Profile Image</h2>
+                    <p className="mt-2 max-w-xl text-sm text-gray-600 dark:text-gray-400">
+                      Upload a square image for the best result. Supported
+                      files must be images and under 5MB.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-3">
+                    <label className="inline-flex cursor-pointer items-center justify-center rounded-2xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleFileChange}
+                      />
+                      {profile?.profilePhoto || selectedFile
+                        ? "Replace Image"
+                        : "Upload Image"}
+                    </label>
+
+                    {(profile?.profilePhoto || selectedFile) && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className="rounded-2xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-100 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300"
+                      >
+                        Delete Image
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="rounded-3xl border border-dashed border-gray-300 bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-950/50">
-              <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="mb-4 flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <h2 className="text-lg font-bold">Profile Image</h2>
+                  <h2 className="text-lg font-bold">Choose an Avatar</h2>
                   <p className="mt-2 max-w-xl text-sm text-gray-600 dark:text-gray-400">
-                    Upload a square image for the best result. Supported files
-                    must be images and under 5MB.
+                    {allowImageUpload
+                      ? "Pick a preset avatar instead of an uploaded photo — it takes over your profile picture immediately once saved."
+                      : "Custom photo uploads are currently disabled by the administrator — pick a preset avatar below."}
                   </p>
                 </div>
 
-                <div className="flex flex-wrap gap-3">
-                  <label className="inline-flex cursor-pointer items-center justify-center rounded-2xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleFileChange}
-                    />
-                    {displayedImage ? "Replace Image" : "Upload Image"}
-                  </label>
+                {allowImageUpload && profile?.profilePhoto && activeAvatarId && (
+                  <button
+                    type="button"
+                    onClick={handleUsePhotoInstead}
+                    className="shrink-0 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-100 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300"
+                  >
+                    Use my uploaded photo instead
+                  </button>
+                )}
+              </div>
 
-                  {(displayedImage || selectedFile) && (
+              <div className="grid grid-cols-5 gap-3 sm:grid-cols-8 md:grid-cols-10">
+                {AVATAR_IDS.map((avatarId) => {
+                  const isSelected = avatarId === activeAvatarId;
+
+                  return (
                     <button
+                      key={avatarId}
                       type="button"
-                      onClick={handleRemoveImage}
-                      className="rounded-2xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-100 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300"
+                      onClick={() => handleSelectAvatar(avatarId)}
+                      title={avatarId}
+                      aria-label={`Choose ${avatarId}`}
+                      className={`aspect-square overflow-hidden rounded-full border-2 transition ${
+                        isSelected
+                          ? "border-blue-500 ring-2 ring-blue-500/40"
+                          : "border-transparent hover:border-gray-300 dark:hover:border-gray-600"
+                      }`}
                     >
-                      Delete Image
+                      <img
+                        src={avatarAssetUrl(avatarId)}
+                        alt={avatarId}
+                        className="h-full w-full"
+                      />
                     </button>
-                  )}
-                </div>
+                  );
+                })}
               </div>
             </div>
 
