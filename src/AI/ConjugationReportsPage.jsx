@@ -15,31 +15,32 @@ const ConjugationReportsPage = () => {
   const [regenerating, setRegenerating] = useState({});
   const [deletingVerb, setDeletingVerb] = useState({});
   const [expandedVerb, setExpandedVerb] = useState(null);
-  const [selectedReportIds, setSelectedReportIds] = useState(new Set());
+  const [selectedVerbs, setSelectedVerbs] = useState(new Set());
   // per-verb custom prompt inputs
   const [customPrompts, setCustomPrompts] = useState({});
 
   const handleToggleExpand = (verb) => {
     setExpandedVerb((prev) => (prev === verb ? null : verb));
-    setSelectedReportIds(new Set());
   };
 
-  const handleToggleSelectReport = (reportId) => {
-    setSelectedReportIds((prev) => {
+  const handleToggleSelectVerb = (verb) => {
+    setSelectedVerbs((prev) => {
       const next = new Set(prev);
-      if (next.has(reportId)) {
-        next.delete(reportId);
+      if (next.has(verb)) {
+        next.delete(verb);
       } else {
-        next.add(reportId);
+        next.add(verb);
       }
       return next;
     });
   };
 
-  const handleToggleSelectAllForVerb = (verbReports) => {
-    const ids = verbReports.map((r) => r.id);
-    const allSelected = ids.length > 0 && ids.every((id) => selectedReportIds.has(id));
-    setSelectedReportIds(allSelected ? new Set() : new Set(ids));
+  const allVerbs = reports.map((r) => r.verb);
+  const allVerbsSelected =
+    allVerbs.length > 0 && allVerbs.every((verb) => selectedVerbs.has(verb));
+
+  const handleToggleSelectAllVerbs = () => {
+    setSelectedVerbs(allVerbsSelected ? new Set() : new Set(allVerbs));
   };
 
   const fetchReports = async () => {
@@ -84,36 +85,32 @@ const ConjugationReportsPage = () => {
     }
   };
 
-  const handleDeleteSelectedReports = async (verb) => {
-    if (selectedReportIds.size === 0) return;
+  const handleDeleteSelectedVerbReports = async () => {
+    if (selectedVerbs.size === 0) return;
 
     const result = await Swal.fire({
-      title: `Delete ${selectedReportIds.size} Selected Report(s)?`,
+      title: `Delete All Reports for ${selectedVerbs.size} Selected Verb(s)?`,
       text: "This action cannot be undone.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes, delete selected!",
+      confirmButtonText: "Yes, delete!",
       cancelButtonText: "Cancel",
     });
     if (!result.isConfirmed) return;
 
     try {
-      await aiApi.delete("/conjugations/admin/bulk", {
-        data: { reportIds: [...selectedReportIds] },
+      await aiApi.delete("/conjugations/admin/verbs/bulk", {
+        data: { verbs: [...selectedVerbs] },
       });
       setReports((prev) =>
-        prev.map((r) => {
-          if (r.verb !== verb) return r;
-          const filteredReports = r.reports.filter(
-            (rep) => !selectedReportIds.has(rep.id),
-          );
-          return { ...r, reports: filteredReports, reportCount: filteredReports.length };
-        }),
+        prev.map((r) =>
+          selectedVerbs.has(r.verb) ? { ...r, reports: [], reportCount: 0 } : r,
+        ),
       );
-      setSelectedReportIds(new Set());
-      toast.success("Selected reports deleted.");
+      setSelectedVerbs(new Set());
+      toast.success("Reports for the selected verb(s) deleted.");
     } catch {
-      toast.error("Failed to delete selected reports. Please try again.");
+      toast.error("Failed to delete reports for the selected verb(s). Please try again.");
     }
   };
 
@@ -134,7 +131,11 @@ const ConjugationReportsPage = () => {
       setReports((prev) =>
         prev.map((r) => (r.verb === verb ? { ...r, reports: [], reportCount: 0 } : r)),
       );
-      setSelectedReportIds(new Set());
+      setSelectedVerbs((prev) => {
+        const next = new Set(prev);
+        next.delete(verb);
+        return next;
+      });
       toast.success(`All reports for "${verb}" deleted.`);
     } catch {
       toast.error(`Failed to delete reports for "${verb}". Please try again.`);
@@ -155,6 +156,30 @@ const ConjugationReportsPage = () => {
         produce a fresh AI result and clear all reports for that verb.
       </p>
 
+      {isSuperAdmin && reports.length > 0 && (
+        <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
+          <label className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/60 text-sm text-gray-300">
+            <input
+              type="checkbox"
+              checked={allVerbsSelected}
+              onChange={handleToggleSelectAllVerbs}
+              className="h-4 w-4 accent-violet-500"
+            />
+            Select all verbs
+          </label>
+
+          {selectedVerbs.size > 0 && (
+            <button
+              onClick={handleDeleteSelectedVerbReports}
+              className="px-4 py-2 rounded-lg bg-rose-700 hover:bg-rose-800 text-white text-sm font-semibold transition-colors"
+            >
+              Delete Selected ({selectedVerbs.size} verb
+              {selectedVerbs.size !== 1 ? "s" : ""})
+            </button>
+          )}
+        </div>
+      )}
+
       {loading ? (
         <div className="flex justify-center mt-16">
           <ScaleLoader color="oklch(0.5 0.134 242.749)" />
@@ -174,6 +199,15 @@ const ConjugationReportsPage = () => {
               <div className="px-5 py-4 space-y-3">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
+                    {isSuperAdmin && (
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 shrink-0 accent-rose-500"
+                        checked={selectedVerbs.has(item.verb)}
+                        onChange={() => handleToggleSelectVerb(item.verb)}
+                        title="Select this verb to delete all its reports"
+                      />
+                    )}
                     <span className="text-xl font-bold text-white">{item.verb}</span>
                     <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
                       {item.reportCount} report{item.reportCount !== 1 ? "s" : ""}
@@ -270,34 +304,13 @@ const ConjugationReportsPage = () => {
                         User reports
                       </p>
                       {isSuperAdmin && item.reports.length > 0 && (
-                        <div className="flex items-center gap-3">
-                          <label className="flex items-center gap-1.5 text-xs text-gray-400">
-                            <input
-                              type="checkbox"
-                              checked={
-                                item.reports.length > 0 &&
-                                item.reports.every((r) => selectedReportIds.has(r.id))
-                              }
-                              onChange={() => handleToggleSelectAllForVerb(item.reports)}
-                            />
-                            Select all
-                          </label>
-                          {selectedReportIds.size > 0 && (
-                            <button
-                              onClick={() => handleDeleteSelectedReports(item.verb)}
-                              className="text-xs px-2 py-1 rounded-md bg-rose-700 hover:bg-rose-800 text-white font-semibold transition-colors"
-                            >
-                              Delete Selected ({selectedReportIds.size})
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleDeleteAllReportsForVerb(item.verb)}
-                            disabled={!!deletingVerb[item.verb]}
-                            className="text-xs px-2 py-1 rounded-md bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold transition-colors"
-                          >
-                            {deletingVerb[item.verb] ? "Deleting…" : "Delete All"}
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => handleDeleteAllReportsForVerb(item.verb)}
+                          disabled={!!deletingVerb[item.verb]}
+                          className="text-xs px-2 py-1 rounded-md bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold transition-colors"
+                        >
+                          {deletingVerb[item.verb] ? "Deleting…" : "Delete All"}
+                        </button>
                       )}
                     </div>
                     <div className="space-y-2">
@@ -306,14 +319,6 @@ const ConjugationReportsPage = () => {
                           key={r.id}
                           className="flex items-start gap-3 rounded-lg bg-gray-900/40 px-3 py-2 text-sm"
                         >
-                          {isSuperAdmin && (
-                            <input
-                              type="checkbox"
-                              className="mt-0.5"
-                              checked={selectedReportIds.has(r.id)}
-                              onChange={() => handleToggleSelectReport(r.id)}
-                            />
-                          )}
                           <span className="text-gray-500 text-xs mt-0.5 shrink-0">
                             {new Date(r.createdAt).toLocaleDateString()}
                           </span>

@@ -20,29 +20,26 @@ const ReportsByUsers = () => {
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const [aiWord, setAiWord] = useState(null);
   const [selectedParagraph, setSelectedParagraph] = useState("");
-  const [selectedReportIds, setSelectedReportIds] = useState(new Set());
+  const [selectedWordIds, setSelectedWordIds] = useState(new Set());
 
-  const allReportIds = reports.flatMap((r) =>
-    (r.reports || []).map((rep) => rep.id),
-  );
-  const allReportsSelected =
-    allReportIds.length > 0 &&
-    allReportIds.every((id) => selectedReportIds.has(id));
+  const allWordIds = reports.map((r) => r.wordId);
+  const allWordsSelected =
+    allWordIds.length > 0 && allWordIds.every((id) => selectedWordIds.has(id));
 
-  const handleToggleSelectReport = (reportId) => {
-    setSelectedReportIds((prev) => {
+  const handleToggleSelectWord = (wordId) => {
+    setSelectedWordIds((prev) => {
       const next = new Set(prev);
-      if (next.has(reportId)) {
-        next.delete(reportId);
+      if (next.has(wordId)) {
+        next.delete(wordId);
       } else {
-        next.add(reportId);
+        next.add(wordId);
       }
       return next;
     });
   };
 
-  const handleToggleSelectAllReports = () => {
-    setSelectedReportIds(allReportsSelected ? new Set() : new Set(allReportIds));
+  const handleToggleSelectAllWords = () => {
+    setSelectedWordIds(allWordsSelected ? new Set() : new Set(allWordIds));
   };
 
   const fetchUsersByIds = async (userIds) => {
@@ -110,13 +107,11 @@ const ReportsByUsers = () => {
     }
 
     return (
-      <div className="flex justify-between gap-1">
-        <span>
-          <strong>{user.name || "Unknown"}</strong>
-        </span>
+      <div className="flex items-center justify-between gap-2">
+        <strong className="text-white text-sm">{user.name || "Unknown"}</strong>
         <button
           onClick={() => setSelectedUser(user)}
-          className="text-blue-600 text-xs underline hover:text-blue-800"
+          className="text-cyan-400 text-xs underline hover:text-cyan-300 shrink-0"
         >
           View ID
         </button>
@@ -298,16 +293,16 @@ const ReportsByUsers = () => {
     }
   };
 
-  const handleDeleteSelectedReports = async () => {
-    if (selectedReportIds.size === 0) return;
+  const handleDeleteSelectedWordReports = async () => {
+    if (selectedWordIds.size === 0) return;
 
     try {
       const result = await Swal.fire({
-        title: `Delete ${selectedReportIds.size} Selected Report(s)?`,
+        title: `Delete All Reports for ${selectedWordIds.size} Selected Word(s)?`,
         text: "This action cannot be undone.",
         icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Yes, delete selected!",
+        confirmButtonText: "Yes, delete!",
         cancelButtonText: "Cancel",
       });
 
@@ -319,41 +314,28 @@ const ReportsByUsers = () => {
         didOpen: () => Swal.showLoading(),
       });
 
-      await aiApi.delete("/paragraphs/admin/bulk", {
-        data: { reportIds: [...selectedReportIds] },
+      await aiApi.delete("/paragraphs/admin/words/bulk", {
+        data: { wordIds: [...selectedWordIds] },
       });
 
-      setReports((prev) =>
-        prev
-          .map((r) => {
-            const filteredReports = (r.reports || []).filter(
-              (rep) => !selectedReportIds.has(rep.id),
-            );
-            return {
-              ...r,
-              reports: filteredReports,
-              reportCount: filteredReports.length,
-            };
-          })
-          .filter((r) => r.reports.length > 0),
-      );
-      setSelectedReportIds(new Set());
+      setReports((prev) => prev.filter((r) => !selectedWordIds.has(r.wordId)));
+      setSelectedWordIds(new Set());
 
       Swal.close();
       Swal.fire({
         icon: "success",
         title: "Deleted!",
-        text: "Selected reports have been deleted successfully.",
+        text: "Reports for the selected word(s) have been deleted successfully.",
         timer: 2000,
         showConfirmButton: false,
       });
     } catch (err) {
-      console.error("Error deleting selected reports:", err);
+      console.error("Error deleting selected word reports:", err);
       Swal.close();
       Swal.fire({
         icon: "error",
         title: "Oops!",
-        text: "Failed to delete selected reports. Try again.",
+        text: "Failed to delete reports for the selected word(s). Try again.",
       });
     }
   };
@@ -361,27 +343,27 @@ const ReportsByUsers = () => {
   // loading state
   if (loading)
     return (
-      <p className="flex justify-center items-center  ">
-        <span>
-          {loading && (
-            <ScaleLoader
-              color="oklch(0.5 0.134 242.749)"
-              loading={loading}
-              // cssOverride={override}
-              size={150}
-              aria-label="Loading Spinner"
-              data-testid="loader"
-            />
-          )}
-        </span>
-      </p>
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
+        <ScaleLoader
+          color="oklch(0.5 0.134 242.749)"
+          loading={loading}
+          size={150}
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />
+      </div>
     );
-  if (error) return <p className="text-red-600">{error}</p>;
+  if (error)
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
+        <p className="text-red-400 text-lg">{error}</p>
+      </div>
+    );
   if (reports.length === 0)
     return (
-      <p className="flex justify-center items-center text-2xl text-white mt-12">
-        No reports found.
-      </p>
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
+        <p className="text-2xl text-gray-400">No reports found.</p>
+      </div>
     );
 
   if (!canAccess) {
@@ -389,142 +371,131 @@ const ReportsByUsers = () => {
   }
 
   return (
-    <div className="container mx-auto p-4 min-h-screen">
-      <h2 className="text-md md:text-2xl lg:text-2xl font-bold mb-4 text-center  py-2 text-white bg-cyan-700  rounded">
-        Reports By Users
-      </h2>
-
-      {isSuperAdmin && (
-        <div className="flex justify-center gap-4 mb-4 flex-wrap">
-          <button
-            onClick={handleDeleteAllReports}
-            className="btn btn-sm bg-red-600 text-white hover:bg-red-700"
-          >
-            Delete All Reports
-          </button>
-
-          <button
-            onClick={handleDeleteAllRegeneratedReports}
-            className="btn btn-sm bg-orange-500 text-white hover:bg-orange-600"
-          >
-            Delete All Regenerated Reports
-          </button>
-
-          {selectedReportIds.size > 0 && (
-            <button
-              onClick={handleDeleteSelectedReports}
-              className="btn btn-sm bg-rose-700 text-white hover:bg-rose-800"
-            >
-              Delete Selected ({selectedReportIds.size})
-            </button>
-          )}
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4 md:p-8">
+      <div className="max-w-5xl mx-auto">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
+            AI Paragraph Reports
+          </h1>
+          <p className="text-gray-400 text-sm">
+            Words flagged by users for incorrect AI-generated paragraphs.
+          </p>
         </div>
-      )}
 
-      <div className="overflow-x-auto mt-12 bg-white">
-        {/* Table */}
-        <table className="table-auto w-full border border-gray-300 rounded-lg">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-4 py-2 border">Word</th>
-              <th className="px-4 py-2 border">Total Reports</th>
-              <th className="px-4 py-2 border">
-                {isSuperAdmin ? (
-                  <label className="flex items-center gap-2 justify-center">
+        {isSuperAdmin && (
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
+            <button
+              onClick={handleDeleteAllReports}
+              className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors"
+            >
+              Delete All Reports
+            </button>
+
+            <button
+              onClick={handleDeleteAllRegeneratedReports}
+              className="px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold transition-colors"
+            >
+              Delete All Regenerated Reports
+            </button>
+
+            <label className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/60 text-sm text-gray-300">
+              <input
+                type="checkbox"
+                checked={allWordsSelected}
+                onChange={handleToggleSelectAllWords}
+                className="h-4 w-4 accent-cyan-500"
+              />
+              Select all words
+            </label>
+
+            {selectedWordIds.size > 0 && (
+              <button
+                onClick={handleDeleteSelectedWordReports}
+                className="px-4 py-2 rounded-lg bg-rose-700 hover:bg-rose-800 text-white text-sm font-semibold transition-colors"
+              >
+                Delete Selected ({selectedWordIds.size} word
+                {selectedWordIds.size !== 1 ? "s" : ""})
+              </button>
+            )}
+          </div>
+        )}
+
+        <div className="space-y-4">
+          {reports.map((r) => (
+            <div
+              key={r.wordId}
+              className="rounded-2xl border border-gray-700 bg-gray-800/60 overflow-hidden"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-gray-700">
+                <div className="flex items-center gap-3">
+                  {isSuperAdmin && (
                     <input
                       type="checkbox"
-                      checked={allReportsSelected}
-                      onChange={handleToggleSelectAllReports}
+                      className="h-4 w-4 shrink-0 accent-rose-500"
+                      checked={selectedWordIds.has(r.wordId)}
+                      onChange={() => handleToggleSelectWord(r.wordId)}
+                      title="Select this word to delete all its reports"
                     />
-                    <span>Reported By</span>
-                  </label>
-                ) : (
-                  "Reported By"
-                )}
-              </th>
-              <th className="px-4 py-2 border">Message</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reports.map((r, index) => (
-              <tr key={index} className="hover:bg-gray-50 align-top">
-                <td className="px-4 py-2 border">
-                  <div className="flex justify-between gap-2">
-                    <span>{r.word}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleOpenAiModal(r)}
-                      className={`relative flex h-6 w-6 items-center justify-center rounded-full border-2 text-xs font-bold text-white shadow-lg transition-all duration-200 hover:scale-110 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100 ${
-                        r.regenerationRequired === false
-                          ? "border-emerald-400 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 hover:shadow-green-500/50"
-                          : "border-red-400 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 hover:shadow-red-500/50"
-                      }`}
-                      disabled={openingWordId === r.wordId}
-                      title={
-                        r.regenerationRequired === false
-                          ? "View current AI content"
-                          : "Needs regeneration — view AI content"
-                      }
-                      aria-label="View current AI content"
-                    >
-                      {openingWordId === r.wordId ? (
-                        <PuffLoader size={14} color="#ffffff" />
-                      ) : (
-                        "ai"
-                      )}
-                    </button>
-                  </div>
-                </td>
-                <td className="px-4 py-2 border">{r.reportCount}</td>
-                <td className="px-4 py-2 border">
-                  {r.reports.map((rep, i) => (
-                    <div key={i} className="mt-2 flex items-start gap-2">
-                      {isSuperAdmin && (
-                        <input
-                          type="checkbox"
-                          className="mt-1"
-                          checked={selectedReportIds.has(rep.id)}
-                          onChange={() => handleToggleSelectReport(rep.id)}
-                        />
-                      )}
-                      <div className="flex-1">
-                        {getUserInfo(rep.userId)}
-                        {i < r.reports.length - 1 && (
-                          <hr className="border-gray-300 my-1" />
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </td>
+                  )}
+                  <span className="text-lg font-bold text-white">{r.word}</span>
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
+                    {r.reportCount} report{r.reportCount !== 1 ? "s" : ""}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleOpenAiModal(r)}
+                  disabled={openingWordId === r.wordId}
+                  title={
+                    r.regenerationRequired === false
+                      ? "View current AI content"
+                      : "Needs regeneration — view AI content"
+                  }
+                  className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-bold text-white shadow-lg transition-colors disabled:cursor-not-allowed disabled:opacity-70 ${
+                    r.regenerationRequired === false
+                      ? "border-emerald-400 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500"
+                      : "border-red-400 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500"
+                  }`}
+                >
+                  {openingWordId === r.wordId ? (
+                    <PuffLoader size={14} color="#ffffff" />
+                  ) : (
+                    "View AI content"
+                  )}
+                </button>
+              </div>
 
-                <td className="px-4 py-2 border">
-                  {r.reports.map((rep, i) => (
-                    <div key={i}>
-                      <div className="flex justify-between gap-2 items-center mt-2">
-                        {rep.message.length > 25 ? (
+              <div className="divide-y divide-gray-700/60">
+                {r.reports.map((rep, i) => (
+                  <div key={rep.id ?? i} className="flex items-start gap-3 px-5 py-3">
+                    <div className="min-w-0 flex-1">
+                      {getUserInfo(rep.userId)}
+                      <div className="mt-1 flex items-start justify-between gap-2">
+                        {rep.message.length > 60 ? (
                           <>
-                            <p>{rep.message.slice(0, 10)}...</p>
+                            <p className="text-sm text-gray-300 italic truncate">
+                              "{rep.message.slice(0, 60)}…"
+                            </p>
                             <button
                               onClick={() => setSelectedMessage(rep.message)}
-                              className="btn btn-sm btn-accent"
+                              className="shrink-0 text-xs text-cyan-400 hover:text-cyan-300 underline"
                             >
-                              View
+                              View full
                             </button>
                           </>
                         ) : (
-                          <p>{rep.message}</p>
+                          <p className="text-sm text-gray-300 italic">
+                            "{rep.message}"
+                          </p>
                         )}
                       </div>
-                      {i < r.reports.length - 1 && (
-                        <hr className="border-gray-300 my-1" />
-                      )}
                     </div>
-                  ))}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
 
         <AIModal
           key={aiWord?.id || "reports-ai-modal"}
@@ -535,53 +506,42 @@ const ReportsByUsers = () => {
           onClose={() => setIsAIModalOpen(false)}
         />
 
-        {/* Modal */}
         {selectedUser && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-            <div className="bg-white rounded-lg p-6 shadow-lg max-w-md w-full">
-              <h2 className="text-lg font-semibold mb-4">User Info</h2>
-              <p>
-                <strong>Name:</strong> {selectedUser.name}
+          <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
+            <div className="bg-gray-800 rounded-2xl p-6 shadow-2xl max-w-md w-full border border-gray-700">
+              <h2 className="text-lg font-semibold mb-4 text-white">User Info</h2>
+              <p className="text-gray-300 text-sm mb-1">
+                <strong className="text-white">Name:</strong> {selectedUser.name}
               </p>
-              <p>
-                <strong>Email:</strong> {selectedUser.email}
+              <p className="text-gray-300 text-sm mb-1">
+                <strong className="text-white">Email:</strong> {selectedUser.email}
               </p>
-              <p>
-                <strong>User ID:</strong> {selectedUser.id}
+              <p className="text-gray-300 text-sm mb-1">
+                <strong className="text-white">User ID:</strong> {selectedUser.id}
               </p>
-              <div className="mt-4 flex justify-end ">
+              <div className="mt-4 flex justify-end">
                 <button
                   onClick={() => setSelectedUser(null)}
-                  className="btn btn-sm btn-warning"
+                  className="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-white text-sm font-semibold transition-colors"
                 >
                   Close
                 </button>
-                {/* <button
-                onClick={() => {
-                  navigator.clipboard.writeText(selectedUser.id);
-                  alert("User ID copied!");
-                }}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Copy ID
-              </button> */}
               </div>
             </div>
           </div>
         )}
 
-        {/* Modal */}
         {selectedMessage && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-lg w-96 relative">
+          <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
+            <div className="bg-gray-800 p-6 rounded-2xl w-full max-w-md relative border border-gray-700">
               <button
-                className="absolute top-2 right-2 text-red-600 font-bold"
+                className="absolute top-3 right-3 text-gray-400 hover:text-white font-bold"
                 onClick={() => setSelectedMessage(null)}
               >
-                X
+                ✕
               </button>
-              <h3 className="text-lg font-bold mb-4">Full Message</h3>
-              <p>{selectedMessage}</p>
+              <h3 className="text-lg font-bold mb-4 text-white">Full Message</h3>
+              <p className="text-gray-300 text-sm">{selectedMessage}</p>
             </div>
           </div>
         )}

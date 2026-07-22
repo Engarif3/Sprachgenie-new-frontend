@@ -67,10 +67,10 @@ export const externalApi = axios.create({
 
 applyFormDataInterceptor(publicApi);
 
-// ✅ Request interceptor: Add auth token from localStorage as fallback if cookies don't work
+// ✅ Request interceptor: Add auth token from sessionStorage as fallback if cookies don't work
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (token && token !== "null") {
       config.headers.Authorization = `Bearer ${token}`;
     }
