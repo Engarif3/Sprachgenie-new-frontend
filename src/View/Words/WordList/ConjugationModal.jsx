@@ -8,6 +8,10 @@ const TENSE_LABELS = {
   präteritum: "Präteritum",
 };
 
+// Module-level so it survives across every ConjugationModal mount within the
+// page session (report reasons/settings rarely change) — cleared on reload.
+let cachedConjugationReportOptions = null;
+
 // Finite sein/haben forms — matched wherever they appear in the row, not
 // just the first word, since impersonal verbs (e.g. "es hat wehgetan")
 // lead with a filler pronoun before the actual auxiliary.
@@ -134,15 +138,30 @@ const ConjugationModal = ({
   const handleOpenReport = async () => {
     setReportOpen(true);
     setReportError("");
+
+    // Reasons/settings rarely change — reuse across report-form opens within
+    // the same page session instead of re-hitting the AI service every time.
+    if (cachedConjugationReportOptions) {
+      setReportReasons(cachedConjugationReportOptions.reasons);
+      setReportFreeTextEnabled(cachedConjugationReportOptions.freeTextEnabled);
+      setReportMaxCharacters(cachedConjugationReportOptions.maxCharacters);
+      return;
+    }
+
     setReportOptionsLoading(true);
     try {
       const [reasonsRes, settingsRes] = await Promise.all([
         aiApi.get("/conjugations/report-reasons"),
         aiApi.get("/conjugations/report-settings"),
       ]);
-      setReportReasons(reasonsRes.data?.data || []);
-      setReportFreeTextEnabled(settingsRes.data?.data?.freeTextEnabled ?? true);
-      setReportMaxCharacters(settingsRes.data?.data?.maxCharacters ?? 50);
+      const reasons = reasonsRes.data?.data || [];
+      const freeTextEnabled = settingsRes.data?.data?.freeTextEnabled ?? true;
+      const maxCharacters = settingsRes.data?.data?.maxCharacters ?? 50;
+
+      cachedConjugationReportOptions = { reasons, freeTextEnabled, maxCharacters };
+      setReportReasons(reasons);
+      setReportFreeTextEnabled(freeTextEnabled);
+      setReportMaxCharacters(maxCharacters);
     } catch (err) {
       console.error("Error loading report options:", err);
       setReportError("Could not load report options. Please try again.");
