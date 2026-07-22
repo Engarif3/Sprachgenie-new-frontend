@@ -5,6 +5,7 @@ import { useLockBodyScroll } from "./ModalScrolling";
 import aiApi from "../../../AI_axios";
 import api from "../../../axios";
 import { useAuth } from "../../../services/auth.services";
+import { countWords } from "../../../utils/countWords";
 
 const splitItems = (value, separators) =>
   String(value || "")
@@ -38,6 +39,12 @@ const AIModal = ({
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [reportMessage, setReportMessage] = useState("");
   const [reportLoading, setReportLoading] = useState(false);
+  const [reportOptionsLoading, setReportOptionsLoading] = useState(false);
+  const [reportReasons, setReportReasons] = useState([]);
+  const [selectedReasonIds, setSelectedReasonIds] = useState(new Set());
+  const [reportFreeTextEnabled, setReportFreeTextEnabled] = useState(true);
+  const [reportMaxWords, setReportMaxWords] = useState(50);
+  const [reportValidationError, setReportValidationError] = useState("");
   const [currentWordData, setCurrentWordData] = useState(aiWord);
   const [currentParagraph, setCurrentParagraph] = useState(selectedParagraph);
   const [correctionPrompt, setCorrectionPrompt] = useState("");
@@ -182,9 +189,56 @@ const AIModal = ({
     }
   };
 
+  const handleOpenReport = async () => {
+    setIsReportOpen(true);
+    setReportValidationError("");
+    setReportOptionsLoading(true);
+    try {
+      const [reasonsRes, settingsRes] = await Promise.all([
+        aiApi.get("/paragraphs/report-reasons"),
+        aiApi.get("/paragraphs/report-settings"),
+      ]);
+      setReportReasons(reasonsRes.data?.data || []);
+      setReportFreeTextEnabled(settingsRes.data?.data?.freeTextEnabled ?? true);
+      setReportMaxWords(settingsRes.data?.data?.maxWords ?? 50);
+    } catch (error) {
+      console.error("Error loading report options:", error);
+      setReportValidationError("Could not load report options. Please try again.");
+    } finally {
+      setReportOptionsLoading(false);
+    }
+  };
+
+  const handleToggleReportReason = (reasonId) => {
+    setSelectedReasonIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(reasonId)) {
+        next.delete(reasonId);
+      } else {
+        next.add(reasonId);
+      }
+      return next;
+    });
+  };
+
+  const showReportNoteField = reportFreeTextEnabled && reportMaxWords > 0;
+  const reportMessageWordCount = countWords(reportMessage || "");
+  const reportMessageTooLong =
+    showReportNoteField && reportMessageWordCount > reportMaxWords;
+
   const handleReportSubmit = async () => {
     if (!activeWord?.id) {
       return Swal.fire("Error", "Missing word ID", "error");
+    }
+
+    setReportValidationError("");
+    if (selectedReasonIds.size === 0) {
+      setReportValidationError("Select at least one reason.");
+      return;
+    }
+    if (reportMessageTooLong) {
+      setReportValidationError(`Your note must be ${reportMaxWords} words or fewer.`);
+      return;
     }
 
     try {
@@ -192,7 +246,8 @@ const AIModal = ({
       const response = await aiApi.post("/paragraphs/report", {
         wordId: activeWord.id,
         userId,
-        message: reportMessage?.trim() || null,
+        reasonIds: [...selectedReasonIds],
+        message: showReportNoteField && reportMessage?.trim() ? reportMessage.trim() : null,
       });
 
       Swal.fire(
@@ -203,6 +258,7 @@ const AIModal = ({
 
       setIsReportOpen(false);
       setReportMessage("");
+      setSelectedReasonIds(new Set());
     } catch (error) {
       const errorMessage = error.response?.data?.error || error.message;
       //   Swal.fire("Error", errorMessage, "error");
@@ -500,7 +556,7 @@ const AIModal = ({
 
           <div className="mt-8 flex justify-between gap-4">
             <button
-              onClick={() => setIsReportOpen(true)}
+              onClick={handleOpenReport}
               className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 px-6 py-3 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/50"
             >
               🚨 Report Issue
@@ -611,16 +667,66 @@ const AIModal = ({
               🚨 Report Issue
             </h2>
 
-            <p className="text-gray-700 text-sm mb-4 bg-yellow-100 border border-yellow-300 rounded-xl p-3">
-              💡 Please describe the issue with this AI generation. (optional)
-            </p>
-            <textarea
-              value={reportMessage}
-              onChange={(e) => setReportMessage(e.target.value)}
-              className="w-full border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 rounded-xl p-4 text-sm bg-white/50 backdrop-blur-sm transition-all"
-              rows={4}
-              placeholder="Describe the problem here..."
-            />
+            {reportOptionsLoading ? (
+              <p className="text-gray-600 text-sm text-center py-4">Loading...</p>
+            ) : (
+              <>
+                <p className="text-gray-700 text-sm font-semibold mb-2">
+                  What's wrong?
+                </p>
+                <div className="space-y-2 mb-4">
+                  {reportReasons.map((reason) => (
+                    <label
+                      key={reason.id}
+                      className="flex items-start gap-2 text-sm text-gray-700 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedReasonIds.has(reason.id)}
+                        onChange={() => handleToggleReportReason(reason.id)}
+                        className="mt-0.5 h-4 w-4 accent-red-500"
+                      />
+                      {reason.label}
+                    </label>
+                  ))}
+                  {reportReasons.length === 0 && (
+                    <p className="text-gray-500 text-sm italic">
+                      No report reasons configured yet.
+                    </p>
+                  )}
+                </div>
+
+                {showReportNoteField && (
+                  <>
+                    <p className="text-gray-700 text-sm mb-2 bg-yellow-100 border border-yellow-300 rounded-xl p-3">
+                      💡 Anything else? (optional)
+                    </p>
+                    <textarea
+                      value={reportMessage}
+                      onChange={(e) => setReportMessage(e.target.value)}
+                      className={`w-full border-2 focus:ring-2 rounded-xl p-4 text-sm bg-white/50 backdrop-blur-sm transition-all ${
+                        reportMessageTooLong
+                          ? "border-red-400 focus:border-red-500 focus:ring-red-500/50"
+                          : "border-gray-300 focus:border-blue-500 focus:ring-blue-500/50"
+                      }`}
+                      rows={4}
+                      placeholder="Describe the problem here..."
+                    />
+                    <p
+                      className={`mt-1 text-xs ${reportMessageTooLong ? "text-red-500" : "text-gray-500"}`}
+                    >
+                      {reportMessageWordCount}/{reportMaxWords} words
+                    </p>
+                  </>
+                )}
+
+                {reportValidationError && (
+                  <p className="mt-3 text-sm text-red-600 font-medium">
+                    {reportValidationError}
+                  </p>
+                )}
+              </>
+            )}
 
             <div className="mt-6 flex justify-end gap-3">
               <button
@@ -631,7 +737,7 @@ const AIModal = ({
               </button>
               <button
                 onClick={handleReportSubmit}
-                disabled={reportLoading}
+                disabled={reportLoading || reportOptionsLoading}
                 className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 disabled:from-gray-400 disabled:to-gray-500 px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {reportLoading ? "⏳ Submitting..." : "✓ Submit Report"}

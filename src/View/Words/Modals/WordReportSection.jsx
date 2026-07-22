@@ -1,11 +1,6 @@
 import { useState } from "react";
 import api from "../../../axios";
-
-const countWords = (text) =>
-  text
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean).length;
+import { countWords } from "../../../utils/countWords";
 
 // A word's `sentences` array mixes real example sentences with "##"/"**"
 // prefixed section headers/notes (see SentenceRenderer in WordListModal) —

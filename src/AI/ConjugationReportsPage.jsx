@@ -21,6 +21,19 @@ const ConjugationReportsPage = () => {
   // per-verb custom prompt inputs
   const [customPrompts, setCustomPrompts] = useState({});
 
+  // Report reasons management
+  const [reasons, setReasons] = useState([]);
+  const [reasonsLoading, setReasonsLoading] = useState(false);
+  const [newReasonLabel, setNewReasonLabel] = useState("");
+  const [editingReasonId, setEditingReasonId] = useState(null);
+  const [editReasonLabel, setEditReasonLabel] = useState("");
+
+  // Note field settings
+  const [freeTextEnabled, setFreeTextEnabled] = useState(true);
+  const [maxWordsInput, setMaxWordsInput] = useState("50");
+  const [settingsLoading, setSettingsLoading] = useState(false);
+  const [savingSettings, setSavingSettings] = useState(false);
+
   const viewingItem = reports.find((r) => r.verb === viewingVerb) || null;
 
   const handleToggleExpand = (verb) => {
@@ -59,9 +72,109 @@ const ConjugationReportsPage = () => {
     }
   };
 
+  const fetchReasons = async () => {
+    setReasonsLoading(true);
+    try {
+      const res = await aiApi.get("/conjugations/report-reasons");
+      setReasons(res.data?.data || []);
+    } catch {
+      toast.error("Failed to load report reasons.");
+    } finally {
+      setReasonsLoading(false);
+    }
+  };
+
+  const fetchSettings = async () => {
+    setSettingsLoading(true);
+    try {
+      const res = await aiApi.get("/conjugations/report-settings");
+      const data = res.data?.data;
+      setFreeTextEnabled(data?.freeTextEnabled ?? true);
+      setMaxWordsInput(String(data?.maxWords ?? 50));
+    } catch {
+      toast.error("Failed to load report settings.");
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    if (canAccess) fetchReports();
+    if (canAccess) {
+      fetchReports();
+      fetchReasons();
+      fetchSettings();
+    }
   }, [canAccess]);
+
+  const handleAddReason = async (e) => {
+    e.preventDefault();
+    if (!newReasonLabel.trim()) return;
+    try {
+      await aiApi.post("/conjugations/report-reasons", { label: newReasonLabel.trim() });
+      setNewReasonLabel("");
+      fetchReasons();
+    } catch {
+      toast.error("Failed to add reason.");
+    }
+  };
+
+  const openEditReason = (reason) => {
+    setEditingReasonId(reason.id);
+    setEditReasonLabel(reason.label);
+  };
+
+  const closeEditReason = () => {
+    setEditingReasonId(null);
+    setEditReasonLabel("");
+  };
+
+  const handleSaveReason = async () => {
+    if (!editReasonLabel.trim()) return;
+    try {
+      await aiApi.put(`/conjugations/report-reasons/${editingReasonId}`, {
+        label: editReasonLabel.trim(),
+      });
+      closeEditReason();
+      fetchReasons();
+    } catch {
+      toast.error("Failed to update reason.");
+    }
+  };
+
+  const handleDeleteReason = async (reason) => {
+    const result = await Swal.fire({
+      title: `Delete reason "${reason.label}"?`,
+      text: "Existing reports keep their other reasons. This cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete!",
+      cancelButtonText: "Cancel",
+    });
+    if (!result.isConfirmed) return;
+    try {
+      await aiApi.delete(`/conjugations/report-reasons/${reason.id}`);
+      fetchReasons();
+    } catch {
+      toast.error("Failed to delete reason.");
+    }
+  };
+
+  const handleSaveSettings = async () => {
+    const maxWords = parseInt(maxWordsInput, 10);
+    if (!Number.isInteger(maxWords) || maxWords < 0) {
+      toast.error("Max words must be a whole number (0 or more)");
+      return;
+    }
+    setSavingSettings(true);
+    try {
+      await aiApi.patch("/conjugations/report-settings", { freeTextEnabled, maxWords });
+      toast.success("Settings saved.");
+    } catch {
+      toast.error("Failed to save settings.");
+    } finally {
+      setSavingSettings(false);
+    }
+  };
 
   const handleRegenerate = async (verb, promptOverride) => {
     setRegenerating((prev) => ({ ...prev, [verb]: true }));
@@ -159,6 +272,138 @@ const ConjugationReportsPage = () => {
         Verbs flagged by users as having incorrect conjugation. Regenerate to
         produce a fresh AI result and clear all reports for that verb.
       </p>
+
+      {isSuperAdmin && (
+        <div className="bg-gray-800/60 rounded-2xl p-6 mb-6 border border-gray-700">
+          <h2 className="text-lg font-bold text-white mb-4">📋 Report Reasons</h2>
+          {reasonsLoading ? (
+            <p className="text-gray-400 text-sm">Loading...</p>
+          ) : (
+            <>
+              <div className="space-y-2 mb-4">
+                {reasons.map((reason) =>
+                  editingReasonId === reason.id ? (
+                    <div
+                      key={reason.id}
+                      className="flex flex-wrap items-center gap-2 rounded-lg border border-gray-600 bg-gray-900/60 p-3"
+                    >
+                      <input
+                        type="text"
+                        value={editReasonLabel}
+                        onChange={(e) => setEditReasonLabel(e.target.value)}
+                        className="flex-1 min-w-[160px] px-3 py-1.5 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-violet-500"
+                      />
+                      <button
+                        onClick={handleSaveReason}
+                        className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg transition"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={closeEditReason}
+                        className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-xs font-semibold rounded-lg transition"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      key={reason.id}
+                      className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-gray-700 bg-gray-900/40 p-3"
+                    >
+                      <span className="text-sm text-white">{reason.label}</span>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => openEditReason(reason)}
+                          className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteReason(reason)}
+                          className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ),
+                )}
+                {reasons.length === 0 && (
+                  <p className="text-gray-500 text-sm">No reasons yet.</p>
+                )}
+              </div>
+
+              <form
+                onSubmit={handleAddReason}
+                className="flex flex-wrap items-center gap-2 border-t border-gray-700 pt-4"
+              >
+                <input
+                  type="text"
+                  value={newReasonLabel}
+                  onChange={(e) => setNewReasonLabel(e.target.value)}
+                  placeholder='e.g. "Wrong haben/sein"'
+                  className="flex-1 min-w-[200px] px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:border-violet-500"
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white text-sm font-semibold rounded-lg hover:from-violet-500 hover:to-purple-500 transition"
+                >
+                  + Add Reason
+                </button>
+              </form>
+            </>
+          )}
+        </div>
+      )}
+
+      {isSuperAdmin && (
+        <div className="bg-gray-800/60 rounded-2xl p-6 mb-6 border border-gray-700">
+          <h2 className="text-lg font-bold text-white mb-4">⚙️ Note Field Settings</h2>
+          {settingsLoading ? (
+            <p className="text-gray-400 text-sm">Loading...</p>
+          ) : (
+            <>
+              <label className="flex items-center gap-2 mb-4 text-sm text-gray-300">
+                <input
+                  type="checkbox"
+                  checked={freeTextEnabled}
+                  onChange={(e) => setFreeTextEnabled(e.target.checked)}
+                  className="h-4 w-4 accent-violet-500"
+                />
+                Allow users to add a short note when reporting
+              </label>
+              <div className="mb-4 max-w-xs">
+                <label
+                  htmlFor="conjugation-max-words-input"
+                  className="block text-white font-semibold mb-2 text-sm"
+                >
+                  Max words in note
+                </label>
+                <input
+                  id="conjugation-max-words-input"
+                  type="number"
+                  min="0"
+                  value={maxWordsInput}
+                  onChange={(e) => setMaxWordsInput(e.target.value)}
+                  disabled={!freeTextEnabled}
+                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-violet-500 disabled:opacity-50"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Set to 0 to hide the note field entirely.
+                </p>
+              </div>
+              <button
+                onClick={handleSaveSettings}
+                disabled={savingSettings}
+                className="px-6 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold rounded-lg hover:from-violet-500 hover:to-purple-500 disabled:opacity-50 transition"
+              >
+                {savingSettings ? "Saving..." : "Save Settings"}
+              </button>
+            </>
+          )}
+        </div>
+      )}
 
       {isSuperAdmin && reports.length > 0 && (
         <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
@@ -343,6 +588,18 @@ const ConjugationReportsPage = () => {
                           <span className="text-gray-400 text-xs">
                             {r.userId ? `User: ${r.userId.slice(0, 8)}…` : "Anonymous"}
                           </span>
+                          {r.reasons?.length > 0 && (
+                            <span className="flex flex-wrap gap-1">
+                              {r.reasons.map((reason) => (
+                                <span
+                                  key={reason.id}
+                                  className="rounded-full bg-violet-500/20 border border-violet-500/40 px-2 py-0.5 text-[11px] text-violet-300"
+                                >
+                                  {reason.label}
+                                </span>
+                              ))}
+                            </span>
+                          )}
                           {r.message && (
                             <span className="text-gray-300 text-xs italic">
                               "{r.message}"
