@@ -35,6 +35,7 @@ const WordReports = () => {
   // Reported words summary
   const [summary, setSummary] = useState([]);
   const [summaryLoading, setSummaryLoading] = useState(false);
+  const [selectedWordIds, setSelectedWordIds] = useState(new Set());
 
   // Expanded per-word report list
   const [expandedWordId, setExpandedWordId] = useState(null);
@@ -225,6 +226,26 @@ const WordReports = () => {
     }
   };
 
+  const handleToggleSelectWord = (wordId) => {
+    setSelectedWordIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(wordId)) {
+        next.delete(wordId);
+      } else {
+        next.add(wordId);
+      }
+      return next;
+    });
+  };
+
+  const allWordIds = summary.map((item) => item.wordId);
+  const allWordsSelected =
+    allWordIds.length > 0 && allWordIds.every((id) => selectedWordIds.has(id));
+
+  const handleToggleSelectAllWords = () => {
+    setSelectedWordIds(allWordsSelected ? new Set() : new Set(allWordIds));
+  };
+
   const handleToggleSelectReport = (id) => {
     setSelectedReportIds((prev) => {
       const next = new Set(prev);
@@ -274,6 +295,14 @@ const WordReports = () => {
       } else if (deleteTarget.type === "allForWord") {
         await api.delete(`/word-reports/admin/word/${deleteTarget.wordId}/all`);
         showSuccess("All reports for this word deleted!");
+      } else if (deleteTarget.type === "bulkWords") {
+        await api.delete("/word-reports/admin/words/bulk", {
+          data: { wordIds: deleteTarget.wordIds },
+        });
+        showSuccess(
+          `Reports for ${deleteTarget.wordIds.length} word(s) deleted!`,
+        );
+        setSelectedWordIds(new Set());
       } else if (deleteTarget.type === "reason") {
         await api.delete(`/word-reports/reasons/${deleteTarget.id}`);
         showSuccess("Reason permanently deleted!");
@@ -503,6 +532,35 @@ const WordReports = () => {
             🚩 Reported Words
           </h2>
 
+          {!summaryLoading && summary.length > 0 && (
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              <label className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-700 bg-gray-900/40 text-sm text-gray-300">
+                <input
+                  type="checkbox"
+                  checked={allWordsSelected}
+                  onChange={handleToggleSelectAllWords}
+                  className="h-4 w-4 accent-orange-500"
+                />
+                Select all words
+              </label>
+
+              {selectedWordIds.size > 0 && (
+                <button
+                  onClick={() =>
+                    openDeleteConfirm({
+                      type: "bulkWords",
+                      wordIds: [...selectedWordIds],
+                    })
+                  }
+                  className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition"
+                >
+                  Delete Selected ({selectedWordIds.size} word
+                  {selectedWordIds.size !== 1 ? "s" : ""})
+                </button>
+              )}
+            </div>
+          )}
+
           {summaryLoading ? (
             <p className="text-gray-400">Loading...</p>
           ) : summary.length === 0 ? (
@@ -515,20 +573,29 @@ const WordReports = () => {
                   className="rounded-lg border border-gray-700 bg-gray-900/40"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3 p-4">
-                    <div>
-                      <button
-                        type="button"
-                        onClick={() => handleOpenWordPreview(item.wordId)}
-                        disabled={modalLoading}
-                        className="text-lg font-bold text-blue-400 hover:text-blue-300 hover:underline transition disabled:opacity-50"
-                      >
-                        {item.wordValue}
-                      </button>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {item.reportCount} report
-                        {item.reportCount === 1 ? "" : "s"} · last{" "}
-                        {formatDate(item.lastReportedAt)}
-                      </p>
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        className="mt-1.5 h-4 w-4 shrink-0 accent-orange-500"
+                        checked={selectedWordIds.has(item.wordId)}
+                        onChange={() => handleToggleSelectWord(item.wordId)}
+                        title="Select this word to delete all its reports"
+                      />
+                      <div>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenWordPreview(item.wordId)}
+                          disabled={modalLoading}
+                          className="text-lg font-bold text-blue-400 hover:text-blue-300 hover:underline transition disabled:opacity-50"
+                        >
+                          {item.wordValue}
+                        </button>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {item.reportCount} report
+                          {item.reportCount === 1 ? "" : "s"} · last{" "}
+                          {formatDate(item.lastReportedAt)}
+                        </p>
+                      </div>
                     </div>
                     <div className="flex gap-2">
                       <button
@@ -658,11 +725,13 @@ const WordReports = () => {
                 ⚠️ Permanently Delete{" "}
                 {deleteTarget.type === "allForWord"
                   ? "All Reports"
-                  : deleteTarget.type === "bulk"
-                    ? `${deleteTarget.ids.length} Reports`
-                    : deleteTarget.type === "reason"
-                      ? "Reason"
-                      : "Report"}
+                  : deleteTarget.type === "bulkWords"
+                    ? `Reports for ${deleteTarget.wordIds.length} Word(s)`
+                    : deleteTarget.type === "bulk"
+                      ? `${deleteTarget.ids.length} Reports`
+                      : deleteTarget.type === "reason"
+                        ? "Reason"
+                        : "Report"}
               </h2>
               <p className="text-gray-300 mb-6 text-sm">
                 {deleteTarget.type === "reason"
