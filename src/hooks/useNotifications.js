@@ -92,17 +92,6 @@ export const useNotifications = () => {
     [refetchUnreadCount],
   );
 
-  const deleteAllNotifications = useCallback(async () => {
-    try {
-      await api.delete("/notifications/mine/all");
-      setNotifications([]);
-      setUnreadCount(0);
-      return true;
-    } catch {
-      return false;
-    }
-  }, []);
-
   useEffect(() => {
     void refetchUnreadCount();
   }, [refetchUnreadCount, userId]);
@@ -124,7 +113,6 @@ export const useNotifications = () => {
     fetchNotifications,
     markAsRead,
     deleteNotifications,
-    deleteAllNotifications,
     refetchUnreadCount,
   };
 };

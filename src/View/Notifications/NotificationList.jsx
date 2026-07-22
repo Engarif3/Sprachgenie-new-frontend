@@ -14,6 +14,10 @@ const formatNotificationDate = (dateValue) => {
 
 const isExternalLink = (link) => /^https?:\/\//i.test(link || "");
 
+// Long enough that a single-line clamp would very likely truncate it — used
+// to decide whether the "See more" toggle is worth showing at all.
+const LONG_MESSAGE_THRESHOLD = 140;
+
 // Shared between the avatar dropdown popover (compact) and the full
 // Dashboard Notifications page. Clicking a row expands the full message and
 // marks it read the first time it's opened, matching how a real inbox works
@@ -53,9 +57,9 @@ const NotificationList = ({
     }
   };
 
-  // Nested interactive elements (CTA link, checkbox, trash button) sit
-  // inside the row's own click target, so each one must stop the click from
-  // bubbling up and re-toggling/collapsing the row.
+  // The CTA link and "See more" toggle sit inside the row's own click
+  // target, so each must stop the click from bubbling up and
+  // re-toggling/collapsing the row a second time.
   const handleCtaClick = (event, notification) => {
     event.stopPropagation();
     if (!notification.isRead) {
@@ -63,9 +67,9 @@ const NotificationList = ({
     }
   };
 
-  const handleCheckboxClick = (event, notification) => {
+  const handleSeeMoreClick = (event, notification) => {
     event.stopPropagation();
-    onToggleSelect?.(notification.id);
+    handleToggle(notification);
   };
 
   const handleDeleteClick = (event, notification) => {
@@ -98,41 +102,45 @@ const NotificationList = ({
       {notifications.map((notification) => {
         const isExpanded = expandedId === notification.id;
         const isSelected = selectedIds?.has(notification.id);
+        const isLongMessage =
+          (notification.message || "").length > LONG_MESSAGE_THRESHOLD;
         const ctaClass =
           "mt-2 inline-flex items-center gap-1 text-sm font-semibold text-orange-500 transition-all hover:gap-2 dark:text-orange-400";
 
         return (
-          <li key={notification.id}>
+          <li
+            key={notification.id}
+            className={`flex items-start gap-2 ${
+              isSelected ? (isLight ? "bg-orange-50" : "bg-orange-500/10") : ""
+            }`}
+          >
+            {/* Outside the clickable message box on purpose — selecting a
+            row for bulk-delete is a separate action from opening it. */}
+            {selectable && (
+              <input
+                type="checkbox"
+                checked={!!isSelected}
+                onChange={() => onToggleSelect?.(notification.id)}
+                className="ml-3 mt-4 h-4 w-4 shrink-0 cursor-pointer accent-orange-500"
+                aria-label={`Select "${notification.topic}"`}
+              />
+            )}
             <div
               role="button"
               tabIndex={0}
               onClick={() => handleToggle(notification)}
               onKeyDown={(e) => handleToggleKeyDown(e, notification)}
-              className={`flex w-full cursor-pointer items-start gap-2 px-3 py-3 text-left transition-colors ${
+              className={`flex w-full min-w-0 cursor-pointer items-start gap-2 px-3 py-3 text-left transition-colors ${
                 isLight ? "hover:bg-slate-50" : "hover:bg-slate-800/60"
-              } ${isSelected ? (isLight ? "bg-orange-50" : "bg-orange-500/10") : ""}`}
+              }`}
             >
-              {selectable && (
-                <input
-                  type="checkbox"
-                  checked={!!isSelected}
-                  onChange={() => {}}
-                  onClick={(e) => handleCheckboxClick(e, notification)}
-                  className="mt-1.5 h-4 w-4 shrink-0 cursor-pointer accent-orange-500"
-                  aria-label={`Select "${notification.topic}"`}
-                />
-              )}
               {!notification.isRead && (
                 <span
                   className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-orange-500"
                   aria-label="Unread"
                 />
               )}
-              <div
-                className={`min-w-0 flex-1 ${
-                  notification.isRead && !selectable ? "ml-4" : ""
-                }`}
-              >
+              <div className={`min-w-0 flex-1 ${notification.isRead ? "ml-4" : ""}`}>
                 <div className="flex items-baseline justify-between gap-2">
                   <p
                     className={`truncate text-sm font-semibold ${
@@ -161,8 +169,8 @@ const NotificationList = ({
                         aria-label="Delete for me"
                         className={`rounded-full p-1 transition-colors ${
                           isLight
-                            ? "text-slate-400 hover:bg-red-50 hover:text-red-600"
-                            : "text-slate-500 hover:bg-red-500/10 hover:text-red-400"
+                            ? "text-red-400 hover:bg-red-50 hover:text-red-600"
+                            : "text-red-400/80 hover:bg-red-500/10 hover:text-red-400"
                         }`}
                       >
                         <Trash2 size={14} />
@@ -177,6 +185,15 @@ const NotificationList = ({
                 >
                   {notification.message}
                 </p>
+                {isLongMessage && (
+                  <button
+                    type="button"
+                    onClick={(e) => handleSeeMoreClick(e, notification)}
+                    className="mt-0.5 text-xs font-semibold text-sky-600 hover:underline dark:text-sky-400"
+                  >
+                    {isExpanded ? "See less" : "See more"}
+                  </button>
+                )}
                 {notification.link &&
                   (isExternalLink(notification.link) ? (
                     <a
@@ -195,11 +212,11 @@ const NotificationList = ({
                       Discover now <ChevronRight size={14} />
                     </Link>
                   ))}
-                {!compact && notification.creator?.name && (
+                {!compact && (
                   <p
                     className={`mt-2 text-xs ${isLight ? "text-slate-400" : "text-slate-500"}`}
                   >
-                    — {notification.creator.name}
+                    — Admin
                   </p>
                 )}
               </div>
