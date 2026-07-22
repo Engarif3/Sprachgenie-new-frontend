@@ -13,6 +13,7 @@ import ENFlag from "../assets/EN.svg";
 import DEFlag from "../assets/DE.svg";
 import ShareSiteModal from "./ShareSiteModal";
 import { useChallengeStreak } from "../hooks/useChallengeStreak";
+import { useNotifications } from "../hooks/useNotifications";
 
 const getUserInitials = (name, email) => {
   const source = (name || email || "User").trim();
@@ -45,6 +46,7 @@ const NavBar = () => {
   const { theme, toggleTheme } = useTheme();
   const { language, toggleLanguage } = useLanguage();
   const { currentStreak } = useChallengeStreak();
+  const { unreadCount } = useNotifications();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -157,6 +159,20 @@ const NavBar = () => {
           👤 Profile
         </Link>
         {/* ========================================== */}
+        {userLoggedIn && (
+          <Link
+            to="/dashboard/notifications"
+            onClick={() => setIsProfileMenuOpen(false)}
+            className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30 flex items-center justify-between gap-2"
+          >
+            <span className="flex items-center gap-2">🔔 Notifications</span>
+            {unreadCount > 0 ? (
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1.5 text-xs font-bold text-white">
+                {unreadCount}
+              </span>
+            ) : null}
+          </Link>
+        )}
         {userLoggedIn && (
           <Link
             to="/favorites"
@@ -398,6 +414,14 @@ const NavBar = () => {
                           </span>
                         )}
                       </button>
+                      {unreadCount > 0 && (
+                        <span
+                          className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full border-2 border-gray-800 bg-orange-500 px-1 text-[10px] font-bold leading-none text-white"
+                          aria-label={`${unreadCount} unread notifications`}
+                        >
+                          {unreadCount > 9 ? "9+" : unreadCount}
+                        </span>
+                      )}
 
                       {isProfileMenuOpen &&
                         renderProfileMenu(mobileProfileMenuRef, true)}
@@ -552,6 +576,14 @@ const NavBar = () => {
                         </span>
                       )}
                     </button>
+                    {unreadCount > 0 && (
+                      <span
+                        className="absolute right-0 top-0 hidden h-5 min-w-5 items-center justify-center rounded-full border-2 border-gray-800 bg-orange-500 px-1 text-[10px] font-bold leading-none text-white md:flex"
+                        aria-label={`${unreadCount} unread notifications`}
+                      >
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                    )}
 
                     {isProfileMenuOpen &&
                       renderProfileMenu(desktopProfileMenuRef, false)}
