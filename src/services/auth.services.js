@@ -226,7 +226,15 @@ export const syncCurrentUser = async ({ preserveOnFailure = true } = {}) => {
     const data = response.data;
 
     if (data?.data) {
-      return storeUserInfo(data.data);
+      const { token, ...userInfo } = data.data;
+      // Repopulates the cross-domain AI-service token in a fresh tab/session
+      // that only had the httpOnly cookie (e.g. right after a deploy, or a
+      // new tab) — without this, aiApi calls silently 401 until an explicit
+      // logout/login cycle, since sessionStorage is per-tab.
+      if (token) {
+        sessionStorage.setItem("token", token);
+      }
+      return storeUserInfo(userInfo);
     }
 
     return setCachedUserInfo(null);
