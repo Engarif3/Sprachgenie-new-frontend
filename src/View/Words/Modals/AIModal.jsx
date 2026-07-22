@@ -221,7 +221,7 @@ const AIModal = ({
     });
   };
 
-  const showReportNoteField = reportFreeTextEnabled && reportMaxWords > 0;
+  const showReportNoteField = reportFreeTextEnabled;
   const reportMessageWordCount = countWords(reportMessage || "");
   const reportMessageTooLong =
     showReportNoteField && reportMessageWordCount > reportMaxWords;

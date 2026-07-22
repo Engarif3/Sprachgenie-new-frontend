@@ -194,8 +194,8 @@ const ReportsByUsers = () => {
 
   const handleSaveSettings = async () => {
     const maxWords = parseInt(maxWordsInput, 10);
-    if (!Number.isInteger(maxWords) || maxWords < 0) {
-      Swal.fire("Error", "Max words must be a whole number (0 or more)", "error");
+    if (!Number.isInteger(maxWords) || maxWords < 1) {
+      Swal.fire("Error", "Max words must be a whole number (1 or more)", "error");
       return;
     }
     setSavingSettings(true);
@@ -600,15 +600,12 @@ const ReportsByUsers = () => {
                   <input
                     id="paragraph-max-words-input"
                     type="number"
-                    min="0"
+                    min="1"
                     value={maxWordsInput}
                     onChange={(e) => setMaxWordsInput(e.target.value)}
                     disabled={!freeTextEnabled}
                     className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-cyan-500 disabled:opacity-50"
                   />
-                  <p className="mt-1 text-xs text-gray-500">
-                    Set to 0 to hide the note field entirely.
-                  </p>
                 </div>
                 <button
                   onClick={handleSaveSettings}
