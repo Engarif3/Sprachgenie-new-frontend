@@ -219,11 +219,13 @@ const ConjugationReportsPage = () => {
       await aiApi.delete("/conjugations/admin/verbs/bulk", {
         data: { verbs: [...selectedVerbs] },
       });
-      setReports((prev) =>
-        prev.map((r) =>
-          selectedVerbs.has(r.verb) ? { ...r, reports: [], reportCount: 0 } : r,
-        ),
-      );
+      // Remove the verb entirely rather than zeroing it in place — a fresh
+      // fetch would never show it again anyway, since getConjugationReports
+      // groups by verb and a verb with zero reports has nothing to group.
+      setReports((prev) => prev.filter((r) => !selectedVerbs.has(r.verb)));
+      if (expandedVerb && selectedVerbs.has(expandedVerb)) {
+        setExpandedVerb(null);
+      }
       setSelectedVerbs(new Set());
       toast.success("Reports for the selected verb(s) deleted.");
     } catch {
@@ -245,9 +247,13 @@ const ConjugationReportsPage = () => {
     setDeletingVerb((prev) => ({ ...prev, [verb]: true }));
     try {
       await aiApi.delete(`/conjugations/admin/verb/${verb}/all`);
-      setReports((prev) =>
-        prev.map((r) => (r.verb === verb ? { ...r, reports: [], reportCount: 0 } : r)),
-      );
+      // Remove the verb entirely rather than zeroing it in place — a fresh
+      // fetch would never show it again anyway, since getConjugationReports
+      // groups by verb and a verb with zero reports has nothing to group.
+      setReports((prev) => prev.filter((r) => r.verb !== verb));
+      if (expandedVerb === verb) {
+        setExpandedVerb(null);
+      }
       setSelectedVerbs((prev) => {
         const next = new Set(prev);
         next.delete(verb);
