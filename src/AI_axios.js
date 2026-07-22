@@ -1,4 +1,5 @@
 import axios from "axios";
+import { reportAiServiceError } from "./utils/reportClientError";
 
 const aiApi = axios.create({
   baseURL: import.meta.env.VITE_AI_API_URL || "http://localhost:5000",
@@ -21,6 +22,24 @@ aiApi.interceptors.request.use(
     return config;
   },
   (error) => Promise.reject(error),
+);
+
+// The AI microservice is a separate, far-less-trafficked deployment from the
+// Main Backend, so it's worth knowing when it's unreachable specifically —
+// report it under its own category (AI_SERVICE_ERROR) rather than letting it
+// go unnoticed (this instance previously had no response interceptor at all).
+aiApi.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (!error.response) {
+      reportAiServiceError({
+        message: `Network error calling AI service ${error.config?.url || "unknown endpoint"}: ${error.message || "request failed"}`,
+        path: error.config?.url,
+      });
+    }
+
+    return Promise.reject(error);
+  },
 );
 
 export default aiApi;
