@@ -10,6 +10,7 @@ const CATEGORY_OPTIONS = [
   { value: "LOGIN_FAILURE", label: "Login Failure" },
   { value: "REGISTRATION_FAILURE", label: "Registration Failure" },
   { value: "FRONTEND_ERROR", label: "Frontend Error" },
+  { value: "AI_SERVICE_ERROR", label: "AI Service Error" },
 ];
 
 const getCategoryBadgeClass = (category) => {
@@ -22,6 +23,8 @@ const getCategoryBadgeClass = (category) => {
       return "border-sky-300/60 bg-sky-50 text-sky-700 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-300";
     case "FRONTEND_ERROR":
       return "border-violet-300/60 bg-violet-50 text-violet-700 dark:border-violet-500/20 dark:bg-violet-500/10 dark:text-violet-200";
+    case "AI_SERVICE_ERROR":
+      return "border-teal-300/60 bg-teal-50 text-teal-700 dark:border-teal-500/20 dark:bg-teal-500/10 dark:text-teal-200";
     default:
       return "border-slate-300/60 bg-slate-100 text-slate-700 dark:border-slate-600/30 dark:bg-slate-800/80 dark:text-slate-200";
   }
