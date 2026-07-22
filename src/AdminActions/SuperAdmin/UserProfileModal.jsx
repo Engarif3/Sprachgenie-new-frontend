@@ -5,6 +5,8 @@ import {
   formatRoleLabel,
   formatStatusLabel,
 } from "../userManagementDisplay";
+import { useProfileSettings } from "../../hooks/useProfileSettings";
+import { getAvatarUrl } from "../../utils/avatar";
 
 const statusBadgeClass = (status) => {
   switch (String(status || "").toUpperCase()) {
@@ -31,6 +33,8 @@ const InfoCard = ({ label, value }) => (
 );
 
 const UserProfileModal = ({ isOpen, user, isLoading, onClose }) => {
+  const { allowImageUpload } = useProfileSettings();
+
   useEffect(() => {
     if (!isOpen) {
       return undefined;
@@ -104,9 +108,9 @@ const UserProfileModal = ({ isOpen, user, isLoading, onClose }) => {
                 <div className="h-28 bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500" />
                 <div className="-mt-14 px-6 pb-6">
                   <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[26px] border-4 border-slate-950 bg-gradient-to-br from-slate-700 to-slate-900 text-2xl font-bold text-white shadow-xl">
-                    {user?.profilePhoto ? (
+                    {getAvatarUrl(user, allowImageUpload) ? (
                       <img
-                        src={user.profilePhoto}
+                        src={getAvatarUrl(user, allowImageUpload)}
                         alt={displayName}
                         className="h-full w-full object-cover"
                       />

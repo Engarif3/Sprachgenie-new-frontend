@@ -33,6 +33,12 @@ const BroadcastNotifications = () => {
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
 
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  // { type: "single", id, topic } | { type: "bulk", ids } | { type: "all" }
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [confirmText, setConfirmText] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
   const fetchNotifications = async () => {
     setLoading(true);
     try {
@@ -67,6 +73,16 @@ const BroadcastNotifications = () => {
     fetchNotifications();
     fetchSettings();
   }, []);
+
+  // Deleting/refetching can drop items that were selected — keep in sync.
+  useEffect(() => {
+    setSelectedIds((prev) => {
+      const stillPresent = new Set(
+        notifications.filter((n) => prev.has(n.id)).map((n) => n.id),
+      );
+      return stillPresent.size === prev.size ? prev : stillPresent;
+    });
+  }, [notifications]);
 
   const showSuccess = (msg) => {
     setSuccess(msg);
@@ -176,18 +192,65 @@ const BroadcastNotifications = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this broadcast? This cannot be undone.")) {
-      return;
-    }
+  const handleToggleSelect = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
 
+  const allSelected =
+    notifications.length > 0 && selectedIds.size === notifications.length;
+
+  const handleToggleSelectAll = () => {
+    setSelectedIds(
+      allSelected ? new Set() : new Set(notifications.map((n) => n.id)),
+    );
+  };
+
+  const openDeleteConfirm = (target) => {
+    setDeleteTarget(target);
+    setConfirmText("");
+  };
+
+  const closeDeleteConfirm = () => {
+    setDeleteTarget(null);
+    setConfirmText("");
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget || confirmText.trim().toUpperCase() !== "OK") return;
+
+    setDeleting(true);
     try {
-      await api.delete(`/notifications/${id}`);
-      showSuccess("Notification deleted successfully!");
+      if (deleteTarget.type === "single") {
+        await api.delete(`/notifications/${deleteTarget.id}`);
+        showSuccess("Notification deleted successfully!");
+      } else if (deleteTarget.type === "bulk") {
+        await api.delete("/notifications/admin/bulk", {
+          data: { notificationIds: deleteTarget.ids },
+        });
+        showSuccess(`${deleteTarget.ids.length} notifications deleted!`);
+        setSelectedIds(new Set());
+      } else if (deleteTarget.type === "all") {
+        await api.delete("/notifications/admin/all");
+        showSuccess("All notifications deleted!");
+        setSelectedIds(new Set());
+      }
+      closeDeleteConfirm();
       fetchNotifications();
     } catch (err) {
-      console.error("Error deleting notification:", err);
-      showError("Failed to delete notification");
+      console.error("Error deleting notification(s):", err);
+      showError(
+        err.response?.data?.message || "Failed to delete notification(s)",
+      );
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -358,9 +421,46 @@ const BroadcastNotifications = () => {
         </form>
 
         {/* Broadcast history */}
-        <h2 className="text-2xl font-bold text-white mb-4">
-          Broadcast History
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <h2 className="text-2xl font-bold text-white">Broadcast History</h2>
+
+          {notifications.length > 0 && (
+            <div className="flex flex-wrap items-center gap-3">
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-300">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={handleToggleSelectAll}
+                  className="h-4 w-4 accent-orange-500"
+                />
+                Select all
+              </label>
+
+              {selectedIds.size > 0 && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    openDeleteConfirm({
+                      type: "bulk",
+                      ids: [...selectedIds],
+                    })
+                  }
+                  className="rounded-lg bg-red-600 px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-red-700"
+                >
+                  Delete Selected ({selectedIds.size})
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => openDeleteConfirm({ type: "all" })}
+                className="rounded-lg border border-red-700 px-4 py-1.5 text-sm font-semibold text-red-400 transition hover:bg-red-900/30"
+              >
+                Delete All
+              </button>
+            </div>
+          )}
+        </div>
 
         {loading ? (
           <p className="text-gray-400 text-center py-8">
@@ -375,9 +475,20 @@ const BroadcastNotifications = () => {
             {notifications.map((notification) => (
               <div
                 key={notification.id}
-                className="bg-gray-800/50 rounded-lg p-6 border border-gray-700"
+                className={`flex items-start gap-3 rounded-lg border p-6 transition-colors ${
+                  selectedIds.has(notification.id)
+                    ? "border-orange-500/60 bg-orange-500/10"
+                    : "border-gray-700 bg-gray-800/50"
+                }`}
               >
-                <div className="flex items-start justify-between gap-4">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.has(notification.id)}
+                  onChange={() => handleToggleSelect(notification.id)}
+                  className="mt-1.5 h-4 w-4 shrink-0 cursor-pointer accent-orange-500"
+                  aria-label={`Select "${notification.topic}"`}
+                />
+                <div className="flex flex-1 items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <h3 className="text-lg font-bold text-white mb-1">
                       {notification.topic}
@@ -404,7 +515,13 @@ const BroadcastNotifications = () => {
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(notification.id)}
+                      onClick={() =>
+                        openDeleteConfirm({
+                          type: "single",
+                          id: notification.id,
+                          topic: notification.topic,
+                        })
+                      }
                       className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition"
                     >
                       Delete
@@ -487,6 +604,69 @@ const BroadcastNotifications = () => {
                   className="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg disabled:opacity-50 transition"
                 >
                   ❌ Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Permanent Delete Confirmation Modal */}
+        {deleteTarget && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full border border-red-700">
+              <h2 className="text-2xl font-bold text-red-400 mb-4">
+                ⚠️ Permanently Delete{" "}
+                {deleteTarget.type === "all"
+                  ? "All Notifications"
+                  : deleteTarget.type === "bulk"
+                    ? `${deleteTarget.ids.length} Notifications`
+                    : "Notification"}
+              </h2>
+
+              <p className="text-gray-300 mb-2">
+                {deleteTarget.type === "single" &&
+                  `"${deleteTarget.topic}" will be permanently deleted for ALL users.`}
+                {deleteTarget.type === "bulk" &&
+                  `${deleteTarget.ids.length} notifications will be permanently deleted for ALL users.`}
+                {deleteTarget.type === "all" &&
+                  "Every broadcast notification will be permanently deleted for ALL users."}
+              </p>
+              <p className="text-red-300 text-sm font-semibold mb-6">
+                This cannot be undone.
+              </p>
+
+              <label
+                htmlFor="delete-confirm-input"
+                className="block text-white font-semibold mb-2"
+              >
+                Type <span className="text-red-400">OK</span> to confirm
+              </label>
+              <input
+                id="delete-confirm-input"
+                type="text"
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+                placeholder="OK"
+                autoFocus
+                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 mb-6"
+              />
+
+              <div className="flex gap-3">
+                <button
+                  onClick={handleConfirmDelete}
+                  disabled={
+                    deleting || confirmText.trim().toUpperCase() !== "OK"
+                  }
+                  className="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition"
+                >
+                  {deleting ? "Deleting..." : "Permanently Delete"}
+                </button>
+                <button
+                  onClick={closeDeleteConfirm}
+                  disabled={deleting}
+                  className="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg disabled:opacity-50 transition"
+                >
+                  Cancel
                 </button>
               </div>
             </div>
