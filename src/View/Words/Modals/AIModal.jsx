@@ -28,6 +28,10 @@ const getWordLevelValue = (word) => {
   return "A1";
 };
 
+// Module-level so it survives across every AIModal mount within the page
+// session (report reasons/settings rarely change) — cleared on full reload.
+let cachedParagraphReportOptions = null;
+
 const AIModal = ({
   isOpen,
   aiWord,
@@ -198,15 +202,32 @@ const AIModal = ({
 
     setIsReportOpen(true);
     setReportValidationError("");
+
+    // Reasons/settings rarely change — reuse across report-form opens within
+    // the same page session instead of re-hitting the AI service every time
+    // (its serverless function is far less trafficked than the main backend,
+    // so repeat cold-start latency is very noticeable otherwise).
+    if (cachedParagraphReportOptions) {
+      setReportReasons(cachedParagraphReportOptions.reasons);
+      setReportFreeTextEnabled(cachedParagraphReportOptions.freeTextEnabled);
+      setReportMaxCharacters(cachedParagraphReportOptions.maxCharacters);
+      return;
+    }
+
     setReportOptionsLoading(true);
     try {
       const [reasonsRes, settingsRes] = await Promise.all([
         aiApi.get("/paragraphs/report-reasons"),
         aiApi.get("/paragraphs/report-settings"),
       ]);
-      setReportReasons(reasonsRes.data?.data || []);
-      setReportFreeTextEnabled(settingsRes.data?.data?.freeTextEnabled ?? true);
-      setReportMaxCharacters(settingsRes.data?.data?.maxCharacters ?? 50);
+      const reasons = reasonsRes.data?.data || [];
+      const freeTextEnabled = settingsRes.data?.data?.freeTextEnabled ?? true;
+      const maxCharacters = settingsRes.data?.data?.maxCharacters ?? 50;
+
+      cachedParagraphReportOptions = { reasons, freeTextEnabled, maxCharacters };
+      setReportReasons(reasons);
+      setReportFreeTextEnabled(freeTextEnabled);
+      setReportMaxCharacters(maxCharacters);
     } catch (error) {
       console.error("Error loading report options:", error);
       setReportValidationError("Could not load report options. Please try again.");

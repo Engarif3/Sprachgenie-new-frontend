@@ -1,6 +1,11 @@
 import { useState } from "react";
 import api from "../../../axios";
 
+// Module-level so it survives across every WordReportSection mount within
+// the page session (report reasons/settings rarely change) — cleared on
+// reload. The already-reported check is per-word/user and always refetched.
+let cachedWordReportOptions = null;
+
 // A word's `sentences` array mixes real example sentences with "##"/"**"
 // prefixed section headers/notes (see SentenceRenderer in WordListModal) —
 // only real sentences make sense to flag as "incorrect", but the original
@@ -49,16 +54,29 @@ const WordReportSection = ({ wordId, sentences }) => {
     setExpanded(true);
     setLoading(true);
     try {
-      const [checkRes, reasonsRes, settingsRes] = await Promise.all([
-        api.get(`/word-reports/check/${wordId}`),
-        api.get("/word-reports/reasons"),
-        api.get("/word-reports/settings"),
-      ]);
+      if (cachedWordReportOptions) {
+        const checkRes = await api.get(`/word-reports/check/${wordId}`);
+        setAlreadyReported(!!checkRes.data?.data?.alreadyReported);
+        setReasons(cachedWordReportOptions.reasons);
+        setFreeTextEnabled(cachedWordReportOptions.freeTextEnabled);
+        setMaxCharacters(cachedWordReportOptions.maxCharacters);
+      } else {
+        const [checkRes, reasonsRes, settingsRes] = await Promise.all([
+          api.get(`/word-reports/check/${wordId}`),
+          api.get("/word-reports/reasons"),
+          api.get("/word-reports/settings"),
+        ]);
 
-      setAlreadyReported(!!checkRes.data?.data?.alreadyReported);
-      setReasons(reasonsRes.data?.data || []);
-      setFreeTextEnabled(settingsRes.data?.data?.freeTextEnabled ?? true);
-      setMaxCharacters(settingsRes.data?.data?.maxCharacters ?? 50);
+        const reasons = reasonsRes.data?.data || [];
+        const freeTextEnabled = settingsRes.data?.data?.freeTextEnabled ?? true;
+        const maxCharacters = settingsRes.data?.data?.maxCharacters ?? 50;
+
+        cachedWordReportOptions = { reasons, freeTextEnabled, maxCharacters };
+        setAlreadyReported(!!checkRes.data?.data?.alreadyReported);
+        setReasons(reasons);
+        setFreeTextEnabled(freeTextEnabled);
+        setMaxCharacters(maxCharacters);
+      }
     } catch (err) {
       console.error("Error loading report options:", err);
       setSubmitError("Could not load report options. Please try again.");
