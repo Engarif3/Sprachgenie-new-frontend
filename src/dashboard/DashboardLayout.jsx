@@ -33,6 +33,7 @@ const DashboardLayout = () => {
   const [expandedSections, setExpandedSections] = useState({
     admin: false,
     content: false,
+    notificationManagement: false,
     settings: false,
     analytics: false,
     monitoring: false,
@@ -303,16 +304,6 @@ const DashboardLayout = () => {
                       <span>🗂️</span>
                       <span>Stories Management</span>
                     </NavLink>
-                    {role === "super_admin" && (
-                      <NavLink
-                        to="/dashboard/broadcast-notifications"
-                        className={({ isActive }) => navItemClass(isActive)}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <span>📢</span>
-                        <span>Broadcast Notifications</span>
-                      </NavLink>
-                    )}
                     <NavLink
                       to="/dashboard/create-conversation"
                       className={({ isActive }) => navItemClass(isActive)}
@@ -330,6 +321,48 @@ const DashboardLayout = () => {
                       <span>Update Conversation</span>
                     </NavLink>
                   </div>
+                )}
+
+                {/* Notification Management: broadcasting announcements to
+                    users — split out of Content into its own section since
+                    it's a distinct admin activity, not learner-facing
+                    content. Super-admin only, matching the route's own
+                    role check. */}
+                {role === "super_admin" && (
+                  <>
+                    <div
+                      onClick={() => toggleSection("notificationManagement")}
+                      className={sectionHeaderClass}
+                      role="button"
+                      tabIndex={0}
+                    >
+                      <span className="flex items-center gap-2">
+                        <span>🔔</span>
+                        <span>Notification Management</span>
+                      </span>
+                      <span
+                        className={`text-sm transition-transform duration-300 ${
+                          expandedSections.notificationManagement
+                            ? "rotate-180"
+                            : ""
+                        }`}
+                      >
+                        ▼
+                      </span>
+                    </div>
+                    {expandedSections.notificationManagement && (
+                      <div className="ml-3 space-y-1 border-l border-slate-200 py-2 pl-4 animate-in fade-in slide-in-from-top-2 duration-200 dark:border-slate-700/60">
+                        <NavLink
+                          to="/dashboard/broadcast-notifications"
+                          className={({ isActive }) => navItemClass(isActive)}
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <span>📢</span>
+                          <span>Broadcast Notifications</span>
+                        </NavLink>
+                      </div>
+                    )}
+                  </>
                 )}
 
                 {/* Settings: numeric caps/config you set, not data you
