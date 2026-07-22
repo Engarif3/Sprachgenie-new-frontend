@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import { ScaleLoader } from "react-spinners";
 import { useAuth } from "../services/auth.services";
 import aiApi from "../AI_axios";
+import ConjugationModal from "../View/Words/WordList/ConjugationModal";
 
 const ConjugationReportsPage = () => {
   const { isAdmin, isSuperAdmin, isLoggedIn, userId } = useAuth();
@@ -16,8 +17,11 @@ const ConjugationReportsPage = () => {
   const [deletingVerb, setDeletingVerb] = useState({});
   const [expandedVerb, setExpandedVerb] = useState(null);
   const [selectedVerbs, setSelectedVerbs] = useState(new Set());
+  const [viewingVerb, setViewingVerb] = useState(null);
   // per-verb custom prompt inputs
   const [customPrompts, setCustomPrompts] = useState({});
+
+  const viewingItem = reports.find((r) => r.verb === viewingVerb) || null;
 
   const handleToggleExpand = (verb) => {
     setExpandedVerb((prev) => (prev === verb ? null : verb));
@@ -59,9 +63,9 @@ const ConjugationReportsPage = () => {
     if (canAccess) fetchReports();
   }, [canAccess]);
 
-  const handleRegenerate = async (verb) => {
+  const handleRegenerate = async (verb, promptOverride) => {
     setRegenerating((prev) => ({ ...prev, [verb]: true }));
-    const customPrompt = (customPrompts[verb] || "").trim();
+    const customPrompt = (promptOverride ?? customPrompts[verb] ?? "").trim();
     try {
       const res = await aiApi.post("/conjugations/regenerate", {
         verb,
@@ -214,12 +218,26 @@ const ConjugationReportsPage = () => {
                     </span>
                   </div>
 
-                  <button
-                    onClick={() => handleToggleExpand(item.verb)}
-                    className="text-sm text-gray-400 hover:text-white transition-colors"
-                  >
-                    {expandedVerb === item.verb ? "Hide details" : "View details"}
-                  </button>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <button
+                      onClick={() => setViewingVerb(item.verb)}
+                      disabled={!item.currentData}
+                      title={
+                        item.currentData
+                          ? "View the full conjugation table"
+                          : "Nothing cached for this verb yet"
+                      }
+                      className="text-sm px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold transition-colors"
+                    >
+                      View Content
+                    </button>
+                    <button
+                      onClick={() => handleToggleExpand(item.verb)}
+                      className="text-sm text-gray-400 hover:text-white transition-colors"
+                    >
+                      {expandedVerb === item.verb ? "Hide details" : "View details"}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Custom prompt + regenerate */}
@@ -340,6 +358,21 @@ const ConjugationReportsPage = () => {
           ))}
         </div>
       )}
+
+      <ConjugationModal
+        isOpen={!!viewingItem}
+        onClose={() => setViewingVerb(null)}
+        word={{ value: viewingItem?.verb }}
+        data={viewingItem?.currentData}
+        isLoading={false}
+        error={null}
+        userId={userId}
+        isAdmin={isAdmin}
+        alreadyReported={false}
+        onAdminRegenerate={(customPrompt) =>
+          handleRegenerate(viewingItem.verb, customPrompt)
+        }
+      />
     </div>
   );
 };
