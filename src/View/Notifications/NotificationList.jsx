@@ -98,7 +98,9 @@ const NotificationList = ({
   }
 
   return (
-    <ul className={`divide-y ${isLight ? "divide-slate-200" : "divide-slate-700"}`}>
+    <ul
+      className={`divide-y ${isLight ? "divide-slate-200" : "divide-slate-700"}`}
+    >
       {notifications.map((notification) => {
         const isExpanded = expandedId === notification.id;
         const isSelected = selectedIds?.has(notification.id);
@@ -140,7 +142,9 @@ const NotificationList = ({
                   aria-label="Unread"
                 />
               )}
-              <div className={`min-w-0 flex-1 ${notification.isRead ? "ml-4" : ""}`}>
+              <div
+                className={`min-w-0 flex-1 ${notification.isRead ? "ml-4" : ""}`}
+              >
                 <div className="flex items-baseline justify-between gap-2">
                   <p
                     className={`truncate text-sm font-semibold ${
@@ -173,7 +177,7 @@ const NotificationList = ({
                             : "text-red-400/80 hover:bg-red-500/10 hover:text-red-400"
                         }`}
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={20} />
                       </button>
                     )}
                   </span>
@@ -185,15 +189,7 @@ const NotificationList = ({
                 >
                   {notification.message}
                 </p>
-                {isLongMessage && (
-                  <button
-                    type="button"
-                    onClick={(e) => handleSeeMoreClick(e, notification)}
-                    className="mt-0.5 text-xs font-semibold text-sky-600 hover:underline dark:text-sky-400"
-                  >
-                    {isExpanded ? "See less" : "See more"}
-                  </button>
-                )}
+
                 {notification.link &&
                   (isExternalLink(notification.link) ? (
                     <a
@@ -212,13 +208,25 @@ const NotificationList = ({
                       Discover now <ChevronRight size={14} />
                     </Link>
                   ))}
-                {!compact && (
-                  <p
-                    className={`mt-2 text-xs ${isLight ? "text-slate-400" : "text-slate-500"}`}
-                  >
-                    — Admin
-                  </p>
-                )}
+
+                <div className="flex justify-between ">
+                  {!compact && (
+                    <p
+                      className={`mt-2 text-xs ${isLight ? "text-slate-400" : "text-slate-500"}`}
+                    >
+                      — Admin
+                    </p>
+                  )}
+                  {isLongMessage && (
+                    <button
+                      type="button"
+                      onClick={(e) => handleSeeMoreClick(e, notification)}
+                      className="mt-2 text-xs font-semibold text-sky-600 hover:underline dark:text-sky-400"
+                    >
+                      {isExpanded ? "See less" : "See more"}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </li>
