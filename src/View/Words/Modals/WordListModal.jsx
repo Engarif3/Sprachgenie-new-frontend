@@ -14,6 +14,7 @@ import { SiGoogletranslate } from "react-icons/si";
 import { FaSpinner } from "react-icons/fa";
 import { IoInformationCircleOutline } from "react-icons/io5";
 import { highlightPrefixInSentence } from "../../../utils/sentencePrefixHighlighter.jsx";
+import WordReportSection from "./WordReportSection";
 
 // Helper function to capitalize first letter
 const capitalizeFirstLetter = (str) => {
@@ -133,7 +134,15 @@ const getWordInfo = (word) => {
 
 // Memoized sentence renderer component
 const SentenceRenderer = memo(
-  ({ sentence, word, onTranslate, translation, isLoading, userLoggedIn }) => {
+  ({
+    sentence,
+    word,
+    onTranslate,
+    translation,
+    isLoading,
+    userLoggedIn,
+    isFlagged,
+  }) => {
     const trimmed = sentence.trim();
     let className = "text-slate-300 text-sm md:text-base lg:text-lg";
     let cleanSentence = sentence;
@@ -184,7 +193,13 @@ const SentenceRenderer = memo(
       : cleanSentence;
 
     return (
-      <div>
+      <div
+        className={
+          isFlagged
+            ? "rounded-lg border border-red-500/60 bg-red-500/10 p-2"
+            : undefined
+        }
+      >
         <div className="text-gray-600 flex items-start gap-2">
           {showSpeakerButton && (
             <span className="flex items-start flex-shrink-0">
@@ -255,6 +270,9 @@ const WordListModal = ({
   favorites = [],
   toggleFavorite,
   loadingFavorites = {},
+  // Sentence indexes to highlight red — only ever set by the superadmin
+  // Word Reports dashboard, so it can show which sentence(s) were flagged.
+  flaggedSentenceIndexes = [],
 }) => {
   const modalRef = useRef(null);
 
@@ -599,6 +617,7 @@ const WordListModal = ({
                     translation={translations[sentence]}
                     isLoading={loadingTranslations[sentence]}
                     userLoggedIn={userLoggedIn}
+                    isFlagged={flaggedSentenceIndexes.includes(index)}
                   />
                 ))}
               </ul>
@@ -609,6 +628,13 @@ const WordListModal = ({
             )}
           </div>
         </div>
+
+        {userLoggedIn && (
+          <WordReportSection
+            wordId={selectedWord.id}
+            sentences={selectedWord.sentences}
+          />
+        )}
 
         <div className="sticky bottom-0 right-2 flex justify-end pr-2 pb-3 mt-6">
           <button

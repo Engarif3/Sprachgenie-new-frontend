@@ -8,7 +8,7 @@ import { useAuth } from "../services/auth.services";
 import AIModal from "../View/Words/Modals/AIModal";
 
 const ReportsByUsers = () => {
-  const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
+  const { isAdmin, isSuperAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
   const canAccess = userLoggedIn && userId && isAdmin;
   const [reports, setReports] = useState([]);
   const [users, setUsers] = useState({});
@@ -20,6 +20,30 @@ const ReportsByUsers = () => {
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const [aiWord, setAiWord] = useState(null);
   const [selectedParagraph, setSelectedParagraph] = useState("");
+  const [selectedReportIds, setSelectedReportIds] = useState(new Set());
+
+  const allReportIds = reports.flatMap((r) =>
+    (r.reports || []).map((rep) => rep.id),
+  );
+  const allReportsSelected =
+    allReportIds.length > 0 &&
+    allReportIds.every((id) => selectedReportIds.has(id));
+
+  const handleToggleSelectReport = (reportId) => {
+    setSelectedReportIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(reportId)) {
+        next.delete(reportId);
+      } else {
+        next.add(reportId);
+      }
+      return next;
+    });
+  };
+
+  const handleToggleSelectAllReports = () => {
+    setSelectedReportIds(allReportsSelected ? new Set() : new Set(allReportIds));
+  };
 
   const fetchUsersByIds = async (userIds) => {
     const uniqueIds = [...new Set((userIds || []).filter(Boolean))];
@@ -274,6 +298,66 @@ const ReportsByUsers = () => {
     }
   };
 
+  const handleDeleteSelectedReports = async () => {
+    if (selectedReportIds.size === 0) return;
+
+    try {
+      const result = await Swal.fire({
+        title: `Delete ${selectedReportIds.size} Selected Report(s)?`,
+        text: "This action cannot be undone.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete selected!",
+        cancelButtonText: "Cancel",
+      });
+
+      if (!result.isConfirmed) return;
+
+      Swal.fire({
+        title: "Deleting...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      await aiApi.delete("/paragraphs/admin/bulk", {
+        data: { reportIds: [...selectedReportIds] },
+      });
+
+      setReports((prev) =>
+        prev
+          .map((r) => {
+            const filteredReports = (r.reports || []).filter(
+              (rep) => !selectedReportIds.has(rep.id),
+            );
+            return {
+              ...r,
+              reports: filteredReports,
+              reportCount: filteredReports.length,
+            };
+          })
+          .filter((r) => r.reports.length > 0),
+      );
+      setSelectedReportIds(new Set());
+
+      Swal.close();
+      Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: "Selected reports have been deleted successfully.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error("Error deleting selected reports:", err);
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: "Failed to delete selected reports. Try again.",
+      });
+    }
+  };
+
   // loading state
   if (loading)
     return (
@@ -310,21 +394,32 @@ const ReportsByUsers = () => {
         Reports By Users
       </h2>
 
-      <div className="flex justify-center gap-4 mb-4 ">
-        <button
-          onClick={handleDeleteAllReports}
-          className="btn btn-sm bg-red-600 text-white hover:bg-red-700"
-        >
-          Delete All Reports
-        </button>
+      {isSuperAdmin && (
+        <div className="flex justify-center gap-4 mb-4 flex-wrap">
+          <button
+            onClick={handleDeleteAllReports}
+            className="btn btn-sm bg-red-600 text-white hover:bg-red-700"
+          >
+            Delete All Reports
+          </button>
 
-        <button
-          onClick={handleDeleteAllRegeneratedReports}
-          className="btn btn-sm bg-orange-500 text-white hover:bg-orange-600"
-        >
-          Delete All Regenerated Reports
-        </button>
-      </div>
+          <button
+            onClick={handleDeleteAllRegeneratedReports}
+            className="btn btn-sm bg-orange-500 text-white hover:bg-orange-600"
+          >
+            Delete All Regenerated Reports
+          </button>
+
+          {selectedReportIds.size > 0 && (
+            <button
+              onClick={handleDeleteSelectedReports}
+              className="btn btn-sm bg-rose-700 text-white hover:bg-rose-800"
+            >
+              Delete Selected ({selectedReportIds.size})
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="overflow-x-auto mt-12 bg-white">
         {/* Table */}
@@ -333,7 +428,20 @@ const ReportsByUsers = () => {
             <tr>
               <th className="px-4 py-2 border">Word</th>
               <th className="px-4 py-2 border">Total Reports</th>
-              <th className="px-4 py-2 border">Reported By</th>
+              <th className="px-4 py-2 border">
+                {isSuperAdmin ? (
+                  <label className="flex items-center gap-2 justify-center">
+                    <input
+                      type="checkbox"
+                      checked={allReportsSelected}
+                      onChange={handleToggleSelectAllReports}
+                    />
+                    <span>Reported By</span>
+                  </label>
+                ) : (
+                  "Reported By"
+                )}
+              </th>
               <th className="px-4 py-2 border">Message</th>
             </tr>
           </thead>
@@ -370,11 +478,21 @@ const ReportsByUsers = () => {
                 <td className="px-4 py-2 border">{r.reportCount}</td>
                 <td className="px-4 py-2 border">
                   {r.reports.map((rep, i) => (
-                    <div key={i} className="mt-2">
-                      {getUserInfo(rep.userId)}
-                      {i < r.reports.length - 1 && (
-                        <hr className="border-gray-300 my-1" />
+                    <div key={i} className="mt-2 flex items-start gap-2">
+                      {isSuperAdmin && (
+                        <input
+                          type="checkbox"
+                          className="mt-1"
+                          checked={selectedReportIds.has(rep.id)}
+                          onChange={() => handleToggleSelectReport(rep.id)}
+                        />
                       )}
+                      <div className="flex-1">
+                        {getUserInfo(rep.userId)}
+                        {i < r.reports.length - 1 && (
+                          <hr className="border-gray-300 my-1" />
+                        )}
+                      </div>
                     </div>
                   ))}
                 </td>

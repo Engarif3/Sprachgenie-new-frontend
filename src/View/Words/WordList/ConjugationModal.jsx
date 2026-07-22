@@ -333,9 +333,9 @@ const ConjugationModal = ({
                 </button>
               )}
 
-              {/* Regular users: report button */}
+              {/* Report button: shown to any logged-in user, including admins
+                  (admins additionally see Regenerate above) */}
               {userId &&
-                !isAdmin &&
                 !reportOpen &&
                 (reportDone ? (
                   <span className="text-xs text-green-500">✓ Reported</span>

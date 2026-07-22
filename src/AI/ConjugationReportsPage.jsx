@@ -1,20 +1,46 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { toast } from "sonner";
+import Swal from "sweetalert2";
 import { ScaleLoader } from "react-spinners";
 import { useAuth } from "../services/auth.services";
 import aiApi from "../AI_axios";
 
 const ConjugationReportsPage = () => {
-  const { isAdmin, isLoggedIn, userId } = useAuth();
+  const { isAdmin, isSuperAdmin, isLoggedIn, userId } = useAuth();
   const canAccess = isLoggedIn && userId && isAdmin;
 
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [regenerating, setRegenerating] = useState({});
+  const [deletingVerb, setDeletingVerb] = useState({});
   const [expandedVerb, setExpandedVerb] = useState(null);
+  const [selectedReportIds, setSelectedReportIds] = useState(new Set());
   // per-verb custom prompt inputs
   const [customPrompts, setCustomPrompts] = useState({});
+
+  const handleToggleExpand = (verb) => {
+    setExpandedVerb((prev) => (prev === verb ? null : verb));
+    setSelectedReportIds(new Set());
+  };
+
+  const handleToggleSelectReport = (reportId) => {
+    setSelectedReportIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(reportId)) {
+        next.delete(reportId);
+      } else {
+        next.add(reportId);
+      }
+      return next;
+    });
+  };
+
+  const handleToggleSelectAllForVerb = (verbReports) => {
+    const ids = verbReports.map((r) => r.id);
+    const allSelected = ids.length > 0 && ids.every((id) => selectedReportIds.has(id));
+    setSelectedReportIds(allSelected ? new Set() : new Set(ids));
+  };
 
   const fetchReports = async () => {
     try {
@@ -58,6 +84,65 @@ const ConjugationReportsPage = () => {
     }
   };
 
+  const handleDeleteSelectedReports = async (verb) => {
+    if (selectedReportIds.size === 0) return;
+
+    const result = await Swal.fire({
+      title: `Delete ${selectedReportIds.size} Selected Report(s)?`,
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete selected!",
+      cancelButtonText: "Cancel",
+    });
+    if (!result.isConfirmed) return;
+
+    try {
+      await aiApi.delete("/conjugations/admin/bulk", {
+        data: { reportIds: [...selectedReportIds] },
+      });
+      setReports((prev) =>
+        prev.map((r) => {
+          if (r.verb !== verb) return r;
+          const filteredReports = r.reports.filter(
+            (rep) => !selectedReportIds.has(rep.id),
+          );
+          return { ...r, reports: filteredReports, reportCount: filteredReports.length };
+        }),
+      );
+      setSelectedReportIds(new Set());
+      toast.success("Selected reports deleted.");
+    } catch {
+      toast.error("Failed to delete selected reports. Please try again.");
+    }
+  };
+
+  const handleDeleteAllReportsForVerb = async (verb) => {
+    const result = await Swal.fire({
+      title: `Delete All Reports for "${verb}"?`,
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete all!",
+      cancelButtonText: "Cancel",
+    });
+    if (!result.isConfirmed) return;
+
+    setDeletingVerb((prev) => ({ ...prev, [verb]: true }));
+    try {
+      await aiApi.delete(`/conjugations/admin/verb/${verb}/all`);
+      setReports((prev) =>
+        prev.map((r) => (r.verb === verb ? { ...r, reports: [], reportCount: 0 } : r)),
+      );
+      setSelectedReportIds(new Set());
+      toast.success(`All reports for "${verb}" deleted.`);
+    } catch {
+      toast.error(`Failed to delete reports for "${verb}". Please try again.`);
+    } finally {
+      setDeletingVerb((prev) => ({ ...prev, [verb]: false }));
+    }
+  };
+
   if (!canAccess) return <Navigate to="/" replace />;
 
   return (
@@ -96,9 +181,7 @@ const ConjugationReportsPage = () => {
                   </div>
 
                   <button
-                    onClick={() =>
-                      setExpandedVerb(expandedVerb === item.verb ? null : item.verb)
-                    }
+                    onClick={() => handleToggleExpand(item.verb)}
                     className="text-sm text-gray-400 hover:text-white transition-colors"
                   >
                     {expandedVerb === item.verb ? "Hide details" : "View details"}
@@ -182,15 +265,55 @@ const ConjugationReportsPage = () => {
 
                   {/* User reports */}
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-2">
-                      User reports
-                    </p>
+                    <div className="flex items-center justify-between gap-4 mb-2">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">
+                        User reports
+                      </p>
+                      {isSuperAdmin && item.reports.length > 0 && (
+                        <div className="flex items-center gap-3">
+                          <label className="flex items-center gap-1.5 text-xs text-gray-400">
+                            <input
+                              type="checkbox"
+                              checked={
+                                item.reports.length > 0 &&
+                                item.reports.every((r) => selectedReportIds.has(r.id))
+                              }
+                              onChange={() => handleToggleSelectAllForVerb(item.reports)}
+                            />
+                            Select all
+                          </label>
+                          {selectedReportIds.size > 0 && (
+                            <button
+                              onClick={() => handleDeleteSelectedReports(item.verb)}
+                              className="text-xs px-2 py-1 rounded-md bg-rose-700 hover:bg-rose-800 text-white font-semibold transition-colors"
+                            >
+                              Delete Selected ({selectedReportIds.size})
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleDeleteAllReportsForVerb(item.verb)}
+                            disabled={!!deletingVerb[item.verb]}
+                            className="text-xs px-2 py-1 rounded-md bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-semibold transition-colors"
+                          >
+                            {deletingVerb[item.verb] ? "Deleting…" : "Delete All"}
+                          </button>
+                        </div>
+                      )}
+                    </div>
                     <div className="space-y-2">
                       {item.reports.map((r) => (
                         <div
                           key={r.id}
                           className="flex items-start gap-3 rounded-lg bg-gray-900/40 px-3 py-2 text-sm"
                         >
+                          {isSuperAdmin && (
+                            <input
+                              type="checkbox"
+                              className="mt-0.5"
+                              checked={selectedReportIds.has(r.id)}
+                              onChange={() => handleToggleSelectReport(r.id)}
+                            />
+                          )}
                           <span className="text-gray-500 text-xs mt-0.5 shrink-0">
                             {new Date(r.createdAt).toLocaleDateString()}
                           </span>

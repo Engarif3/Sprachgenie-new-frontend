@@ -35,6 +35,7 @@ const DashboardLayout = () => {
   const [expandedSections, setExpandedSections] = useState({
     admin: false,
     content: false,
+    reports: false,
     settings: false,
     analytics: false,
     monitoring: false,
@@ -338,6 +339,57 @@ const DashboardLayout = () => {
                   </div>
                 )}
 
+                {/* Reports: all user-submitted content reports live here,
+                    top-level and separate from Content/Analytics. */}
+                <div
+                  onClick={() => toggleSection("reports")}
+                  className={sectionHeaderClass}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <span className="flex items-center gap-2">
+                    <span>🚩</span>
+                    <span>Reports</span>
+                  </span>
+                  <span
+                    className={`text-sm transition-transform duration-300 ${
+                      expandedSections.reports ? "rotate-180" : ""
+                    }`}
+                  >
+                    ▼
+                  </span>
+                </div>
+                {expandedSections.reports && (
+                  <div className="ml-3 space-y-1 border-l border-slate-200 py-2 pl-4 animate-in fade-in slide-in-from-top-2 duration-200 dark:border-slate-700/60">
+                    {role === "super_admin" && (
+                      <NavLink
+                        to="/dashboard/word-reports"
+                        className={({ isActive }) => navItemClass(isActive)}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <span>🚩</span>
+                        <span>Word Reports</span>
+                      </NavLink>
+                    )}
+                    <NavLink
+                      to="/dashboard/get-reports"
+                      className={({ isActive }) => navItemClass(isActive)}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>📋</span>
+                      <span>AI Paragraph Reports</span>
+                    </NavLink>
+                    <NavLink
+                      to="/dashboard/conjugation-reports"
+                      className={({ isActive }) => navItemClass(isActive)}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>🔤</span>
+                      <span>Conjugation Reports</span>
+                    </NavLink>
+                  </div>
+                )}
+
                 {/* Settings: numeric caps/config you set, not data you
                     view — separated from Analytics below. */}
                 <div
@@ -425,22 +477,6 @@ const DashboardLayout = () => {
                     >
                       <span>🤖</span>
                       <span>AI Usage</span>
-                    </NavLink>
-                    <NavLink
-                      to="/dashboard/get-reports"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>📋</span>
-                      <span>Reports</span>
-                    </NavLink>
-                    <NavLink
-                      to="/dashboard/conjugation-reports"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>🔤</span>
-                      <span>Conj. Reports</span>
                     </NavLink>
                   </div>
                 )}
