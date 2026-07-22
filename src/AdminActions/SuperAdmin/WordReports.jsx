@@ -28,7 +28,7 @@ const WordReports = () => {
 
   // Settings
   const [freeTextEnabled, setFreeTextEnabled] = useState(true);
-  const [maxWordsInput, setMaxWordsInput] = useState("50");
+  const [maxCharactersInput, setMaxCharactersInput] = useState("50");
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
 
@@ -79,7 +79,7 @@ const WordReports = () => {
       const response = await api.get("/word-reports/settings");
       const data = response.data?.data;
       setFreeTextEnabled(data?.freeTextEnabled ?? true);
-      setMaxWordsInput(String(data?.maxWords ?? 50));
+      setMaxCharactersInput(String(data?.maxCharacters ?? 50));
     } catch (err) {
       console.error("Error fetching word report settings:", err);
     } finally {
@@ -170,15 +170,15 @@ const WordReports = () => {
   // ---- Settings ----
 
   const handleSaveSettings = async () => {
-    const maxWords = parseInt(maxWordsInput, 10);
-    if (!Number.isInteger(maxWords) || maxWords < 1) {
-      showError("Max words must be a whole number (1 or more)");
+    const maxCharacters = parseInt(maxCharactersInput, 10);
+    if (!Number.isInteger(maxCharacters) || maxCharacters < 1) {
+      showError("Max characters must be a whole number (1 or more)");
       return;
     }
 
     setSavingSettings(true);
     try {
-      await api.patch("/word-reports/settings", { freeTextEnabled, maxWords });
+      await api.patch("/word-reports/settings", { freeTextEnabled, maxCharacters });
       showSuccess("Settings saved!");
     } catch (err) {
       console.error("Error saving settings:", err);
@@ -469,17 +469,17 @@ const WordReports = () => {
               </label>
               <div className="mb-4 max-w-xs">
                 <label
-                  htmlFor="max-words-input"
+                  htmlFor="max-characters-input"
                   className="block text-white font-semibold mb-2 text-sm"
                 >
-                  Max words in note
+                  Max characters in note
                 </label>
                 <input
-                  id="max-words-input"
+                  id="max-characters-input"
                   type="number"
                   min="1"
-                  value={maxWordsInput}
-                  onChange={(e) => setMaxWordsInput(e.target.value)}
+                  value={maxCharactersInput}
+                  onChange={(e) => setMaxCharactersInput(e.target.value)}
                   disabled={!freeTextEnabled}
                   className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-orange-500 disabled:opacity-50"
                 />

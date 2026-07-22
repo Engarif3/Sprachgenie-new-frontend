@@ -31,7 +31,7 @@ const ReportsByUsers = () => {
 
   // Note field settings
   const [freeTextEnabled, setFreeTextEnabled] = useState(true);
-  const [maxWordsInput, setMaxWordsInput] = useState("50");
+  const [maxCharactersInput, setMaxCharactersInput] = useState("50");
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
 
@@ -99,7 +99,7 @@ const ReportsByUsers = () => {
       const response = await aiApi.get("/paragraphs/report-settings");
       const data = response.data?.data;
       setFreeTextEnabled(data?.freeTextEnabled ?? true);
-      setMaxWordsInput(String(data?.maxWords ?? 50));
+      setMaxCharactersInput(String(data?.maxCharacters ?? 50));
     } catch (err) {
       console.error("Error fetching report settings:", err);
     } finally {
@@ -193,14 +193,21 @@ const ReportsByUsers = () => {
   };
 
   const handleSaveSettings = async () => {
-    const maxWords = parseInt(maxWordsInput, 10);
-    if (!Number.isInteger(maxWords) || maxWords < 1) {
-      Swal.fire("Error", "Max words must be a whole number (1 or more)", "error");
+    const maxCharacters = parseInt(maxCharactersInput, 10);
+    if (!Number.isInteger(maxCharacters) || maxCharacters < 1) {
+      Swal.fire("Error", "Max characters must be a whole number (1 or more)", "error");
       return;
     }
     setSavingSettings(true);
     try {
-      await aiApi.patch("/paragraphs/report-settings", { freeTextEnabled, maxWords });
+      await aiApi.patch("/paragraphs/report-settings", { freeTextEnabled, maxCharacters });
+      Swal.fire({
+        icon: "success",
+        title: "Saved!",
+        text: "Settings saved successfully.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (err) {
       console.error("Error saving settings:", err);
       Swal.fire("Error", err.response?.data?.message || "Failed to save settings", "error");
@@ -592,17 +599,17 @@ const ReportsByUsers = () => {
                 </label>
                 <div className="mb-4 max-w-xs">
                   <label
-                    htmlFor="paragraph-max-words-input"
+                    htmlFor="paragraph-max-characters-input"
                     className="block text-white font-semibold mb-2 text-sm"
                   >
-                    Max words in note
+                    Max characters in note
                   </label>
                   <input
-                    id="paragraph-max-words-input"
+                    id="paragraph-max-characters-input"
                     type="number"
                     min="1"
-                    value={maxWordsInput}
-                    onChange={(e) => setMaxWordsInput(e.target.value)}
+                    value={maxCharactersInput}
+                    onChange={(e) => setMaxCharactersInput(e.target.value)}
                     disabled={!freeTextEnabled}
                     className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-cyan-500 disabled:opacity-50"
                   />

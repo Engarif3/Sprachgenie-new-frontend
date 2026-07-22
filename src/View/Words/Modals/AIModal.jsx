@@ -5,7 +5,6 @@ import { useLockBodyScroll } from "./ModalScrolling";
 import aiApi from "../../../AI_axios";
 import api from "../../../axios";
 import { useAuth } from "../../../services/auth.services";
-import { countWords } from "../../../utils/countWords";
 
 const splitItems = (value, separators) =>
   String(value || "")
@@ -43,7 +42,7 @@ const AIModal = ({
   const [reportReasons, setReportReasons] = useState([]);
   const [selectedReasonIds, setSelectedReasonIds] = useState(new Set());
   const [reportFreeTextEnabled, setReportFreeTextEnabled] = useState(true);
-  const [reportMaxWords, setReportMaxWords] = useState(50);
+  const [reportMaxCharacters, setReportMaxCharacters] = useState(50);
   const [reportValidationError, setReportValidationError] = useState("");
   const [currentWordData, setCurrentWordData] = useState(aiWord);
   const [currentParagraph, setCurrentParagraph] = useState(selectedParagraph);
@@ -65,6 +64,8 @@ const AIModal = ({
     setCurrentParagraph(selectedParagraph || "");
     setReportMessage("");
     setIsReportOpen(false);
+    setSelectedReasonIds(new Set());
+    setReportValidationError("");
 
     const nextMeanings =
       Array.isArray(aiWord?.aiMeanings) && aiWord.aiMeanings.length
@@ -189,7 +190,12 @@ const AIModal = ({
     }
   };
 
-  const handleOpenReport = async () => {
+  const handleToggleReport = async () => {
+    if (isReportOpen) {
+      setIsReportOpen(false);
+      return;
+    }
+
     setIsReportOpen(true);
     setReportValidationError("");
     setReportOptionsLoading(true);
@@ -200,7 +206,7 @@ const AIModal = ({
       ]);
       setReportReasons(reasonsRes.data?.data || []);
       setReportFreeTextEnabled(settingsRes.data?.data?.freeTextEnabled ?? true);
-      setReportMaxWords(settingsRes.data?.data?.maxWords ?? 50);
+      setReportMaxCharacters(settingsRes.data?.data?.maxCharacters ?? 50);
     } catch (error) {
       console.error("Error loading report options:", error);
       setReportValidationError("Could not load report options. Please try again.");
@@ -222,9 +228,9 @@ const AIModal = ({
   };
 
   const showReportNoteField = reportFreeTextEnabled;
-  const reportMessageWordCount = countWords(reportMessage || "");
+  const reportMessageCharCount = (reportMessage || "").trim().length;
   const reportMessageTooLong =
-    showReportNoteField && reportMessageWordCount > reportMaxWords;
+    showReportNoteField && reportMessageCharCount > reportMaxCharacters;
 
   const handleReportSubmit = async () => {
     if (!activeWord?.id) {
@@ -232,12 +238,13 @@ const AIModal = ({
     }
 
     setReportValidationError("");
-    if (selectedReasonIds.size === 0) {
-      setReportValidationError("Select at least one reason.");
+    const hasMessage = showReportNoteField && reportMessage.trim().length > 0;
+    if (selectedReasonIds.size === 0 && !hasMessage) {
+      setReportValidationError("Select at least one reason or add a note.");
       return;
     }
     if (reportMessageTooLong) {
-      setReportValidationError(`Your note must be ${reportMaxWords} words or fewer.`);
+      setReportValidationError(`Your note must be ${reportMaxCharacters} characters or fewer.`);
       return;
     }
 
@@ -554,12 +561,94 @@ const AIModal = ({
             </div>
           )}
 
+          {isReportOpen && (
+            <div className="mt-6 rounded-2xl border border-red-500/30 bg-red-950/10 p-4 md:p-6">
+              <h3 className="text-lg font-semibold text-red-300 mb-3">
+                🚨 Report an Issue
+              </h3>
+
+              {reportOptionsLoading ? (
+                <p className="text-gray-400 text-sm">Loading...</p>
+              ) : (
+                <>
+                  <p className="text-gray-300 text-sm font-semibold mb-2">
+                    What's wrong?
+                  </p>
+                  <div className="space-y-2 mb-4">
+                    {reportReasons.map((reason) => (
+                      <label
+                        key={reason.id}
+                        className="flex items-start gap-2 text-sm text-gray-300 cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedReasonIds.has(reason.id)}
+                          onChange={() => handleToggleReportReason(reason.id)}
+                          className="mt-0.5 h-4 w-4 accent-red-500"
+                        />
+                        {reason.label}
+                      </label>
+                    ))}
+                    {reportReasons.length === 0 && (
+                      <p className="text-gray-500 text-sm italic">
+                        No report reasons configured yet.
+                      </p>
+                    )}
+                  </div>
+
+                  {showReportNoteField && (
+                    <>
+                      <textarea
+                        value={reportMessage}
+                        onChange={(e) => setReportMessage(e.target.value)}
+                        className={`w-full rounded-lg bg-gray-900 border text-sm text-white px-3 py-2 placeholder-gray-500 focus:outline-none resize-none ${
+                          reportMessageTooLong
+                            ? "border-red-400 focus:border-red-400"
+                            : "border-gray-600 focus:border-red-400"
+                        }`}
+                        rows={3}
+                        placeholder="Anything else? (optional)"
+                      />
+                      <p
+                        className={`mt-1 text-xs ${reportMessageTooLong ? "text-red-400" : "text-gray-500"}`}
+                      >
+                        {reportMessageCharCount}/{reportMaxCharacters} characters
+                      </p>
+                    </>
+                  )}
+
+                  {reportValidationError && (
+                    <p className="mt-3 text-sm text-red-400">
+                      {reportValidationError}
+                    </p>
+                  )}
+                </>
+              )}
+
+              <div className="mt-4 flex gap-3">
+                <button
+                  onClick={handleReportSubmit}
+                  disabled={reportLoading || reportOptionsLoading}
+                  className="px-4 py-1.5 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors"
+                >
+                  {reportLoading ? "Submitting…" : "Submit report"}
+                </button>
+                <button
+                  onClick={() => setIsReportOpen(false)}
+                  className="px-4 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="mt-8 flex justify-between gap-4">
             <button
-              onClick={handleOpenReport}
+              onClick={handleToggleReport}
               className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 px-6 py-3 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/50"
             >
-              🚨 Report Issue
+              {isReportOpen ? "✕ Hide Report Form" : "🚨 Report Issue"}
             </button>
 
             <button
@@ -659,93 +748,6 @@ const AIModal = ({
         </div>
       )}
 
-      {/* Report Modal */}
-      {isReportOpen && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-gradient-to-br from-gray-50 via-white to-gray-100 rounded-3xl shadow-2xl p-8 w-full md:w-1/3 mx-4 border-2 border-gray-200/50">
-            <h2 className="text-2xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-pink-500">
-              🚨 Report Issue
-            </h2>
-
-            {reportOptionsLoading ? (
-              <p className="text-gray-600 text-sm text-center py-4">Loading...</p>
-            ) : (
-              <>
-                <p className="text-gray-700 text-sm font-semibold mb-2">
-                  What's wrong?
-                </p>
-                <div className="space-y-2 mb-4">
-                  {reportReasons.map((reason) => (
-                    <label
-                      key={reason.id}
-                      className="flex items-start gap-2 text-sm text-gray-700 cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedReasonIds.has(reason.id)}
-                        onChange={() => handleToggleReportReason(reason.id)}
-                        className="mt-0.5 h-4 w-4 accent-red-500"
-                      />
-                      {reason.label}
-                    </label>
-                  ))}
-                  {reportReasons.length === 0 && (
-                    <p className="text-gray-500 text-sm italic">
-                      No report reasons configured yet.
-                    </p>
-                  )}
-                </div>
-
-                {showReportNoteField && (
-                  <>
-                    <p className="text-gray-700 text-sm mb-2 bg-yellow-100 border border-yellow-300 rounded-xl p-3">
-                      💡 Anything else? (optional)
-                    </p>
-                    <textarea
-                      value={reportMessage}
-                      onChange={(e) => setReportMessage(e.target.value)}
-                      className={`w-full border-2 focus:ring-2 rounded-xl p-4 text-sm bg-white/50 backdrop-blur-sm transition-all ${
-                        reportMessageTooLong
-                          ? "border-red-400 focus:border-red-500 focus:ring-red-500/50"
-                          : "border-gray-300 focus:border-blue-500 focus:ring-blue-500/50"
-                      }`}
-                      rows={4}
-                      placeholder="Describe the problem here..."
-                    />
-                    <p
-                      className={`mt-1 text-xs ${reportMessageTooLong ? "text-red-500" : "text-gray-500"}`}
-                    >
-                      {reportMessageWordCount}/{reportMaxWords} words
-                    </p>
-                  </>
-                )}
-
-                {reportValidationError && (
-                  <p className="mt-3 text-sm text-red-600 font-medium">
-                    {reportValidationError}
-                  </p>
-                )}
-              </>
-            )}
-
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                onClick={() => setIsReportOpen(false)}
-                className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-md"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleReportSubmit}
-                disabled={reportLoading || reportOptionsLoading}
-                className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 disabled:from-gray-400 disabled:to-gray-500 px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/50 disabled:cursor-not-allowed disabled:hover:scale-100"
-              >
-                {reportLoading ? "⏳ Submitting..." : "✓ Submit Report"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 };

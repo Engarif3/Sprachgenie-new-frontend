@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import aiApi from "../../../AI_axios";
 import { useLockBodyScroll } from "../Modals/ModalScrolling";
-import { countWords } from "../../../utils/countWords";
 
 const TENSE_LABELS = {
   präsens: "Präsens",
@@ -107,7 +106,7 @@ const ConjugationModal = ({
   const [reportReasons, setReportReasons] = useState([]);
   const [selectedReasonIds, setSelectedReasonIds] = useState(new Set());
   const [reportFreeTextEnabled, setReportFreeTextEnabled] = useState(true);
-  const [reportMaxWords, setReportMaxWords] = useState(50);
+  const [reportMaxCharacters, setReportMaxCharacters] = useState(50);
 
   // Sync external "already reported" flag when modal re-opens for a new verb
   useEffect(() => {
@@ -143,7 +142,7 @@ const ConjugationModal = ({
       ]);
       setReportReasons(reasonsRes.data?.data || []);
       setReportFreeTextEnabled(settingsRes.data?.data?.freeTextEnabled ?? true);
-      setReportMaxWords(settingsRes.data?.data?.maxWords ?? 50);
+      setReportMaxCharacters(settingsRes.data?.data?.maxCharacters ?? 50);
     } catch (err) {
       console.error("Error loading report options:", err);
       setReportError("Could not load report options. Please try again.");
@@ -165,18 +164,19 @@ const ConjugationModal = ({
   };
 
   const showReportNoteField = reportFreeTextEnabled;
-  const reportMessageWordCount = countWords(reportMessage || "");
+  const reportMessageCharCount = (reportMessage || "").trim().length;
   const reportMessageTooLong =
-    showReportNoteField && reportMessageWordCount > reportMaxWords;
+    showReportNoteField && reportMessageCharCount > reportMaxCharacters;
 
   const submitReport = async () => {
     setReportError("");
-    if (selectedReasonIds.size === 0) {
-      setReportError("Select at least one reason.");
+    const hasMessage = showReportNoteField && reportMessage.trim().length > 0;
+    if (selectedReasonIds.size === 0 && !hasMessage) {
+      setReportError("Select at least one reason or add a note.");
       return;
     }
     if (reportMessageTooLong) {
-      setReportError(`Your note must be ${reportMaxWords} words or fewer.`);
+      setReportError(`Your note must be ${reportMaxCharacters} characters or fewer.`);
       return;
     }
 
@@ -379,7 +379,7 @@ const ConjugationModal = ({
                           <p
                             className={`text-xs ${reportMessageTooLong ? "text-red-400" : "text-gray-500"}`}
                           >
-                            {reportMessageWordCount}/{reportMaxWords} words
+                            {reportMessageCharCount}/{reportMaxCharacters} characters
                           </p>
                         </>
                       )}

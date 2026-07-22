@@ -30,7 +30,7 @@ const ConjugationReportsPage = () => {
 
   // Note field settings
   const [freeTextEnabled, setFreeTextEnabled] = useState(true);
-  const [maxWordsInput, setMaxWordsInput] = useState("50");
+  const [maxCharactersInput, setMaxCharactersInput] = useState("50");
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
 
@@ -90,7 +90,7 @@ const ConjugationReportsPage = () => {
       const res = await aiApi.get("/conjugations/report-settings");
       const data = res.data?.data;
       setFreeTextEnabled(data?.freeTextEnabled ?? true);
-      setMaxWordsInput(String(data?.maxWords ?? 50));
+      setMaxCharactersInput(String(data?.maxCharacters ?? 50));
     } catch {
       toast.error("Failed to load report settings.");
     } finally {
@@ -160,14 +160,14 @@ const ConjugationReportsPage = () => {
   };
 
   const handleSaveSettings = async () => {
-    const maxWords = parseInt(maxWordsInput, 10);
-    if (!Number.isInteger(maxWords) || maxWords < 1) {
-      toast.error("Max words must be a whole number (1 or more)");
+    const maxCharacters = parseInt(maxCharactersInput, 10);
+    if (!Number.isInteger(maxCharacters) || maxCharacters < 1) {
+      toast.error("Max characters must be a whole number (1 or more)");
       return;
     }
     setSavingSettings(true);
     try {
-      await aiApi.patch("/conjugations/report-settings", { freeTextEnabled, maxWords });
+      await aiApi.patch("/conjugations/report-settings", { freeTextEnabled, maxCharacters });
       toast.success("Settings saved.");
     } catch {
       toast.error("Failed to save settings.");
@@ -375,17 +375,17 @@ const ConjugationReportsPage = () => {
               </label>
               <div className="mb-4 max-w-xs">
                 <label
-                  htmlFor="conjugation-max-words-input"
+                  htmlFor="conjugation-max-characters-input"
                   className="block text-white font-semibold mb-2 text-sm"
                 >
-                  Max words in note
+                  Max characters in note
                 </label>
                 <input
-                  id="conjugation-max-words-input"
+                  id="conjugation-max-characters-input"
                   type="number"
                   min="1"
-                  value={maxWordsInput}
-                  onChange={(e) => setMaxWordsInput(e.target.value)}
+                  value={maxCharactersInput}
+                  onChange={(e) => setMaxCharactersInput(e.target.value)}
                   disabled={!freeTextEnabled}
                   className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-violet-500 disabled:opacity-50"
                 />
