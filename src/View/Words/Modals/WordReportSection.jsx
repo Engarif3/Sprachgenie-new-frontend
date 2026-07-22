@@ -1,6 +1,5 @@
 import { useState } from "react";
 import api from "../../../axios";
-import { countWords } from "../../../utils/countWords";
 
 // A word's `sentences` array mixes real example sentences with "##"/"**"
 // prefixed section headers/notes (see SentenceRenderer in WordListModal) —
@@ -25,7 +24,7 @@ const WordReportSection = ({ wordId, sentences }) => {
   const [alreadyReported, setAlreadyReported] = useState(false);
   const [reasons, setReasons] = useState([]);
   const [freeTextEnabled, setFreeTextEnabled] = useState(true);
-  const [maxWords, setMaxWords] = useState(50);
+  const [maxCharacters, setMaxCharacters] = useState(50);
 
   const [selectedReasonIds, setSelectedReasonIds] = useState(new Set());
   const [selectedSentenceIndex, setSelectedSentenceIndex] = useState(null);
@@ -38,8 +37,8 @@ const WordReportSection = ({ wordId, sentences }) => {
   const needsSentence = [...selectedReasonIds].some(
     (id) => reasons.find((r) => r.id === id)?.requiresSentence,
   );
-  const messageWordCount = countWords(message);
-  const messageTooLong = freeTextEnabled && messageWordCount > maxWords;
+  const messageCharCount = message.trim().length;
+  const messageTooLong = freeTextEnabled && messageCharCount > maxCharacters;
 
   const handleExpand = async () => {
     if (expanded) {
@@ -59,7 +58,7 @@ const WordReportSection = ({ wordId, sentences }) => {
       setAlreadyReported(!!checkRes.data?.data?.alreadyReported);
       setReasons(reasonsRes.data?.data || []);
       setFreeTextEnabled(settingsRes.data?.data?.freeTextEnabled ?? true);
-      setMaxWords(settingsRes.data?.data?.maxWords ?? 50);
+      setMaxCharacters(settingsRes.data?.data?.maxCharacters ?? 50);
     } catch (err) {
       console.error("Error loading report options:", err);
       setSubmitError("Could not load report options. Please try again.");
@@ -83,8 +82,9 @@ const WordReportSection = ({ wordId, sentences }) => {
   const handleSubmit = async () => {
     setSubmitError("");
 
-    if (selectedReasonIds.size === 0) {
-      setSubmitError("Select at least one reason.");
+    const hasMessage = freeTextEnabled && message.trim().length > 0;
+    if (selectedReasonIds.size === 0 && !hasMessage) {
+      setSubmitError("Select at least one reason or add a note.");
       return;
     }
     if (needsSentence && selectedSentenceIndex === null) {
@@ -92,7 +92,7 @@ const WordReportSection = ({ wordId, sentences }) => {
       return;
     }
     if (messageTooLong) {
-      setSubmitError(`Your note must be ${maxWords} words or fewer.`);
+      setSubmitError(`Your note must be ${maxCharacters} characters or fewer.`);
       return;
     }
 
@@ -172,7 +172,7 @@ const WordReportSection = ({ wordId, sentences }) => {
                       This word has no sentences to select.
                     </p>
                   ) : (
-                    <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                    <div className="custom-scrollbar max-h-40 space-y-1.5 overflow-y-auto rounded-lg border border-gray-700/60 bg-gray-950/50 p-2.5 pr-1.5">
                       {reportableSentences.map(({ text, index }) => (
                         <label
                           key={index}
@@ -216,7 +216,7 @@ const WordReportSection = ({ wordId, sentences }) => {
                   <p
                     className={`mt-1 text-xs ${messageTooLong ? "text-red-400" : "text-gray-500"}`}
                   >
-                    {messageWordCount}/{maxWords} words
+                    {messageCharCount}/{maxCharacters} characters
                   </p>
                 </div>
               )}
