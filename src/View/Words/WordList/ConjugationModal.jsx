@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import aiApi from "../../../AI_axios";
 import { useLockBodyScroll } from "../Modals/ModalScrolling";
+import { countWords } from "../../../utils/countWords";
 
 const TENSE_LABELS = {
   präsens: "Präsens",
@@ -102,6 +103,11 @@ const ConjugationModal = ({
   const [reportError, setReportError] = useState("");
   const [adminPrompt, setAdminPrompt] = useState("");
   const [adminPromptOpen, setAdminPromptOpen] = useState(false);
+  const [reportOptionsLoading, setReportOptionsLoading] = useState(false);
+  const [reportReasons, setReportReasons] = useState([]);
+  const [selectedReasonIds, setSelectedReasonIds] = useState(new Set());
+  const [reportFreeTextEnabled, setReportFreeTextEnabled] = useState(true);
+  const [reportMaxWords, setReportMaxWords] = useState(50);
 
   // Sync external "already reported" flag when modal re-opens for a new verb
   useEffect(() => {
@@ -109,6 +115,7 @@ const ConjugationModal = ({
     setReportOpen(false);
     setReportMessage("");
     setReportError("");
+    setSelectedReasonIds(new Set());
   }, [alreadyReported, data]);
 
   useEffect(() => {
@@ -125,14 +132,61 @@ const ConjugationModal = ({
   const verbLabel = data?.verb || word?.value || "";
   const meaning = data?.meaning ? `(${data.meaning})` : "";
 
-  const submitReport = async () => {
-    setReportSubmitting(true);
+  const handleOpenReport = async () => {
+    setReportOpen(true);
     setReportError("");
+    setReportOptionsLoading(true);
+    try {
+      const [reasonsRes, settingsRes] = await Promise.all([
+        aiApi.get("/conjugations/report-reasons"),
+        aiApi.get("/conjugations/report-settings"),
+      ]);
+      setReportReasons(reasonsRes.data?.data || []);
+      setReportFreeTextEnabled(settingsRes.data?.data?.freeTextEnabled ?? true);
+      setReportMaxWords(settingsRes.data?.data?.maxWords ?? 50);
+    } catch (err) {
+      console.error("Error loading report options:", err);
+      setReportError("Could not load report options. Please try again.");
+    } finally {
+      setReportOptionsLoading(false);
+    }
+  };
+
+  const handleToggleReportReason = (reasonId) => {
+    setSelectedReasonIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(reasonId)) {
+        next.delete(reasonId);
+      } else {
+        next.add(reasonId);
+      }
+      return next;
+    });
+  };
+
+  const showReportNoteField = reportFreeTextEnabled && reportMaxWords > 0;
+  const reportMessageWordCount = countWords(reportMessage || "");
+  const reportMessageTooLong =
+    showReportNoteField && reportMessageWordCount > reportMaxWords;
+
+  const submitReport = async () => {
+    setReportError("");
+    if (selectedReasonIds.size === 0) {
+      setReportError("Select at least one reason.");
+      return;
+    }
+    if (reportMessageTooLong) {
+      setReportError(`Your note must be ${reportMaxWords} words or fewer.`);
+      return;
+    }
+
+    setReportSubmitting(true);
     try {
       await aiApi.post("/conjugations/report", {
         verb: verbLabel,
         userId: userId ?? null,
-        message: reportMessage.trim() || null,
+        reasonIds: [...selectedReasonIds],
+        message: showReportNoteField && reportMessage.trim() ? reportMessage.trim() : null,
       });
       setReportDone(true);
       setReportOpen(false);
@@ -282,20 +336,63 @@ const ConjugationModal = ({
                   <p className="text-sm font-semibold text-red-300">
                     Report incorrect conjugation
                   </p>
-                  <textarea
-                    className="w-full rounded-lg bg-gray-800 border border-gray-600 text-sm text-white px-3 py-2 placeholder-gray-500 focus:outline-none focus:border-red-400 resize-none"
-                    rows={2}
-                    placeholder="Optional: describe the error (e.g. wrong haben/sein)"
-                    value={reportMessage}
-                    onChange={(e) => setReportMessage(e.target.value)}
-                  />
+
+                  {reportOptionsLoading ? (
+                    <p className="text-gray-400 text-sm">Loading...</p>
+                  ) : (
+                    <>
+                      <div className="space-y-1.5">
+                        {reportReasons.map((reason) => (
+                          <label
+                            key={reason.id}
+                            className="flex items-start gap-2 text-sm text-gray-300 cursor-pointer"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedReasonIds.has(reason.id)}
+                              onChange={() => handleToggleReportReason(reason.id)}
+                              className="mt-0.5 h-4 w-4 accent-red-500"
+                            />
+                            {reason.label}
+                          </label>
+                        ))}
+                        {reportReasons.length === 0 && (
+                          <p className="text-gray-500 text-sm italic">
+                            No report reasons configured yet.
+                          </p>
+                        )}
+                      </div>
+
+                      {showReportNoteField && (
+                        <>
+                          <textarea
+                            className={`w-full rounded-lg bg-gray-800 border text-sm text-white px-3 py-2 placeholder-gray-500 focus:outline-none resize-none ${
+                              reportMessageTooLong
+                                ? "border-red-400 focus:border-red-400"
+                                : "border-gray-600 focus:border-red-400"
+                            }`}
+                            rows={2}
+                            placeholder="Optional: describe the error (e.g. wrong haben/sein)"
+                            value={reportMessage}
+                            onChange={(e) => setReportMessage(e.target.value)}
+                          />
+                          <p
+                            className={`text-xs ${reportMessageTooLong ? "text-red-400" : "text-gray-500"}`}
+                          >
+                            {reportMessageWordCount}/{reportMaxWords} words
+                          </p>
+                        </>
+                      )}
+                    </>
+                  )}
+
                   {reportError && (
                     <p className="text-xs text-red-400">{reportError}</p>
                   )}
                   <div className="flex gap-2">
                     <button
                       onClick={submitReport}
-                      disabled={reportSubmitting}
+                      disabled={reportSubmitting || reportOptionsLoading}
                       className="px-4 py-1.5 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors"
                     >
                       {reportSubmitting ? "Submitting…" : "Submit report"}
@@ -341,7 +438,7 @@ const ConjugationModal = ({
                   <span className="text-xs text-green-500">✓ Reported</span>
                 ) : (
                   <button
-                    onClick={() => setReportOpen(true)}
+                    onClick={handleOpenReport}
                     className="text-xs text-red-400 hover:text-red-200 transition-colors"
                   >
                     Report error

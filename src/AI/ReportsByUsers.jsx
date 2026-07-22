@@ -22,6 +22,19 @@ const ReportsByUsers = () => {
   const [selectedParagraph, setSelectedParagraph] = useState("");
   const [selectedWordIds, setSelectedWordIds] = useState(new Set());
 
+  // Report reasons management
+  const [reasons, setReasons] = useState([]);
+  const [reasonsLoading, setReasonsLoading] = useState(false);
+  const [newReasonLabel, setNewReasonLabel] = useState("");
+  const [editingReasonId, setEditingReasonId] = useState(null);
+  const [editReasonLabel, setEditReasonLabel] = useState("");
+
+  // Note field settings
+  const [freeTextEnabled, setFreeTextEnabled] = useState(true);
+  const [maxWordsInput, setMaxWordsInput] = useState("50");
+  const [settingsLoading, setSettingsLoading] = useState(false);
+  const [savingSettings, setSavingSettings] = useState(false);
+
   const allWordIds = reports.map((r) => r.wordId);
   const allWordsSelected =
     allWordIds.length > 0 && allWordIds.every((id) => selectedWordIds.has(id));
@@ -68,6 +81,32 @@ const ReportsByUsers = () => {
     }, {});
   };
 
+  const fetchReasons = async () => {
+    setReasonsLoading(true);
+    try {
+      const response = await aiApi.get("/paragraphs/report-reasons");
+      setReasons(response.data?.data || []);
+    } catch (err) {
+      console.error("Error fetching report reasons:", err);
+    } finally {
+      setReasonsLoading(false);
+    }
+  };
+
+  const fetchSettings = async () => {
+    setSettingsLoading(true);
+    try {
+      const response = await aiApi.get("/paragraphs/report-settings");
+      const data = response.data?.data;
+      setFreeTextEnabled(data?.freeTextEnabled ?? true);
+      setMaxWordsInput(String(data?.maxWords ?? 50));
+    } catch (err) {
+      console.error("Error fetching report settings:", err);
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
+
   useEffect(() => {
     const loadReportsAndUsers = async () => {
       try {
@@ -93,7 +132,82 @@ const ReportsByUsers = () => {
     };
 
     loadReportsAndUsers();
+    fetchReasons();
+    fetchSettings();
   }, []);
+
+  const handleAddReason = async (e) => {
+    e.preventDefault();
+    if (!newReasonLabel.trim()) return;
+    try {
+      await aiApi.post("/paragraphs/report-reasons", { label: newReasonLabel.trim() });
+      setNewReasonLabel("");
+      fetchReasons();
+    } catch (err) {
+      console.error("Error adding reason:", err);
+      Swal.fire("Error", err.response?.data?.message || "Failed to add reason", "error");
+    }
+  };
+
+  const openEditReason = (reason) => {
+    setEditingReasonId(reason.id);
+    setEditReasonLabel(reason.label);
+  };
+
+  const closeEditReason = () => {
+    setEditingReasonId(null);
+    setEditReasonLabel("");
+  };
+
+  const handleSaveReason = async () => {
+    if (!editReasonLabel.trim()) return;
+    try {
+      await aiApi.put(`/paragraphs/report-reasons/${editingReasonId}`, {
+        label: editReasonLabel.trim(),
+      });
+      closeEditReason();
+      fetchReasons();
+    } catch (err) {
+      console.error("Error updating reason:", err);
+      Swal.fire("Error", err.response?.data?.message || "Failed to update reason", "error");
+    }
+  };
+
+  const handleDeleteReason = async (reason) => {
+    const result = await Swal.fire({
+      title: `Delete reason "${reason.label}"?`,
+      text: "Existing reports keep their other reasons. This cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete!",
+      cancelButtonText: "Cancel",
+    });
+    if (!result.isConfirmed) return;
+    try {
+      await aiApi.delete(`/paragraphs/report-reasons/${reason.id}`);
+      fetchReasons();
+    } catch (err) {
+      console.error("Error deleting reason:", err);
+      Swal.fire("Error", err.response?.data?.message || "Failed to delete reason", "error");
+    }
+  };
+
+  const handleSaveSettings = async () => {
+    const maxWords = parseInt(maxWordsInput, 10);
+    if (!Number.isInteger(maxWords) || maxWords < 0) {
+      Swal.fire("Error", "Max words must be a whole number (0 or more)", "error");
+      return;
+    }
+    setSavingSettings(true);
+    try {
+      await aiApi.patch("/paragraphs/report-settings", { freeTextEnabled, maxWords });
+    } catch (err) {
+      console.error("Error saving settings:", err);
+      Swal.fire("Error", err.response?.data?.message || "Failed to save settings", "error");
+    } finally {
+      setSavingSettings(false);
+    }
+  };
 
   const UserInfoDisplay = ({ userId }) => {
     const user = users[userId];
@@ -359,12 +473,6 @@ const ReportsByUsers = () => {
         <p className="text-red-400 text-lg">{error}</p>
       </div>
     );
-  if (reports.length === 0)
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
-        <p className="text-2xl text-gray-400">No reports found.</p>
-      </div>
-    );
 
   if (!canAccess) {
     return <Navigate to="/" replace />;
@@ -383,6 +491,138 @@ const ReportsByUsers = () => {
         </div>
 
         {isSuperAdmin && (
+          <div className="bg-gray-800/50 rounded-lg p-6 mb-6 border border-gray-700">
+            <h2 className="text-lg font-bold text-white mb-4">📋 Report Reasons</h2>
+            {reasonsLoading ? (
+              <p className="text-gray-400 text-sm">Loading...</p>
+            ) : (
+              <>
+                <div className="space-y-2 mb-4">
+                  {reasons.map((reason) =>
+                    editingReasonId === reason.id ? (
+                      <div
+                        key={reason.id}
+                        className="flex flex-wrap items-center gap-2 rounded-lg border border-gray-600 bg-gray-900/60 p-3"
+                      >
+                        <input
+                          type="text"
+                          value={editReasonLabel}
+                          onChange={(e) => setEditReasonLabel(e.target.value)}
+                          className="flex-1 min-w-[160px] px-3 py-1.5 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-500"
+                        />
+                        <button
+                          onClick={handleSaveReason}
+                          className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg transition"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={closeEditReason}
+                          className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-xs font-semibold rounded-lg transition"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <div
+                        key={reason.id}
+                        className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-gray-700 bg-gray-900/40 p-3"
+                      >
+                        <span className="text-sm text-white">{reason.label}</span>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => openEditReason(reason)}
+                            className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteReason(reason)}
+                            className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    ),
+                  )}
+                  {reasons.length === 0 && (
+                    <p className="text-gray-500 text-sm">No reasons yet.</p>
+                  )}
+                </div>
+
+                <form
+                  onSubmit={handleAddReason}
+                  className="flex flex-wrap items-center gap-2 border-t border-gray-700 pt-4"
+                >
+                  <input
+                    type="text"
+                    value={newReasonLabel}
+                    onChange={(e) => setNewReasonLabel(e.target.value)}
+                    placeholder='e.g. "Wrong meaning"'
+                    className="flex-1 min-w-[200px] px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:border-cyan-500"
+                  />
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-sm font-semibold rounded-lg hover:from-cyan-600 hover:to-blue-600 transition"
+                  >
+                    + Add Reason
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        )}
+
+        {isSuperAdmin && (
+          <div className="bg-gray-800/50 rounded-lg p-6 mb-8 border border-gray-700">
+            <h2 className="text-lg font-bold text-white mb-4">⚙️ Note Field Settings</h2>
+            {settingsLoading ? (
+              <p className="text-gray-400 text-sm">Loading...</p>
+            ) : (
+              <>
+                <label className="flex items-center gap-2 mb-4 text-sm text-gray-300">
+                  <input
+                    type="checkbox"
+                    checked={freeTextEnabled}
+                    onChange={(e) => setFreeTextEnabled(e.target.checked)}
+                    className="h-4 w-4 accent-cyan-500"
+                  />
+                  Allow users to add a short note when reporting
+                </label>
+                <div className="mb-4 max-w-xs">
+                  <label
+                    htmlFor="paragraph-max-words-input"
+                    className="block text-white font-semibold mb-2 text-sm"
+                  >
+                    Max words in note
+                  </label>
+                  <input
+                    id="paragraph-max-words-input"
+                    type="number"
+                    min="0"
+                    value={maxWordsInput}
+                    onChange={(e) => setMaxWordsInput(e.target.value)}
+                    disabled={!freeTextEnabled}
+                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-cyan-500 disabled:opacity-50"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    Set to 0 to hide the note field entirely.
+                  </p>
+                </div>
+                <button
+                  onClick={handleSaveSettings}
+                  disabled={savingSettings}
+                  className="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold rounded-lg hover:from-cyan-600 hover:to-blue-600 disabled:opacity-50 transition"
+                >
+                  {savingSettings ? "Saving..." : "Save Settings"}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
+        {isSuperAdmin && reports.length > 0 && (
           <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
             <button
               onClick={handleDeleteAllReports}
@@ -418,6 +658,12 @@ const ReportsByUsers = () => {
               </button>
             )}
           </div>
+        )}
+
+        {reports.length === 0 && (
+          <p className="text-center text-2xl text-gray-400 mt-12 mb-8">
+            No reports found.
+          </p>
         )}
 
         <div className="space-y-4">
@@ -470,6 +716,18 @@ const ReportsByUsers = () => {
                   <div key={rep.id ?? i} className="flex items-start gap-3 px-5 py-3">
                     <div className="min-w-0 flex-1">
                       {getUserInfo(rep.userId)}
+                      {rep.reasons?.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mt-1">
+                          {rep.reasons.map((reason) => (
+                            <span
+                              key={reason.id}
+                              className="rounded-full bg-cyan-500/20 border border-cyan-500/40 px-2 py-0.5 text-[11px] text-cyan-300"
+                            >
+                              {reason.label}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                       <div className="mt-1 flex items-start justify-between gap-2">
                         {rep.message.length > 60 ? (
                           <>
