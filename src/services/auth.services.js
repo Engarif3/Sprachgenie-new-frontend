@@ -149,6 +149,9 @@ export const getAuthState = () =>
 
 export const clearUserInfo = () => {
   writeSessionHint(false);
+  if (typeof window !== "undefined") {
+    window.sessionStorage.removeItem("token");
+  }
   setCachedUserInfo(null);
 };
 

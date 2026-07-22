@@ -10,7 +10,10 @@ const aiApi = axios.create({
 
 aiApi.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    // The AI service is on a different domain than the main backend, so the
+    // httpOnly session cookie never reaches it — fall back to the JWT
+    // stashed in sessionStorage at login (see Login.jsx).
+    const token = sessionStorage.getItem("token");
     if (token && token !== "null") {
       config.headers.Authorization = `Bearer ${token}`;
     }

@@ -191,8 +191,15 @@ const Login = () => {
     try {
       const res = await userLogin(formData);
 
-      // ✅ Token now in httpOnly cookie (not in response body)
+      // ✅ Session lives in an httpOnly cookie for the main backend.
+      // The AI microservice is on a different domain, so that cookie
+      // never reaches it — stash the same JWT in sessionStorage (cleared
+      // on tab close) purely so cross-domain AI-service requests can send
+      // it as an Authorization header.
       if (res?.success) {
+        if (res?.data?.token) {
+          sessionStorage.setItem("token", res.data.token);
+        }
         toast.success(res.message || "Login successful");
 
         // ✅ Fetch user info from /auth/me

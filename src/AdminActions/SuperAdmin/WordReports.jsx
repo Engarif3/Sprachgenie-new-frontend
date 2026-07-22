@@ -243,9 +243,7 @@ const WordReports = () => {
 
   const handleToggleSelectAllReports = () => {
     setSelectedReportIds(
-      allReportsSelected
-        ? new Set()
-        : new Set(reportsForWord.map((r) => r.id)),
+      allReportsSelected ? new Set() : new Set(reportsForWord.map((r) => r.id)),
     );
   };
 
@@ -274,9 +272,7 @@ const WordReports = () => {
         });
         showSuccess(`${deleteTarget.ids.length} reports deleted!`);
       } else if (deleteTarget.type === "allForWord") {
-        await api.delete(
-          `/word-reports/admin/word/${deleteTarget.wordId}/all`,
-        );
+        await api.delete(`/word-reports/admin/word/${deleteTarget.wordId}/all`);
         showSuccess("All reports for this word deleted!");
       } else if (deleteTarget.type === "reason") {
         await api.delete(`/word-reports/reasons/${deleteTarget.id}`);
@@ -308,7 +304,9 @@ const WordReports = () => {
     ? [
         ...new Set(
           reportsForWord
-            .filter((r) => r.sentenceIndex !== null && r.sentenceIndex !== undefined)
+            .filter(
+              (r) => r.sentenceIndex !== null && r.sentenceIndex !== undefined,
+            )
             .map((r) => r.sentenceIndex),
         ),
       ]
@@ -446,7 +444,7 @@ const WordReports = () => {
                   type="submit"
                   className="px-4 py-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white text-sm font-semibold rounded-lg hover:from-orange-600 hover:to-pink-600 transition"
                 >
-                  + Add Reason
+                  Add Option
                 </button>
               </form>
             </>
@@ -624,8 +622,8 @@ const WordReports = () => {
                                     </p>
                                   )}
                                   <p className="text-xs text-gray-500">
-                                    {report.user?.name || report.user?.email}{" "}
-                                    · {formatDate(report.createdAt)}
+                                    {report.user?.name || report.user?.email} ·{" "}
+                                    {formatDate(report.createdAt)}
                                   </p>
                                 </div>
                                 <button
