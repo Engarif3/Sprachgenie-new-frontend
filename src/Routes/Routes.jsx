@@ -61,6 +61,12 @@ const GenerateStory = lazy(
 const StoriesManagement = lazy(
   () => import("../AdminActions/SuperAdmin/StoriesManagement"),
 );
+const BroadcastNotifications = lazy(
+  () => import("../AdminActions/SuperAdmin/BroadcastNotifications"),
+);
+const NotificationsPage = lazy(
+  () => import("../View/Notifications/NotificationsPage"),
+);
 const PerfectAndPastForm = lazy(
   () => import("../View/Grammar/PerfectAndPastForm/PerfectAndPastForm"),
 );
@@ -143,6 +149,10 @@ const UpdateBasicUserStatusWithSuspense = withSuspense(UpdateBasicUserStatus);
 const UpdateUserStatusWithSuspense = withSuspense(UpdateUserStatus);
 const GenerateStoryWithSuspense = withSuspense(GenerateStory);
 const StoriesManagementWithSuspense = withSuspense(StoriesManagement);
+const BroadcastNotificationsWithSuspense = withSuspense(
+  BroadcastNotifications,
+);
+const NotificationsPageWithSuspense = withSuspense(NotificationsPage);
 const PerfectAndPastFormWithSuspense = withSuspense(PerfectAndPastForm);
 const StoryTitleListWithSuspense = withSuspense(StoryTitleList);
 const StoryDetailWithSuspense = withSuspense(StoryDetail);
@@ -361,6 +371,17 @@ export const router = createBrowserRouter(
                 <StoriesManagementWithSuspense />,
                 ADMIN_ROLES,
               ),
+            },
+            {
+              path: "broadcast-notifications",
+              element: protectRoute(
+                <BroadcastNotificationsWithSuspense />,
+                SUPER_ADMIN_ROLES,
+              ),
+            },
+            {
+              path: "notifications",
+              element: protectRoute(<NotificationsPageWithSuspense />),
             },
             {
               path: "create-conversation",

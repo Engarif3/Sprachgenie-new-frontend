@@ -1,5 +1,6 @@
 import { Link, Navigate, Outlet, NavLink } from "react-router-dom";
 import { useAuth } from "../services/auth.services";
+import { useNotifications } from "../hooks/useNotifications";
 import Container from "../utils/Container";
 import { useState } from "react";
 import { IoClose, IoMenu } from "react-icons/io5";
@@ -38,6 +39,7 @@ const DashboardLayout = () => {
   });
 
   const { safeUserInfo: userInfo, userId, userRole: role } = useAuth();
+  const { unreadCount } = useNotifications();
 
   const toggleSection = (section) => {
     setExpandedSections((prev) => ({
@@ -160,6 +162,21 @@ const DashboardLayout = () => {
             >
               <span className="text-lg">🏆</span>
               <span>Leaderboard</span>
+            </NavLink>
+
+            <NavLink
+              to="/dashboard/notifications"
+              className={({ isActive }) => navItemClass(isActive)}
+              onClick={() => setIsOpen(false)}
+              title="Announcements"
+            >
+              <span className="text-lg">🔔</span>
+              <span>Notifications</span>
+              {unreadCount > 0 && (
+                <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1.5 text-xs font-bold text-white">
+                  {unreadCount}
+                </span>
+              )}
             </NavLink>
 
             {(role === "admin" || role === "super_admin") && (
@@ -286,6 +303,16 @@ const DashboardLayout = () => {
                       <span>🗂️</span>
                       <span>Stories Management</span>
                     </NavLink>
+                    {role === "super_admin" && (
+                      <NavLink
+                        to="/dashboard/broadcast-notifications"
+                        className={({ isActive }) => navItemClass(isActive)}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <span>📢</span>
+                        <span>Broadcast Notifications</span>
+                      </NavLink>
+                    )}
                     <NavLink
                       to="/dashboard/create-conversation"
                       className={({ isActive }) => navItemClass(isActive)}
