@@ -24,7 +24,6 @@ const NotificationsPage = () => {
     fetchNotifications,
     markAsRead,
     deleteNotifications,
-    deleteAllNotifications,
   } = useNotifications();
   const [selectedIds, setSelectedIds] = useState(new Set());
 
@@ -86,46 +85,17 @@ const NotificationsPage = () => {
     setSelectedIds(new Set());
   };
 
-  const handleDeleteAll = async () => {
-    const result = await confirmDelete({
-      title: "Delete all notifications?",
-      text: "Your entire inbox will be cleared, but other users will still see them.",
-    });
-    if (!result.isConfirmed) return;
-
-    await deleteAllNotifications();
-    setSelectedIds(new Set());
-  };
-
   return (
     <div className="mx-auto max-w-3xl p-4 pb-12 md:p-8">
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1
-            className={`text-3xl font-bold ${isLight ? "text-slate-900" : "text-white"}`}
-          >
-            🔔 Notifications
-          </h1>
-          <p
-            className={`mt-1 ${isLight ? "text-slate-600" : "text-slate-400"}`}
-          >
-            Announcements from the Sprachgenie team.
-          </p>
-        </div>
-
-        {notifications.length > 0 && (
-          <button
-            type="button"
-            onClick={handleDeleteAll}
-            className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
-              isLight
-                ? "border-slate-200 bg-white text-slate-600 hover:border-red-300 hover:text-red-600"
-                : "border-slate-700 bg-slate-900 text-slate-300 hover:border-red-500/50 hover:text-red-400"
-            }`}
-          >
-            Clear all
-          </button>
-        )}
+      <div className="mb-6">
+        <h1
+          className={`text-3xl font-bold ${isLight ? "text-slate-900" : "text-white"}`}
+        >
+          🔔 Notifications
+        </h1>
+        <p className={`mt-1 ${isLight ? "text-slate-600" : "text-slate-400"}`}>
+          Announcements from the Sprachgenie team.
+        </p>
       </div>
 
       {notifications.length > 0 && (
