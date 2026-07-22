@@ -41,7 +41,6 @@ const WordReports = () => {
   const [expandedWordId, setExpandedWordId] = useState(null);
   const [reportsForWord, setReportsForWord] = useState([]);
   const [reportsLoading, setReportsLoading] = useState(false);
-  const [selectedReportIds, setSelectedReportIds] = useState(new Set());
 
   // Delete confirmation (type "OK")
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -195,12 +194,10 @@ const WordReports = () => {
     if (expandedWordId === wordId) {
       setExpandedWordId(null);
       setReportsForWord([]);
-      setSelectedReportIds(new Set());
       return;
     }
 
     setExpandedWordId(wordId);
-    setSelectedReportIds(new Set());
     setReportsLoading(true);
     try {
       const response = await api.get(`/word-reports/admin/word/${wordId}`);
@@ -246,28 +243,6 @@ const WordReports = () => {
     setSelectedWordIds(allWordsSelected ? new Set() : new Set(allWordIds));
   };
 
-  const handleToggleSelectReport = (id) => {
-    setSelectedReportIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
-
-  const allReportsSelected =
-    reportsForWord.length > 0 &&
-    selectedReportIds.size === reportsForWord.length;
-
-  const handleToggleSelectAllReports = () => {
-    setSelectedReportIds(
-      allReportsSelected ? new Set() : new Set(reportsForWord.map((r) => r.id)),
-    );
-  };
-
   const openDeleteConfirm = (target) => {
     setDeleteTarget(target);
     setConfirmText("");
@@ -287,11 +262,6 @@ const WordReports = () => {
           data: { reportIds: [deleteTarget.id] },
         });
         showSuccess("Report deleted!");
-      } else if (deleteTarget.type === "bulk") {
-        await api.delete("/word-reports/admin/bulk", {
-          data: { reportIds: deleteTarget.ids },
-        });
-        showSuccess(`${deleteTarget.ids.length} reports deleted!`);
       } else if (deleteTarget.type === "allForWord") {
         await api.delete(`/word-reports/admin/word/${deleteTarget.wordId}/all`);
         showSuccess("All reports for this word deleted!");
@@ -310,7 +280,6 @@ const WordReports = () => {
       }
 
       closeDeleteConfirm();
-      setSelectedReportIds(new Set());
 
       if (deleteTarget.type !== "reason") {
         fetchSummary();
@@ -626,45 +595,12 @@ const WordReports = () => {
                         <p className="text-gray-400 text-sm">Loading...</p>
                       ) : (
                         <>
-                          <div className="flex items-center justify-between mb-3">
-                            <label className="flex items-center gap-2 text-xs text-gray-300">
-                              <input
-                                type="checkbox"
-                                checked={allReportsSelected}
-                                onChange={handleToggleSelectAllReports}
-                                className="h-4 w-4 accent-orange-500"
-                              />
-                              Select all
-                            </label>
-                            {selectedReportIds.size > 0 && (
-                              <button
-                                onClick={() =>
-                                  openDeleteConfirm({
-                                    type: "bulk",
-                                    ids: [...selectedReportIds],
-                                  })
-                                }
-                                className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition"
-                              >
-                                Delete Selected ({selectedReportIds.size})
-                              </button>
-                            )}
-                          </div>
-
                           <div className="space-y-2">
                             {reportsForWord.map((report) => (
                               <div
                                 key={report.id}
                                 className="flex items-start gap-3 rounded-lg border border-gray-700 bg-gray-800/50 p-3"
                               >
-                                <input
-                                  type="checkbox"
-                                  checked={selectedReportIds.has(report.id)}
-                                  onChange={() =>
-                                    handleToggleSelectReport(report.id)
-                                  }
-                                  className="mt-1 h-4 w-4 shrink-0 accent-orange-500"
-                                />
                                 <div className="min-w-0 flex-1">
                                   <div className="flex flex-wrap gap-1.5 mb-1">
                                     {report.reasons.map((r) => (
@@ -727,11 +663,9 @@ const WordReports = () => {
                   ? "All Reports"
                   : deleteTarget.type === "bulkWords"
                     ? `Reports for ${deleteTarget.wordIds.length} Word(s)`
-                    : deleteTarget.type === "bulk"
-                      ? `${deleteTarget.ids.length} Reports`
-                      : deleteTarget.type === "reason"
-                        ? "Reason"
-                        : "Report"}
+                    : deleteTarget.type === "reason"
+                      ? "Reason"
+                      : "Report"}
               </h2>
               <p className="text-gray-300 mb-6 text-sm">
                 {deleteTarget.type === "reason"
