@@ -143,7 +143,7 @@ const WordReportSection = ({ wordId, sentences }) => {
         onClick={handleExpand}
         className="text-sm font-semibold text-red-400 hover:text-red-300 transition-colors"
       >
-        🚩 {expanded ? "Hide report form" : "Report a problem with this word"}
+        🚩 {expanded ? "Hide report form" : "Report a problem"}
       </button>
 
       {expanded && (
