@@ -31,7 +31,10 @@ aiApi.interceptors.request.use(
 aiApi.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (!error.response) {
+    // Deliberately cancelled requests (e.g. a paragraph-generation abort
+    // controller superseding a stale request) also have no `error.response`
+    // but aren't a failure worth reporting.
+    if (!error.response && !axios.isCancel(error)) {
       reportAiServiceError({
         message: `Network error calling AI service ${error.config?.url || "unknown endpoint"}: ${error.message || "request failed"}`,
         path: error.config?.url,

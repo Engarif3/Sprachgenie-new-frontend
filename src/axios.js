@@ -99,8 +99,11 @@ api.interceptors.response.use(
   (error) => {
     // The request never reached the backend (network error, timeout, CORS
     // failure) — the backend can't log what it never saw, so only the
-    // frontend knows this happened.
-    if (!error.response) {
+    // frontend knows this happened. Deliberately cancelled requests (e.g.
+    // the word-suggest typeahead aborting a stale keystroke's request) also
+    // have no `error.response` but aren't a failure worth reporting — they're
+    // our own code intentionally superseding an in-flight call.
+    if (!error.response && !axios.isCancel(error)) {
       reportClientError({
         message: `Network error calling ${error.config?.url || "unknown endpoint"}: ${error.message || "request failed"}`,
         path: error.config?.url,
