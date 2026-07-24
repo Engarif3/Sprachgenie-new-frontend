@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from "react";
 import api, { externalApi } from "../axios";
 
+const DASHBOARD_TABS = [
+  { key: "overview", label: "Overview", icon: "🚦" },
+  { key: "frontend", label: "Frontend", icon: "🌐" },
+  { key: "backend", label: "Backend", icon: "🖥️" },
+  { key: "database", label: "Database & Cache", icon: "🗄️" },
+  { key: "ai", label: "AI Service", icon: "🤖" },
+  { key: "logs", label: "Logs & Alerts", icon: "📋" },
+];
+
 const DECLARED_SYSTEMS = {
   frontend: {
     label: "Frontend",
@@ -466,6 +475,7 @@ const AdminSystemStatus = () => {
     backend: false,
     database: false,
   });
+  const [activeTab, setActiveTab] = useState("overview");
 
   const frontendResponseSeverity = getResponseSeverity(
     infrastructureStatus?.frontend?.responseTime,
@@ -674,7 +684,26 @@ const AdminSystemStatus = () => {
         </div>
       </div>
 
+      <div className="max-w-6xl mx-auto flex flex-wrap gap-2">
+        {DASHBOARD_TABS.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => setActiveTab(tab.key)}
+            className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
+              activeTab === tab.key
+                ? "border-cyan-400/50 bg-cyan-500/20 text-cyan-100"
+                : "border-white/10 bg-gray-900 text-gray-400 hover:bg-white/5 hover:text-gray-200"
+            }`}
+          >
+            {tab.icon} {tab.label}
+          </button>
+        ))}
+      </div>
+
       <div className="space-y-6">
+        {activeTab === "overview" && (
+        <>
         {/* Response Time Metrics */}
         <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-6xl mx-auto mt-6">
           <h2 className="text-2xl font-bold text-white mb-4">
@@ -722,15 +751,60 @@ const AdminSystemStatus = () => {
             </div>
           )}
         </div>
-        {/* Live Production Systems Status */}
+
+        {/* At-a-glance status strip for every system — click a tab above for details */}
+        <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-6xl mx-auto">
+          <h2 className="text-2xl font-bold text-white mb-4">
+            🚦 All Systems
+          </h2>
+          {!infrastructureStatus ? (
+            <p className="text-gray-400">Loading production system status...</p>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+              {[
+                { key: "frontend", label: "Frontend", status: infrastructureStatus.frontend?.status },
+                { key: "backend", label: "Backend", status: infrastructureStatus.backend?.status },
+                { key: "database", label: "Database", status: infrastructureStatus.databaseServer?.databaseStatus },
+                { key: "database", label: "Redis", status: infrastructureStatus.redis?.status },
+                { key: "ai", label: "AI Service", status: infrastructureStatus.aiService?.status },
+              ].map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={() => setActiveTab(item.key)}
+                  className="rounded-lg border border-white/10 bg-black/20 p-3 text-left transition-colors hover:bg-white/5"
+                >
+                  <p className="text-xs uppercase tracking-wide text-gray-400">
+                    {item.label}
+                  </p>
+                  <p
+                    className={`mt-1 text-sm font-bold ${
+                      item.status === "UP"
+                        ? "text-emerald-300"
+                        : item.status === "UNCONFIGURED"
+                          ? "text-gray-400"
+                          : "text-rose-300"
+                    }`}
+                  >
+                    {item.status || "Unknown"}
+                  </p>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        </>
+        )}
+
+        {["frontend", "backend", "database", "ai"].includes(activeTab) && (
         <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-6xl mx-auto">
           <div className="mb-4">
             <h2 className="text-2xl font-bold text-white">
-              🚦 Live Production Systems Status
+              {DASHBOARD_TABS.find((tab) => tab.key === activeTab)?.icon}{" "}
+              {DASHBOARD_TABS.find((tab) => tab.key === activeTab)?.label}
             </h2>
             <p className="mt-2 text-sm text-gray-400">
-              Start here for the current production picture across frontend,
-              backend, and database or VPS infrastructure.
+              Live production status for this system.
             </p>
           </div>
 
@@ -738,6 +812,8 @@ const AdminSystemStatus = () => {
             <p className="text-gray-400">Loading production system status...</p>
           ) : (
             <div className="space-y-4">
+              {activeTab === "frontend" && (
+              <>
               <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -1005,7 +1081,11 @@ const AdminSystemStatus = () => {
                   ) : null}
                 </div>
               </div>
+              </>
+              )}
 
+              {activeTab === "backend" && (
+              <>
               <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -1218,7 +1298,11 @@ const AdminSystemStatus = () => {
                   ) : null}
                 </div>
               </div>
+              </>
+              )}
 
+              {activeTab === "database" && (
+              <>
               <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -1734,6 +1818,68 @@ const AdminSystemStatus = () => {
                 </div>
               </div>
 
+              <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-300">
+                      Redis
+                    </p>
+                    <h3 className="mt-2 text-xl font-bold text-white">
+                      Upstash
+                    </h3>
+                  </div>
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-bold ${
+                      infrastructureStatus.redis?.status === "UP"
+                        ? "bg-emerald-500/20 text-emerald-300"
+                        : "bg-rose-500/20 text-rose-300"
+                    }`}
+                  >
+                    {infrastructureStatus.redis?.status || "Unknown"}
+                  </span>
+                </div>
+                <div className="mt-4 space-y-3 text-sm text-gray-300">
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
+                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                        Response
+                      </p>
+                      <p className="mt-2 text-xl font-bold text-white">
+                        {infrastructureStatus.redis?.responseTime || "N/A"}
+                      </p>
+                      <p className="mt-1 text-xs text-gray-500">
+                        Backs rate limiting and the word-list cache
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-white/10 bg-black/20 p-4 md:col-span-3">
+                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                        Word List Cache Hit Rate
+                      </p>
+                      <p className="mt-2 text-xl font-bold text-white">
+                        {infrastructureStatus.redis?.wordListCache
+                          ?.hitRatePercent !== null &&
+                        infrastructureStatus.redis?.wordListCache
+                          ?.hitRatePercent !== undefined
+                          ? `${infrastructureStatus.redis.wordListCache.hitRatePercent}%`
+                          : "No traffic yet"}
+                      </p>
+                      <p className="mt-1 text-xs text-gray-500">
+                        {infrastructureStatus.redis?.wordListCache?.hits ?? 0}{" "}
+                        hits /{" "}
+                        {infrastructureStatus.redis?.wordListCache?.misses ??
+                          0}{" "}
+                        misses since counters were last reset — higher is
+                        better (fewer database hits from concurrent visitors)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              </>
+              )}
+
+              {activeTab === "ai" && (
+              <>
               <div className="rounded-xl border border-violet-500/30 bg-violet-500/10 p-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -1814,10 +1960,15 @@ const AdminSystemStatus = () => {
                   </div>
                 </div>
               </div>
+              </>
+              )}
             </div>
           )}
         </div>
+        )}
 
+        {activeTab === "backend" && (
+        <>
         {/* Database Statistics */}
         <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-6xl mx-auto mt-6">
           <h2 className="text-2xl font-bold text-white mb-4">
@@ -1997,7 +2148,11 @@ const AdminSystemStatus = () => {
             <p className="text-gray-400">Loading rate limit status...</p>
           )}
         </div>
+        </>
+        )}
 
+        {activeTab === "logs" && (
+        <>
         {/* Alert History */}
         <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-6xl mx-auto mt-6">
           <h2 className="text-2xl font-bold text-white mb-4">
@@ -2114,6 +2269,8 @@ const AdminSystemStatus = () => {
             </p>
           </div>
         </div>
+        </>
+        )}
       </div>
 
       {isInfrastructureCheckModalOpen ? (
