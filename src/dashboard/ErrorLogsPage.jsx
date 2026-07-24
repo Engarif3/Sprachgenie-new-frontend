@@ -3,7 +3,6 @@ import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "../axios";
 import { useAuth } from "../services/auth.services";
-import FilterDropdown from "../components/UI/FilterDropdown";
 
 const CATEGORY_OPTIONS = [
   { value: "", label: "All categories" },
@@ -482,64 +481,59 @@ const ErrorLogsPage = () => {
               />
             </label>
 
-            <div className="lg:col-span-2">
+            <label className="lg:col-span-2">
               <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                 Category
               </span>
-              <FilterDropdown
-                id="error-logs-category"
-                ariaLabel="Filter by category"
-                placeholder={CATEGORY_OPTIONS[0].label}
-                displayLabel={getCategoryLabel(filters.category)}
-                selectedValue={filters.category}
-                onSelect={(value) =>
-                  setFilters((prev) => ({ ...prev, category: value }))
-                }
-                items={CATEGORY_OPTIONS.slice(1)}
-              />
-            </div>
+              <select
+                name="category"
+                value={filters.category}
+                onChange={handleFilterChange}
+                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 dark:border-slate-700 dark:bg-slate-950/70 dark:text-white dark:focus:border-sky-400"
+              >
+                {CATEGORY_OPTIONS.map((option) => (
+                  <option key={option.value || "all"} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-            <div className="lg:col-span-2">
+            <label className="lg:col-span-2">
               <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                 Environment
               </span>
-              <FilterDropdown
-                id="error-logs-environment"
-                ariaLabel="Filter by environment"
-                placeholder={ENVIRONMENT_OPTIONS[0].label}
-                displayLabel={
-                  ENVIRONMENT_OPTIONS.find(
-                    (option) => option.value === filters.environment,
-                  )?.label || ENVIRONMENT_OPTIONS[0].label
-                }
-                selectedValue={filters.environment}
-                onSelect={(value) =>
-                  setFilters((prev) => ({ ...prev, environment: value }))
-                }
-                items={ENVIRONMENT_OPTIONS.slice(1)}
-              />
-            </div>
+              <select
+                name="environment"
+                value={filters.environment}
+                onChange={handleFilterChange}
+                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 dark:border-slate-700 dark:bg-slate-950/70 dark:text-white dark:focus:border-sky-400"
+              >
+                {ENVIRONMENT_OPTIONS.map((option) => (
+                  <option key={option.value || "all"} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-            <div className="lg:col-span-2">
+            <label className="lg:col-span-2">
               <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                 User
               </span>
-              <FilterDropdown
-                id="error-logs-has-user"
-                ariaLabel="Filter by user link"
-                placeholder={HAS_USER_OPTIONS[0].label}
-                displayLabel={
-                  HAS_USER_OPTIONS.find(
-                    (option) => option.value === filters.hasUser,
-                  )?.label || HAS_USER_OPTIONS[0].label
-                }
-                selectedValue={filters.hasUser}
-                onSelect={(value) =>
-                  setFilters((prev) => ({ ...prev, hasUser: value }))
-                }
-                items={HAS_USER_OPTIONS.slice(1)}
-              />
-            </div>
+              <select
+                name="hasUser"
+                value={filters.hasUser}
+                onChange={handleFilterChange}
+                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 dark:border-slate-700 dark:bg-slate-950/70 dark:text-white dark:focus:border-sky-400"
+              >
+                {HAS_USER_OPTIONS.map((option) => (
+                  <option key={option.value || "all"} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
 
             <div className="flex items-end gap-3 lg:col-span-2">
               <button
