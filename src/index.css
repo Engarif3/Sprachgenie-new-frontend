@@ -414,4 +414,44 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(96, 165, 250, 0.6) rgba(31, 41, 55, 0.4);
   }
+
+  /* Dashboard sidebar nav scrollbar — replaces dead `scrollbar-thin
+     scrollbar-thumb-slate-300 ...` Tailwind classes that were never doing
+     anything (they need the tailwind-scrollbar plugin, which isn't
+     installed), so the sidebar was falling back to the raw unstyled
+     browser scrollbar. Theme-aware since the sidebar supports both light
+     and dark mode, unlike custom-scrollbar above which is dark-only. */
+  .sidebar-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .sidebar-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .sidebar-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.35);
+    border-radius: 10px;
+  }
+
+  .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 116, 139, 0.55);
+  }
+
+  .sidebar-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(100, 116, 139, 0.35) transparent;
+  }
+
+  .dark .sidebar-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(14, 165, 233, 0.4);
+  }
+
+  .dark .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(14, 165, 233, 0.6);
+  }
+
+  .dark .sidebar-scrollbar {
+    scrollbar-color: rgba(14, 165, 233, 0.4) transparent;
+  }
 }

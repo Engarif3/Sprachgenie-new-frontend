@@ -1,11 +1,51 @@
-import { Link, Navigate, Outlet, NavLink } from "react-router-dom";
+import { Link, Navigate, Outlet, NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../services/auth.services";
 import { useNotifications } from "../hooks/useNotifications";
 import { useProfileSettings } from "../hooks/useProfileSettings";
 import { getAvatarUrl } from "../utils/avatar";
 import Container from "../utils/Container";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IoClose, IoMenu } from "react-icons/io5";
+
+// Which section each route lives under — used to auto-expand the relevant
+// section on load/navigation instead of making a super admin (who sees all
+// six sections) hunt through collapsed menus for whichever page they're
+// already on.
+const SECTION_ROUTES = {
+  admin: ["/dashboard/update-user-status", "/dashboard/update-basic-user-status"],
+  content: [
+    "/dashboard/create-word",
+    "/dashboard/topic",
+    "/dashboard/update-topic",
+    "/dashboard/generate-story",
+    "/dashboard/stories-management",
+    "/dashboard/create-conversation",
+    "/dashboard/update-conversation",
+  ],
+  reports: [
+    "/dashboard/word-reports",
+    "/dashboard/get-reports",
+    "/dashboard/conjugation-reports",
+  ],
+  settings: [
+    "/dashboard/global-limits",
+    "/dashboard/user-limits",
+    "/dashboard/profile-photo-settings",
+  ],
+  analytics: ["/dashboard/users-favorite-count", "/dashboard/get-usage"],
+  monitoring: [
+    "/dashboard/registration-metadata",
+    "/dashboard/system-status",
+    "/dashboard/visitors-info",
+    "/dashboard/visitors",
+    "/dashboard/error-logs",
+  ],
+};
+
+const getActiveSection = (pathname) =>
+  Object.keys(SECTION_ROUTES).find((section) =>
+    SECTION_ROUTES[section].some((route) => pathname.startsWith(route)),
+  ) || null;
 
 const getUserInitials = (name, email) => {
   const source = (name || email || "User").trim();
@@ -32,19 +72,34 @@ const formatRoleLabel = (role) => {
 
 const DashboardLayout = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [expandedSections, setExpandedSections] = useState({
+  const location = useLocation();
+  const [expandedSections, setExpandedSections] = useState(() => ({
     admin: false,
     content: false,
     reports: false,
     settings: false,
     analytics: false,
     monitoring: false,
-  });
+    [getActiveSection(location.pathname)]: true,
+  }));
 
   const { safeUserInfo: userInfo, userId, userRole: role } = useAuth();
   const { unreadCount } = useNotifications();
   const { allowImageUpload } = useProfileSettings();
   const avatarUrl = getAvatarUrl(userInfo, allowImageUpload);
+
+  // Keep the relevant section open as the admin navigates around (e.g. via
+  // a link that isn't in the sidebar itself) — never collapses a section
+  // the admin opened manually, only ensures the current page's section
+  // is (still) expanded.
+  useEffect(() => {
+    const activeSection = getActiveSection(location.pathname);
+    if (activeSection) {
+      setExpandedSections((prev) =>
+        prev[activeSection] ? prev : { ...prev, [activeSection]: true },
+      );
+    }
+  }, [location.pathname]);
 
   const toggleSection = (section) => {
     setExpandedSections((prev) => ({
@@ -64,8 +119,12 @@ const DashboardLayout = () => {
         : "border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:border-slate-800 dark:hover:bg-white/5 dark:hover:text-white"
     }`;
 
-  const sectionHeaderClass =
-    "flex cursor-pointer items-center justify-between rounded-2xl border border-transparent px-4 py-3 text-sm font-semibold text-slate-700 transition-all duration-300 hover:border-slate-200 hover:bg-slate-100 dark:text-slate-200 dark:hover:border-slate-800 dark:hover:bg-white/5";
+  const sectionHeaderClass = (isExpanded) =>
+    `flex cursor-pointer items-center justify-between rounded-2xl border px-4 py-3 text-sm font-semibold transition-all duration-300 ${
+      isExpanded
+        ? "border-sky-200 bg-sky-50/80 text-sky-800 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-200"
+        : "border-transparent text-slate-700 hover:border-slate-200 hover:bg-slate-100 dark:text-slate-200 dark:hover:border-slate-800 dark:hover:bg-white/5"
+    }`;
 
   return (
     <Container>
@@ -122,7 +181,7 @@ const DashboardLayout = () => {
             </div>
           </div>
 
-          <nav className="flex-1 space-y-1 overflow-y-auto px-4 py-5 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent dark:scrollbar-thumb-slate-700">
+          <nav className="sidebar-scrollbar flex-1 space-y-1 overflow-y-auto px-4 py-5">
             <NavLink
               to="/dashboard"
               end
@@ -210,7 +269,7 @@ const DashboardLayout = () => {
                     role check (see Routes.jsx) — do not widen these. */}
                 <div
                   onClick={() => toggleSection("admin")}
-                  className={sectionHeaderClass}
+                  className={sectionHeaderClass(expandedSections.admin)}
                   role="button"
                   tabIndex={0}
                 >
@@ -258,7 +317,7 @@ const DashboardLayout = () => {
                     see it. */}
                 <div
                   onClick={() => toggleSection("content")}
-                  className={sectionHeaderClass}
+                  className={sectionHeaderClass(expandedSections.content)}
                   role="button"
                   tabIndex={0}
                 >
@@ -343,7 +402,7 @@ const DashboardLayout = () => {
                     top-level and separate from Content/Analytics. */}
                 <div
                   onClick={() => toggleSection("reports")}
-                  className={sectionHeaderClass}
+                  className={sectionHeaderClass(expandedSections.reports)}
                   role="button"
                   tabIndex={0}
                 >
@@ -394,7 +453,7 @@ const DashboardLayout = () => {
                     view — separated from Analytics below. */}
                 <div
                   onClick={() => toggleSection("settings")}
-                  className={sectionHeaderClass}
+                  className={sectionHeaderClass(expandedSections.settings)}
                   role="button"
                   tabIndex={0}
                 >
@@ -444,7 +503,7 @@ const DashboardLayout = () => {
                 {/* Analytics: data you view (usage/report stats). */}
                 <div
                   onClick={() => toggleSection("analytics")}
-                  className={sectionHeaderClass}
+                  className={sectionHeaderClass(expandedSections.analytics)}
                   role="button"
                   tabIndex={0}
                 >
@@ -486,7 +545,7 @@ const DashboardLayout = () => {
                     unlabeled trailing list. */}
                 <div
                   onClick={() => toggleSection("monitoring")}
-                  className={sectionHeaderClass}
+                  className={sectionHeaderClass(expandedSections.monitoring)}
                   role="button"
                   tabIndex={0}
                 >
