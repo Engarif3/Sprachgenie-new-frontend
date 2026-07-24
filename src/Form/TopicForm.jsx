@@ -77,6 +77,7 @@ import axios from "../axios";
 import Container from "../utils/Container";
 import { useAuth } from "../services/auth.services";
 import { invalidateWordsCache } from "../utils/storage";
+import FilterDropdown from "../components/UI/FilterDropdown";
 
 const TopicForm = () => {
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
@@ -112,6 +113,14 @@ const TopicForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    // FilterDropdown isn't a native form input, so the `required` attribute
+    // the old <select> relied on no longer applies — this replaces it.
+    if (!topicData.levelId) {
+      alert("Please select a level");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -163,21 +172,26 @@ const TopicForm = () => {
             <label htmlFor="levelId" className="block  font-medium ">
               Select Level
             </label>
-            <select
-              id="levelId"
-              name="levelId"
-              value={topicData.levelId}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full input-md rounded-md text-black border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-            >
-              <option value="">Select Level</option>
-              {levels.map((level) => (
-                <option key={level.id} value={level.id}>
-                  {level.level}
-                </option>
-              ))}
-            </select>
+            <div className="mt-1">
+              <FilterDropdown
+                id="levelId"
+                ariaLabel="Select level"
+                placeholder="Select Level"
+                displayLabel={
+                  levels.find(
+                    (level) => String(level.id) === String(topicData.levelId),
+                  )?.level || "Select Level"
+                }
+                selectedValue={String(topicData.levelId || "")}
+                onSelect={(value) =>
+                  setTopicData((prev) => ({ ...prev, levelId: value }))
+                }
+                items={levels.map((level) => ({
+                  value: String(level.id),
+                  label: level.level,
+                }))}
+              />
+            </div>
           </div>
 
           <button
