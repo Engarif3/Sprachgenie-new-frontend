@@ -1721,7 +1721,7 @@ const WordList = () => {
           <div className="flex items-center gap-1.5 md:gap-3 lg:gap-3">
             <Link
               to="/quiz"
-              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-1 md:px-2 lg:px-2 py-1 md:py-2 lg:py-1 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/50"
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-1 md:px-2 lg:px-2 py-1 md:py-1 lg:py-1 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/50"
             >
               🎮 Play Quiz
             </Link>

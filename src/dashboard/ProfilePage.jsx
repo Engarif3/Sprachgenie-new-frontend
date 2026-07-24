@@ -402,6 +402,26 @@ const ProfilePage = () => {
   const phoneNumberHasError =
     showPhoneNumberError && !isValidContactNumberLength(formState.phoneNumber);
 
+  // Whether anything the user could Save has actually changed, so the
+  // button stays disabled on an untouched form instead of re-submitting
+  // identical data. Compares live form/avatar state directly against the
+  // last-loaded `profile` (the source of truth formState was seeded from),
+  // rather than a separate snapshot that could itself drift out of sync.
+  const savedContact = parseContactNumber(profile?.contactNumber || "");
+  const hasProfileFieldChanges =
+    formState.name !== (profile?.name || "") ||
+    formState.address !== (profile?.address || "") ||
+    formState.countryCode !== savedContact.countryCode ||
+    formState.phoneNumber !== savedContact.phoneNumber;
+  const hasAvatarChange =
+    selectedAvatarId !== undefined &&
+    selectedAvatarId !== (profile?.avatarId || "");
+  const isDirty =
+    hasProfileFieldChanges ||
+    hasAvatarChange ||
+    !!selectedFile ||
+    removeProfilePhoto;
+
   if (isLoading) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center px-6 py-12">
@@ -759,7 +779,7 @@ const ProfilePage = () => {
               </p>
               <button
                 type="submit"
-                disabled={isSaving}
+                disabled={isSaving || !isDirty}
                 className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:from-blue-700 hover:to-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSaving ? "Saving changes..." : "Save Profile"}

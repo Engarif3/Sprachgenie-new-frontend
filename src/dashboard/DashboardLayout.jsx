@@ -154,6 +154,7 @@ const DashboardLayout = () => {
               <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-500 via-blue-500 to-indigo-600 text-sm font-bold text-white shadow-lg shadow-sky-900/20 dark:border-sky-500/20">
                 {avatarUrl ? (
                   <img
+                    key={avatarUrl}
                     src={avatarUrl}
                     alt={userInfo?.name || "Profile"}
                     className="h-full w-full object-cover"
@@ -615,6 +616,7 @@ const DashboardLayout = () => {
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-sky-200 bg-gradient-to-br from-sky-500 to-indigo-600 text-sm font-bold text-white shadow-md dark:border-sky-500/20">
                   {avatarUrl ? (
                     <img
+                      key={avatarUrl}
                       src={avatarUrl}
                       alt={userInfo?.name || "Profile"}
                       className="h-full w-full object-cover"
