@@ -83,10 +83,17 @@ const DashboardLayout = () => {
     [getActiveSection(location.pathname)]: true,
   }));
 
-  const { safeUserInfo: userInfo, userId, userRole: role } = useAuth();
+  const {
+    safeUserInfo: userInfo,
+    userId,
+    userRole: role,
+    isBootstrapResolved,
+  } = useAuth();
   const { unreadCount } = useNotifications();
   const { allowImageUpload } = useProfileSettings();
-  const avatarUrl = getAvatarUrl(userInfo, allowImageUpload);
+  const avatarUrl = isBootstrapResolved
+    ? getAvatarUrl(userInfo, allowImageUpload)
+    : null;
 
   // Keep the relevant section open as the admin navigates around (e.g. via
   // a link that isn't in the sidebar itself) — never collapses a section

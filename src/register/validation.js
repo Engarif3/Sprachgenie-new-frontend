@@ -25,9 +25,19 @@
 
 import { z } from "zod";
 
+// "Admin" is reserved for actual super admins — the backend enforces this
+// too (see assertNameAllowedForRole in user.sevice.ts), this is just for
+// immediate inline feedback.
+const RESERVED_NAME_PATTERN = /\badmin\b/i;
+
 // User fields validation
 export const UserValidationSchema = z.object({
-  name: z.string().min(1, "Please enter your name!"),
+  name: z
+    .string()
+    .min(1, "Please enter your name!")
+    .refine((value) => !RESERVED_NAME_PATTERN.test(value), {
+      message: "The word 'Admin' is reserved and cannot be used in your name.",
+    }),
   email: z.string().email("Please enter a valid email!"),
   // contactNumber: z
   //   .string()
