@@ -1969,73 +1969,29 @@ const AdminSystemStatus = () => {
                   <p className="text-gray-400 text-sm font-medium mb-3">
                     Per IP Limit
                   </p>
-                  <div className="space-y-3">
-                    <p className="text-gray-300 text-sm">
-                      {rateLimitStatus.perIP?.limit}
-                    </p>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-400 text-xs">
-                          Active IPs
-                        </span>
-                        <span className="text-blue-400 font-bold text-sm">
-                          {rateLimitStatus.perIP?.activeTracking}
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-700 rounded-full h-2.5">
-                        <div
-                          className={`h-2.5 rounded-full ${
-                            (rateLimitStatus.perIP?.activeTracking || 0) > 50
-                              ? "bg-red-500"
-                              : (rateLimitStatus.perIP?.activeTracking || 0) >
-                                  20
-                                ? "bg-yellow-500"
-                                : "bg-blue-500"
-                          }`}
-                          style={{
-                            width: `${Math.min((rateLimitStatus.perIP?.activeTracking || 0) * 2, 100)}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  <p className="text-gray-300 text-sm">
+                    {rateLimitStatus.perIP?.limit}
+                  </p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Window: {rateLimitStatus.perIP?.window || "N/A"}
+                  </p>
                 </div>
                 <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
                   <p className="text-gray-400 text-sm font-medium mb-3">
                     Per User Limit
                   </p>
-                  <div className="space-y-3">
-                    <p className="text-gray-300 text-sm">
-                      {rateLimitStatus.perUser?.limit}
-                    </p>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-400 text-xs">
-                          Active Users
-                        </span>
-                        <span className="text-purple-400 font-bold text-sm">
-                          {rateLimitStatus.perUser?.activeTracking}
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-700 rounded-full h-2.5">
-                        <div
-                          className={`h-2.5 rounded-full ${
-                            (rateLimitStatus.perUser?.activeTracking || 0) > 20
-                              ? "bg-red-500"
-                              : (rateLimitStatus.perUser?.activeTracking || 0) >
-                                  5
-                                ? "bg-yellow-500"
-                                : "bg-purple-500"
-                          }`}
-                          style={{
-                            width: `${Math.min((rateLimitStatus.perUser?.activeTracking || 0) * 5, 100)}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  <p className="text-gray-300 text-sm">
+                    {rateLimitStatus.perUser?.limit}
+                  </p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Window: {rateLimitStatus.perUser?.window || "N/A"}
+                  </p>
                 </div>
               </div>
+              <p className="mt-3 text-xs text-gray-500">
+                {rateLimitStatus.backend ||
+                  "Per-IP/per-user request counts are enforced server-side but not exposed here to avoid an expensive live scan on every dashboard refresh."}
+              </p>
             </div>
           ) : (
             <p className="text-gray-400">Loading rate limit status...</p>
