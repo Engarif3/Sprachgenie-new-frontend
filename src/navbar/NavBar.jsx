@@ -38,6 +38,7 @@ const NavBar = () => {
     safeUserInfo: userInfo,
     isAdmin,
     isLoggedIn: userLoggedIn,
+    isBootstrapResolved,
   } = useAuth();
   const desktopProfileMenuRef = useRef(null);
   const desktopProfileToggleRef = useRef(null);
@@ -50,7 +51,13 @@ const NavBar = () => {
   const { currentStreak } = useChallengeStreak();
   const { unreadCount } = useNotifications();
   const { allowImageUpload } = useProfileSettings();
-  const avatarUrl = getAvatarUrl(userInfo, allowImageUpload);
+  // Don't compute an avatar from userInfo until the initial /auth/me
+  // bootstrap has resolved — otherwise this briefly renders off of
+  // whatever stale/empty auth state exists at first paint (e.g. after a
+  // reload), then flips to the real one a moment later.
+  const avatarUrl = isBootstrapResolved
+    ? getAvatarUrl(userInfo, allowImageUpload)
+    : null;
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -395,7 +402,7 @@ const NavBar = () => {
                     </Link>
                   )}
 
-                  {userLoggedIn && (
+                  {isBootstrapResolved && userLoggedIn && (
                     <div className="relative">
                       <button
                         ref={mobileProfileToggleRef}
@@ -408,6 +415,7 @@ const NavBar = () => {
                       >
                         {avatarUrl ? (
                           <img
+                            key={avatarUrl}
                             src={avatarUrl}
                             alt={userInfo?.name || "Profile"}
                             className="h-full w-full rounded-full object-cover"
@@ -432,7 +440,7 @@ const NavBar = () => {
                     </div>
                   )}
 
-                  {!userLoggedIn && (
+                  {isBootstrapResolved && !userLoggedIn && (
                     <div className="relative">
                       <button
                         ref={mobileVisitorToggleRef}
@@ -557,7 +565,7 @@ const NavBar = () => {
               </div>
 
               <div className="relative ml-auto flex min-w-[8.5rem] items-center justify-end">
-                {userLoggedIn ? (
+                {!isBootstrapResolved ? null : userLoggedIn ? (
                   <>
                     <button
                       ref={desktopProfileToggleRef}
@@ -570,6 +578,7 @@ const NavBar = () => {
                     >
                       {avatarUrl ? (
                         <img
+                          key={avatarUrl}
                           src={avatarUrl}
                           alt={userInfo?.name || "Profile"}
                           className="h-full w-full rounded-full object-cover"
