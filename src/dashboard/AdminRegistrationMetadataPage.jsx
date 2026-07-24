@@ -3,8 +3,18 @@ import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api, { externalApi } from "../axios";
 import { useAuth } from "../services/auth.services";
+import FilterDropdown from "../components/UI/FilterDropdown";
 
 const GEOCODING_ENDPOINT = "https://nominatim.openstreetmap.org/search";
+
+const DEVICE_TYPE_OPTIONS = [
+  { value: "", label: "All devices" },
+  { value: "desktop", label: "Desktop" },
+  { value: "mobile", label: "Mobile" },
+  { value: "tablet", label: "Tablet" },
+  { value: "bot", label: "Bot" },
+  { value: "unknown", label: "Unknown" },
+];
 
 const buildQueryParams = (filters, page) => {
   const params = {
@@ -547,24 +557,26 @@ const AdminRegistrationMetadataPage = () => {
               />
             </label>
 
-            <label>
+            <div>
               <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                 Device
               </span>
-              <select
-                name="deviceType"
-                value={filters.deviceType}
-                onChange={handleFilterChange}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 dark:border-slate-700 dark:bg-slate-950/70 dark:text-white dark:focus:border-sky-400"
-              >
-                <option value="">All devices</option>
-                <option value="desktop">Desktop</option>
-                <option value="mobile">Mobile</option>
-                <option value="tablet">Tablet</option>
-                <option value="bot">Bot</option>
-                <option value="unknown">Unknown</option>
-              </select>
-            </label>
+              <FilterDropdown
+                id="registration-metadata-device-type"
+                ariaLabel="Filter by device type"
+                placeholder={DEVICE_TYPE_OPTIONS[0].label}
+                displayLabel={
+                  DEVICE_TYPE_OPTIONS.find(
+                    (option) => option.value === filters.deviceType,
+                  )?.label || DEVICE_TYPE_OPTIONS[0].label
+                }
+                selectedValue={filters.deviceType}
+                onSelect={(value) =>
+                  setFilters((prev) => ({ ...prev, deviceType: value }))
+                }
+                items={DEVICE_TYPE_OPTIONS.slice(1)}
+              />
+            </div>
 
             <label>
               <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">

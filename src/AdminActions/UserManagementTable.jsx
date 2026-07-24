@@ -7,6 +7,22 @@ import {
 } from "./userManagementDisplay";
 import { useProfileSettings } from "../hooks/useProfileSettings";
 import { getAvatarUrl } from "../utils/avatar";
+import FilterDropdown from "../components/UI/FilterDropdown";
+
+const STATUS_FILTER_OPTIONS = [
+  { value: "ALL", label: "All" },
+  { value: "ACTIVE", label: "Active" },
+  { value: "BLOCKED", label: "Blocked" },
+  { value: "DELETED", label: "Deactivated" },
+  { value: "PENDING", label: "Pending" },
+];
+
+const ROW_STATUS_OPTIONS = [
+  { value: "ACTIVE", label: "Active" },
+  { value: "BLOCKED", label: "Blocked" },
+  { value: "DELETED", label: "Deactivated" },
+  { value: "PENDING", label: "Pending" },
+];
 
 const getStatusBadgeClass = (status) => {
   switch (String(status || "").toUpperCase()) {
@@ -59,18 +75,20 @@ const UserManagementTable = ({
         >
           Status:
         </label>
-        <select
-          id={filterId}
-          value={selectedStatus}
-          onChange={(event) => onSelectedStatusChange?.(event.target.value)}
-          className="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
-        >
-          <option value="ALL">All</option>
-          <option value="ACTIVE">Active</option>
-          <option value="BLOCKED">Blocked</option>
-          <option value="DELETED">Deactivated</option>
-          <option value="PENDING">Pending</option>
-        </select>
+        <div className="w-44">
+          <FilterDropdown
+            id={filterId}
+            ariaLabel="Filter users by status"
+            displayLabel={
+              STATUS_FILTER_OPTIONS.find(
+                (option) => option.value === selectedStatus,
+              )?.label || STATUS_FILTER_OPTIONS[0].label
+            }
+            selectedValue={selectedStatus}
+            onSelect={(value) => onSelectedStatusChange?.(value)}
+            items={STATUS_FILTER_OPTIONS}
+          />
+        </div>
       </div>
     </div>
   ) : null;
@@ -169,21 +187,25 @@ const UserManagementTable = ({
                       </td>
                       <td className="px-3 py-1 text-center">
                         {showRoleSelect ? (
-                          <select
-                            value={resolvedRole}
-                            onChange={(event) =>
-                              onRoleChange?.(user, event.target.value)
-                            }
-                            className="rounded-lg border border-slate-300 bg-white px-3 py-1 text-xs font-semibold text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
-                          >
-                            {roleOptions.map((roleOption) => (
-                              <option key={roleOption} value={roleOption}>
-                                {roleOption === "BASIC_USER"
+                          <div className="mx-auto w-32">
+                            <FilterDropdown
+                              ariaLabel={`Change role for ${user.name || user.email}`}
+                              displayLabel={
+                                resolvedRole === "BASIC_USER"
                                   ? "USER"
-                                  : roleOption}
-                              </option>
-                            ))}
-                          </select>
+                                  : resolvedRole
+                              }
+                              selectedValue={resolvedRole}
+                              onSelect={(value) => onRoleChange?.(user, value)}
+                              items={roleOptions.map((roleOption) => ({
+                                value: roleOption,
+                                label:
+                                  roleOption === "BASIC_USER"
+                                    ? "USER"
+                                    : roleOption,
+                              }))}
+                            />
+                          </div>
                         ) : (
                           <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-700">
                             {formatRoleLabel(resolvedRole)}
@@ -199,18 +221,21 @@ const UserManagementTable = ({
                           >
                             {formatStatusLabel(user.status)}
                           </span>
-                          <select
-                            value={user.status}
-                            onChange={(event) =>
-                              onStatusChange(user.id, event.target.value)
-                            }
-                            className="rounded-lg border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
-                          >
-                            <option value="ACTIVE">Active</option>
-                            <option value="BLOCKED">Blocked</option>
-                            <option value="DELETED">Deactivated</option>
-                            <option value="PENDING">Pending</option>
-                          </select>
+                          <div className="w-36">
+                            <FilterDropdown
+                              ariaLabel={`Change status for ${user.name || user.email}`}
+                              displayLabel={
+                                ROW_STATUS_OPTIONS.find(
+                                  (option) => option.value === user.status,
+                                )?.label || user.status
+                              }
+                              selectedValue={user.status}
+                              onSelect={(value) =>
+                                onStatusChange(user.id, value)
+                              }
+                              items={ROW_STATUS_OPTIONS}
+                            />
+                          </div>
                         </div>
                       </td>
                       {showPermanentDelete && (

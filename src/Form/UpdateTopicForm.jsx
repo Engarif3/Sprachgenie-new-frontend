@@ -5,6 +5,7 @@ import axios from "../axios";
 import Container from "../utils/Container";
 import { useAuth } from "../services/auth.services";
 import { invalidateWordsCache } from "../utils/storage";
+import FilterDropdown from "../components/UI/FilterDropdown";
 
 const EMPTY_TOPIC_FORM = {
   name: "",
@@ -60,8 +61,7 @@ const UpdateTopicForm = () => {
     void fetchOptions();
   }, []);
 
-  const handleTopicSelection = (event) => {
-    const nextTopicId = event.target.value;
+  const handleTopicSelection = (nextTopicId) => {
     setSelectedTopicId(nextTopicId);
 
     if (!nextTopicId) {
@@ -97,6 +97,13 @@ const UpdateTopicForm = () => {
 
     if (!selectedTopicId) {
       alert("Please select a topic to update");
+      return;
+    }
+
+    // FilterDropdown isn't a native form input, so the `required` attribute
+    // the old <select> relied on no longer applies — this replaces it.
+    if (!topicData.levelId) {
+      alert("Please select a level");
       return;
     }
 
@@ -186,25 +193,33 @@ const UpdateTopicForm = () => {
             <label htmlFor="selectedTopicId" className="block font-medium">
               Select Topic
             </label>
-            <select
-              id="selectedTopicId"
-              name="selectedTopicId"
-              value={selectedTopicId}
-              onChange={handleTopicSelection}
-              disabled={loadingOptions || loading}
-              required
-              className="mt-1 block w-full input-md rounded-md text-black border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-            >
-              <option value="">
-                {loadingOptions ? "Loading topics..." : "Select Topic"}
-              </option>
-              {topics.map((topic) => (
-                <option key={topic.id} value={topic.id}>
-                  {topic.level?.level ? `${topic.level.level} - ` : ""}
-                  {topic.name}
-                </option>
-              ))}
-            </select>
+            <div className="mt-1">
+              <FilterDropdown
+                id="selectedTopicId"
+                ariaLabel="Select topic"
+                placeholder={
+                  loadingOptions ? "Loading topics..." : "Select Topic"
+                }
+                disabled={loadingOptions || loading}
+                displayLabel={
+                  (() => {
+                    const selected = topics.find(
+                      (topic) => String(topic.id) === String(selectedTopicId),
+                    );
+                    if (!selected) {
+                      return loadingOptions ? "Loading topics..." : "Select Topic";
+                    }
+                    return `${selected.level?.level ? `${selected.level.level} - ` : ""}${selected.name}`;
+                  })()
+                }
+                selectedValue={String(selectedTopicId || "")}
+                onSelect={handleTopicSelection}
+                items={topics.map((topic) => ({
+                  value: String(topic.id),
+                  label: `${topic.level?.level ? `${topic.level.level} - ` : ""}${topic.name}`,
+                }))}
+              />
+            </div>
           </div>
 
           <div>
@@ -227,22 +242,27 @@ const UpdateTopicForm = () => {
             <label htmlFor="levelId" className="block font-medium">
               Select Level
             </label>
-            <select
-              id="levelId"
-              name="levelId"
-              value={topicData.levelId}
-              onChange={handleChange}
-              required
-              disabled={!selectedTopicId || loadingOptions}
-              className="mt-1 block w-full input-md rounded-md text-black border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-            >
-              <option value="">Select Level</option>
-              {levels.map((level) => (
-                <option key={level.id} value={level.id}>
-                  {level.level}
-                </option>
-              ))}
-            </select>
+            <div className="mt-1">
+              <FilterDropdown
+                id="levelId"
+                ariaLabel="Select level"
+                placeholder="Select Level"
+                disabled={!selectedTopicId || loadingOptions}
+                displayLabel={
+                  levels.find(
+                    (level) => String(level.id) === String(topicData.levelId),
+                  )?.level || "Select Level"
+                }
+                selectedValue={String(topicData.levelId || "")}
+                onSelect={(value) =>
+                  setTopicData((prev) => ({ ...prev, levelId: value }))
+                }
+                items={levels.map((level) => ({
+                  value: String(level.id),
+                  label: level.level,
+                }))}
+              />
+            </div>
           </div>
 
           <button

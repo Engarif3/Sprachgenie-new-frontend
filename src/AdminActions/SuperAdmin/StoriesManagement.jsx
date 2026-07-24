@@ -2,6 +2,20 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import api from "../../axios";
 import aiApi from "../../AI_axios";
+import FilterDropdown from "../../components/UI/FilterDropdown";
+
+const STORY_FILTER_STATUS_OPTIONS = [
+  { value: "all", label: "All Stories" },
+  { value: "published", label: "Published Only" },
+  { value: "draft", label: "Drafts Only" },
+];
+
+const STORY_LEVEL_OPTIONS = [
+  { value: "A1", label: "A1 - Beginner" },
+  { value: "A2", label: "A2 - Elementary" },
+  { value: "B1", label: "B1 - Intermediate" },
+  { value: "B2", label: "B2 - Upper Intermediate" },
+];
 
 const StoriesManagement = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -397,16 +411,18 @@ const StoriesManagement = () => {
               >
                 Filter by Status
               </label>
-              <select
+              <FilterDropdown
                 id="stories-filter-status"
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
-              >
-                <option value="all">All Stories</option>
-                <option value="published">Published Only</option>
-                <option value="draft">Drafts Only</option>
-              </select>
+                ariaLabel="Filter stories by status"
+                displayLabel={
+                  STORY_FILTER_STATUS_OPTIONS.find(
+                    (option) => option.value === filterStatus,
+                  )?.label || STORY_FILTER_STATUS_OPTIONS[0].label
+                }
+                selectedValue={filterStatus}
+                onSelect={(value) => setFilterStatus(value)}
+                items={STORY_FILTER_STATUS_OPTIONS}
+              />
             </div>
           </div>
         </div>
@@ -567,18 +583,21 @@ const StoriesManagement = () => {
                     >
                       Language Level
                     </label>
-                    <select
+                    <FilterDropdown
                       id="edit-story-level"
-                      value={editLevelId}
-                      onChange={(e) => setEditLevelId(e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
-                    >
-                      {levels.map((level) => (
-                        <option key={level.id} value={level.id}>
-                          {level.level}
-                        </option>
-                      ))}
-                    </select>
+                      ariaLabel="Select language level"
+                      displayLabel={
+                        levels.find(
+                          (level) => String(level.id) === String(editLevelId),
+                        )?.level || "Select a level"
+                      }
+                      selectedValue={String(editLevelId)}
+                      onSelect={(value) => setEditLevelId(value)}
+                      items={levels.map((level) => ({
+                        value: String(level.id),
+                        label: level.level,
+                      }))}
+                    />
                   </div>
 
                   {/* Description Input */}
@@ -765,17 +784,18 @@ const StoriesManagement = () => {
                 >
                   Language Level
                 </label>
-                <select
+                <FilterDropdown
                   id="regenerate-story-level"
-                  value={regenerateLevel}
-                  onChange={(e) => setRegenerateLevel(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
-                >
-                  <option value="A1">A1 - Beginner</option>
-                  <option value="A2">A2 - Elementary</option>
-                  <option value="B1">B1 - Intermediate</option>
-                  <option value="B2">B2 - Upper Intermediate</option>
-                </select>
+                  ariaLabel="Select language level"
+                  displayLabel={
+                    STORY_LEVEL_OPTIONS.find(
+                      (option) => option.value === regenerateLevel,
+                    )?.label || STORY_LEVEL_OPTIONS[0].label
+                  }
+                  selectedValue={regenerateLevel}
+                  onSelect={(value) => setRegenerateLevel(value)}
+                  items={STORY_LEVEL_OPTIONS}
+                />
               </div>
 
               {/* Prompt Input */}
