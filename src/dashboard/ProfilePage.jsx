@@ -68,6 +68,11 @@ const isValidContactNumberLength = (phoneNumber) => {
   return digitCount === 0 || (digitCount >= 8 && digitCount <= 15);
 };
 
+// "Admin" is reserved for actual super admins — the backend enforces this
+// too (see assertNameAllowedForRole in user.sevice.ts), this is just for
+// immediate inline feedback.
+const RESERVED_NAME_PATTERN = /\badmin\b/i;
+
 const normalizeRole = (role) => {
   if (!role) {
     return "user";
@@ -109,6 +114,7 @@ const ProfilePage = () => {
   // empty string, not null, is what clears it (see user.sevice.ts).
   const [selectedAvatarId, setSelectedAvatarId] = useState(undefined);
   const [showPhoneNumberError, setShowPhoneNumberError] = useState(false);
+  const [showNameError, setShowNameError] = useState(false);
   const [countryQuery, setCountryQuery] = useState("");
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
   const countryDropdownRef = useRef(null);
@@ -183,6 +189,10 @@ const ProfilePage = () => {
     loadProfile();
   }, []);
 
+  const isReservedName = (name) =>
+    normalizeRole(cachedUser.role || profile?.role) !== "super_admin" &&
+    RESERVED_NAME_PATTERN.test(name);
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
 
@@ -190,6 +200,10 @@ const ProfilePage = () => {
       ...current,
       [name]: value,
     }));
+
+    if (name === "name" && showNameError) {
+      setShowNameError(isReservedName(value));
+    }
   };
 
   const handlePhoneNumberChange = (event) => {
@@ -283,6 +297,14 @@ const ProfilePage = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (isReservedName(formState.name)) {
+      setShowNameError(true);
+      toast.error("The word 'Admin' is reserved and cannot be used in your name.");
+      return;
+    }
+
+    setShowNameError(false);
+
     if (!isValidContactNumberLength(formState.phoneNumber)) {
       setShowPhoneNumberError(true);
       toast.error("Phone number must contain between 8 and 15 digits.");
@@ -514,9 +536,20 @@ const ProfilePage = () => {
                   autoComplete="name"
                   value={formState.name}
                   onChange={handleInputChange}
-                  className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
+                  onBlur={() => setShowNameError(isReservedName(formState.name))}
+                  className={`w-full rounded-2xl border bg-white px-4 py-3 text-sm text-gray-900 shadow-sm outline-none transition dark:bg-gray-950 dark:text-white ${
+                    showNameError && isReservedName(formState.name)
+                      ? "border-red-400 focus:border-red-500 focus:ring-4 focus:ring-red-500/10 dark:border-red-500"
+                      : "border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-gray-700"
+                  }`}
                   placeholder="Your full name"
                 />
+                {showNameError && isReservedName(formState.name) ? (
+                  <p className="mt-2 text-sm font-medium text-red-600 dark:text-red-400">
+                    The word &quot;Admin&quot; is reserved and cannot be used
+                    in your name.
+                  </p>
+                ) : null}
               </label>
 
               <label className="block">
