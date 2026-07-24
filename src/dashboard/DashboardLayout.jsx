@@ -90,9 +90,9 @@ const DashboardLayout = () => {
     isBootstrapResolved,
   } = useAuth();
   const { unreadCount } = useNotifications();
-  const { allowImageUpload } = useProfileSettings();
+  const { settings: profileSettings } = useProfileSettings();
   const avatarUrl = isBootstrapResolved
-    ? getAvatarUrl(userInfo, allowImageUpload)
+    ? getAvatarUrl(userInfo, profileSettings)
     : null;
 
   // Keep the relevant section open as the admin navigates around (e.g. via

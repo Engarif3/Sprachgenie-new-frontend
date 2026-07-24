@@ -42,7 +42,7 @@ const UserManagementTable = ({
   onPermanentDelete,
   emptyStateText = "No users found for the current selection.",
 }) => {
-  const { allowImageUpload } = useProfileSettings();
+  const { settings: profileSettings } = useProfileSettings();
 
   const statusFilterMarkup = showFilter ? (
     <div className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50 px-8 py-2 md:flex-row md:items-center md:justify-between">
@@ -134,9 +134,9 @@ const UserManagementTable = ({
                       <td className="px-4 py-2.5 align-top">
                         <div className="flex items-center gap-2.5">
                           <div className="mr-2 flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md border border-slate-400 bg-slate-700 text-xs font-bold text-white">
-                            {getAvatarUrl(user, allowImageUpload) ? (
+                            {getAvatarUrl(user, profileSettings) ? (
                               <img
-                                src={getAvatarUrl(user, allowImageUpload)}
+                                src={getAvatarUrl(user, profileSettings)}
                                 alt={user.name || user.email}
                                 className="h-full w-full object-cover"
                               />
