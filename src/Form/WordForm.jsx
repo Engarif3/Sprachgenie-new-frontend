@@ -11,7 +11,6 @@ import {
 } from "../utils/wordValidation";
 
 import { useAuth } from "../services/auth.services";
-import FilterDropdown from "../components/UI/FilterDropdown";
 
 const normalizeWordValue = (value) =>
   String(value || "")
@@ -275,14 +274,6 @@ const WordForm = () => {
       });
     }
   };
-
-  // FilterDropdown's onSelect only provides the raw value, not a synthetic
-  // event — this adapts it into the shape handleChange already expects, so
-  // every field's existing update logic (nested verbAttributes/
-  // prepositionAttributes, the article-reset-on-POS-change side effect,
-  // etc.) keeps working unchanged.
-  const handleDropdownSelect = (name) => (value) =>
-    handleChange({ target: { name, value } });
 
   // Handle form submission
   const handleSubmit = async (event) => {
@@ -830,24 +821,25 @@ const WordForm = () => {
                 >
                   Level
                 </label>
-                <div className="mt-2">
-                  <FilterDropdown
-                    id="levelId"
-                    ariaLabel="Select level"
-                    placeholder="Select Level"
-                    displayLabel={
-                      levels.find(
-                        (level) => String(level.id) === String(wordData.levelId),
-                      )?.level || "Select Level"
-                    }
-                    selectedValue={String(wordData.levelId || "")}
-                    onSelect={handleDropdownSelect("levelId")}
-                    items={levels.map((level) => ({
-                      value: String(level.id),
-                      label: level.level,
-                    }))}
-                  />
-                </div>
+                <select
+                  id="levelId"
+                  name="levelId"
+                  value={wordData.levelId}
+                  onChange={handleChange}
+                  required
+                  className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                >
+                  <option value="">Select Level</option>
+                  {levels && levels.length > 0 ? (
+                    levels.map((level) => (
+                      <option key={level.id} value={level.id}>
+                        {level.level}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>No levels available</option>
+                  )}
+                </select>
               </div>
             </div>
 
@@ -860,25 +852,25 @@ const WordForm = () => {
                 >
                   Part of Speech
                 </label>
-                <div className="mt-2">
-                  <FilterDropdown
-                    id="partOfSpeechId"
-                    ariaLabel="Select part of speech"
-                    placeholder="Select Part of Speech"
-                    displayLabel={
-                      partsOfSpeech.find(
-                        (pos) =>
-                          String(pos.id) === String(wordData.partOfSpeechId),
-                      )?.name || "Select Part of Speech"
-                    }
-                    selectedValue={String(wordData.partOfSpeechId || "")}
-                    onSelect={handleDropdownSelect("partOfSpeechId")}
-                    items={partsOfSpeech.map((pos) => ({
-                      value: String(pos.id),
-                      label: pos.name,
-                    }))}
-                  />
-                </div>
+                <select
+                  id="partOfSpeechId"
+                  name="partOfSpeechId"
+                  value={wordData.partOfSpeechId}
+                  onChange={handleChange}
+                  required
+                  className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                >
+                  <option value="">Select Part of Speech</option>
+                  {partsOfSpeech && partsOfSpeech.length > 0 ? (
+                    partsOfSpeech.map((pos) => (
+                      <option key={pos.id} value={pos.id}>
+                        {pos.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>No parts of speech available</option>
+                  )}
+                </select>
               </div>
 
               {/* Article Dropdown — only relevant for nouns */}
@@ -894,33 +886,27 @@ const WordForm = () => {
                     </span>
                   )}
                 </label>
-                <div className="mt-2">
-                  <FilterDropdown
-                    id="articleId"
-                    ariaLabel="Select article"
-                    placeholder="Select Article"
-                    disabled={!isNounSelected}
-                    displayLabel={
-                      (() => {
-                        const selected = articles.find(
-                          (article) =>
-                            String(article.id) === String(wordData.articleId),
-                        );
-                        if (!selected) return "Select Article";
-                        return selected.name.trim() === ""
+                <select
+                  id="articleId"
+                  name="articleId"
+                  value={wordData.articleId}
+                  onChange={handleChange}
+                  disabled={!isNounSelected}
+                  className={`input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 ${!isNounSelected ? "opacity-50 cursor-not-allowed" : ""}`}
+                >
+                  <option value="">Select Article</option>
+                  {articles && articles.length > 0 ? (
+                    articles.map((article) => (
+                      <option key={article.id} value={article.id}>
+                        {article.name.trim() === ""
                           ? "No Article"
-                          : selected.name;
-                      })()
-                    }
-                    selectedValue={String(wordData.articleId || "")}
-                    onSelect={handleDropdownSelect("articleId")}
-                    items={articles.map((article) => ({
-                      value: String(article.id),
-                      label:
-                        article.name.trim() === "" ? "No Article" : article.name,
-                    }))}
-                  />
-                </div>
+                          : article.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>No articles available</option>
+                  )}
+                </select>
               </div>
 
               {/* Verb Attributes - Only show when part of speech is verb */}
@@ -940,25 +926,16 @@ const WordForm = () => {
                     >
                       Conjugation Type
                     </label>
-                    <div className="mt-2">
-                      <FilterDropdown
-                        id="verbAttributes-conjugation"
-                        ariaLabel="Select conjugation type"
-                        displayLabel={
-                          wordData.verbAttributes.conjugation === "IRREGULAR"
-                            ? "Irregular (strong)"
-                            : "Regular (weak)"
-                        }
-                        selectedValue={wordData.verbAttributes.conjugation}
-                        onSelect={handleDropdownSelect(
-                          "verbAttributes.conjugation",
-                        )}
-                        items={[
-                          { value: "REGULAR", label: "Regular (weak)" },
-                          { value: "IRREGULAR", label: "Irregular (strong)" },
-                        ]}
-                      />
-                    </div>
+                    <select
+                      id="verbAttributes-conjugation"
+                      name="verbAttributes.conjugation"
+                      value={wordData.verbAttributes.conjugation}
+                      onChange={handleChange}
+                      className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                    >
+                      <option value="REGULAR">Regular (weak)</option>
+                      <option value="IRREGULAR">Irregular (strong)</option>
+                    </select>
                   </div>
 
                   {/* Prefix Type */}
@@ -969,35 +946,21 @@ const WordForm = () => {
                     >
                       Prefix Type
                     </label>
-                    <div className="mt-2">
-                      <FilterDropdown
-                        id="verbAttributes-prefixType"
-                        ariaLabel="Select prefix type"
-                        displayLabel={
-                          {
-                            NONE: "No Prefix",
-                            SEPARABLE: "Separable (e.g., aufstehen, ankommen)",
-                            INSEPARABLE:
-                              "Inseparable (e.g., verstehen, bekommen)",
-                          }[wordData.verbAttributes.prefixType] || "No Prefix"
-                        }
-                        selectedValue={wordData.verbAttributes.prefixType}
-                        onSelect={handleDropdownSelect(
-                          "verbAttributes.prefixType",
-                        )}
-                        items={[
-                          { value: "NONE", label: "No Prefix" },
-                          {
-                            value: "SEPARABLE",
-                            label: "Separable (e.g., aufstehen, ankommen)",
-                          },
-                          {
-                            value: "INSEPARABLE",
-                            label: "Inseparable (e.g., verstehen, bekommen)",
-                          },
-                        ]}
-                      />
-                    </div>
+                    <select
+                      id="verbAttributes-prefixType"
+                      name="verbAttributes.prefixType"
+                      value={wordData.verbAttributes.prefixType}
+                      onChange={handleChange}
+                      className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                    >
+                      <option value="NONE">No Prefix</option>
+                      <option value="SEPARABLE">
+                        Separable (e.g., aufstehen, ankommen)
+                      </option>
+                      <option value="INSEPARABLE">
+                        Inseparable (e.g., verstehen, bekommen)
+                      </option>
+                    </select>
                   </div>
 
                   {/* Separable Prefix Input - Only shown for separable verbs */}
@@ -1036,37 +999,19 @@ const WordForm = () => {
                     >
                       Case Requirement
                     </label>
-                    <div className="mt-2">
-                      <FilterDropdown
-                        id="verbAttributes-caseRequirement"
-                        ariaLabel="Select case requirement"
-                        placeholder="Not specified"
-                        displayLabel={
-                          {
-                            ACCUSATIVE: "Accusative (Akkusativ)",
-                            DATIVE: "Dative (Dativ)",
-                            GENITIVE: "Genitive (Genitiv)",
-                            PREPOSITIONAL: "Prepositional",
-                          }[wordData.verbAttributes.caseRequirement] ||
-                          "Not specified"
-                        }
-                        selectedValue={
-                          wordData.verbAttributes.caseRequirement || ""
-                        }
-                        onSelect={handleDropdownSelect(
-                          "verbAttributes.caseRequirement",
-                        )}
-                        items={[
-                          {
-                            value: "ACCUSATIVE",
-                            label: "Accusative (Akkusativ)",
-                          },
-                          { value: "DATIVE", label: "Dative (Dativ)" },
-                          { value: "GENITIVE", label: "Genitive (Genitiv)" },
-                          { value: "PREPOSITIONAL", label: "Prepositional" },
-                        ]}
-                      />
-                    </div>
+                    <select
+                      id="verbAttributes-caseRequirement"
+                      name="verbAttributes.caseRequirement"
+                      value={wordData.verbAttributes.caseRequirement || ""}
+                      onChange={handleChange}
+                      className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                    >
+                      <option value="">Not specified</option>
+                      <option value="ACCUSATIVE">Accusative (Akkusativ)</option>
+                      <option value="DATIVE">Dative (Dativ)</option>
+                      <option value="GENITIVE">Genitive (Genitiv)</option>
+                      <option value="PREPOSITIONAL">Prepositional</option>
+                    </select>
                   </div>
 
                   {/* Reflexive Checkbox */}
@@ -1131,46 +1076,29 @@ const WordForm = () => {
                     >
                       Case Requirement
                     </label>
-                    <div className="mt-2">
-                      <FilterDropdown
-                        id="prepositionAttributes-prepositionCase"
-                        ariaLabel="Select case requirement"
-                        placeholder="Not specified"
-                        displayLabel={
-                          {
-                            ACCUSATIVE: "Accusative (e.g., durch, für, gegen, ohne)",
-                            DATIVE: "Dative (e.g., aus, bei, mit, nach)",
-                            GENITIVE: "Genitive (e.g., während, wegen, trotz)",
-                            WECHSEL: "Changeable (Accusative/Dative)",
-                          }[wordData.prepositionAttributes.prepositionCase] ||
-                          "Not specified"
-                        }
-                        selectedValue={
-                          wordData.prepositionAttributes.prepositionCase || ""
-                        }
-                        onSelect={handleDropdownSelect(
-                          "prepositionAttributes.prepositionCase",
-                        )}
-                        items={[
-                          {
-                            value: "ACCUSATIVE",
-                            label: "Accusative (e.g., durch, für, gegen, ohne)",
-                          },
-                          {
-                            value: "DATIVE",
-                            label: "Dative (e.g., aus, bei, mit, nach)",
-                          },
-                          {
-                            value: "GENITIVE",
-                            label: "Genitive (e.g., während, wegen, trotz)",
-                          },
-                          {
-                            value: "WECHSEL",
-                            label: "Changeable (Accusative/Dative)",
-                          },
-                        ]}
-                      />
-                    </div>
+                    <select
+                      id="prepositionAttributes-prepositionCase"
+                      name="prepositionAttributes.prepositionCase"
+                      value={
+                        wordData.prepositionAttributes.prepositionCase || ""
+                      }
+                      onChange={handleChange}
+                      className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                    >
+                      <option value="">Not specified</option>
+                      <option value="ACCUSATIVE">
+                        Accusative (e.g., durch, für, gegen, ohne)
+                      </option>
+                      <option value="DATIVE">
+                        Dative (e.g., aus, bei, mit, nach)
+                      </option>
+                      <option value="GENITIVE">
+                        Genitive (e.g., während, wegen, trotz)
+                      </option>
+                      <option value="WECHSEL">
+                        Changeable (Accusative/Dative)
+                      </option>
+                    </select>
                   </div>
 
                   {/* Info Text */}
@@ -1224,24 +1152,24 @@ const WordForm = () => {
                 >
                   Topic
                 </label>
-                <div className="mt-2">
-                  <FilterDropdown
-                    id="topicId"
-                    ariaLabel="Select topic"
-                    placeholder="Select Topic"
-                    displayLabel={
-                      topics.find(
-                        (topic) => String(topic.id) === String(wordData.topicId),
-                      )?.name || "Select Topic"
-                    }
-                    selectedValue={String(wordData.topicId || "")}
-                    onSelect={handleDropdownSelect("topicId")}
-                    items={topics.map((topic) => ({
-                      value: String(topic.id),
-                      label: topic.name,
-                    }))}
-                  />
-                </div>
+                <select
+                  id="topicId"
+                  name="topicId"
+                  value={wordData.topicId}
+                  onChange={handleChange}
+                  className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                >
+                  <option value="">Select Topic</option>
+                  {topics && topics.length > 0 ? (
+                    topics.map((topic) => (
+                      <option key={topic.id} value={topic.id}>
+                        {topic.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>No topics available</option>
+                  )}
+                </select>
               </div>
 
               {/* Optional Inputs */}
