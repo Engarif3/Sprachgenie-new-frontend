@@ -50,13 +50,13 @@ const NavBar = () => {
   const { language, toggleLanguage } = useLanguage();
   const { currentStreak } = useChallengeStreak();
   const { unreadCount } = useNotifications();
-  const { allowImageUpload } = useProfileSettings();
+  const { settings: profileSettings } = useProfileSettings();
   // Don't compute an avatar from userInfo until the initial /auth/me
   // bootstrap has resolved — otherwise this briefly renders off of
   // whatever stale/empty auth state exists at first paint (e.g. after a
   // reload), then flips to the real one a moment later.
   const avatarUrl = isBootstrapResolved
-    ? getAvatarUrl(userInfo, allowImageUpload)
+    ? getAvatarUrl(userInfo, profileSettings)
     : null;
 
   useEffect(() => {

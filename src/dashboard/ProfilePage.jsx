@@ -5,7 +5,12 @@ import Swal from "sweetalert2";
 import api from "../axios";
 import { storeUserInfo, useAuth } from "../services/auth.services";
 import { useProfileSettings } from "../hooks/useProfileSettings";
-import { AVATAR_IDS, avatarAssetUrl, getAvatarUrl } from "../utils/avatar";
+import {
+  AVATAR_IDS,
+  avatarAssetUrl,
+  getAvatarUrl,
+  isImageUploadAllowedForUser,
+} from "../utils/avatar";
 
 const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
 
@@ -94,7 +99,7 @@ const createInitials = (name, email) => {
 
 const ProfilePage = () => {
   const { safeUserInfo: cachedUser } = useAuth();
-  const { allowImageUpload } = useProfileSettings();
+  const { settings: profileSettings } = useProfileSettings();
   const initialContact = parseContactNumber(cachedUser.contactNumber || "");
   const [profile, setProfile] = useState(null);
   const [formState, setFormState] = useState({
@@ -392,7 +397,8 @@ const ProfilePage = () => {
   const pendingAvatarUrl = selectedAvatarId
     ? avatarAssetUrl(selectedAvatarId)
     : null;
-  const effectiveAvatarUrl = getAvatarUrl(profile, allowImageUpload);
+  const canUploadPhoto = isImageUploadAllowedForUser(profile, profileSettings);
+  const effectiveAvatarUrl = getAvatarUrl(profile, profileSettings);
   const displayedImage =
     pendingAvatarUrl ||
     previewUrl ||
@@ -717,7 +723,7 @@ const ProfilePage = () => {
               )}
             </div>
 
-            {allowImageUpload && (
+            {canUploadPhoto && (
               <div className="rounded-3xl border border-dashed border-gray-300 bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-950/50">
                 <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                   <div>
@@ -760,13 +766,13 @@ const ProfilePage = () => {
                 <div>
                   <h2 className="text-lg font-bold">Choose an Avatar</h2>
                   <p className="mt-2 max-w-xl text-sm text-gray-600 dark:text-gray-400">
-                    {allowImageUpload
+                    {canUploadPhoto
                       ? "Pick a preset avatar instead of an uploaded photo — it takes over your profile picture immediately once saved."
                       : "Custom photo uploads are currently disabled by the administrator — pick a preset avatar below."}
                   </p>
                 </div>
 
-                {allowImageUpload && profile?.profilePhoto && activeAvatarId && (
+                {canUploadPhoto && profile?.profilePhoto && activeAvatarId && (
                   <button
                     type="button"
                     onClick={handleUsePhotoInstead}

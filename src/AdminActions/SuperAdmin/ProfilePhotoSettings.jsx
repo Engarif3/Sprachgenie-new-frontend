@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import api from "../../axios";
 
 const ProfilePhotoSettings = () => {
-  const [allowImageUpload, setAllowImageUpload] = useState(true);
+  const [allowImageUploadAdmin, setAllowImageUploadAdmin] = useState(true);
+  const [allowImageUploadBasicUser, setAllowImageUploadBasicUser] =
+    useState(true);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -12,7 +14,9 @@ const ProfilePhotoSettings = () => {
     setLoading(true);
     try {
       const response = await api.get("/profile-settings");
-      setAllowImageUpload(response.data?.data?.allowImageUpload ?? true);
+      const data = response.data?.data;
+      setAllowImageUploadAdmin(data?.allowImageUploadAdmin ?? true);
+      setAllowImageUploadBasicUser(data?.allowImageUploadBasicUser ?? true);
     } catch (err) {
       console.error("Error fetching profile settings:", err);
       setError("Failed to load settings");
@@ -29,7 +33,10 @@ const ProfilePhotoSettings = () => {
     setSaving(true);
     setError("");
     try {
-      await api.patch("/profile-settings", { allowImageUpload });
+      await api.patch("/profile-settings", {
+        allowImageUploadAdmin,
+        allowImageUploadBasicUser,
+      });
       setSuccess("Settings saved!");
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
@@ -51,8 +58,9 @@ const ProfilePhotoSettings = () => {
             Profile Photo Settings
           </h1>
           <p className="text-gray-400">
-            Control whether users can upload a custom profile photo, or must
-            choose from the preset avatars.
+            Control whether admins and basic users can upload a custom
+            profile photo, or must choose from the preset avatars. Super
+            admins can always upload, regardless of these settings.
           </p>
         </div>
 
@@ -67,7 +75,7 @@ const ProfilePhotoSettings = () => {
           </div>
         )}
 
-        <div className="bg-gray-800/50 rounded-lg p-8 border border-gray-700">
+        <div className="bg-gray-800/50 rounded-lg p-8 border border-gray-700 space-y-8">
           {loading ? (
             <p className="text-gray-400">Loading settings...</p>
           ) : (
@@ -75,16 +83,16 @@ const ProfilePhotoSettings = () => {
               <label className="flex items-start gap-4 cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={allowImageUpload}
-                  onChange={(e) => setAllowImageUpload(e.target.checked)}
+                  checked={allowImageUploadAdmin}
+                  onChange={(e) => setAllowImageUploadAdmin(e.target.checked)}
                   className="mt-1 h-5 w-5 accent-orange-500 cursor-pointer"
                 />
                 <span>
                   <span className="block text-white font-semibold">
-                    Allow users to upload custom profile photos
+                    Allow admins to upload custom profile photos
                   </span>
                   <span className="block text-sm text-gray-400 mt-1">
-                    When turned off, every user's profile picture falls back
+                    When turned off, every admin's profile picture falls back
                     to their chosen preset avatar (or their initials if
                     they've never picked one) — this doesn't delete anyone's
                     uploaded photo, it just stops showing it. Turning it back
@@ -93,11 +101,31 @@ const ProfilePhotoSettings = () => {
                 </span>
               </label>
 
+              <label className="flex items-start gap-4 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={allowImageUploadBasicUser}
+                  onChange={(e) =>
+                    setAllowImageUploadBasicUser(e.target.checked)
+                  }
+                  className="mt-1 h-5 w-5 accent-orange-500 cursor-pointer"
+                />
+                <span>
+                  <span className="block text-white font-semibold">
+                    Allow basic users to upload custom profile photos
+                  </span>
+                  <span className="block text-sm text-gray-400 mt-1">
+                    Same behavior as above, applied independently to basic
+                    user accounts.
+                  </span>
+                </span>
+              </label>
+
               <button
                 type="button"
                 onClick={handleSave}
                 disabled={saving}
-                className="mt-6 px-6 py-2.5 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
               >
                 {saving ? "Saving..." : "Save Settings"}
               </button>

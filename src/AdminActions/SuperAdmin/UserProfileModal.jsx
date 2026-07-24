@@ -33,7 +33,7 @@ const InfoCard = ({ label, value }) => (
 );
 
 const UserProfileModal = ({ isOpen, user, isLoading, onClose }) => {
-  const { allowImageUpload } = useProfileSettings();
+  const { settings: profileSettings } = useProfileSettings();
 
   useEffect(() => {
     if (!isOpen) {
@@ -108,9 +108,9 @@ const UserProfileModal = ({ isOpen, user, isLoading, onClose }) => {
                 <div className="h-28 bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500" />
                 <div className="-mt-14 px-6 pb-6">
                   <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[26px] border-4 border-slate-950 bg-gradient-to-br from-slate-700 to-slate-900 text-2xl font-bold text-white shadow-xl">
-                    {getAvatarUrl(user, allowImageUpload) ? (
+                    {getAvatarUrl(user, profileSettings) ? (
                       <img
-                        src={getAvatarUrl(user, allowImageUpload)}
+                        src={getAvatarUrl(user, profileSettings)}
                         alt={displayName}
                         className="h-full w-full object-cover"
                       />
