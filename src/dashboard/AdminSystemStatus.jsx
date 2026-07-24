@@ -1562,7 +1562,7 @@ const AdminSystemStatus = () => {
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-1 gap-2 text-[11px] sm:grid-cols-2">
+                          <div className="grid grid-cols-1 gap-2 text-[11px] sm:grid-cols-3">
                             <div className="rounded-md border border-white/10 bg-white/5 p-3 text-gray-200">
                               <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
                                 Network Usage
@@ -1661,6 +1661,67 @@ const AdminSystemStatus = () => {
                                 )}
                               </div>
                             </div>
+                            <div className="rounded-md border border-white/10 bg-white/5 p-3 text-gray-200">
+                              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                                Connection Pool (PgBouncer)
+                              </p>
+                              {infrastructureStatus.databaseServer?.pgBouncer
+                                ?.status === "UP" ? (
+                                <div className="mt-2 space-y-2">
+                                  <p>
+                                    Clients waiting:{" "}
+                                    <span
+                                      className={
+                                        (infrastructureStatus.databaseServer
+                                          .pgBouncer.totalClientsWaiting || 0) >
+                                        0
+                                          ? "font-semibold text-amber-300"
+                                          : "font-semibold text-emerald-300"
+                                      }
+                                    >
+                                      {infrastructureStatus.databaseServer
+                                        .pgBouncer.totalClientsWaiting ?? "N/A"}
+                                    </span>
+                                  </p>
+                                  <div className="space-y-1 text-[10px] text-gray-300">
+                                    {(
+                                      infrastructureStatus.databaseServer
+                                        .pgBouncer.pools || []
+                                    )
+                                      .filter(
+                                        (pool) => pool.database !== "pgbouncer",
+                                      )
+                                      .map((pool) => (
+                                        <p key={pool.database}>
+                                          <span className="font-mono text-white">
+                                            {pool.database}
+                                          </span>
+                                          : {pool.clientsActive} client
+                                          {pool.clientsActive === 1 ? "" : "s"}
+                                          {" -> "}
+                                          {pool.serverConnectionsActive +
+                                            pool.serverConnectionsIdle}{" "}
+                                          real connection
+                                          {pool.serverConnectionsActive +
+                                            pool.serverConnectionsIdle ===
+                                          1
+                                            ? ""
+                                            : "s"}
+                                          {pool.clientsWaiting > 0
+                                            ? ` (${pool.clientsWaiting} waiting!)`
+                                            : ""}
+                                        </p>
+                                      ))}
+                                  </div>
+                                </div>
+                              ) : (
+                                <p className="mt-2 text-gray-400">
+                                  {infrastructureStatus.databaseServer
+                                    ?.pgBouncer?.note ||
+                                    "PgBouncer stats unavailable"}
+                                </p>
+                              )}
+                            </div>
                           </div>
                         </>
                       ) : (
@@ -1670,6 +1731,87 @@ const AdminSystemStatus = () => {
                       )}
                     </div>
                   ) : null}
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-violet-500/30 bg-violet-500/10 p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-300">
+                      AI Service
+                    </p>
+                    <h3 className="mt-2 text-xl font-bold text-white">
+                      {infrastructureStatus.aiService?.provider || "Unknown"}
+                    </h3>
+                  </div>
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-bold ${
+                      infrastructureStatus.aiService?.status === "UP"
+                        ? "bg-emerald-500/20 text-emerald-300"
+                        : infrastructureStatus.aiService?.status ===
+                            "UNCONFIGURED"
+                          ? "bg-gray-500/20 text-gray-300"
+                          : "bg-rose-500/20 text-rose-300"
+                    }`}
+                  >
+                    {infrastructureStatus.aiService?.status || "Unknown"}
+                  </span>
+                </div>
+                <div className="mt-4 space-y-3 text-sm text-gray-300">
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
+                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                        Public URL
+                      </p>
+                      <p className="mt-2 break-all text-sm font-semibold text-white">
+                        {infrastructureStatus.aiService?.publicUrl || "N/A"}
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
+                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                        Response
+                      </p>
+                      <p className="mt-2 text-xl font-bold text-white">
+                        {infrastructureStatus.aiService?.responseTime ||
+                          "N/A"}
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
+                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                        Database
+                      </p>
+                      <p
+                        className={`mt-2 text-sm font-semibold ${
+                          infrastructureStatus.aiService?.database ===
+                          "connected"
+                            ? "text-emerald-300"
+                            : infrastructureStatus.aiService?.database
+                              ? "text-rose-300"
+                              : "text-gray-400"
+                        }`}
+                      >
+                        {infrastructureStatus.aiService?.database || "N/A"}
+                      </p>
+                      <p className="mt-1 text-xs text-gray-500">
+                        Own database, separate from the main backend
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
+                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                        Checked
+                      </p>
+                      <p className="mt-2 text-sm font-semibold text-white">
+                        {infrastructureStatus.aiService?.checkedAt
+                          ? new Date(
+                              infrastructureStatus.aiService.checkedAt,
+                            ).toLocaleTimeString()
+                          : "N/A"}
+                      </p>
+                      <p className="mt-1 text-xs text-gray-500">
+                        {infrastructureStatus.aiService?.note || ""}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
