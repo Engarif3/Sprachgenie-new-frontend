@@ -102,8 +102,17 @@ api.interceptors.response.use(
     // frontend knows this happened. Deliberately cancelled requests (e.g.
     // the word-suggest typeahead aborting a stale keystroke's request) also
     // have no `error.response` but aren't a failure worth reporting — they're
-    // our own code intentionally superseding an in-flight call.
-    if (!error.response && !axios.isCancel(error)) {
+    // our own code intentionally superseding an in-flight call. Callers can
+    // also opt a request out entirely (`{ skipErrorReporting: true }` in its
+    // config) for background/decorative calls (e.g. the unread-notification-
+    // count poll) where the call site already silently tolerates failure —
+    // a mobile user's connection blipping during a 30s background poll isn't
+    // an application error worth an admin dashboard entry.
+    if (
+      !error.response &&
+      !axios.isCancel(error) &&
+      !error.config?.skipErrorReporting
+    ) {
       reportClientError({
         message: `Network error calling ${error.config?.url || "unknown endpoint"}: ${error.message || "request failed"}`,
         path: error.config?.url,

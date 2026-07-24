@@ -22,7 +22,11 @@ export const useNotifications = () => {
     }
 
     try {
-      const res = await api.get("/notifications/unread-count");
+      // Background poll every 30s — a mobile connection blip here is
+      // routine noise, not worth an Error Logs entry (see axios.js).
+      const res = await api.get("/notifications/unread-count", {
+        skipErrorReporting: true,
+      });
       setUnreadCount(res.data?.data?.count ?? 0);
     } catch {
       // Decorative badge — a failed poll just leaves the last known count.
