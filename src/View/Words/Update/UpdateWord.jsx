@@ -1156,8 +1156,8 @@ const UpdateWord = () => {
       text: "This action cannot be undone.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Delete",
       cancelButtonText: "Cancel",
+      confirmButtonText: "Delete",
       reverseButtons: true,
     });
 
@@ -1930,7 +1930,7 @@ const UpdateWord = () => {
                     className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter meanings"
                   />
-                  <div className="mt-2 max-h-[28rem] overflow-y-auto pr-1">
+                  <div className="mt-2">
                     <DndContext
                       sensors={sensors}
                       collisionDetection={closestCenter}
@@ -2135,7 +2135,7 @@ const UpdateWord = () => {
                     className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Sentence A. SentenceB."
                   />
-                  <div className="mt-2 max-h-[28rem] overflow-y-auto pr-1">
+                  <div className="mt-2">
                     <DndContext
                       sensors={sensors}
                       collisionDetection={closestCenter}
