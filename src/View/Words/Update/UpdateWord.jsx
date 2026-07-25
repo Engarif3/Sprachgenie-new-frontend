@@ -1872,7 +1872,7 @@ const UpdateWord = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 justify-center items-start  gap-4 w-full md:w-8/12 p-1  md:p-8 lg:p-8 rounded-lg bg-stone-800">
                 {/* Meanings Section */}
                 <div className="w-full">
-                  <div className="sticky top-16 z-10 -mx-1 mb-2 flex items-center justify-between bg-stone-800 px-1 py-2">
+                  <div className="sticky top-16 z-10 -mx-1 mb-2 space-y-2 bg-stone-800 px-1 py-2">
                     <label
                       htmlFor="update-meaning-input"
                       className="block text-white"
@@ -1880,7 +1880,7 @@ const UpdateWord = () => {
                       <span className="font-medium text-lg"> Meaning</span> (for
                       multiple input use comma)
                     </label>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap items-center justify-end gap-2">
                       {selectedItems.meaning.size > 0 && (
                         <>
                           <button
@@ -2074,7 +2074,7 @@ const UpdateWord = () => {
 
                 {/* Sentences Section */}
                 <div>
-                  <div className="sticky top-16 z-10 -mx-1 mb-2 flex items-center justify-between bg-stone-800 px-1 py-2">
+                  <div className="sticky top-16 z-10 -mx-1 mb-2 space-y-2 bg-stone-800 px-1 py-2">
                     <label
                       htmlFor="update-sentences-input"
                       className="block text-white"
@@ -2083,7 +2083,7 @@ const UpdateWord = () => {
                       (for multiple input use "|". eg. sentence A. | Sentence
                       B.)
                     </label>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap items-center justify-end gap-2">
                       {selectedItems.sentences.size > 0 && (
                         <>
                           <button
