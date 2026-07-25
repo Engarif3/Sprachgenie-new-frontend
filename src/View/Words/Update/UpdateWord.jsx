@@ -1878,6 +1878,7 @@ const UpdateWord = () => {
             </div>
             <div className="w-full  flex flex-col md:flex-row lg:flex-row justify-center items-center mt-8  ">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 justify-center items-start  gap-4 w-full md:w-8/12 p-1  md:p-8 lg:p-8 rounded-lg bg-stone-800">
+                <div className="space-y-6">
                 {/* Meanings Section */}
                 <div className="w-full">
                   <div className="mb-2 space-y-2">
@@ -2322,6 +2323,9 @@ const UpdateWord = () => {
                   </div>
                 </div>
 
+                </div>
+
+                <div className="space-y-6">
                 {/* Level Dropdown */}
                 <div>
                   <label
@@ -2874,6 +2878,7 @@ const UpdateWord = () => {
                   </div>
                 </div>
 
+                </div>
                 {/* </div> */}
               </div>
             </div>
