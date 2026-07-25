@@ -1150,7 +1150,6 @@ const UpdateWord = () => {
       showCancelButton: true,
       cancelButtonText: "Cancel",
       confirmButtonText: "Delete",
-      reverseButtons: true,
     });
 
     if (result.isConfirmed) {
