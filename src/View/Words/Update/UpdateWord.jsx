@@ -1144,22 +1144,13 @@ const UpdateWord = () => {
     if (indices.length === 0) return;
 
     const result = await Swal.fire({
-      title: `Remove ${indices.length} item${indices.length > 1 ? "s" : ""}?`,
-      text: 'Type "ok" (case insensitive) to confirm this action. This cannot be undone.',
-      input: "text",
-      inputPlaceholder: 'Type "ok" to confirm',
+      title: `Delete ${indices.length} item${indices.length > 1 ? "s" : ""}?`,
+      text: "This action cannot be undone.",
+      icon: "warning",
       showCancelButton: true,
       cancelButtonText: "Cancel",
-      confirmButtonText: `Remove ${indices.length}`,
+      confirmButtonText: "Delete",
       reverseButtons: true,
-      preConfirm: (value) => {
-        if (value && value.toLowerCase() === "ok") {
-          return true;
-        } else {
-          Swal.showValidationMessage('Please type "ok" to confirm');
-          return false;
-        }
-      },
     });
 
     if (result.isConfirmed) {
