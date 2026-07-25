@@ -1776,7 +1776,7 @@ const UpdateWord = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 justify-center items-start  gap-4 w-full md:w-8/12 p-1  md:p-8 lg:p-8 rounded-lg bg-stone-800">
                 {/* Meanings Section */}
                 <div className="w-full">
-                  <div className="flex justify-between items-center mb-2">
+                  <div className="sticky top-16 z-10 -mx-1 mb-2 flex items-center justify-between bg-stone-800 px-1 py-2">
                     <label
                       htmlFor="update-meaning-input"
                       className="block text-white"
@@ -1968,7 +1968,7 @@ const UpdateWord = () => {
 
                 {/* Sentences Section */}
                 <div>
-                  <div className="flex justify-between items-center mb-2">
+                  <div className="sticky top-16 z-10 -mx-1 mb-2 flex items-center justify-between bg-stone-800 px-1 py-2">
                     <label
                       htmlFor="update-sentences-input"
                       className="block text-white"
