@@ -117,10 +117,7 @@ const DraggableItem = ({
           <input
             type="checkbox"
             checked={isSelected}
-            onChange={(e) => {
-              e.stopPropagation();
-              onToggleSelect(index);
-            }}
+            onChange={(e) => { e.stopPropagation(); onToggleSelect(index); }}
             onClick={(e) => e.stopPropagation()}
             className="h-4 w-4 flex-shrink-0 cursor-pointer rounded border-gray-500 accent-blue-600"
           />
@@ -370,10 +367,7 @@ const UpdateWord = () => {
   const [refetchTrigger, setRefetchTrigger] = useState(0);
   const [addingAt, setAddingAt] = useState(null); // { index: number, position: 'above' | 'below', field: string }
   const [newItemValue, setNewItemValue] = useState("");
-  const [selectedItems, setSelectedItems] = useState({
-    meaning: new Set(),
-    sentences: new Set(),
-  });
+  const [selectedItems, setSelectedItems] = useState({ meaning: new Set(), sentences: new Set() });
   const [wordsNeedingPOSSelection, setWordsNeedingPOSSelection] = useState([]);
   const [posSelections, setPOSSelections] = useState({});
   // Tracks POS overrides for EXISTING relation items (not new typed ones)
@@ -1019,9 +1013,7 @@ const UpdateWord = () => {
         // Reset article to "No Article" when POS changes to something
         // other than noun — mirrors WordForm.jsx's create-word behavior.
         if (name === "partOfSpeechId") {
-          const newPOS = partOfSpeeches.find(
-            (p) => p.id === parseInt(value, 10),
-          );
+          const newPOS = partOfSpeeches.find((p) => p.id === parseInt(value, 10));
           if (!newPOS || newPOS.name.toLowerCase() !== "noun") {
             updated.articleId = "4";
           }
@@ -1878,10 +1870,9 @@ const UpdateWord = () => {
             </div>
             <div className="w-full  flex flex-col md:flex-row lg:flex-row justify-center items-center mt-8  ">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 justify-center items-start  gap-4 w-full md:w-8/12 p-1  md:p-8 lg:p-8 rounded-lg bg-stone-800">
-                <div className="space-y-6">
                 {/* Meanings Section */}
                 <div className="w-full">
-                  <div className="mb-2 space-y-2">
+                  <div className="sticky top-16 z-10 -mx-1 mb-2 space-y-2 bg-stone-800 px-1 py-2">
                     <label
                       htmlFor="update-meaning-input"
                       className="block text-white"
@@ -2024,9 +2015,7 @@ const UpdateWord = () => {
                                 })
                               }
                               isSelected={selectedItems.meaning.has(index)}
-                              onToggleSelect={(idx) =>
-                                handleToggleSelectItem("meaning", idx)
-                              }
+                              onToggleSelect={(idx) => handleToggleSelectItem("meaning", idx)}
                             />
                             {addingAt?.field === "meaning" &&
                               addingAt?.position === "below" &&
@@ -2056,6 +2045,209 @@ const UpdateWord = () => {
                                     onClick={() =>
                                       handleAddItem(
                                         "meaning",
+                                        addingAt.index,
+                                        "below",
+                                      )
+                                    }
+                                    className="btn btn-sm btn-success"
+                                  >
+                                    Add
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setAddingAt(null);
+                                      setNewItemValue("");
+                                    }}
+                                    className="btn btn-sm btn-ghost"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              )}
+                          </div>
+                        ))}
+                      </SortableContext>
+                    </DndContext>
+                  </div>
+                </div>
+
+                {/* Sentences Section */}
+                <div>
+                  <div className="sticky top-16 z-10 -mx-1 mb-2 space-y-2 bg-stone-800 px-1 py-2">
+                    <label
+                      htmlFor="update-sentences-input"
+                      className="block text-white"
+                    >
+                      <span className="font-medium text-lg">Sentences</span>{" "}
+                      (for multiple input use "|". eg. sentence A. | Sentence
+                      B.)
+                    </label>
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      {selectedItems.sentences.size > 0 && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => handleDeselectAll("sentences")}
+                            disabled={loading}
+                            className="btn btn-sm border border-slate-500 bg-slate-700 text-white hover:bg-slate-600"
+                          >
+                            Deselect All
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSelected("sentences")}
+                            disabled={loading}
+                            className="btn btn-warning btn-sm"
+                          >
+                            Delete Selected ({selectedItems.sentences.size})
+                          </button>
+                        </>
+                      )}
+                      {formData.sentences.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={handleClearAllSentences}
+                          disabled={loading}
+                          className="btn btn-error btn-sm"
+                        >
+                          Clear All
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <input
+                    id="update-sentences-input"
+                    type="text"
+                    name="sentences"
+                    value={inputData.sentences}
+                    onChange={handleInputChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Sentence A. SentenceB."
+                  />
+                  <div className="mt-2">
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <SortableContext
+                        items={formData.sentences.map(
+                          (_, index) => `sentences-${index}`,
+                        )}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        {formData.sentences.map((item, index) => (
+                          <div key={index}>
+                            {addingAt?.field === "sentences" &&
+                              addingAt?.position === "above" &&
+                              addingAt?.index === index && (
+                                <div className="flex gap-2 mt-2 mb-2 p-2 bg-green-100 rounded-lg">
+                                  <input
+                                    type="text"
+                                    placeholder="Add above..."
+                                    value={newItemValue}
+                                    onChange={(e) =>
+                                      setNewItemValue(e.target.value)
+                                    }
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter") {
+                                        handleAddItem(
+                                          "sentences",
+                                          addingAt.index,
+                                          "above",
+                                        );
+                                      }
+                                    }}
+                                    className="flex-1 p-2 border border-gray-300 rounded"
+                                    autoFocus
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleAddItem(
+                                        "sentences",
+                                        addingAt.index,
+                                        "above",
+                                      )
+                                    }
+                                    className="btn btn-sm btn-success"
+                                  >
+                                    Add
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setAddingAt(null);
+                                      setNewItemValue("");
+                                    }}
+                                    className="btn btn-sm btn-ghost"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              )}
+                            <DraggableItem
+                              key={`item-${index}`}
+                              id={`sentences-${index}`}
+                              item={item}
+                              index={index}
+                              field="sentences"
+                              editingField={editingField}
+                              editValue={editValue}
+                              onEdit={(field, idx, val) => {
+                                setEditingField({ type: field, index: idx });
+                                setEditValue(val);
+                              }}
+                              onRemove={handleRemoveItem}
+                              onSaveEdit={handleSaveEdit}
+                              onCancelEdit={() => setEditingField(null)}
+                              setEditValue={setEditValue}
+                              onAddAbove={(field, idx) =>
+                                setAddingAt({
+                                  field,
+                                  index: idx,
+                                  position: "above",
+                                })
+                              }
+                              onAddBelow={(field, idx) =>
+                                setAddingAt({
+                                  field,
+                                  index: idx,
+                                  position: "below",
+                                })
+                              }
+                              isSelected={selectedItems.sentences.has(index)}
+                              onToggleSelect={(idx) => handleToggleSelectItem("sentences", idx)}
+                            />
+                            {addingAt?.field === "sentences" &&
+                              addingAt?.position === "below" &&
+                              addingAt?.index === index && (
+                                <div className="flex gap-2 mt-2 mb-2 p-2 bg-green-100 rounded-lg">
+                                  <input
+                                    type="text"
+                                    placeholder="Add below..."
+                                    value={newItemValue}
+                                    onChange={(e) =>
+                                      setNewItemValue(e.target.value)
+                                    }
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter") {
+                                        handleAddItem(
+                                          "sentences",
+                                          addingAt.index,
+                                          "below",
+                                        );
+                                      }
+                                    }}
+                                    className="flex-1 p-2 border border-gray-300 rounded"
+                                    autoFocus
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleAddItem(
+                                        "sentences",
                                         addingAt.index,
                                         "below",
                                       )
@@ -2323,9 +2515,6 @@ const UpdateWord = () => {
                   </div>
                 </div>
 
-                </div>
-
-                <div className="space-y-6">
                 {/* Level Dropdown */}
                 <div>
                   <label
@@ -2673,212 +2862,6 @@ const UpdateWord = () => {
                   </div>
                 )}
 
-                {/* Sentences Section */}
-                <div className="md:col-span-2">
-                  <div className="mb-2 space-y-2">
-                    <label
-                      htmlFor="update-sentences-input"
-                      className="block text-white"
-                    >
-                      <span className="font-medium text-lg">Sentences</span>{" "}
-                      (for multiple input use "|". eg. sentence A. | Sentence
-                      B.)
-                    </label>
-                    <div className="flex flex-wrap items-center justify-end gap-2">
-                      {selectedItems.sentences.size > 0 && (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => handleDeselectAll("sentences")}
-                            disabled={loading}
-                            className="btn btn-sm border border-slate-500 bg-slate-700 text-white hover:bg-slate-600"
-                          >
-                            Deselect All
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveSelected("sentences")}
-                            disabled={loading}
-                            className="btn btn-warning btn-sm"
-                          >
-                            Delete Selected ({selectedItems.sentences.size})
-                          </button>
-                        </>
-                      )}
-                      {formData.sentences.length > 0 && (
-                        <button
-                          type="button"
-                          onClick={handleClearAllSentences}
-                          disabled={loading}
-                          className="btn btn-error btn-sm"
-                        >
-                          Clear All
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  <input
-                    id="update-sentences-input"
-                    type="text"
-                    name="sentences"
-                    value={inputData.sentences}
-                    onChange={handleInputChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Sentence A. SentenceB."
-                  />
-                  <div className="mt-2">
-                    <DndContext
-                      sensors={sensors}
-                      collisionDetection={closestCenter}
-                      onDragEnd={handleDragEnd}
-                    >
-                      <SortableContext
-                        items={formData.sentences.map(
-                          (_, index) => `sentences-${index}`,
-                        )}
-                        strategy={verticalListSortingStrategy}
-                      >
-                        {formData.sentences.map((item, index) => (
-                          <div key={index}>
-                            {addingAt?.field === "sentences" &&
-                              addingAt?.position === "above" &&
-                              addingAt?.index === index && (
-                                <div className="flex gap-2 mt-2 mb-2 p-2 bg-green-100 rounded-lg">
-                                  <input
-                                    type="text"
-                                    placeholder="Add above..."
-                                    value={newItemValue}
-                                    onChange={(e) =>
-                                      setNewItemValue(e.target.value)
-                                    }
-                                    onKeyDown={(e) => {
-                                      if (e.key === "Enter") {
-                                        handleAddItem(
-                                          "sentences",
-                                          addingAt.index,
-                                          "above",
-                                        );
-                                      }
-                                    }}
-                                    className="flex-1 p-2 border border-gray-300 rounded"
-                                    autoFocus
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      handleAddItem(
-                                        "sentences",
-                                        addingAt.index,
-                                        "above",
-                                      )
-                                    }
-                                    className="btn btn-sm btn-success"
-                                  >
-                                    Add
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setAddingAt(null);
-                                      setNewItemValue("");
-                                    }}
-                                    className="btn btn-sm btn-ghost"
-                                  >
-                                    Cancel
-                                  </button>
-                                </div>
-                              )}
-                            <DraggableItem
-                              key={`item-${index}`}
-                              id={`sentences-${index}`}
-                              item={item}
-                              index={index}
-                              field="sentences"
-                              editingField={editingField}
-                              editValue={editValue}
-                              onEdit={(field, idx, val) => {
-                                setEditingField({ type: field, index: idx });
-                                setEditValue(val);
-                              }}
-                              onRemove={handleRemoveItem}
-                              onSaveEdit={handleSaveEdit}
-                              onCancelEdit={() => setEditingField(null)}
-                              setEditValue={setEditValue}
-                              onAddAbove={(field, idx) =>
-                                setAddingAt({
-                                  field,
-                                  index: idx,
-                                  position: "above",
-                                })
-                              }
-                              onAddBelow={(field, idx) =>
-                                setAddingAt({
-                                  field,
-                                  index: idx,
-                                  position: "below",
-                                })
-                              }
-                              isSelected={selectedItems.sentences.has(index)}
-                              onToggleSelect={(idx) =>
-                                handleToggleSelectItem("sentences", idx)
-                              }
-                            />
-                            {addingAt?.field === "sentences" &&
-                              addingAt?.position === "below" &&
-                              addingAt?.index === index && (
-                                <div className="flex gap-2 mt-2 mb-2 p-2 bg-green-100 rounded-lg">
-                                  <input
-                                    type="text"
-                                    placeholder="Add below..."
-                                    value={newItemValue}
-                                    onChange={(e) =>
-                                      setNewItemValue(e.target.value)
-                                    }
-                                    onKeyDown={(e) => {
-                                      if (e.key === "Enter") {
-                                        handleAddItem(
-                                          "sentences",
-                                          addingAt.index,
-                                          "below",
-                                        );
-                                      }
-                                    }}
-                                    className="flex-1 p-2 border border-gray-300 rounded"
-                                    autoFocus
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      handleAddItem(
-                                        "sentences",
-                                        addingAt.index,
-                                        "below",
-                                      )
-                                    }
-                                    className="btn btn-sm btn-success"
-                                  >
-                                    Add
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setAddingAt(null);
-                                      setNewItemValue("");
-                                    }}
-                                    className="btn btn-sm btn-ghost"
-                                  >
-                                    Cancel
-                                  </button>
-                                </div>
-                              )}
-                          </div>
-                        ))}
-                      </SortableContext>
-                    </DndContext>
-                  </div>
-                </div>
-
-                </div>
                 {/* </div> */}
               </div>
             </div>
