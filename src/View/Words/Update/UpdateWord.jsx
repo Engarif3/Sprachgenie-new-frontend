@@ -1887,7 +1887,7 @@ const UpdateWord = () => {
                             type="button"
                             onClick={() => handleDeselectAll("meaning")}
                             disabled={loading}
-                            className="btn btn-ghost btn-sm"
+                            className="btn btn-sm border border-slate-500 bg-slate-700 text-white hover:bg-slate-600"
                           >
                             Deselect All
                           </button>
@@ -2090,7 +2090,7 @@ const UpdateWord = () => {
                             type="button"
                             onClick={() => handleDeselectAll("sentences")}
                             disabled={loading}
-                            className="btn btn-ghost btn-sm"
+                            className="btn btn-sm border border-slate-500 bg-slate-700 text-white hover:bg-slate-600"
                           >
                             Deselect All
                           </button>
