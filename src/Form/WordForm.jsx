@@ -301,6 +301,33 @@ const WordForm = () => {
       return;
     }
 
+    const selectedPOS = partsOfSpeech.find(
+      (p) => p.id === parseInt(wordData.partOfSpeechId, 10),
+    );
+    const isNoun = selectedPOS?.name?.toLowerCase() === "noun";
+
+    if (isNoun && !wordData.articleId) {
+      Swal.fire({
+        title: "Article Required",
+        text: "Please select an article for this noun before creating the word.",
+        icon: "warning",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    if (!isNoun && wordData.articleId) {
+      Swal.fire({
+        title: "Invalid Article Selection",
+        text: "An article can only be set when the part of speech is Noun.",
+        icon: "warning",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
     // Check if all required POS selections have been made
     if (wordsNeedingPOSSelection.length > 0) {
       const allSelectionsComplete = wordsNeedingPOSSelection.every(

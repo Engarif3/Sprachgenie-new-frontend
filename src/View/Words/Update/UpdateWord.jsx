@@ -1007,10 +1007,20 @@ const UpdateWord = () => {
       name === "articleId" ||
       name === "partOfSpeechId"
     ) {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
+      setFormData((prevData) => {
+        const updated = { ...prevData, [name]: value };
+
+        // Reset article to "No Article" when POS changes to something
+        // other than noun — mirrors WordForm.jsx's create-word behavior.
+        if (name === "partOfSpeechId") {
+          const newPOS = partOfSpeeches.find((p) => p.id === parseInt(value, 10));
+          if (!newPOS || newPOS.name.toLowerCase() !== "noun") {
+            updated.articleId = "4";
+          }
+        }
+
+        return updated;
+      });
     } else if (
       name === "value" ||
       name === "pluralForm" ||
@@ -1125,17 +1135,31 @@ const UpdateWord = () => {
     });
   };
 
+  const handleDeselectAll = (field) => {
+    setSelectedItems((prev) => ({ ...prev, [field]: new Set() }));
+  };
+
   const handleRemoveSelected = async (field) => {
     const indices = [...selectedItems[field]].sort((a, b) => b - a);
     if (indices.length === 0) return;
 
     const result = await Swal.fire({
       title: `Remove ${indices.length} item${indices.length > 1 ? "s" : ""}?`,
-      text: "This action cannot be undone.",
+      text: 'Type "ok" (case insensitive) to confirm this action. This cannot be undone.',
+      input: "text",
+      inputPlaceholder: 'Type "ok" to confirm',
       showCancelButton: true,
       cancelButtonText: "Cancel",
       confirmButtonText: `Remove ${indices.length}`,
       reverseButtons: true,
+      preConfirm: (value) => {
+        if (value && value.toLowerCase() === "ok") {
+          return true;
+        } else {
+          Swal.showValidationMessage('Please type "ok" to confirm');
+          return false;
+        }
+      },
     });
 
     if (result.isConfirmed) {
@@ -1294,6 +1318,36 @@ const UpdateWord = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const selectedPOS = partOfSpeeches.find(
+      (p) => p.id === parseInt(formData.partOfSpeechId, 10),
+    );
+    const isNoun = selectedPOS?.name?.toLowerCase() === "noun";
+    const hasRealArticle =
+      !!formData.articleId && Number(formData.articleId) !== 4;
+
+    if (isNoun && !hasRealArticle) {
+      Swal.fire({
+        title: "Article Required",
+        text: "Please select an article for this noun before saving.",
+        icon: "warning",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    if (!isNoun && hasRealArticle) {
+      Swal.fire({
+        title: "Invalid Article Selection",
+        text: "An article can only be set when the part of speech is Noun.",
+        icon: "warning",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
     setLoading(true);
     setMessage("");
 
@@ -1309,15 +1363,49 @@ const UpdateWord = () => {
 
     // Collect specific variant IDs for multi-POS overridden relations so the
     // backend connects the exact variant instead of guessing by word value.
-    const synonymIds = Object.values(relPOSOverrides.synonym).map((info) =>
-      Number(info.variantId),
-    );
-    const antonymIds = Object.values(relPOSOverrides.antonym).map((info) =>
-      Number(info.variantId),
-    );
-    const similarWordIds = Object.values(relPOSOverrides.similarWord).map(
+    const overriddenSynonymIds = Object.values(relPOSOverrides.synonym).map(
       (info) => Number(info.variantId),
     );
+    const overriddenAntonymIds = Object.values(relPOSOverrides.antonym).map(
+      (info) => Number(info.variantId),
+    );
+    const overriddenSimilarWordIds = Object.values(
+      relPOSOverrides.similarWord,
+    ).map((info) => Number(info.variantId));
+
+    // Preserve the already-connected variant for every existing relation the
+    // admin isn't explicitly re-picking this session. Without this, the
+    // backend falls back to resolving these by plain value (see
+    // batchUpsertRelatedWords), which picks whichever variant of that word
+    // happens to have the lowest id — silently reconnecting a multi-POS
+    // relation to the wrong variant on every unrelated save, not just once.
+    const preservedIdsFor = (values, overrides, savedIds) =>
+      values
+        .filter((v) => !overrides[v] && savedIds[v] !== undefined)
+        .map((v) => savedIds[v]);
+
+    const preservedSynonymIds = preservedIdsFor(
+      formData.synonyms,
+      relPOSOverrides.synonym,
+      currentRelationIds.synonym,
+    );
+    const preservedAntonymIds = preservedIdsFor(
+      formData.antonyms,
+      relPOSOverrides.antonym,
+      currentRelationIds.antonym,
+    );
+    const preservedSimilarWordIds = preservedIdsFor(
+      formData.similarWords,
+      relPOSOverrides.similarWord,
+      currentRelationIds.similarWord,
+    );
+
+    const synonymIds = [...overriddenSynonymIds, ...preservedSynonymIds];
+    const antonymIds = [...overriddenAntonymIds, ...preservedAntonymIds];
+    const similarWordIds = [
+      ...overriddenSimilarWordIds,
+      ...preservedSimilarWordIds,
+    ];
 
     const dataToSend = {
       ...formData,
@@ -1328,12 +1416,24 @@ const UpdateWord = () => {
       sentences: formData.sentences.concat(
         normalizeSentenceItems(inputData.sentences),
       ),
-      // Exclude overridden words from value-based processing — their specific
-      // variant IDs are sent separately via synonymIds/antonymIds/similarWordIds.
-      synonyms: formData.synonyms.filter((s) => !relPOSOverrides.synonym[s]),
-      antonyms: formData.antonyms.filter((s) => !relPOSOverrides.antonym[s]),
+      // Only genuinely unresolved values (no known current id, and not
+      // explicitly overridden this session) go through the backend's
+      // value-based lookup — everything else is sent as an explicit id via
+      // synonymIds/antonymIds/similarWordIds above.
+      synonyms: formData.synonyms.filter(
+        (s) =>
+          !relPOSOverrides.synonym[s] &&
+          currentRelationIds.synonym[s] === undefined,
+      ),
+      antonyms: formData.antonyms.filter(
+        (s) =>
+          !relPOSOverrides.antonym[s] &&
+          currentRelationIds.antonym[s] === undefined,
+      ),
       similarWords: formData.similarWords.filter(
-        (s) => !relPOSOverrides.similarWord[s],
+        (s) =>
+          !relPOSOverrides.similarWord[s] &&
+          currentRelationIds.similarWord[s] === undefined,
       ),
       ...(synonymIds.length > 0 && { synonymIds }),
       ...(antonymIds.length > 0 && { antonymIds }),
@@ -1735,6 +1835,11 @@ const UpdateWord = () => {
     return <Navigate to="/" replace />;
   }
 
+  const isNounSelected =
+    partOfSpeeches
+      .find((p) => p.id === parseInt(formData.partOfSpeechId, 10))
+      ?.name?.toLowerCase() === "noun";
+
   return (
     <Container>
       <h2 className="text-3xl font-semibold mb-6 text-center mt-8 text-white">
@@ -1786,14 +1891,24 @@ const UpdateWord = () => {
                     </label>
                     <div className="flex gap-2">
                       {selectedItems.meaning.size > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveSelected("meaning")}
-                          disabled={loading}
-                          className="btn btn-warning btn-sm"
-                        >
-                          Delete Selected ({selectedItems.meaning.size})
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => handleDeselectAll("meaning")}
+                            disabled={loading}
+                            className="btn btn-ghost btn-sm"
+                          >
+                            Deselect All
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSelected("meaning")}
+                            disabled={loading}
+                            className="btn btn-warning btn-sm"
+                          >
+                            Delete Selected ({selectedItems.meaning.size})
+                          </button>
+                        </>
                       )}
                       {formData.meaning.length > 0 && (
                         <button
@@ -1979,14 +2094,24 @@ const UpdateWord = () => {
                     </label>
                     <div className="flex gap-2">
                       {selectedItems.sentences.size > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveSelected("sentences")}
-                          disabled={loading}
-                          className="btn btn-warning btn-sm"
-                        >
-                          Delete Selected ({selectedItems.sentences.size})
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => handleDeselectAll("sentences")}
+                            disabled={loading}
+                            className="btn btn-ghost btn-sm"
+                          >
+                            Deselect All
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSelected("sentences")}
+                            disabled={loading}
+                            className="btn btn-warning btn-sm"
+                          >
+                            Delete Selected ({selectedItems.sentences.size})
+                          </button>
+                        </>
                       )}
                       {formData.sentences.length > 0 && (
                         <button
@@ -2451,20 +2576,26 @@ const UpdateWord = () => {
                   </select>
                 </div>
 
-                {/* Article Dropdown */}
+                {/* Article Dropdown — only relevant for nouns */}
                 <div>
                   <label
                     htmlFor="update-articleId"
                     className="block  mb-2 text-white"
                   >
                     <span className="font-medium text-lg">Article</span>
+                    {!isNounSelected && (
+                      <span className="ml-2 text-sm font-normal text-gray-400">
+                        (only for nouns)
+                      </span>
+                    )}
                   </label>
                   <select
                     id="update-articleId"
                     name="articleId"
                     value={formData.articleId || "4"}
                     onChange={handleInputChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={!isNounSelected}
+                    className={`w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${!isNounSelected ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <option value="Select" disabled>
                       Select
