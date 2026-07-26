@@ -346,6 +346,11 @@ const UpdateWord = () => {
     partOfSpeech: {},
   });
 
+  // Snapshot of formData as last loaded/saved from the server — compared
+  // against the live formData (plus any pending quick-add/inline-edit text)
+  // to decide whether the Update button should be enabled at all.
+  const [initialFormData, setInitialFormData] = useState(null);
+
   const [levels, setLevels] = useState([]);
   const [topics, setTopics] = useState([]);
   const [articles, setArticles] = useState([]);
@@ -846,7 +851,7 @@ const UpdateWord = () => {
           prepositionCase: word.prepositionCase ?? null,
         };
 
-        setFormData({
+        const loadedFormData = {
           id: word.id,
           value: word.value,
           meaning: word.meaning || [],
@@ -867,7 +872,10 @@ const UpdateWord = () => {
           topic: word.topic,
           article: word.article,
           partOfSpeech: word.partOfSpeech,
-        });
+        };
+
+        setFormData(loadedFormData);
+        setInitialFormData(loadedFormData);
 
         wordCurrentIds = {
           synonym: Object.fromEntries(
@@ -1309,12 +1317,59 @@ const UpdateWord = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // If the admin left an "add above/below" or inline "edit" box open with
+    // unsaved text instead of clicking its own Add/Save button, fold it into
+    // the payload here instead of silently dropping it — those two inline
+    // actions normally save straight to the backend on their own, bypassing
+    // this form's submit entirely, so anything left un-clicked in them never
+    // reached formData before.
+    let mergedFormData = formData;
+
+    if (addingAt && newItemValue.trim()) {
+      const itemsToInsert = normalizeInsertedItems(
+        addingAt.field,
+        newItemValue,
+      );
+
+      if (itemsToInsert.length > 0) {
+        const updatedArray = [...mergedFormData[addingAt.field]];
+        const insertIndex =
+          addingAt.position === "above" ? addingAt.index : addingAt.index + 1;
+        updatedArray.splice(insertIndex, 0, ...itemsToInsert);
+        mergedFormData = { ...mergedFormData, [addingAt.field]: updatedArray };
+      }
+    }
+
+    if (editingField && editValue.trim()) {
+      const replacementItems = normalizeInsertedItems(
+        editingField.type,
+        editValue,
+      );
+
+      if (replacementItems.length > 0) {
+        const updatedArray = [...mergedFormData[editingField.type]];
+        updatedArray.splice(editingField.index, 1, ...replacementItems);
+        mergedFormData = {
+          ...mergedFormData,
+          [editingField.type]: updatedArray,
+        };
+      }
+    }
+
+    if (mergedFormData !== formData) {
+      setFormData(mergedFormData);
+      setAddingAt(null);
+      setNewItemValue("");
+      setEditingField(null);
+      setEditValue("");
+    }
+
     const selectedPOS = partOfSpeeches.find(
-      (p) => p.id === parseInt(formData.partOfSpeechId, 10),
+      (p) => p.id === parseInt(mergedFormData.partOfSpeechId, 10),
     );
     const isNoun = selectedPOS?.name?.toLowerCase() === "noun";
     const hasRealArticle =
-      !!formData.articleId && Number(formData.articleId) !== 4;
+      !!mergedFormData.articleId && Number(mergedFormData.articleId) !== 4;
 
     if (isNoun && !hasRealArticle) {
       Swal.fire({
@@ -1375,17 +1430,17 @@ const UpdateWord = () => {
         .map((v) => savedIds[v]);
 
     const preservedSynonymIds = preservedIdsFor(
-      formData.synonyms,
+      mergedFormData.synonyms,
       relPOSOverrides.synonym,
       currentRelationIds.synonym,
     );
     const preservedAntonymIds = preservedIdsFor(
-      formData.antonyms,
+      mergedFormData.antonyms,
       relPOSOverrides.antonym,
       currentRelationIds.antonym,
     );
     const preservedSimilarWordIds = preservedIdsFor(
-      formData.similarWords,
+      mergedFormData.similarWords,
       relPOSOverrides.similarWord,
       currentRelationIds.similarWord,
     );
@@ -1398,29 +1453,29 @@ const UpdateWord = () => {
     ];
 
     const dataToSend = {
-      ...formData,
+      ...mergedFormData,
 
-      meaning: formData.meaning.concat(
+      meaning: mergedFormData.meaning.concat(
         normalizeFieldItems("meaning", inputData.meaning),
       ),
-      sentences: formData.sentences.concat(
+      sentences: mergedFormData.sentences.concat(
         normalizeSentenceItems(inputData.sentences),
       ),
       // Only genuinely unresolved values (no known current id, and not
       // explicitly overridden this session) go through the backend's
       // value-based lookup — everything else is sent as an explicit id via
       // synonymIds/antonymIds/similarWordIds above.
-      synonyms: formData.synonyms.filter(
+      synonyms: mergedFormData.synonyms.filter(
         (s) =>
           !relPOSOverrides.synonym[s] &&
           currentRelationIds.synonym[s] === undefined,
       ),
-      antonyms: formData.antonyms.filter(
+      antonyms: mergedFormData.antonyms.filter(
         (s) =>
           !relPOSOverrides.antonym[s] &&
           currentRelationIds.antonym[s] === undefined,
       ),
-      similarWords: formData.similarWords.filter(
+      similarWords: mergedFormData.similarWords.filter(
         (s) =>
           !relPOSOverrides.similarWord[s] &&
           currentRelationIds.similarWord[s] === undefined,
@@ -1829,6 +1884,27 @@ const UpdateWord = () => {
     partOfSpeeches
       .find((p) => p.id === parseInt(formData.partOfSpeechId, 10))
       ?.name?.toLowerCase() === "noun";
+
+  // Whether there's actually anything for Update to save — either a real
+  // change to formData, unsaved text sitting in one of the quick-add inputs
+  // (meaning/sentences/synonyms/antonyms/similarWords), or an open "add
+  // above/below"/inline-edit box with unsaved text. Without this, Update
+  // stayed clickable and re-submitted identical data every time.
+  const hasPendingQuickAdd = Boolean(
+    inputData.meaning.trim() ||
+      inputData.sentences.trim() ||
+      inputData.synonyms.trim() ||
+      inputData.antonyms.trim() ||
+      inputData.similarWords.trim(),
+  );
+  const hasPendingInlineEdit = Boolean(
+    (addingAt && newItemValue.trim()) || (editingField && editValue.trim()),
+  );
+  const isDirty =
+    hasPendingQuickAdd ||
+    hasPendingInlineEdit ||
+    (initialFormData !== null &&
+      JSON.stringify(formData) !== JSON.stringify(initialFormData));
 
   return (
     <Container>
@@ -2868,6 +2944,7 @@ const UpdateWord = () => {
             <div className="text-center mt-6 mb-24 w-full p-1">
               <button
                 type="submit"
+                disabled={loading || !isDirty}
                 className="btn w-full md:w-8/12 lg:w-8/12 btn-primary"
               >
                 Update
