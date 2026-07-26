@@ -1317,6 +1317,17 @@ const UpdateWord = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!isDirty) {
+      Swal.fire({
+        title: "Nothing to update",
+        text: "You haven't changed anything yet.",
+        icon: "info",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
     // If the admin left an "add above/below" or inline "edit" box open with
     // unsaved text instead of clicking its own Add/Save button, fold it into
     // the payload here instead of silently dropping it — those two inline
@@ -2944,8 +2955,13 @@ const UpdateWord = () => {
             <div className="text-center mt-6 mb-24 w-full p-1">
               <button
                 type="submit"
-                disabled={loading || !isDirty}
-                className="btn w-full md:w-8/12 lg:w-8/12 btn-primary disabled:cursor-not-allowed disabled:border-slate-500 disabled:bg-slate-600 disabled:text-slate-300 disabled:opacity-100"
+                disabled={loading}
+                aria-disabled={!isDirty}
+                className={`btn w-full md:w-8/12 lg:w-8/12 disabled:cursor-not-allowed disabled:opacity-100 ${
+                  isDirty
+                    ? "btn-primary"
+                    : "cursor-not-allowed border-slate-500 bg-slate-600 text-slate-300 hover:border-slate-500 hover:bg-slate-600"
+                }`}
               >
                 Update
               </button>
