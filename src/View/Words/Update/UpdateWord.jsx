@@ -2945,7 +2945,7 @@ const UpdateWord = () => {
               <button
                 type="submit"
                 disabled={loading || !isDirty}
-                className="btn w-full md:w-8/12 lg:w-8/12 btn-primary"
+                className="btn w-full md:w-8/12 lg:w-8/12 btn-primary disabled:cursor-not-allowed disabled:border-slate-500 disabled:bg-slate-600 disabled:text-slate-300 disabled:opacity-100"
               >
                 Update
               </button>
