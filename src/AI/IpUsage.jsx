@@ -17,6 +17,7 @@ const IpUsage = () => {
   const [loading, setLoading] = useState(true);
   const [resettingIp, setResettingIp] = useState(null);
   const [resettingAll, setResettingAll] = useState(false);
+  const [savingOverrideIp, setSavingOverrideIp] = useState(null);
 
   const fetchUsage = async () => {
     try {
@@ -39,7 +40,12 @@ const IpUsage = () => {
           const matchedUser = row.userIdHint
             ? usersById.get(row.userIdHint)
             : null;
-          return { ...row, matchedUser };
+          return {
+            ...row,
+            matchedUser,
+            pendingBurstLimit: row.override?.burstLimit ?? "",
+            pendingDailyLimit: row.override?.dailyLimit ?? "",
+          };
         }),
       );
     } catch (err) {
@@ -81,6 +87,59 @@ const IpUsage = () => {
       Swal.fire("Error", "Failed to reset IP usage", "error");
     } finally {
       setResettingIp(null);
+    }
+  };
+
+  const handleOverrideFieldChange = (ip, field, value) => {
+    setUsage((prev) =>
+      prev.map((row) => (row.ip === ip ? { ...row, [field]: value } : row)),
+    );
+  };
+
+  const handleSaveOverride = async (ip) => {
+    const row = usage.find((r) => r.ip === ip);
+    if (!row) return;
+
+    setSavingOverrideIp(ip);
+    try {
+      await aiApi.post("/rate-limit/override", {
+        ip,
+        burstLimit: row.pendingBurstLimit || null,
+        dailyLimit: row.pendingDailyLimit || null,
+      });
+      await fetchUsage();
+      Swal.fire({
+        icon: "success",
+        title: "Saved",
+        text: `Custom limit saved for ${ip}.`,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Failed to save custom limit", "error");
+    } finally {
+      setSavingOverrideIp(null);
+    }
+  };
+
+  const handleClearOverride = async (ip) => {
+    setSavingOverrideIp(ip);
+    try {
+      await aiApi.delete("/rate-limit/override", { data: { ip } });
+      await fetchUsage();
+      Swal.fire({
+        icon: "success",
+        title: "Cleared",
+        text: `${ip} reverted to the global default limit.`,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Failed to clear custom limit", "error");
+    } finally {
+      setSavingOverrideIp(null);
     }
   };
 
@@ -175,6 +234,7 @@ const IpUsage = () => {
                 <th className="p-2 text-center">
                   Daily (24h) <br /> Used / Limit
                 </th>
+                <th className="p-2 text-center">Custom Limit</th>
                 <th className="p-2 text-center">Actions</th>
               </tr>
             </thead>
@@ -208,13 +268,61 @@ const IpUsage = () => {
                     {u.daily.used} / {u.daily.limit}
                   </td>
                   <td className="p-2 text-center">
-                    <button
-                      onClick={() => handleResetIp(u.ip)}
-                      disabled={resettingIp === u.ip || resettingAll}
-                      className="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700 disabled:opacity-50"
-                    >
-                      {resettingIp === u.ip ? "Resetting..." : "Reset"}
-                    </button>
+                    <div className="flex flex-col gap-1 items-center">
+                      <input
+                        type="number"
+                        placeholder="Burst"
+                        value={u.pendingBurstLimit}
+                        onChange={(e) =>
+                          handleOverrideFieldChange(
+                            u.ip,
+                            "pendingBurstLimit",
+                            e.target.value,
+                          )
+                        }
+                        className="w-20 p-1 border rounded text-center text-sm"
+                      />
+                      <input
+                        type="number"
+                        placeholder="Daily"
+                        value={u.pendingDailyLimit}
+                        onChange={(e) =>
+                          handleOverrideFieldChange(
+                            u.ip,
+                            "pendingDailyLimit",
+                            e.target.value,
+                          )
+                        }
+                        className="w-20 p-1 border rounded text-center text-sm"
+                      />
+                    </div>
+                  </td>
+                  <td className="p-2 text-center">
+                    <div className="flex flex-col gap-1 items-center">
+                      <button
+                        onClick={() => handleSaveOverride(u.ip)}
+                        disabled={savingOverrideIp === u.ip}
+                        className="bg-cyan-700 text-white px-3 py-1 rounded hover:bg-cyan-800 disabled:opacity-50 w-24"
+                      >
+                        {savingOverrideIp === u.ip ? "Saving..." : "Save Limit"}
+                      </button>
+                      {u.override && (
+                        <button
+                          onClick={() => handleClearOverride(u.ip)}
+                          disabled={savingOverrideIp === u.ip}
+                          className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 disabled:opacity-50 w-24"
+                        >
+                          Clear
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleResetIp(u.ip)}
+                        disabled={resettingIp === u.ip || resettingAll}
+                        className="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700 disabled:opacity-50 w-24"
+                      >
+                        {resettingIp === u.ip ? "Resetting..." : "Reset Usage"}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
