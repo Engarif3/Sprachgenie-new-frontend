@@ -30,6 +30,7 @@ const SECTION_ROUTES = {
   settings: [
     "/dashboard/global-limits",
     "/dashboard/user-limits",
+    "/dashboard/ip-rate-limits",
     "/dashboard/profile-photo-settings",
   ],
   analytics: ["/dashboard/users-favorite-count", "/dashboard/get-usage"],
@@ -494,6 +495,14 @@ const DashboardLayout = () => {
                     >
                       <span>⚙️</span>
                       <span>User Limits</span>
+                    </NavLink>
+                    <NavLink
+                      to="/dashboard/ip-rate-limits"
+                      className={({ isActive }) => navItemClass(isActive)}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>🛡️</span>
+                      <span>IP Rate Limits</span>
                     </NavLink>
                     {role === "super_admin" && (
                       <NavLink
