@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import { ScaleLoader } from "react-spinners";
 import Swal from "sweetalert2";
 import aiApi from "../AI_axios";
+import api from "../axios";
 import { useAuth } from "../services/auth.services";
 
 // Shows current burst/daily usage per client IP against the IP-based
@@ -18,8 +19,27 @@ const IpUsage = () => {
   const fetchUsage = async () => {
     try {
       setLoading(true);
-      const res = await aiApi.get("/rate-limit/usage");
-      setUsage(res.data);
+      const [usageRes, usersRes] = await Promise.all([
+        aiApi.get("/rate-limit/usage"),
+        // Best-effort only — the userIdHint on each row comes straight from
+        // the client's request body, unverified, so it may not match any
+        // real account (or may be stale/spoofed). Never used for anything
+        // security-sensitive, just a display label.
+        api.get("/user").catch(() => null),
+      ]);
+
+      const usersById = new Map(
+        (usersRes?.data?.data || []).map((u) => [u.id, u]),
+      );
+
+      setUsage(
+        usageRes.data.map((row) => {
+          const matchedUser = row.userIdHint
+            ? usersById.get(row.userIdHint)
+            : null;
+          return { ...row, matchedUser };
+        }),
+      );
     } catch (err) {
       console.error("Failed to fetch IP usage:", err);
       Swal.fire("Error", "Failed to fetch IP usage data", "error");
@@ -73,6 +93,7 @@ const IpUsage = () => {
             <thead>
               <tr className="bg-cyan-700 text-white">
                 <th className="p-2 text-center">IP Address</th>
+                <th className="p-2 text-center">Last Seen User</th>
                 <th className="p-2 text-center">
                   Burst (1 min) <br /> Used / Limit
                 </th>
@@ -88,6 +109,22 @@ const IpUsage = () => {
                   className="border-b odd:bg-white even:bg-gray-100"
                 >
                   <td className="p-2 text-center font-mono">{u.ip}</td>
+                  <td className="p-2 text-center">
+                    {u.matchedUser ? (
+                      <>
+                        <div>{u.matchedUser.name}</div>
+                        <div className="text-xs text-gray-500">
+                          {u.matchedUser.email}
+                        </div>
+                      </>
+                    ) : u.userIdHint ? (
+                      <span className="text-xs text-gray-500" title={u.userIdHint}>
+                        Unknown ({u.userIdHint.slice(0, 12)}…)
+                      </span>
+                    ) : (
+                      <span className="text-xs text-gray-400">Guest</span>
+                    )}
+                  </td>
                   <td className="p-2 text-center">
                     {u.burst.used} / {u.burst.limit}
                   </td>
