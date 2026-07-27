@@ -240,14 +240,14 @@ const IpUsage = () => {
       <div className="flex justify-end gap-2 mb-4">
         <button
           onClick={fetchUsage}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="w-32 whitespace-nowrap px-4 py-2 rounded text-white text-sm bg-blue-600 hover:bg-blue-700"
         >
           🔄 Refresh
         </button>
         <button
           onClick={handleResetAll}
           disabled={resettingAll || !usage.length}
-          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 disabled:opacity-50"
+          className="w-32 whitespace-nowrap px-4 py-2 rounded text-white text-sm bg-red-600 hover:bg-red-700 disabled:opacity-50"
         >
           {resettingAll ? "Resetting..." : "🗑️ Reset All"}
         </button>
@@ -338,7 +338,7 @@ const IpUsage = () => {
                       <button
                         onClick={() => handleSaveOverride(u.ip)}
                         disabled={savingOverrideIp === u.ip}
-                        className="bg-cyan-700 text-white px-3 py-1 rounded hover:bg-cyan-800 disabled:opacity-50 w-24"
+                        className="w-28 whitespace-nowrap px-3 py-1 rounded text-white text-sm bg-cyan-700 hover:bg-cyan-800 disabled:opacity-50"
                       >
                         {savingOverrideIp === u.ip ? "Saving..." : "Save Limit"}
                       </button>
@@ -346,7 +346,7 @@ const IpUsage = () => {
                         <button
                           onClick={() => handleClearOverride(u.ip)}
                           disabled={savingOverrideIp === u.ip}
-                          className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 disabled:opacity-50 w-24"
+                          className="w-28 whitespace-nowrap px-3 py-1 rounded text-white text-sm bg-gray-500 hover:bg-gray-600 disabled:opacity-50"
                         >
                           Clear
                         </button>
@@ -354,7 +354,7 @@ const IpUsage = () => {
                       <button
                         onClick={() => handleResetIp(u.ip)}
                         disabled={resettingIp === u.ip || resettingAll}
-                        className="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700 disabled:opacity-50 w-24"
+                        className="w-28 whitespace-nowrap px-3 py-1 rounded text-white text-sm bg-gray-600 hover:bg-gray-700 disabled:opacity-50"
                       >
                         {resettingIp === u.ip ? "Resetting..." : "Reset Usage"}
                       </button>
