@@ -15,6 +15,8 @@ const IpUsage = () => {
   const canAccess = userLoggedIn && userId && isAdmin;
   const [usage, setUsage] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [resettingIp, setResettingIp] = useState(null);
+  const [resettingAll, setResettingAll] = useState(false);
 
   const fetchUsage = async () => {
     try {
@@ -52,6 +54,72 @@ const IpUsage = () => {
     fetchUsage();
   }, []);
 
+  const handleResetIp = async (ip) => {
+    setResettingIp(ip);
+    try {
+      await aiApi.post("/rate-limit/reset", { ip });
+      setUsage((prev) =>
+        prev.map((row) =>
+          row.ip === ip
+            ? {
+                ...row,
+                burst: { ...row.burst, used: 0 },
+                daily: { ...row.daily, used: 0 },
+              }
+            : row,
+        ),
+      );
+      Swal.fire({
+        icon: "success",
+        title: "Reset",
+        text: `${ip}'s usage was reset.`,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Failed to reset IP usage", "error");
+    } finally {
+      setResettingIp(null);
+    }
+  };
+
+  const handleResetAll = () => {
+    Swal.fire({
+      title: "Reset all IPs?",
+      text: "This clears burst + daily usage for every IP currently tracked.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, reset all!",
+    }).then(async (result) => {
+      if (!result.isConfirmed) return;
+
+      setResettingAll(true);
+      try {
+        const res = await aiApi.post("/rate-limit/reset-all");
+        setUsage((prev) =>
+          prev.map((row) => ({
+            ...row,
+            burst: { ...row.burst, used: 0 },
+            daily: { ...row.daily, used: 0 },
+          })),
+        );
+        Swal.fire(
+          "Reset!",
+          `${res.data.count} IP(s) had their usage reset.`,
+          "success",
+        );
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Error", "Failed to reset all IP usage", "error");
+      } finally {
+        setResettingAll(false);
+      }
+    });
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -74,12 +142,19 @@ const IpUsage = () => {
         unlike per-user usage, IPs aren't pre-registered.
       </p>
 
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-end gap-2 mb-4">
         <button
           onClick={fetchUsage}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           🔄 Refresh
+        </button>
+        <button
+          onClick={handleResetAll}
+          disabled={resettingAll || !usage.length}
+          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 disabled:opacity-50"
+        >
+          {resettingAll ? "Resetting..." : "🗑️ Reset All"}
         </button>
       </div>
 
@@ -100,6 +175,7 @@ const IpUsage = () => {
                 <th className="p-2 text-center">
                   Daily (24h) <br /> Used / Limit
                 </th>
+                <th className="p-2 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -130,6 +206,15 @@ const IpUsage = () => {
                   </td>
                   <td className="p-2 text-center">
                     {u.daily.used} / {u.daily.limit}
+                  </td>
+                  <td className="p-2 text-center">
+                    <button
+                      onClick={() => handleResetIp(u.ip)}
+                      disabled={resettingIp === u.ip || resettingAll}
+                      className="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700 disabled:opacity-50"
+                    >
+                      {resettingIp === u.ip ? "Resetting..." : "Reset"}
+                    </button>
                   </td>
                 </tr>
               ))}
