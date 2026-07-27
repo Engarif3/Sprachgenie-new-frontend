@@ -361,10 +361,7 @@ const FavoriteWordsTable = ({
                         {loadingConjugations?.[word.id] ? (
                           <PuffLoader size={14} color="#ffffff" />
                         ) : (
-                          <span className="hidden md:inline">Conj.</span>
-                        )}
-                        {!loadingConjugations?.[word.id] && (
-                          <span className="md:hidden leading-none">C</span>
+                          <span className="leading-none">ai</span>
                         )}
                       </button>
                     ) : (
