@@ -33,7 +33,11 @@ const SECTION_ROUTES = {
     "/dashboard/ip-rate-limits",
     "/dashboard/profile-photo-settings",
   ],
-  analytics: ["/dashboard/users-favorite-count", "/dashboard/get-usage"],
+  analytics: [
+    "/dashboard/users-favorite-count",
+    "/dashboard/get-usage",
+    "/dashboard/ip-usage",
+  ],
   monitoring: [
     "/dashboard/registration-metadata",
     "/dashboard/system-status",
@@ -553,6 +557,14 @@ const DashboardLayout = () => {
                     >
                       <span>🤖</span>
                       <span>AI Usage</span>
+                    </NavLink>
+                    <NavLink
+                      to="/dashboard/ip-usage"
+                      className={({ isActive }) => navItemClass(isActive)}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>📡</span>
+                      <span>IP Usage</span>
                     </NavLink>
                   </div>
                 )}

@@ -98,6 +98,7 @@ const Backend = lazy(() => import("../Backend/Backend"));
 const GlobalLimits = lazy(() => import("../AI/GlobalLimits"));
 const UserLimits = lazy(() => import("../AI/UserLimits"));
 const IpRateLimits = lazy(() => import("../AI/IpRateLimits"));
+const IpUsage = lazy(() => import("../AI/IpUsage"));
 const ProfilePhotoSettings = lazy(
   () => import("../AdminActions/SuperAdmin/ProfilePhotoSettings"),
 );
@@ -181,6 +182,7 @@ const BackendWithSuspense = withSuspense(Backend);
 const GlobalLimitsWithSuspense = withSuspense(GlobalLimits);
 const UserLimitsWithSuspense = withSuspense(UserLimits);
 const IpRateLimitsWithSuspense = withSuspense(IpRateLimits);
+const IpUsageWithSuspense = withSuspense(IpUsage);
 const ProfilePhotoSettingsWithSuspense = withSuspense(ProfilePhotoSettings);
 const UsageWithSuspense = withSuspense(Usage);
 const ReportsByUsersWithSuspense = withSuspense(ReportsByUsers);
@@ -436,6 +438,10 @@ export const router = createBrowserRouter(
             {
               path: "ip-rate-limits",
               element: protectRoute(<IpRateLimitsWithSuspense />, ADMIN_ROLES),
+            },
+            {
+              path: "ip-usage",
+              element: protectRoute(<IpUsageWithSuspense />, ADMIN_ROLES),
             },
             {
               path: "profile-photo-settings",
