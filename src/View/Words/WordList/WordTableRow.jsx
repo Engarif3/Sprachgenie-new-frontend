@@ -360,7 +360,7 @@ const WordTableRow = ({
           <button
             type="button"
             onClick={() => handleConjugate(word)}
-            className="inline-flex items-center justify-center gap-1 rounded-full border-2 border-violet-400 bg-gradient-to-r from-violet-600 to-purple-600 px-2 py-1.5 md:px-1 text-[11px] md:text-xs font-bold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-violet-500 hover:to-purple-500 hover:shadow-violet-500/50 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
+            className="inline-flex items-center justify-center rounded-full border-2 border-violet-400 bg-gradient-to-r from-violet-600 to-purple-600 h-6 w-6 text-xs font-bold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-violet-500 hover:to-purple-500 hover:shadow-violet-500/50 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
             disabled={!!loadingConjugations?.[word.id]}
             title="Show conjugation table"
             aria-label="Show conjugation table"
