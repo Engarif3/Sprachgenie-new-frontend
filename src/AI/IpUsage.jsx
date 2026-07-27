@@ -60,7 +60,37 @@ const IpUsage = () => {
     fetchUsage();
   }, []);
 
+  // Every mutating action here (reset, save/clear a custom limit) requires
+  // typing "OK" rather than just clicking a confirm button — a plain
+  // click-through confirm is too easy to hit by accident on a page full of
+  // per-row action buttons.
+  const confirmWithTypedOk = async (title, text) => {
+    const result = await Swal.fire({
+      title,
+      text,
+      icon: "warning",
+      input: "text",
+      inputPlaceholder: 'Type "OK" to confirm',
+      showCancelButton: true,
+      confirmButtonText: "Confirm",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      inputValidator: (value) => {
+        if ((value || "").trim().toUpperCase() !== "OK") {
+          return 'You must type "OK" to confirm';
+        }
+      },
+    });
+    return result.isConfirmed;
+  };
+
   const handleResetIp = async (ip) => {
+    const confirmed = await confirmWithTypedOk(
+      `Reset usage for ${ip}?`,
+      "This clears its burst + daily usage back to 0.",
+    );
+    if (!confirmed) return;
+
     setResettingIp(ip);
     try {
       await aiApi.post("/rate-limit/reset", { ip });
@@ -100,6 +130,12 @@ const IpUsage = () => {
     const row = usage.find((r) => r.ip === ip);
     if (!row) return;
 
+    const confirmed = await confirmWithTypedOk(
+      `Set custom limit for ${ip}?`,
+      `Burst: ${row.pendingBurstLimit || "global default"}, Daily: ${row.pendingDailyLimit || "global default"}.`,
+    );
+    if (!confirmed) return;
+
     setSavingOverrideIp(ip);
     try {
       await aiApi.post("/rate-limit/override", {
@@ -124,6 +160,12 @@ const IpUsage = () => {
   };
 
   const handleClearOverride = async (ip) => {
+    const confirmed = await confirmWithTypedOk(
+      `Clear custom limit for ${ip}?`,
+      "It will revert to the global default burst/daily limit.",
+    );
+    if (!confirmed) return;
+
     setSavingOverrideIp(ip);
     try {
       await aiApi.delete("/rate-limit/override", { data: { ip } });
@@ -143,40 +185,34 @@ const IpUsage = () => {
     }
   };
 
-  const handleResetAll = () => {
-    Swal.fire({
-      title: "Reset all IPs?",
-      text: "This clears burst + daily usage for every IP currently tracked.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, reset all!",
-    }).then(async (result) => {
-      if (!result.isConfirmed) return;
+  const handleResetAll = async () => {
+    const confirmed = await confirmWithTypedOk(
+      "Reset all IPs?",
+      "This clears burst + daily usage for every IP currently tracked.",
+    );
+    if (!confirmed) return;
 
-      setResettingAll(true);
-      try {
-        const res = await aiApi.post("/rate-limit/reset-all");
-        setUsage((prev) =>
-          prev.map((row) => ({
-            ...row,
-            burst: { ...row.burst, used: 0 },
-            daily: { ...row.daily, used: 0 },
-          })),
-        );
-        Swal.fire(
-          "Reset!",
-          `${res.data.count} IP(s) had their usage reset.`,
-          "success",
-        );
-      } catch (err) {
-        console.error(err);
-        Swal.fire("Error", "Failed to reset all IP usage", "error");
-      } finally {
-        setResettingAll(false);
-      }
-    });
+    setResettingAll(true);
+    try {
+      const res = await aiApi.post("/rate-limit/reset-all");
+      setUsage((prev) =>
+        prev.map((row) => ({
+          ...row,
+          burst: { ...row.burst, used: 0 },
+          daily: { ...row.daily, used: 0 },
+        })),
+      );
+      Swal.fire(
+        "Reset!",
+        `${res.data.count} IP(s) had their usage reset.`,
+        "success",
+      );
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Failed to reset all IP usage", "error");
+    } finally {
+      setResettingAll(false);
+    }
   };
 
   if (loading) {
