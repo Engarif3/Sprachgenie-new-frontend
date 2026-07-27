@@ -280,8 +280,8 @@ const IpUsage = () => {
                   key={u.ip}
                   className="border-b odd:bg-white even:bg-gray-100"
                 >
-                  <td className="p-2 text-center font-mono">{u.ip}</td>
-                  <td className="p-2 text-center">
+                  <td className="p-2 text-center align-middle font-mono">{u.ip}</td>
+                  <td className="p-2 text-center align-middle">
                     {u.matchedUser ? (
                       <>
                         <div>{u.matchedUser.name}</div>
@@ -297,14 +297,14 @@ const IpUsage = () => {
                       <span className="text-xs text-gray-400">Guest</span>
                     )}
                   </td>
-                  <td className="p-2 text-center">
+                  <td className="p-2 text-center align-middle">
                     {u.burst.used} / {u.burst.limit}
                   </td>
-                  <td className="p-2 text-center">
+                  <td className="p-2 text-center align-middle">
                     {u.daily.used} / {u.daily.limit}
                   </td>
-                  <td className="p-2 text-center">
-                    <div className="flex flex-col gap-1 items-center">
+                  <td className="p-2 text-center align-middle">
+                    <div className="flex flex-row gap-1 justify-center">
                       <input
                         type="number"
                         placeholder="Burst"
@@ -316,7 +316,7 @@ const IpUsage = () => {
                             e.target.value,
                           )
                         }
-                        className="w-20 p-1 border rounded text-center text-sm"
+                        className="w-16 p-1 border rounded text-center text-sm"
                       />
                       <input
                         type="number"
@@ -329,24 +329,24 @@ const IpUsage = () => {
                             e.target.value,
                           )
                         }
-                        className="w-20 p-1 border rounded text-center text-sm"
+                        className="w-16 p-1 border rounded text-center text-sm"
                       />
                     </div>
                   </td>
-                  <td className="p-2 text-center">
-                    <div className="flex flex-col gap-1 items-center">
+                  <td className="p-2 text-center align-middle">
+                    <div className="flex flex-row flex-wrap gap-1 justify-center max-w-[180px] mx-auto">
                       <button
                         onClick={() => handleSaveOverride(u.ip)}
                         disabled={savingOverrideIp === u.ip}
-                        className="w-28 whitespace-nowrap px-3 py-1 rounded text-white text-sm bg-cyan-700 hover:bg-cyan-800 disabled:opacity-50"
+                        className="whitespace-nowrap px-2 py-1 rounded text-white text-xs bg-cyan-700 hover:bg-cyan-800 disabled:opacity-50"
                       >
-                        {savingOverrideIp === u.ip ? "Saving..." : "Save Limit"}
+                        {savingOverrideIp === u.ip ? "Saving..." : "Save"}
                       </button>
                       {u.override && (
                         <button
                           onClick={() => handleClearOverride(u.ip)}
                           disabled={savingOverrideIp === u.ip}
-                          className="w-28 whitespace-nowrap px-3 py-1 rounded text-white text-sm bg-gray-500 hover:bg-gray-600 disabled:opacity-50"
+                          className="whitespace-nowrap px-2 py-1 rounded text-white text-xs bg-gray-500 hover:bg-gray-600 disabled:opacity-50"
                         >
                           Clear
                         </button>
@@ -354,9 +354,9 @@ const IpUsage = () => {
                       <button
                         onClick={() => handleResetIp(u.ip)}
                         disabled={resettingIp === u.ip || resettingAll}
-                        className="w-28 whitespace-nowrap px-3 py-1 rounded text-white text-sm bg-gray-600 hover:bg-gray-700 disabled:opacity-50"
+                        className="whitespace-nowrap px-2 py-1 rounded text-white text-xs bg-gray-600 hover:bg-gray-700 disabled:opacity-50"
                       >
-                        {resettingIp === u.ip ? "Resetting..." : "Reset Usage"}
+                        {resettingIp === u.ip ? "Resetting..." : "Reset"}
                       </button>
                     </div>
                   </td>
