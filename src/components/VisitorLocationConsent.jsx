@@ -39,14 +39,14 @@ const VisitorLocationConsent = ({ onDecision }) => {
           <button
             type="button"
             onClick={() => onDecision(false)}
-            className="rounded-md border border-gray-600 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:border-gray-400 hover:bg-white/5"
+            className="rounded-md border border-gray-600 px-3 py-1 text-xs font-semibold text-gray-300 transition hover:border-gray-400 hover:bg-white/5"
           >
             Decline
           </button>
           <button
             type="button"
             onClick={() => onDecision(true)}
-            className="rounded-md bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-500"
+            className="rounded-md bg-cyan-600 px-3 py-1 text-xs font-semibold text-white transition hover:bg-cyan-500"
           >
             Accept
           </button>
