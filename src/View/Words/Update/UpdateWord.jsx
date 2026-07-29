@@ -1858,8 +1858,23 @@ const UpdateWord = () => {
 
         // Trigger refetch by incrementing counter
         setRefetchTrigger((prev) => prev + 1);
-      } catch {
-        setMessage("Failed to update the word.");
+      } catch (error) {
+        const errorMessage =
+          error.response?.data?.message || "Failed to update the word.";
+
+        // The "word already exists as X" duplicate-POS message needs to stay
+        // on screen and name what to change — an auto-dismissing toast isn't
+        // enough time to read and act on it.
+        const isDuplicatePosError = errorMessage.includes("already exists as");
+
+        Swal.fire({
+          title: "Error",
+          text: errorMessage,
+          icon: "error",
+          ...(isDuplicatePosError
+            ? { confirmButtonText: "OK" }
+            : { timer: 2000, showConfirmButton: false }),
+        });
       } finally {
         setLoading(false);
       }

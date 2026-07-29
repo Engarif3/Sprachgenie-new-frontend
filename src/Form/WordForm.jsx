@@ -810,25 +810,22 @@ const WordForm = () => {
         });
       }
     } catch (error) {
-      // catch (error) {
-      //   Swal.fire({
-      //     title: "Error",
-      //     text: "There was an error creating the word.",
-      //     icon: "error",
-      //     timer: 1500,
-      //     showConfirmButton: false,
-      //   });
-      // }
       const errorMessage =
         error.response?.data?.message ||
         "There was an error creating the word.";
+
+      // The "word already exists as X" duplicate-POS message needs to stay
+      // on screen and name what to change — an auto-dismissing toast isn't
+      // enough time to read and act on it.
+      const isDuplicatePosError = errorMessage.includes("already exists as");
 
       Swal.fire({
         title: "Error",
         text: errorMessage,
         icon: "error",
-        timer: 2000,
-        showConfirmButton: false,
+        ...(isDuplicatePosError
+          ? { confirmButtonText: "OK" }
+          : { timer: 2000, showConfirmButton: false }),
       });
     }
   };
