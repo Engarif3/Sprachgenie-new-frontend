@@ -6,6 +6,7 @@ import Container from "../../../utils/Container";
 import api, { publicApi } from "../../../axios";
 import { useAuth } from "../../../services/auth.services";
 import { invalidateWordsCache } from "../../../utils/storage";
+import RelationTagInput from "../../../components/RelationTagInput";
 import {
   validateSingleRelationField,
   validateRelationWords,
@@ -361,9 +362,9 @@ const UpdateWord = () => {
   const [inputData, setInputData] = useState({
     meaning: "",
     sentences: "",
-    synonyms: "",
-    antonyms: "",
-    similarWords: "",
+    synonyms: [],
+    antonyms: [],
+    similarWords: [],
   });
 
   const [loading, setLoading] = useState(false);
@@ -464,11 +465,10 @@ const UpdateWord = () => {
 
       // Remove from inputData so it won't be re-processed on submit
       setInputData((prev) => {
-        const items = normalizeFieldItems(fieldName, prev[fieldName]);
-        const filtered = items.filter(
+        const filtered = prev[fieldName].filter(
           (w) => normalizeWordValue(w) !== normalizeWordValue(word),
         );
-        return { ...prev, [fieldName]: filtered.join(", ") };
+        return { ...prev, [fieldName]: filtered };
       });
 
       // Move to formData as a saved relation
@@ -629,13 +629,11 @@ const UpdateWord = () => {
   // Check for words needing POS selection when input relations change
   useEffect(() => {
     const checkRelations = async () => {
+      const dedupeChips = (chips) => Array.from(new Set(chips.filter(Boolean)));
       const newRelationWords = {
-        synonyms: normalizeFieldItems("synonyms", inputData.synonyms),
-        antonyms: normalizeFieldItems("antonyms", inputData.antonyms),
-        similarWords: normalizeFieldItems(
-          "similarWords",
-          inputData.similarWords,
-        ),
+        synonyms: dedupeChips(inputData.synonyms),
+        antonyms: dedupeChips(inputData.antonyms),
+        similarWords: dedupeChips(inputData.similarWords),
       };
 
       const wordsNeeding =
@@ -1039,13 +1037,7 @@ const UpdateWord = () => {
         ...prevData,
         [name]: type === "checkbox" ? checked : value,
       }));
-    } else if (
-      name === "meaning" ||
-      name === "sentences" ||
-      name === "synonyms" ||
-      name === "antonyms" ||
-      name === "similarWords"
-    ) {
+    } else if (name === "meaning" || name === "sentences") {
       setInputData((prevData) => ({
         ...prevData,
         [name]: value,
@@ -1074,6 +1066,13 @@ const UpdateWord = () => {
         }));
       }
     }
+  };
+
+  const handleRelationChipsChange = (field, nextChips) => {
+    setInputData((prevData) => ({
+      ...prevData,
+      [field]: nextChips,
+    }));
   };
 
   const handleRemoveItem = async (field, index) => {
@@ -1410,12 +1409,10 @@ const UpdateWord = () => {
     // Ensure the necessary fields are arrays and remove empty strings
     // New relation words (synonym/antonym/similarWord) are added separately
     // after the update using /word/relation/add so posSelections can be applied.
-    const newSynonyms = normalizeFieldItems("synonyms", inputData.synonyms);
-    const newAntonyms = normalizeFieldItems("antonyms", inputData.antonyms);
-    const newSimilarWords = normalizeFieldItems(
-      "similarWords",
-      inputData.similarWords,
-    );
+    const dedupeChips = (chips) => Array.from(new Set(chips.filter(Boolean)));
+    const newSynonyms = dedupeChips(inputData.synonyms);
+    const newAntonyms = dedupeChips(inputData.antonyms);
+    const newSimilarWords = dedupeChips(inputData.similarWords);
 
     // Collect specific variant IDs for multi-POS overridden relations so the
     // backend connects the exact variant instead of guessing by word value.
@@ -1610,9 +1607,9 @@ const UpdateWord = () => {
 
     // Validate relation words (only the new ones from input)
     const newRelationWords = {
-      synonyms: normalizeFieldItems("synonyms", inputData.synonyms),
-      antonyms: normalizeFieldItems("antonyms", inputData.antonyms),
-      similarWords: normalizeFieldItems("similarWords", inputData.similarWords),
+      synonyms: newSynonyms,
+      antonyms: newAntonyms,
+      similarWords: newSimilarWords,
     };
 
     // Value-level self-reference check for new relations.
@@ -1794,9 +1791,9 @@ const UpdateWord = () => {
         setInputData({
           meaning: "",
           sentences: "",
-          synonyms: "",
-          antonyms: "",
-          similarWords: "",
+          synonyms: [],
+          antonyms: [],
+          similarWords: [],
         });
         setPOSSelections({});
         setWordsNeedingPOSSelection([]);
@@ -1904,9 +1901,9 @@ const UpdateWord = () => {
   const hasPendingQuickAdd = Boolean(
     inputData.meaning.trim() ||
       inputData.sentences.trim() ||
-      inputData.synonyms.trim() ||
-      inputData.antonyms.trim() ||
-      inputData.similarWords.trim(),
+      inputData.synonyms.length > 0 ||
+      inputData.antonyms.length > 0 ||
+      inputData.similarWords.length > 0,
   );
   const hasPendingInlineEdit = Boolean(
     (addingAt && newItemValue.trim()) || (editingField && editValue.trim()),
@@ -2388,14 +2385,14 @@ const UpdateWord = () => {
                     <span className="font-medium text-lg"> Synonyms</span> (for
                     multiple input use comma)
                   </label>
-                  <input
+                  <RelationTagInput
                     id="update-synonyms"
-                    type="text"
-                    name="synonyms"
-                    value={inputData.synonyms}
-                    onChange={handleInputChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter synonyms"
+                    values={inputData.synonyms}
+                    onChange={(next) =>
+                      handleRelationChipsChange("synonyms", next)
+                    }
+                    relationType="synonyms"
+                    placeholder="Type a synonym and press comma…"
                   />
                   {wordsNeedingPOSSelection
                     .filter((w) => w.relationType === "synonym")
@@ -2461,14 +2458,14 @@ const UpdateWord = () => {
                     multiple input use comma)
                   </label>
 
-                  <input
+                  <RelationTagInput
                     id="update-antonyms"
-                    type="text"
-                    name="antonyms"
-                    value={inputData.antonyms}
-                    onChange={handleInputChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter antonyms"
+                    values={inputData.antonyms}
+                    onChange={(next) =>
+                      handleRelationChipsChange("antonyms", next)
+                    }
+                    relationType="antonyms"
+                    placeholder="Type an antonym and press comma…"
                   />
                   {wordsNeedingPOSSelection
                     .filter((w) => w.relationType === "antonym")
@@ -2534,14 +2531,14 @@ const UpdateWord = () => {
                     (for multiple input use comma)
                   </label>
 
-                  <input
+                  <RelationTagInput
                     id="update-similarWords"
-                    type="text"
-                    name="similarWords"
-                    value={inputData.similarWords}
-                    onChange={handleInputChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter similar words"
+                    values={inputData.similarWords}
+                    onChange={(next) =>
+                      handleRelationChipsChange("similarWords", next)
+                    }
+                    relationType="similarWords"
+                    placeholder="Type a word and press comma…"
                   />
                   {wordsNeedingPOSSelection
                     .filter((w) => w.relationType === "similarWord")

@@ -11,6 +11,7 @@ import {
 } from "../utils/wordValidation";
 
 import { useAuth } from "../services/auth.services";
+import RelationTagInput from "../components/RelationTagInput";
 
 const normalizeWordValue = (value) =>
   String(value || "")
@@ -59,9 +60,9 @@ const WordForm = () => {
     topicId: "",
     articleId: "",
     partOfSpeechId: "",
-    synonyms: "",
-    antonyms: "",
-    similarWords: "",
+    synonyms: [],
+    antonyms: [],
+    similarWords: [],
     prefix: "",
     isPrepositional: false,
     verbAttributes: {
@@ -83,6 +84,18 @@ const WordForm = () => {
   const [partsOfSpeech, setPartsOfSpeech] = useState([]);
   const [wordsNeedingPOSSelection, setWordsNeedingPOSSelection] = useState([]);
   const [posSelections, setPOSSelections] = useState({});
+  // Relation words whose text matches the word currently being created AND
+  // that already exist as a *different* word in the DB. Unlike Update (where
+  // the word being edited already has its own row, so its own text always
+  // counts toward its variant lookup), a brand-new word here never counts
+  // toward its own lookup — so an existing word sharing the same text looks
+  // "unambiguous" (exactly 1 variant) even though it's a distinct entity.
+  // Without tracking this separately, the plain text-equality self-reference
+  // check below would wrongly block it instead of letting addRelation's
+  // existing id/POS-aware logic resolve it after creation.
+  const [selfTextExistingWords, setSelfTextExistingWords] = useState(
+    new Set(),
+  );
 
   // Fetch the options for level, topic, article, and partOfSpeech
   useEffect(() => {
@@ -164,20 +177,12 @@ const WordForm = () => {
   // Check for words needing POS selection when relations change
   useEffect(() => {
     const checkRelations = async () => {
-      const normalizeRelationList = (text) =>
-        Array.from(
-          new Set(
-            text
-              .split(",")
-              .map((s) => s.trim())
-              .filter(Boolean),
-          ),
-        );
+      const dedupeChips = (chips) => Array.from(new Set(chips.filter(Boolean)));
 
       const relationsToCheck = {
-        synonyms: normalizeRelationList(wordData.synonyms),
-        antonyms: normalizeRelationList(wordData.antonyms),
-        similarWords: normalizeRelationList(wordData.similarWords),
+        synonyms: dedupeChips(wordData.synonyms),
+        antonyms: dedupeChips(wordData.antonyms),
+        similarWords: dedupeChips(wordData.similarWords),
       };
 
       const wordsNeeding =
@@ -194,6 +199,58 @@ const WordForm = () => {
 
     checkRelations();
   }, [wordData.synonyms, wordData.antonyms, wordData.similarWords]);
+
+  // Separately track relation words that share text with the word being
+  // created (see selfTextExistingWords above) — these need an existence
+  // check regardless of variant count, unlike the >1 threshold used for
+  // detecting genuinely ambiguous (multi-POS) relation words.
+  useEffect(() => {
+    const checkSelfTextCandidates = async () => {
+      const newWordValue = normalizeWordValue(wordData.value);
+
+      if (!newWordValue) {
+        setSelfTextExistingWords(new Set());
+        return;
+      }
+
+      const candidateWords = [
+        ...wordData.synonyms,
+        ...wordData.antonyms,
+        ...wordData.similarWords,
+      ].filter(
+        (word) => Boolean(word) && normalizeWordValue(word) === newWordValue,
+      );
+
+      if (candidateWords.length === 0) {
+        setSelfTextExistingWords(new Set());
+        return;
+      }
+
+      const uniqueCandidates = [...new Set(candidateWords)];
+      const results = await Promise.all(
+        uniqueCandidates.map(async (word) => ({
+          word,
+          variants: await fetchWordVariants(word),
+        })),
+      );
+
+      setSelfTextExistingWords(
+        new Set(
+          results
+            .filter((r) => r.variants.length >= 1)
+            .map((r) => normalizeWordValue(r.word)),
+        ),
+      );
+    };
+
+    checkSelfTextCandidates();
+  }, [
+    wordData.value,
+    wordData.synonyms,
+    wordData.antonyms,
+    wordData.similarWords,
+  ]);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -273,6 +330,13 @@ const WordForm = () => {
         return updated;
       });
     }
+  };
+
+  const handleRelationChipsChange = (field, nextChips) => {
+    setWordData((prevData) => ({
+      ...prevData,
+      [field]: nextChips,
+    }));
   };
 
   // Handle form submission
@@ -372,39 +436,17 @@ const WordForm = () => {
       topicId: parseIntOrNull(wordData.topicId) || 1,
       articleId: parseIntOrNull(wordData.articleId) || 4,
       partOfSpeechId: parseIntOrNull(wordData.partOfSpeechId),
-      synonyms:
-        typeof wordData.synonyms === "string"
-          ? Array.from(
-              new Set(
-                wordData.synonyms
-                  .split(",")
-                  .map((item) => item.trim())
-                  .filter((item) => item),
-              ),
-            )
-          : [],
-      antonyms:
-        typeof wordData.antonyms === "string"
-          ? Array.from(
-              new Set(
-                wordData.antonyms
-                  .split(",")
-                  .map((item) => item.trim())
-                  .filter((item) => item),
-              ),
-            )
-          : [],
-      similarWords:
-        typeof wordData.similarWords === "string"
-          ? Array.from(
-              new Set(
-                wordData.similarWords
-                  .split(",")
-                  .map((item) => item.trim())
-                  .filter((item) => item),
-              ),
-            )
-          : [],
+      synonyms: Array.from(
+        new Set(wordData.synonyms.map((item) => item.trim()).filter(Boolean)),
+      ),
+      antonyms: Array.from(
+        new Set(wordData.antonyms.map((item) => item.trim()).filter(Boolean)),
+      ),
+      similarWords: Array.from(
+        new Set(
+          wordData.similarWords.map((item) => item.trim()).filter(Boolean),
+        ),
+      ),
     };
 
     // Add verbAttributes only if there are non-default values
@@ -475,11 +517,14 @@ const WordForm = () => {
 
     newWordData.createdBy = userId;
 
-    // Skip multi-POS words from the value-level self-reference check — their
-    // POS is validated individually in addRelation via partOfSpeechId comparison.
-    const multiPOSValues = new Set(
-      wordsNeedingPOSSelection.map((w) => normalizeWordValue(w.word)),
-    );
+    // Skip multi-POS words, and same-text-as-new-word words that already
+    // exist elsewhere, from the value-level self-reference check — both are
+    // validated individually in addRelation via id/partOfSpeechId comparison
+    // instead of plain text equality.
+    const multiPOSValues = new Set([
+      ...wordsNeedingPOSSelection.map((w) => normalizeWordValue(w.word)),
+      ...selfTextExistingWords,
+    ]);
     const relationsForSelfRefCheck = {
       synonyms: newWordData.synonyms.filter(
         (v) => !multiPOSValues.has(normalizeWordValue(v)),
@@ -1206,16 +1251,17 @@ const WordForm = () => {
                     htmlFor="synonyms"
                     className="block text-sm font-medium text-white"
                   >
-                    Synonyms (comma separated, Optional)
+                    Synonyms (Optional)
                   </label>
-                  <div className="flex gap-2 mt-2">
-                    <input
-                      type="text"
+                  <div className="mt-2">
+                    <RelationTagInput
                       id="synonyms"
-                      name="synonyms"
-                      value={wordData.synonyms}
-                      onChange={handleChange}
-                      className="input-md flex-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                      values={wordData.synonyms}
+                      onChange={(next) =>
+                        handleRelationChipsChange("synonyms", next)
+                      }
+                      relationType="synonyms"
+                      placeholder="Type a synonym and press comma…"
                     />
                   </div>
                   {wordsNeedingPOSSelection
@@ -1243,16 +1289,17 @@ const WordForm = () => {
                     htmlFor="antonyms"
                     className="block text-sm font-medium text-white"
                   >
-                    Antonyms (comma separated, Optional)
+                    Antonyms (Optional)
                   </label>
-                  <div className="flex gap-2 mt-2">
-                    <input
-                      type="text"
+                  <div className="mt-2">
+                    <RelationTagInput
                       id="antonyms"
-                      name="antonyms"
-                      value={wordData.antonyms}
-                      onChange={handleChange}
-                      className="input-md flex-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                      values={wordData.antonyms}
+                      onChange={(next) =>
+                        handleRelationChipsChange("antonyms", next)
+                      }
+                      relationType="antonyms"
+                      placeholder="Type an antonym and press comma…"
                     />
                   </div>
                   {wordsNeedingPOSSelection
@@ -1280,16 +1327,17 @@ const WordForm = () => {
                     htmlFor="similarWords"
                     className="block text-sm font-medium text-white"
                   >
-                    Word to Watch (comma separated, Optional)
+                    Word to Watch (Optional)
                   </label>
-                  <div className="flex gap-2 mt-2">
-                    <input
-                      type="text"
+                  <div className="mt-2">
+                    <RelationTagInput
                       id="similarWords"
-                      name="similarWords"
-                      value={wordData.similarWords}
-                      onChange={handleChange}
-                      className="input-md flex-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                      values={wordData.similarWords}
+                      onChange={(next) =>
+                        handleRelationChipsChange("similarWords", next)
+                      }
+                      relationType="similarWords"
+                      placeholder="Type a word and press comma…"
                     />
                   </div>
                   {wordsNeedingPOSSelection
