@@ -244,7 +244,7 @@ export const showPOSSelectionPopup = async (
               <input type="radio" name="pos-option" value="${index}" class="mr-2"
                      ${variant.id === currentVariantId ? "checked" : ""}
                      ${isDisabled ? "disabled" : ""}>
-              <strong>${variant.partOfSpeech.name}</strong>
+              <strong>${variant.partsOfSpeech.map((p) => p.name).join(", ")}</strong>
               ${isDisabled ? ' <span class="text-orange-500 font-semibold text-sm ml-1">(same word)</span>' : ""}
               ${variant.level ? ` (Level: ${variant.level.level})` : ""}
             </div>

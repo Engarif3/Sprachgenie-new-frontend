@@ -269,6 +269,13 @@ const normalizeWordValue = (value) =>
     .trim()
     .toLowerCase();
 
+// "Phrase" and "unknown" can't be combined with any other part of speech —
+// mirrors the backend's validateExclusivePartOfSpeechRule. (Unlike the
+// create form, Update's relation self-reference checks are already
+// id-based — the word being edited always has a real id — so no POS-set
+// comparison helper is needed here.)
+const EXCLUSIVE_PART_OF_SPEECH_NAMES = ["phrase", "unknown"];
+
 const getSelfReferenceMessage = (value, relations) => {
   const normalizedValue = normalizeWordValue(value);
 
@@ -324,7 +331,7 @@ const UpdateWord = () => {
     levelId: null,
     topicId: null,
     articleId: null,
-    partOfSpeechId: null,
+    partOfSpeechIds: [],
     pluralForm: "",
     synonyms: [],
     antonyms: [],
@@ -344,7 +351,7 @@ const UpdateWord = () => {
     level: {},
     topic: {},
     article: {},
-    partOfSpeech: {},
+    partsOfSpeech: [],
   });
 
   // Snapshot of formData as last loaded/saved from the server — compared
@@ -493,7 +500,7 @@ const UpdateWord = () => {
           ...prev,
           [relationType]: {
             ...prev[relationType],
-            [word]: selected.partOfSpeech.name,
+            [word]: selected.partsOfSpeech.map((p) => p.name).join(", "),
           },
         }));
       }
@@ -506,7 +513,7 @@ const UpdateWord = () => {
           ...prev[relationType],
           [word]: {
             variantId: selected.id,
-            partOfSpeechName: selected.partOfSpeech.name,
+            partOfSpeechName: selected.partsOfSpeech.map((p) => p.name).join(", "),
           },
         },
       }));
@@ -518,7 +525,7 @@ const UpdateWord = () => {
 
       Swal.fire({
         title: "Added!",
-        text: `"${word}" added as ${relationType} (${selected.partOfSpeech.name}).`,
+        text: `"${word}" added as ${relationType} (${selected.partsOfSpeech.map((p) => p.name).join(", ")}).`,
         timer: 800,
         showConfirmButton: false,
         icon: "success",
@@ -595,7 +602,7 @@ const UpdateWord = () => {
         ...prev,
         [relationType]: {
           ...prev[relationType],
-          [wordValue]: selected.partOfSpeech.name,
+          [wordValue]: selected.partsOfSpeech.map((p) => p.name).join(", "),
         },
       }));
       // Keep relPOSOverrides in sync so main submit also uses the correct variant
@@ -605,14 +612,14 @@ const UpdateWord = () => {
           ...prev[relationType],
           [wordValue]: {
             variantId: selected.id,
-            partOfSpeechName: selected.partOfSpeech.name,
+            partOfSpeechName: selected.partsOfSpeech.map((p) => p.name).join(", "),
           },
         },
       }));
 
       Swal.fire({
         title: "Updated!",
-        text: `Part of speech changed to "${selected.partOfSpeech.name}".`,
+        text: `Part of speech changed to "${selected.partsOfSpeech.map((p) => p.name).join(", ")}".`,
         timer: 800,
         showConfirmButton: false,
         icon: "success",
@@ -857,7 +864,10 @@ const UpdateWord = () => {
           levelId: word.levelId || 1,
           topicId: word.topicId || 1,
           articleId: word.articleId || 4,
-          partOfSpeechId: word.partOfSpeechId || 3,
+          partOfSpeechIds:
+            word.partsOfSpeech?.length > 0
+              ? word.partsOfSpeech.map((p) => p.id)
+              : [3],
           pluralForm: word.pluralForm || "",
           synonyms: word.synonyms?.map((item) => item.value) || [],
           antonyms: word.antonyms?.map((item) => item.value) || [],
@@ -869,7 +879,7 @@ const UpdateWord = () => {
           level: word.level,
           topic: word.topic,
           article: word.article,
-          partOfSpeech: word.partOfSpeech,
+          partsOfSpeech: word.partsOfSpeech || [],
         };
 
         setFormData(loadedFormData);
@@ -930,7 +940,10 @@ const UpdateWord = () => {
         for (const { word: wordVal, relationType, variants } of multiPOSWords) {
           const currentId = wordCurrentIds[relationType]?.[wordVal];
           const match = variants.find((v) => v.id === currentId);
-          if (match) posNames[relationType][wordVal] = match.partOfSpeech.name;
+          if (match)
+            posNames[relationType][wordVal] = match.partsOfSpeech
+              .map((p) => p.name)
+              .join(", ");
         }
         setCurrentRelationPOSNames(posNames);
       } catch (posError) {
@@ -1006,27 +1019,13 @@ const UpdateWord = () => {
         };
       });
     }
-    // If it's a select field (levelId, topicId, articleId, partOfSpeechId), update formData directly
+    // If it's a select field (levelId, topicId, articleId), update formData directly
     else if (
       name === "levelId" ||
       name === "topicId" ||
-      name === "articleId" ||
-      name === "partOfSpeechId"
+      name === "articleId"
     ) {
-      setFormData((prevData) => {
-        const updated = { ...prevData, [name]: value };
-
-        // Reset article to "No Article" when POS changes to something
-        // other than noun — mirrors WordForm.jsx's create-word behavior.
-        if (name === "partOfSpeechId") {
-          const newPOS = partOfSpeeches.find((p) => p.id === parseInt(value, 10));
-          if (!newPOS || newPOS.name.toLowerCase() !== "noun") {
-            updated.articleId = "4";
-          }
-        }
-
-        return updated;
-      });
+      setFormData((prevData) => ({ ...prevData, [name]: value }));
     } else if (
       name === "value" ||
       name === "pluralForm" ||
@@ -1073,6 +1072,41 @@ const UpdateWord = () => {
       ...prevData,
       [field]: nextChips,
     }));
+  };
+
+  // Toggling a part-of-speech checkbox. Phrase/unknown are mutually
+  // exclusive with everything else (backend enforces this too — see
+  // validateExclusivePartOfSpeechRule); selecting one of them clears any
+  // other selection, and the checkbox group disables the rest while one is
+  // active.
+  const togglePartOfSpeech = (pos) => {
+    const isExclusive = EXCLUSIVE_PART_OF_SPEECH_NAMES.includes(
+      pos.name.toLowerCase(),
+    );
+
+    setFormData((prevData) => {
+      const currentlySelected = prevData.partOfSpeechIds.includes(pos.id);
+      const nextIds = isExclusive
+        ? currentlySelected
+          ? []
+          : [pos.id]
+        : currentlySelected
+          ? prevData.partOfSpeechIds.filter((id) => id !== pos.id)
+          : [...prevData.partOfSpeechIds, pos.id];
+
+      const nextSelectedNames = partOfSpeeches
+        .filter((p) => nextIds.includes(p.id))
+        .map((p) => p.name.toLowerCase());
+      const stillNoun = nextSelectedNames.includes("noun");
+
+      return {
+        ...prevData,
+        partOfSpeechIds: nextIds,
+        // Reset article to "No Article" when noun is no longer selected —
+        // mirrors WordForm.jsx's create-word behavior.
+        articleId: stillNoun ? prevData.articleId : "4",
+      };
+    });
   };
 
   const handleRemoveItem = async (field, index) => {
@@ -1374,10 +1408,21 @@ const UpdateWord = () => {
       setEditValue("");
     }
 
-    const selectedPOS = partOfSpeeches.find(
-      (p) => p.id === parseInt(mergedFormData.partOfSpeechId, 10),
-    );
-    const isNoun = selectedPOS?.name?.toLowerCase() === "noun";
+    if (mergedFormData.partOfSpeechIds.length === 0) {
+      Swal.fire({
+        title: "Part of Speech Required",
+        text: "Please select at least one part of speech before saving.",
+        icon: "warning",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    const selectedPosNames = partOfSpeeches
+      .filter((p) => mergedFormData.partOfSpeechIds.includes(p.id))
+      .map((p) => p.name.toLowerCase());
+    const isNoun = selectedPosNames.includes("noun");
     const hasRealArticle =
       !!mergedFormData.articleId && Number(mergedFormData.articleId) !== 4;
 
@@ -1523,7 +1568,7 @@ const UpdateWord = () => {
     delete dataToSend.level;
     delete dataToSend.topic;
     delete dataToSend.article;
-    delete dataToSend.partOfSpeech;
+    delete dataToSend.partsOfSpeech;
 
     // Add prepositionCase directly to dataToSend
     dataToSend.prepositionCase = formData.prepositionAttributes.prepositionCase;
@@ -1888,10 +1933,13 @@ const UpdateWord = () => {
     return <Navigate to="/" replace />;
   }
 
-  const isNounSelected =
-    partOfSpeeches
-      .find((p) => p.id === parseInt(formData.partOfSpeechId, 10))
-      ?.name?.toLowerCase() === "noun";
+  const selectedPosNames = partOfSpeeches
+    .filter((p) => formData.partOfSpeechIds.includes(p.id))
+    .map((p) => p.name.toLowerCase());
+  const isNounSelected = selectedPosNames.includes("noun");
+  const isPhraseOrUnknownSelected = selectedPosNames.some((name) =>
+    EXCLUSIVE_PART_OF_SPEECH_NAMES.includes(name),
+  );
 
   // Whether there's actually anything for Update to save — either a real
   // change to formData, unsaved text sitting in one of the quick-add inputs
@@ -2408,7 +2456,7 @@ const UpdateWord = () => {
                         }`}
                       >
                         {posSelections[`${w.word}-synonym`]
-                          ? `✓ ${w.word} (${posSelections[`${w.word}-synonym`].partOfSpeech.name})`
+                          ? `✓ ${w.word} (${posSelections[`${w.word}-synonym`].partsOfSpeech.map((p) => p.name).join(", ")})`
                           : `Select POS for "${w.word}"`}
                       </button>
                     ))}
@@ -2481,7 +2529,7 @@ const UpdateWord = () => {
                         }`}
                       >
                         {posSelections[`${w.word}-antonym`]
-                          ? `✓ ${w.word} (${posSelections[`${w.word}-antonym`].partOfSpeech.name})`
+                          ? `✓ ${w.word} (${posSelections[`${w.word}-antonym`].partsOfSpeech.map((p) => p.name).join(", ")})`
                           : `Select POS for "${w.word}"`}
                       </button>
                     ))}
@@ -2556,7 +2604,7 @@ const UpdateWord = () => {
                         }`}
                       >
                         {posSelections[`${w.word}-similarWord`]
-                          ? `✓ ${w.word} (${posSelections[`${w.word}-similarWord`].partOfSpeech.name})`
+                          ? `✓ ${w.word} (${posSelections[`${w.word}-similarWord`].partsOfSpeech.map((p) => p.name).join(", ")})`
                           : `Select POS for "${w.word}"`}
                       </button>
                     ))}
@@ -2682,36 +2730,57 @@ const UpdateWord = () => {
                   </select>
                 </div>
 
-                {/* Part of Speech Dropdown */}
+                {/* Part of Speech — multi-select checkboxes */}
                 <div>
-                  <label
-                    htmlFor="update-partOfSpeechId"
-                    className="block  mb-2 text-white"
-                  >
-                    <span className="font-medium text-lg"> Part of Speech</span>
+                  <label className="block mb-2 text-white">
+                    <span className="font-medium text-lg">
+                      Part(s) of Speech
+                    </span>
                   </label>
-                  <select
-                    id="update-partOfSpeechId"
-                    name="partOfSpeechId"
-                    value={formData.partOfSpeechId || "3"}
-                    onChange={handleInputChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  <p className="text-xs text-gray-400 mb-2">
+                    Select one or more (e.g. Adjective + Adverb). Phrase and
+                    Unknown can't be combined with anything else.
+                  </p>
+                  <div
+                    role="group"
+                    aria-label="Parts of speech"
+                    className="grid grid-cols-2 gap-2 p-3 rounded-lg border border-gray-300 bg-white"
                   >
-                    <option value="Select" disabled>
-                      Select
-                    </option>
-                    {partOfSpeeches.map((pos) => (
-                      <option key={pos.id} value={pos.id}>
-                        {pos.name}
-                      </option>
-                    ))}
-                  </select>
+                    {partOfSpeeches.map((pos) => {
+                      const isChecked = formData.partOfSpeechIds.includes(
+                        pos.id,
+                      );
+                      const isExclusive =
+                        EXCLUSIVE_PART_OF_SPEECH_NAMES.includes(
+                          pos.name.toLowerCase(),
+                        );
+                      const disabled =
+                        !isChecked &&
+                        ((isPhraseOrUnknownSelected && !isExclusive) ||
+                          (isExclusive &&
+                            formData.partOfSpeechIds.length > 0));
+
+                      return (
+                        <label
+                          key={pos.id}
+                          className={`flex items-center gap-2 text-sm ${disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            disabled={disabled}
+                            onChange={() => togglePartOfSpeech(pos)}
+                            className="h-4 w-4 rounded border-gray-400 text-indigo-600 focus:ring-indigo-500"
+                          />
+                          {pos.name}
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                {/* Verb Attributes - Only show when part of speech is verb */}
-                {partOfSpeeches
-                  .find((pos) => pos.id === parseInt(formData.partOfSpeechId))
-                  ?.name?.toLowerCase() === "verb" && (
+                {/* Verb Attributes - shown when verb is among the selected POS */}
+                {selectedPosNames.includes("verb") && (
                   <div className="space-y-4 p-4 bg-blue-50 dark:bg-slate-800 rounded-lg border-2 border-blue-200 dark:border-blue-600">
                     <h3 className="text-sm font-semibold text-blue-700 dark:text-blue-300">
                       🔹 Verb Attributes
@@ -2860,10 +2929,8 @@ const UpdateWord = () => {
                   </div>
                 )}
 
-                {/* Preposition Attributes - Only show when part of speech is preposition */}
-                {partOfSpeeches
-                  .find((pos) => pos.id === parseInt(formData.partOfSpeechId))
-                  ?.name?.toLowerCase() === "preposition" && (
+                {/* Preposition Attributes - shown when preposition is among the selected POS */}
+                {selectedPosNames.includes("preposition") && (
                   <div className="space-y-4 p-4 bg-purple-50 dark:bg-slate-800 rounded-lg border-2 border-purple-200 dark:border-purple-600">
                     <h3 className="text-sm font-semibold text-purple-700 dark:text-purple-300">
                       🔹 Preposition Attributes
@@ -2910,10 +2977,8 @@ const UpdateWord = () => {
                   </div>
                 )}
 
-                {/* Adjective Attributes - Only show when part of speech is adjective */}
-                {partOfSpeeches
-                  .find((pos) => pos.id === parseInt(formData.partOfSpeechId))
-                  ?.name?.toLowerCase() === "adjective" && (
+                {/* Adjective Attributes - shown when adjective is among the selected POS */}
+                {selectedPosNames.includes("adjective") && (
                   <div className="space-y-4 p-4 bg-yellow-50 dark:bg-slate-800 rounded-lg border-2 border-yellow-200 dark:border-yellow-600">
                     <h3 className="text-sm font-semibold text-yellow-700 dark:text-yellow-300">
                       🔹 Adjective Attributes

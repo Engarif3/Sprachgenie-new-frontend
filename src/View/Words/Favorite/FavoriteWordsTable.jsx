@@ -13,14 +13,17 @@ const capitalizeFirstLetter = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
+const getPosTagNames = (word) =>
+  (word?.partsOfSpeech || []).map((p) => normalizeText(p.name));
+
 // Helper function to render word with prefix highlighting for separable verbs
 const renderWordWithPrefix = (word) => {
   const wordValue = word.value || "";
   const prefix = word.prefix;
-  const partOfSpeech = normalizeText(word?.partOfSpeech?.name);
+  const isVerbTagged = getPosTagNames(word).includes("verb");
   const prefixType = word.prefixType;
 
-  if (partOfSpeech === "verb" && prefixType === "SEPARABLE" && prefix) {
+  if (isVerbTagged && prefixType === "SEPARABLE" && prefix) {
     // Split the word into parts
     const parts = wordValue.split(" ");
     let foundMatch = false;
@@ -82,99 +85,80 @@ const PartOfSpeechBadge = ({ text, className, tooltipText }) => {
   );
 };
 
+const ARTICLE_COLUMN_BASE_MARKER_CLASSNAME =
+  "inline-block bg-black w-full px-1 md:px-2 lg:px-2 py-1 rounded-xl border text-xs md:text-sm lg:text-sm shadow-sm";
+const ARTICLE_COLUMN_DEFAULT_CLASSNAME =
+  "font-semibold text-orange-500 dark:text-orange-400 text-xs md:text-sm lg:text-base";
+
+// One badge config per taggable POS name — a word can now carry more than
+// one tag (e.g. adjective + adverb), so this renders one badge per tag
+// instead of picking a single POS to display.
+const POS_BADGE_CONFIG = {
+  verb: {
+    text: "vrb.",
+    className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-white bg-cyan-600 font-bold`,
+    tooltipText: "Verb",
+  },
+  adjective: {
+    text: "adj.",
+    className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-emerald-300`,
+    tooltipText: "Adjective",
+  },
+  adverb: {
+    text: "adv.",
+    className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-violet-300`,
+    tooltipText: "Adverb",
+  },
+  preposition: {
+    text: "prep.",
+    className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-amber-200`,
+    tooltipText: "Preposition",
+  },
+  conjunction: {
+    text: "conj.",
+    className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-rose-300`,
+    tooltipText: "Conjunction",
+  },
+  phrase: {
+    text: "phr.",
+    className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-cyan-400`,
+    tooltipText: "Phrase",
+  },
+};
+
+// Returns an array of badges to render in the Article column — one entry
+// per POS tag the word carries (e.g. adjective+adverb shows two badges side
+// by side), or the grammatical article text for nouns/untagged words.
 const getArticleColumnDisplay = (word) => {
-  const partOfSpeechName = normalizeText(word?.partOfSpeech?.name);
+  const tagNames = getPosTagNames(word);
   const articleName =
     typeof word?.article?.name === "string" ? word.article.name : "";
-  const defaultArticleClassName =
-    "font-semibold text-orange-500 dark:text-orange-400 text-xs md:text-sm lg:text-base";
-  const baseMarkerClassName =
-    "inline-block bg-black w-full px-1 md:px-2 lg:px-2 py-1 rounded-xl border text-xs md:text-sm lg:text-sm shadow-sm";
 
-  if (
-    !partOfSpeechName ||
-    partOfSpeechName === "unknown" ||
-    partOfSpeechName === "not specified"
-  ) {
-    return {
-      text: articleName,
-      className: defaultArticleClassName,
-      tooltipText: "",
-    };
+  const badges = tagNames
+    .filter((tag) => POS_BADGE_CONFIG[tag])
+    .map((tag) => ({ key: tag, ...POS_BADGE_CONFIG[tag] }));
+
+  const hasUnbadgedTag = tagNames.some(
+    (tag) =>
+      !POS_BADGE_CONFIG[tag] &&
+      tag !== "noun" &&
+      tag !== "unknown" &&
+      tag !== "not specified",
+  );
+
+  if (badges.length === 0 || hasUnbadgedTag) {
+    return [
+      {
+        key: "article",
+        text: articleName,
+        className: ARTICLE_COLUMN_DEFAULT_CLASSNAME,
+        tooltipText: "",
+      },
+      ...badges,
+    ];
   }
 
-  if (partOfSpeechName === "noun") {
-    return {
-      text: articleName,
-      className: defaultArticleClassName,
-      tooltipText: "",
-    };
-  }
-
-  if (partOfSpeechName === "verb") {
-    return {
-      text: "vrb.",
-      className: `${baseMarkerClassName} text-white bg-cyan-600 font-bold`,
-      tooltipText: "Verb",
-    };
-  }
-
-  if (partOfSpeechName === "adjective") {
-    return {
-      text: "adj.",
-      className: `${baseMarkerClassName} text-emerald-300`,
-      tooltipText: "Adjective",
-    };
-  }
-
-  if (partOfSpeechName === "adverb") {
-    return {
-      text: "adv.",
-      className: `${baseMarkerClassName} text-violet-300`,
-      tooltipText: "Adverb",
-    };
-  }
-
-  if (
-    partOfSpeechName === "adjective/adverb" ||
-    partOfSpeechName === "adjective / adverb"
-  ) {
-    return {
-      text: "adj/adv",
-      className: `${baseMarkerClassName} text-fuchsia-300`,
-      tooltipText: "Adjective/Adverb",
-    };
-  }
-
-  if (partOfSpeechName === "preposition") {
-    return {
-      text: "prep.",
-      className: `${baseMarkerClassName} text-amber-200`,
-      tooltipText: "Preposition",
-    };
-  }
-
-  if (partOfSpeechName === "conjunction") {
-    return {
-      text: "conj.",
-      className: `${baseMarkerClassName} text-rose-300`,
-      tooltipText: "Conjunction",
-    };
-  }
-
-  if (partOfSpeechName === "phrase") {
-    return {
-      text: "phr.",
-      className: `${baseMarkerClassName} text-cyan-400`,
-      tooltipText: "Phrase",
-    };
-  }
-
-  return {
-    text: articleName,
-    className: defaultArticleClassName,
-    tooltipText: "",
-  };
+  return badges;
 };
 
 const TABLE_VARIANTS = {
@@ -286,7 +270,7 @@ const FavoriteWordsTable = ({
           </thead>
           <tbody>
             {paginatedFavorites.map((word, index) => {
-              const articleColumnDisplay = getArticleColumnDisplay(word);
+              const articleColumnBadges = getArticleColumnDisplay(word);
 
               return (
                 <tr
@@ -298,11 +282,16 @@ const FavoriteWordsTable = ({
                   } border-b border-slate-200 transition-all duration-300 dark:border-gray-700`}
                 >
                   <td className={tableVariant.articleCell}>
-                    <PartOfSpeechBadge
-                      text={articleColumnDisplay.text}
-                      className={articleColumnDisplay.className}
-                      tooltipText={articleColumnDisplay.tooltipText}
-                    />
+                    <div className="flex flex-wrap items-center justify-center gap-1">
+                      {articleColumnBadges.map((badge) => (
+                        <PartOfSpeechBadge
+                          key={badge.key}
+                          text={badge.text}
+                          className={badge.className}
+                          tooltipText={badge.tooltipText}
+                        />
+                      ))}
+                    </div>
                   </td>
                   <td className={tableVariant.wordCell}>
                     <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between md:gap-4">
@@ -349,7 +338,7 @@ const FavoriteWordsTable = ({
                     </span>
                   </td>
                   <td className={tableVariant.conjugateCell}>
-                    {normalizeText(word?.partOfSpeech?.name) === "verb" ? (
+                    {getPosTagNames(word).includes("verb") ? (
                       <button
                         type="button"
                         onClick={() => handleConjugate?.(word)}

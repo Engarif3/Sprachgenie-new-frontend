@@ -171,9 +171,9 @@ const RelationTagInput = ({
               className="block w-full text-left px-3 py-2 text-sm text-gray-800 hover:bg-blue-50"
             >
               {word.value}
-              {word.partOfSpeech?.name && (
+              {word.partsOfSpeech?.length > 0 && (
                 <span className="ml-2 text-xs text-gray-500">
-                  ({word.partOfSpeech.name})
+                  ({word.partsOfSpeech.map((p) => p.name).join(", ")})
                 </span>
               )}
             </button>

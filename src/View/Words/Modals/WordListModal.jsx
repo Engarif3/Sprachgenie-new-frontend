@@ -28,15 +28,18 @@ const normalizeText = (value) =>
     .trim()
     .toLowerCase();
 
+const getPosTagNames = (word) =>
+  (word?.partsOfSpeech || []).map((p) => normalizeText(p.name));
+
 // Helper function to render word with highlighted separable prefix
 const renderWordWithPrefix = (word) => {
   const wordValue = word.value || "";
   const prefix = word.prefix;
-  const partOfSpeech = normalizeText(word?.partOfSpeech?.name);
+  const isVerbTagged = getPosTagNames(word).includes("verb");
   const prefixType = word.prefixType;
 
   // Only highlight if it's a separable verb with a prefix
-  if (partOfSpeech === "verb" && prefixType === "SEPARABLE" && prefix) {
+  if (isVerbTagged && prefixType === "SEPARABLE" && prefix) {
     // Split the word into parts
     const parts = wordValue.split(" ");
     let foundMatch = false;
@@ -84,17 +87,20 @@ const renderWordWithPrefix = (word) => {
   return <span>{capitalizeFirstLetter(wordValue)}</span>;
 };
 
-// Helper function to get word info based on part of speech
+// Helper function to get word info based on the word's part(s) of speech —
+// a word can carry more than one tag (e.g. adjective + adverb), so this
+// pushes one chip per tag and applies every tag-specific info block that
+// matches, instead of picking a single POS.
 const getWordInfo = (word) => {
-  const partOfSpeech = normalizeText(word?.partOfSpeech?.name);
+  const tagNames = getPosTagNames(word);
   const info = [];
 
-  // Add part of speech as the first item (skip "unknown")
-  if (partOfSpeech && partOfSpeech !== "unknown") {
-    info.push(partOfSpeech);
-  }
+  // Add each part of speech as its own chip (skip "unknown")
+  tagNames
+    .filter((tag) => tag && tag !== "unknown")
+    .forEach((tag) => info.push(tag));
 
-  if (partOfSpeech === "verb") {
+  if (tagNames.includes("verb")) {
     // Verb info
     if (word.prefixType === "SEPARABLE") info.push("separable");
     if (word.prefixType === "INSEPARABLE") info.push("inseparable");
@@ -111,7 +117,9 @@ const getWordInfo = (word) => {
       };
       info.push(caseMap[caseReq] || caseReq.toLowerCase());
     }
-  } else if (partOfSpeech === "preposition") {
+  }
+
+  if (tagNames.includes("preposition")) {
     // Preposition info
     if (word.prepositionCase) {
       const caseMap = {
@@ -124,7 +132,9 @@ const getWordInfo = (word) => {
         caseMap[word.prepositionCase] || word.prepositionCase.toLowerCase(),
       );
     }
-  } else if (partOfSpeech === "adjective") {
+  }
+
+  if (tagNames.includes("adjective")) {
     // Adjective info
     if (word.isPrepositional) info.push("prepositional");
   }
