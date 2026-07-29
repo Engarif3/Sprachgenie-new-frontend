@@ -1,11 +1,16 @@
 import "./i18n";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import NavBar from "./navbar/NavBar";
 import Footer from "./footer/Footer";
 import ScrollToTop from "./ScrollToTop";
 import ErrorBoundary from "./components/ErrorBoundary";
 import RadioMiniPlayer from "./View/Radio/RadioMiniPlayer";
+import VisitorLocationConsent, {
+  getStoredLocationConsent,
+  setStoredLocationConsent,
+} from "./components/VisitorLocationConsent";
+import { requestBrowserGeolocation } from "./utils/browserGeolocation";
 import Swal from "sweetalert2";
 import { publicApi } from "./axios";
 import {
@@ -32,6 +37,20 @@ const AppContent = () => {
       ? "bg-transparent"
       : "bg-gradient-to-b from-slate-800 via-slate-900 to-slate-950"
     : "bg-gray-50";
+  const noHeaderFooter = ["/login", "/register"].some((p) =>
+    location.pathname.startsWith(p),
+  );
+
+  const [locationConsent, setLocationConsent] = useState(() =>
+    getStoredLocationConsent(),
+  );
+  const hasGrantedLocation = locationConsent === "granted";
+
+  const handleLocationConsentDecision = (granted) => {
+    const value = granted ? "granted" : "denied";
+    setStoredLocationConsent(value);
+    setLocationConsent(value);
+  };
 
   // Same auth & env logic...
   useEffect(() => {
@@ -56,7 +75,16 @@ const AppContent = () => {
   useEffect(() => {
     const trackVisitor = async () => {
       try {
-        await publicApi.post("/visitors/track");
+        const browserGeolocation = hasGrantedLocation
+          ? await requestBrowserGeolocation()
+          : null;
+
+        await publicApi.post(
+          "/visitors/track",
+          browserGeolocation
+            ? { registrationMetadata: { browserGeolocation } }
+            : undefined,
+        );
       } catch (error) {
         console.error("Failed to track visitor:", error);
       }
@@ -89,7 +117,7 @@ const AppContent = () => {
         window.clearTimeout(timeoutId);
       }
     };
-  }, []);
+  }, [hasGrantedLocation]);
 
   useEffect(() => {
     const handleLogoutNavigation = () => {
@@ -121,7 +149,9 @@ const AppContent = () => {
         return;
       }
 
-      await syncCurrentUser();
+      // Passive refresh (fires on every tab focus + every 60s) — a stray
+      // 401 here shouldn't force-logout someone mid-edit on another page.
+      await syncCurrentUser({ forceLogoutOn401: false });
     };
 
     initializeAuth();
@@ -142,10 +172,6 @@ const AppContent = () => {
     };
   }, [navigate]);
 
-  const noHeaderFooter = ["/login", "/register"].some((p) =>
-    location.pathname.startsWith(p),
-  );
-
   return (
     <div className={`relative min-h-screen ${appBackgroundClass}`}>
       {/* Dark mode overlay */}
@@ -162,6 +188,10 @@ const AppContent = () => {
 
       <ScrollToTop />
       {!noHeaderFooter && <NavBar />}
+
+      {!noHeaderFooter && locationConsent === null && (
+        <VisitorLocationConsent onDecision={handleLocationConsentDecision} />
+      )}
 
       <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
         <Outlet />

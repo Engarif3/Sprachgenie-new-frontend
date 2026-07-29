@@ -215,7 +215,20 @@ export const useAuth = () => {
   return createAuthState(snapshot.userInfo, snapshot.isBootstrapResolved);
 };
 
-export const syncCurrentUser = async ({ preserveOnFailure = true } = {}) => {
+export const syncCurrentUser = async ({
+  preserveOnFailure = true,
+  // A passive background sync (the periodic re-check and the one fired on
+  // every tab focus/visibilitychange in App.jsx) failing with 401/403 once
+  // isn't proof the session is actually dead — it can be a transient hiccup
+  // right as a throttled background tab wakes up. Force-logging the user out
+  // from that alone would silently discard in-progress work (e.g. an admin
+  // mid-edit on the Update Word page loses their unsaved changes and gets
+  // bounced to /login just for switching tabs). Real enforcement already
+  // happens correctly via the `api` interceptor's 401 handling the moment an
+  // actual authenticated action (like Save) fails, so background callers
+  // pass forceLogoutOn401: false and just leave the cached session alone.
+  forceLogoutOn401 = true,
+} = {}) => {
   if (readLogoutInProgress()) {
     clearUserInfo();
     return null;
@@ -242,6 +255,10 @@ export const syncCurrentUser = async ({ preserveOnFailure = true } = {}) => {
     const status = error.response?.status;
 
     if (status === 401 || status === 403) {
+      if (!forceLogoutOn401) {
+        return authStore.userInfo;
+      }
+
       if (authStore.userInfo) {
         queueForcedLogoutNotice({
           title: "Logged out",

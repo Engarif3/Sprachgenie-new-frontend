@@ -31,6 +31,8 @@ const getVisitorLocationSourceLabel = (source) => {
       return "Cloudflare IP metadata";
     case "ipwhois-fallback":
       return "IP geolocation fallback";
+    case "browser-geolocation":
+      return "Precise device location (consented)";
     default:
       return source || "Unknown source";
   }

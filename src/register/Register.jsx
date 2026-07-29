@@ -9,6 +9,7 @@ import { defaultValues, validationSchema } from "./validation";
 import DarkVeil from "../View/Home/DarkVeil";
 import { IoBookOutline, IoClose, IoEye, IoEyeOff } from "react-icons/io5";
 import AuthHomeLink from "../components/auth/AuthHomeLink";
+import { requestBrowserGeolocation } from "../utils/browserGeolocation";
 
 const NOTICE_COPY = {
   security: {
@@ -35,35 +36,6 @@ const NOTICE_COPY = {
       toggleLabel: "English",
     },
   },
-};
-
-const requestPreciseLocationForSignup = async () => {
-  if (!navigator.geolocation) {
-    return null;
-  }
-
-  return new Promise((resolve) => {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        resolve({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy:
-            typeof position.coords.accuracy === "number"
-              ? position.coords.accuracy
-              : null,
-          capturedAt: new Date().toISOString(),
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
-        });
-      },
-      () => resolve(null),
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 0,
-      },
-    );
-  });
 };
 
 const Register = () => {
@@ -118,7 +90,7 @@ const Register = () => {
 
     const { optionalPreciseLocationConsent, ...restFormData } = formData;
     const preciseLocation = optionalPreciseLocationConsent
-      ? await requestPreciseLocationForSignup()
+      ? await requestBrowserGeolocation()
       : null;
 
     const submissionData = {
