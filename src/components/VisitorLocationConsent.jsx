@@ -18,28 +18,33 @@ export const setStoredLocationConsent = (value) => {
   }
 };
 
+// Styled like a familiar cookie-consent bar (full-width, flush to the
+// bottom) since that's a pattern visitors already recognize — the wording
+// itself stays specific to what's actually being requested (precise device
+// location, not cookies), since consent has to describe what it's actually
+// consent for.
 const VisitorLocationConsent = ({ onDecision }) => {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 flex justify-center px-4 pb-4">
-      <div className="w-full max-w-2xl rounded-2xl border border-cyan-500/30 bg-gradient-to-br from-gray-900 via-slate-950 to-black p-4 text-sm text-gray-200 shadow-2xl">
-        <p>
+    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-gray-700 bg-gray-900/95 shadow-[0_-4px_20px_rgba(0,0,0,0.3)] backdrop-blur-sm">
+      <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-4 text-sm text-gray-200 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+        <p className="flex-1">
           Allow SprachGenie to use your device&apos;s precise location for
           more accurate visit analytics? We always record an approximate,
           network-based location either way. Declining has no effect on using
           the site.
         </p>
-        <div className="mt-3 flex justify-end gap-2">
+        <div className="flex shrink-0 justify-end gap-2">
           <button
             type="button"
             onClick={() => onDecision(false)}
-            className="rounded-full border border-gray-700 px-4 py-2 font-semibold text-gray-300 transition hover:border-gray-500 hover:bg-white/5"
+            className="rounded-md border border-gray-600 px-4 py-2 text-sm font-semibold text-gray-300 transition hover:border-gray-400 hover:bg-white/5"
           >
             Decline
           </button>
           <button
             type="button"
             onClick={() => onDecision(true)}
-            className="rounded-full border border-cyan-500/40 bg-cyan-500/10 px-4 py-2 font-semibold text-cyan-200 transition hover:border-cyan-400 hover:bg-cyan-500/20 hover:text-white"
+            className="rounded-md bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-500"
           >
             Allow precise location
           </button>
