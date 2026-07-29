@@ -48,7 +48,7 @@ const VisitorLocationConsent = ({ onDecision }) => {
             onClick={() => onDecision(true)}
             className="rounded-md bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-500"
           >
-            Allow exact location
+            Accept
           </button>
         </div>
       </div>
