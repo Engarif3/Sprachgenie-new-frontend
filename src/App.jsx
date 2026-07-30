@@ -24,6 +24,10 @@ import { LanguageProvider } from "./context/LanguageContext";
 
 const AUTH_SYNC_INTERVAL_MS = 60000;
 const VISITOR_TRACK_DELAY_MS = 1500;
+// Gates the exact-GPS request to once per tab session — without this, every
+// refresh re-triggers navigator.geolocation.getCurrentPosition(), which
+// re-shows the browser's native permission prompt each time.
+const LOCATION_SESSION_CAPTURED_KEY = "sg_visitor_location_captured_session";
 const DarkVeil = lazy(() => import("./View/Home/DarkVeil"));
 
 const AppContent = () => {
@@ -75,9 +79,30 @@ const AppContent = () => {
   useEffect(() => {
     const trackVisitor = async () => {
       try {
-        const browserGeolocation = hasGrantedLocation
+        let alreadyCapturedThisSession = false;
+        try {
+          alreadyCapturedThisSession = Boolean(
+            window.sessionStorage.getItem(LOCATION_SESSION_CAPTURED_KEY),
+          );
+        } catch {
+          // Storage disabled (e.g. private browsing) — fall back to
+          // requesting once for this page load, same as before this change.
+        }
+
+        const shouldCaptureGeolocation =
+          hasGrantedLocation && !alreadyCapturedThisSession;
+
+        const browserGeolocation = shouldCaptureGeolocation
           ? await requestBrowserGeolocation()
           : null;
+
+        if (shouldCaptureGeolocation) {
+          try {
+            window.sessionStorage.setItem(LOCATION_SESSION_CAPTURED_KEY, "1");
+          } catch {
+            // Ignore — worst case we ask again next reload.
+          }
+        }
 
         await publicApi.post(
           "/visitors/track",
