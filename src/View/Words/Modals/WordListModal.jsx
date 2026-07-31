@@ -512,7 +512,9 @@ const WordListModal = ({
                           {item.article}{" "}
                         </span>
                       )}
-                      <span className="text-gray-300 ">{item.value}</span>
+                      <span className="text-gray-300 ">
+                        {item.article ? capitalizeFirstLetter(item.value) : item.value}
+                      </span>
                       <span className="text-orange-400 ">
                         {idx < synonymsList.length - 1 && ", "}
                       </span>
@@ -535,7 +537,9 @@ const WordListModal = ({
                           {item.article}{" "}
                         </span>
                       )}
-                      <span className="text-gray-300 ">{item.value}</span>
+                      <span className="text-gray-300 ">
+                        {item.article ? capitalizeFirstLetter(item.value) : item.value}
+                      </span>
                       <span className="text-orange-400 ">
                         {idx < antonymsList.length - 1 && ", "}
                       </span>
@@ -558,7 +562,9 @@ const WordListModal = ({
                           {item.article}{" "}
                         </span>
                       )}
-                      <span className="text-gray-300 ">{item.value}</span>
+                      <span className="text-gray-300 ">
+                        {item.article ? capitalizeFirstLetter(item.value) : item.value}
+                      </span>
                       {/* {idx < similarWordsList.length - 1 && ", "} */}
                       <span className="text-orange-400">
                         {idx < similarWordsList.length - 1 && ", "}
