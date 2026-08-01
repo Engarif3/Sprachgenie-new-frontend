@@ -173,7 +173,7 @@ const getArticleColumnDisplay = (word) => {
 
   // A word tagged noun always shows something for its noun-ness alongside
   // any other badges it carries: the grammatical article when the word has
-  // one, or a plain "n." badge when it doesn't (the article field can be an
+  // one, or a plain "noun" badge when it doesn't (the article field can be an
   // empty string rather than unset — e.g. "Bitte" = adverb + noun used to
   // render only "adv.", silently losing the noun tag entirely because
   // there was no article text to fall back to).
@@ -187,7 +187,7 @@ const getArticleColumnDisplay = (word) => {
         }
       : {
           key: "noun-badge",
-          text: "n.",
+          text: "noun",
           className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-amber-400`,
           tooltipText: "Noun",
         };
