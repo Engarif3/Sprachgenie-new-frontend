@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { MessageCircle, ChevronRight } from "lucide-react";
+import { MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
 import api from "../../axios";
@@ -21,6 +21,7 @@ const LEVEL_BADGES = {
 const DEFAULT_BADGE =
   "bg-slate-100 text-slate-700 dark:bg-slate-500/15 dark:text-slate-300";
 const CEFR_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"];
+const CONVERSATIONS_PER_PAGE = 9;
 
 const ConversationTitleList = () => {
   const { theme } = useTheme();
@@ -69,8 +70,26 @@ const ConversationTitleList = () => {
     ? conversations.filter((c) => c.levels?.level === activeLevel)
     : conversations;
 
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredConversations.length / CONVERSATIONS_PER_PAGE),
+  );
+  const requestedPage = parseInt(searchParams.get("page") || "1", 10);
+  const currentPage = Math.min(Math.max(requestedPage || 1, 1), totalPages);
+  const paginatedConversations = filteredConversations.slice(
+    (currentPage - 1) * CONVERSATIONS_PER_PAGE,
+    currentPage * CONVERSATIONS_PER_PAGE,
+  );
+
   const handleSelectLevel = (level) => {
     setSearchParams(level ? { level } : {});
+  };
+
+  const handleGoToPage = (page) => {
+    const params = {};
+    if (activeLevel) params.level = activeLevel;
+    if (page > 1) params.page = String(page);
+    setSearchParams(params);
   };
 
   const tabClass = (isActive) =>
@@ -148,7 +167,7 @@ const ConversationTitleList = () => {
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {filteredConversations.map((conversation) => {
+            {paginatedConversations.map((conversation) => {
               const level = conversation.levels?.level;
               const badgeClass = LEVEL_BADGES[level] || DEFAULT_BADGE;
               const { english, german } = splitConversationTopic(
@@ -198,6 +217,40 @@ const ConversationTitleList = () => {
                 </button>
               );
             })}
+          </div>
+        )}
+
+        {!loading && totalPages > 1 && (
+          <div className="mt-10 flex items-center justify-center gap-4">
+            <button
+              type="button"
+              onClick={() => handleGoToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`inline-flex items-center gap-1 rounded-full border px-4 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+                isLight
+                  ? "border-slate-200 bg-white text-slate-600 hover:border-orange-300"
+                  : "border-slate-700 bg-slate-900 text-slate-300 hover:border-orange-500/50"
+              }`}
+            >
+              <ChevronLeft size={16} /> Previous
+            </button>
+            <span
+              className={`text-sm font-semibold ${isLight ? "text-slate-600" : "text-slate-300"}`}
+            >
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={() => handleGoToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`inline-flex items-center gap-1 rounded-full border px-4 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+                isLight
+                  ? "border-slate-200 bg-white text-slate-600 hover:border-orange-300"
+                  : "border-slate-700 bg-slate-900 text-slate-300 hover:border-orange-500/50"
+              }`}
+            >
+              Next <ChevronRight size={16} />
+            </button>
           </div>
         )}
       </div>
