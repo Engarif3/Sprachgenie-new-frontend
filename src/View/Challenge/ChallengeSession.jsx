@@ -475,7 +475,7 @@ const ChallengeSession = () => {
               className={`flex items-center justify-center gap-2 text-3xl font-bold sm:text-4xl ${isLight ? "text-slate-900" : "text-white"}`}
             >
               {/* <span className="text-4xl">🎯</span> */}
-              <span className="bg-gradient-to-r from-emerald-500 via-amber-500 to-fuchsia-500 bg-clip-text text-transparent pb-8">
+              <span className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent pb-8">
                 Daily Challenge
               </span>
             </h1>

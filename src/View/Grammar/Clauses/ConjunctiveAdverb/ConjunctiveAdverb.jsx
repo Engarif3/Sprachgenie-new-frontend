@@ -74,7 +74,7 @@ const ConjunctiveAdverb = () => {
   return (
     <Container>
       <div className="max-w-4xl min-h-screen mx-auto p-4">
-        <h2 className="text-3xl font-bold font-mono text-center text-white mb-4">
+        <h2 className="text-3xl font-bold sm:text-4xl bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent text-center mb-4">
           Conjunctive Adverbs
         </h2>
         <p className="text-lg text-center my-12 text-white">

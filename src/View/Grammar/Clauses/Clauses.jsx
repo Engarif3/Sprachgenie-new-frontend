@@ -12,7 +12,7 @@ const Clauses = () => {
   return (
     <Container>
       <div className="max-w-5xl mx-auto p-4 mb-4 min-h-screen">
-        <h2 className="text-3xl font-bold font-mono text-white my-5 md:my-8 lg:my-8 text-center">
+        <h2 className="text-3xl font-bold sm:text-4xl bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent my-5 md:my-8 lg:my-8 text-center">
           Types of clauses
         </h2>
 

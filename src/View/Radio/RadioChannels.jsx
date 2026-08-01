@@ -1102,7 +1102,7 @@ const RadioChannels = () => {
                 Live radio channels
               </div>
 
-              <h1 className="max-w-3xl  font-black leading-tight text-2xl md:text-6xl text-center md:text-center lg:text-left text-white">
+              <h1 className="max-w-3xl font-bold leading-tight text-2xl sm:text-3xl md:text-4xl text-center lg:text-left text-white">
                 German radio channels for listening practice
               </h1>
 
