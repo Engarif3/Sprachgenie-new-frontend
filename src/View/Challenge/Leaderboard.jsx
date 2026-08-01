@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { Bot, Crown, LoaderCircle, Lock, Pencil, Rocket, Trophy } from "lucide-react";
+import { Bot, Crown, LoaderCircle, Lock, Pencil, Rocket, Trophy, UserCheck } from "lucide-react";
 import Container from "../../utils/Container";
 import api from "../../axios";
 import { useTheme } from "../../context/ThemeContext";
@@ -106,9 +106,9 @@ const BLUR_PLACEHOLDER_ENTRIES = Array.from({ length: 8 }, (_, index) => ({
   weeklyXp: 260 - index * 24,
 }));
 
-const loadLeaderboard = async (level) => {
+const loadLeaderboard = async (level, realOnly) => {
   const response = await api.get(
-    `/challenge/levels/${level}/leaderboard?limit=20`,
+    `/challenge/levels/${level}/leaderboard?limit=20${realOnly ? "&realOnly=true" : ""}`,
   );
   return (
     response.data?.data || {
@@ -139,6 +139,10 @@ const Leaderboard = () => {
   const [botsEnabled, setBotsEnabled] = useState(null);
   const [togglingBots, setTogglingBots] = useState(false);
   const [deployingBots, setDeployingBots] = useState(false);
+  // Super-admin-only view filter — excludes bots from this request's list
+  // and rank math entirely, so a super admin can check who the real users
+  // actually are without turning bots off for everyone else.
+  const [realOnly, setRealOnly] = useState(false);
 
   const refresh = useCallback(
     async (signal) => {
@@ -154,7 +158,7 @@ const Leaderboard = () => {
       setLoading(true);
 
       try {
-        const data = await loadLeaderboard(activeLevel);
+        const data = await loadLeaderboard(activeLevel, isSuperAdmin && realOnly);
         if (signal?.cancelled) return;
         setEntries(data.entries);
         setMe(data.me);
@@ -173,7 +177,7 @@ const Leaderboard = () => {
         }
       }
     },
-    [activeLevel, isLoggedIn],
+    [activeLevel, isLoggedIn, isSuperAdmin, realOnly],
   );
 
   useEffect(() => {
@@ -372,7 +376,7 @@ const Leaderboard = () => {
             className={`flex items-center gap-2 text-3xl font-bold ${isLight ? "text-slate-900" : "text-white"}`}
           >
             <Trophy className="h-8 w-8 text-amber-500" />
-            <span className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
               Leaderboard
             </span>
           </h1>
@@ -497,6 +501,36 @@ const Leaderboard = () => {
                   <span
                     className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
                       botsEnabled ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </span>
+              </button>
+            ) : null}
+
+            {isSuperAdmin ? (
+              <button
+                type="button"
+                onClick={() => setRealOnly((prev) => !prev)}
+                className={`flex items-center justify-between gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors ${cardClass}`}
+              >
+                <span
+                  className={`flex items-center gap-2 ${isLight ? "text-slate-700" : "text-slate-200"}`}
+                >
+                  <UserCheck size={16} />
+                  Real users only
+                </span>
+                <span
+                  className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
+                    realOnly
+                      ? "bg-sky-500"
+                      : isLight
+                        ? "bg-slate-300"
+                        : "bg-slate-700"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                      realOnly ? "translate-x-6" : "translate-x-1"
                     }`}
                   />
                 </span>
