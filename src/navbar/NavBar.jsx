@@ -2,7 +2,20 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import AuthButton from "../components/UI/AuthButton/AuthButton";
 import { useAuth } from "../services/auth.services";
-import { FaBook, FaHome, FaSun, FaMoon } from "react-icons/fa";
+import {
+  FaBook,
+  FaHome,
+  FaSun,
+  FaMoon,
+  FaLayerGroup,
+  FaChevronDown,
+  FaBookOpen,
+  FaComments,
+  FaBrain,
+  FaPuzzlePiece,
+  FaQuestionCircle,
+  FaTrophy,
+} from "react-icons/fa";
 import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
 import { RiRadioFill } from "react-icons/ri";
 import { useTheme } from "../context/ThemeContext";
@@ -33,6 +46,7 @@ const NavBar = () => {
   const location = useLocation();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isVisitorMenuOpen, setIsVisitorMenuOpen] = useState(false);
+  const [isContentMenuOpen, setIsContentMenuOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const {
     safeUserInfo: userInfo,
@@ -46,6 +60,10 @@ const NavBar = () => {
   const mobileProfileToggleRef = useRef(null);
   const mobileVisitorMenuRef = useRef(null);
   const mobileVisitorToggleRef = useRef(null);
+  const desktopContentMenuRef = useRef(null);
+  const desktopContentToggleRef = useRef(null);
+  const mobileContentMenuRef = useRef(null);
+  const mobileContentToggleRef = useRef(null);
   const { theme, toggleTheme } = useTheme();
   const { language, toggleLanguage } = useLanguage();
   const { currentStreak } = useChallengeStreak();
@@ -70,6 +88,11 @@ const NavBar = () => {
       const clickedVisitorMenu =
         mobileVisitorMenuRef.current?.contains(event.target) ||
         mobileVisitorToggleRef.current?.contains(event.target);
+      const clickedContentMenu =
+        desktopContentMenuRef.current?.contains(event.target) ||
+        desktopContentToggleRef.current?.contains(event.target) ||
+        mobileContentMenuRef.current?.contains(event.target) ||
+        mobileContentToggleRef.current?.contains(event.target);
 
       if (!clickedDesktopProfile && !clickedMobileProfile) {
         setIsProfileMenuOpen(false);
@@ -78,9 +101,13 @@ const NavBar = () => {
       if (!clickedVisitorMenu) {
         setIsVisitorMenuOpen(false);
       }
+
+      if (!clickedContentMenu) {
+        setIsContentMenuOpen(false);
+      }
     };
 
-    if (isProfileMenuOpen || isVisitorMenuOpen) {
+    if (isProfileMenuOpen || isVisitorMenuOpen || isContentMenuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -89,11 +116,12 @@ const NavBar = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isProfileMenuOpen, isVisitorMenuOpen]);
+  }, [isProfileMenuOpen, isVisitorMenuOpen, isContentMenuOpen]);
 
   useEffect(() => {
     setIsProfileMenuOpen(false);
     setIsVisitorMenuOpen(false);
+    setIsContentMenuOpen(false);
   }, [location.pathname]);
 
   const navbarBackgroundClass =
@@ -140,6 +168,47 @@ const NavBar = () => {
         />
       </span>
     </>
+  );
+
+  // All learning content sections, surfaced together here so users can
+  // jump between them without detouring back through the Home page.
+  const contentLinks = [
+    { to: "/words", label: t("navbar.vocabulary"), Icon: FaBook },
+    { to: "/stories", label: t("navbar.stories"), Icon: FaBookOpen },
+    {
+      to: "/conversation-titles",
+      label: t("navbar.conversations"),
+      Icon: FaComments,
+    },
+    { to: "/radio", label: t("navbar.radio"), Icon: RiRadioFill },
+    { to: "/grammar", label: t("navbar.grammar"), Icon: FaBrain },
+    { to: "/prefix-types", label: t("navbar.prefixes"), Icon: FaPuzzlePiece },
+    { to: "/quiz", label: t("navbar.quiz"), Icon: FaQuestionCircle },
+    { to: "/challenge", label: t("navbar.dailyChallenge"), Icon: FaTrophy },
+  ];
+
+  const renderContentMenu = (menuRef) => (
+    <div
+      ref={menuRef}
+      className="absolute right-0 top-full z-30 mt-2 w-56 overflow-hidden rounded-2xl border border-sky-800/60 bg-gray-900/95 p-2 shadow-2xl backdrop-blur-sm"
+    >
+      <div className="flex flex-col gap-1">
+        {contentLinks.map(({ to, label, Icon }) => (
+          <Link
+            key={to}
+            to={to}
+            onClick={() => setIsContentMenuOpen(false)}
+            className="group flex items-center gap-2 rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
+          >
+            <Icon
+              size={16}
+              className="text-sky-500 transition-colors group-hover:text-sky-400"
+            />
+            {label}
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 
   const renderProfileMenu = (menuRef, isMobile = false) => (
@@ -388,6 +457,25 @@ const NavBar = () => {
                     </Link>
                   )}
 
+                  <div className="relative">
+                    <button
+                      ref={mobileContentToggleRef}
+                      type="button"
+                      onClick={() =>
+                        setIsContentMenuOpen((current) => !current)
+                      }
+                      className={mobileQuickActionClass}
+                      aria-label={t("navbar.content")}
+                      title={t("navbar.content")}
+                    >
+                      <FaLayerGroup
+                        className="text-[15px] text-sky-300 transition-colors duration-300 group-hover:text-sky-100"
+                        size={15}
+                      />
+                    </button>
+                    {isContentMenuOpen && renderContentMenu(mobileContentMenuRef)}
+                  </div>
+
                   {location.pathname !== "/" && (
                     <Link
                       to="/"
@@ -510,6 +598,30 @@ const NavBar = () => {
                   </span>
                 </Link>
               )}
+              <div className="relative hidden md:block">
+                <button
+                  ref={desktopContentToggleRef}
+                  type="button"
+                  onClick={() => setIsContentMenuOpen((current) => !current)}
+                  className="group flex items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 transition-all duration-300"
+                >
+                  <FaLayerGroup
+                    className="text-sky-500 group-hover:text-sky-500 transition-colors group-hover:animate-bounce"
+                    size={18}
+                  />
+                  <span className="ml-1 lg:ml-2 text-base lg:text-xl text-white group-hover:text-sky-400 transition-colors">
+                    {t("navbar.content")}
+                  </span>
+                  <FaChevronDown
+                    size={12}
+                    className={`ml-1 text-sky-400 transition-transform duration-300 ${
+                      isContentMenuOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                {isContentMenuOpen && renderContentMenu(desktopContentMenuRef)}
+              </div>
+
               {userLoggedIn && (
                 <>
                   <Link

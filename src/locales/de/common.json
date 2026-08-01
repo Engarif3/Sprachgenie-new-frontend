@@ -11,7 +11,14 @@
     "language": "Sprache",
     "german": "Deutsch",
     "english": "English",
-    "createTopic": "Thema erstellen"
+    "createTopic": "Thema erstellen",
+    "content": "Inhalte",
+    "stories": "Geschichten",
+    "conversations": "Gespräche",
+    "grammar": "Grammatik",
+    "prefixes": "Präfixe",
+    "quiz": "Quiz",
+    "dailyChallenge": "Tägliche Herausforderung"
   },
   "footer": {
     "allRightsReserved": "Alle Rechte vorbehalten",
