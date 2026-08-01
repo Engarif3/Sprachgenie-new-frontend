@@ -14,6 +14,10 @@ import { useAuth } from "../services/auth.services";
 import RelationTagInput from "../components/RelationTagInput";
 import Button from "../components/UI/Button";
 import PageHeader from "../components/UI/PageHeader";
+import {
+  capitalizePartOfSpeechName,
+  sortByPartOfSpeechDisplayOrder,
+} from "../utils/partOfSpeechDisplay";
 
 const normalizeWordValue = (value) =>
   String(value || "")
@@ -127,7 +131,9 @@ const WordForm = () => {
         setLevels(levelResponse.data.data);
         setTopics(topicResponse.data.data);
         setArticles(articleResponse.data);
-        setPartsOfSpeech(partOfSpeechResponse.data);
+        setPartsOfSpeech(
+          sortByPartOfSpeechDisplayOrder(partOfSpeechResponse.data),
+        );
       } catch (error) {
         console.error("Error fetching form data:", error);
       }
@@ -1000,7 +1006,7 @@ const WordForm = () => {
                             onChange={() => togglePartOfSpeech(pos)}
                             className="h-4 w-4 rounded border-gray-400 text-sky-600 focus:ring-sky-500"
                           />
-                          {pos.name}
+                          {capitalizePartOfSpeechName(pos.name)}
                         </label>
                       );
                     })

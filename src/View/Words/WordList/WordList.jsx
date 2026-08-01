@@ -13,6 +13,10 @@ import Swal from "sweetalert2";
 import Container from "../../../utils/Container";
 import Pagination from "../../../utils/Pagination";
 import { useAuth } from "../../../services/auth.services";
+import {
+  capitalizePartOfSpeechName,
+  sortByPartOfSpeechDisplayOrder,
+} from "../../../utils/partOfSpeechDisplay";
 import api from "../../../axios";
 import Loader from "../../../utils/Loader";
 import {
@@ -358,7 +362,7 @@ const normalizePartOfSpeechOptions = (value) => {
   const options = Array.isArray(value) ? value : [];
   const seenValues = new Set();
 
-  return options
+  const normalized = options
     .map((item) => {
       if (!isRecord(item)) {
         return null;
@@ -381,10 +385,12 @@ const normalizePartOfSpeechOptions = (value) => {
 
       return {
         value: normalizedValue,
-        label,
+        label: capitalizePartOfSpeechName(label),
       };
     })
     .filter(Boolean);
+
+  return sortByPartOfSpeechDisplayOrder(normalized, (opt) => opt.value);
 };
 
 const showWordListRecoveryToast = ({ icon, title }) => {
@@ -2014,6 +2020,7 @@ const WordList = () => {
               onSelectAdjectiveFilter={handleAdjectiveFilterChange}
               partOfSpeechOptions={partOfSpeechOptions}
               notSpecifiedValue={NOT_SPECIFIED_PART_OF_SPEECH}
+              showNotSpecified={isAdmin}
             />
           </div>
         </div>

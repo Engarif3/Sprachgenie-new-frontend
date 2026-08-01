@@ -32,6 +32,10 @@ import {
 } from "@dnd-kit/sortable";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import {
+  capitalizePartOfSpeechName,
+  sortByPartOfSpeechDisplayOrder,
+} from "../../../utils/partOfSpeechDisplay";
 
 // Draggable Item Component
 const DraggableItem = ({
@@ -901,7 +905,9 @@ const UpdateWord = () => {
         setLevels(levelsResponse.data);
         setTopics(topicsResponse.data);
         setArticles(articlesResponse.data);
-        setPartOfSpeeches(partOfSpeechResponse.data);
+        setPartOfSpeeches(
+          sortByPartOfSpeechDisplayOrder(partOfSpeechResponse.data),
+        );
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -2787,7 +2793,7 @@ const UpdateWord = () => {
                             onChange={() => togglePartOfSpeech(pos)}
                             className="h-4 w-4 rounded border-gray-400 text-indigo-600 focus:ring-indigo-500"
                           />
-                          {pos.name}
+                          {capitalizePartOfSpeechName(pos.name)}
                         </label>
                       );
                     })}

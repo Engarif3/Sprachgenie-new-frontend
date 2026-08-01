@@ -12,6 +12,7 @@ const PartOfSpeechDropdown = ({
   onSelectAdjectiveFilter,
   partOfSpeechOptions,
   notSpecifiedValue,
+  showNotSpecified = true,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVerbHovered, setIsVerbHovered] = useState(false);
@@ -368,7 +369,7 @@ const PartOfSpeechDropdown = ({
       return filter ? filter.label : "Adjective";
     }
 
-    if (selectedPartOfSpeech === notSpecifiedValue) {
+    if (showNotSpecified && selectedPartOfSpeech === notSpecifiedValue) {
       return "Not specified";
     }
 
@@ -811,18 +812,22 @@ const PartOfSpeechDropdown = ({
               );
             })}
 
-            {/* Not Specified Option */}
-            <button
-              onClick={() => handleSelect(notSpecifiedValue)}
-              className={`
-                w-full px-4 py-2.5 text-left text-base transition-colors duration-150
-                hover:bg-cyan-500/20
-                ${selectedPartOfSpeech === notSpecifiedValue ? "bg-cyan-500/20 text-cyan-400" : "text-gray-300"}
-              `}
-              role="menuitem"
-            >
-              Not specified
-            </button>
+            {/* Not Specified Option — admin/super_admin only, since it
+                surfaces data-quality state (untagged words) rather than a
+                filter a basic user has any use for. */}
+            {showNotSpecified && (
+              <button
+                onClick={() => handleSelect(notSpecifiedValue)}
+                className={`
+                  w-full px-4 py-2.5 text-left text-base transition-colors duration-150
+                  hover:bg-cyan-500/20
+                  ${selectedPartOfSpeech === notSpecifiedValue ? "bg-cyan-500/20 text-cyan-400" : "text-gray-300"}
+                `}
+                role="menuitem"
+              >
+                Not specified
+              </button>
+            )}
           </div>
         </div>
       )}
