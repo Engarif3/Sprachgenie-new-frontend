@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../axios";
+import Button from "../../components/UI/Button";
+import PageHeader from "../../components/UI/PageHeader";
 
 const formatDate = (dateValue) => {
   if (!dateValue) return "";
@@ -259,12 +261,11 @@ const BroadcastNotifications = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-500 mb-2">
-            Broadcast Notifications
-          </h1>
-          <p className="text-gray-400">
-            Send an announcement that every user will see as a notification
-          </p>
+          <PageHeader
+            surface="dark"
+            title="Broadcast Notifications"
+            subtitle="Send an announcement that every user will see as a notification"
+          />
         </div>
 
         {/* Messages */}
@@ -337,14 +338,14 @@ const BroadcastNotifications = () => {
                 </div>
               </div>
 
-              <button
+              <Button
                 type="button"
+                surface="dark"
                 onClick={handleSaveSettings}
                 disabled={savingSettings}
-                className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
               >
                 {savingSettings ? "Saving..." : "Save Settings"}
-              </button>
+              </Button>
             </>
           )}
         </div>
@@ -411,13 +412,9 @@ const BroadcastNotifications = () => {
             </p>
           </div>
 
-          <button
-            type="submit"
-            disabled={broadcasting}
-            className="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-          >
+          <Button type="submit" surface="dark" disabled={broadcasting} fullWidth size="lg">
             {broadcasting ? "Broadcasting..." : "📢 Broadcast to All Users"}
-          </button>
+          </Button>
         </form>
 
         {/* Broadcast history */}

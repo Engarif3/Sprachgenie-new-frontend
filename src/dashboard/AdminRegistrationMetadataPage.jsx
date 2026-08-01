@@ -3,6 +3,8 @@ import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api, { externalApi } from "../axios";
 import { useAuth } from "../services/auth.services";
+import PageHeader from "../components/UI/PageHeader";
+import Button from "../components/UI/Button";
 
 const GEOCODING_ENDPOINT = "https://nominatim.openstreetmap.org/search";
 
@@ -468,12 +470,11 @@ const AdminRegistrationMetadataPage = () => {
         <section className="rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-lg shadow-slate-900/5 dark:border-slate-800 dark:bg-slate-900/85 dark:shadow-black/20 md:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-3xl">
-              <p className="mb-3 inline-flex rounded-full border border-emerald-300/60 bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300">
-                Security Monitoring
-              </p>
-              <h1 className="text-3xl font-bold text-slate-900 dark:text-white md:text-4xl">
-                Registration Metadata
-              </h1>
+              <PageHeader
+                eyebrow="Security Monitoring"
+                eyebrowTone="emerald"
+                title="Registration Metadata"
+              />
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:w-[25rem]">
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950/60">
@@ -581,19 +582,10 @@ const AdminRegistrationMetadataPage = () => {
             </label>
 
             <div className="flex items-end gap-3 lg:col-span-6">
-              <button
-                type="submit"
-                className="rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-sky-700"
-              >
-                Apply Filters
-              </button>
-              <button
-                type="button"
-                onClick={handleResetFilters}
-                className="rounded-2xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
-              >
+              <Button type="submit">Apply Filters</Button>
+              <Button type="button" variant="secondary" onClick={handleResetFilters}>
                 Reset
-              </button>
+              </Button>
             </div>
           </form>
         </section>

@@ -12,6 +12,8 @@ import {
 
 import { useAuth } from "../services/auth.services";
 import RelationTagInput from "../components/RelationTagInput";
+import Button from "../components/UI/Button";
+import PageHeader from "../components/UI/PageHeader";
 
 const normalizeWordValue = (value) =>
   String(value || "")
@@ -849,9 +851,7 @@ const WordForm = () => {
 
   return (
     <div className="w-full  p-0 md:p-6  lg:p-6 mt-4">
-      <h2 className="text-2xl font-semibold text-white mb-6 text-center">
-        Create a Word
-      </h2>
+      <PageHeader title="Create a Word" align="center" className="mb-6" />
       <form onSubmit={handleSubmit} className="w-full shadow-lg ">
         <div className="w-full bg-stone-800 rounded-md p-1   md:p-8 lg:p-8 ">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-8">
@@ -871,7 +871,7 @@ const WordForm = () => {
                   value={wordData.value}
                   onChange={handleChange}
                   required
-                  className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                  className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
                 />
               </div>
 
@@ -890,7 +890,7 @@ const WordForm = () => {
                   value={wordData.meaning}
                   onChange={handleChange}
                   required
-                  className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                  className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
                 />
               </div>
 
@@ -908,7 +908,7 @@ const WordForm = () => {
                   name="sentences"
                   value={wordData.sentences}
                   onChange={handleChange}
-                  className=" input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                  className=" input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
                 />
               </div>
 
@@ -926,7 +926,7 @@ const WordForm = () => {
                   name="pluralForm"
                   value={wordData.pluralForm}
                   onChange={handleChange}
-                  className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                  className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
                 />
               </div>
 
@@ -944,7 +944,7 @@ const WordForm = () => {
                   value={wordData.levelId}
                   onChange={handleChange}
                   required
-                  className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                  className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
                 >
                   <option value="">Select Level</option>
                   {levels && levels.length > 0 ? (
@@ -998,7 +998,7 @@ const WordForm = () => {
                             checked={isChecked}
                             disabled={disabled}
                             onChange={() => togglePartOfSpeech(pos)}
-                            className="h-4 w-4 rounded border-gray-400 text-indigo-600 focus:ring-indigo-500"
+                            className="h-4 w-4 rounded border-gray-400 text-sky-600 focus:ring-sky-500"
                           />
                           {pos.name}
                         </label>
@@ -1031,7 +1031,7 @@ const WordForm = () => {
                   value={wordData.articleId}
                   onChange={handleChange}
                   disabled={!isNounSelected}
-                  className={`input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 ${!isNounSelected ? "opacity-50 cursor-not-allowed" : ""}`}
+                  className={`input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50 ${!isNounSelected ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
                   <option value="">Select Article</option>
                   {articles && articles.length > 0 ? (
@@ -1068,7 +1068,7 @@ const WordForm = () => {
                       name="verbAttributes.conjugation"
                       value={wordData.verbAttributes.conjugation}
                       onChange={handleChange}
-                      className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                      className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
                     >
                       <option value="REGULAR">Regular (weak)</option>
                       <option value="IRREGULAR">Irregular (strong)</option>
@@ -1088,7 +1088,7 @@ const WordForm = () => {
                       name="verbAttributes.prefixType"
                       value={wordData.verbAttributes.prefixType}
                       onChange={handleChange}
-                      className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                      className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
                     >
                       <option value="NONE">No Prefix</option>
                       <option value="SEPARABLE">
@@ -1119,7 +1119,7 @@ const WordForm = () => {
                         value={wordData.prefix || ""}
                         onChange={handleChange}
                         placeholder="Enter prefix"
-                        className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                        className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
                       />
                       <p className="mt-1 text-xs text-gray-500">
                         The prefix will be highlighted in orange when displaying
@@ -1141,7 +1141,7 @@ const WordForm = () => {
                       name="verbAttributes.caseRequirement"
                       value={wordData.verbAttributes.caseRequirement || ""}
                       onChange={handleChange}
-                      className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                      className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
                     >
                       <option value="">Not specified</option>
                       <option value="ACCUSATIVE">Accusative (Akkusativ)</option>
@@ -1159,7 +1159,7 @@ const WordForm = () => {
                       name="verbAttributes.isReflexive"
                       checked={wordData.verbAttributes.isReflexive}
                       onChange={handleChange}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
                     />
                     <label
                       htmlFor="verbAttributes-isReflexive"
@@ -1177,7 +1177,7 @@ const WordForm = () => {
                       name="verbAttributes.isModal"
                       checked={wordData.verbAttributes.isModal}
                       onChange={handleChange}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
                     />
                     <label
                       htmlFor="verbAttributes-isModal"
@@ -1218,7 +1218,7 @@ const WordForm = () => {
                         wordData.prepositionAttributes.prepositionCase || ""
                       }
                       onChange={handleChange}
-                      className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                      className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
                     >
                       <option value="">Not specified</option>
                       <option value="ACCUSATIVE">
@@ -1290,7 +1290,7 @@ const WordForm = () => {
                   name="topicId"
                   value={wordData.topicId}
                   onChange={handleChange}
-                  className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                  className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
                 >
                   <option value="">Select Topic</option>
                   {topics && topics.length > 0 ? (
@@ -1428,12 +1428,9 @@ const WordForm = () => {
         </div>
         {/* Submit Button */}
         <div>
-          <button
-            type="submit"
-            className="w-full py-2 text-white font-medium bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 my-8"
-          >
+          <Button type="submit" fullWidth className="my-8">
             Submit
-          </button>
+          </Button>
         </div>
       </form>
     </div>

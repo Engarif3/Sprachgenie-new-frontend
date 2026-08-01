@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import api from "../../axios"; // For backend (with cookies)
 import aiApi from "../../AI_axios";
+import Button from "../../components/UI/Button";
+import PageHeader from "../../components/UI/PageHeader";
 
 const GenerateStory = () => {
   const [formData, setFormData] = useState({
@@ -257,13 +259,11 @@ const GenerateStory = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-500 mb-2">
-            Generate German Story
-          </h1>
-          <p className="text-gray-400">
-            Create AI-powered German language stories for different proficiency
-            levels
-          </p>
+          <PageHeader
+            surface="dark"
+            title="Generate German Story"
+            subtitle="Create AI-powered German language stories for different proficiency levels"
+          />
         </div>
 
         {/* Form */}
@@ -335,11 +335,7 @@ const GenerateStory = () => {
             )}
 
             {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2"
-            >
+            <Button type="submit" surface="dark" disabled={loading} fullWidth size="lg">
               {loading ? (
                 <>
                   <span className="inline-block animate-spin">⏳</span>
@@ -351,7 +347,7 @@ const GenerateStory = () => {
                   Generate Story
                 </>
               )}
-            </button>
+            </Button>
           </form>
         )}
 
@@ -505,13 +501,15 @@ const GenerateStory = () => {
                     alt="Preview"
                     className="w-full max-h-64 object-cover rounded-lg"
                   />
-                  <button
+                  <Button
                     type="button"
+                    variant="danger"
+                    surface="dark"
                     onClick={() => setUploadedImage(null)}
-                    className="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition"
+                    fullWidth
                   >
                     Remove Photo
-                  </button>
+                  </Button>
                 </div>
               ) : (
                 <div className="flex flex-col gap-4">
@@ -547,48 +545,63 @@ const GenerateStory = () => {
             <div className="flex flex-col gap-3">
               {!storyId ? (
                 <>
-                  <button
+                  <Button
+                    variant="primary"
+                    surface="dark"
+                    size="lg"
                     onClick={handleSaveDraft}
                     disabled={loading}
-                    className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg disabled:opacity-50 transition-all duration-300"
+                    fullWidth
                   >
                     {loading ? "Saving..." : "💾 Save as Draft"}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    surface="dark"
+                    size="lg"
                     onClick={handleRegenerate}
                     disabled={loading}
-                    className="w-full px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg disabled:opacity-50 transition-all duration-300"
+                    fullWidth
                   >
                     ♻️ Regenerate
-                  </button>
+                  </Button>
                 </>
               ) : (
                 <>
                   {uploadedImage?.preview && (
-                    <button
+                    <Button
+                      variant="primary"
+                      surface="dark"
+                      size="lg"
                       onClick={() => handleUploadImage(storyId)}
                       disabled={loading || uploadingImage}
-                      className="w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg disabled:opacity-50 transition-all duration-300"
+                      fullWidth
                     >
                       {uploadingImage
                         ? "Uploading..."
                         : "📤 Upload Photo to Cloud"}
-                    </button>
+                    </Button>
                   )}
-                  <button
+                  <Button
+                    variant="success"
+                    surface="dark"
+                    size="lg"
                     onClick={handlePublish}
                     disabled={loading}
-                    className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg disabled:opacity-50 transition-all duration-300"
+                    fullWidth
                   >
                     {loading ? "Publishing..." : "✅ Publish Story"}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    surface="dark"
+                    size="lg"
                     onClick={handleRegenerate}
                     disabled={loading}
-                    className="w-full px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg disabled:opacity-50 transition-all duration-300"
+                    fullWidth
                   >
                     ↩️ Start Over
-                  </button>
+                  </Button>
                 </>
               )}
             </div>

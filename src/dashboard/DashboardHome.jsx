@@ -2,6 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../services/auth.services";
+import PageHeader from "../components/UI/PageHeader";
 
 const DashboardHome = () => {
   const { safeUserInfo: userInfo, isAdmin, isSuperAdmin, userRole } = useAuth();
@@ -77,14 +78,17 @@ const DashboardHome = () => {
     <div className="px-4 md:px-6 lg:px-8 py-8 md:py-12  min-h-screen">
       {/* Welcome Section */}
       <div className="mb-12 max-w-4xl mx-auto">
-        <div className="mb-4"></div>
-        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold dark:text-white mb-4">
-          Welcome back,{" "}
-          <span className="text-blue-400">{userInfo.name || "User"}</span>
-        </h1>
-        <p className="text-gray-700 dark:text-gray-400 text-base md:text-lg font-medium">
-          Manage your vocabulary journey and learning progress
-        </p>
+        <PageHeader
+          title={
+            <>
+              Welcome back,{" "}
+              <span className="text-sky-500 dark:text-sky-400">
+                {userInfo.name || "User"}
+              </span>
+            </>
+          }
+          subtitle="Manage your vocabulary journey and learning progress"
+        />
       </div>
 
       {/* Quick Stats */}

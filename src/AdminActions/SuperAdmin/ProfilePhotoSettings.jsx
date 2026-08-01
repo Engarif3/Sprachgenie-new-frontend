@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../../axios";
+import PageHeader from "../../components/UI/PageHeader";
 
 const ProfilePhotoSettings = () => {
   const [allowImageUploadAdmin, setAllowImageUploadAdmin] = useState(true);
@@ -54,14 +55,11 @@ const ProfilePhotoSettings = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-8">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-500 mb-2">
-            Profile Photo Settings
-          </h1>
-          <p className="text-gray-400">
-            Control whether admins and basic users can upload a custom
-            profile photo, or must choose from the preset avatars. Super
-            admins can always upload, regardless of these settings.
-          </p>
+          <PageHeader
+            surface="dark"
+            title="Profile Photo Settings"
+            subtitle="Control whether admins and basic users can upload a custom profile photo, or must choose from the preset avatars. Super admins can always upload, regardless of these settings."
+          />
         </div>
 
         {error && (

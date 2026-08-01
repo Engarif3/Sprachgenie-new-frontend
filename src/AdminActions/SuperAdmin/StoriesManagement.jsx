@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import api from "../../axios";
 import aiApi from "../../AI_axios";
+import PageHeader from "../../components/UI/PageHeader";
 
 const StoriesManagement = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -360,12 +361,11 @@ const StoriesManagement = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-500 mb-2">
-            Stories Management
-          </h1>
-          <p className="text-gray-400">
-            View, edit, publish, and delete your German language stories
-          </p>
+          <PageHeader
+            surface="dark"
+            title="Stories Management"
+            subtitle="View, edit, publish, and delete your German language stories"
+          />
         </div>
 
         {/* Filters */}

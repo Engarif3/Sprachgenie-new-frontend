@@ -52,7 +52,7 @@
 //             value={topicData.name}
 //             onChange={handleChange}
 //             required
-//             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+//             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
 //           />
 //         </div>
 
@@ -77,6 +77,8 @@ import axios from "../axios";
 import Container from "../utils/Container";
 import { useAuth } from "../services/auth.services";
 import { invalidateWordsCache } from "../utils/storage";
+import Button from "../components/UI/Button";
+import PageHeader from "../components/UI/PageHeader";
 
 const TopicForm = () => {
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
@@ -137,9 +139,11 @@ const TopicForm = () => {
   return (
     <Container>
       <div className="min-h-screen ">
-        <h2 className="text-white text-3xl font-semibold mt-8 mb-6 text-center">
-          Create a Topic
-        </h2>
+        <PageHeader
+          title="Create a Topic"
+          align="center"
+          className="mt-8 mb-6"
+        />
         <form
           onSubmit={handleSubmit}
           className="space-y-4 p-4 bg-stone-800 rounded-md text-white "
@@ -155,7 +159,7 @@ const TopicForm = () => {
               value={topicData.name}
               onChange={handleChange}
               required
-              className="mt-1 block w-full input-md rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+              className="mt-1 block w-full input-md rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
             />
           </div>
 
@@ -169,7 +173,7 @@ const TopicForm = () => {
               value={topicData.levelId}
               onChange={handleChange}
               required
-              className="mt-1 block w-full input-md rounded-md text-black border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+              className="mt-1 block w-full input-md rounded-md text-black border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
             >
               <option value="">Select Level</option>
               {levels.map((level) => (
@@ -180,13 +184,9 @@ const TopicForm = () => {
             </select>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="mt-24 w-full rounded-md bg-indigo-600 py-2 text-white font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 "
-          >
+          <Button type="submit" disabled={loading} fullWidth className="mt-24">
             {loading ? "Creating..." : "Create Topic"}
-          </button>
+          </Button>
         </form>
       </div>
     </Container>

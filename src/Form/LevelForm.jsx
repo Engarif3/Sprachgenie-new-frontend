@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import axios from "../axios"; // Adjust the axios import if needed
 import Container from "../utils/Container";
 import { useAuth } from "../services/auth.services";
+import Button from "../components/UI/Button";
 
 const LevelForm = () => {
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
@@ -67,18 +68,13 @@ const LevelForm = () => {
             value={levelData.levelName} // Update to levelName
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
           />
         </div>
 
-        <button
-          type="submit"
-          disabled={loading} // Disable button while loading
-          className="mt-4 w-full rounded-md bg-indigo-600 py-2 text-white font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        >
-          {loading ? "Submitting..." : "Submit"}{" "}
-          {/* Show loading text while submitting */}
-        </button>
+        <Button type="submit" disabled={loading} fullWidth className="mt-4">
+          {loading ? "Submitting..." : "Submit"}
+        </Button>
       </form>
     </Container>
   );

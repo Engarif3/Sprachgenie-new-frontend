@@ -11,6 +11,7 @@ import {
   getAvatarUrl,
   isImageUploadAllowedForUser,
 } from "../utils/avatar";
+import PageHeader from "../components/UI/PageHeader";
 
 const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
 
@@ -520,14 +521,11 @@ const ProfilePage = () => {
 
         <section className="rounded-3xl border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-800 dark:bg-gray-900/80 dark:text-white">
           <div className="mb-8">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-blue-500">
-              Profile Settings
-            </p>
-            <h1 className="mt-2 text-3xl font-bold">Manage your account</h1>
-            <p className="mt-3 max-w-2xl text-sm text-gray-600 dark:text-gray-400">
-              Update your personal information, replace your profile image, or
-              remove it entirely. Changes apply only to your own account.
-            </p>
+            <PageHeader
+              eyebrow="Profile Settings"
+              title="Manage your account"
+              subtitle="Update your personal information, replace your profile image, or remove it entirely. Changes apply only to your own account."
+            />
           </div>
 
           <form className="space-y-8" onSubmit={handleSubmit}>

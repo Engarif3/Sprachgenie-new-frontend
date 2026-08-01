@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import api from "../../axios";
 import WordListModal from "../../View/Words/Modals/WordListModal";
+import Button from "../../components/UI/Button";
+import PageHeader from "../../components/UI/PageHeader";
 
 const formatDate = (dateValue) => {
   if (!dateValue) return "";
@@ -314,13 +316,11 @@ const WordReports = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-8">
       <div className="max-w-5xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-500 mb-2">
-            Word Reports
-          </h1>
-          <p className="text-gray-400">
-            Manage report reasons, the optional note field, and review words
-            users have flagged.
-          </p>
+          <PageHeader
+            surface="dark"
+            title="Word Reports"
+            subtitle="Manage report reasons, the optional note field, and review words users have flagged."
+          />
         </div>
 
         {error && (
@@ -368,18 +368,22 @@ const WordReports = () => {
                         />
                         Requires sentence pick
                       </label>
-                      <button
+                      <Button
+                        variant="success"
+                        surface="dark"
+                        size="sm"
                         onClick={handleSaveReason}
-                        className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded-lg transition"
                       >
                         Save
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        surface="dark"
+                        size="sm"
                         onClick={closeEditReason}
-                        className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-xs font-semibold rounded-lg transition"
                       >
                         Cancel
-                      </button>
+                      </Button>
                     </div>
                   ) : (
                     <div
@@ -395,18 +399,22 @@ const WordReports = () => {
                         )}
                       </span>
                       <div className="flex gap-2">
-                        <button
+                        <Button
+                          variant="primary"
+                          surface="dark"
+                          size="sm"
                           onClick={() => openEditReason(reason)}
-                          className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition"
                         >
                           Edit
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                          variant="danger"
+                          surface="dark"
+                          size="sm"
                           onClick={() => handleDeleteReason(reason)}
-                          className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition"
                         >
                           Delete
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   ),
@@ -438,12 +446,9 @@ const WordReports = () => {
                   />
                   Requires sentence pick
                 </label>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white text-sm font-semibold rounded-lg hover:from-orange-600 hover:to-pink-600 transition"
-                >
+                <Button type="submit" surface="dark">
                   Add Option
-                </button>
+                </Button>
               </form>
             </>
           )}

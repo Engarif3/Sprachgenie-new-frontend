@@ -3,6 +3,7 @@ import Swal from "sweetalert2";
 import { useTheme } from "../../context/ThemeContext";
 import { useNotifications } from "../../hooks/useNotifications";
 import NotificationList from "./NotificationList";
+import PageHeader from "../../components/UI/PageHeader";
 
 const confirmDelete = ({ title, text }) =>
   Swal.fire({
@@ -88,14 +89,10 @@ const NotificationsPage = () => {
   return (
     <div className="mx-auto max-w-3xl p-4 pb-12 md:p-8">
       <div className="mb-6">
-        <h1
-          className={`text-3xl font-bold ${isLight ? "text-slate-900" : "text-white"}`}
-        >
-          🔔 Notifications
-        </h1>
-        <p className={`mt-1 ${isLight ? "text-slate-600" : "text-slate-400"}`}>
-          Announcements from the Sprachgenie team.
-        </p>
+        <PageHeader
+          title="🔔 Notifications"
+          subtitle="Announcements from the Sprachgenie team."
+        />
       </div>
 
       {notifications.length > 0 && (

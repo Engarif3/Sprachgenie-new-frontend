@@ -5,6 +5,8 @@ import axios from "../axios";
 import Container from "../utils/Container";
 import { useAuth } from "../services/auth.services";
 import { invalidateWordsCache } from "../utils/storage";
+import Button from "../components/UI/Button";
+import PageHeader from "../components/UI/PageHeader";
 
 const EMPTY_TOPIC_FORM = {
   name: "",
@@ -113,7 +115,7 @@ const UpdateTopicForm = () => {
       showCancelButton: true,
       confirmButtonText: "Update",
       cancelButtonText: "Cancel",
-      confirmButtonColor: "#4f46e5",
+      confirmButtonColor: "#0284c7",
       cancelButtonColor: "#475569",
       background: "#1c1917",
       color: "#f5f5f4",
@@ -175,9 +177,11 @@ const UpdateTopicForm = () => {
   return (
     <Container>
       <div className="min-h-screen ">
-        <h2 className="text-white text-3xl font-semibold mt-8 mb-6 text-center">
-          Update Topic
-        </h2>
+        <PageHeader
+          title="Update Topic"
+          align="center"
+          className="mt-8 mb-6"
+        />
         <form
           onSubmit={handleSubmit}
           className="space-y-4 p-4 bg-stone-800 rounded-md text-white"
@@ -193,7 +197,7 @@ const UpdateTopicForm = () => {
               onChange={handleTopicSelection}
               disabled={loadingOptions || loading}
               required
-              className="mt-1 block w-full input-md rounded-md text-black border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+              className="mt-1 block w-full input-md rounded-md text-black border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
             >
               <option value="">
                 {loadingOptions ? "Loading topics..." : "Select Topic"}
@@ -219,7 +223,7 @@ const UpdateTopicForm = () => {
               onChange={handleChange}
               required
               disabled={!selectedTopicId}
-              className="mt-1 block w-full input-md rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 text-black"
+              className="mt-1 block w-full input-md rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50 text-black"
             />
           </div>
 
@@ -234,7 +238,7 @@ const UpdateTopicForm = () => {
               onChange={handleChange}
               required
               disabled={!selectedTopicId || loadingOptions}
-              className="mt-1 block w-full input-md rounded-md text-black border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+              className="mt-1 block w-full input-md rounded-md text-black border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
             >
               <option value="">Select Level</option>
               {levels.map((level) => (
@@ -245,13 +249,14 @@ const UpdateTopicForm = () => {
             </select>
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={loading || !selectedTopicId}
-            className="mt-24 w-full rounded-md bg-indigo-600 py-2 text-white font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            fullWidth
+            className="mt-24"
           >
             {loading ? "Updating..." : "Update Topic"}
-          </button>
+          </Button>
         </form>
       </div>
     </Container>
