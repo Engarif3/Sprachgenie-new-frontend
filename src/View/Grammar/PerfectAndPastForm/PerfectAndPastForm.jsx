@@ -131,7 +131,7 @@ const PerfectAndPastForm = () => {
   return (
     <Container>
       <div className="mx-auto mt-16 mb-24 p-1">
-        <h2 className="text-3xl font-bold font-mono dark:text-white my-5 text-center">
+        <h2 className="text-3xl font-bold sm:text-4xl bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent my-5 text-center">
           Starke und unregelmäßige Verben
           <br />({totalPraesens})
         </h2>
@@ -143,7 +143,7 @@ const PerfectAndPastForm = () => {
             placeholder="Search by Präsens, Präteritum, Perfekt, or meaning..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
-            className="w-full md:w-1/2 px-4 py-2 border border-gray-400 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full md:w-1/2 px-4 py-2 border border-gray-400 dark:border-gray-600 rounded shadow-sm bg-white text-gray-900 placeholder-gray-500 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -171,7 +171,7 @@ const PerfectAndPastForm = () => {
               <div className="hidden md:block overflow-x-auto">
                 <table className="min-w-full rounded-lg shadow-md">
                   <thead>
-                    <tr className="bg-cyan-700 dark:text-white">
+                    <tr className="bg-cyan-700 text-white">
                       <th className="py-2 px-4 text-start">Verb (Präsens)</th>
                       <th className="py-2 px-4 text-start">Präteritum</th>
                       <th className="py-2 px-4 text-start">Perfekt</th>
@@ -186,7 +186,7 @@ const PerfectAndPastForm = () => {
                     {filteredVerbs.map((verb, verbIndex) => (
                       <tr
                         key={`${groupIndex}-${verbIndex}`}
-                        className="border-b text-slate-950 odd:bg-white even:bg-gray-300 hover:bg-gray-700 hover:text-white"
+                        className="border-b border-gray-200 dark:border-gray-700 text-slate-800 odd:bg-white even:bg-slate-50 hover:bg-sky-50 dark:text-slate-100 dark:odd:bg-slate-900 dark:even:bg-slate-800 dark:hover:bg-slate-700"
                       >
                         <td className="py-2 px-4 text-start font-bold">
                           {verb.Präsens}
@@ -197,12 +197,12 @@ const PerfectAndPastForm = () => {
                         <td className="py-2 px-4 text-start">{verb.Perfekt}</td>
                         <td className="py-2 px-4 text-start">{verb.meaning}</td>
                         <td className="py-2 px-4 text-start">
-                          <div className="mr-1 text-blue-600 font-semibold">
+                          <div className="mr-1 text-blue-600 dark:text-blue-400 font-semibold">
                             {verb.PerfektSentence}
                           </div>
                         </td>
                         <td className="py-2 px-4 text-justify">
-                          <div className="mr-1 text-pink-600 font-semibold">
+                          <div className="mr-1 text-pink-600 dark:text-pink-400 font-semibold">
                             {verb.PräteritumSentence}
                           </div>
                         </td>
@@ -217,7 +217,7 @@ const PerfectAndPastForm = () => {
                 {filteredVerbs.map((verb, verbIndex) => (
                   <div
                     key={`${groupIndex}-${verbIndex}`}
-                    className="border rounded-lg p-4 bg-white shadow"
+                    className="border border-gray-200 rounded-lg p-4 bg-white shadow dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                   >
                     <p>
                       <span className="font-semibold">Verb:</span>{" "}
@@ -238,12 +238,14 @@ const PerfectAndPastForm = () => {
 
                     {/* Sentences in a Row on Small Devices */}
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-2 mt-2">
-                      <div className="text-blue-600 font-semibold sm:w-1/2">
-                        <span className="font-bold text-black">Perfekt:</span>{" "}
+                      <div className="text-blue-600 dark:text-blue-400 font-semibold sm:w-1/2">
+                        <span className="font-bold text-gray-900 dark:text-white">
+                          Perfekt:
+                        </span>{" "}
                         {verb.PerfektSentence}
                       </div>
-                      <div className="text-pink-600 font-semibold sm:w-1/2">
-                        <span className="font-bold text-black">
+                      <div className="text-pink-600 dark:text-pink-400 font-semibold sm:w-1/2">
+                        <span className="font-bold text-gray-900 dark:text-white">
                           Präteritum:
                         </span>{" "}
                         {verb.PräteritumSentence}
