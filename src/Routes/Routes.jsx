@@ -317,6 +317,14 @@ export const router = createBrowserRouter(
               element: <ProfilePageWithSuspense />,
             },
             {
+              // Same component as the public /challenge/leaderboard route —
+              // nested here too so the sidebar link keeps the dashboard
+              // layout (and its menu) visible instead of navigating to the
+              // standalone public route, which has no sidebar at all.
+              path: "leaderboard",
+              element: <LeaderboardWithSuspense />,
+            },
+            {
               path: "visitors",
               element: protectRoute(
                 <AdminVisitorsPageWithSuspense />,

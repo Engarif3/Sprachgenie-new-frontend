@@ -12,7 +12,10 @@ import { IoClose, IoMenu } from "react-icons/io5";
 // six sections) hunt through collapsed menus for whichever page they're
 // already on.
 const SECTION_ROUTES = {
-  admin: ["/dashboard/update-user-status", "/dashboard/update-basic-user-status"],
+  admin: [
+    "/dashboard/update-user-status",
+    "/dashboard/update-basic-user-status",
+  ],
   content: [
     "/dashboard/create-word",
     "/dashboard/topic",
@@ -205,9 +208,7 @@ const DashboardLayout = () => {
               <span className="text-lg">🏠</span>
               <span>Overview</span>
               {expandedSections.admin === false && (
-                <span className="absolute right-3 text-xs opacity-0 transition-opacity group-hover:opacity-100">
-                  →
-                </span>
+                <span className="absolute right-3 text-xs opacity-0 transition-opacity group-hover:opacity-100"></span>
               )}
             </NavLink>
 
@@ -232,7 +233,7 @@ const DashboardLayout = () => {
             </NavLink>
 
             <NavLink
-              to="/challenge/leaderboard"
+              to="/dashboard/leaderboard"
               className={({ isActive }) => navItemClass(isActive)}
               onClick={() => setIsOpen(false)}
               title="Weekly XP Leaderboard"
