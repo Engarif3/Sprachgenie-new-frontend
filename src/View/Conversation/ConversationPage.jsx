@@ -10,7 +10,9 @@ import { MdOutlineDoubleArrow } from "react-icons/md";
 import { SiGoogletranslate } from "react-icons/si";
 import { FaSpinner } from "react-icons/fa";
 import { FaPen } from "react-icons/fa6";
+import { HiSpeakerWave } from "react-icons/hi2";
 import { splitConversationTopic } from "../../utils/splitConversationTopic";
+import { pronounceWord } from "../../utils/wordPronounciation";
 
 // One visual identity per speaker (avatar + bubble tint + name color),
 // cycled by order of first appearance, independent of which side (left or
@@ -294,34 +296,47 @@ const ConversationPage = () => {
                         {message.message}
                       </div>
 
-                      {/* Translate — same publicApi /translate (de -> en)
-                          pattern used in the word-list modal. */}
-                      <button
-                        type="button"
-                        onClick={() =>
-                          isLoggedIn
-                            ? translateMessage(message.message)
-                            : handleTranslateLocked()
-                        }
-                        disabled={isTranslating}
-                        title={isLoggedIn ? "Translate" : "Sign in to use translation feature"}
-                        className="flex items-center gap-1 px-1 text-xs transition-transform hover:scale-110 disabled:cursor-not-allowed"
-                      >
-                        {isTranslating ? (
-                          <FaSpinner size={12} className="animate-spin" />
-                        ) : (
-                          <SiGoogletranslate
-                            size={12}
-                            className={
-                              isLoggedIn
-                                ? "text-sky-500 hover:text-green-500"
-                                : isLight
-                                  ? "text-slate-400"
-                                  : "text-slate-500"
-                            }
-                          />
-                        )}
-                      </button>
+                      <div className="flex items-center gap-2 px-1">
+                        {/* Pronounce — same speechSynthesis pattern used
+                            throughout the word list/modal. */}
+                        <button
+                          type="button"
+                          onClick={() => pronounceWord(message.message)}
+                          title="Pronounce"
+                          className="flex items-center transition-transform hover:scale-110"
+                        >
+                          <HiSpeakerWave size={13} className="text-sky-500 hover:text-green-500" />
+                        </button>
+
+                        {/* Translate — same publicApi /translate (de -> en)
+                            pattern used in the word-list modal. */}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            isLoggedIn
+                              ? translateMessage(message.message)
+                              : handleTranslateLocked()
+                          }
+                          disabled={isTranslating}
+                          title={isLoggedIn ? "Translate" : "Sign in to use translation feature"}
+                          className="flex items-center gap-1 text-xs transition-transform hover:scale-110 disabled:cursor-not-allowed"
+                        >
+                          {isTranslating ? (
+                            <FaSpinner size={12} className="animate-spin" />
+                          ) : (
+                            <SiGoogletranslate
+                              size={12}
+                              className={
+                                isLoggedIn
+                                  ? "text-sky-500 hover:text-green-500"
+                                  : isLight
+                                    ? "text-slate-400"
+                                    : "text-slate-500"
+                              }
+                            />
+                          )}
+                        </button>
+                      </div>
 
                       {translation && (
                         <p
