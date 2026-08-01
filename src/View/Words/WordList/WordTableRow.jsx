@@ -132,6 +132,21 @@ const POS_BADGE_CONFIG = {
     className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-cyan-400`,
     tooltipText: "Phrase",
   },
+  pronoun: {
+    text: "pron.",
+    className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-fuchsia-300`,
+    tooltipText: "Pronoun",
+  },
+  interjection: {
+    text: "intj.",
+    className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-orange-300`,
+    tooltipText: "Interjection",
+  },
+  numeral: {
+    text: "num.",
+    className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-lime-300`,
+    tooltipText: "Numeral",
+  },
 };
 
 // Returns an array of badges to render in the Article column — one entry
@@ -139,14 +154,16 @@ const POS_BADGE_CONFIG = {
 // by side), or the grammatical article text for nouns/untagged words.
 const getArticleColumnDisplay = (word) => {
   const tagNames = getPosTagNames(word);
-  const articleName =
-    typeof word?.article?.name === "string" ? word.article.name : "";
+  const articleName = (
+    typeof word?.article?.name === "string" ? word.article.name : ""
+  ).trim();
 
-  const badges = tagNames
+  const otherBadges = tagNames
     .filter((tag) => POS_BADGE_CONFIG[tag])
     .map((tag) => ({ key: tag, ...POS_BADGE_CONFIG[tag] }));
 
-  const hasUnbadgedTag = tagNames.some(
+  const isTaggedNoun = tagNames.includes("noun");
+  const hasUnrecognizedTag = tagNames.some(
     (tag) =>
       !POS_BADGE_CONFIG[tag] &&
       tag !== "noun" &&
@@ -154,10 +171,32 @@ const getArticleColumnDisplay = (word) => {
       tag !== "not specified",
   );
 
-  // Show the article text whenever there's no POS-specific badge to show
-  // instead (noun, untagged, or an unrecognized POS name) — otherwise the
-  // Article column would render nothing at all for that word.
-  if (badges.length === 0 || hasUnbadgedTag) {
+  // A word tagged noun always shows something for its noun-ness alongside
+  // any other badges it carries: the grammatical article when the word has
+  // one, or a plain "n." badge when it doesn't (the article field can be an
+  // empty string rather than unset — e.g. "Bitte" = adverb + noun used to
+  // render only "adv.", silently losing the noun tag entirely because
+  // there was no article text to fall back to).
+  if (isTaggedNoun) {
+    const nounEntry = articleName
+      ? {
+          key: "article",
+          text: articleName,
+          className: ARTICLE_COLUMN_DEFAULT_CLASSNAME,
+          tooltipText: "",
+        }
+      : {
+          key: "noun-badge",
+          text: "n.",
+          className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-amber-400`,
+          tooltipText: "Noun",
+        };
+    return [nounEntry, ...otherBadges];
+  }
+
+  // Untagged or unrecognized-POS words fall back to showing the article
+  // text alone (possibly empty) so the column never renders nothing.
+  if (otherBadges.length === 0 || hasUnrecognizedTag) {
     return [
       {
         key: "article",
@@ -165,11 +204,11 @@ const getArticleColumnDisplay = (word) => {
         className: ARTICLE_COLUMN_DEFAULT_CLASSNAME,
         tooltipText: "",
       },
-      ...badges,
+      ...otherBadges,
     ];
   }
 
-  return badges;
+  return otherBadges;
 };
 
 const WordTableRow = ({
