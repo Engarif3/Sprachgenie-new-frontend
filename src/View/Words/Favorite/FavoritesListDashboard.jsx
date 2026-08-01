@@ -572,7 +572,6 @@ const FavoritesListDashboard = () => {
                       },
                     }}
                     handleRemoveFavorite={handleRemoveFavorite}
-                    variant="dashboard"
                   />
                 </>
               ) : (

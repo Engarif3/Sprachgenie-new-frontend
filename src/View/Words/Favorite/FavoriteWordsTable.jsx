@@ -10,6 +10,7 @@ const normalizeText = (value) =>
     .toLowerCase();
 
 const capitalizeFirstLetter = (str) => {
+  if (!str) return str;
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
@@ -17,6 +18,8 @@ const getPosTagNames = (word) =>
   (word?.partsOfSpeech || []).map((p) => normalizeText(p.name));
 
 // Helper function to render word with prefix highlighting for separable verbs
+// — identical to WordTableRow's, kept in sync so the Favorites table reads
+// exactly like the main Wordlist table.
 const renderWordWithPrefix = (word) => {
   const wordValue = word.value || "";
   const prefix = word.prefix;
@@ -24,12 +27,10 @@ const renderWordWithPrefix = (word) => {
   const prefixType = word.prefixType;
 
   if (isVerbTagged && prefixType === "SEPARABLE" && prefix) {
-    // Split the word into parts
     const parts = wordValue.split(" ");
     let foundMatch = false;
     let matchIndex = -1;
 
-    // Find which part starts with the prefix (skip "sich" if it's the first part)
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
       if (part.toLowerCase() === "sich") continue; // Skip "sich"
@@ -47,7 +48,6 @@ const renderWordWithPrefix = (word) => {
       const prefixPart = matchedPart.slice(0, prefixLength);
       const restPart = matchedPart.slice(prefixLength);
 
-      // Reconstruct the word with highlighted prefix
       return (
         <span>
           {parts.slice(0, matchIndex).map((p, idx) => (
@@ -86,17 +86,17 @@ const PartOfSpeechBadge = ({ text, className, tooltipText }) => {
 };
 
 const ARTICLE_COLUMN_BASE_MARKER_CLASSNAME =
-  "inline-block bg-black w-full px-1 md:px-2 lg:px-2 py-1 rounded-xl border text-xs md:text-sm lg:text-sm shadow-sm";
+  "inline-block bg-black w-full px-1 py-1 rounded-xl border text-xs  shadow-sm";
 const ARTICLE_COLUMN_DEFAULT_CLASSNAME =
-  "font-semibold text-orange-500 dark:text-orange-400 text-xs md:text-sm lg:text-base";
+  "font-bold text-orange-400 text-xs md:text-lg lg:text-lg";
 
-// One badge config per taggable POS name — a word can now carry more than
-// one tag (e.g. adjective + adverb), so this renders one badge per tag
-// instead of picking a single POS to display.
+// One badge config per taggable POS name — matches WordTableRow's
+// POS_BADGE_CONFIG exactly (same colors) so a word looks the same whether
+// it's shown in the Wordlist or the Favorites table.
 const POS_BADGE_CONFIG = {
   verb: {
     text: "vrb.",
-    className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-white bg-cyan-600 font-bold`,
+    className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-white bg-sky-600 font-bold`,
     tooltipText: "Verb",
   },
   adjective: {
@@ -110,7 +110,7 @@ const POS_BADGE_CONFIG = {
     tooltipText: "Adverb",
   },
   preposition: {
-    text: "prep.",
+    text: "pre.",
     className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-amber-200`,
     tooltipText: "Preposition",
   },
@@ -161,69 +161,6 @@ const getArticleColumnDisplay = (word) => {
   return badges;
 };
 
-const TABLE_VARIANTS = {
-  page: {
-    articleCell:
-      "border border-slate-200 border-dotted p-0 text-center dark:border-gray-700 md:p-2 lg:p-2",
-    wordCell:
-      "border border-slate-200 border-dotted p-1 dark:border-gray-700 md:p-2 lg:p-2",
-    wordText:
-      "max-w-[120px] cursor-pointer break-words pl-1 text-sm font-bold text-blue-600 transition-all duration-300 hover:scale-105 hover:text-blue-700 line-clamp-2 hover:line-clamp-none hover:max-w-full dark:text-blue-400 dark:hover:text-blue-300 md:max-w-full md:pl-0 md:text-lg lg:pl-0 lg:text-lg",
-    pronounceButton:
-      "rounded-full border border-blue-300 bg-gradient-to-r from-blue-50 to-cyan-50 p-1 text-blue-700 shadow-sm transition-all duration-300 hover:scale-110 hover:from-blue-100 hover:to-cyan-100 dark:border-blue-500/50 dark:from-blue-500/20 dark:to-cyan-500/20 dark:text-white dark:hover:from-blue-500/40 dark:hover:to-cyan-500/40",
-    meaningCell:
-      "border border-slate-200 border-dotted p-0 pl-2 dark:border-gray-700 md:p-2 lg:p-2",
-    meaningText:
-      "max-w-[120px] break-words text-sm font-medium text-slate-700 line-clamp-2 hover:line-clamp-none dark:text-white md:max-w-full md:text-base lg:text-base",
-    conjugateCell:
-      "border border-slate-200 border-dotted p-1 text-center dark:border-gray-700 md:p-2 lg:p-2",
-    synonymsCell:
-      "hidden border border-slate-200 border-dotted p-1 dark:border-gray-700 md:table-cell md:p-2 lg:p-2",
-    synonymsTag:
-      "inline-flex max-w-full cursor-pointer items-center gap-1 break-words rounded-full border border-blue-300 bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-1.5 text-md font-semibold text-blue-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-blue-100 hover:to-indigo-100 dark:border-blue-500/50 dark:from-blue-500/20 dark:to-purple-500/20 dark:text-blue-300 dark:hover:from-blue-500/40 dark:hover:to-purple-500/40 dark:hover:shadow-blue-500/50",
-    antonymsCell:
-      "hidden border border-slate-200 p-1 dark:border-gray-700/50 lg:table-cell md:p-2 lg:p-2",
-    antonymsTag:
-      "inline-flex max-w-full cursor-pointer items-center gap-1 break-words rounded-full border border-rose-300 bg-gradient-to-r from-rose-50 to-pink-50 px-3 py-1.5 text-md font-semibold text-rose-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-rose-100 hover:to-pink-100 dark:border-red-500/50 dark:from-red-500/20 dark:to-pink-500/20 dark:text-red-300 dark:hover:from-red-500/40 dark:hover:to-pink-500/40 dark:hover:shadow-red-500/50",
-    similarCell:
-      "hidden border border-slate-200 border-dotted p-1 dark:border-gray-700 lg:table-cell md:p-2 lg:p-2",
-    similarTag:
-      "inline-flex max-w-full cursor-pointer items-center gap-1 break-words rounded-full border border-violet-300 bg-gradient-to-r from-violet-50 to-fuchsia-50 px-3 py-1.5 text-md font-semibold text-violet-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-violet-100 hover:to-fuchsia-100 dark:border-purple-500/50 dark:from-purple-500/20 dark:to-pink-500/20 dark:text-purple-300 dark:hover:from-purple-500/40 dark:hover:to-pink-500/40 dark:hover:shadow-purple-500/50",
-    removeCell:
-      "border border-slate-200 border-dotted p-1 text-center dark:border-gray-700 md:p-2 lg:p-2",
-  },
-  dashboard: {
-    articleCell:
-      "border border-slate-200 border-dotted p-2 text-center dark:border-gray-700 md:p-2 lg:p-2",
-    wordCell:
-      "border border-slate-200 border-dotted p-2 dark:border-gray-700 md:p-2 lg:p-2",
-    wordText:
-      "max-w-[80px] cursor-pointer break-words text-xs font-bold text-blue-600 transition-all duration-300 hover:scale-105 hover:text-blue-700 line-clamp-2 hover:line-clamp-none dark:text-blue-400 dark:hover:text-blue-300 md:max-w-full md:text-sm lg:text-base",
-    pronounceButton:
-      "rounded-full border border-blue-300 bg-gradient-to-r from-blue-50 to-cyan-50 px-1 text-xs text-blue-700 shadow-sm transition-all duration-300 hover:scale-110 hover:from-blue-100 hover:to-cyan-100 dark:border-blue-500/50 dark:from-blue-500/20 dark:to-cyan-500/20 dark:text-white dark:hover:from-blue-500/40 dark:hover:to-cyan-500/40 md:text-sm",
-    meaningCell:
-      "border border-slate-200 border-dotted p-2 dark:border-gray-700 md:p-2 lg:p-2",
-    meaningText:
-      "max-w-[120px] break-words text-xs font-medium text-slate-700 line-clamp-2 hover:line-clamp-none dark:text-white md:max-w-full md:text-sm lg:text-base",
-    conjugateCell:
-      "border border-slate-200 border-dotted p-1 text-center dark:border-gray-700 md:p-2 lg:p-2",
-    synonymsCell:
-      "hidden border border-slate-200 border-dotted p-2 dark:border-gray-700 md:table-cell md:p-2 lg:p-2",
-    synonymsTag:
-      "inline-flex max-w-full cursor-pointer items-center gap-1 break-words rounded-full border border-blue-300 bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-1.5 text-xs font-semibold text-blue-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-blue-100 hover:to-indigo-100 dark:border-blue-500/50 dark:from-blue-500/20 dark:to-purple-500/20 dark:text-blue-300 dark:hover:from-blue-500/40 dark:hover:to-purple-500/40 dark:hover:shadow-blue-500/50 md:text-sm",
-    antonymsCell:
-      "hidden border border-slate-200 border-dotted p-2 dark:border-gray-700 lg:table-cell md:p-2 lg:p-2",
-    antonymsTag:
-      "inline-flex max-w-full cursor-pointer items-center gap-1 break-words rounded-full border border-rose-300 bg-gradient-to-r from-rose-50 to-pink-50 px-3 py-1.5 text-xs font-semibold text-rose-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-rose-100 hover:to-pink-100 dark:border-red-500/50 dark:from-red-500/20 dark:to-pink-500/20 dark:text-red-300 dark:hover:from-red-500/40 dark:hover:to-pink-500/40 dark:hover:shadow-red-500/50 md:text-sm",
-    similarCell:
-      "hidden border border-slate-200 border-dotted p-2 dark:border-gray-700 lg:table-cell md:p-2 lg:p-2",
-    similarTag:
-      "inline-flex max-w-full cursor-pointer items-center gap-1 break-words rounded-full border border-violet-300 bg-gradient-to-r from-violet-50 to-fuchsia-50 px-3 py-1.5 text-xs font-semibold text-violet-700 shadow-sm transition-all duration-300 hover:scale-105 hover:from-violet-100 hover:to-fuchsia-100 dark:border-purple-500/50 dark:from-purple-500/20 dark:to-pink-500/20 dark:text-purple-300 dark:hover:from-purple-500/40 dark:hover:to-pink-500/40 dark:hover:shadow-purple-500/50 md:text-sm",
-    removeCell:
-      "border border-slate-200 border-dotted p-2 text-center dark:border-gray-700 md:p-2 lg:p-2",
-  },
-};
-
 const FavoriteWordsTable = ({
   paginatedFavorites,
   openModal,
@@ -234,54 +171,59 @@ const FavoriteWordsTable = ({
   loadingConjugations,
   conjugationModalProps,
   handleRemoveFavorite,
-  variant = "page",
 }) => {
-  const tableVariant = TABLE_VARIANTS[variant] ?? TABLE_VARIANTS.page;
-
   return (
     <>
-      <div className="overflow-hidden rounded-2xl  shadow-xl dark:border-gray-700/50 dark:shadow-2xl">
-        <table className="w-full border-collapse text-xs sm:text-sm md:text-base">
+      <div className="overflow-x-auto border-gray-700/50 rounded-2xl shadow-2xl">
+        <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-slate-900 text-sm text-white md:text-xl lg:text-xl dark:bg-gradient-to-r dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
-              <th className="rounded-tl-xl border-l border-slate-200 py-3 text-center text-sm font-bold text-orange-400 md:text-lg lg:text-lg dark:border-gray-700 w-[5%] md:w-[3%] lg:w-[3%]">
+            <tr className="bg-slate-900 dark:bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 text-sm md:text-xl lg:text-xl text-white">
+              <th className="py-3 text-sm md:text-lg lg:text-lg text-center text-orange-400 font-bold w-[5%] md:w-[3%] lg:w-[3%] rounded-tl-xl border-l border-gray-800">
                 {/* Art. */}
               </th>
-              <th className="border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-blue-400 dark:border-gray-700 w-[15%] md:w-[10%] lg:w-[10%]">
+              <th className="border-l py-3 border-gray-700 border-dotted text-center text-blue-400 font-bold w-[15%] md:w-[10%] lg:w-[10%] border-b">
                 Word
               </th>
-              <th className="border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-purple-400 dark:border-gray-700 w-[10%] md:w-[25%] lg:w-[25%]">
+              <th className="border-l py-3 border-gray-700 border-dotted text-center text-purple-400 font-bold w-[10%] md:w-[25%] lg:w-[25%] border-b">
                 Meaning
               </th>
-              <th className="border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-violet-400 dark:border-gray-700 w-[3%] md:w-[5%] lg:w-[5%]">
+              <th className="border-l py-3 border-gray-700 border-dotted text-center text-violet-400 font-bold w-[3%] md:w-[5%] lg:w-[5%] border-b">
                 Conju.
               </th>
-              <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-cyan-400 dark:border-gray-700 md:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+              <th className="border-l py-3 border-gray-700 border-dotted text-center text-cyan-400 font-bold hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b">
                 Synonym
               </th>
-              <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-pink-400 dark:border-gray-700  lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+              <th className="border-l py-3 border-gray-700 border-dotted text-center text-pink-400 font-bold hidden lg:table-cell xl:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b">
                 Antonym
               </th>
-              <th className="hidden border-b border-l border-dotted border-slate-200 py-3 text-center font-bold text-green-400 dark:border-gray-700 lg:table-cell w-[15%] md:w-[20%] lg:w-[20%]">
+              <th className="border-l py-3 border-gray-700 border-dotted text-center text-green-400 font-bold hidden lg:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b">
                 Word to Watch
               </th>
-              <th className="rounded-tr-xl border-l border-r border-dotted border-slate-200 py-3 text-center text-sm font-bold text-red-400 dark:border-gray-700 md:text-lg lg:text-lg w-[3%] md:w-[3%] lg:w-[3%]"></th>
+              <th className="border-l border-dotted hidden md:table-cell lg:table-cell py-3 border-gray-700 text-sm md:text-lg lg:text-lg text-center text-yellow-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b">
+                Level
+              </th>
+              <th className="border-r border-l py-3 border-dotted border-gray-700 text-sm md:text-lg lg:text-lg text-center text-red-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b rounded-tr-xl">
+                🗑️
+              </th>
             </tr>
           </thead>
+
           <tbody>
             {paginatedFavorites.map((word, index) => {
               const articleColumnBadges = getArticleColumnDisplay(word);
+              const isVerb = getPosTagNames(word).includes("verb");
 
               return (
                 <tr
                   key={word.id}
-                  className={`${
+                  className={`transition-colors duration-200 hover:bg-gradient-to-r hover:from-blue-500/5 hover:to-purple-500/5 ${
                     index % 2 === 0
-                      ? "bg-white hover:bg-sky-50/70 dark:bg-gray-800 dark:hover:bg-gray-700"
-                      : "bg-slate-50/80 hover:bg-sky-50 dark:bg-gray-900 dark:hover:bg-gray-800"
-                  } border-b border-slate-200 transition-all duration-300 dark:border-gray-700`}
+                      ? " dark:bg-gray-800/40"
+                      : "dark:bg-gray-900/40"
+                  }`}
                 >
-                  <td className={tableVariant.articleCell}>
+                  {/* Article */}
+                  <td className="border border-gray-700 border-dotted p-1 text-center">
                     <div className="flex flex-wrap items-center justify-center gap-1">
                       {articleColumnBadges.map((badge) => (
                         <PartOfSpeechBadge
@@ -293,52 +235,64 @@ const FavoriteWordsTable = ({
                       ))}
                     </div>
                   </td>
-                  <td className={tableVariant.wordCell}>
-                    <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between md:gap-4">
+
+                  {/* Word value */}
+                  <td className="border border-gray-700 border-dotted p-1 md:p-3">
+                    <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
                       <span
-                        className={tableVariant.wordText}
+                        className="inline-flex items-center gap-2 cursor-pointer p-0 md:p-2 lg:p-2 text-blue-600 dark:text-blue-400 hover:text-blue-300 text-sm md:text-lg lg:text-lg font-semibold md:font-bold lg:font-bold break-words max-w-[120px] md:max-w-full transition-colors duration-200"
                         onClick={() => openModal(word)}
                       >
                         {renderWordWithPrefix(word)}
                       </span>
 
-                      <div className="flex gap-1 self-end md:gap-2 md:self-auto lg:gap-2">
+                      <div className="flex gap-1 self-end md:gap-4 md:self-auto lg:gap-4">
                         <button
                           onClick={() => pronounceWord(word.value)}
-                          className={tableVariant.pronounceButton}
+                          className="text-md md:text-2xl lg:text-2xl hover:scale-110 transition-transform duration-200 hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]"
+                          title="Pronounce word"
                         >
                           🔊
                         </button>
 
-                        <div
+                        <button
+                          type="button"
                           onClick={() => generateParagraph(word)}
-                          className="relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 border-emerald-300 bg-gradient-to-r from-emerald-50 to-green-50 px-2 py-1 text-sm italic text-emerald-700 shadow-sm transition-all duration-300 hover:scale-110 hover:border-emerald-400 hover:from-emerald-500 hover:to-green-500 hover:text-white dark:border-green-500/50 dark:from-green-500/20 dark:to-emerald-500/20 dark:text-white dark:hover:border-green-400 dark:hover:from-green-500 dark:hover:to-emerald-500"
+                          className="relative border-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white italic px-2 py-1 text-xs font-semibold md:font-bold lg:font-bold rounded-full md:mt-4 h-6 w-6 cursor-pointer hover:scale-110 border-emerald-400 transition-all duration-200 shadow-lg hover:shadow-green-500/50 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
+                          disabled={loadingParagraphs[word.id]}
+                          title="Generate AI paragraph"
+                          aria-label="Generate AI paragraph"
                         >
                           {loadingParagraphs[word.id] && (
-                            <span className="absolute inset-0 flex items-center justify-center z-10">
-                              <PuffLoader size={20} color="#10b981" />
+                            <span className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                              <PuffLoader size={20} color="#FF0000" />
                             </span>
                           )}
+
                           <span
                             className={`${
                               loadingParagraphs[word.id]
                                 ? "invisible"
-                                : "text-xs font-bold "
+                                : "flex items-center justify-center relative bottom-1"
                             }`}
                           >
                             ai
                           </span>
-                        </div>
+                        </button>
                       </div>
                     </div>
                   </td>
-                  <td className={tableVariant.meaningCell}>
-                    <span className={tableVariant.meaningText}>
+
+                  {/* Meaning */}
+                  <td className="border border-gray-700 border-dotted pl-1 p-0 md:p-3 lg:p-3 text-sm md:text-lg lg:text-lg text-cyan-500 dark:text-cyan-300 font-serif">
+                    <span className="line-clamp-2 hover:line-clamp-none break-words max-w-[120px] md:max-w-full">
                       {word.meaning?.join(", ")}
                     </span>
                   </td>
-                  <td className={tableVariant.conjugateCell}>
-                    {getPosTagNames(word).includes("verb") ? (
+
+                  {/* Conjugate — verbs only */}
+                  <td className="border border-gray-700 border-dotted p-1 md:p-2 text-center">
+                    {isVerb ? (
                       <button
                         type="button"
                         onClick={() => handleConjugate?.(word)}
@@ -354,18 +308,18 @@ const FavoriteWordsTable = ({
                         )}
                       </button>
                     ) : (
-                      <span className="text-gray-400 dark:text-gray-600">
-                        —
-                      </span>
+                      <span className="text-gray-600">—</span>
                     )}
                   </td>
-                  <td className={tableVariant.synonymsCell}>
-                    <div className="flex flex-wrap gap-1.5">
-                      {word.synonyms?.map((synonym, synonymIndex) => (
+
+                  {/* Synonyms */}
+                  <td className="border border-gray-700 border-dotted p-2 md:p-3 text-blue-600 dark:text-blue-300 hidden md:table-cell">
+                    <div className="flex flex-wrap gap-2">
+                      {word.synonyms?.map((synonym, idx) => (
                         <span
-                          key={synonymIndex}
+                          key={idx}
                           onClick={() => openWordInModal(synonym.value)}
-                          className={tableVariant.synonymsTag}
+                          className="text-md max-w-full break-words px-3 py-1 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/50 rounded-full hover:from-blue-500/30 hover:to-cyan-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
                         >
                           {synonym.value}
                         </span>
@@ -373,37 +327,50 @@ const FavoriteWordsTable = ({
                     </div>
                   </td>
 
-                  <td className={tableVariant.antonymsCell}>
-                    <div className="flex flex-wrap gap-1.5">
-                      {word.antonyms?.map((antonym, antonymIndex) => (
+                  {/* Antonyms */}
+                  <td className="border border-gray-700 border-dotted p-2 md:p-3 text-red-600 dark:text-red-300 hidden lg:table-cell xl:table-cell">
+                    <div className="flex flex-wrap gap-2">
+                      {word.antonyms?.map((antonym, idx) => (
                         <span
-                          key={antonymIndex}
+                          key={idx}
                           onClick={() => openWordInModal(antonym.value)}
-                          className={tableVariant.antonymsTag}
+                          className="text-md max-w-full break-words px-3 py-1 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 rounded-full hover:from-red-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
                         >
                           {antonym.value}
                         </span>
                       ))}
                     </div>
                   </td>
-                  <td className={tableVariant.similarCell}>
-                    <div className="flex flex-wrap gap-1.5">
-                      {word.similarWords?.map((similarWord, similarIndex) => (
+
+                  {/* Similar Words */}
+                  <td className="border border-gray-700 border-dotted p-2 md:p-3 text-blue-400 hidden lg:table-cell">
+                    <div className="flex flex-wrap gap-2">
+                      {word.similarWords?.map((similarword, idx) => (
                         <span
-                          key={similarIndex}
-                          onClick={() => openWordInModal(similarWord.value)}
-                          className={tableVariant.similarTag}
+                          key={idx}
+                          onClick={() => openWordInModal(similarword.value)}
+                          className="text-md max-w-full break-words px-3 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-full hover:from-purple-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
                         >
-                          {similarWord.value}
+                          {similarword.value}
                         </span>
                       ))}
                     </div>
                   </td>
 
-                  <td className={tableVariant.removeCell}>
+                  {/* Level */}
+                  <td className="border border-gray-700 border-dotted p-2 md:p-3 hidden md:table-cell text-center">
+                    <span className="inline-block px-3 py-1 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-xs sm:text-sm">
+                      {word.level?.level}
+                    </span>
+                  </td>
+
+                  {/* Remove from favorites */}
+                  <td className="border border-gray-700 border-dotted p-2 md:p-3 text-center">
                     <button
                       onClick={() => handleRemoveFavorite(word.id)}
-                      className="rounded-xl border border-rose-300 bg-gradient-to-r from-rose-50 to-pink-50 p-2.5 font-bold text-rose-700 shadow-sm transition-all duration-300 hover:scale-110 hover:from-red-600 hover:to-pink-600 hover:text-white dark:border-red-500/50 dark:from-red-500/20 dark:to-pink-500/20 dark:text-red-300 dark:shadow-lg dark:hover:shadow-red-500/50"
+                      className="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 rounded-lg font-semibold text-white text-xs sm:text-sm transition-colors duration-200 hover:scale-105 shadow-md"
+                      title="Remove from favorites"
+                      aria-label="Remove from favorites"
                     >
                       <ImBin size={12} />
                     </button>

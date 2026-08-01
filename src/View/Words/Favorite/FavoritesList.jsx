@@ -599,7 +599,6 @@ const FavoritesList = () => {
                       },
                     }}
                     handleRemoveFavorite={handleRemoveFavorite}
-                    variant="page"
                   />
                 </>
               ) : (
