@@ -445,6 +445,7 @@ const WordList = () => {
   const [showRecentOnly, setShowRecentOnly] = useState(false);
   const [adminCompletenessFilter, setAdminCompletenessFilter] = useState("");
   const [recentlyAddedLimit, setRecentlyAddedLimit] = useState(null);
+  const [totalWordCount, setTotalWordCount] = useState(null);
   const [isRefreshingPage, setIsRefreshingPage] = useState(false);
   const [pageCacheReady, setPageCacheReady] = useState(false);
 
@@ -543,9 +544,12 @@ const WordList = () => {
     const fetchWordListSettings = async () => {
       try {
         const response = await api.get("/word/settings");
-        const limit = response.data?.data?.recentlyAddedLimit;
-        if (typeof limit === "number") {
-          setRecentlyAddedLimit(limit);
+        const data = response.data?.data;
+        if (typeof data?.recentlyAddedLimit === "number") {
+          setRecentlyAddedLimit(data.recentlyAddedLimit);
+        }
+        if (typeof data?.totalWordCount === "number") {
+          setTotalWordCount(data.totalWordCount);
         }
       } catch (error) {
         console.error("Failed to fetch word list settings:", error);
@@ -1713,18 +1717,48 @@ const WordList = () => {
       return;
     }
 
+    // Re-fetch right before opening the prompt so the ceiling (total word
+    // count) and current value are fresh, not whatever was loaded on mount.
+    let currentLimit = recentlyAddedLimit;
+    let maxLimit = totalWordCount;
+
+    try {
+      const response = await api.get("/word/settings");
+      const data = response.data?.data;
+      if (typeof data?.recentlyAddedLimit === "number") {
+        currentLimit = data.recentlyAddedLimit;
+        setRecentlyAddedLimit(data.recentlyAddedLimit);
+      }
+      if (typeof data?.totalWordCount === "number") {
+        maxLimit = data.totalWordCount;
+        setTotalWordCount(data.totalWordCount);
+      }
+    } catch (error) {
+      console.error("Failed to fetch latest word list settings:", error);
+    }
+
+    const effectiveMax =
+      typeof maxLimit === "number" && maxLimit > 0 ? maxLimit : undefined;
+
     const { value: enteredLimit } = await Swal.fire({
       title: "Recently Added Limit",
       input: "number",
-      inputLabel: 'Number of words to show for "Recently added"',
-      inputValue: recentlyAddedLimit ?? 50,
-      inputAttributes: { min: 1, max: 500, step: 1 },
+      inputLabel: effectiveMax
+        ? `Number of words to show for "Recently added" (1-${effectiveMax})`
+        : 'Number of words to show for "Recently added"',
+      inputValue: currentLimit ?? 50,
+      inputAttributes: effectiveMax
+        ? { min: 1, max: effectiveMax, step: 1 }
+        : { min: 1, step: 1 },
       showCancelButton: true,
       confirmButtonText: "Save",
       inputValidator: (value) => {
         const parsedValue = Number(value);
-        if (!value || !Number.isInteger(parsedValue) || parsedValue < 1 || parsedValue > 500) {
-          return "Enter a whole number between 1 and 500";
+        if (!value || !Number.isInteger(parsedValue) || parsedValue < 1) {
+          return "Enter a whole positive number";
+        }
+        if (effectiveMax && parsedValue > effectiveMax) {
+          return `Enter a number no greater than the total word count (${effectiveMax})`;
         }
         return undefined;
       },
@@ -1756,7 +1790,7 @@ const WordList = () => {
         "error",
       );
     }
-  }, [isSuperAdmin, recentlyAddedLimit]);
+  }, [isSuperAdmin, recentlyAddedLimit, totalWordCount]);
 
   // to show info
   useEffect(() => {
@@ -1905,37 +1939,39 @@ const WordList = () => {
           </div>
           {showAdminControls && (
             <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-white/10 md:pt-0 md:border-t-0 md:flex-nowrap md:justify-end md:gap-3 md:flex-shrink-0">
-              <select
-                id="admin-completeness-filter"
-                name="adminCompletenessFilter"
-                value={adminCompletenessFilter}
-                onChange={handleAdminCompletenessFilterChange}
-                className="min-h-[30px] w-full sm:w-auto md:w-auto px-2 py-2 md:px-2.5 md:py-1.5 rounded-full font-semibold text-sm shadow-lg border border-stone-500 bg-stone-800 text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50"
-                aria-label="Admin word completeness filter"
-              >
-                {ADMIN_COMPLETENESS_FILTER_OPTIONS.map((option) => (
-                  <option
-                    key={option.value || "all"}
-                    value={option.value}
-                    className="bg-stone-800 text-white"
-                  >
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              {isSuperAdmin && (
-                <button
-                  type="button"
-                  onClick={handleSetRecentlyAddedLimit}
-                  className="min-h-[30px] w-full sm:w-auto md:w-auto px-2 py-2 md:px-2.5 md:py-1.5 rounded-full font-semibold text-sm shadow-lg border border-cyan-500 bg-cyan-700/40 text-white hover:bg-cyan-700/60 transition-all"
-                  title='Set how many words "Recently added" shows'
+              <div className="flex flex-col items-stretch sm:items-end gap-1 w-full sm:w-auto">
+                <select
+                  id="admin-completeness-filter"
+                  name="adminCompletenessFilter"
+                  value={adminCompletenessFilter}
+                  onChange={handleAdminCompletenessFilterChange}
+                  className="min-h-[30px] w-full sm:w-auto md:w-auto px-2 py-2 md:px-2.5 md:py-1.5 rounded-full font-semibold text-sm shadow-lg border border-stone-500 bg-stone-800 text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50"
+                  aria-label="Admin word completeness filter"
                 >
-                  Recently added limit
-                  {typeof recentlyAddedLimit === "number"
-                    ? `: ${recentlyAddedLimit}`
-                    : ""}
-                </button>
-              )}
+                  {ADMIN_COMPLETENESS_FILTER_OPTIONS.map((option) => (
+                    <option
+                      key={option.value || "all"}
+                      value={option.value}
+                      className="bg-stone-800 text-white"
+                    >
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                {isSuperAdmin && (
+                  <button
+                    type="button"
+                    onClick={handleSetRecentlyAddedLimit}
+                    className="text-[11px] sm:text-xs text-cyan-400 hover:text-cyan-300 underline underline-offset-2 transition-colors self-start sm:self-end"
+                    title='Set how many words "Recently added" shows'
+                  >
+                    Recently added limit
+                    {typeof recentlyAddedLimit === "number"
+                      ? `: ${recentlyAddedLimit}`
+                      : ""}
+                  </button>
+                )}
+              </div>
               {/* <p className="text-md font-bold whitespace-nowrap hidden md:block px-2 py-1 md:px-2.5 md:py-1.5 bg-sky-600  rounded-full text-white">
                 {displayedWordsCount} words
               </p> */}
