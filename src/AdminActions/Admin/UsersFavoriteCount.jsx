@@ -38,11 +38,10 @@ const UsersFavoriteCount = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4 md:p-8">
+    <div className="min-h-screen bg-slate-50 p-4 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 md:p-8">
       <div className="mx-auto max-w-4xl">
         <div className="mb-8">
           <PageHeader
-            surface="dark"
             title="Users & Favorite Words Count"
             subtitle="How many words each user has saved to their favorites."
           />
@@ -53,14 +52,14 @@ const UsersFavoriteCount = () => {
             <ScaleLoader color="oklch(0.5 0.134 242.749)" loading={loading} />
           </div>
         ) : error ? (
-          <div className="rounded-lg border border-red-700 bg-red-900/30 p-4 text-center text-red-200">
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-center text-red-700 dark:border-red-700 dark:bg-red-900/30 dark:text-red-200">
             {error}
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-gray-700 bg-gray-800/50">
+          <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
             <table className="min-w-full table-auto">
               <thead>
-                <tr className="bg-gray-900/60 text-gray-200">
+                <tr className="bg-slate-100 text-slate-700 dark:bg-gray-900/60 dark:text-gray-200">
                   <th className="p-3 text-center font-semibold">Name</th>
                   <th className="p-3 text-center font-semibold">Email</th>
                   <th className="p-3 text-center font-semibold">
@@ -72,15 +71,15 @@ const UsersFavoriteCount = () => {
                 {users.map((user) => (
                   <tr
                     key={user.id}
-                    className="border-t border-gray-700 odd:bg-gray-800/30 even:bg-gray-800/60"
+                    className="border-t border-slate-200 odd:bg-white even:bg-slate-50 dark:border-gray-700 dark:odd:bg-gray-800/30 dark:even:bg-gray-800/60"
                   >
-                    <td className="p-3 text-center text-gray-200">
+                    <td className="p-3 text-center text-slate-800 dark:text-gray-200">
                       {user.name}
                     </td>
-                    <td className="p-3 text-center text-gray-300">
+                    <td className="p-3 text-center text-slate-600 dark:text-gray-300">
                       {user.email}
                     </td>
-                    <td className="p-3 text-center font-bold text-sky-400">
+                    <td className="p-3 text-center font-bold text-sky-600 dark:text-sky-400">
                       {user.favoriteCount}
                     </td>
                   </tr>

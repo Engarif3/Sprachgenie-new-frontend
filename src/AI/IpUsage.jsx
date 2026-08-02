@@ -219,7 +219,7 @@ const IpUsage = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
         <ScaleLoader color="#36d7b7" loading={loading} size={150} />
       </div>
     );
@@ -230,23 +230,21 @@ const IpUsage = () => {
   }
 
   const overrideInputClass =
-    "w-16 rounded-md border border-gray-600 bg-gray-900/60 p-1 text-center text-sm text-white placeholder-gray-500 focus:border-sky-500 focus:outline-none focus:ring focus:ring-sky-500/30";
+    "w-16 rounded-md border border-slate-300 bg-white p-1 text-center text-sm text-slate-900 placeholder-slate-400 focus:border-sky-500 focus:outline-none focus:ring focus:ring-sky-500/30 dark:border-gray-600 dark:bg-gray-900/60 dark:text-white dark:placeholder-gray-500";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4 md:p-8">
+    <div className="min-h-screen bg-slate-50 p-4 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 md:p-8">
       <div className="mx-auto max-w-6xl">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <PageHeader
-            surface="dark"
             title="IP Usage (AI Generation)"
             subtitle="Only IPs seen making a generation request recently are listed — unlike per-user usage, IPs aren't pre-registered."
           />
           <div className="flex gap-2">
-            <Button surface="dark" variant="secondary" onClick={fetchUsage}>
+            <Button variant="secondary" onClick={fetchUsage}>
               🔄 Refresh
             </Button>
             <Button
-              surface="dark"
               variant="danger"
               onClick={handleResetAll}
               disabled={resettingAll || !usage.length}
@@ -257,14 +255,14 @@ const IpUsage = () => {
         </div>
 
         {!usage.length ? (
-          <p className="text-center text-white">
+          <p className="text-center text-slate-700 dark:text-white">
             No IPs have hit the generation limiter recently.
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-gray-700 bg-gray-800/50">
+          <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
             <table className="min-w-full table-auto">
               <thead>
-                <tr className="bg-gray-900/60 text-gray-200">
+                <tr className="bg-slate-100 text-slate-700 dark:bg-gray-900/60 dark:text-gray-200">
                   <th className="p-3 text-center font-semibold">
                     IP Address
                   </th>
@@ -287,34 +285,36 @@ const IpUsage = () => {
                 {usage.map((u) => (
                   <tr
                     key={u.ip}
-                    className="border-t border-gray-700 odd:bg-gray-800/30 even:bg-gray-800/60"
+                    className="border-t border-slate-200 odd:bg-white even:bg-slate-50 dark:border-gray-700 dark:odd:bg-gray-800/30 dark:even:bg-gray-800/60"
                   >
-                    <td className="p-3 text-center align-middle font-mono text-gray-200">
+                    <td className="p-3 text-center align-middle font-mono text-slate-800 dark:text-gray-200">
                       {u.ip}
                     </td>
-                    <td className="p-3 text-center align-middle text-gray-200">
+                    <td className="p-3 text-center align-middle text-slate-800 dark:text-gray-200">
                       {u.matchedUser ? (
                         <>
                           <div>{u.matchedUser.name}</div>
-                          <div className="text-xs text-gray-400">
+                          <div className="text-xs text-slate-500 dark:text-gray-400">
                             {u.matchedUser.email}
                           </div>
                         </>
                       ) : u.userIdHint ? (
                         <span
-                          className="text-xs text-gray-400"
+                          className="text-xs text-slate-500 dark:text-gray-400"
                           title={u.userIdHint}
                         >
                           Unknown ({u.userIdHint.slice(0, 12)}…)
                         </span>
                       ) : (
-                        <span className="text-xs text-gray-500">Guest</span>
+                        <span className="text-xs text-slate-400 dark:text-gray-500">
+                          Guest
+                        </span>
                       )}
                     </td>
-                    <td className="p-3 text-center align-middle text-gray-200">
+                    <td className="p-3 text-center align-middle text-slate-800 dark:text-gray-200">
                       {u.burst.used} / {u.burst.limit}
                     </td>
-                    <td className="p-3 text-center align-middle text-gray-200">
+                    <td className="p-3 text-center align-middle text-slate-800 dark:text-gray-200">
                       {u.daily.used} / {u.daily.limit}
                     </td>
                     <td className="p-3 text-center align-middle">
@@ -360,7 +360,7 @@ const IpUsage = () => {
                           <button
                             onClick={() => handleClearOverride(u.ip)}
                             disabled={savingOverrideIp === u.ip}
-                            className="whitespace-nowrap rounded px-2 py-1 text-xs text-white bg-gray-600 hover:bg-gray-500 disabled:opacity-50"
+                            className="whitespace-nowrap rounded px-2 py-1 text-xs text-white bg-gray-500 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 disabled:opacity-50"
                           >
                             Clear
                           </button>
@@ -368,7 +368,7 @@ const IpUsage = () => {
                         <button
                           onClick={() => handleResetIp(u.ip)}
                           disabled={resettingIp === u.ip || resettingAll}
-                          className="whitespace-nowrap rounded px-2 py-1 text-xs text-white bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+                          className="whitespace-nowrap rounded px-2 py-1 text-xs text-white bg-gray-600 hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-600 disabled:opacity-50"
                         >
                           {resettingIp === u.ip ? "Resetting..." : "Reset"}
                         </button>

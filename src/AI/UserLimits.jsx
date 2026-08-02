@@ -203,7 +203,7 @@ const UserLimits = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
         <ScaleLoader color="#36d7b7" loading={loading} size={150} />
       </div>
     );
@@ -211,8 +211,10 @@ const UserLimits = () => {
 
   if (!users.length)
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
-        <p className="text-center text-white">No users found.</p>
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+        <p className="text-center text-slate-700 dark:text-white">
+          No users found.
+        </p>
       </div>
     );
 
@@ -221,21 +223,20 @@ const UserLimits = () => {
   }
 
   const limitInputClass =
-    "w-20 rounded-md border border-gray-600 bg-gray-900/60 p-1 text-center text-white focus:border-sky-500 focus:outline-none focus:ring focus:ring-sky-500/30";
+    "w-20 rounded-md border border-slate-300 bg-white p-1 text-center text-slate-900 focus:border-sky-500 focus:outline-none focus:ring focus:ring-sky-500/30 dark:border-gray-600 dark:bg-gray-900/60 dark:text-white";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4 md:p-8">
+    <div className="min-h-screen bg-slate-50 p-4 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 md:p-8">
       <div className="mx-auto max-w-6xl">
         <div className="mb-6">
           <PageHeader
-            surface="dark"
             title="User Limits"
             subtitle="Per-user AI generation caps. Users without a personal override fall back to the global limits below."
           />
         </div>
 
-        <div className="mb-6 flex flex-wrap items-center justify-center gap-2 rounded-lg border border-gray-700 bg-gray-800/50 px-4 py-3">
-          <span className="text-sm font-semibold text-gray-200">
+        <div className="mb-6 flex flex-wrap items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
+          <span className="text-sm font-semibold text-slate-700 dark:text-gray-200">
             Global Limits:
           </span>
           <span className="rounded bg-red-600/80 px-2 py-0.5 text-sm text-white">
@@ -250,22 +251,18 @@ const UserLimits = () => {
         </div>
 
         <div className="mb-4 flex justify-between items-center gap-2">
-          <Button
-            surface="dark"
-            variant="secondary"
-            onClick={() => setShowUserId(!showUserId)}
-          >
+          <Button variant="secondary" onClick={() => setShowUserId(!showUserId)}>
             {showUserId ? "🔒 Hide ID" : "👁️ Show ID"}
           </Button>
-          <Button surface="dark" variant="danger" onClick={handleResetAllToGlobal}>
+          <Button variant="danger" onClick={handleResetAllToGlobal}>
             Reset All to Global
           </Button>
         </div>
 
-        <div className="overflow-x-auto rounded-lg border border-gray-700 bg-gray-800/50">
+        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
           <table className="min-w-full table-auto">
             <thead>
-              <tr className="bg-gray-900/60 text-gray-200">
+              <tr className="bg-slate-100 text-slate-700 dark:bg-gray-900/60 dark:text-gray-200">
                 {showUserId && (
                   <th className="p-3 text-center font-semibold">ID</th>
                 )}
@@ -287,17 +284,17 @@ const UserLimits = () => {
               {users.map((user) => (
                 <tr
                   key={user.id}
-                  className="border-t border-gray-700 odd:bg-gray-800/30 even:bg-gray-800/60"
+                  className="border-t border-slate-200 odd:bg-white even:bg-slate-50 dark:border-gray-700 dark:odd:bg-gray-800/30 dark:even:bg-gray-800/60"
                 >
                   {showUserId && (
-                    <td className="p-3 text-center text-gray-300">
+                    <td className="p-3 text-center text-slate-600 dark:text-gray-300">
                       {user.id}
                     </td>
                   )}
-                  <td className="p-3 text-center text-gray-200">
+                  <td className="p-3 text-center text-slate-800 dark:text-gray-200">
                     {user.name}
                   </td>
-                  <td className="p-3 text-center text-gray-300">
+                  <td className="p-3 text-center text-slate-600 dark:text-gray-300">
                     {user.email}
                   </td>
 
@@ -359,7 +356,6 @@ const UserLimits = () => {
                   <td className="p-3 text-center">
                     <div className="flex justify-center gap-2">
                       <Button
-                        surface="dark"
                         size="sm"
                         onClick={() => handleUpdateLimits(user.id)}
                         disabled={updatingId === user.id}
@@ -367,7 +363,6 @@ const UserLimits = () => {
                         {updatingId === user.id ? "Updating..." : "Update"}
                       </Button>
                       <Button
-                        surface="dark"
                         variant="secondary"
                         size="sm"
                         onClick={() => handleResetToGlobal(user.id)}

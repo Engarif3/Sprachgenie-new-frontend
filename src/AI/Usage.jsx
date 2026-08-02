@@ -88,7 +88,7 @@ const Usage = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
         <ScaleLoader color="#36d7b7" loading={loading} size={150} />
       </div>
     );
@@ -96,8 +96,10 @@ const Usage = () => {
 
   if (!usageData.length)
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
-        <p className="text-center text-white">No active users found.</p>
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+        <p className="text-center text-slate-700 dark:text-white">
+          No active users found.
+        </p>
       </div>
     );
 
@@ -106,27 +108,22 @@ const Usage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4 md:p-8">
+    <div className="min-h-screen bg-slate-50 p-4 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 md:p-8">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <PageHeader
-            surface="dark"
             title="Active Users Limits Usage"
             subtitle="AI generation usage against each user's daily/monthly/yearly cap."
           />
-          <Button
-            surface="dark"
-            variant="secondary"
-            onClick={() => setShowUserId(!showUserId)}
-          >
+          <Button variant="secondary" onClick={() => setShowUserId(!showUserId)}>
             {showUserId ? "🔒 Hide ID" : "👁️ Show ID"}
           </Button>
         </div>
 
-        <div className="overflow-x-auto rounded-lg border border-gray-700 bg-gray-800/50">
+        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
           <table className="min-w-full table-auto">
             <thead>
-              <tr className="bg-gray-900/60 text-gray-200">
+              <tr className="bg-slate-100 text-slate-700 dark:bg-gray-900/60 dark:text-gray-200">
                 {showUserId && (
                   <th className="p-3 text-center font-semibold">User ID</th>
                 )}
@@ -148,27 +145,29 @@ const Usage = () => {
               {usageData.map((u) => (
                 <tr
                   key={u.userId}
-                  className="border-t border-gray-700 odd:bg-gray-800/30 even:bg-gray-800/60"
+                  className="border-t border-slate-200 odd:bg-white even:bg-slate-50 dark:border-gray-700 dark:odd:bg-gray-800/30 dark:even:bg-gray-800/60"
                 >
                   {showUserId && (
-                    <td className="p-3 text-center text-gray-300">
+                    <td className="p-3 text-center text-slate-600 dark:text-gray-300">
                       {u.userId}
                     </td>
                   )}
-                  <td className="p-3 text-center text-gray-200">{u.name}</td>
-                  <td className="p-3 text-center text-gray-300">
+                  <td className="p-3 text-center text-slate-800 dark:text-gray-200">
+                    {u.name}
+                  </td>
+                  <td className="p-3 text-center text-slate-600 dark:text-gray-300">
                     {u.email}
                   </td>
-                  <td className="p-3 text-center text-gray-300">
+                  <td className="p-3 text-center text-slate-600 dark:text-gray-300">
                     {u.status}
                   </td>
-                  <td className="p-3 text-center text-gray-200">
+                  <td className="p-3 text-center text-slate-800 dark:text-gray-200">
                     {u.daily.used} / {u.daily.limit}
                   </td>
-                  <td className="p-3 text-center text-gray-200">
+                  <td className="p-3 text-center text-slate-800 dark:text-gray-200">
                     {u.monthly.used} / {u.monthly.limit}
                   </td>
-                  <td className="p-3 text-center text-gray-200">
+                  <td className="p-3 text-center text-slate-800 dark:text-gray-200">
                     {u.yearly.used} / {u.yearly.limit}
                   </td>
                 </tr>

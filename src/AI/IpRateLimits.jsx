@@ -55,25 +55,24 @@ const IpRateLimits = () => {
   }
 
   const inputClass =
-    "mt-1 w-full rounded-lg border border-gray-700 bg-gray-900/60 px-3 py-2 text-white placeholder-gray-500 focus:border-sky-500 focus:outline-none focus:ring focus:ring-sky-500/30";
+    "mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-sky-500 focus:outline-none focus:ring focus:ring-sky-500/30 dark:border-gray-700 dark:bg-gray-900/60 dark:text-white dark:placeholder-gray-500";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4 md:p-8">
+    <div className="min-h-screen bg-slate-50 p-4 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 md:p-8">
       <div className="mx-auto max-w-lg">
         <div className="mb-8">
           <PageHeader
-            surface="dark"
             title="IP Rate Limits"
             subtitle="Shared cap applied per client IP address across all AI generation (paragraphs and conjugations), regardless of which user account is signed in."
           />
         </div>
 
-        <div className="space-y-6 rounded-lg border border-gray-700 bg-gray-800/50 p-6 md:p-8">
+        <div className="space-y-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none md:p-8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
                 htmlFor="ip-burst-limit"
-                className="block text-sm font-medium text-gray-300"
+                className="block text-sm font-medium text-slate-700 dark:text-gray-300"
               >
                 Burst Limit (requests per minute)
               </label>
@@ -90,7 +89,7 @@ const IpRateLimits = () => {
             <div>
               <label
                 htmlFor="ip-daily-limit"
-                className="block text-sm font-medium text-gray-300"
+                className="block text-sm font-medium text-slate-700 dark:text-gray-300"
               >
                 Daily Limit (requests per 24h)
               </label>
@@ -104,11 +103,15 @@ const IpRateLimits = () => {
                 className={inputClass}
               />
             </div>
-            <Button type="submit" surface="dark" disabled={loading}>
+            <Button type="submit" disabled={loading}>
               {loading ? "Updating..." : "Update Limits"}
             </Button>
           </form>
-          {message && <p className="text-sm text-gray-300">{message}</p>}
+          {message && (
+            <p className="text-sm text-slate-700 dark:text-gray-300">
+              {message}
+            </p>
+          )}
         </div>
       </div>
     </div>
