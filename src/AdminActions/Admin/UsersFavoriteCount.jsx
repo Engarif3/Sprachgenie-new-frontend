@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
-import Container from "../../utils/Container";
 import { useAuth } from "../../services/auth.services";
 import api from "../../axios";
-import { useNavigate } from "react-router-dom";
 import { ScaleLoader } from "react-spinners";
+import PageHeader from "../../components/UI/PageHeader";
 
 const UsersFavoriteCount = () => {
   const [users, setUsers] = useState([]);
@@ -39,49 +38,58 @@ const UsersFavoriteCount = () => {
   }
 
   return (
-    <div className="container mx-auto p-4 min-h-screen">
-      <h2 className="text-2xl font-bold mb-4 text-center text-white py-2 bg-cyan-700 rounded">
-        Users & Favorite Words Count{" "}
-        {/* <span className="text-md text-orange-300">({users.length})</span> */}
-      </h2>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4 md:p-8">
+      <div className="mx-auto max-w-4xl">
+        <div className="mb-8">
+          <PageHeader
+            surface="dark"
+            title="Users & Favorite Words Count"
+            subtitle="How many words each user has saved to their favorites."
+          />
+        </div>
 
-      {loading ? (
-        <div className="flex justify-center py-4">
-          <ScaleLoader color="oklch(0.5 0.134 242.749)" loading={loading} />
-        </div>
-      ) : error ? (
-        <div className="text-red-600 text-center">{error}</div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full table-auto">
-            <thead>
-              <tr className="bg-green-600 text-white">
-                <th className="p-2 text-center">Name</th>
-                <th className="p-2 text-center">Email</th>
-                <th className="p-2 text-center">Favorite Count</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr
-                  key={user.id}
-                  className="border-b odd:bg-white even:bg-gray-200"
-                >
-                  <td className="p-2 text-center text-slate-900">
-                    {user.name}
-                  </td>
-                  <td className="p-2 text-center text-slate-900">
-                    {user.email}
-                  </td>
-                  <td className="p-2 text-center font-bold text-blue-600">
-                    {user.favoriteCount}
-                  </td>
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <ScaleLoader color="oklch(0.5 0.134 242.749)" loading={loading} />
+          </div>
+        ) : error ? (
+          <div className="rounded-lg border border-red-700 bg-red-900/30 p-4 text-center text-red-200">
+            {error}
+          </div>
+        ) : (
+          <div className="overflow-x-auto rounded-lg border border-gray-700 bg-gray-800/50">
+            <table className="min-w-full table-auto">
+              <thead>
+                <tr className="bg-gray-900/60 text-gray-200">
+                  <th className="p-3 text-center font-semibold">Name</th>
+                  <th className="p-3 text-center font-semibold">Email</th>
+                  <th className="p-3 text-center font-semibold">
+                    Favorite Count
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+              </thead>
+              <tbody>
+                {users.map((user) => (
+                  <tr
+                    key={user.id}
+                    className="border-t border-gray-700 odd:bg-gray-800/30 even:bg-gray-800/60"
+                  >
+                    <td className="p-3 text-center text-gray-200">
+                      {user.name}
+                    </td>
+                    <td className="p-3 text-center text-gray-300">
+                      {user.email}
+                    </td>
+                    <td className="p-3 text-center font-bold text-sky-400">
+                      {user.favoriteCount}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

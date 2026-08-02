@@ -6,6 +6,8 @@ import api from "../axios";
 import aiApi from "../AI_axios";
 import Pagination from "../AdminActions/AdminPaginationForUsers";
 import { useAuth } from "../services/auth.services";
+import PageHeader from "../components/UI/PageHeader";
+import Button from "../components/UI/Button";
 
 const Usage = () => {
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
@@ -86,7 +88,7 @@ const Usage = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
         <ScaleLoader color="#36d7b7" loading={loading} size={150} />
       </div>
     );
@@ -94,7 +96,9 @@ const Usage = () => {
 
   if (!usageData.length)
     return (
-      <p className="text-center mt-4 text-white">No active users found.</p>
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
+        <p className="text-center text-white">No active users found.</p>
+      </div>
     );
 
   if (!canAccess) {
@@ -102,70 +106,84 @@ const Usage = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4 text-center text-white">
-        Active Users Limits Usage
-      </h2>
-
-      <div className="overflow-x-auto">
-        <div className="flex justify-end mb-4">
-          <button
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4 md:p-8">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <PageHeader
+            surface="dark"
+            title="Active Users Limits Usage"
+            subtitle="AI generation usage against each user's daily/monthly/yearly cap."
+          />
+          <Button
+            surface="dark"
+            variant="secondary"
             onClick={() => setShowUserId(!showUserId)}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
             {showUserId ? "🔒 Hide ID" : "👁️ Show ID"}
-          </button>
+          </Button>
         </div>
 
-        <table className="min-w-full table-auto border">
-          <thead>
-            <tr className="bg-cyan-700 text-white">
-              {showUserId && <th className="p-2 text-center">User ID</th>}
-              <th className="p-2 text-center">Name</th>
-              <th className="p-2 text-center">Email</th>
-              <th className="p-2 text-center">Status</th>
-              <th className="p-2 text-center">
-                Daily <br /> Used / Limit
-              </th>
-              <th className="p-2 text-center">
-                Monthly <br /> Used / Limit
-              </th>
-              <th className="p-2 text-center">
-                Yearly <br /> Used / Limit
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {usageData.map((u) => (
-              <tr
-                key={u.userId}
-                className="border-b odd:bg-white even:bg-gray-100"
-              >
-                {showUserId && <td className="p-2 text-center">{u.userId}</td>}
-                <td className="p-2 text-center">{u.name}</td>
-                <td className="p-2 text-center">{u.email}</td>
-                <td className="p-2 text-center">{u.status}</td>
-                <td className="p-2 text-center">
-                  {u.daily.used} / {u.daily.limit}
-                </td>
-                <td className="p-2 text-center">
-                  {u.monthly.used} / {u.monthly.limit}
-                </td>
-                <td className="p-2 text-center">
-                  {u.yearly.used} / {u.yearly.limit}
-                </td>
+        <div className="overflow-x-auto rounded-lg border border-gray-700 bg-gray-800/50">
+          <table className="min-w-full table-auto">
+            <thead>
+              <tr className="bg-gray-900/60 text-gray-200">
+                {showUserId && (
+                  <th className="p-3 text-center font-semibold">User ID</th>
+                )}
+                <th className="p-3 text-center font-semibold">Name</th>
+                <th className="p-3 text-center font-semibold">Email</th>
+                <th className="p-3 text-center font-semibold">Status</th>
+                <th className="p-3 text-center font-semibold">
+                  Daily <br /> Used / Limit
+                </th>
+                <th className="p-3 text-center font-semibold">
+                  Monthly <br /> Used / Limit
+                </th>
+                <th className="p-3 text-center font-semibold">
+                  Yearly <br /> Used / Limit
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {usageData.map((u) => (
+                <tr
+                  key={u.userId}
+                  className="border-t border-gray-700 odd:bg-gray-800/30 even:bg-gray-800/60"
+                >
+                  {showUserId && (
+                    <td className="p-3 text-center text-gray-300">
+                      {u.userId}
+                    </td>
+                  )}
+                  <td className="p-3 text-center text-gray-200">{u.name}</td>
+                  <td className="p-3 text-center text-gray-300">
+                    {u.email}
+                  </td>
+                  <td className="p-3 text-center text-gray-300">
+                    {u.status}
+                  </td>
+                  <td className="p-3 text-center text-gray-200">
+                    {u.daily.used} / {u.daily.limit}
+                  </td>
+                  <td className="p-3 text-center text-gray-200">
+                    {u.monthly.used} / {u.monthly.limit}
+                  </td>
+                  <td className="p-3 text-center text-gray-200">
+                    {u.yearly.used} / {u.yearly.limit}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-      <div className="mt-4 flex justify-center">
-        <Pagination
-          page={page}
-          totalPages={totalPages}
-          onPageChange={setPage}
-        />
+        <div className="mt-4 flex justify-center">
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </div>
       </div>
     </div>
   );
