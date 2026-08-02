@@ -364,6 +364,14 @@ export const router = createBrowserRouter(
               ),
             },
             {
+              // Same component as the standalone /level route — nested here
+              // too so the "Create Level" sidebar link keeps the dashboard
+              // layout (and its menu) visible, matching topic/update-topic
+              // below.
+              path: "level",
+              element: protectRoute(<LevelFormWithSuspense />, ADMIN_ROLES),
+            },
+            {
               path: "topic",
               element: protectRoute(
                 <TopicFormWithSuspense />,
