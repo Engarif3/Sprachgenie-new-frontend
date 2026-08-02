@@ -1489,9 +1489,13 @@ const WordList = () => {
       allowedLevels.map((level) => ({
         type: "item",
         value: level.level,
-        label: level.level,
+        // Non-admins never receive a hidden level here at all (the backend
+        // already filters it out of `levels`) — this suffix is purely a
+        // visual cue for admins managing which levels are currently hidden.
+        label:
+          level.isHidden && isAdmin ? `${level.level} (Hidden)` : level.level,
       })),
-    [allowedLevels],
+    [allowedLevels, isAdmin],
   );
 
   // Update the toggleView function
