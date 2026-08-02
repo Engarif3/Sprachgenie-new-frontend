@@ -21,6 +21,11 @@ const UpdateTopicForm = () => {
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
   const canAccess = userLoggedIn && userId && isAdmin;
   const [topicData, setTopicData] = useState(EMPTY_TOPIC_FORM);
+  // The selected topic's level as of selection/last successful save — kept
+  // separate from topicData.levelId (which tracks the live edit) so submit
+  // can tell "the level is actually being changed" apart from "resubmitted
+  // unchanged" without re-deriving it from `topics` at submit time.
+  const [originalLevelId, setOriginalLevelId] = useState("");
   const [levels, setLevels] = useState([]);
   const [topics, setTopics] = useState([]);
   const [selectedTopicId, setSelectedTopicId] = useState("");
@@ -69,6 +74,7 @@ const UpdateTopicForm = () => {
 
     if (!nextTopicId) {
       setTopicData(EMPTY_TOPIC_FORM);
+      setOriginalLevelId("");
       return;
     }
 
@@ -78,13 +84,16 @@ const UpdateTopicForm = () => {
 
     if (!selectedTopic) {
       setTopicData(EMPTY_TOPIC_FORM);
+      setOriginalLevelId("");
       return;
     }
 
-    setTopicData({
-      name: selectedTopic.name || "",
-      levelId: selectedTopic.levelId ? String(selectedTopic.levelId) : "",
-    });
+    const levelIdStr = selectedTopic.levelId
+      ? String(selectedTopic.levelId)
+      : "";
+
+    setTopicData({ name: selectedTopic.name || "", levelId: levelIdStr });
+    setOriginalLevelId(levelIdStr);
   };
 
   const handleChange = (event) => {
@@ -95,6 +104,16 @@ const UpdateTopicForm = () => {
     }));
   };
 
+  const levelLabel = (levelIdStr) => {
+    if (!levelIdStr) {
+      return "Any Level";
+    }
+    const found = levels.find(
+      (level) => String(level.id) === String(levelIdStr),
+    );
+    return found ? found.level : `Level #${levelIdStr}`;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -103,27 +122,59 @@ const UpdateTopicForm = () => {
       return;
     }
 
-    const confirmation = await Swal.fire({
-      title: "Update topic?",
-      text: "Type ok to confirm this topic update.",
-      input: "text",
-      inputPlaceholder: "Type ok",
-      inputAutoTrim: true,
-      inputValidator: (value) =>
-        value?.trim().toLowerCase() === "ok"
-          ? null
-          : 'Please type "ok" to continue.',
-      showCancelButton: true,
-      confirmButtonText: "Update",
-      cancelButtonText: "Cancel",
-      confirmButtonColor: "#0284c7",
-      cancelButtonColor: "#475569",
-      background: "#1c1917",
-      color: "#f5f5f4",
-    });
+    const isLevelChanging = topicData.levelId !== originalLevelId;
+    let password;
 
-    if (!confirmation.isConfirmed) {
-      return;
+    if (isLevelChanging) {
+      // Changing a topic's level is significant enough to re-verify the
+      // caller's own password — same rationale as force-deleting a topic:
+      // proves it's really them, independent of the session cookie. A
+      // rename with no level change stays on the lighter "type ok" prompt.
+      const passwordConfirmation = await Swal.fire({
+        title: "Confirm level change?",
+        html: `Changing <strong>${topicData.name || "this topic"}</strong>'s level from <strong>${levelLabel(originalLevelId)}</strong> to <strong>${levelLabel(topicData.levelId)}</strong>. Enter your password to confirm.`,
+        icon: "warning",
+        input: "password",
+        inputPlaceholder: "Your password",
+        inputAttributes: { autocomplete: "current-password" },
+        inputValidator: (value) => (value ? null : "Password is required"),
+        showCancelButton: true,
+        confirmButtonText: "Confirm",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#0284c7",
+        cancelButtonColor: "#475569",
+        background: "#1c1917",
+        color: "#f5f5f4",
+      });
+
+      if (!passwordConfirmation.isConfirmed) {
+        return;
+      }
+
+      password = passwordConfirmation.value;
+    } else {
+      const confirmation = await Swal.fire({
+        title: "Update topic?",
+        text: "Type ok to confirm this topic update.",
+        input: "text",
+        inputPlaceholder: "Type ok",
+        inputAutoTrim: true,
+        inputValidator: (value) =>
+          value?.trim().toLowerCase() === "ok"
+            ? null
+            : 'Please type "ok" to continue.',
+        showCancelButton: true,
+        confirmButtonText: "Update",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#0284c7",
+        cancelButtonColor: "#475569",
+        background: "#1c1917",
+        color: "#f5f5f4",
+      });
+
+      if (!confirmation.isConfirmed) {
+        return;
+      }
     }
 
     setLoading(true);
@@ -136,6 +187,7 @@ const UpdateTopicForm = () => {
         // (even as null) so the backend can tell "clear the level" apart
         // from "the field wasn't sent at all".
         levelId: topicData.levelId ? parseInt(topicData.levelId, 10) : null,
+        ...(password ? { password } : {}),
       });
 
       await invalidateWordsCache();
@@ -147,10 +199,11 @@ const UpdateTopicForm = () => {
       );
 
       if (updatedTopic) {
-        setTopicData({
-          name: updatedTopic.name || "",
-          levelId: updatedTopic.levelId ? String(updatedTopic.levelId) : "",
-        });
+        const levelIdStr = updatedTopic.levelId
+          ? String(updatedTopic.levelId)
+          : "";
+        setTopicData({ name: updatedTopic.name || "", levelId: levelIdStr });
+        setOriginalLevelId(levelIdStr);
       }
 
       await Swal.fire({
