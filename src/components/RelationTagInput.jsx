@@ -202,14 +202,12 @@ const RelationTagInput = ({
                   <span className="italic text-amber-700">?</span>
                 </>
               ) : (
-                <>
-                  {word.value}
-                  {word.meaning?.length > 0 && (
-                    <span className="ml-2 text-xs text-gray-500">
-                      — {word.meaning[0]}
-                    </span>
-                  )}
-                </>
+                word.value
+              )}
+              {word.partsOfSpeech?.length > 0 && (
+                <span className="ml-2 text-xs text-gray-500">
+                  ({word.partsOfSpeech.map((p) => p.name).join(", ")})
+                </span>
               )}
             </button>
           ))}
