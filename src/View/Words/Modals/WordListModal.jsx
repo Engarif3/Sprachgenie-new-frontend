@@ -540,7 +540,7 @@ const WordListModal = ({
             {isEnumeratedMeaning ? (
               <div className="text-sm md:text-base lg:text-lg">
                 <span className="text-blue-400 font-semibold">Meaning:</span>
-                <div className="mt-1 pl-3 space-y-0.5">
+                <div className="mt-1 pl-6 space-y-0.5">
                   {enumeratedMeaningParts.map((item, index) => {
                     const { marker, text } = splitMeaningMarkerFromText(item);
                     return (
