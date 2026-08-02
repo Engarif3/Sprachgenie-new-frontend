@@ -1965,8 +1965,8 @@ const WordList = () => {
                   title='Set how many words "Recently added" shows'
                 >
                   {typeof recentlyAddedLimit === "number"
-                    ? `Limit: ${recentlyAddedLimit}`
-                    : "Set limit"}
+                    ? `Recently Limit: ${recentlyAddedLimit}`
+                    : "Set Recently Limit"}
                 </button>
               )}
               {/* <p className="text-md font-bold whitespace-nowrap hidden md:block px-2 py-1 md:px-2.5 md:py-1.5 bg-sky-600  rounded-full text-white">
