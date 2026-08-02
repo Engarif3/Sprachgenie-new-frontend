@@ -1484,14 +1484,28 @@ const WordList = () => {
     [levels, isAdmin],
   );
 
+  // Non-admins never receive a hidden level here at all (the backend
+  // already filters it out of `levels`) — this is purely a visual cue for
+  // admins managing which levels are currently hidden.
+  const selectedLevelLabel = useMemo(() => {
+    if (!selectedLevel) {
+      return "All Levels";
+    }
+
+    const matchedLevel = allowedLevels.find(
+      (level) => level.level === selectedLevel,
+    );
+
+    return matchedLevel?.isHidden && isAdmin
+      ? `${selectedLevel} (Hidden)`
+      : selectedLevel;
+  }, [allowedLevels, selectedLevel, isAdmin]);
+
   const levelItems = useMemo(
     () =>
       allowedLevels.map((level) => ({
         type: "item",
         value: level.level,
-        // Non-admins never receive a hidden level here at all (the backend
-        // already filters it out of `levels`) — this suffix is purely a
-        // visual cue for admins managing which levels are currently hidden.
         label:
           level.isHidden && isAdmin ? `${level.level} (Hidden)` : level.level,
       })),
@@ -2134,7 +2148,7 @@ const WordList = () => {
               id="level-select"
               ariaLabel="Filter words by level"
               placeholder="All Levels"
-              displayLabel={selectedLevel || "All Levels"}
+              displayLabel={selectedLevelLabel}
               selectedValue={selectedLevel}
               onSelect={handleLevelChange}
               items={levelItems}
