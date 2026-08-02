@@ -1496,13 +1496,28 @@ const WordList = () => {
 
   // Update the toggleView function
 
-  // Memoize sorted topics separately to avoid recreating JSX on every render
+  // Memoize sorted topics separately to avoid recreating JSX on every render.
+  // Group order: level-grouped topics (by level order) → "Any Level" topics
+  // (levelId === null — a real, intentional "not tied to one level" topic,
+  // distinct from Miscellaneous below) → Miscellaneous (UNKNOWN_TOPIC_ID,
+  // the unassigned-words bucket) last.
   const sortedTopicData = useMemo(() => {
     const levelIdToLevelMap = new Map(levels.map((level) => [level.id, level]));
 
     const sorted = [...filteredTopics].sort((a, b) => {
       if (a.id === UNKNOWN_TOPIC_ID) return 1;
       if (b.id === UNKNOWN_TOPIC_ID) return -1;
+
+      const aIsAnyLevel = a.levelId == null;
+      const bIsAnyLevel = b.levelId == null;
+
+      if (aIsAnyLevel !== bIsAnyLevel) {
+        return aIsAnyLevel ? 1 : -1;
+      }
+
+      if (aIsAnyLevel && bIsAnyLevel) {
+        return 0;
+      }
 
       const levelA = levelIdToLevelMap.get(a.levelId);
       const levelB = levelIdToLevelMap.get(b.levelId);
@@ -1521,17 +1536,29 @@ const WordList = () => {
   const topicItems = useMemo(() => {
     const { sorted: sortedTopics, levelIdToLevelMap } = sortedTopicData;
 
-    let lastLevelId = null;
+    let lastGroupKey = null;
     const rows = [];
 
     sortedTopics.forEach((topic) => {
-      const level = levelIdToLevelMap.get(topic.levelId);
+      const isAnyLevelTopic =
+        topic.id !== UNKNOWN_TOPIC_ID && topic.levelId == null;
+      const level = isAnyLevelTopic
+        ? null
+        : levelIdToLevelMap.get(topic.levelId);
+      const groupKey =
+        topic.id === UNKNOWN_TOPIC_ID
+          ? "misc"
+          : isAnyLevelTopic
+            ? "any-level"
+            : level
+              ? `level-${level.id}`
+              : "unknown-level";
 
-      if (level && level.id !== lastLevelId && lastLevelId !== null) {
+      if (groupKey !== lastGroupKey && lastGroupKey !== null) {
         rows.push({ type: "separator" });
       }
 
-      lastLevelId = level ? level.id : null;
+      lastGroupKey = groupKey;
 
       if (topic.id === UNKNOWN_TOPIC_ID) {
         const displayLevel = selectedLevel ? selectedLevel : "All";
@@ -1539,6 +1566,15 @@ const WordList = () => {
           type: "item",
           value: topic.name,
           label: `${displayLevel} ➡️ ${topic.name}`,
+        });
+        return;
+      }
+
+      if (isAnyLevelTopic) {
+        rows.push({
+          type: "item",
+          value: topic.name,
+          label: `Any Level ➡️ ${topic.name}`,
         });
         return;
       }

@@ -131,7 +131,11 @@ const UpdateTopicForm = () => {
     try {
       await axios.put(`/topic/update/${selectedTopicId}`, {
         ...topicData,
-        levelId: parseInt(topicData.levelId, 10),
+        // Empty selection means "Any Level" — words from every level can be
+        // filed under this topic, not just one. Always sending the key
+        // (even as null) so the backend can tell "clear the level" apart
+        // from "the field wasn't sent at all".
+        levelId: topicData.levelId ? parseInt(topicData.levelId, 10) : null,
       });
 
       await invalidateWordsCache();
@@ -377,24 +381,27 @@ const UpdateTopicForm = () => {
 
           <div>
             <label htmlFor="levelId" className="block font-medium">
-              Select Level
+              Select Level (optional)
             </label>
             <select
               id="levelId"
               name="levelId"
               value={topicData.levelId}
               onChange={handleChange}
-              required
               disabled={!selectedTopicId || loadingOptions || loading || deleting}
               className="mt-1 block w-full input-md rounded-md text-black border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
             >
-              <option value="">Select Level</option>
+              <option value="">Any Level</option>
               {levels.map((level) => (
                 <option key={level.id} value={level.id}>
                   {level.level}
                 </option>
               ))}
             </select>
+            <p className="mt-1 text-xs text-gray-400">
+              Leave as "Any Level" to let words from any level be filed under
+              this topic.
+            </p>
           </div>
 
           <Button

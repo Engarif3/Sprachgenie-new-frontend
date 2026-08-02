@@ -119,7 +119,9 @@ const TopicForm = () => {
     try {
       await axios.post("/topic/create", {
         ...topicData,
-        levelId: parseInt(topicData.levelId, 10),
+        // Empty selection means "Any Level" — words from every level can be
+        // filed under this topic, not just one.
+        levelId: topicData.levelId ? parseInt(topicData.levelId, 10) : null,
       });
       await invalidateWordsCache();
       alert("Topic created successfully");
@@ -165,23 +167,26 @@ const TopicForm = () => {
 
           <div>
             <label htmlFor="levelId" className="block  font-medium ">
-              Select Level
+              Select Level (optional)
             </label>
             <select
               id="levelId"
               name="levelId"
               value={topicData.levelId}
               onChange={handleChange}
-              required
               className="mt-1 block w-full input-md rounded-md text-black border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
             >
-              <option value="">Select Level</option>
+              <option value="">Any Level</option>
               {levels.map((level) => (
                 <option key={level.id} value={level.id}>
                   {level.level}
                 </option>
               ))}
             </select>
+            <p className="mt-1 text-xs text-gray-400">
+              Leave as "Any Level" to let words from any level be filed under
+              this topic.
+            </p>
           </div>
 
           <Button type="submit" disabled={loading} fullWidth className="mt-24">
