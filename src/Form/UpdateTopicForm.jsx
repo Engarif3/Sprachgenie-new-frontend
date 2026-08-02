@@ -387,6 +387,11 @@ const UpdateTopicForm = () => {
           align="center"
           className="mt-8 mb-6"
         />
+        <p className="text-center text-sm text-gray-400 -mt-4 mb-6">
+          {loadingOptions
+            ? "Loading topics..."
+            : `${topics.length} topic${topics.length === 1 ? "" : "s"} available`}
+        </p>
         <form
           onSubmit={handleSubmit}
           className="space-y-4 p-4 bg-stone-800 rounded-md text-white"

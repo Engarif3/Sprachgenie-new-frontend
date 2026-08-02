@@ -357,6 +357,14 @@ const DashboardLayout = () => {
                       <span>➕</span>
                       <span>Create Word</span>
                     </NavLink>
+                    <NavLink
+                      to="/dashboard/level"
+                      className={({ isActive }) => navItemClass(isActive)}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <span>🎚️</span>
+                      <span>Create Level</span>
+                    </NavLink>
                     {role === "super_admin" && (
                       <>
                         <NavLink
