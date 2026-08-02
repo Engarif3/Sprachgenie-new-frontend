@@ -16,27 +16,26 @@ import { IoInformationCircleOutline } from "react-icons/io5";
 import { highlightPrefixInSentence } from "../../../utils/sentencePrefixHighlighter.jsx";
 import WordReportSection from "./WordReportSection";
 
-// Matches a leading enumeration marker: a number immediately followed by
-// ")" or "." — e.g. "1)", "2." (with optional surrounding whitespace) at
-// the start of a meaning entry. Letter markers (a), A.) aren't handled yet
-// — numbers only for now.
-const ENUMERATED_MEANING_PATTERN = /^\s*\d+[).]\s*/;
-
-// Finds number+")"/number+"." markers ANYWHERE in a block of text, not
-// just at its start — some entries are saved as one long string with
-// every numbered meaning run together ("1) foo 2) bar 3) baz") rather
-// than as separate array items.
+// Finds number+")"/number+"." markers ("1)", "2.") ANYWHERE in a block of
+// text. Letter markers (a), A.) aren't handled yet — numbers only for now.
 const ENUMERATED_MEANING_SPLIT_PATTERN = /\d+[).]/g;
 
-// Splits one meaning entry into its numbered/lettered parts when it
-// contains 2+ embedded markers; returns null when there's nothing to
-// split (fewer than 2 markers), so the caller can leave it untouched.
-const splitEnumeratedMeaningText = (text) => {
+// The `meaning` array isn't reliably one array item per numbered entry —
+// the input that saves it splits on commas, so a single numbered entry
+// like "1) foo: bar, baz" written by the admin lands in the DB shredded
+// across several array items ("1) foo: bar", "baz"). Reassembling with
+// ", " (the same join the plain, non-enumerated display already uses)
+// recovers the original text, and only THEN does splitting on the
+// embedded markers land on the right boundaries. Returns null when the
+// reassembled text has fewer than 2 markers, so a normal meaning that
+// merely happens to start with a digit isn't misdetected as a list.
+const splitMeaningIntoEnumeratedParts = (meaning) => {
+  const combinedText = (meaning || []).join(", ");
   const markerStarts = [];
   let match;
   ENUMERATED_MEANING_SPLIT_PATTERN.lastIndex = 0;
 
-  while ((match = ENUMERATED_MEANING_SPLIT_PATTERN.exec(text)) !== null) {
+  while ((match = ENUMERATED_MEANING_SPLIT_PATTERN.exec(combinedText)) !== null) {
     markerStarts.push(match.index);
   }
 
@@ -46,18 +45,12 @@ const splitEnumeratedMeaningText = (text) => {
 
   return markerStarts.map((start, index) => {
     const end =
-      index + 1 < markerStarts.length ? markerStarts[index + 1] : text.length;
-    return text.slice(start, end).trim();
+      index + 1 < markerStarts.length
+        ? markerStarts[index + 1]
+        : combinedText.length;
+    return combinedText.slice(start, end).trim();
   });
 };
-
-// Expands any meaning entries that are themselves an unsplit enumerated
-// blob into their individual parts, leaving ordinary entries as-is.
-const flattenMeaningItems = (meaning) =>
-  (meaning || []).flatMap((item) => {
-    const text = String(item ?? "");
-    return splitEnumeratedMeaningText(text) ?? [text];
-  });
 
 // Helper function to capitalize first letter
 const capitalizeFirstLetter = (str) => {
@@ -450,26 +443,15 @@ const WordListModal = ({
     return selectedWord?.meaning?.join(", ") || "";
   }, [selectedWord?.meaning]);
 
-  // Meanings that are themselves a numbered/lettered list (1) 2) 3), 1. 2.
-  // 3., a) b) c), A) B) C) …) read better one-per-line than comma-joined —
-  // whether each number was saved as its own array entry, or the whole
-  // list was saved as one run-together string (flattenMeaningItems splits
-  // that case apart). Only true when there are 2+ resulting parts and
-  // EVERY one carries a marker, so a plain single meaning that merely
-  // happens to start with a number isn't misdetected.
-  const flattenedMeaningItems = useMemo(
-    () => flattenMeaningItems(selectedWord?.meaning),
+  // Meanings that are themselves a numbered list (1) foo 2) bar …) read
+  // better one-per-line than comma-joined; null means the meaning isn't a
+  // real numbered list, so the plain comma-joined display is used instead.
+  const enumeratedMeaningParts = useMemo(
+    () => splitMeaningIntoEnumeratedParts(selectedWord?.meaning),
     [selectedWord?.meaning],
   );
 
-  const isEnumeratedMeaning = useMemo(
-    () =>
-      flattenedMeaningItems.length > 1 &&
-      flattenedMeaningItems.every((item) =>
-        ENUMERATED_MEANING_PATTERN.test(item),
-      ),
-    [flattenedMeaningItems],
-  );
+  const isEnumeratedMeaning = enumeratedMeaningParts !== null;
 
   // Now check if we should render
   if (!selectedWord) return null;
@@ -544,7 +526,7 @@ const WordListModal = ({
               <div className="text-sm md:text-base lg:text-lg">
                 <span className="text-blue-400 font-semibold">Meaning:</span>
                 <div className="mt-1 space-y-0.5">
-                  {flattenedMeaningItems.map((item, index) => (
+                  {enumeratedMeaningParts.map((item, index) => (
                     <p
                       key={index}
                       className="text-cyan-500 tracking-wide font-medium italic"
