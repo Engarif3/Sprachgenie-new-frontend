@@ -558,8 +558,10 @@ const WordListModal = ({
                 </div>
               </div>
             ) : (
-              <p className="text-sm md:text-base lg:text-lg">
-                <span className="text-blue-400 font-semibold">Meaning:</span>{" "}
+              <p className="text-sm md:text-base lg:text-lg flex gap-1">
+                <span className="text-blue-400 font-semibold flex-shrink-0">
+                  Meaning:
+                </span>
                 <span className="text-cyan-500 tracking-wide font-normal italic">
                   {meaningsList}
                 </span>
