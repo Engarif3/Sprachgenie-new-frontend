@@ -26,6 +26,7 @@ const UpdateTopicForm = () => {
   const [selectedTopicId, setSelectedTopicId] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingOptions, setLoadingOptions] = useState(true);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchOptions = async () => {
     setLoadingOptions(true);
@@ -170,6 +171,153 @@ const UpdateTopicForm = () => {
     }
   };
 
+  const clearSelectionAndRefresh = async () => {
+    await invalidateWordsCache();
+    setSelectedTopicId("");
+    setTopicData(EMPTY_TOPIC_FORM);
+    await fetchOptions();
+  };
+
+  // SUPER_ADMIN escape hatch for the "still has words" block below: asks for
+  // the caller's own password (re-verified server-side, independent of the
+  // session cookie) and, if confirmed, force-deletes the topic — every word
+  // on it gets reassigned to "Miscellaneous" first, never silently dropped.
+  // Returns { attempted: false } if the admin backs out of the password
+  // prompt, so the caller can tell "cancelled" apart from "failed".
+  const promptForceDelete = async (topicId, topicLabel, wordCount) => {
+    const passwordConfirmation = await Swal.fire({
+      title: "Force delete topic?",
+      html: `<strong>${topicLabel}</strong> still has ${wordCount} word${
+        wordCount === 1 ? "" : "s"
+      }. As SUPER_ADMIN you can delete it anyway — every word on it will be moved to <strong>&quot;Miscellaneous&quot;</strong>, not deleted. Enter your password to confirm.`,
+      icon: "warning",
+      input: "password",
+      inputPlaceholder: "Your password",
+      inputAttributes: { autocomplete: "current-password" },
+      inputValidator: (value) => (value ? null : "Password is required"),
+      showCancelButton: true,
+      confirmButtonText: "Force Delete",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#e11d48",
+      cancelButtonColor: "#475569",
+      background: "#1c1917",
+      color: "#f5f5f4",
+    });
+
+    if (!passwordConfirmation.isConfirmed) {
+      return { attempted: false };
+    }
+
+    const response = await axios.post(`/topic/force-delete/${topicId}`, {
+      password: passwordConfirmation.value,
+    });
+
+    return { attempted: true, message: response.data?.message };
+  };
+
+  const handleDelete = async () => {
+    if (!selectedTopicId) {
+      alert("Please select a topic to delete");
+      return;
+    }
+
+    const topicLabel = topicData.name || "this topic";
+
+    const confirmation = await Swal.fire({
+      title: "Delete topic?",
+      html: `Type <strong>ok</strong> to permanently delete <strong>${topicLabel}</strong>. This can't be undone.`,
+      icon: "warning",
+      input: "text",
+      inputPlaceholder: "Type ok",
+      inputAutoTrim: true,
+      inputValidator: (value) =>
+        value?.trim().toLowerCase() === "ok"
+          ? null
+          : 'Please type "ok" to continue.',
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#e11d48",
+      cancelButtonColor: "#475569",
+      background: "#1c1917",
+      color: "#f5f5f4",
+    });
+
+    if (!confirmation.isConfirmed) {
+      return;
+    }
+
+    setDeleting(true);
+
+    try {
+      await axios.delete(`/topic/delete/${selectedTopicId}`);
+
+      await clearSelectionAndRefresh();
+
+      await Swal.fire({
+        icon: "success",
+        title: "Topic deleted successfully",
+        timer: 1400,
+        showConfirmButton: false,
+        background: "#1c1917",
+        color: "#f5f5f4",
+      });
+    } catch (error) {
+      const wordCount = error.response?.data?.data?.wordCount;
+
+      // Blocked specifically because the topic still has words — offer the
+      // SUPER_ADMIN the password-confirmed force-delete-and-reassign path
+      // instead of just reporting failure.
+      if (typeof wordCount === "number" && wordCount > 0) {
+        try {
+          const result = await promptForceDelete(
+            selectedTopicId,
+            topicLabel,
+            wordCount,
+          );
+
+          if (!result.attempted) {
+            return;
+          }
+
+          await clearSelectionAndRefresh();
+
+          await Swal.fire({
+            icon: "success",
+            title: result.message || "Topic deleted successfully",
+            timer: 2200,
+            showConfirmButton: false,
+            background: "#1c1917",
+            color: "#f5f5f4",
+          });
+        } catch (forceDeleteError) {
+          console.error("Error force-deleting topic:", forceDeleteError);
+          await Swal.fire({
+            icon: "error",
+            title: "Delete failed",
+            text:
+              forceDeleteError.response?.data?.message ||
+              "Error deleting topic",
+            background: "#1c1917",
+            color: "#f5f5f4",
+          });
+        }
+        return;
+      }
+
+      console.error("Error deleting topic:", error);
+      await Swal.fire({
+        icon: "error",
+        title: "Delete failed",
+        text: error.response?.data?.message || "Error deleting topic",
+        background: "#1c1917",
+        color: "#f5f5f4",
+      });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (!canAccess) {
     return <Navigate to="/" replace />;
   }
@@ -195,7 +343,7 @@ const UpdateTopicForm = () => {
               name="selectedTopicId"
               value={selectedTopicId}
               onChange={handleTopicSelection}
-              disabled={loadingOptions || loading}
+              disabled={loadingOptions || loading || deleting}
               required
               className="mt-1 block w-full input-md rounded-md text-black border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
             >
@@ -222,7 +370,7 @@ const UpdateTopicForm = () => {
               value={topicData.name}
               onChange={handleChange}
               required
-              disabled={!selectedTopicId}
+              disabled={!selectedTopicId || loading || deleting}
               className="mt-1 block w-full input-md rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50 text-black"
             />
           </div>
@@ -237,7 +385,7 @@ const UpdateTopicForm = () => {
               value={topicData.levelId}
               onChange={handleChange}
               required
-              disabled={!selectedTopicId || loadingOptions}
+              disabled={!selectedTopicId || loadingOptions || loading || deleting}
               className="mt-1 block w-full input-md rounded-md text-black border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
             >
               <option value="">Select Level</option>
@@ -251,11 +399,22 @@ const UpdateTopicForm = () => {
 
           <Button
             type="submit"
-            disabled={loading || !selectedTopicId}
+            disabled={loading || deleting || !selectedTopicId}
             fullWidth
             className="mt-24"
           >
             {loading ? "Updating..." : "Update Topic"}
+          </Button>
+
+          <Button
+            type="button"
+            variant="danger"
+            onClick={handleDelete}
+            disabled={loading || deleting || !selectedTopicId}
+            fullWidth
+            className="mt-4"
+          >
+            {deleting ? "Deleting..." : "Delete Topic"}
           </Button>
         </form>
       </div>
