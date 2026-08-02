@@ -24,10 +24,15 @@ const ENUMERATED_MEANING_SPLIT_PATTERN = /\d+[).]/g;
 // rendered as its own flex item — a wrapped second line of that part
 // then naturally lines up under the text, not under the marker, since
 // it's wrapping within its own flex item rather than the whole line.
-const ENUMERATED_MEANING_LEADING_MARKER = /^\d+[).]\s*/;
+// Always displayed as "1)" even when the source used "1." — one
+// consistent marker style regardless of which one the admin typed.
+const ENUMERATED_MEANING_LEADING_MARKER = /^(\d+)[).]\s*/;
 const splitMeaningMarkerFromText = (part) => {
-  const marker = part.match(ENUMERATED_MEANING_LEADING_MARKER)?.[0] ?? "";
-  return { marker: marker.trimEnd(), text: part.slice(marker.length) };
+  const match = part.match(ENUMERATED_MEANING_LEADING_MARKER);
+  if (!match) {
+    return { marker: "", text: part };
+  }
+  return { marker: `${match[1]})`, text: part.slice(match[0].length) };
 };
 
 // The `meaning` array isn't reliably one array item per numbered entry —
@@ -535,15 +540,17 @@ const WordListModal = ({
             {isEnumeratedMeaning ? (
               <div className="text-sm md:text-base lg:text-lg">
                 <span className="text-blue-400 font-semibold">Meaning:</span>
-                <div className="mt-1 space-y-0.5">
+                <div className="mt-1 pl-3 space-y-0.5">
                   {enumeratedMeaningParts.map((item, index) => {
                     const { marker, text } = splitMeaningMarkerFromText(item);
                     return (
                       <p
                         key={index}
-                        className="text-cyan-500 tracking-wide font-medium italic flex gap-1"
+                        className="text-cyan-500 tracking-wide font-normal italic flex gap-1"
                       >
-                        <span className="flex-shrink-0">{marker}</span>
+                        <span className="flex-shrink-0 text-orange-400 font-semibold not-italic">
+                          {marker}
+                        </span>
                         <span>{text}</span>
                       </p>
                     );
@@ -552,8 +559,8 @@ const WordListModal = ({
               </div>
             ) : (
               <p className="text-sm md:text-base lg:text-lg">
-                <span className="text-blue-400 font-semibold">Meaning:</span>{" "}
-                <span className="text-cyan-500  tracking-wide font-medium italic">
+                <span className="text-blue-400 font-semibold">Meaning:</span>
+                <span className="block pl-3 mt-1 text-cyan-500 tracking-wide font-normal italic">
                   {meaningsList}
                 </span>
               </p>
