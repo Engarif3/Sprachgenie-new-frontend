@@ -159,7 +159,7 @@ const TopicForm = () => {
               value={topicData.name}
               onChange={handleChange}
               required
-              className="mt-1 block w-full input-md rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
+              className="mt-1 block w-full input-md rounded-md text-black border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
             />
           </div>
 
