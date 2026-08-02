@@ -26,6 +26,12 @@ const renderWordWithPrefix = (word) => {
   const isVerbTagged = getPosTagNames(word).includes("verb");
   const prefixType = word.prefixType;
 
+  // Short form / abbreviation words (e.g. "AKW", "USA") always render in
+  // full caps instead of the usual first-letter-capitalized style.
+  if (word.isShortForm) {
+    return <span>{wordValue.toUpperCase()}</span>;
+  }
+
   if (isVerbTagged && prefixType === "SEPARABLE" && prefix) {
     const parts = wordValue.split(" ");
     let foundMatch = false;
@@ -329,7 +335,7 @@ const FavoriteWordsTable = ({
                         <span
                           key={idx}
                           onClick={() => openWordInModal(synonym.value)}
-                          className="text-base max-w-full break-words px-1.5 py-0.5 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/50 rounded-full hover:from-blue-500/30 hover:to-cyan-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
+                          className="inline-block max-w-[12rem] break-words text-center text-base px-1 py-0.5 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/50 rounded-full hover:from-blue-500/30 hover:to-cyan-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
                         >
                           {synonym.value}
                         </span>
@@ -344,7 +350,7 @@ const FavoriteWordsTable = ({
                         <span
                           key={idx}
                           onClick={() => openWordInModal(antonym.value)}
-                          className="text-base max-w-full break-words px-1.5 py-0.5 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 rounded-full hover:from-red-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
+                          className="inline-block max-w-[12rem] break-words text-center text-base px-1 py-0.5 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 rounded-full hover:from-red-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
                         >
                           {antonym.value}
                         </span>
@@ -359,7 +365,7 @@ const FavoriteWordsTable = ({
                         <span
                           key={idx}
                           onClick={() => openWordInModal(similarword.value)}
-                          className="text-base max-w-full break-words px-1.5 py-0.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-full hover:from-purple-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
+                          className="inline-block max-w-[12rem] break-words text-center text-base px-1 py-0.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-full hover:from-purple-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
                         >
                           {similarword.value}
                         </span>

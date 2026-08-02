@@ -84,6 +84,7 @@ const WordForm = () => {
     similarWords: [],
     prefix: "",
     isPrepositional: false,
+    isShortForm: false,
     verbAttributes: {
       conjugation: "REGULAR",
       isReflexive: false,
@@ -531,6 +532,9 @@ const WordForm = () => {
     // Include isPrepositional (boolean)
     newWordData.isPrepositional = wordData.isPrepositional;
 
+    // Include isShortForm (boolean)
+    newWordData.isShortForm = wordData.isShortForm;
+
     // Validate prefix matches the word if it's a separable verb
     if (
       wordData.verbAttributes.prefixType === "SEPARABLE" &&
@@ -934,6 +938,25 @@ const WordForm = () => {
                   onChange={handleChange}
                   className="input-md mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
                 />
+              </div>
+
+              {/* Short Form Checkbox */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="isShortForm"
+                  name="isShortForm"
+                  checked={wordData.isShortForm}
+                  onChange={handleChange}
+                  className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
+                />
+                <label
+                  htmlFor="isShortForm"
+                  className="text-sm font-medium text-white"
+                >
+                  Short Form / Abbreviation (e.g., AKW, USA) — shows in ALL
+                  CAPS
+                </label>
               </div>
 
               {/* Level Dropdown */}

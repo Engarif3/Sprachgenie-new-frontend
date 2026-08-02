@@ -342,6 +342,7 @@ const UpdateWord = () => {
     similarWords: [],
     prefix: null,
     isPrepositional: false,
+    isShortForm: false,
     verbAttributes: {
       conjugation: "REGULAR",
       isReflexive: false,
@@ -878,6 +879,7 @@ const UpdateWord = () => {
           similarWords: word.similarWords?.map((item) => item.value) || [],
           prefix: word.prefix || null,
           isPrepositional: word.isPrepositional || false,
+          isShortForm: word.isShortForm || false,
           verbAttributes,
           prepositionAttributes,
           level: word.level,
@@ -1036,7 +1038,8 @@ const UpdateWord = () => {
       name === "value" ||
       name === "pluralForm" ||
       name === "prefix" ||
-      name === "isPrepositional"
+      name === "isPrepositional" ||
+      name === "isShortForm"
     ) {
       setFormData((prevData) => ({
         ...prevData,
@@ -1585,6 +1588,9 @@ const UpdateWord = () => {
 
     // Add isPrepositional directly to dataToSend
     dataToSend.isPrepositional = formData.isPrepositional;
+
+    // Add isShortForm directly to dataToSend
+    dataToSend.isShortForm = formData.isShortForm;
 
     // Validate prefix matches the word if it's a separable verb
     if (
@@ -2452,6 +2458,25 @@ const UpdateWord = () => {
                     className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter plural form"
                   />
+                </div>
+
+                {/* Short Form Checkbox */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="isShortForm"
+                    name="isShortForm"
+                    checked={formData.isShortForm}
+                    onChange={handleInputChange}
+                    className="h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300 rounded"
+                  />
+                  <label
+                    htmlFor="isShortForm"
+                    className="text-sm font-medium text-white"
+                  >
+                    Short Form / Abbreviation (e.g., AKW, USA) — shows in ALL
+                    CAPS
+                  </label>
                 </div>
 
                 {/* Synonyms Section */}

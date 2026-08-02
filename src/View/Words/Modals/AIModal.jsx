@@ -444,7 +444,11 @@ const AIModal = ({
                 ? activeWord.article
                 : activeWord?.article?.name || ""}
             </span>{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 capitalize">
+            <span
+              className={`text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 ${
+                activeWord?.isShortForm ? "uppercase" : "capitalize"
+              }`}
+            >
               {activeWord?.value}
             </span>
           </h2>

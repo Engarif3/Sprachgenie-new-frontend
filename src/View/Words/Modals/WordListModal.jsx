@@ -89,6 +89,12 @@ const renderWordWithPrefix = (word) => {
   const isVerbTagged = getPosTagNames(word).includes("verb");
   const prefixType = word.prefixType;
 
+  // Short form / abbreviation words (e.g. "AKW", "USA") always render in
+  // full caps instead of the usual first-letter-capitalized style.
+  if (word.isShortForm) {
+    return <span>{wordValue.toUpperCase()}</span>;
+  }
+
   // Only highlight if it's a separable verb with a prefix
   if (isVerbTagged && prefixType === "SEPARABLE" && prefix) {
     // Split the word into parts
