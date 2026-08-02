@@ -356,6 +356,12 @@ const ADMIN_COMPLETENESS_FILTER_OPTIONS = [
   { value: "missingSentences", label: "Missing sentences" },
 ];
 
+// Not a real completeness filter — selecting it opens the "Recently added"
+// limit prompt instead of changing adminCompletenessFilter. Kept out of
+// ADMIN_COMPLETENESS_FILTER_OPTIONS (used to build the query) so it can
+// never leak into missingMeaningOnly/missingSentencesOnly.
+const RECENTLY_ADDED_LIMIT_OPTION_VALUE = "__recentlyAddedLimit__";
+
 const normalizePartOfSpeechName = (value) => normalizeText(value);
 
 const normalizePartOfSpeechOptions = (value) => {
@@ -1700,18 +1706,6 @@ const WordList = () => {
     setCurrentPage(1);
   }, []);
 
-  const handleAdminCompletenessFilterChange = useCallback(
-    (event) => {
-      if (!isAdmin) {
-        return;
-      }
-
-      setAdminCompletenessFilter(event.target.value);
-      setCurrentPage(1);
-    },
-    [isAdmin],
-  );
-
   const handleSetRecentlyAddedLimit = useCallback(async () => {
     if (!isSuperAdmin) {
       return;
@@ -1791,6 +1785,28 @@ const WordList = () => {
       );
     }
   }, [isSuperAdmin, recentlyAddedLimit, totalWordCount]);
+
+  const handleAdminCompletenessFilterChange = useCallback(
+    (event) => {
+      if (!isAdmin) {
+        return;
+      }
+
+      const value = event.target.value;
+
+      // Picked from the same dropdown as a convenience for SUPER_ADMIN, but
+      // it's an action (opens a prompt), not an actual completeness filter —
+      // never let it become adminCompletenessFilter/query state.
+      if (value === RECENTLY_ADDED_LIMIT_OPTION_VALUE) {
+        void handleSetRecentlyAddedLimit();
+        return;
+      }
+
+      setAdminCompletenessFilter(value);
+      setCurrentPage(1);
+    },
+    [isAdmin, handleSetRecentlyAddedLimit],
+  );
 
   // to show info
   useEffect(() => {
@@ -1939,39 +1955,36 @@ const WordList = () => {
           </div>
           {showAdminControls && (
             <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-white/10 md:pt-0 md:border-t-0 md:flex-nowrap md:justify-end md:gap-3 md:flex-shrink-0">
-              <div className="flex flex-col items-stretch sm:items-end gap-1 w-full sm:w-auto">
-                <select
-                  id="admin-completeness-filter"
-                  name="adminCompletenessFilter"
-                  value={adminCompletenessFilter}
-                  onChange={handleAdminCompletenessFilterChange}
-                  className="min-h-[30px] w-full sm:w-auto md:w-auto px-2 py-2 md:px-2.5 md:py-1.5 rounded-full font-semibold text-sm shadow-lg border border-stone-500 bg-stone-800 text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50"
-                  aria-label="Admin word completeness filter"
-                >
-                  {ADMIN_COMPLETENESS_FILTER_OPTIONS.map((option) => (
-                    <option
-                      key={option.value || "all"}
-                      value={option.value}
-                      className="bg-stone-800 text-white"
-                    >
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                {isSuperAdmin && (
-                  <button
-                    type="button"
-                    onClick={handleSetRecentlyAddedLimit}
-                    className="text-[11px] sm:text-xs text-cyan-400 hover:text-cyan-300 underline underline-offset-2 transition-colors self-start sm:self-end"
-                    title='Set how many words "Recently added" shows'
+              <select
+                id="admin-completeness-filter"
+                name="adminCompletenessFilter"
+                value={adminCompletenessFilter}
+                onChange={handleAdminCompletenessFilterChange}
+                className="min-h-[30px] w-full sm:w-auto md:w-auto px-2 py-2 md:px-2.5 md:py-1.5 rounded-full font-semibold text-sm shadow-lg border border-stone-500 bg-stone-800 text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50"
+                aria-label="Admin word completeness filter"
+              >
+                {ADMIN_COMPLETENESS_FILTER_OPTIONS.map((option) => (
+                  <option
+                    key={option.value || "all"}
+                    value={option.value}
+                    className="bg-stone-800 text-white"
                   >
-                    Recently added limit
-                    {typeof recentlyAddedLimit === "number"
-                      ? `: ${recentlyAddedLimit}`
-                      : ""}
-                  </button>
+                    {option.label}
+                  </option>
+                ))}
+                {isSuperAdmin && (
+                  <option
+                    value={RECENTLY_ADDED_LIMIT_OPTION_VALUE}
+                    className="bg-stone-800 text-cyan-300"
+                  >
+                    {`Recently added limit${
+                      typeof recentlyAddedLimit === "number"
+                        ? `: ${recentlyAddedLimit}`
+                        : ""
+                    }`}
+                  </option>
                 )}
-              </div>
+              </select>
               {/* <p className="text-md font-bold whitespace-nowrap hidden md:block px-2 py-1 md:px-2.5 md:py-1.5 bg-sky-600  rounded-full text-white">
                 {displayedWordsCount} words
               </p> */}
