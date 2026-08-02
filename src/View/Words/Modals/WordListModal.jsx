@@ -20,6 +20,16 @@ import WordReportSection from "./WordReportSection";
 // text. Letter markers (a), A.) aren't handled yet — numbers only for now.
 const ENUMERATED_MEANING_SPLIT_PATTERN = /\d+[).]/g;
 
+// Pulls the leading marker off one already-split part so it can be
+// rendered as its own flex item — a wrapped second line of that part
+// then naturally lines up under the text, not under the marker, since
+// it's wrapping within its own flex item rather than the whole line.
+const ENUMERATED_MEANING_LEADING_MARKER = /^\d+[).]\s*/;
+const splitMeaningMarkerFromText = (part) => {
+  const marker = part.match(ENUMERATED_MEANING_LEADING_MARKER)?.[0] ?? "";
+  return { marker: marker.trimEnd(), text: part.slice(marker.length) };
+};
+
 // The `meaning` array isn't reliably one array item per numbered entry —
 // the input that saves it splits on commas, so a single numbered entry
 // like "1) foo: bar, baz" written by the admin lands in the DB shredded
@@ -526,14 +536,18 @@ const WordListModal = ({
               <div className="text-sm md:text-base lg:text-lg">
                 <span className="text-blue-400 font-semibold">Meaning:</span>
                 <div className="mt-1 space-y-0.5">
-                  {enumeratedMeaningParts.map((item, index) => (
-                    <p
-                      key={index}
-                      className="text-cyan-500 tracking-wide font-medium italic"
-                    >
-                      {item}
-                    </p>
-                  ))}
+                  {enumeratedMeaningParts.map((item, index) => {
+                    const { marker, text } = splitMeaningMarkerFromText(item);
+                    return (
+                      <p
+                        key={index}
+                        className="text-cyan-500 tracking-wide font-medium italic flex gap-1"
+                      >
+                        <span className="flex-shrink-0">{marker}</span>
+                        <span>{text}</span>
+                      </p>
+                    );
+                  })}
                 </div>
               </div>
             ) : (
