@@ -214,7 +214,16 @@ const buildAdminCompletenessPagePayload = (payload, queryState, page) => {
     isPartial: false,
   });
 
-  if (!hasAdminCompletenessFilter(queryState)) {
+  // This client-side re-slice only makes sense when the backend returned
+  // the ENTIRE matching set in one response — true when `all=true` is
+  // actually honored server-side (plain completeness filter, no
+  // recentOnly). When recentOnly is also on, the backend ignores `all`
+  // (see getWordsListFromDB's effectiveShowAll) and already returns one
+  // correctly-paginated page — filtered AND paginated server-side within
+  // the recently-added pool. Re-slicing that single page here as if it
+  // were the full set would collapse pagination to "page 1 of 1" and hide
+  // any further matching words.
+  if (!hasAdminCompletenessFilter(queryState) || queryState.recentOnly) {
     return normalizedPayload;
   }
 
@@ -1975,7 +1984,7 @@ const WordList = () => {
             </div>
           )}
           <p className="text-md font-bold whitespace-nowrap hidden md:block px-2 py-1 md:px-2.5 md:py-1.5 bg-sky-600  rounded-full text-white">
-            {displayedWordsCount} words
+            {wordCountLabel}: {displayedWordsCount} words
           </p>
         </div>
       </div>
@@ -2150,7 +2159,6 @@ const WordList = () => {
         learningMode={learningMode}
         setAction={setShowActionColumn}
         showAction={showActionColumn}
-        totalWords={displayedWordsCount}
       />
 
       {/* Table content */}
@@ -2271,7 +2279,12 @@ const WordList = () => {
                 ) : (
                   <tr>
                     <td
-                      colSpan="7"
+                      // 10 columns always render (Art., Word, Meaning, Conju.,
+                      // Synonym, Antonym, Word to Watch, Level, Action, ❤️) plus
+                      // the "#" history column, which only renders under the
+                      // same condition as showAdminControls — matches the
+                      // header's <th> count and WordTableRow's <td> count.
+                      colSpan={showAdminControls ? 11 : 10}
                       className="text-center py-4 font-bold text-gray-500 h-96 align-middle text-xl sm:text-2xl"
                     >
                       No words available. Will be added soon!
@@ -2306,7 +2319,6 @@ const WordList = () => {
         learningMode={learningMode}
         setAction={setShowActionColumn}
         showAction={showActionColumn}
-        totalWords={displayedWordsCount}
       />
 
       {/* ========= */}

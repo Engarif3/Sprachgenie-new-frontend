@@ -6,7 +6,6 @@ const Pagination = ({
   setCurrentPage,
   toggleLearningMode,
   learningMode,
-  totalWords,
   setAction,
   showAction,
 }) => {
@@ -41,13 +40,6 @@ const Pagination = ({
             </button>
           )}
         </div>
-        {/* <div className="flex md:hidden lg:hidden justify-center items-center mr-6">
-          {userLoggedIn && isAdmin && (
-            <p className=" text-info text-sm md:text-md lg:text-md font-semibold whitespace-nowrap  ">
-              {totalWords} words
-            </p>
-          )}
-        </div> */}
 
         {userLoggedIn && isAdmin && (
           <button
@@ -60,11 +52,6 @@ const Pagination = ({
       </div>
       {/* Pagination Buttons */}
       <div className="flex justify-between md:justify-end items-center gap-4 w-full md:w-auto">
-        {/* {userLoggedIn && isAdmin && (
-          <p className="text-info text-sm md:text-md lg:text-md font-semibold lg:font-semibold whitespace-nowrap ml-2 block md:hidden">
-            {totalWords} words
-          </p>
-        )} */}
         <div className="w-full">
           <div className="flex  gap-2 md:gap-3 lg:gap-3 justify-center items-center">
             {currentPage > 1 && (
@@ -110,6 +97,18 @@ const Pagination = ({
             >
               Next
             </button>
+            {currentPage < totalPages && (
+              <button
+                onClick={() => {
+                  setTimeout(() => {
+                    setCurrentPage(totalPages);
+                  }, 300);
+                }}
+                className="px-2 md:px-4 lg:px-4  md:py-2 py-1 lg:py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 rounded-full font-thin md:font-semibold lg:font-semibold text-sm md:text-md lg:text-md text-white  transition-all duration-300 hover:scale-105 shadow-md mr-2 md:mr-6"
+              >
+                Last
+              </button>
+            )}
           </div>
         </div>
       </div>
