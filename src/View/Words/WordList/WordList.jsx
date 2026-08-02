@@ -2250,40 +2250,40 @@ const WordList = () => {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-slate-900 dark:bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 text-sm md:text-xl lg:text-xl text-white">
-                  <th className="py-3  text-sm md:text-lg lg:text-lg text-center text-orange-400 font-bold w-[5%] md:w-[3%] lg:w-[3%] rounded-tl-xl border-l  border-gray-800">
+                  <th className="py-3 text-sm md:text-lg lg:text-lg text-center text-slate-200 font-bold w-[5%] md:w-[3%] lg:w-[3%] rounded-tl-xl border-b-2 border-slate-700/70">
                     {/* Art. */}
                   </th>
-                  <th className="border-l py-3 border-gray-700 border-dotted text-center text-blue-400 font-bold w-[15%] md:w-[10%] lg:w-[10%] border-b">
+                  <th className="py-3 text-center text-slate-200 font-bold w-[15%] md:w-[10%] lg:w-[10%] border-b-2 border-slate-700/70">
                     Word
                   </th>
 
-                  <th className="border-l py-3 border-gray-700 border-dotted text-center text-purple-400 font-bold w-[10%] md:w-[25%] lg:w-[25%] border-b">
+                  <th className="py-3 text-center text-slate-200 font-bold w-[10%] md:w-[25%] lg:w-[25%] border-b-2 border-slate-700/70">
                     Meaning
                   </th>
-                  <th className="border-l py-3 border-gray-700 border-dotted text-center text-violet-400 font-bold w-[3%] md:w-[5%] lg:w-[5%] border-b">
+                  <th className="py-3 text-center text-slate-200 font-bold w-[3%] md:w-[5%] lg:w-[5%] border-b-2 border-slate-700/70">
                     Conju.
                   </th>
-                  <th className="border-l py-3 border-gray-700 border-dotted text-center text-cyan-400 font-bold hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b">
+                  <th className="py-3 text-center text-slate-200 font-bold hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b-2 border-slate-700/70">
                     Synonym
                   </th>
-                  <th className="border-l py-3 border-gray-700 border-dotted text-center text-pink-400 font-bold hidden lg:table-cell xl:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b">
+                  <th className="py-3 text-center text-slate-200 font-bold hidden lg:table-cell xl:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b-2 border-slate-700/70">
                     Antonym
                   </th>
-                  <th className="border-l py-3 border-gray-700 border-dotted text-center text-green-400 font-bold hidden lg:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b">
+                  <th className="py-3 text-center text-slate-200 font-bold hidden lg:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b-2 border-slate-700/70">
                     Word to Watch
                   </th>
-                  <th className="border-l border-dotted hidden md:table-cell lg:table-cell py-3 border-gray-700 text-sm md:text-lg lg:text-lg text-center text-yellow-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b">
+                  <th className="hidden md:table-cell lg:table-cell py-3 text-sm md:text-lg lg:text-lg text-center text-slate-200 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b-2 border-slate-700/70">
                     Level
                   </th>
                   <th
-                    className={`border-l py-3 border-dotted border-gray-700 text-center text-indigo-400 font-bold border-b ${
+                    className={`py-3 text-center text-slate-200 font-bold border-b-2 border-slate-700/70 ${
                       showActionColumn ? "table-cell" : "hidden"
                     } `}
                   >
                     Action
                   </th>
                   <th
-                    className={`border-r border-l border-dotted border-gray-700 text-sm md:text-lg lg:text-lg py-3 text-center text-red-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b ${
+                    className={`text-sm md:text-lg lg:text-lg py-3 text-center text-slate-200 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b-2 border-slate-700/70 ${
                       !userLoggedIn ? "rounded-tr-xl" : ""
                     }`}
                   >
@@ -2291,7 +2291,7 @@ const WordList = () => {
                   </th>
                   {userLoggedIn && isAdmin && (
                     <>
-                      <th className="border-l py-3 border-dotted hidden md:table-cell lg:table-cell border-gray-700 text-sm md:text-lg lg:text-lg text-center text-teal-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b rounded-tr-xl">
+                      <th className="hidden md:table-cell lg:table-cell py-3 text-sm md:text-lg lg:text-lg text-center text-slate-200 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b-2 border-slate-700/70 rounded-tr-xl">
                         #
                       </th>
                     </>

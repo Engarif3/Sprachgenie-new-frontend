@@ -1,7 +1,7 @@
 import React from "react";
 import { pronounceWord } from "../../../utils/wordPronounciation";
 import { PuffLoader } from "react-spinners";
-import { ImBin } from "react-icons/im";
+import { RiDeleteBin6Line } from "react-icons/ri";
 import ConjugationModal from "../WordList/ConjugationModal";
 
 const normalizeText = (value) =>
@@ -178,31 +178,31 @@ const FavoriteWordsTable = ({
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-slate-900 dark:bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 text-sm md:text-xl lg:text-xl text-white">
-              <th className="py-3 text-sm md:text-lg lg:text-lg text-center text-orange-400 font-bold w-[5%] md:w-[3%] lg:w-[3%] rounded-tl-xl border-l border-gray-800">
+              <th className="py-3 text-sm md:text-lg lg:text-lg text-center text-slate-200 font-bold w-[5%] md:w-[3%] lg:w-[3%] rounded-tl-xl border-b-2 border-slate-700/70">
                 {/* Art. */}
               </th>
-              <th className="border-l py-3 border-gray-700 border-dotted text-center text-blue-400 font-bold w-[15%] md:w-[10%] lg:w-[10%] border-b">
+              <th className="py-3 text-center text-slate-200 font-bold w-[15%] md:w-[10%] lg:w-[10%] border-b-2 border-slate-700/70">
                 Word
               </th>
-              <th className="border-l py-3 border-gray-700 border-dotted text-center text-purple-400 font-bold w-[10%] md:w-[25%] lg:w-[25%] border-b">
+              <th className="py-3 text-center text-slate-200 font-bold w-[10%] md:w-[25%] lg:w-[25%] border-b-2 border-slate-700/70">
                 Meaning
               </th>
-              <th className="border-l py-3 border-gray-700 border-dotted text-center text-violet-400 font-bold w-[3%] md:w-[5%] lg:w-[5%] border-b">
+              <th className="py-3 text-center text-slate-200 font-bold w-[3%] md:w-[5%] lg:w-[5%] border-b-2 border-slate-700/70">
                 Conju.
               </th>
-              <th className="border-l py-3 border-gray-700 border-dotted text-center text-cyan-400 font-bold hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b">
+              <th className="py-3 text-center text-slate-200 font-bold hidden md:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b-2 border-slate-700/70">
                 Synonym
               </th>
-              <th className="border-l py-3 border-gray-700 border-dotted text-center text-pink-400 font-bold hidden lg:table-cell xl:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b">
+              <th className="py-3 text-center text-slate-200 font-bold hidden lg:table-cell xl:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b-2 border-slate-700/70">
                 Antonym
               </th>
-              <th className="border-l py-3 border-gray-700 border-dotted text-center text-green-400 font-bold hidden lg:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b">
+              <th className="py-3 text-center text-slate-200 font-bold hidden lg:table-cell w-[15%] md:w-[20%] lg:w-[20%] border-b-2 border-slate-700/70">
                 Word to Watch
               </th>
-              <th className="border-l border-dotted hidden md:table-cell lg:table-cell py-3 border-gray-700 text-sm md:text-lg lg:text-lg text-center text-yellow-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b">
+              <th className="hidden md:table-cell lg:table-cell py-3 text-sm md:text-lg lg:text-lg text-center text-slate-200 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b-2 border-slate-700/70">
                 Level
               </th>
-              <th className="border-r border-l py-3 border-dotted border-gray-700 text-sm md:text-lg lg:text-lg text-center text-red-400 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b rounded-tr-xl">
+              <th className="py-3 text-sm md:text-lg lg:text-lg text-center text-slate-200 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b-2 border-slate-700/70 rounded-tr-xl">
                 🗑️
               </th>
             </tr>
@@ -216,14 +216,14 @@ const FavoriteWordsTable = ({
               return (
                 <tr
                   key={word.id}
-                  className={`transition-colors duration-200 hover:bg-gradient-to-r hover:from-blue-500/5 hover:to-purple-500/5 ${
+                  className={`border-b border-slate-200 dark:border-gray-700/60 transition-colors duration-200 hover:bg-gradient-to-r hover:from-blue-500/5 hover:to-purple-500/5 ${
                     index % 2 === 0
-                      ? " dark:bg-gray-800/40"
-                      : "dark:bg-gray-900/40"
+                      ? "bg-white dark:bg-gray-800/40"
+                      : "bg-slate-50 dark:bg-gray-900/40"
                   }`}
                 >
                   {/* Article */}
-                  <td className="border border-gray-700 border-dotted p-1 text-center">
+                  <td className="p-1 text-center">
                     <div className="flex flex-wrap items-center justify-center gap-1">
                       {articleColumnBadges.map((badge) => (
                         <PartOfSpeechBadge
@@ -237,7 +237,7 @@ const FavoriteWordsTable = ({
                   </td>
 
                   {/* Word value */}
-                  <td className="border border-gray-700 border-dotted p-1 md:p-3">
+                  <td className="p-1 md:p-3">
                     <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
                       <span
                         className="inline-flex items-center gap-2 cursor-pointer p-0 md:p-2 lg:p-2 text-blue-600 dark:text-blue-400 hover:text-blue-300 text-sm md:text-lg lg:text-lg font-semibold md:font-bold lg:font-bold break-words max-w-[120px] md:max-w-full transition-colors duration-200"
@@ -284,28 +284,38 @@ const FavoriteWordsTable = ({
                   </td>
 
                   {/* Meaning */}
-                  <td className="border border-gray-700 border-dotted pl-1 p-0 md:p-3 lg:p-3 text-sm md:text-lg lg:text-lg text-cyan-500 dark:text-cyan-300 font-serif">
+                  <td className="pl-1 p-0 md:p-3 lg:p-3 text-sm md:text-lg lg:text-lg text-cyan-500 dark:text-cyan-300 font-serif">
                     <span className="line-clamp-2 hover:line-clamp-none break-words max-w-[120px] md:max-w-full">
                       {word.meaning?.join(", ")}
                     </span>
                   </td>
 
                   {/* Conjugate — verbs only */}
-                  <td className="border border-gray-700 border-dotted p-1 md:p-2 text-center">
+                  <td className="p-1 md:p-2 text-center">
                     {isVerb ? (
                       <button
                         type="button"
                         onClick={() => handleConjugate?.(word)}
-                        className="inline-flex items-center justify-center rounded-full border-2 border-violet-400 bg-gradient-to-r from-violet-600 to-purple-600 h-6 w-6 text-xs font-bold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-violet-500 hover:to-purple-500 hover:shadow-violet-500/50 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
+                        className="relative border-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white italic px-2 py-1 text-xs font-semibold md:font-bold lg:font-bold rounded-full h-6 w-6 cursor-pointer hover:scale-105 border-violet-400 transition-all duration-200 shadow-lg hover:shadow-violet-500/50 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
                         disabled={!!loadingConjugations?.[word.id]}
                         title="Show conjugation table"
                         aria-label="Show conjugation table"
                       >
-                        {loadingConjugations?.[word.id] ? (
-                          <PuffLoader size={14} color="#ffffff" />
-                        ) : (
-                          <span className="leading-none">ai</span>
+                        {loadingConjugations?.[word.id] && (
+                          <span className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                            <PuffLoader size={14} color="#ffffff" />
+                          </span>
                         )}
+
+                        <span
+                          className={`${
+                            loadingConjugations?.[word.id]
+                              ? "invisible"
+                              : "flex items-center justify-center relative bottom-1"
+                          }`}
+                        >
+                          ai
+                        </span>
                       </button>
                     ) : (
                       <span className="text-gray-600">—</span>
@@ -313,13 +323,13 @@ const FavoriteWordsTable = ({
                   </td>
 
                   {/* Synonyms */}
-                  <td className="border border-gray-700 border-dotted p-2 md:p-3 text-blue-600 dark:text-blue-300 hidden md:table-cell">
-                    <div className="flex flex-wrap gap-2">
+                  <td className="p-2 md:p-3 text-blue-600 dark:text-blue-300 hidden md:table-cell">
+                    <div className="flex flex-wrap gap-1.5">
                       {word.synonyms?.map((synonym, idx) => (
                         <span
                           key={idx}
                           onClick={() => openWordInModal(synonym.value)}
-                          className="text-md max-w-full break-words px-3 py-1 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/50 rounded-full hover:from-blue-500/30 hover:to-cyan-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
+                          className="text-base max-w-full break-words px-1.5 py-0.5 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/50 rounded-full hover:from-blue-500/30 hover:to-cyan-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
                         >
                           {synonym.value}
                         </span>
@@ -328,13 +338,13 @@ const FavoriteWordsTable = ({
                   </td>
 
                   {/* Antonyms */}
-                  <td className="border border-gray-700 border-dotted p-2 md:p-3 text-red-600 dark:text-red-300 hidden lg:table-cell xl:table-cell">
-                    <div className="flex flex-wrap gap-2">
+                  <td className="p-2 md:p-3 text-red-600 dark:text-red-300 hidden lg:table-cell xl:table-cell">
+                    <div className="flex flex-wrap gap-1.5">
                       {word.antonyms?.map((antonym, idx) => (
                         <span
                           key={idx}
                           onClick={() => openWordInModal(antonym.value)}
-                          className="text-md max-w-full break-words px-3 py-1 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 rounded-full hover:from-red-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
+                          className="text-base max-w-full break-words px-1.5 py-0.5 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 rounded-full hover:from-red-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
                         >
                           {antonym.value}
                         </span>
@@ -343,13 +353,13 @@ const FavoriteWordsTable = ({
                   </td>
 
                   {/* Similar Words */}
-                  <td className="border border-gray-700 border-dotted p-2 md:p-3 text-blue-400 hidden lg:table-cell">
-                    <div className="flex flex-wrap gap-2">
+                  <td className="p-2 md:p-3 text-blue-400 hidden lg:table-cell">
+                    <div className="flex flex-wrap gap-1.5">
                       {word.similarWords?.map((similarword, idx) => (
                         <span
                           key={idx}
                           onClick={() => openWordInModal(similarword.value)}
-                          className="text-md max-w-full break-words px-3 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-full hover:from-purple-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
+                          className="text-base max-w-full break-words px-1.5 py-0.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-full hover:from-purple-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
                         >
                           {similarword.value}
                         </span>
@@ -358,21 +368,21 @@ const FavoriteWordsTable = ({
                   </td>
 
                   {/* Level */}
-                  <td className="border border-gray-700 border-dotted p-2 md:p-3 hidden md:table-cell text-center">
+                  <td className="p-2 md:p-3 hidden md:table-cell text-center">
                     <span className="inline-block px-3 py-1 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-xs sm:text-sm">
                       {word.level?.level}
                     </span>
                   </td>
 
                   {/* Remove from favorites */}
-                  <td className="border border-gray-700 border-dotted p-2 md:p-3 text-center">
+                  <td className="p-2 md:p-3 text-center">
                     <button
                       onClick={() => handleRemoveFavorite(word.id)}
-                      className="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 rounded-lg font-semibold text-white text-xs sm:text-sm transition-colors duration-200 hover:scale-105 shadow-md"
+                      className="inline-flex items-center justify-center h-7 w-7 rounded-full border-2 border-rose-400 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-lg transition-all duration-200 hover:scale-110 hover:shadow-red-500/50"
                       title="Remove from favorites"
                       aria-label="Remove from favorites"
                     >
-                      <ImBin size={12} />
+                      <RiDeleteBin6Line size={14} />
                     </button>
                   </td>
                 </tr>

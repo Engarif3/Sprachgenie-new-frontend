@@ -88,6 +88,21 @@ const AIModal = ({
 
   if (!isOpen || !activeWord) return null;
 
+  // Only close when the click lands on the backdrop itself, not when it
+  // bubbles up from something inside the card — mirrors WordListModal's
+  // handleBackgroundClick.
+  const handleBackgroundClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const handlePreviewBackgroundClick = (e) => {
+    if (e.target === e.currentTarget) {
+      setIsPreviewOpen(false);
+    }
+  };
+
   const applyUpdatedContent = ({ meanings, paragraph }) => {
     const nextMeanings = Array.isArray(meanings) ? meanings : [];
     const nextParagraph = paragraph || "";
@@ -418,7 +433,10 @@ const AIModal = ({
   return (
     <>
       {/* AI Modal */}
-      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+      <div
+        className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50"
+        onClick={handleBackgroundClick}
+      >
         <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl shadow-2xl p-1 md:p-8 lg:p-8 w-full md:w-2/3 lg:w-1/2 max-h-[90vh] overflow-y-auto mx-1 border-2 border-gray-700/50">
           <h2 className="text-3xl md:text-5xl lg:text-5xl font-bold text-center mb-4">
             <span className="text-sky-400 font-bold">
@@ -683,7 +701,10 @@ const AIModal = ({
       </div>
 
       {isPreviewOpen && previewData && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          onClick={handlePreviewBackgroundClick}
+        >
           <div className="mx-3 max-h-[92vh] w-full max-w-6xl overflow-y-auto rounded-3xl border border-sky-300/25 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 shadow-2xl md:p-8">
             <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
               <div>

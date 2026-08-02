@@ -279,12 +279,14 @@ const WordTableRow = ({
   return (
     <tr
       key={word.id}
-      className={`transition-colors duration-200 hover:bg-gradient-to-r hover:from-blue-500/5 hover:to-purple-500/5 ${
-        index % 2 === 0 ? " dark:bg-gray-800/40" : "dark:bg-gray-900/40"
+      className={`border-b border-slate-200 dark:border-gray-700/60 transition-colors duration-200 hover:bg-gradient-to-r hover:from-blue-500/5 hover:to-purple-500/5 ${
+        index % 2 === 0
+          ? "bg-white dark:bg-gray-800/40"
+          : "bg-slate-50 dark:bg-gray-900/40"
       }`}
     >
       {/* Article */}
-      <td className="border border-gray-700 border-dotted p-1  text-center">
+      <td className="p-1 text-center">
         <div className="flex flex-wrap items-center justify-center gap-1">
           {articleColumnBadges.map((badge) => (
             <PartOfSpeechBadge
@@ -300,7 +302,7 @@ const WordTableRow = ({
       {/* Word value */}
       {/* Previous version with CSS capitalize - capitalizes every word */}
       {/* <td className="border-l border-gray-400  p-2 capitalize border-dotted"> */}
-      <td className="border border-gray-700 border-dotted p-1 md:p-3">
+      <td className="p-1 md:p-3">
         <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
           <span
             tabIndex={learningMode ? 0 : -1}
@@ -372,7 +374,7 @@ const WordTableRow = ({
 
       {/* Meaning */}
       <td
-        className={`border border-gray-700 border-dotted pl-1 p-0 md:p-3 lg:p-3 text-sm md:text-lg lg:text-lg ${
+        className={`pl-1 p-0 md:p-3 lg:p-3 text-sm md:text-lg lg:text-lg ${
           learningMode && index === currentIndex
             ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold"
             : "text-cyan-500 dark:text-cyan-300 font-serif"
@@ -392,21 +394,31 @@ const WordTableRow = ({
       </td>
 
       {/* Conjugate — verbs only */}
-      <td className="border border-gray-700 border-dotted p-1 md:p-2 text-center">
+      <td className="p-1 md:p-2 text-center">
         {isVerb ? (
           <button
             type="button"
             onClick={() => handleConjugate(word)}
-            className="inline-flex items-center justify-center rounded-full border-2 border-violet-400 bg-gradient-to-r from-violet-600 to-purple-600 h-6 w-6 text-xs font-bold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-violet-500 hover:to-purple-500 hover:shadow-violet-500/50 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
+            className="relative border-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white italic px-2 py-1 text-xs font-semibold md:font-bold lg:font-bold rounded-full h-6 w-6 cursor-pointer hover:scale-105 border-violet-400 transition-all duration-200 shadow-lg hover:shadow-violet-500/50 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
             disabled={!!loadingConjugations?.[word.id]}
             title="Show conjugation table"
             aria-label="Show conjugation table"
           >
-            {loadingConjugations?.[word.id] ? (
-              <PuffLoader size={14} color="#ffffff" />
-            ) : (
-              <span className="leading-none">ai</span>
+            {loadingConjugations?.[word.id] && (
+              <span className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                <PuffLoader size={14} color="#ffffff" />
+              </span>
             )}
+
+            <span
+              className={`${
+                loadingConjugations?.[word.id]
+                  ? "invisible"
+                  : "flex items-center justify-center relative bottom-1"
+              }`}
+            >
+              ai
+            </span>
           </button>
         ) : (
           <span className="text-gray-600">—</span>
@@ -414,13 +426,13 @@ const WordTableRow = ({
       </td>
 
       {/* Synonyms */}
-      <td className="border border-gray-700 border-dotted p-2 md:p-3 text-blue-600 dark:text-blue-300 hidden md:table-cell">
-        <div className="flex flex-wrap gap-2">
+      <td className="p-2 md:p-3 text-blue-600 dark:text-blue-300 hidden md:table-cell">
+        <div className="flex flex-wrap gap-1.5">
           {word.synonyms?.map((synonym, idx) => (
             <span
               key={idx}
               onClick={() => openWordInModal(synonym.value, synonym.id)}
-              className="text-md max-w-full break-words px-3 py-1 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/50 rounded-full hover:from-blue-500/30 hover:to-cyan-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
+              className="text-base max-w-full break-words px-1.5 py-0.5 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/50 rounded-full hover:from-blue-500/30 hover:to-cyan-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
             >
               {synonym.value}
             </span>
@@ -429,13 +441,13 @@ const WordTableRow = ({
       </td>
 
       {/* Antonyms */}
-      <td className="border border-gray-700 border-dotted p-2 md:p-3 text-red-600 dark:text-red-300 hidden lg:table-cell xl:table-cell">
-        <div className="flex flex-wrap gap-2">
+      <td className="p-2 md:p-3 text-red-600 dark:text-red-300 hidden lg:table-cell xl:table-cell">
+        <div className="flex flex-wrap gap-1.5">
           {word.antonyms?.map((antonym, idx) => (
             <span
               key={idx}
               onClick={() => openWordInModal(antonym.value, antonym.id)}
-              className="text-md max-w-full break-words px-3 py-1 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 rounded-full hover:from-red-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
+              className="text-base max-w-full break-words px-1.5 py-0.5 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 rounded-full hover:from-red-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
             >
               {antonym.value}
             </span>
@@ -444,13 +456,13 @@ const WordTableRow = ({
       </td>
 
       {/* Similar Words */}
-      <td className="border border-gray-700 border-dotted p-2 md:p-3 text-blue-400 hidden lg:table-cell">
-        <div className="flex flex-wrap gap-2">
+      <td className="p-2 md:p-3 text-blue-400 hidden lg:table-cell">
+        <div className="flex flex-wrap gap-1.5">
           {word.similarWords?.map((similarword, idx) => (
             <span
               key={idx}
               onClick={() => openWordInModal(similarword.value, similarword.id)}
-              className="text-md max-w-full break-words px-3 py-1 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-full hover:from-purple-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
+              className="text-base max-w-full break-words px-1.5 py-0.5 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/50 rounded-full hover:from-purple-500/30 hover:to-pink-500/30 hover:scale-105 transition-all duration-200 cursor-pointer font-medium"
             >
               {similarword.value}
             </span>
@@ -459,7 +471,7 @@ const WordTableRow = ({
       </td>
 
       {/* Level */}
-      <td className="border border-gray-700 border-dotted p-2 md:p-3 hidden md:table-cell text-center">
+      <td className="p-2 md:p-3 hidden md:table-cell text-center">
         <span className="inline-block px-3 py-1 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-xs sm:text-sm">
           {word.level?.level}
         </span>
@@ -467,7 +479,7 @@ const WordTableRow = ({
 
       {/* Action */}
       <td
-        className={`border border-gray-700 border-dotted p-2 md:p-3 text-center ${
+        className={`p-2 md:p-3 text-center ${
           showActionColumn ? "table-cell" : "hidden"
         } `}
       >
@@ -488,10 +500,7 @@ const WordTableRow = ({
       </td>
 
       {/* Favorite */}
-      <td className="border border-gray-700 border-dotted p-0 md:p-3 text-center">
-        {/* <td
-        className={`${userLoggedIn ? "border" : "border"} border-gray-700 border-dotted p-0 md:p-3 text-center`}
-      > */}
+      <td className="p-0 md:p-3 text-center">
         {userLoggedIn ? (
           <FavoriteButton
             isFavorite={favorites.includes(word.id)}
@@ -526,7 +535,7 @@ const WordTableRow = ({
 
       {/* History */}
       {userLoggedIn && canManageWords && (
-        <td className="border-b border-gray-700 border-dotted  p-2 md:p-3 text-center hidden md:table-cell lg:table-cell">
+        <td className="p-2 md:p-3 text-center hidden md:table-cell lg:table-cell">
           <button
             onClick={() => {
               setSelectedHistory({

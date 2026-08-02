@@ -200,6 +200,7 @@ const SentenceRenderer = memo(
     word,
     onTranslate,
     translation,
+    isTranslationActive,
     isLoading,
     userLoggedIn,
     isFlagged,
@@ -286,14 +287,18 @@ const SentenceRenderer = memo(
               onClick={() => onTranslate(cleanSentence)}
               className=" flex-shrink-0 flex items-center justify-center mt-0 lg:mt-1 hover:scale-110 transition-transform"
               disabled={isLoading}
-              title="Translate"
+              title={isTranslationActive ? "Hide translation" : "Translate"}
             >
               {isLoading ? (
                 <FaSpinner size={16} className="animate-spin" />
               ) : (
                 <SiGoogletranslate
                   size={16}
-                  className="text-sky-500 hover:text-green-500"
+                  className={
+                    isTranslationActive
+                      ? "text-green-500"
+                      : "text-sky-500 hover:text-green-500"
+                  }
                 />
               )}
             </button>
@@ -339,17 +344,31 @@ const WordListModal = ({
 
   const { isAdmin, isLoggedIn: userLoggedIn } = useAuth();
 
-  // Translation state
+  // Translation state — `translations` caches the fetched text per sentence
+  // so re-toggling never re-hits the API; `visibleTranslations` tracks
+  // whether that cached text is currently shown, independent of whether
+  // it's been fetched yet, so the button can toggle show/hide on repeat
+  // clicks instead of only ever translating once.
   const [translations, setTranslations] = useState({});
   const [loadingTranslations, setLoadingTranslations] = useState({});
+  const [visibleTranslations, setVisibleTranslations] = useState({});
 
   // Call hooks BEFORE any conditional returns
   useLockBodyScroll(!!selectedWord);
 
-  // Translate sentence handler
+  // Translate sentence handler — toggles the translation's visibility,
+  // fetching it from the API only the first time it's shown.
   const translateSentence = useCallback(
     async (sentence) => {
-      if (translations[sentence]) return; // avoid re-translation
+      if (visibleTranslations[sentence]) {
+        setVisibleTranslations((prev) => ({ ...prev, [sentence]: false }));
+        return;
+      }
+
+      if (translations[sentence]) {
+        setVisibleTranslations((prev) => ({ ...prev, [sentence]: true }));
+        return;
+      }
 
       setLoadingTranslations((prev) => ({ ...prev, [sentence]: true }));
 
@@ -369,17 +388,19 @@ const WordListModal = ({
           ...prev,
           [sentence]: data.data.translated,
         }));
+        setVisibleTranslations((prev) => ({ ...prev, [sentence]: true }));
       } catch (err) {
         console.error("Translation failed:", err);
         setTranslations((prev) => ({
           ...prev,
           [sentence]: `❌ ${err.message}`,
         }));
+        setVisibleTranslations((prev) => ({ ...prev, [sentence]: true }));
       } finally {
         setLoadingTranslations((prev) => ({ ...prev, [sentence]: false }));
       }
     },
-    [translations],
+    [translations, visibleTranslations],
   );
 
   // Add escape key handler for better UX
@@ -499,7 +520,7 @@ const WordListModal = ({
         )}
         <p className="text-center mt-8 md:mt-6 lg:mt-6 px-4 md:px-6">
           <span className="inline-block px-4 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full">
-            <span className="text-cyan-500 text-lg font-bold">Topic:</span>
+            <span className="text-blue-400 text-lg font-bold">Topic:</span>
             <span className="text-md md:text-xl lg:text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-400 ml-2">
               {selectedWord.topic?.name || ""}
             </span>
@@ -704,7 +725,7 @@ const WordListModal = ({
             )}
           </div>
           <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm p-2 md:p-4 lg:p-3 rounded-2xl border border-gray-700/30 ">
-            <p className="text-md md:text-lg lg:text-lg text-green-400 font-semibold mb-3">
+            <p className="text-md md:text-lg lg:text-lg text-blue-400 font-semibold mb-3">
               📝 Sentences:
             </p>
             {(selectedWord.sentences?.length || 0) > 0 ? (
@@ -715,7 +736,12 @@ const WordListModal = ({
                     sentence={sentence}
                     word={selectedWord}
                     onTranslate={translateSentence}
-                    translation={translations[sentence]}
+                    translation={
+                      visibleTranslations[sentence]
+                        ? translations[sentence]
+                        : undefined
+                    }
+                    isTranslationActive={!!visibleTranslations[sentence]}
                     isLoading={loadingTranslations[sentence]}
                     userLoggedIn={userLoggedIn}
                     isFlagged={flaggedSentenceIndexes.includes(index)}

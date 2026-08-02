@@ -142,7 +142,7 @@ export const highlightPrefixInSentence = (word, sentence) => {
     if ((isEndOfClause || isAuxChain) && lowerPart.startsWith(prefix)) {
       return (
         <span key={`${part}-${index}`}>
-          <span className="text-orange-500 font-bold">
+          <span className="text-orange-500 font-normal">
             {part.slice(0, prefixLength)}
           </span>
           {part.slice(prefixLength)}
