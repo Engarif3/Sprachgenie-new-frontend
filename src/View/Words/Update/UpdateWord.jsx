@@ -1789,6 +1789,15 @@ const UpdateWord = () => {
       cancelButtonText: "Cancel",
     });
 
+    if (!result.isConfirmed) {
+      // setLoading(true) ran well before this prompt — without resetting it
+      // here, cancelling (or dismissing via Escape/backdrop click) left the
+      // Update button permanently disabled until a full page reload, since
+      // the only setLoading(false) lived in this block's own finally.
+      setLoading(false);
+      return;
+    }
+
     if (result.isConfirmed) {
       try {
         const response = await api.put(
