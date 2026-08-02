@@ -569,7 +569,7 @@ const WordListModal = ({
                         key={index}
                         className="text-cyan-500 tracking-wide font-normal italic flex gap-1"
                       >
-                        <span className="flex-shrink-0 text-orange-400 font-semibold not-italic">
+                        <span className="flex-shrink-0 text-white font-normal not-italic">
                           {marker}
                         </span>
                         <span>{text}</span>
