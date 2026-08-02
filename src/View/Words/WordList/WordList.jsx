@@ -444,6 +444,7 @@ const WordList = () => {
   const [showInfo, setShowInfo] = useState(false);
   const [showRecentOnly, setShowRecentOnly] = useState(false);
   const [adminCompletenessFilter, setAdminCompletenessFilter] = useState("");
+  const [recentlyAddedLimit, setRecentlyAddedLimit] = useState(null);
   const [isRefreshingPage, setIsRefreshingPage] = useState(false);
   const [pageCacheReady, setPageCacheReady] = useState(false);
 
@@ -464,7 +465,7 @@ const WordList = () => {
   // =========Search suggestions ===============
 
   // ===================
-  const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
+  const { isAdmin, isSuperAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
 
   const [favorites, setFavorites] = useState([]);
 
@@ -535,6 +536,24 @@ const WordList = () => {
 
     fetchPartOfSpeechOptions();
   }, []);
+
+  useEffect(() => {
+    if (!isSuperAdmin) return;
+
+    const fetchWordListSettings = async () => {
+      try {
+        const response = await api.get("/word/settings");
+        const limit = response.data?.data?.recentlyAddedLimit;
+        if (typeof limit === "number") {
+          setRecentlyAddedLimit(limit);
+        }
+      } catch (error) {
+        console.error("Failed to fetch word list settings:", error);
+      }
+    };
+
+    fetchWordListSettings();
+  }, [isSuperAdmin]);
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -1689,6 +1708,56 @@ const WordList = () => {
     [isAdmin],
   );
 
+  const handleSetRecentlyAddedLimit = useCallback(async () => {
+    if (!isSuperAdmin) {
+      return;
+    }
+
+    const { value: enteredLimit } = await Swal.fire({
+      title: "Recently Added Limit",
+      input: "number",
+      inputLabel: 'Number of words to show for "Recently added"',
+      inputValue: recentlyAddedLimit ?? 50,
+      inputAttributes: { min: 1, max: 500, step: 1 },
+      showCancelButton: true,
+      confirmButtonText: "Save",
+      inputValidator: (value) => {
+        const parsedValue = Number(value);
+        if (!value || !Number.isInteger(parsedValue) || parsedValue < 1 || parsedValue > 500) {
+          return "Enter a whole number between 1 and 500";
+        }
+        return undefined;
+      },
+    });
+
+    if (enteredLimit === undefined) {
+      return;
+    }
+
+    try {
+      const response = await api.patch("/word/settings", {
+        recentlyAddedLimit: Number(enteredLimit),
+      });
+      setRecentlyAddedLimit(response.data?.data?.recentlyAddedLimit ?? Number(enteredLimit));
+      await invalidateWordsCache();
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "success",
+        title: "Recently added limit updated",
+        showConfirmButton: false,
+        timer: 1800,
+        timerProgressBar: true,
+      });
+    } catch (error) {
+      Swal.fire(
+        "Error",
+        error.response?.data?.message || "Failed to update setting",
+        "error",
+      );
+    }
+  }, [isSuperAdmin, recentlyAddedLimit]);
+
   // to show info
   useEffect(() => {
     const handleClickOutside = () => setShowInfo(false);
@@ -1854,6 +1923,19 @@ const WordList = () => {
                   </option>
                 ))}
               </select>
+              {isSuperAdmin && (
+                <button
+                  type="button"
+                  onClick={handleSetRecentlyAddedLimit}
+                  className="min-h-[30px] w-full sm:w-auto md:w-auto px-2 py-2 md:px-2.5 md:py-1.5 rounded-full font-semibold text-sm shadow-lg border border-cyan-500 bg-cyan-700/40 text-white hover:bg-cyan-700/60 transition-all"
+                  title='Set how many words "Recently added" shows'
+                >
+                  Recently added limit
+                  {typeof recentlyAddedLimit === "number"
+                    ? `: ${recentlyAddedLimit}`
+                    : ""}
+                </button>
+              )}
               {/* <p className="text-md font-bold whitespace-nowrap hidden md:block px-2 py-1 md:px-2.5 md:py-1.5 bg-sky-600  rounded-full text-white">
                 {displayedWordsCount} words
               </p> */}
