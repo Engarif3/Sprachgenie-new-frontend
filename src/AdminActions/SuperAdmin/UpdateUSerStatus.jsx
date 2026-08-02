@@ -19,7 +19,7 @@ const getTabButtonClass = (isActive) =>
   `inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition-all duration-200 ${
     isActive
       ? "bg-slate-950 text-white shadow-lg shadow-slate-950/20"
-      : "bg-gray-400 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+      : "bg-slate-200 dark:bg-gray-700 text-slate-600 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-gray-600 hover:text-slate-900 dark:hover:text-white"
   }`;
 
 const UpdateUserStatus = () => {
@@ -461,7 +461,7 @@ const UpdateUserStatus = () => {
     return (
       <Container>
         <div className="flex min-h-[50vh] items-center justify-center px-4 py-10">
-          <div className="rounded-[28px] border border-rose-200 bg-rose-50 px-6 py-5 text-center text-rose-700 shadow-lg shadow-rose-100/50">
+          <div className="rounded-[28px] border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 px-6 py-5 text-center text-rose-700 dark:text-rose-300 shadow-lg shadow-rose-100/50 dark:shadow-none">
             {error}
           </div>
         </div>
@@ -472,7 +472,7 @@ const UpdateUserStatus = () => {
   return (
     <Container>
       {isSuperAdmin && (
-        <div className="min-h-screen   px-4 py-5 md:px-6 lg:px-8">
+        <div className="min-h-screen bg-slate-50 dark:bg-transparent px-4 py-5 md:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl space-y-5">
             <UserManagementSummary
               badge="Super Admin Console"
@@ -486,14 +486,14 @@ const UpdateUserStatus = () => {
                 {
                   label: "Admin Accounts",
                   value: adminTotalCount,
-                  borderClass: "border-cyan-200",
-                  labelClass: "text-cyan-900",
+                  borderClass: "border-cyan-200 dark:border-cyan-500/30",
+                  labelClass: "text-cyan-900 dark:text-cyan-300",
                 },
                 {
                   label: "Basic User Accounts",
                   value: basicUserTotalCount,
-                  borderClass: "border-emerald-200",
-                  labelClass: "text-emerald-700",
+                  borderClass: "border-emerald-200 dark:border-emerald-500/30",
+                  labelClass: "text-emerald-700 dark:text-emerald-300",
                 },
                 {
                   label: "Status View",
@@ -501,25 +501,25 @@ const UpdateUserStatus = () => {
                     selectedStatus === "ALL"
                       ? "All"
                       : formatRoleLabel(selectedStatus.toLowerCase()),
-                  borderClass: "border-amber-200",
-                  labelClass: "text-amber-700",
+                  borderClass: "border-amber-200 dark:border-amber-500/30",
+                  labelClass: "text-amber-700 dark:text-amber-300",
                 },
               ]}
             />
 
-            <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-lg shadow-slate-200/60 md:p-5">
+            <section className="rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 p-4 shadow-lg shadow-slate-200/60 dark:shadow-none md:p-5">
               <div className="flex flex-col gap-4 px-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-gray-400">
                     Switch View
                   </p>
-                  <h2 className="mt-2 text-2xl font-bold text-slate-950">
+                  <h2 className="mt-2 text-2xl font-bold text-slate-950 dark:text-white">
                     {activeTab === "admins"
                       ? "Admin accounts"
                       : "User accounts"}
                   </h2>
                 </div>
-                <div className="flex flex-wrap gap-2 rounded-full bg-slate-100 p-1.5">
+                <div className="flex flex-wrap gap-2 rounded-full bg-slate-100 dark:bg-gray-900/60 p-1.5">
                   <button
                     type="button"
                     onClick={() => setActiveTab("admins")}
@@ -548,7 +548,7 @@ const UpdateUserStatus = () => {
 
             {activeTab === "admins" ? (
               loadingAdmins ? (
-                <div className="flex min-h-[260px] items-center justify-center rounded-[28px] border border-slate-200 bg-white shadow-xl shadow-slate-200/70">
+                <div className="flex min-h-[260px] items-center justify-center rounded-[28px] border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 shadow-xl shadow-slate-200/70 dark:shadow-none">
                   <ScaleLoader
                     color="#155e75"
                     loading={loadingAdmins}
@@ -572,7 +572,7 @@ const UpdateUserStatus = () => {
                 />
               )
             ) : loadingUsers ? (
-              <div className="flex min-h-[260px] items-center justify-center rounded-[28px] border border-slate-200 bg-white shadow-xl shadow-slate-200/70">
+              <div className="flex min-h-[260px] items-center justify-center rounded-[28px] border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 shadow-xl shadow-slate-200/70 dark:shadow-none">
                 <ScaleLoader
                   color="#155e75"
                   loading={loadingUsers}

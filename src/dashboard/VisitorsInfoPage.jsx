@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import api from "../axios";
@@ -58,16 +58,16 @@ const VisitorsInfoPage = () => {
 
   return (
     <div className="space-y-6 py-8">
-      <div className="max-w-6xl mx-auto rounded-2xl border border-violet-500/20 bg-gray-900 p-5 shadow-[0_18px_50px_rgba(0,0,0,0.25)]">
+      <div className="max-w-6xl mx-auto rounded-2xl border border-violet-300 dark:border-violet-500/20 bg-white dark:bg-gray-900 p-5 shadow-[0_18px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_18px_50px_rgba(0,0,0,0.25)]">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-violet-300">
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-violet-700 dark:text-violet-300">
               Visitor Analytics
             </p>
-            <h1 className="mt-2 text-3xl font-bold text-white">
+            <h1 className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">
               Visitors Info Dashboard
             </h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-400">
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500 dark:text-gray-400">
               Review visitor volume, short-term traffic movement, and jump into
               the full visitor location dashboard from here.
             </p>
@@ -75,83 +75,85 @@ const VisitorsInfoPage = () => {
           <button
             type="button"
             onClick={handleRefreshVisitors}
-            className="rounded-lg border border-violet-400/30 bg-violet-500/10 px-4 py-2 text-sm font-medium text-violet-200 transition-colors hover:bg-violet-500/20"
+            className="rounded-lg border border-violet-300 dark:border-violet-400/30 bg-violet-100 dark:bg-violet-500/10 px-4 py-2 text-sm font-medium text-violet-700 dark:text-violet-200 transition-colors hover:bg-violet-200 dark:hover:bg-violet-500/20"
           >
             Refresh visitor data
           </button>
         </div>
       </div>
 
-      <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-6xl mx-auto">
+      <div className="p-6 bg-white dark:bg-gray-900 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm dark:shadow-none max-w-6xl mx-auto">
         <div>
-          <h2 className="text-2xl font-bold text-white">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
             👥 Visitors Overview
           </h2>
-          <p className="mt-2 text-sm text-gray-400">
+          <p className="mt-2 text-sm text-slate-500 dark:text-gray-400">
             Start here for visitor totals and recent activity before opening the
             detailed location breakdown.
           </p>
         </div>
 
         {visitorsLoading || analyticsLoading ? (
-          <p className="mt-4 text-gray-400">Loading visitor analytics...</p>
+          <p className="mt-4 text-slate-500 dark:text-gray-400">
+            Loading visitor analytics...
+          </p>
         ) : (
           <div className="mt-5 space-y-5">
             <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-              <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                <p className="text-xs uppercase tracking-wide text-gray-400">
+              <div className="rounded-lg border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-black/20 p-4">
+                <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                   Unique Visitors
                 </p>
-                <p className="mt-2 text-2xl font-bold text-white">
+                <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">
                   {uniqueVisitors || 0}
                 </p>
               </div>
-              <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                <p className="text-xs uppercase tracking-wide text-gray-400">
+              <div className="rounded-lg border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-black/20 p-4">
+                <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                   Daily
                 </p>
-                <p className="mt-2 text-2xl font-bold text-cyan-300">
+                <p className="mt-2 text-2xl font-bold text-cyan-600 dark:text-cyan-300">
                   {visitorSummary.daily || 0}
                 </p>
               </div>
-              <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                <p className="text-xs uppercase tracking-wide text-gray-400">
+              <div className="rounded-lg border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-black/20 p-4">
+                <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                   Weekly
                 </p>
-                <p className="mt-2 text-2xl font-bold text-emerald-300">
+                <p className="mt-2 text-2xl font-bold text-emerald-600 dark:text-emerald-300">
                   {visitorSummary.weekly || 0}
                 </p>
               </div>
-              <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                <p className="text-xs uppercase tracking-wide text-gray-400">
+              <div className="rounded-lg border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-black/20 p-4">
+                <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                   Monthly
                 </p>
-                <p className="mt-2 text-2xl font-bold text-amber-300">
+                <p className="mt-2 text-2xl font-bold text-amber-600 dark:text-amber-300">
                   {visitorSummary.monthly || 0}
                 </p>
               </div>
-              <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                <p className="text-xs uppercase tracking-wide text-gray-400">
+              <div className="rounded-lg border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-black/20 p-4">
+                <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                   Total
                 </p>
-                <p className="mt-2 text-2xl font-bold text-violet-300">
+                <p className="mt-2 text-2xl font-bold text-violet-600 dark:text-violet-300">
                   {visitorSummary.total || 0}
                 </p>
               </div>
             </div>
 
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-white/5 p-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-sm font-semibold text-white">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white">
                     Last 14 Days Visitor Trend
                   </p>
-                  <p className="mt-1 text-xs text-gray-400">
+                  <p className="mt-1 text-xs text-slate-500 dark:text-gray-400">
                     Short-term traffic pattern from the saved daily analytics
                     dataset.
                   </p>
                 </div>
-                <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1 text-[11px] font-semibold text-gray-200">
+                <span className="rounded-full border border-slate-200 bg-white dark:border-white/10 dark:bg-black/20 px-3 py-1 text-[11px] font-semibold text-slate-700 dark:text-gray-200">
                   {visitorTrendEntries.length} days loaded
                 </span>
               </div>
@@ -168,7 +170,7 @@ const VisitorsInfoPage = () => {
                         key={date}
                         className="flex flex-col items-center justify-end gap-2"
                       >
-                        <span className="h-5 text-xs font-semibold text-white">
+                        <span className="h-5 text-xs font-semibold text-slate-900 dark:text-white">
                           {normalizedCount > 0 ? normalizedCount : ""}
                         </span>
                         <div
@@ -179,7 +181,7 @@ const VisitorsInfoPage = () => {
                           }}
                           title={`${new Date(date).toLocaleDateString()}: ${normalizedCount} visitors`}
                         />
-                        <p className="text-center text-[10px] text-gray-400 whitespace-nowrap">
+                        <p className="text-center text-[10px] text-slate-400 dark:text-gray-400 whitespace-nowrap">
                           {new Date(date).toLocaleDateString("en-US", {
                             month: "short",
                             day: "numeric",
@@ -190,7 +192,7 @@ const VisitorsInfoPage = () => {
                   })}
                 </div>
               ) : (
-                <p className="mt-4 text-sm text-gray-400">
+                <p className="mt-4 text-sm text-slate-500 dark:text-gray-400">
                   No recent visitor trend data available.
                 </p>
               )}
@@ -199,18 +201,18 @@ const VisitorsInfoPage = () => {
         )}
       </div>
 
-      <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-6xl mx-auto">
+      <div className="p-6 bg-white dark:bg-gray-900 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm dark:shadow-none max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
               🌍 Visitors by Location
             </h2>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">
               Full visitor analytics and detailed location breakdown
             </p>
           </div>
         </div>
-        <p className="text-gray-400 mb-4">
+        <p className="text-slate-500 dark:text-gray-400 mb-4">
           View detailed visitor information grouped by location with pagination,
           IP addresses, browser and device information.
         </p>

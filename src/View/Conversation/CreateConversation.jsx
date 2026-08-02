@@ -97,9 +97,12 @@ const CreateConversation = () => {
     return <Navigate to="/" replace />;
   }
 
+  const fieldClass =
+    "border border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-900/60 text-slate-900 dark:text-white p-2 w-full rounded-md";
+
   return (
-    <div className="max-w-5xl mx-auto p-4 min-h-screen">
-      <h2 className="text-3xl font-bold font-mono text-white my-5 md:my-8 lg:my-8 text-center">
+    <div className="max-w-5xl mx-auto p-4 min-h-screen bg-slate-50 dark:bg-transparent">
+      <h2 className="text-3xl font-bold font-mono text-slate-900 dark:text-white my-5 md:my-8 lg:my-8 text-center">
         Create Conversation
       </h2>
       <form className="space-y-3">
@@ -107,7 +110,7 @@ const CreateConversation = () => {
         <div>
           <label
             htmlFor="conversation-topic"
-            className="block font-semibold text-white"
+            className="block font-semibold text-slate-800 dark:text-white"
           >
             Topic
           </label>
@@ -117,7 +120,7 @@ const CreateConversation = () => {
             name="topic"
             value={formData.topic}
             onChange={handleInputChange}
-            className="border p-2 w-full"
+            className={fieldClass}
             placeholder="Enter conversation topic"
           />
         </div>
@@ -126,7 +129,7 @@ const CreateConversation = () => {
         <div>
           <label
             htmlFor="conversation-level"
-            className="block font-semibold text-white"
+            className="block font-semibold text-slate-800 dark:text-white"
           >
             Level
           </label>
@@ -135,7 +138,7 @@ const CreateConversation = () => {
             name="levelId"
             value={formData.levelId}
             onChange={handleLevelChange}
-            className="border p-2 w-full"
+            className={fieldClass}
           >
             {levels.map((level) => (
               <option key={level.value} value={level.value}>
@@ -149,7 +152,7 @@ const CreateConversation = () => {
         <div>
           <label
             htmlFor="conversation-text"
-            className="block font-semibold text-white"
+            className="block font-semibold text-slate-800 dark:text-white"
           >
             Text (JSON format)
           </label>
@@ -158,11 +161,11 @@ const CreateConversation = () => {
             name="text"
             value={formData.text}
             onChange={handleTextChange}
-            className="border p-2 w-full"
+            className={fieldClass}
             rows="6"
             placeholder='[{ "speaker": "Lena", "message": "Hallo..." }]'
           />
-          <p className="text-sm  mt-2 text-white">
+          <p className="text-sm mt-2 text-slate-600 dark:text-white">
             Please enter the text as valid JSON. For example:
             <br />
             <code>[{`{"speaker": "Lena", "message": "Hallo..."}`}]</code>

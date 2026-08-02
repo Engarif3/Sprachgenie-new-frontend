@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import api from "../../axios";
 import aiApi from "../../AI_axios";
@@ -357,25 +357,24 @@ const StoriesManagement = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-8">
+    <div className="min-h-screen bg-slate-50 p-8 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <PageHeader
-            surface="dark"
             title="Stories Management"
             subtitle="View, edit, publish, and delete your German language stories"
           />
         </div>
 
         {/* Filters */}
-        <div className="bg-gray-800/50 rounded-lg p-6 mb-8 border border-gray-700">
+        <div className="rounded-lg border border-slate-200 bg-white p-6 mb-8 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Search */}
             <div>
               <label
                 htmlFor="stories-search"
-                className="block text-white font-semibold mb-2"
+                className="block text-slate-800 dark:text-white font-semibold mb-2"
               >
                 Search Stories
               </label>
@@ -385,7 +384,7 @@ const StoriesManagement = () => {
                 placeholder="Search by title or description..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
               />
             </div>
 
@@ -393,7 +392,7 @@ const StoriesManagement = () => {
             <div>
               <label
                 htmlFor="stories-filter-status"
-                className="block text-white font-semibold mb-2"
+                className="block text-slate-800 dark:text-white font-semibold mb-2"
               >
                 Filter by Status
               </label>
@@ -401,7 +400,7 @@ const StoriesManagement = () => {
                 id="stories-filter-status"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               >
                 <option value="all">All Stories</option>
                 <option value="published">Published Only</option>
@@ -413,13 +412,13 @@ const StoriesManagement = () => {
 
         {/* Messages */}
         {error && (
-          <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg text-red-200">
+          <div className="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg text-red-700 dark:bg-red-900/30 dark:border-red-700 dark:text-red-200">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="mb-6 p-4 bg-green-900/30 border border-green-700 rounded-lg text-green-200">
+          <div className="mb-6 p-4 bg-green-50 border border-green-300 rounded-lg text-green-700 dark:bg-green-900/30 dark:border-green-700 dark:text-green-200">
             {success}
           </div>
         )}
@@ -427,18 +426,22 @@ const StoriesManagement = () => {
         {/* Stories Grid */}
         {loading ? (
           <div className="text-center py-12">
-            <p className="text-gray-400 text-lg">Loading stories...</p>
+            <p className="text-slate-500 dark:text-gray-400 text-lg">
+              Loading stories...
+            </p>
           </div>
         ) : filteredStories.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-400 text-lg">No stories found</p>
+            <p className="text-slate-500 dark:text-gray-400 text-lg">
+              No stories found
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredStories.map((story) => (
               <div
                 key={story.id}
-                className="bg-gray-800/50 rounded-lg overflow-hidden border border-gray-700 hover:border-orange-500 transition-colors duration-300"
+                className="rounded-lg overflow-hidden border border-slate-200 bg-white shadow-sm hover:border-orange-500 transition-colors duration-300 dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none"
               >
                 {/* Image */}
                 {story.image && (
@@ -452,33 +455,33 @@ const StoriesManagement = () => {
                 {/* Content */}
                 <div className="p-6">
                   {/* Title */}
-                  <h3 className="text-lg font-bold text-white mb-2 line-clamp-2">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 line-clamp-2">
                     {story.title}
                   </h3>
 
                   {/* Status Badge */}
                   <div className="mb-3">
                     {story.isPublished ? (
-                      <span className="inline-block px-3 py-1 bg-green-600/30 border border-green-500 text-green-300 text-xs font-semibold rounded-full">
+                      <span className="inline-block px-3 py-1 bg-green-100 border border-green-400 text-green-700 text-xs font-semibold rounded-full dark:bg-green-600/30 dark:border-green-500 dark:text-green-300">
                         ✅ Published
                       </span>
                     ) : (
-                      <span className="inline-block px-3 py-1 bg-yellow-600/30 border border-yellow-500 text-yellow-300 text-xs font-semibold rounded-full">
+                      <span className="inline-block px-3 py-1 bg-yellow-100 border border-yellow-400 text-yellow-700 text-xs font-semibold rounded-full dark:bg-yellow-600/30 dark:border-yellow-500 dark:text-yellow-300">
                         📝 Draft
                       </span>
                     )}
                   </div>
 
                   {/* Description Preview */}
-                  <p className="text-gray-300 text-sm line-clamp-3 mb-4">
+                  <p className="text-slate-600 dark:text-gray-300 text-sm line-clamp-3 mb-4">
                     {story.description}
                   </p>
 
                   {/* Metadata */}
-                  <div className="text-xs text-gray-400 mb-4 space-y-1">
+                  <div className="text-xs text-slate-500 dark:text-gray-400 mb-4 space-y-1">
                     <p>
                       📚 Level:{" "}
-                      <span className="text-orange-400">
+                      <span className="text-orange-600 dark:text-orange-400">
                         {story.level?.level || "N/A"}
                       </span>
                     </p>

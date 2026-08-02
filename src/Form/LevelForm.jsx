@@ -184,7 +184,7 @@ const LevelForm = () => {
           align="center"
           className="mt-8 mb-6"
         />
-        <p className="text-center text-sm text-gray-400 -mt-4 mb-6">
+        <p className="text-center text-sm text-slate-500 dark:text-gray-400 -mt-4 mb-6">
           {loadingLevels
             ? "Loading levels..."
             : levels.length > 0
@@ -193,7 +193,7 @@ const LevelForm = () => {
         </p>
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 p-4 bg-stone-800 rounded-md text-white"
+          className="space-y-4 rounded-md border border-slate-200 bg-white p-4 text-slate-900 shadow-sm dark:border-transparent dark:bg-stone-800 dark:text-white dark:shadow-none"
         >
           <div>
             <label htmlFor="levelName" className="block font-medium">
@@ -207,7 +207,7 @@ const LevelForm = () => {
               onChange={(event) => setLevelName(event.target.value)}
               placeholder="e.g. C1"
               required
-              className="mt-1 block w-full input-md rounded-md text-black border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
+              className="mt-1 block w-full input-md rounded-md border-slate-300 text-black shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50 dark:border-gray-600 dark:bg-gray-900/60 dark:text-white"
             />
           </div>
 
@@ -217,28 +217,32 @@ const LevelForm = () => {
         </form>
 
         {isSuperAdmin && (
-          <div className="mt-8 p-4 bg-stone-800 rounded-md text-white">
+          <div className="mt-8 rounded-md border border-slate-200 bg-white p-4 text-slate-900 shadow-sm dark:border-transparent dark:bg-stone-800 dark:text-white dark:shadow-none">
             <h3 className="font-medium mb-3">Manage Level Visibility</h3>
-            <p className="text-xs text-gray-400 mb-3">
+            <p className="text-xs text-slate-500 dark:text-gray-400 mb-3">
               Hiding a level removes it and its words from the word list for
               basic users/guests. You'll keep seeing it here and everywhere
               else while managing content.
             </p>
             {loadingLevels ? (
-              <p className="text-sm text-gray-400">Loading levels...</p>
+              <p className="text-sm text-slate-500 dark:text-gray-400">
+                Loading levels...
+              </p>
             ) : levels.length === 0 ? (
-              <p className="text-sm text-gray-400">No levels yet</p>
+              <p className="text-sm text-slate-500 dark:text-gray-400">
+                No levels yet
+              </p>
             ) : (
               <ul className="space-y-2">
                 {levels.map((level) => (
                   <li
                     key={level.id}
-                    className="flex items-center justify-between gap-3 rounded-md bg-stone-900 px-3 py-2"
+                    className="flex items-center justify-between gap-3 rounded-md bg-slate-100 px-3 py-2 dark:bg-stone-900"
                   >
                     <span className="flex items-center gap-2">
                       {level.level}
                       {level.isHidden && (
-                        <span className="rounded-full bg-rose-600/20 px-2 py-0.5 text-xs font-semibold text-rose-300">
+                        <span className="rounded-full bg-rose-100 px-2 py-0.5 text-xs font-semibold text-rose-700 dark:bg-rose-600/20 dark:text-rose-300">
                           Hidden
                         </span>
                       )}

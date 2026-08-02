@@ -243,12 +243,17 @@ const UpdateBasicUserStatus = () => {
     return <Navigate to="/" replace />;
   }
 
-  if (error) return <div>{error}</div>;
+  if (error)
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-transparent p-6 text-rose-700 dark:text-rose-300">
+        {error}
+      </div>
+    );
 
   return (
     <Container>
       {userRole === "admin" && (
-        <div className="min-h-screen px-4 py-5 md:px-6 lg:px-8">
+        <div className="min-h-screen bg-slate-50 dark:bg-transparent px-4 py-5 md:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl space-y-5">
             <UserManagementSummary
               badge="Admin Console"
@@ -262,8 +267,8 @@ const UpdateBasicUserStatus = () => {
                 {
                   label: "Basic User Accounts",
                   value: basicUsers.length,
-                  borderClass: "border-emerald-200",
-                  labelClass: "text-emerald-700",
+                  borderClass: "border-emerald-200 dark:border-emerald-500/30",
+                  labelClass: "text-emerald-700 dark:text-emerald-300",
                 },
                 {
                   label: "Status View",
@@ -271,14 +276,14 @@ const UpdateBasicUserStatus = () => {
                     selectedStatus === "ALL"
                       ? "All"
                       : formatStatusLabel(selectedStatus),
-                  borderClass: "border-amber-200",
-                  labelClass: "text-amber-700",
+                  borderClass: "border-amber-200 dark:border-amber-500/30",
+                  labelClass: "text-amber-700 dark:text-amber-300",
                 },
                 {
                   label: "Search Query",
                   value: searchTerm.trim() || "None",
-                  borderClass: "border-cyan-200",
-                  labelClass: "text-cyan-700",
+                  borderClass: "border-cyan-200 dark:border-cyan-500/30",
+                  labelClass: "text-cyan-700 dark:text-cyan-300",
                 },
               ]}
             />
@@ -290,7 +295,7 @@ const UpdateBasicUserStatus = () => {
             />
 
             {loading ? (
-              <div className="flex min-h-[260px] items-center justify-center rounded-[28px] border border-slate-200 bg-white shadow-xl shadow-slate-200/70">
+              <div className="flex min-h-[260px] items-center justify-center rounded-[28px] border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 shadow-xl shadow-slate-200/70 dark:shadow-none">
                 <ScaleLoader color="#155e75" loading={loading} size={150} />
               </div>
             ) : (

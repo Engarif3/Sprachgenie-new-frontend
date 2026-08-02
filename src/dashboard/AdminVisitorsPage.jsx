@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { toast } from "sonner";
 import api, { externalApi } from "../axios";
@@ -91,10 +91,10 @@ const buildLocationQuery = (location) => {
 
 const buttonBaseClass =
   "inline-flex items-center justify-center rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50";
-const primaryButtonClass = `${buttonBaseClass} border-sky-500/40 bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-lg shadow-sky-950/25 hover:-translate-y-0.5 hover:from-sky-400 hover:to-blue-500 hover:shadow-xl hover:shadow-sky-950/35 focus:ring-sky-400/45`;
-const secondaryButtonClass = `${buttonBaseClass} border-slate-700 bg-slate-900/80 text-slate-100 shadow-lg shadow-slate-950/25 hover:-translate-y-0.5 hover:border-slate-500 hover:bg-slate-800 focus:ring-slate-400/30`;
-const dangerButtonClass = `${buttonBaseClass} border-rose-500/45 bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-lg shadow-rose-950/30 hover:-translate-y-0.5 hover:from-rose-500 hover:to-red-500 hover:shadow-xl hover:shadow-rose-950/40 focus:ring-rose-400/45`;
-const ghostDangerButtonClass = `${buttonBaseClass} border-rose-500/30 bg-rose-500/10 text-rose-100 hover:-translate-y-0.5 hover:border-rose-400/55 hover:bg-rose-500/18 hover:text-white focus:ring-rose-400/35`;
+const primaryButtonClass = `${buttonBaseClass} border-sky-300 dark:border-sky-500/40 bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-lg shadow-sky-950/25 hover:-translate-y-0.5 hover:from-sky-400 hover:to-blue-500 hover:shadow-xl hover:shadow-sky-950/35 focus:ring-sky-400/45`;
+const secondaryButtonClass = `${buttonBaseClass} border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/80 text-slate-900 dark:text-slate-100 shadow-lg shadow-slate-950/25 hover:-translate-y-0.5 hover:border-slate-400 dark:hover:border-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 focus:ring-slate-400/30`;
+const dangerButtonClass = `${buttonBaseClass} border-rose-300 dark:border-rose-500/45 bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-lg shadow-rose-950/30 hover:-translate-y-0.5 hover:from-rose-500 hover:to-red-500 hover:shadow-xl hover:shadow-rose-950/40 focus:ring-rose-400/45`;
+const ghostDangerButtonClass = `${buttonBaseClass} border-rose-300 dark:border-rose-500/30 bg-rose-100 dark:bg-rose-500/10 text-rose-800 dark:text-rose-100 hover:-translate-y-0.5 hover:border-rose-400 dark:hover:border-rose-400/55 hover:bg-rose-200 dark:hover:bg-rose-500/18 hover:text-white focus:ring-rose-400/35`;
 const dashboardTabClass =
   "inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-sky-400/35";
 const LOCATION_PAGE_SIZE = 20;
@@ -436,15 +436,15 @@ const AdminVisitorsPage = () => {
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.12),_transparent_30%),linear-gradient(180deg,_#020617_0%,_#0f172a_48%,_#020617_100%)] p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="mb-6 flex flex-col gap-4 rounded-3xl border border-slate-800/80 bg-slate-950/70 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.45)] backdrop-blur-sm md:flex-row md:items-center md:justify-between md:p-6">
+        <div className="mb-6 flex flex-col gap-4 rounded-3xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950/70 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.45)] backdrop-blur-sm md:flex-row md:items-center md:justify-between md:p-6">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-sky-300/80">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-sky-700 dark:text-sky-300/80">
               Security Analytics
             </p>
-            <h1 className="mt-2 text-3xl font-bold text-white">
+            <h1 className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">
               👥 Visitors Dashboard
             </h1>
-            <p className="mt-2 text-sm text-slate-400">
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
               See the newest visitors first, or switch back to grouped location
               analysis when you need the broader breakdown.
             </p>
@@ -484,14 +484,14 @@ const AdminVisitorsPage = () => {
           </div>
         </div>
 
-        <div className="mb-6 flex flex-wrap gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/75 p-3 shadow-[0_18px_40px_rgba(2,6,23,0.3)]">
+        <div className="mb-6 flex flex-wrap gap-3 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950/75 p-3 shadow-[0_18px_40px_rgba(2,6,23,0.3)]">
           <button
             type="button"
             onClick={() => setViewMode("recent")}
             className={`${dashboardTabClass} ${
               viewMode === "recent"
-                ? "border-sky-400/45 bg-sky-500/15 text-sky-100 shadow-lg shadow-sky-950/20"
-                : "border-slate-700 bg-slate-900/80 text-slate-300 hover:border-slate-500 hover:text-white"
+                ? "border-sky-300 dark:border-sky-400/45 bg-sky-100 dark:bg-sky-500/15 text-sky-800 dark:text-sky-100 shadow-lg shadow-sky-950/20"
+                : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/80 text-slate-600 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500 hover:text-slate-900 dark:hover:text-white"
             }`}
           >
             Recent Visitors
@@ -501,8 +501,8 @@ const AdminVisitorsPage = () => {
             onClick={() => setViewMode("location")}
             className={`${dashboardTabClass} ${
               viewMode === "location"
-                ? "border-sky-400/45 bg-sky-500/15 text-sky-100 shadow-lg shadow-sky-950/20"
-                : "border-slate-700 bg-slate-900/80 text-slate-300 hover:border-slate-500 hover:text-white"
+                ? "border-sky-300 dark:border-sky-400/45 bg-sky-100 dark:bg-sky-500/15 text-sky-800 dark:text-sky-100 shadow-lg shadow-sky-950/20"
+                : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/80 text-slate-600 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500 hover:text-slate-900 dark:hover:text-white"
             }`}
           >
             Location Groups
@@ -525,31 +525,31 @@ const AdminVisitorsPage = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="rounded-3xl border border-slate-800/80 bg-slate-950/75 p-6 shadow-[0_18px_50px_rgba(2,6,23,0.35)]">
+              <div className="rounded-3xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950/75 p-6 shadow-[0_18px_50px_rgba(2,6,23,0.35)]">
                 <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div>
-                    <h2 className="text-xl font-semibold text-white">
+                    <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
                       Most Recent Visitors
                     </h2>
-                    <p className="mt-2 text-sm text-slate-400">
+                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
                       Sorted by latest visit time so you can immediately see who
                       arrived most recently.
                     </p>
                   </div>
-                  <div className="flex flex-wrap gap-2 text-xs text-slate-200">
-                    <span className="rounded-full border border-slate-700/80 bg-slate-900/80 px-3 py-1.5">
+                  <div className="flex flex-wrap gap-2 text-xs text-slate-800 dark:text-slate-200">
+                    <span className="rounded-full border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-900/80 px-3 py-1.5">
                       Total unique visitors: {recentTotal}
                     </span>
-                    <span className="rounded-full border border-slate-700/80 bg-slate-900/80 px-3 py-1.5">
+                    <span className="rounded-full border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-900/80 px-3 py-1.5">
                       Page: {recentPage}
                     </span>
                   </div>
                 </div>
 
-                <div className="overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-950/70">
+                <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950/70">
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-slate-300">
-                      <thead className="border-b border-slate-800 bg-slate-900/85">
+                    <table className="w-full text-sm text-slate-600 dark:text-slate-300">
+                      <thead className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/85">
                         <tr>
                           <th className="px-4 py-3 text-left font-semibold">
                             Visited At
@@ -581,20 +581,20 @@ const AdminVisitorsPage = () => {
                         {recentVisitors.map((visitor) => (
                           <tr
                             key={visitor.ipAddress}
-                            className="border-b border-slate-800/80 transition-colors hover:bg-slate-900/70"
+                            className="border-b border-slate-200 dark:border-slate-800/80 transition-colors hover:bg-slate-50 dark:hover:bg-slate-900/70"
                           >
                             <td className="px-4 py-3 whitespace-nowrap">
                               {new Date(visitor.visitedAt).toLocaleString()}
                             </td>
-                            <td className="px-4 py-3 font-mono text-slate-400">
+                            <td className="px-4 py-3 font-mono text-slate-600 dark:text-slate-400">
                               {visitor.ipAddress}
                             </td>
                             <td className="px-4 py-3">
                               <div className="flex flex-col gap-1">
-                                <span className="font-medium text-white">
+                                <span className="font-medium text-slate-900 dark:text-white">
                                   {getRecentVisitorLocationLabel(visitor)}
                                 </span>
-                                <span className="text-xs text-slate-500">
+                                <span className="text-xs text-slate-600 dark:text-slate-500">
                                   {getVisitorLocationSourceLabel(
                                     visitor.source,
                                   )}
@@ -620,7 +620,7 @@ const AdminVisitorsPage = () => {
                                     href={getRecentVisitorMapUrl(visitor)}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="rounded-lg border border-sky-500/25 bg-sky-500/10 px-3 py-1.5 text-xs font-semibold text-sky-100 transition-all duration-200 hover:border-sky-400/50 hover:bg-sky-500/20 hover:text-white"
+                                    className="rounded-lg border border-sky-300 dark:border-sky-500/25 bg-sky-100 dark:bg-sky-500/10 px-3 py-1.5 text-xs font-semibold text-sky-800 dark:text-sky-100 transition-all duration-200 hover:border-sky-400 dark:hover:border-sky-400/50 hover:bg-sky-200 dark:hover:bg-sky-500/20 hover:text-white"
                                   >
                                     Map
                                   </a>
@@ -636,7 +636,7 @@ const AdminVisitorsPage = () => {
                                       inputValue: "",
                                     })
                                   }
-                                  className="rounded-lg border border-rose-500/25 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-100 transition-all duration-200 hover:border-rose-400/50 hover:bg-rose-500/20 hover:text-white"
+                                  className="rounded-lg border border-rose-300 dark:border-rose-500/25 bg-rose-100 dark:bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-800 dark:text-rose-100 transition-all duration-200 hover:border-rose-400 dark:hover:border-rose-400/50 hover:bg-rose-200 dark:hover:bg-rose-500/20 hover:text-white"
                                 >
                                   Delete
                                 </button>
@@ -649,7 +649,7 @@ const AdminVisitorsPage = () => {
                   </div>
                 </div>
 
-                <div className="mt-4 flex flex-col gap-3 border-t border-slate-800 pt-4 md:flex-row md:items-center md:justify-between">
+                <div className="mt-4 flex flex-col gap-3 border-t border-slate-200 dark:border-slate-800 pt-4 md:flex-row md:items-center md:justify-between">
                   <button
                     onClick={() => fetchRecentVisitors(recentPage - 1)}
                     disabled={recentLoading || recentPage === 1}
@@ -657,9 +657,9 @@ const AdminVisitorsPage = () => {
                   >
                     ← Previous
                   </button>
-                  <span className="text-sm font-medium text-slate-300">
+                  <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
                     Page{" "}
-                    <span className="font-bold text-sky-300">{recentPage}</span>{" "}
+                    <span className="font-bold text-sky-700 dark:text-sky-300">{recentPage}</span>{" "}
                     • {recentTotal} total unique visitors
                   </span>
                   <button
@@ -688,32 +688,32 @@ const AdminVisitorsPage = () => {
             {visitorsByLocation.map((location, idx) => (
               <div
                 key={idx}
-                className="rounded-3xl border border-slate-800/80 bg-slate-950/75 p-6 shadow-[0_18px_50px_rgba(2,6,23,0.35)] transition-all duration-300 hover:border-slate-700 hover:shadow-[0_24px_60px_rgba(2,6,23,0.42)]"
+                className="rounded-3xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950/75 p-6 shadow-[0_18px_50px_rgba(2,6,23,0.35)] transition-all duration-300 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-[0_24px_60px_rgba(2,6,23,0.42)]"
               >
                 <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div>
-                    <h3 className="text-xl font-semibold text-white">
+                    <h3 className="text-xl font-semibold text-slate-900 dark:text-white">
                       📍 {decodeDisplayValue(location.country) || "Unknown"},{" "}
                       {decodeDisplayValue(location.city) || "Unknown"}
                     </h3>
-                    <p className="mt-2 text-sm text-slate-400">
+                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
                       {location.count}{" "}
                       {location.count === 1 ? "visitor" : "visitors"}
                     </p>
-                    <p className="mt-2 text-xs leading-6 text-slate-500">
+                    <p className="mt-2 text-xs leading-6 text-slate-600 dark:text-slate-500">
                       Approximate IP-based location via{" "}
                       {getVisitorLocationSourceLabel(location.source)}.
                     </p>
-                    <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-200">
-                      <span className="rounded-full border border-slate-700/80 bg-slate-900/80 px-3 py-1.5">
+                    <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-800 dark:text-slate-200">
+                      <span className="rounded-full border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-900/80 px-3 py-1.5">
                         Region:{" "}
                         {decodeDisplayValue(location.region) || "Unknown"}
                       </span>
-                      <span className="rounded-full border border-slate-700/80 bg-slate-900/80 px-3 py-1.5">
+                      <span className="rounded-full border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-900/80 px-3 py-1.5">
                         Timezone:{" "}
                         {decodeDisplayValue(location.timezone) || "Unknown"}
                       </span>
-                      <span className="rounded-full border border-slate-700/80 bg-slate-900/80 px-3 py-1.5">
+                      <span className="rounded-full border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-900/80 px-3 py-1.5">
                         Total visits: {location.visitCount}
                       </span>
                     </div>
@@ -749,10 +749,10 @@ const AdminVisitorsPage = () => {
                 </div>
 
                 {/* Visitors Table */}
-                <div className="overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-950/70">
+                <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950/70">
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-slate-300">
-                      <thead className="border-b border-slate-800 bg-slate-900/85">
+                    <table className="w-full text-sm text-slate-600 dark:text-slate-300">
+                      <thead className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/85">
                         <tr>
                           <th className="px-4 py-3 text-left font-semibold">
                             IP Address
@@ -784,9 +784,9 @@ const AdminVisitorsPage = () => {
                             (visitor, vIdx) => (
                               <tr
                                 key={vIdx}
-                                className="border-b border-slate-800/80 transition-colors hover:bg-slate-900/70"
+                                className="border-b border-slate-200 dark:border-slate-800/80 transition-colors hover:bg-slate-50 dark:hover:bg-slate-900/70"
                               >
-                                <td className="px-4 py-3 font-mono text-slate-400">
+                                <td className="px-4 py-3 font-mono text-slate-600 dark:text-slate-400">
                                   {visitor.ipAddress}
                                 </td>
                                 <td className="px-4 py-3">{visitor.browser}</td>
@@ -809,7 +809,7 @@ const AdminVisitorsPage = () => {
                                         href={getLocationMapUrl(location)}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="rounded-lg border border-sky-500/25 bg-sky-500/10 px-3 py-1.5 text-xs font-semibold text-sky-100 transition-all duration-200 hover:border-sky-400/50 hover:bg-sky-500/20 hover:text-white"
+                                        className="rounded-lg border border-sky-300 dark:border-sky-500/25 bg-sky-100 dark:bg-sky-500/10 px-3 py-1.5 text-xs font-semibold text-sky-800 dark:text-sky-100 transition-all duration-200 hover:border-sky-400 dark:hover:border-sky-400/50 hover:bg-sky-200 dark:hover:bg-sky-500/20 hover:text-white"
                                       >
                                         Map
                                       </a>
@@ -825,7 +825,7 @@ const AdminVisitorsPage = () => {
                                           inputValue: "",
                                         })
                                       }
-                                      className="rounded-lg border border-rose-500/25 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-100 transition-all duration-200 hover:border-rose-400/50 hover:bg-rose-500/20 hover:text-white"
+                                      className="rounded-lg border border-rose-300 dark:border-rose-500/25 bg-rose-100 dark:bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-800 dark:text-rose-100 transition-all duration-200 hover:border-rose-400 dark:hover:border-rose-400/50 hover:bg-rose-200 dark:hover:bg-rose-500/20 hover:text-white"
                                     >
                                       Delete
                                     </button>
@@ -844,7 +844,7 @@ const AdminVisitorsPage = () => {
                 {(() => {
                   const paginationData = getPaginatedVisitors(location);
                   return location.visitors.length > 10 ? (
-                    <div className="mt-4 flex flex-col gap-3 border-t border-slate-800 pt-4 md:flex-row md:items-center md:justify-between">
+                    <div className="mt-4 flex flex-col gap-3 border-t border-slate-200 dark:border-slate-800 pt-4 md:flex-row md:items-center md:justify-between">
                       <button
                         onClick={() =>
                           handleVisitorPageChange(
@@ -858,13 +858,13 @@ const AdminVisitorsPage = () => {
                       >
                         ← Previous
                       </button>
-                      <span className="text-sm font-medium text-slate-300">
+                      <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
                         Page{" "}
-                        <span className="font-bold text-sky-300">
+                        <span className="font-bold text-sky-700 dark:text-sky-300">
                           {paginationData.currentPage}
                         </span>{" "}
                         of{" "}
-                        <span className="font-bold text-sky-300">
+                        <span className="font-bold text-sky-700 dark:text-sky-300">
                           {paginationData.totalPages}
                         </span>{" "}
                         ({location.visitors.length} total)
@@ -889,7 +889,7 @@ const AdminVisitorsPage = () => {
             ))}
 
             {/* Pagination Controls */}
-            <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/75 p-4 shadow-[0_18px_40px_rgba(2,6,23,0.3)] md:flex-row md:items-center md:justify-between">
+            <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950/75 p-4 shadow-[0_18px_40px_rgba(2,6,23,0.3)] md:flex-row md:items-center md:justify-between">
               <button
                 onClick={() => fetchVisitorsByLocation(locationPage - 1)}
                 disabled={locationLoading || locationPage === 1}
@@ -897,9 +897,9 @@ const AdminVisitorsPage = () => {
               >
                 ← Previous
               </button>
-              <span className="flex-1 text-center font-medium text-slate-300">
+              <span className="flex-1 text-center font-medium text-slate-600 dark:text-slate-300">
                 Page{" "}
-                <span className="font-bold text-sky-300">{locationPage}</span> •{" "}
+                <span className="font-bold text-sky-700 dark:text-sky-300">{locationPage}</span> •{" "}
                 {locationTotal} total locations
               </span>
               <button
@@ -916,12 +916,12 @@ const AdminVisitorsPage = () => {
 
       {/* Delete Confirmation Modal */}
       {deleteConfirmation.show && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 px-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-3xl border border-rose-500/30 bg-slate-950/95 p-8 shadow-[0_28px_80px_rgba(2,6,23,0.6)]">
-            <h2 className="mb-4 text-2xl font-bold text-rose-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-50 dark:bg-slate-950/75 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl border border-rose-300 dark:border-rose-500/30 bg-slate-50 dark:bg-slate-950/95 p-8 shadow-[0_28px_80px_rgba(2,6,23,0.6)]">
+            <h2 className="mb-4 text-2xl font-bold text-rose-700 dark:text-rose-300">
               ⚠️ Confirm Deletion
             </h2>
-            <p className="mb-6 text-slate-300">
+            <p className="mb-6 text-slate-600 dark:text-slate-300">
               {deleteConfirmation.type === "all" &&
                 "Are you sure you want to delete ALL visitors? This action cannot be undone."}
               {deleteConfirmation.type === "location" &&
@@ -939,7 +939,7 @@ const AdminVisitorsPage = () => {
                   <>
                     <label
                       htmlFor="visitors-delete-confirm"
-                      className="mb-2 block text-sm text-slate-400"
+                      className="mb-2 block text-sm text-slate-600 dark:text-slate-400"
                     >
                       Type "{requiredInput}" to confirm:
                     </label>
@@ -954,7 +954,7 @@ const AdminVisitorsPage = () => {
                         })
                       }
                       placeholder={`Type '${requiredInput}' to confirm`}
-                      className="w-full rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-white transition-all duration-200 focus:border-rose-400/60 focus:outline-none focus:ring-2 focus:ring-rose-400/25"
+                      className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-slate-900 dark:text-white transition-all duration-200 focus:border-rose-300 dark:focus:border-rose-400/60 focus:outline-none focus:ring-2 focus:ring-rose-400/25"
                       onKeyDown={(e) => {
                         if (
                           e.key === "Enter" &&

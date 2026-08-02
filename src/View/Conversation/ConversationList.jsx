@@ -211,12 +211,12 @@ const ConversationsList = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-4 min-h-screen">
-      <h2 className="text-3xl font-bold font-mono text-white my-5 md:my-8 lg:my-8 text-center">
+    <div className="max-w-5xl mx-auto p-4 min-h-screen bg-slate-50 dark:bg-transparent">
+      <h2 className="text-3xl font-bold font-mono text-slate-900 dark:text-white my-5 md:my-8 lg:my-8 text-center">
         Conversation Topics
       </h2>
       {fetchError && (
-        <p className="text-center text-red-400 bg-red-900/30 border border-red-500/40 rounded-lg py-3 px-4 my-4">
+        <p className="text-center text-red-700 bg-red-50 border border-red-300 dark:text-red-400 dark:bg-red-900/30 dark:border-red-500/40 rounded-lg py-3 px-4 my-4">
           {fetchError}
         </p>
       )}
@@ -238,7 +238,7 @@ const ConversationsList = () => {
           {conversations.map((conversation) => (
             <li
               key={conversation.id}
-              className="flex justify-between items-center bg-gray-100 p-3 rounded shadow"
+              className="flex justify-between items-center bg-gray-100 dark:bg-gray-800 text-slate-900 dark:text-white p-3 rounded shadow"
             >
               <span>{conversation.topic}</span>
               {isAdmin && (

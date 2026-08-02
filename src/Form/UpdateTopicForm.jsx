@@ -387,14 +387,14 @@ const UpdateTopicForm = () => {
           align="center"
           className="mt-8 mb-6"
         />
-        <p className="text-center text-sm text-gray-400 -mt-4 mb-6">
+        <p className="text-center text-sm text-slate-500 dark:text-gray-400 -mt-4 mb-6">
           {loadingOptions
             ? "Loading topics..."
             : `${topics.length} topic${topics.length === 1 ? "" : "s"} available`}
         </p>
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 p-4 bg-stone-800 rounded-md text-white"
+          className="space-y-4 rounded-md border border-slate-200 bg-white p-4 text-slate-900 shadow-sm dark:border-transparent dark:bg-stone-800 dark:text-white dark:shadow-none"
         >
           <div>
             <label htmlFor="selectedTopicId" className="block font-medium">
@@ -407,7 +407,7 @@ const UpdateTopicForm = () => {
               onChange={handleTopicSelection}
               disabled={loadingOptions || loading || deleting}
               required
-              className="mt-1 block w-full input-md rounded-md text-black border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
+              className="mt-1 block w-full input-md rounded-md border-slate-300 text-black shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50 dark:border-gray-600 dark:bg-gray-900/60 dark:text-white"
             >
               <option value="">
                 {loadingOptions ? "Loading topics..." : "Select Topic"}
@@ -433,7 +433,7 @@ const UpdateTopicForm = () => {
               onChange={handleChange}
               required
               disabled={!selectedTopicId || loading || deleting}
-              className="mt-1 block w-full input-md rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50 text-black"
+              className="mt-1 block w-full input-md rounded-md border-slate-300 text-black shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50 dark:border-gray-600 dark:bg-gray-900/60 dark:text-white"
             />
           </div>
 
@@ -447,7 +447,7 @@ const UpdateTopicForm = () => {
               value={topicData.levelId}
               onChange={handleChange}
               disabled={!selectedTopicId || loadingOptions || loading || deleting}
-              className="mt-1 block w-full input-md rounded-md text-black border-gray-300 shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50"
+              className="mt-1 block w-full input-md rounded-md border-slate-300 text-black shadow-sm focus:border-sky-500 focus:ring focus:ring-sky-500 focus:ring-opacity-50 dark:border-gray-600 dark:bg-gray-900/60 dark:text-white"
             >
               <option value="">Any Level</option>
               {levels.map((level) => (
@@ -456,7 +456,7 @@ const UpdateTopicForm = () => {
                 </option>
               ))}
             </select>
-            <p className="mt-1 text-xs text-gray-400">
+            <p className="mt-1 text-xs text-slate-500 dark:text-gray-400">
               Leave as "Any Level" to let words from any level be filed under
               this topic.
             </p>

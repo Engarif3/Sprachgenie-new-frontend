@@ -24,11 +24,13 @@ const statusBadgeClass = (status) => {
 };
 
 const InfoCard = ({ label, value }) => (
-  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-    <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
+  <div className="rounded-2xl border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-900/40 p-4">
+    <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-gray-400">
       {label}
     </p>
-    <p className="mt-2 text-sm font-medium text-slate-900">{value}</p>
+    <p className="mt-2 text-sm font-medium text-slate-900 dark:text-white">
+      {value}
+    </p>
   </div>
 );
 
@@ -74,22 +76,22 @@ const UserProfileModal = ({ isOpen, user, isLoading, onClose }) => {
       role="presentation"
     >
       <div
-        className="relative w-full max-w-5xl overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-2xl shadow-slate-950/30"
+        className="relative w-full max-w-5xl overflow-hidden rounded-[28px] border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl shadow-slate-950/30"
         onClick={(event) => event.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-label="User profile"
       >
-        <div className="flex items-center justify-between border-b border-slate-200 bg-white/95 px-5 py-4 backdrop-blur md:px-7">
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 px-5 py-4 backdrop-blur md:px-7">
           <div>
-            <h2 className="mt-1 text-xl font-bold text-slate-950 md:text-2xl">
+            <h2 className="mt-1 text-xl font-bold text-slate-950 dark:text-white md:text-2xl">
               {displayName}
             </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-lg font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-lg font-semibold text-slate-600 dark:text-gray-300 transition hover:border-slate-300 dark:hover:border-gray-500 hover:bg-slate-100 dark:hover:bg-gray-700 hover:text-slate-900 dark:hover:text-white"
             aria-label="Close user profile"
           >
             ×
@@ -100,7 +102,7 @@ const UserProfileModal = ({ isOpen, user, isLoading, onClose }) => {
           {isLoading ? (
             <div className="grid gap-6 lg:grid-cols-[340px,1fr]">
               <div className="min-h-[360px] animate-pulse rounded-[28px] bg-slate-900" />
-              <div className="min-h-[360px] animate-pulse rounded-[28px] bg-slate-100" />
+              <div className="min-h-[360px] animate-pulse rounded-[28px] bg-slate-100 dark:bg-gray-800" />
             </div>
           ) : (
             <div className="grid gap-6 lg:grid-cols-[340px,1fr]">
@@ -166,12 +168,12 @@ const UserProfileModal = ({ isOpen, user, isLoading, onClose }) => {
                 </div>
               </section>
 
-              <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/60">
+              <section className="rounded-[28px] border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 p-6 shadow-xl shadow-slate-200/60 dark:shadow-none">
                 <div className="mb-8">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-700">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-cyan-700 dark:text-cyan-300">
                     Profile Snapshot
                   </p>
-                  <h3 className="mt-2 text-3xl font-bold text-slate-950">
+                  <h3 className="mt-2 text-3xl font-bold text-slate-950 dark:text-white">
                     Account overview
                   </h3>
                 </div>

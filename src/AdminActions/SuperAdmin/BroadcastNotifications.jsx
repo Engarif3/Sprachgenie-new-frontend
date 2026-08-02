@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../../axios";
 import Button from "../../components/UI/Button";
 import PageHeader from "../../components/UI/PageHeader";
@@ -257,12 +257,11 @@ const BroadcastNotifications = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-8">
+    <div className="min-h-screen bg-slate-50 p-8 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <PageHeader
-            surface="dark"
             title="Broadcast Notifications"
             subtitle="Send an announcement that every user will see as a notification"
           />
@@ -270,29 +269,33 @@ const BroadcastNotifications = () => {
 
         {/* Messages */}
         {error && (
-          <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg text-red-200">
+          <div className="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg text-red-700 dark:bg-red-900/30 dark:border-red-700 dark:text-red-200">
             {error}
           </div>
         )}
         {success && (
-          <div className="mb-6 p-4 bg-green-900/30 border border-green-700 rounded-lg text-green-200">
+          <div className="mb-6 p-4 bg-green-50 border border-green-300 rounded-lg text-green-700 dark:bg-green-900/30 dark:border-green-700 dark:text-green-200">
             {success}
           </div>
         )}
 
         {/* Settings */}
-        <div className="bg-gray-800/50 rounded-lg p-8 mb-8 border border-gray-700">
-          <h2 className="text-xl font-bold text-white mb-4">⚙️ Settings</h2>
+        <div className="rounded-lg border border-slate-200 bg-white p-8 mb-8 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
+            ⚙️ Settings
+          </h2>
 
           {settingsLoading ? (
-            <p className="text-gray-400">Loading settings...</p>
+            <p className="text-slate-500 dark:text-gray-400">
+              Loading settings...
+            </p>
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                   <label
                     htmlFor="notification-retention-days"
-                    className="block text-white font-semibold mb-2"
+                    className="block text-slate-800 dark:text-white font-semibold mb-2"
                   >
                     Auto-delete after (days)
                   </label>
@@ -302,9 +305,9 @@ const BroadcastNotifications = () => {
                     min="1"
                     value={retentionDaysInput}
                     onChange={(e) => setRetentionDaysInput(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                    className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   />
-                  <label className="mt-2 flex items-center gap-2 text-sm text-gray-400">
+                  <label className="mt-2 flex items-center gap-2 text-sm text-slate-500 dark:text-gray-400">
                     <input
                       type="checkbox"
                       checked={autoDeleteEnabled}
@@ -318,7 +321,7 @@ const BroadcastNotifications = () => {
                 <div>
                   <label
                     htmlFor="notification-display-limit"
-                    className="block text-white font-semibold mb-2"
+                    className="block text-slate-800 dark:text-white font-semibold mb-2"
                   >
                     Notifications shown to users
                   </label>
@@ -328,9 +331,9 @@ const BroadcastNotifications = () => {
                     min="1"
                     value={displayLimitInput}
                     onChange={(e) => setDisplayLimitInput(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                    className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   />
-                  <p className="mt-2 text-sm text-gray-400">
+                  <p className="mt-2 text-sm text-slate-500 dark:text-gray-400">
                     Only the most recent {displayLimitInput || "N"} broadcasts
                     appear in a user's inbox. Older ones stay here for you to
                     manage until they auto-delete.
@@ -340,7 +343,6 @@ const BroadcastNotifications = () => {
 
               <Button
                 type="button"
-                surface="dark"
                 onClick={handleSaveSettings}
                 disabled={savingSettings}
               >
@@ -353,12 +355,12 @@ const BroadcastNotifications = () => {
         {/* Composer */}
         <form
           onSubmit={handleBroadcast}
-          className="bg-gray-800/50 rounded-lg p-8 mb-8 border border-gray-700"
+          className="rounded-lg border border-slate-200 bg-white p-8 mb-8 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none"
         >
           <div className="mb-6">
             <label
               htmlFor="notification-topic"
-              className="block text-white font-semibold mb-2"
+              className="block text-slate-800 dark:text-white font-semibold mb-2"
             >
               Topic *
             </label>
@@ -368,7 +370,7 @@ const BroadcastNotifications = () => {
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               placeholder="e.g. New feature: AI-generated stories"
-              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+              className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
               required
             />
           </div>
@@ -376,7 +378,7 @@ const BroadcastNotifications = () => {
           <div className="mb-6">
             <label
               htmlFor="notification-message"
-              className="block text-white font-semibold mb-2"
+              className="block text-slate-800 dark:text-white font-semibold mb-2"
             >
               Message *
             </label>
@@ -385,7 +387,7 @@ const BroadcastNotifications = () => {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Write the announcement..."
-              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 resize-none"
+              className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 resize-none dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
               rows="4"
               required
             />
@@ -394,7 +396,7 @@ const BroadcastNotifications = () => {
           <div className="mb-6">
             <label
               htmlFor="notification-link"
-              className="block text-white font-semibold mb-2"
+              className="block text-slate-800 dark:text-white font-semibold mb-2"
             >
               Link (optional)
             </label>
@@ -404,26 +406,28 @@ const BroadcastNotifications = () => {
               value={link}
               onChange={(e) => setLink(e.target.value)}
               placeholder="https://... or /stories/some-story-id"
-              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+              className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
             />
-            <p className="text-gray-400 text-sm mt-1">
+            <p className="text-slate-500 dark:text-gray-400 text-sm mt-1">
               If set, users will see a "Discover now →" button that takes
               them straight there. Leave empty to hide it.
             </p>
           </div>
 
-          <Button type="submit" surface="dark" disabled={broadcasting} fullWidth size="lg">
+          <Button type="submit" disabled={broadcasting} fullWidth size="lg">
             {broadcasting ? "Broadcasting..." : "📢 Broadcast to All Users"}
           </Button>
         </form>
 
         {/* Broadcast history */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-          <h2 className="text-2xl font-bold text-white">Broadcast History</h2>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+            Broadcast History
+          </h2>
 
           {notifications.length > 0 && (
             <div className="flex flex-wrap items-center gap-3">
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-300">
+              <label className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-gray-300">
                 <input
                   type="checkbox"
                   checked={allSelected}
@@ -451,7 +455,7 @@ const BroadcastNotifications = () => {
               <button
                 type="button"
                 onClick={() => openDeleteConfirm({ type: "all" })}
-                className="rounded-lg border border-red-700 px-4 py-1.5 text-sm font-semibold text-red-400 transition hover:bg-red-900/30"
+                className="rounded-lg border border-red-300 px-4 py-1.5 text-sm font-semibold text-red-600 transition hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30"
               >
                 Delete All
               </button>
@@ -460,11 +464,11 @@ const BroadcastNotifications = () => {
         </div>
 
         {loading ? (
-          <p className="text-gray-400 text-center py-8">
+          <p className="text-slate-500 dark:text-gray-400 text-center py-8">
             Loading notifications...
           </p>
         ) : notifications.length === 0 ? (
-          <p className="text-gray-400 text-center py-8">
+          <p className="text-slate-500 dark:text-gray-400 text-center py-8">
             No notifications broadcast yet.
           </p>
         ) : (
@@ -475,7 +479,7 @@ const BroadcastNotifications = () => {
                 className={`flex items-start gap-3 rounded-lg border p-6 transition-colors ${
                   selectedIds.has(notification.id)
                     ? "border-orange-500/60 bg-orange-500/10"
-                    : "border-gray-700 bg-gray-800/50"
+                    : "border-slate-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none"
                 }`}
               >
                 <input
@@ -487,18 +491,18 @@ const BroadcastNotifications = () => {
                 />
                 <div className="flex flex-1 items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-lg font-bold text-white mb-1">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
                       {notification.topic}
                     </h3>
-                    <p className="text-gray-300 whitespace-pre-wrap mb-2">
+                    <p className="text-slate-600 dark:text-gray-300 whitespace-pre-wrap mb-2">
                       {notification.message}
                     </p>
                     {notification.link && (
-                      <p className="text-sm text-orange-400 mb-2 truncate">
+                      <p className="text-sm text-orange-600 dark:text-orange-400 mb-2 truncate">
                         🔗 {notification.link}
                       </p>
                     )}
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-slate-400 dark:text-gray-500">
                       Broadcast {formatDate(notification.createdAt)}
                       {notification.creator?.name &&
                         ` by ${notification.creator.name}`}

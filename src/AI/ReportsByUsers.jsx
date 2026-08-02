@@ -221,7 +221,7 @@ const ReportsByUsers = () => {
 
     if (!user) {
       return (
-        <div className="text-gray-500 text-sm">
+        <div className="text-slate-400 dark:text-gray-500 text-sm">
           <span className="italic">{userId.substring(0, 8)}...</span>
         </div>
       );
@@ -229,10 +229,12 @@ const ReportsByUsers = () => {
 
     return (
       <div className="flex items-center justify-between gap-2">
-        <strong className="text-white text-sm">{user.name || "Unknown"}</strong>
+        <strong className="text-slate-900 dark:text-white text-sm">
+          {user.name || "Unknown"}
+        </strong>
         <button
           onClick={() => setSelectedUser(user)}
-          className="text-cyan-400 text-xs underline hover:text-cyan-300 shrink-0"
+          className="text-cyan-600 hover:text-cyan-500 dark:text-cyan-400 dark:hover:text-cyan-300 text-xs underline shrink-0"
         >
           View ID
         </button>
@@ -464,7 +466,7 @@ const ReportsByUsers = () => {
   // loading state
   if (loading)
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
         <ScaleLoader
           color="oklch(0.5 0.134 242.749)"
           loading={loading}
@@ -476,8 +478,8 @@ const ReportsByUsers = () => {
     );
   if (error)
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
-        <p className="text-red-400 text-lg">{error}</p>
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+        <p className="text-red-600 dark:text-red-400 text-lg">{error}</p>
       </div>
     );
 
@@ -486,22 +488,26 @@ const ReportsByUsers = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4 md:p-8">
+    <div className="min-h-screen bg-slate-50 p-4 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 md:p-8">
       <div className="max-w-5xl mx-auto">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
+          <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-cyan-400 dark:to-blue-500 mb-2">
             AI Paragraph Reports
           </h1>
-          <p className="text-gray-400 text-sm">
+          <p className="text-slate-500 dark:text-gray-400 text-sm">
             Words flagged by users for incorrect AI-generated paragraphs.
           </p>
         </div>
 
         {isSuperAdmin && (
-          <div className="bg-gray-800/50 rounded-lg p-6 mb-6 border border-gray-700">
-            <h2 className="text-lg font-bold text-white mb-4">📋 Report Reasons</h2>
+          <div className="rounded-lg border border-slate-200 bg-white p-6 mb-6 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+              📋 Report Reasons
+            </h2>
             {reasonsLoading ? (
-              <p className="text-gray-400 text-sm">Loading...</p>
+              <p className="text-slate-500 dark:text-gray-400 text-sm">
+                Loading...
+              </p>
             ) : (
               <>
                 <div className="space-y-2 mb-4">
@@ -509,13 +515,13 @@ const ReportsByUsers = () => {
                     editingReasonId === reason.id ? (
                       <div
                         key={reason.id}
-                        className="flex flex-wrap items-center gap-2 rounded-lg border border-gray-600 bg-gray-900/60 p-3"
+                        className="flex flex-wrap items-center gap-2 rounded-lg border border-slate-300 bg-slate-50 p-3 dark:border-gray-600 dark:bg-gray-900/60"
                       >
                         <input
                           type="text"
                           value={editReasonLabel}
                           onChange={(e) => setEditReasonLabel(e.target.value)}
-                          className="flex-1 min-w-[160px] px-3 py-1.5 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-500"
+                          className="flex-1 min-w-[160px] px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:border-cyan-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                         />
                         <button
                           onClick={handleSaveReason}
@@ -525,7 +531,7 @@ const ReportsByUsers = () => {
                         </button>
                         <button
                           onClick={closeEditReason}
-                          className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-xs font-semibold rounded-lg transition"
+                          className="px-3 py-1.5 bg-gray-500 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 text-white text-xs font-semibold rounded-lg transition"
                         >
                           Cancel
                         </button>
@@ -533,9 +539,11 @@ const ReportsByUsers = () => {
                     ) : (
                       <div
                         key={reason.id}
-                        className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-gray-700 bg-gray-900/40 p-3"
+                        className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-gray-700 dark:bg-gray-900/40"
                       >
-                        <span className="text-sm text-white">{reason.label}</span>
+                        <span className="text-sm text-slate-800 dark:text-white">
+                          {reason.label}
+                        </span>
                         <div className="flex gap-2">
                           <button
                             onClick={() => openEditReason(reason)}
@@ -554,20 +562,22 @@ const ReportsByUsers = () => {
                     ),
                   )}
                   {reasons.length === 0 && (
-                    <p className="text-gray-500 text-sm">No reasons yet.</p>
+                    <p className="text-slate-400 dark:text-gray-500 text-sm">
+                      No reasons yet.
+                    </p>
                   )}
                 </div>
 
                 <form
                   onSubmit={handleAddReason}
-                  className="flex flex-wrap items-center gap-2 border-t border-gray-700 pt-4"
+                  className="flex flex-wrap items-center gap-2 border-t border-slate-200 dark:border-gray-700 pt-4"
                 >
                   <input
                     type="text"
                     value={newReasonLabel}
                     onChange={(e) => setNewReasonLabel(e.target.value)}
                     placeholder='e.g. "Wrong meaning"'
-                    className="flex-1 min-w-[200px] px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:border-cyan-500"
+                    className="flex-1 min-w-[200px] px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:border-cyan-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                   />
                   <button
                     type="submit"
@@ -582,13 +592,17 @@ const ReportsByUsers = () => {
         )}
 
         {isSuperAdmin && (
-          <div className="bg-gray-800/50 rounded-lg p-6 mb-8 border border-gray-700">
-            <h2 className="text-lg font-bold text-white mb-4">⚙️ Note Field Settings</h2>
+          <div className="rounded-lg border border-slate-200 bg-white p-6 mb-8 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+              ⚙️ Note Field Settings
+            </h2>
             {settingsLoading ? (
-              <p className="text-gray-400 text-sm">Loading...</p>
+              <p className="text-slate-500 dark:text-gray-400 text-sm">
+                Loading...
+              </p>
             ) : (
               <>
-                <label className="flex items-center gap-2 mb-4 text-sm text-gray-300">
+                <label className="flex items-center gap-2 mb-4 text-sm text-slate-600 dark:text-gray-300">
                   <input
                     type="checkbox"
                     checked={freeTextEnabled}
@@ -600,7 +614,7 @@ const ReportsByUsers = () => {
                 <div className="mb-4 max-w-xs">
                   <label
                     htmlFor="paragraph-max-characters-input"
-                    className="block text-white font-semibold mb-2 text-sm"
+                    className="block text-slate-800 dark:text-white font-semibold mb-2 text-sm"
                   >
                     Max characters in note
                   </label>
@@ -611,7 +625,7 @@ const ReportsByUsers = () => {
                     value={maxCharactersInput}
                     onChange={(e) => setMaxCharactersInput(e.target.value)}
                     disabled={!freeTextEnabled}
-                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-cyan-500 disabled:opacity-50"
+                    className="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:border-cyan-500 disabled:opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   />
                 </div>
                 <button
@@ -642,7 +656,7 @@ const ReportsByUsers = () => {
               Delete All Regenerated Reports
             </button>
 
-            <label className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/60 text-sm text-gray-300">
+            <label className="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-slate-100 text-sm text-slate-600 dark:border-gray-700 dark:bg-gray-800/60 dark:text-gray-300">
               <input
                 type="checkbox"
                 checked={allWordsSelected}
@@ -665,7 +679,7 @@ const ReportsByUsers = () => {
         )}
 
         {reports.length === 0 && (
-          <p className="text-center text-2xl text-gray-400 mt-12 mb-8">
+          <p className="text-center text-2xl text-slate-400 dark:text-gray-400 mt-12 mb-8">
             No reports found.
           </p>
         )}
@@ -674,9 +688,9 @@ const ReportsByUsers = () => {
           {reports.map((r) => (
             <div
               key={r.wordId}
-              className="rounded-2xl border border-gray-700 bg-gray-800/60 overflow-hidden"
+              className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden dark:border-gray-700 dark:bg-gray-800/60 dark:shadow-none"
             >
-              <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-gray-700">
+              <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-slate-200 dark:border-gray-700">
                 <div className="flex items-center gap-3">
                   {isSuperAdmin && (
                     <input
@@ -687,8 +701,10 @@ const ReportsByUsers = () => {
                       title="Select this word to delete all its reports"
                     />
                   )}
-                  <span className="text-lg font-bold text-white">{r.word}</span>
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
+                  <span className="text-lg font-bold text-slate-900 dark:text-white">
+                    {r.word}
+                  </span>
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-300 dark:bg-red-500/20 dark:text-red-300 dark:border-red-500/30">
                     {r.reportCount} report{r.reportCount !== 1 ? "s" : ""}
                   </span>
                 </div>
@@ -715,7 +731,7 @@ const ReportsByUsers = () => {
                 </button>
               </div>
 
-              <div className="divide-y divide-gray-700/60">
+              <div className="divide-y divide-slate-200 dark:divide-gray-700/60">
                 {r.reports.map((rep, i) => (
                   <div key={rep.id ?? i} className="flex items-start gap-3 px-5 py-3">
                     <div className="min-w-0 flex-1">
@@ -725,7 +741,7 @@ const ReportsByUsers = () => {
                           {rep.reasons.map((reason) => (
                             <span
                               key={reason.id}
-                              className="rounded-full bg-cyan-500/20 border border-cyan-500/40 px-2 py-0.5 text-[11px] text-cyan-300"
+                              className="rounded-full bg-cyan-100 border border-cyan-300 px-2 py-0.5 text-[11px] text-cyan-700 dark:bg-cyan-500/20 dark:border-cyan-500/40 dark:text-cyan-300"
                             >
                               {reason.label}
                             </span>
@@ -735,18 +751,18 @@ const ReportsByUsers = () => {
                       <div className="mt-1 flex items-start justify-between gap-2">
                         {rep.message.length > 60 ? (
                           <>
-                            <p className="text-sm text-gray-300 italic truncate">
+                            <p className="text-sm text-slate-600 dark:text-gray-300 italic truncate">
                               "{rep.message.slice(0, 60)}…"
                             </p>
                             <button
                               onClick={() => setSelectedMessage(rep.message)}
-                              className="shrink-0 text-xs text-cyan-400 hover:text-cyan-300 underline"
+                              className="shrink-0 text-xs text-cyan-600 hover:text-cyan-500 dark:text-cyan-400 dark:hover:text-cyan-300 underline"
                             >
                               View full
                             </button>
                           </>
                         ) : (
-                          <p className="text-sm text-gray-300 italic">
+                          <p className="text-sm text-slate-600 dark:text-gray-300 italic">
                             "{rep.message}"
                           </p>
                         )}

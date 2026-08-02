@@ -255,12 +255,11 @@ const GenerateStory = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-8">
+    <div className="min-h-screen bg-slate-50 p-8 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <PageHeader
-            surface="dark"
             title="Generate German Story"
             subtitle="Create AI-powered German language stories for different proficiency levels"
           />
@@ -270,13 +269,13 @@ const GenerateStory = () => {
         {!preview && (
           <form
             onSubmit={handleGenerateStory}
-            className="bg-gray-800/50 rounded-lg p-8 mb-8 border border-gray-700"
+            className="rounded-lg border border-slate-200 bg-white p-8 mb-8 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none"
           >
             {/* Prompt Input */}
             <div className="mb-6">
               <label
                 htmlFor="generate-story-prompt"
-                className="block text-white font-semibold mb-2"
+                className="block text-slate-800 dark:text-white font-semibold mb-2"
               >
                 Story Prompt *
               </label>
@@ -286,11 +285,11 @@ const GenerateStory = () => {
                 value={formData.prompt}
                 onChange={handleInputChange}
                 placeholder="Describe the story you want to generate (e.g., 'A day in the life of a German student' or 'A family day at the beach')"
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 resize-none"
+                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 resize-none dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                 rows="4"
                 required
               />
-              <p className="text-gray-400 text-sm mt-1">
+              <p className="text-slate-500 dark:text-gray-400 text-sm mt-1">
                 Be specific and descriptive for better results
               </p>
             </div>
@@ -299,7 +298,7 @@ const GenerateStory = () => {
             <div className="mb-6">
               <label
                 htmlFor="generate-story-level"
-                className="block text-white font-semibold mb-2"
+                className="block text-slate-800 dark:text-white font-semibold mb-2"
               >
                 Language Level *
               </label>
@@ -308,7 +307,7 @@ const GenerateStory = () => {
                 name="levelId"
                 value={formData.levelId}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 required
               >
                 <option value="">Select a level</option>
@@ -322,20 +321,20 @@ const GenerateStory = () => {
 
             {/* Error Message */}
             {error && (
-              <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg text-red-200">
+              <div className="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg text-red-700 dark:bg-red-900/30 dark:border-red-700 dark:text-red-200">
                 {error}
               </div>
             )}
 
             {/* Success Message */}
             {success && (
-              <div className="mb-6 p-4 bg-green-900/30 border border-green-700 rounded-lg text-green-200">
+              <div className="mb-6 p-4 bg-green-50 border border-green-300 rounded-lg text-green-700 dark:bg-green-900/30 dark:border-green-700 dark:text-green-200">
                 {success}
               </div>
             )}
 
             {/* Submit Button */}
-            <Button type="submit" surface="dark" disabled={loading} fullWidth size="lg">
+            <Button type="submit" disabled={loading} fullWidth size="lg">
               {loading ? (
                 <>
                   <span className="inline-block animate-spin">⏳</span>
@@ -353,11 +352,11 @@ const GenerateStory = () => {
 
         {/* Preview Section */}
         {preview && (
-          <div className="bg-gray-800/50 rounded-lg p-8 border border-green-700/50 mb-8">
-            <h2 className="text-2xl font-bold text-green-400 mb-6">
+          <div className="rounded-lg border border-green-300 bg-white p-8 mb-8 shadow-sm dark:border-green-700/50 dark:bg-gray-800/50 dark:shadow-none">
+            <h2 className="text-2xl font-bold text-green-600 dark:text-green-400 mb-6">
               Preview - Story Generated! 🎉
             </h2>
-            <p className="text-gray-400 text-sm mb-6">
+            <p className="text-slate-500 dark:text-gray-400 text-sm mb-6">
               You can edit the title, story text, and vocabulary below before
               saving.
             </p>
@@ -366,7 +365,7 @@ const GenerateStory = () => {
             <div className="mb-6">
               <label
                 htmlFor="preview-title"
-                className="block text-white font-semibold mb-2"
+                className="block text-slate-800 dark:text-white font-semibold mb-2"
               >
                 Title
               </label>
@@ -377,9 +376,9 @@ const GenerateStory = () => {
                 onChange={(e) =>
                   handlePreviewFieldChange("title", e.target.value)
                 }
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-xl font-bold focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+                className="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 text-xl font-bold focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
-              <p className="text-gray-400 text-sm mt-2">
+              <p className="text-slate-500 dark:text-gray-400 text-sm mt-2">
                 Level:{" "}
                 {levels.find((l) => l.id === parseInt(formData.levelId))
                   ?.level || "A2"}
@@ -387,10 +386,10 @@ const GenerateStory = () => {
             </div>
 
             {/* Story Description */}
-            <div className="mb-6 bg-gray-700/50 p-6 rounded-lg border border-gray-600">
+            <div className="mb-6 bg-slate-50 p-6 rounded-lg border border-slate-200 dark:bg-gray-700/50 dark:border-gray-600">
               <label
                 htmlFor="preview-description"
-                className="block text-white font-semibold mb-3"
+                className="block text-slate-800 dark:text-white font-semibold mb-3"
               >
                 Story
               </label>
@@ -401,20 +400,20 @@ const GenerateStory = () => {
                   handlePreviewFieldChange("description", e.target.value)
                 }
                 rows={10}
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-gray-200 leading-relaxed focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 resize-y"
+                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-700 leading-relaxed focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 resize-y dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200"
               />
             </div>
 
             {/* Passage Vocabulary */}
             <div className="mb-6">
-              <h4 className="text-white font-semibold mb-3">
+              <h4 className="text-slate-800 dark:text-white font-semibold mb-3">
                 Vocabulary from Story
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {preview.passageVocabulary?.map((item, index) => (
                   <div
                     key={index}
-                    className="p-3 bg-gray-700/50 border border-gray-600 rounded space-y-1"
+                    className="p-3 bg-slate-50 border border-slate-200 rounded space-y-1 dark:bg-gray-700/50 dark:border-gray-600"
                   >
                     <input
                       type="text"
@@ -427,7 +426,7 @@ const GenerateStory = () => {
                           e.target.value,
                         )
                       }
-                      className="w-full bg-transparent text-orange-400 font-semibold focus:outline-none focus:ring-1 focus:ring-orange-500/40 rounded px-1"
+                      className="w-full bg-transparent text-orange-600 dark:text-orange-400 font-semibold focus:outline-none focus:ring-1 focus:ring-orange-500/40 rounded px-1"
                     />
                     <input
                       type="text"
@@ -440,7 +439,7 @@ const GenerateStory = () => {
                           e.target.value,
                         )
                       }
-                      className="w-full bg-transparent text-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500/40 rounded px-1"
+                      className="w-full bg-transparent text-slate-600 dark:text-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-orange-500/40 rounded px-1"
                     />
                   </div>
                 ))}
@@ -449,14 +448,14 @@ const GenerateStory = () => {
 
             {/* General Vocabulary */}
             <div className="mb-6">
-              <h4 className="text-white font-semibold mb-3">
+              <h4 className="text-slate-800 dark:text-white font-semibold mb-3">
                 Additional Vocabulary
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {preview.vocabulary?.map((item, index) => (
                   <div
                     key={index}
-                    className="p-3 bg-gray-700/50 border border-gray-600 rounded space-y-1"
+                    className="p-3 bg-slate-50 border border-slate-200 rounded space-y-1 dark:bg-gray-700/50 dark:border-gray-600"
                   >
                     <input
                       type="text"
@@ -469,7 +468,7 @@ const GenerateStory = () => {
                           e.target.value,
                         )
                       }
-                      className="w-full bg-transparent text-blue-400 font-semibold focus:outline-none focus:ring-1 focus:ring-blue-500/40 rounded px-1"
+                      className="w-full bg-transparent text-blue-600 dark:text-blue-400 font-semibold focus:outline-none focus:ring-1 focus:ring-blue-500/40 rounded px-1"
                     />
                     <input
                       type="text"
@@ -482,7 +481,7 @@ const GenerateStory = () => {
                           e.target.value,
                         )
                       }
-                      className="w-full bg-transparent text-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/40 rounded px-1"
+                      className="w-full bg-transparent text-slate-600 dark:text-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500/40 rounded px-1"
                     />
                   </div>
                 ))}
@@ -490,8 +489,8 @@ const GenerateStory = () => {
             </div>
 
             {/* Photo Upload Section */}
-            <div className="mb-6 bg-gray-700/50 p-6 rounded-lg border border-gray-600">
-              <h4 className="text-white font-semibold mb-4">
+            <div className="mb-6 bg-slate-50 p-6 rounded-lg border border-slate-200 dark:bg-gray-700/50 dark:border-gray-600">
+              <h4 className="text-slate-800 dark:text-white font-semibold mb-4">
                 📸 Upload Photo (Optional)
               </h4>
               {uploadedImage ? (
@@ -504,7 +503,6 @@ const GenerateStory = () => {
                   <Button
                     type="button"
                     variant="danger"
-                    surface="dark"
                     onClick={() => setUploadedImage(null)}
                     fullWidth
                   >
@@ -518,9 +516,9 @@ const GenerateStory = () => {
                     accept="image/*"
                     onChange={handleImageUpload}
                     disabled={uploadingImage}
-                    className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-orange-500 file:text-white hover:file:bg-orange-600 disabled:opacity-50"
+                    className="block w-full text-sm text-slate-600 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-orange-500 file:text-white hover:file:bg-orange-600 disabled:opacity-50"
                   />
-                  <p className="text-gray-400 text-sm">
+                  <p className="text-slate-500 dark:text-gray-400 text-sm">
                     Max 5MB. Formats: JPG, PNG, WebP
                   </p>
                 </div>
@@ -529,14 +527,14 @@ const GenerateStory = () => {
 
             {/* Error Message */}
             {error && (
-              <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg text-red-200">
+              <div className="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg text-red-700 dark:bg-red-900/30 dark:border-red-700 dark:text-red-200">
                 {error}
               </div>
             )}
 
             {/* Success Message */}
             {success && (
-              <div className="mb-6 p-4 bg-green-900/30 border border-green-700 rounded-lg text-green-200">
+              <div className="mb-6 p-4 bg-green-50 border border-green-300 rounded-lg text-green-700 dark:bg-green-900/30 dark:border-green-700 dark:text-green-200">
                 {success}
               </div>
             )}
@@ -547,7 +545,6 @@ const GenerateStory = () => {
                 <>
                   <Button
                     variant="primary"
-                    surface="dark"
                     size="lg"
                     onClick={handleSaveDraft}
                     disabled={loading}
@@ -557,7 +554,6 @@ const GenerateStory = () => {
                   </Button>
                   <Button
                     variant="secondary"
-                    surface="dark"
                     size="lg"
                     onClick={handleRegenerate}
                     disabled={loading}
@@ -571,7 +567,6 @@ const GenerateStory = () => {
                   {uploadedImage?.preview && (
                     <Button
                       variant="primary"
-                      surface="dark"
                       size="lg"
                       onClick={() => handleUploadImage(storyId)}
                       disabled={loading || uploadingImage}
@@ -584,7 +579,6 @@ const GenerateStory = () => {
                   )}
                   <Button
                     variant="success"
-                    surface="dark"
                     size="lg"
                     onClick={handlePublish}
                     disabled={loading}
@@ -594,7 +588,6 @@ const GenerateStory = () => {
                   </Button>
                   <Button
                     variant="secondary"
-                    surface="dark"
                     size="lg"
                     onClick={handleRegenerate}
                     disabled={loading}

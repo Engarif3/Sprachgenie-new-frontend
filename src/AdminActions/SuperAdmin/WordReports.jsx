@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../../axios";
 import WordListModal from "../../View/Words/Modals/WordListModal";
 import Button from "../../components/UI/Button";
@@ -313,35 +313,34 @@ const WordReports = () => {
     : [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-8">
+    <div className="min-h-screen bg-slate-50 p-8 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
       <div className="max-w-5xl mx-auto">
         <div className="mb-8">
           <PageHeader
-            surface="dark"
             title="Word Reports"
             subtitle="Manage report reasons, the optional note field, and review words users have flagged."
           />
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg text-red-200">
+          <div className="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg text-red-700 dark:bg-red-900/30 dark:border-red-700 dark:text-red-200">
             {error}
           </div>
         )}
         {success && (
-          <div className="mb-6 p-4 bg-green-900/30 border border-green-700 rounded-lg text-green-200">
+          <div className="mb-6 p-4 bg-green-50 border border-green-300 rounded-lg text-green-700 dark:bg-green-900/30 dark:border-green-700 dark:text-green-200">
             {success}
           </div>
         )}
 
         {/* Reasons management */}
-        <div className="bg-gray-800/50 rounded-lg p-8 mb-8 border border-gray-700">
-          <h2 className="text-xl font-bold text-white mb-4">
+        <div className="rounded-lg border border-slate-200 bg-white p-8 mb-8 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
             📋 Report Reasons
           </h2>
 
           {reasonsLoading ? (
-            <p className="text-gray-400">Loading...</p>
+            <p className="text-slate-500 dark:text-gray-400">Loading...</p>
           ) : (
             <>
               <div className="space-y-2 mb-6">
@@ -349,15 +348,15 @@ const WordReports = () => {
                   editingReasonId === reason.id ? (
                     <div
                       key={reason.id}
-                      className="flex flex-wrap items-center gap-2 rounded-lg border border-gray-600 bg-gray-900/60 p-3"
+                      className="flex flex-wrap items-center gap-2 rounded-lg border border-slate-300 bg-slate-50 p-3 dark:border-gray-600 dark:bg-gray-900/60"
                     >
                       <input
                         type="text"
                         value={editReasonLabel}
                         onChange={(e) => setEditReasonLabel(e.target.value)}
-                        className="flex-1 min-w-[160px] px-3 py-1.5 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-orange-500"
+                        className="flex-1 min-w-[160px] px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                       />
-                      <label className="flex items-center gap-1.5 text-xs text-gray-300">
+                      <label className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-gray-300">
                         <input
                           type="checkbox"
                           checked={editReasonRequiresSentence}
@@ -370,7 +369,6 @@ const WordReports = () => {
                       </label>
                       <Button
                         variant="success"
-                        surface="dark"
                         size="sm"
                         onClick={handleSaveReason}
                       >
@@ -378,7 +376,6 @@ const WordReports = () => {
                       </Button>
                       <Button
                         variant="secondary"
-                        surface="dark"
                         size="sm"
                         onClick={closeEditReason}
                       >
@@ -388,12 +385,12 @@ const WordReports = () => {
                   ) : (
                     <div
                       key={reason.id}
-                      className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-gray-700 bg-gray-900/40 p-3"
+                      className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-gray-700 dark:bg-gray-900/40"
                     >
-                      <span className="text-sm text-white">
+                      <span className="text-sm text-slate-800 dark:text-white">
                         {reason.label}
                         {reason.requiresSentence && (
-                          <span className="ml-2 rounded-full bg-orange-500/20 border border-orange-500/40 px-2 py-0.5 text-[11px] text-orange-300">
+                          <span className="ml-2 rounded-full bg-orange-100 border border-orange-300 px-2 py-0.5 text-[11px] text-orange-700 dark:bg-orange-500/20 dark:border-orange-500/40 dark:text-orange-300">
                             requires sentence
                           </span>
                         )}
@@ -401,7 +398,6 @@ const WordReports = () => {
                       <div className="flex gap-2">
                         <Button
                           variant="primary"
-                          surface="dark"
                           size="sm"
                           onClick={() => openEditReason(reason)}
                         >
@@ -409,7 +405,6 @@ const WordReports = () => {
                         </Button>
                         <Button
                           variant="danger"
-                          surface="dark"
                           size="sm"
                           onClick={() => handleDeleteReason(reason)}
                         >
@@ -420,22 +415,24 @@ const WordReports = () => {
                   ),
                 )}
                 {reasons.length === 0 && (
-                  <p className="text-gray-500 text-sm">No reasons yet.</p>
+                  <p className="text-slate-400 dark:text-gray-500 text-sm">
+                    No reasons yet.
+                  </p>
                 )}
               </div>
 
               <form
                 onSubmit={handleAddReason}
-                className="flex flex-wrap items-center gap-2 border-t border-gray-700 pt-4"
+                className="flex flex-wrap items-center gap-2 border-t border-slate-200 dark:border-gray-700 pt-4"
               >
                 <input
                   type="text"
                   value={newReasonLabel}
                   onChange={(e) => setNewReasonLabel(e.target.value)}
                   placeholder='e.g. "Spelling mistake"'
-                  className="flex-1 min-w-[200px] px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:border-orange-500"
+                  className="flex-1 min-w-[200px] px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                 />
-                <label className="flex items-center gap-1.5 text-xs text-gray-300">
+                <label className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-gray-300">
                   <input
                     type="checkbox"
                     checked={newReasonRequiresSentence}
@@ -446,24 +443,22 @@ const WordReports = () => {
                   />
                   Requires sentence pick
                 </label>
-                <Button type="submit" surface="dark">
-                  Add Option
-                </Button>
+                <Button type="submit">Add Option</Button>
               </form>
             </>
           )}
         </div>
 
         {/* Settings */}
-        <div className="bg-gray-800/50 rounded-lg p-8 mb-8 border border-gray-700">
-          <h2 className="text-xl font-bold text-white mb-4">
+        <div className="rounded-lg border border-slate-200 bg-white p-8 mb-8 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
             ⚙️ Note Field Settings
           </h2>
           {settingsLoading ? (
-            <p className="text-gray-400">Loading...</p>
+            <p className="text-slate-500 dark:text-gray-400">Loading...</p>
           ) : (
             <>
-              <label className="flex items-center gap-2 mb-4 text-sm text-gray-300">
+              <label className="flex items-center gap-2 mb-4 text-sm text-slate-600 dark:text-gray-300">
                 <input
                   type="checkbox"
                   checked={freeTextEnabled}
@@ -475,7 +470,7 @@ const WordReports = () => {
               <div className="mb-4 max-w-xs">
                 <label
                   htmlFor="max-characters-input"
-                  className="block text-white font-semibold mb-2 text-sm"
+                  className="block text-slate-800 dark:text-white font-semibold mb-2 text-sm"
                 >
                   Max characters in note
                 </label>
@@ -486,7 +481,7 @@ const WordReports = () => {
                   value={maxCharactersInput}
                   onChange={(e) => setMaxCharactersInput(e.target.value)}
                   disabled={!freeTextEnabled}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-orange-500 disabled:opacity-50"
+                  className="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:border-orange-500 disabled:opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 />
               </div>
               <button
@@ -501,14 +496,14 @@ const WordReports = () => {
         </div>
 
         {/* Reported words */}
-        <div className="bg-gray-800/50 rounded-lg p-8 border border-gray-700">
-          <h2 className="text-xl font-bold text-white mb-4">
+        <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
             🚩 Reported Words
           </h2>
 
           {!summaryLoading && summary.length > 0 && (
             <div className="flex flex-wrap items-center gap-3 mb-4">
-              <label className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-700 bg-gray-900/40 text-sm text-gray-300">
+              <label className="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-600 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-300">
                 <input
                   type="checkbox"
                   checked={allWordsSelected}
@@ -536,15 +531,17 @@ const WordReports = () => {
           )}
 
           {summaryLoading ? (
-            <p className="text-gray-400">Loading...</p>
+            <p className="text-slate-500 dark:text-gray-400">Loading...</p>
           ) : summary.length === 0 ? (
-            <p className="text-gray-400">No words have been reported.</p>
+            <p className="text-slate-500 dark:text-gray-400">
+              No words have been reported.
+            </p>
           ) : (
             <div className="space-y-3">
               {summary.map((item) => (
                 <div
                   key={item.wordId}
-                  className="rounded-lg border border-gray-700 bg-gray-900/40"
+                  className="rounded-lg border border-slate-200 bg-slate-50 dark:border-gray-700 dark:bg-gray-900/40"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3 p-4">
                     <div className="flex items-start gap-3">
@@ -560,11 +557,11 @@ const WordReports = () => {
                           type="button"
                           onClick={() => handleOpenWordPreview(item.wordId)}
                           disabled={modalLoading}
-                          className="text-lg font-bold text-blue-400 hover:text-blue-300 hover:underline transition disabled:opacity-50"
+                          className="text-lg font-bold text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 hover:underline transition disabled:opacity-50"
                         >
                           {item.wordValue}
                         </button>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-slate-400 dark:text-gray-500 mt-1">
                           {item.reportCount} report
                           {item.reportCount === 1 ? "" : "s"} · last{" "}
                           {formatDate(item.lastReportedAt)}
@@ -587,7 +584,7 @@ const WordReports = () => {
                             wordId: item.wordId,
                           })
                         }
-                        className="px-3 py-1.5 border border-red-700 text-red-400 hover:bg-red-900/30 text-sm font-semibold rounded-lg transition"
+                        className="px-3 py-1.5 border border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/30 text-sm font-semibold rounded-lg transition"
                       >
                         Delete All
                       </button>
@@ -595,23 +592,25 @@ const WordReports = () => {
                   </div>
 
                   {expandedWordId === item.wordId && (
-                    <div className="border-t border-gray-700 p-4">
+                    <div className="border-t border-slate-200 dark:border-gray-700 p-4">
                       {reportsLoading ? (
-                        <p className="text-gray-400 text-sm">Loading...</p>
+                        <p className="text-slate-500 dark:text-gray-400 text-sm">
+                          Loading...
+                        </p>
                       ) : (
                         <>
                           <div className="space-y-2">
                             {reportsForWord.map((report) => (
                               <div
                                 key={report.id}
-                                className="flex items-start gap-3 rounded-lg border border-gray-700 bg-gray-800/50 p-3"
+                                className="flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800/50"
                               >
                                 <div className="min-w-0 flex-1">
                                   <div className="flex flex-wrap gap-1.5 mb-1">
                                     {report.reasons.map((r) => (
                                       <span
                                         key={r.id}
-                                        className="rounded-full bg-orange-500/20 border border-orange-500/40 px-2 py-0.5 text-[11px] text-orange-300"
+                                        className="rounded-full bg-orange-100 border border-orange-300 px-2 py-0.5 text-[11px] text-orange-700 dark:bg-orange-500/20 dark:border-orange-500/40 dark:text-orange-300"
                                       >
                                         {r.label}
                                       </span>
@@ -619,17 +618,17 @@ const WordReports = () => {
                                   </div>
                                   {report.sentenceIndex !== null &&
                                     report.sentenceIndex !== undefined && (
-                                      <p className="text-xs text-red-300 mb-1">
+                                      <p className="text-xs text-red-600 dark:text-red-300 mb-1">
                                         Flagged sentence #
                                         {report.sentenceIndex + 1}
                                       </p>
                                     )}
                                   {report.message && (
-                                    <p className="text-sm text-gray-300 italic mb-1">
+                                    <p className="text-sm text-slate-600 dark:text-gray-300 italic mb-1">
                                       "{report.message}"
                                     </p>
                                   )}
-                                  <p className="text-xs text-gray-500">
+                                  <p className="text-xs text-slate-400 dark:text-gray-500">
                                     {report.user?.name || report.user?.email} ·{" "}
                                     {formatDate(report.createdAt)}
                                   </p>
@@ -641,7 +640,7 @@ const WordReports = () => {
                                       id: report.id,
                                     })
                                   }
-                                  className="shrink-0 px-2 py-1 text-red-400 hover:bg-red-900/30 text-xs font-semibold rounded-lg transition"
+                                  className="shrink-0 px-2 py-1 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 text-xs font-semibold rounded-lg transition"
                                 >
                                   Delete
                                 </button>

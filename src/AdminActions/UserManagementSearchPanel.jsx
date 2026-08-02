@@ -1,13 +1,13 @@
 const UserManagementSearchPanel = ({ searchTerm, onSearchChange, onClear }) => {
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-lg shadow-slate-200/60 md:p-5">
+    <section className="rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 p-4 shadow-lg shadow-slate-200/60 dark:shadow-none md:p-5">
       <div className="mt-1 px-4">
-        <div className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-3 rounded-lg border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-900/40 p-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-gray-400">
               Search Users
             </p>
-            <p className="mt-1 text-sm text-slate-600">
+            <p className="mt-1 text-sm text-slate-600 dark:text-gray-300">
               Find by user name, email, or ID.
             </p>
           </div>
@@ -17,12 +17,12 @@ const UserManagementSearchPanel = ({ searchTerm, onSearchChange, onClear }) => {
               value={searchTerm}
               onChange={onSearchChange}
               placeholder="Search by name, email, or ID"
-              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
+              className="w-full rounded-lg border border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-900/60 px-4 py-2.5 text-sm text-slate-700 dark:text-white outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
             />
             <button
               type="button"
               onClick={onClear}
-              className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-100"
+              className="rounded-lg border border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-900/60 px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-gray-200 transition hover:border-slate-400 dark:hover:border-gray-500 hover:bg-slate-100 dark:hover:bg-gray-800"
             >
               Clear
             </button>

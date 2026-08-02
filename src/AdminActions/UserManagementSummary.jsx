@@ -1,7 +1,7 @@
 const UserManagementSummary = ({ badge, title, currentFilterLabel, cards }) => {
   return (
-    <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl shadow-slate-200/60">
-      <div className="border-b border-slate-200 bg-slate-900 px-6 py-6 text-white md:px-8">
+    <section className="overflow-hidden rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 shadow-xl shadow-slate-200/60 dark:shadow-none">
+      <div className="border-b border-slate-200 dark:border-gray-700 bg-slate-900 px-6 py-6 text-white md:px-8">
         <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-cyan-200">
           {badge}
         </p>
@@ -31,7 +31,7 @@ const UserManagementSummary = ({ badge, title, currentFilterLabel, cards }) => {
             >
               {card.label}
             </p>
-            <p className="mt-2 text-2xl font-bold text-slate-950">
+            <p className="mt-2 text-2xl font-bold text-slate-950 dark:text-white">
               {card.value}
             </p>
           </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../../axios";
 import PageHeader from "../../components/UI/PageHeader";
 
@@ -52,30 +52,31 @@ const ProfilePhotoSettings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-8">
+    <div className="min-h-screen bg-slate-50 p-8 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <PageHeader
-            surface="dark"
             title="Profile Photo Settings"
             subtitle="Control whether admins and basic users can upload a custom profile photo, or must choose from the preset avatars. Super admins can always upload, regardless of these settings."
           />
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-900/30 border border-red-700 rounded-lg text-red-200">
+          <div className="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg text-red-700 dark:bg-red-900/30 dark:border-red-700 dark:text-red-200">
             {error}
           </div>
         )}
         {success && (
-          <div className="mb-6 p-4 bg-green-900/30 border border-green-700 rounded-lg text-green-200">
+          <div className="mb-6 p-4 bg-green-50 border border-green-300 rounded-lg text-green-700 dark:bg-green-900/30 dark:border-green-700 dark:text-green-200">
             {success}
           </div>
         )}
 
-        <div className="bg-gray-800/50 rounded-lg p-8 border border-gray-700 space-y-8">
+        <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm space-y-8 dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
           {loading ? (
-            <p className="text-gray-400">Loading settings...</p>
+            <p className="text-slate-500 dark:text-gray-400">
+              Loading settings...
+            </p>
           ) : (
             <>
               <label className="flex items-start gap-4 cursor-pointer">
@@ -86,10 +87,10 @@ const ProfilePhotoSettings = () => {
                   className="mt-1 h-5 w-5 accent-orange-500 cursor-pointer"
                 />
                 <span>
-                  <span className="block text-white font-semibold">
+                  <span className="block text-slate-800 dark:text-white font-semibold">
                     Allow admins to upload custom profile photos
                   </span>
-                  <span className="block text-sm text-gray-400 mt-1">
+                  <span className="block text-sm text-slate-500 dark:text-gray-400 mt-1">
                     When turned off, every admin's profile picture falls back
                     to their chosen preset avatar (or their initials if
                     they've never picked one) — this doesn't delete anyone's
@@ -109,10 +110,10 @@ const ProfilePhotoSettings = () => {
                   className="mt-1 h-5 w-5 accent-orange-500 cursor-pointer"
                 />
                 <span>
-                  <span className="block text-white font-semibold">
+                  <span className="block text-slate-800 dark:text-white font-semibold">
                     Allow basic users to upload custom profile photos
                   </span>
-                  <span className="block text-sm text-gray-400 mt-1">
+                  <span className="block text-sm text-slate-500 dark:text-gray-400 mt-1">
                     Same behavior as above, applied independently to basic
                     user accounts.
                   </span>

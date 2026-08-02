@@ -11,15 +11,15 @@ import { getAvatarUrl } from "../utils/avatar";
 const getStatusBadgeClass = (status) => {
   switch (String(status || "").toUpperCase()) {
     case "ACTIVE":
-      return "border-emerald-200 bg-emerald-50 text-emerald-700";
+      return "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300";
     case "PENDING":
-      return "border-amber-200 bg-amber-50 text-amber-700";
+      return "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300";
     case "BLOCKED":
-      return "border-rose-200 bg-rose-50 text-rose-700";
+      return "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300";
     case "DELETED":
-      return "border-slate-200 bg-slate-100 text-slate-700";
+      return "border-slate-200 bg-slate-100 text-slate-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300";
     default:
-      return "border-sky-200 bg-sky-50 text-sky-700";
+      return "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-300";
   }
 };
 
@@ -45,17 +45,19 @@ const UserManagementTable = ({
   const { settings: profileSettings } = useProfileSettings();
 
   const statusFilterMarkup = showFilter ? (
-    <div className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-slate-50 px-8 py-2 md:flex-row md:items-center md:justify-between">
+    <div className="flex flex-col gap-3 rounded-lg border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-900/40 px-8 py-2 md:flex-row md:items-center md:justify-between">
       <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500 dark:text-gray-400">
           Filter
         </p>
-        <h3 className="mt-1 text-lg font-bold text-slate-950">User status</h3>
+        <h3 className="mt-1 text-lg font-bold text-slate-950 dark:text-white">
+          User status
+        </h3>
       </div>
       <div className="flex items-center gap-3">
         <label
           htmlFor={filterId}
-          className="text-sm font-semibold text-slate-700"
+          className="text-sm font-semibold text-slate-700 dark:text-gray-200"
         >
           Status:
         </label>
@@ -63,7 +65,7 @@ const UserManagementTable = ({
           id={filterId}
           value={selectedStatus}
           onChange={(event) => onSelectedStatusChange?.(event.target.value)}
-          className="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
+          className="rounded-xl border border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-900/60 px-3.5 py-2 text-sm font-medium text-slate-700 dark:text-white shadow-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
         >
           <option value="ALL">All</option>
           <option value="ACTIVE">Active</option>
@@ -79,9 +81,9 @@ const UserManagementTable = ({
     <div className="space-y-4">
       {statusFilterMarkup}
 
-      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg shadow-slate-200/60">
+      <div className="overflow-hidden rounded-lg border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 shadow-lg shadow-slate-200/60 dark:shadow-none">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200">
+          <table className="min-w-full divide-y divide-slate-200 dark:divide-gray-700">
             <thead className="bg-slate-900 text-white">
               <tr>
                 <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.18em]">
@@ -109,12 +111,12 @@ const UserManagementTable = ({
                 </th>
               </tr>
             </thead>
-            <tbody className="[&>tr:nth-child(odd)]:bg-gray-200 [&>tr:nth-child(even)]:bg-white">
+            <tbody className="[&>tr:nth-child(odd)]:bg-gray-200 dark:[&>tr:nth-child(odd)]:bg-gray-800/40 [&>tr:nth-child(even)]:bg-white dark:[&>tr:nth-child(even)]:bg-gray-800/70">
               {users.length === 0 ? (
                 <tr>
                   <td
                     colSpan={showPermanentDelete ? 7 : 6}
-                    className="px-4 py-10 text-center text-sm text-slate-500"
+                    className="px-4 py-10 text-center text-sm text-slate-500 dark:text-gray-400"
                   >
                     {emptyStateText}
                   </td>
@@ -129,11 +131,11 @@ const UserManagementTable = ({
                   return (
                     <tr
                       key={user.id}
-                      className="transition-colors hover:bg-slate-50/80"
+                      className="transition-colors hover:bg-slate-50/80 dark:hover:bg-gray-700/60"
                     >
                       <td className="px-4 py-2.5 align-top">
                         <div className="flex items-center gap-2.5">
-                          <div className="mr-2 flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md border border-slate-400 bg-slate-700 text-xs font-bold text-white">
+                          <div className="mr-2 flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md border border-slate-400 dark:border-gray-500 bg-slate-700 text-xs font-bold text-white">
                             {getAvatarUrl(user, profileSettings) ? (
                               <img
                                 src={getAvatarUrl(user, profileSettings)}
@@ -147,13 +149,13 @@ const UserManagementTable = ({
                             )}
                           </div>
                           <div className="min-w-0 max-w-[280px]">
-                            <p className="whitespace-normal break-words text-xs font-semibold leading-5 text-slate-950">
+                            <p className="whitespace-normal break-words text-xs font-semibold leading-5 text-slate-950 dark:text-white">
                               {user.name || "No name"}
                             </p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-3 py-1 text-xs text-slate-700">
+                      <td className="px-3 py-1 text-xs text-slate-700 dark:text-gray-300">
                         <div className="max-w-[260px] whitespace-normal break-all leading-5">
                           {user.email}
                         </div>
@@ -162,7 +164,7 @@ const UserManagementTable = ({
                         <button
                           type="button"
                           onClick={() => onOpenProfile(user)}
-                          className="rounded-lg border border-cyan-200 bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700 transition hover:border-cyan-300 hover:bg-cyan-100 hover:text-cyan-800"
+                          className="rounded-lg border border-cyan-200 dark:border-cyan-500/30 bg-cyan-50 dark:bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-700 dark:text-cyan-300 transition hover:border-cyan-300 dark:hover:border-cyan-400/50 hover:bg-cyan-100 dark:hover:bg-cyan-500/20 hover:text-cyan-800 dark:hover:text-cyan-200"
                         >
                           Profile
                         </button>
@@ -174,7 +176,7 @@ const UserManagementTable = ({
                             onChange={(event) =>
                               onRoleChange?.(user, event.target.value)
                             }
-                            className="rounded-lg border border-slate-300 bg-white px-3 py-1 text-xs font-semibold text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
+                            className="rounded-lg border border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-900/60 px-3 py-1 text-xs font-semibold text-slate-700 dark:text-white outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
                           >
                             {roleOptions.map((roleOption) => (
                               <option key={roleOption} value={roleOption}>
@@ -185,7 +187,7 @@ const UserManagementTable = ({
                             ))}
                           </select>
                         ) : (
-                          <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-700">
+                          <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-700 dark:text-gray-300">
                             {formatRoleLabel(resolvedRole)}
                           </span>
                         )}
@@ -204,7 +206,7 @@ const UserManagementTable = ({
                             onChange={(event) =>
                               onStatusChange(user.id, event.target.value)
                             }
-                            className="rounded-lg border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
+                            className="rounded-lg border border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-900/60 px-3 py-1 text-xs font-medium text-slate-700 dark:text-white outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10"
                           >
                             <option value="ACTIVE">Active</option>
                             <option value="BLOCKED">Blocked</option>
@@ -222,7 +224,7 @@ const UserManagementTable = ({
                               String(user.status || "").toUpperCase() !==
                               "DELETED"
                             }
-                            className="rounded-lg border border-slate-300 bg-white px-3 py-1 text-[11px] font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400"
+                            className="rounded-lg border border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-900/60 px-3 py-1 text-[11px] font-semibold text-slate-700 dark:text-gray-200 transition hover:border-slate-400 dark:hover:border-gray-500 hover:bg-slate-100 dark:hover:bg-gray-800 disabled:cursor-not-allowed disabled:border-slate-200 dark:disabled:border-gray-700 disabled:bg-slate-100 dark:disabled:bg-gray-800 disabled:text-slate-400 dark:disabled:text-gray-500"
                             title={
                               String(user.status || "").toUpperCase() ===
                               "DELETED"
@@ -234,13 +236,13 @@ const UserManagementTable = ({
                           </button>
                         </td>
                       )}
-                      <td className="px-3 py-1 text-center text-xs text-slate-700">
+                      <td className="px-3 py-1 text-center text-xs text-slate-700 dark:text-gray-300">
                         <div className="flex items-center gap-1 leading-tight">
-                          <span className="rounded-lg bg-slate-100 px-3 py-1 font-medium text-slate-700">
+                          <span className="rounded-lg bg-slate-100 dark:bg-gray-700 px-3 py-1 font-medium text-slate-700 dark:text-gray-200">
                             {formattedDateTime[0]}
                           </span>
                           <span>-</span>
-                          <span className="rounded-lg bg-emerald-50 px-3 py-1 font-medium text-emerald-700">
+                          <span className="rounded-lg bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 font-medium text-emerald-700 dark:text-emerald-300">
                             {formattedDateTime[1]}
                           </span>
                         </div>

@@ -270,20 +270,24 @@ const ConjugationReportsPage = () => {
   if (!canAccess) return <Navigate to="/" replace />;
 
   return (
-    <div className="max-w-4xl mx-auto p-4 min-h-screen">
-      <h2 className="text-3xl font-bold font-mono text-white my-6 text-center">
+    <div className="max-w-4xl mx-auto p-4 min-h-screen bg-slate-50 dark:bg-transparent">
+      <h2 className="text-3xl font-bold font-mono text-slate-900 dark:text-white my-6 text-center">
         Conjugation Reports
       </h2>
-      <p className="text-center text-gray-400 text-sm mb-8">
+      <p className="text-center text-slate-500 dark:text-gray-400 text-sm mb-8">
         Verbs flagged by users as having incorrect conjugation. Regenerate to
         produce a fresh AI result and clear all reports for that verb.
       </p>
 
       {isSuperAdmin && (
-        <div className="bg-gray-800/60 rounded-2xl p-6 mb-6 border border-gray-700">
-          <h2 className="text-lg font-bold text-white mb-4">📋 Report Reasons</h2>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 mb-6 shadow-sm dark:border-gray-700 dark:bg-gray-800/60 dark:shadow-none">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+            📋 Report Reasons
+          </h2>
           {reasonsLoading ? (
-            <p className="text-gray-400 text-sm">Loading...</p>
+            <p className="text-slate-500 dark:text-gray-400 text-sm">
+              Loading...
+            </p>
           ) : (
             <>
               <div className="space-y-2 mb-4">
@@ -291,13 +295,13 @@ const ConjugationReportsPage = () => {
                   editingReasonId === reason.id ? (
                     <div
                       key={reason.id}
-                      className="flex flex-wrap items-center gap-2 rounded-lg border border-gray-600 bg-gray-900/60 p-3"
+                      className="flex flex-wrap items-center gap-2 rounded-lg border border-slate-300 bg-slate-50 p-3 dark:border-gray-600 dark:bg-gray-900/60"
                     >
                       <input
                         type="text"
                         value={editReasonLabel}
                         onChange={(e) => setEditReasonLabel(e.target.value)}
-                        className="flex-1 min-w-[160px] px-3 py-1.5 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:border-violet-500"
+                        className="flex-1 min-w-[160px] px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:border-violet-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                       />
                       <button
                         onClick={handleSaveReason}
@@ -307,7 +311,7 @@ const ConjugationReportsPage = () => {
                       </button>
                       <button
                         onClick={closeEditReason}
-                        className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-xs font-semibold rounded-lg transition"
+                        className="px-3 py-1.5 bg-gray-500 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 text-white text-xs font-semibold rounded-lg transition"
                       >
                         Cancel
                       </button>
@@ -315,9 +319,11 @@ const ConjugationReportsPage = () => {
                   ) : (
                     <div
                       key={reason.id}
-                      className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-gray-700 bg-gray-900/40 p-3"
+                      className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-gray-700 dark:bg-gray-900/40"
                     >
-                      <span className="text-sm text-white">{reason.label}</span>
+                      <span className="text-sm text-slate-800 dark:text-white">
+                        {reason.label}
+                      </span>
                       <div className="flex gap-2">
                         <button
                           onClick={() => openEditReason(reason)}
@@ -336,20 +342,22 @@ const ConjugationReportsPage = () => {
                   ),
                 )}
                 {reasons.length === 0 && (
-                  <p className="text-gray-500 text-sm">No reasons yet.</p>
+                  <p className="text-slate-400 dark:text-gray-500 text-sm">
+                    No reasons yet.
+                  </p>
                 )}
               </div>
 
               <form
                 onSubmit={handleAddReason}
-                className="flex flex-wrap items-center gap-2 border-t border-gray-700 pt-4"
+                className="flex flex-wrap items-center gap-2 border-t border-slate-200 dark:border-gray-700 pt-4"
               >
                 <input
                   type="text"
                   value={newReasonLabel}
                   onChange={(e) => setNewReasonLabel(e.target.value)}
                   placeholder='e.g. "Wrong haben/sein"'
-                  className="flex-1 min-w-[200px] px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:border-violet-500"
+                  className="flex-1 min-w-[200px] px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:border-violet-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                 />
                 <button
                   type="submit"
@@ -364,13 +372,17 @@ const ConjugationReportsPage = () => {
       )}
 
       {isSuperAdmin && (
-        <div className="bg-gray-800/60 rounded-2xl p-6 mb-6 border border-gray-700">
-          <h2 className="text-lg font-bold text-white mb-4">⚙️ Note Field Settings</h2>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 mb-6 shadow-sm dark:border-gray-700 dark:bg-gray-800/60 dark:shadow-none">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
+            ⚙️ Note Field Settings
+          </h2>
           {settingsLoading ? (
-            <p className="text-gray-400 text-sm">Loading...</p>
+            <p className="text-slate-500 dark:text-gray-400 text-sm">
+              Loading...
+            </p>
           ) : (
             <>
-              <label className="flex items-center gap-2 mb-4 text-sm text-gray-300">
+              <label className="flex items-center gap-2 mb-4 text-sm text-slate-600 dark:text-gray-300">
                 <input
                   type="checkbox"
                   checked={freeTextEnabled}
@@ -382,7 +394,7 @@ const ConjugationReportsPage = () => {
               <div className="mb-4 max-w-xs">
                 <label
                   htmlFor="conjugation-max-characters-input"
-                  className="block text-white font-semibold mb-2 text-sm"
+                  className="block text-slate-800 dark:text-white font-semibold mb-2 text-sm"
                 >
                   Max characters in note
                 </label>
@@ -393,7 +405,7 @@ const ConjugationReportsPage = () => {
                   value={maxCharactersInput}
                   onChange={(e) => setMaxCharactersInput(e.target.value)}
                   disabled={!freeTextEnabled}
-                  className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-violet-500 disabled:opacity-50"
+                  className="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:border-violet-500 disabled:opacity-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 />
               </div>
               <button
@@ -410,7 +422,7 @@ const ConjugationReportsPage = () => {
 
       {isSuperAdmin && reports.length > 0 && (
         <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
-          <label className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-700 bg-gray-800/60 text-sm text-gray-300">
+          <label className="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-slate-100 text-sm text-slate-600 dark:border-gray-700 dark:bg-gray-800/60 dark:text-gray-300">
             <input
               type="checkbox"
               checked={allVerbsSelected}
@@ -437,7 +449,7 @@ const ConjugationReportsPage = () => {
           <ScaleLoader color="oklch(0.5 0.134 242.749)" />
         </div>
       ) : reports.length === 0 ? (
-        <div className="text-center text-gray-500 mt-16 text-lg">
+        <div className="text-center text-slate-400 dark:text-gray-500 mt-16 text-lg">
           No reports yet.
         </div>
       ) : (
@@ -445,7 +457,7 @@ const ConjugationReportsPage = () => {
           {reports.map((item) => (
             <div
               key={item.verb}
-              className="rounded-2xl border border-gray-700 bg-gray-800/60 overflow-hidden"
+              className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden dark:border-gray-700 dark:bg-gray-800/60 dark:shadow-none"
             >
               {/* Row header */}
               <div className="px-5 py-4 space-y-3">
@@ -460,8 +472,10 @@ const ConjugationReportsPage = () => {
                         title="Select this verb to delete all its reports"
                       />
                     )}
-                    <span className="text-xl font-bold text-white">{item.verb}</span>
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
+                    <span className="text-xl font-bold text-slate-900 dark:text-white">
+                      {item.verb}
+                    </span>
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-300 dark:bg-red-500/20 dark:text-red-300 dark:border-red-500/30">
                       {item.reportCount} report{item.reportCount !== 1 ? "s" : ""}
                     </span>
                   </div>
@@ -481,7 +495,7 @@ const ConjugationReportsPage = () => {
                     </button>
                     <button
                       onClick={() => handleToggleExpand(item.verb)}
-                      className="text-sm text-gray-400 hover:text-white transition-colors"
+                      className="text-sm text-slate-500 hover:text-slate-800 dark:text-gray-400 dark:hover:text-white transition-colors"
                     >
                       {expandedVerb === item.verb ? "Hide details" : "View details"}
                     </button>
@@ -500,7 +514,7 @@ const ConjugationReportsPage = () => {
                       }))
                     }
                     placeholder={`Optional: custom instruction for AI (e.g. "Use sein not haben — ${item.verb} is a movement verb")`}
-                    className="flex-1 rounded-lg bg-gray-900 border border-gray-600 text-sm text-white px-3 py-2 placeholder-gray-600 focus:outline-none focus:border-violet-500 resize-none"
+                    className="flex-1 rounded-lg bg-white border border-slate-300 text-sm text-slate-900 px-3 py-2 placeholder-slate-400 focus:outline-none focus:border-violet-500 resize-none dark:bg-gray-900 dark:border-gray-600 dark:text-white dark:placeholder-gray-600"
                   />
                   <button
                     onClick={() => handleRegenerate(item.verb)}
@@ -521,38 +535,47 @@ const ConjugationReportsPage = () => {
 
               {/* Expanded details */}
               {expandedVerb === item.verb && (
-                <div className="border-t border-gray-700 px-5 py-4 space-y-4">
+                <div className="border-t border-slate-200 dark:border-gray-700 px-5 py-4 space-y-4">
                   {/* Current conjugation snapshot */}
                   {item.currentData && (
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-2">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-gray-500 mb-2">
                         Current cached conjugation
                       </p>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
                         {["präsens", "präteritum"].map((tense) => (
-                          <div key={tense} className="rounded-lg bg-gray-900/60 p-3">
-                            <p className="text-violet-300 font-semibold mb-2 capitalize">
+                          <div
+                            key={tense}
+                            className="rounded-lg bg-slate-50 dark:bg-gray-900/60 p-3"
+                          >
+                            <p className="text-violet-700 dark:text-violet-300 font-semibold mb-2 capitalize">
                               {tense === "präsens" ? "Präsens" : "Präteritum"}
                             </p>
                             {(item.currentData[tense] || []).map(({ pronoun, conjugation }) => (
-                              <p key={pronoun} className="text-gray-300 text-xs">
-                                <span className="text-cyan-400">{pronoun}</span>
+                              <p key={pronoun} className="text-slate-600 dark:text-gray-300 text-xs">
+                                <span className="text-cyan-600 dark:text-cyan-400">
+                                  {pronoun}
+                                </span>
                                 {" → "}
                                 {conjugation}
                               </p>
                             ))}
                           </div>
                         ))}
-                        <div className="rounded-lg bg-gray-900/60 p-3">
-                          <p className="text-violet-300 font-semibold mb-2">Perfekt</p>
-                          <p className="text-xs text-amber-300 font-bold mb-1">
+                        <div className="rounded-lg bg-slate-50 dark:bg-gray-900/60 p-3">
+                          <p className="text-violet-700 dark:text-violet-300 font-semibold mb-2">
+                            Perfekt
+                          </p>
+                          <p className="text-xs text-amber-700 dark:text-amber-300 font-bold mb-1">
                             {item.currentData.perfekt?.auxiliary} +{" "}
                             {item.currentData.perfekt?.participleForm}
                           </p>
                           {(item.currentData.perfekt?.conjugations || []).slice(0, 3).map(
                             ({ pronoun, conjugation }) => (
-                              <p key={pronoun} className="text-gray-300 text-xs">
-                                <span className="text-cyan-400">{pronoun}</span>
+                              <p key={pronoun} className="text-slate-600 dark:text-gray-300 text-xs">
+                                <span className="text-cyan-600 dark:text-cyan-400">
+                                  {pronoun}
+                                </span>
                                 {" → "}
                                 {conjugation}
                               </p>
@@ -566,7 +589,7 @@ const ConjugationReportsPage = () => {
                   {/* User reports */}
                   <div>
                     <div className="flex items-center justify-between gap-4 mb-2">
-                      <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-gray-500">
                         User reports
                       </p>
                       {isSuperAdmin && item.reports.length > 0 && (
@@ -583,12 +606,12 @@ const ConjugationReportsPage = () => {
                       {item.reports.map((r) => (
                         <div
                           key={r.id}
-                          className="flex items-start gap-3 rounded-lg bg-gray-900/40 px-3 py-2 text-sm"
+                          className="flex items-start gap-3 rounded-lg bg-slate-50 dark:bg-gray-900/40 px-3 py-2 text-sm"
                         >
-                          <span className="text-gray-500 text-xs mt-0.5 shrink-0">
+                          <span className="text-slate-400 dark:text-gray-500 text-xs mt-0.5 shrink-0">
                             {new Date(r.createdAt).toLocaleDateString()}
                           </span>
-                          <span className="text-gray-400 text-xs">
+                          <span className="text-slate-500 dark:text-gray-400 text-xs">
                             {r.userId ? `User: ${r.userId.slice(0, 8)}…` : "Anonymous"}
                           </span>
                           {r.reasons?.length > 0 && (
@@ -596,7 +619,7 @@ const ConjugationReportsPage = () => {
                               {r.reasons.map((reason) => (
                                 <span
                                   key={reason.id}
-                                  className="rounded-full bg-violet-500/20 border border-violet-500/40 px-2 py-0.5 text-[11px] text-violet-300"
+                                  className="rounded-full bg-violet-100 border border-violet-300 px-2 py-0.5 text-[11px] text-violet-700 dark:bg-violet-500/20 dark:border-violet-500/40 dark:text-violet-300"
                                 >
                                   {reason.label}
                                 </span>
@@ -604,7 +627,7 @@ const ConjugationReportsPage = () => {
                             </span>
                           )}
                           {r.message && (
-                            <span className="text-gray-300 text-xs italic">
+                            <span className="text-slate-600 dark:text-gray-300 text-xs italic">
                               "{r.message}"
                             </span>
                           )}

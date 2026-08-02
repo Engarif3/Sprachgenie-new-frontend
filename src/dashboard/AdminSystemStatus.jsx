@@ -191,18 +191,18 @@ const getUsageTextClass = (value) => {
   const percent = parseUsagePercent(value);
 
   if (percent === null) {
-    return "text-gray-200";
+    return "text-slate-700 dark:text-gray-200";
   }
 
   if (percent >= 85) {
-    return "text-rose-300";
+    return "text-rose-700 dark:text-rose-300";
   }
 
   if (percent >= 65) {
-    return "text-amber-300";
+    return "text-amber-700 dark:text-amber-300";
   }
 
-  return "text-emerald-300";
+  return "text-emerald-700 dark:text-emerald-300";
 };
 
 const getUsageSeverity = (value) => {
@@ -226,13 +226,13 @@ const getUsageSeverity = (value) => {
 const getSeverityBadgeClass = (severity) => {
   switch (severity) {
     case "critical":
-      return "bg-rose-500/20 text-rose-200 border border-rose-500/30";
+      return "bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-200 border border-rose-300 dark:border-rose-500/30";
     case "warning":
-      return "bg-amber-500/20 text-amber-200 border border-amber-500/30";
+      return "bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-200 border border-amber-300 dark:border-amber-500/30";
     case "healthy":
-      return "bg-emerald-500/20 text-emerald-200 border border-emerald-500/30";
+      return "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-500/30";
     default:
-      return "bg-gray-500/20 text-gray-200 border border-gray-500/30";
+      return "bg-slate-200 dark:bg-gray-500/20 text-slate-700 dark:text-gray-200 border border-slate-300 dark:border-gray-500/30";
   }
 };
 
@@ -357,44 +357,44 @@ const MetricProgressCard = ({
   const safePercent = clampPercent(percent);
 
   return (
-    <div className="min-h-[170px] rounded-xl border border-white/10 bg-black/20 p-4">
+    <div className="min-h-[170px] rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm font-medium text-gray-300">{label}</p>
+        <p className="text-sm font-medium text-slate-600 dark:text-gray-300">{label}</p>
         <p className={`text-base font-semibold ${accentClass}`}>
           {Number.isFinite(percent) ? `${safePercent.toFixed(2)}%` : "N/A"}
         </p>
       </div>
 
-      <div className="mt-3 h-3 overflow-hidden rounded-full border border-white/10 bg-slate-800/90">
+      <div className="mt-3 h-3 overflow-hidden rounded-full border border-slate-200 bg-slate-200 dark:border-white/10 dark:bg-slate-800/90">
         <div
           className={`h-full rounded-full ${barClass}`}
           style={{ width: `${safePercent}%` }}
         />
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-3 text-xs text-gray-400">
+      <div className="mt-4 grid grid-cols-3 gap-3 text-xs text-slate-500 dark:text-gray-400">
         <div>
           <p>Used</p>
-          <p className="mt-1 text-sm font-semibold text-white">
+          <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">
             {used || "N/A"}
           </p>
         </div>
         <div>
           <p>Free</p>
-          <p className="mt-1 text-sm font-semibold text-white">
+          <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">
             {free || "N/A"}
           </p>
         </div>
         <div>
           <p>Total</p>
-          <p className="mt-1 text-sm font-semibold text-white">
+          <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">
             {total || "N/A"}
           </p>
         </div>
       </div>
 
       {subtitle ? (
-        <p className="mt-3 text-xs leading-5 text-gray-500">{subtitle}</p>
+        <p className="mt-3 text-xs leading-5 text-slate-400 dark:text-gray-500">{subtitle}</p>
       ) : null}
     </div>
   );
@@ -664,21 +664,21 @@ const AdminSystemStatus = () => {
 
   return (
     <div className="space-y-6 py-8">
-      <div className="max-w-6xl mx-auto rounded-2xl border border-gray-700 bg-gray-900 p-5 shadow-[0_18px_50px_rgba(0,0,0,0.25)]">
+      <div className="max-w-6xl mx-auto rounded-2xl border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5 shadow-[0_18px_50px_rgba(0,0,0,0.25)]">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-700 dark:text-cyan-300">
               Admin Monitoring
             </p>
-            <h1 className="mt-2 text-3xl font-bold text-white">
+            <h1 className="mt-2 text-3xl font-bold text-slate-900 dark:text-white">
               System Status Dashboard
             </h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-400">
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500 dark:text-gray-400">
               Review production system health, database status, rate limits,
               alerts, and operational activity from a single monitoring page.
             </p>
           </div>
-          <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-xs text-gray-300">
+          <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20 px-4 py-3 text-xs text-slate-600 dark:text-gray-300">
             Last health refresh: {formatMetricTimestamp(healthTimestamp)}
           </div>
         </div>
@@ -692,8 +692,8 @@ const AdminSystemStatus = () => {
             onClick={() => setActiveTab(tab.key)}
             className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
               activeTab === tab.key
-                ? "border-cyan-400/50 bg-cyan-500/20 text-cyan-100"
-                : "border-white/10 bg-gray-900 text-gray-400 hover:bg-white/5 hover:text-gray-200"
+                ? "border-cyan-300 dark:border-cyan-400/50 bg-cyan-100 text-cyan-800 dark:bg-cyan-500/20 dark:text-cyan-100"
+                : "border-slate-200 bg-white text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:border-white/10 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-200"
             }`}
           >
             {tab.icon} {tab.label}
@@ -705,46 +705,46 @@ const AdminSystemStatus = () => {
         {activeTab === "overview" && (
         <>
         {/* Response Time Metrics */}
-        <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-6xl mx-auto mt-6">
-          <h2 className="text-2xl font-bold text-white mb-4">
+        <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto dark:bg-gray-900 dark:border-gray-700 dark:shadow-none mt-6">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
             ⏱️ Response Time Metrics
           </h2>
 
           {metricsLoading ? (
-            <p className="text-gray-400">Loading metrics...</p>
+            <p className="text-slate-500 dark:text-gray-400">Loading metrics...</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-                <p className="text-gray-300 text-sm font-medium mb-2">
+              <div className="p-4 bg-blue-100 dark:bg-blue-500/10 border border-blue-300 dark:border-blue-500/30 rounded-lg">
+                <p className="text-slate-600 dark:text-gray-300 text-sm font-medium mb-2">
                   API Server
                 </p>
-                <p className="text-2xl font-bold text-blue-400">
+                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {healthMetrics.apiServer?.responseTime || "N/A"}
                 </p>
               </div>
-              <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                <p className="text-gray-300 text-sm font-medium mb-2">
+              <div className="p-4 bg-green-100 dark:bg-green-500/10 border border-green-300 dark:border-green-500/30 rounded-lg">
+                <p className="text-slate-600 dark:text-gray-300 text-sm font-medium mb-2">
                   Latest DB Ping
                 </p>
-                <p className="text-2xl font-bold text-green-400">
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {healthMetrics.database?.responseTime || "N/A"}
                 </p>
-                <p className="mt-2 text-xs text-gray-500">
+                <p className="mt-2 text-xs text-slate-400 dark:text-gray-500">
                   Simple database ping using a lightweight check
                 </p>
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
                   Checked:{" "}
                   {formatMetricTimestamp(healthMetrics.database?.lastCheck)}
                 </p>
               </div>
-              <div className="p-4 bg-purple-500/10 border border-purple-500/30 rounded-lg">
-                <p className="text-gray-300 text-sm font-medium mb-2">
+              <div className="p-4 bg-purple-100 dark:bg-purple-500/10 border border-purple-300 dark:border-purple-500/30 rounded-lg">
+                <p className="text-slate-600 dark:text-gray-300 text-sm font-medium mb-2">
                   Auth Check
                 </p>
-                <p className="text-2xl font-bold text-purple-400">
+                <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                   {healthMetrics.authService?.responseTime || "N/A"}
                 </p>
-                <p className="mt-2 text-xs text-gray-500">
+                <p className="mt-2 text-xs text-slate-400 dark:text-gray-500">
                   Measures a user lookup used by the auth flow
                 </p>
               </div>
@@ -753,12 +753,14 @@ const AdminSystemStatus = () => {
         </div>
 
         {/* At-a-glance status strip for every system — click a tab above for details */}
-        <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold text-white mb-4">
+        <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto dark:bg-gray-900 dark:border-gray-700 dark:shadow-none">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
             🚦 All Systems
           </h2>
           {!infrastructureStatus ? (
-            <p className="text-gray-400">Loading production system status...</p>
+            <p className="text-slate-500 dark:text-gray-400">
+              Loading production system status...
+            </p>
           ) : (
             <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
               {[
@@ -772,18 +774,18 @@ const AdminSystemStatus = () => {
                   key={item.label}
                   type="button"
                   onClick={() => setActiveTab(item.key)}
-                  className="rounded-lg border border-white/10 bg-black/20 p-3 text-left transition-colors hover:bg-white/5"
+                  className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-left transition-colors hover:bg-slate-100 dark:border-white/10 dark:bg-black/20 dark:hover:bg-white/5"
                 >
-                  <p className="text-xs uppercase tracking-wide text-gray-400">
+                  <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                     {item.label}
                   </p>
                   <p
                     className={`mt-1 text-sm font-bold ${
                       item.status === "UP"
-                        ? "text-emerald-300"
+                        ? "text-emerald-600 dark:text-emerald-300"
                         : item.status === "UNCONFIGURED"
-                          ? "text-gray-400"
-                          : "text-rose-300"
+                          ? "text-slate-500 dark:text-gray-400"
+                          : "text-rose-600 dark:text-rose-300"
                     }`}
                   >
                     {item.status || "Unknown"}
@@ -797,55 +799,55 @@ const AdminSystemStatus = () => {
         )}
 
         {["frontend", "backend", "database", "ai"].includes(activeTab) && (
-        <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-6xl mx-auto">
+        <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto dark:bg-gray-900 dark:border-gray-700 dark:shadow-none">
           <div className="mb-4">
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
               {DASHBOARD_TABS.find((tab) => tab.key === activeTab)?.icon}{" "}
               {DASHBOARD_TABS.find((tab) => tab.key === activeTab)?.label}
             </h2>
-            <p className="mt-2 text-sm text-gray-400">
+            <p className="mt-2 text-sm text-slate-500 dark:text-gray-400">
               Live production status for this system.
             </p>
           </div>
 
           {!infrastructureStatus ? (
-            <p className="text-gray-400">Loading production system status...</p>
+            <p className="text-slate-500 dark:text-gray-400">Loading production system status...</p>
           ) : (
             <div className="space-y-4">
               {activeTab === "frontend" && (
               <>
-              <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-5">
+              <div className="rounded-xl border border-cyan-300 dark:border-cyan-500/30 bg-cyan-100 dark:bg-cyan-500/10 p-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-700 dark:text-cyan-300">
                       Frontend
                     </p>
-                    <h3 className="mt-2 text-xl font-bold text-white">
+                    <h3 className="mt-2 text-xl font-bold text-slate-900 dark:text-white">
                       {infrastructureStatus.frontend?.provider || "Unknown"}
                     </h3>
                   </div>
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-bold ${
                       infrastructureStatus.frontend?.status === "UP"
-                        ? "bg-emerald-500/20 text-emerald-300"
-                        : "bg-rose-500/20 text-rose-300"
+                        ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
+                        : "bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300"
                     }`}
                   >
                     {infrastructureStatus.frontend?.status || "Unknown"}
                   </span>
                 </div>
-                <div className="mt-4 space-y-3 text-sm text-gray-300">
+                <div className="mt-4 space-y-3 text-sm text-slate-600 dark:text-gray-300">
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
-                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                         Public URL
                       </p>
-                      <p className="mt-2 break-all text-sm font-semibold text-white">
+                      <p className="mt-2 break-all text-sm font-semibold text-slate-900 dark:text-white">
                         {infrastructureStatus.frontend?.publicUrl || "N/A"}
                       </p>
                     </div>
-                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                         Response
                       </p>
                       <p
@@ -859,31 +861,31 @@ const AdminSystemStatus = () => {
                       >
                         {infrastructureStatus.frontend?.responseTime || "N/A"}
                       </p>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
                         {getSeverityLabel(frontendResponseSeverity)} latency
                       </p>
                     </div>
-                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                         Location
                       </p>
-                      <p className="mt-2 text-sm font-semibold text-white">
+                      <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">
                         {DECLARED_SYSTEMS.frontend.location}
                       </p>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
                         Edge delivery near the visitor
                       </p>
                     </div>
-                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                         Build
                       </p>
-                      <p className="mt-2 text-sm font-semibold text-white">
+                      <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">
                         {hasFrontendVersion
                           ? `v${frontendSystemInfo.version}`
                           : "Production build"}
                       </p>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
                         {hasFrontendCommitRef
                           ? `${getShortCommitRef(frontendSystemInfo.commitRef)} commit`
                           : "Metadata unavailable locally"}
@@ -895,7 +897,7 @@ const AdminSystemStatus = () => {
                     <button
                       type="button"
                       onClick={() => toggleSystemDetails("frontend")}
-                      className="rounded-lg border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-xs font-semibold text-cyan-100 transition-colors hover:bg-cyan-500/20"
+                      className="rounded-lg border border-cyan-300 dark:border-cyan-400/30 bg-cyan-100 dark:bg-cyan-500/10 px-4 py-2 text-xs font-semibold text-cyan-800 dark:text-cyan-100 transition-colors hover:bg-cyan-200 dark:hover:bg-cyan-500/20"
                     >
                       {expandedSystems.frontend ? "Show less" : "Show more"}
                     </button>
@@ -903,21 +905,21 @@ const AdminSystemStatus = () => {
 
                   {expandedSystems.frontend ? (
                     <>
-                      <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                      <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 p-4">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                           <div>
-                            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-gray-400">
                               Netlify Delivery
                             </p>
-                            <h4 className="mt-2 text-lg font-semibold text-white">
+                            <h4 className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">
                               {infrastructureStatus.frontend?.provider ||
                                 "Netlify"}
                             </h4>
-                            <p className="mt-1 text-xs leading-6 text-gray-400">
+                            <p className="mt-1 text-xs leading-6 text-slate-500 dark:text-gray-400">
                               Production site delivery for{" "}
                               {DECLARED_SYSTEMS.frontend.primary}
                             </p>
-                            <p className="mt-1 text-xs leading-6 text-gray-500">
+                            <p className="mt-1 text-xs leading-6 text-slate-400 dark:text-gray-500">
                               Last checked{" "}
                               {formatMetricTimestamp(
                                 infrastructureStatus.frontend?.checkedAt,
@@ -934,7 +936,7 @@ const AdminSystemStatus = () => {
                               Edge {getSeverityLabel(frontendResponseSeverity)}
                             </span>
                             {frontendSystemInfo.isLocalEnvironment ? (
-                              <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1 text-[11px] font-semibold text-gray-200">
+                              <span className="rounded-full border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20 px-3 py-1 text-[11px] font-semibold text-slate-700 dark:text-gray-200">
                                 Dashboard opened locally
                               </span>
                             ) : null}
@@ -942,8 +944,8 @@ const AdminSystemStatus = () => {
                         </div>
 
                         <div className="mt-4 grid grid-cols-2 gap-2 text-[11px] sm:grid-cols-4">
-                          <div className="rounded-md border border-white/10 bg-black/20 p-3">
-                            <p className="text-gray-400">Response</p>
+                          <div className="rounded-md border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-black/20">
+                            <p className="text-slate-500 dark:text-gray-400">Response</p>
                             <p
                               className={`mt-1 text-base font-semibold ${getUsageTextClass(
                                 frontendResponseSeverity === "critical"
@@ -956,41 +958,41 @@ const AdminSystemStatus = () => {
                               {infrastructureStatus.frontend?.responseTime ||
                                 "N/A"}
                             </p>
-                            <p className="mt-1 text-[10px] text-gray-500">
+                            <p className="mt-1 text-[10px] text-slate-400 dark:text-gray-500">
                               {getSeverityLabel(frontendResponseSeverity)}{" "}
                               latency
                             </p>
                           </div>
-                          <div className="rounded-md border border-white/10 bg-black/20 p-3">
-                            <p className="text-gray-400">Location</p>
-                            <p className="mt-1 text-base font-semibold text-white">
+                          <div className="rounded-md border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-black/20">
+                            <p className="text-slate-500 dark:text-gray-400">Location</p>
+                            <p className="mt-1 text-base font-semibold text-slate-900 dark:text-white">
                               {DECLARED_SYSTEMS.frontend.location}
                             </p>
-                            <p className="mt-1 text-[10px] text-gray-500">
+                            <p className="mt-1 text-[10px] text-slate-400 dark:text-gray-500">
                               {hasFrontendDeployContext
                                 ? `${frontendSystemInfo.deployContext} deploy`
                                 : "Served from Netlify edge nodes"}
                             </p>
                           </div>
-                          <div className="rounded-md border border-white/10 bg-black/20 p-3">
-                            <p className="text-gray-400">Primary Domain</p>
-                            <p className="mt-1 text-base font-semibold text-white break-all">
+                          <div className="rounded-md border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-black/20">
+                            <p className="text-slate-500 dark:text-gray-400">Primary Domain</p>
+                            <p className="mt-1 text-base font-semibold text-slate-900 dark:text-white break-all">
                               {DECLARED_SYSTEMS.frontend.primary}
                               <br />
                               By {DECLARED_SYSTEMS.frontend.domain}
                             </p>
-                            <p className="mt-1 text-[10px] text-gray-500">
+                            <p className="mt-1 text-[10px] text-slate-400 dark:text-gray-500">
                               Netlify production hostname
                             </p>
                           </div>
-                          <div className="rounded-md border border-white/10 bg-black/20 p-3">
-                            <p className="text-gray-400">Build Version</p>
-                            <p className="mt-1 text-base font-semibold text-white">
+                          <div className="rounded-md border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-black/20">
+                            <p className="text-slate-500 dark:text-gray-400">Build Version</p>
+                            <p className="mt-1 text-base font-semibold text-slate-900 dark:text-white">
                               {hasFrontendVersion
                                 ? `v${frontendSystemInfo.version}`
                                 : "Production build"}
                             </p>
-                            <p className="mt-1 text-[10px] text-gray-500">
+                            <p className="mt-1 text-[10px] text-slate-400 dark:text-gray-500">
                               {hasFrontendCommitRef
                                 ? `${getShortCommitRef(frontendSystemInfo.commitRef)} commit`
                                 : "Build metadata unavailable in local dev"}
@@ -999,23 +1001,23 @@ const AdminSystemStatus = () => {
                         </div>
 
                         <div className="mt-3 grid grid-cols-1 gap-2 text-[11px] sm:grid-cols-2 xl:grid-cols-3">
-                          <div className="rounded-md border border-white/10 bg-black/20 p-3 text-gray-200">
+                          <div className="rounded-md border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-black/20 text-slate-700 dark:text-gray-200">
                             <p>
                               Public URL:{" "}
-                              <span className="font-mono text-white break-all">
+                              <span className="font-mono text-slate-900 dark:text-white break-all">
                                 {infrastructureStatus.frontend?.publicUrl ||
                                   "N/A"}
                               </span>
                             </p>
                             <p className="mt-2">
                               Provider:{" "}
-                              <span className="text-white">
+                              <span className="text-slate-900 dark:text-white">
                                 {infrastructureStatus.frontend?.provider ||
                                   "N/A"}
                               </span>
                             </p>
                             {frontendSystemInfo.isLocalEnvironment ? (
-                              <p className="mt-2 text-gray-400">
+                              <p className="mt-2 text-slate-500 dark:text-gray-400">
                                 This dashboard is open from localhost, but the
                                 monitored frontend target remains the production
                                 site above.
@@ -1025,11 +1027,11 @@ const AdminSystemStatus = () => {
                           {hasFrontendDeployUrl ||
                           hasFrontendBranch ||
                           hasFrontendVersion ? (
-                            <div className="rounded-md border border-white/10 bg-black/20 p-3 text-gray-200">
+                            <div className="rounded-md border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-black/20 text-slate-700 dark:text-gray-200">
                               {hasFrontendDeployUrl ? (
                                 <p>
                                   Deploy URL:{" "}
-                                  <span className="font-mono text-white break-all">
+                                  <span className="font-mono text-slate-900 dark:text-white break-all">
                                     {frontendSystemInfo.deployUrl}
                                   </span>
                                 </p>
@@ -1041,7 +1043,7 @@ const AdminSystemStatus = () => {
                                   }
                                 >
                                   Branch:{" "}
-                                  <span className="text-white">
+                                  <span className="text-slate-900 dark:text-white">
                                     {frontendSystemInfo.branch}
                                   </span>
                                 </p>
@@ -1055,7 +1057,7 @@ const AdminSystemStatus = () => {
                                   }
                                 >
                                   Built:{" "}
-                                  <span className="text-white">
+                                  <span className="text-slate-900 dark:text-white">
                                     {formatMetricTimestamp(
                                       frontendSystemInfo.builtAt,
                                     )}
@@ -1064,7 +1066,7 @@ const AdminSystemStatus = () => {
                               ) : null}
                             </div>
                           ) : null}
-                          <div className="rounded-md border border-white/10 bg-black/20 p-3 text-gray-300">
+                          <div className="rounded-md border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-black/20 text-slate-600 dark:text-gray-300">
                             <p className="leading-6">
                               Netlify exposes site availability and delivery
                               performance, but browser-hosted frontends do not
@@ -1074,7 +1076,7 @@ const AdminSystemStatus = () => {
                           </div>
                         </div>
                       </div>
-                      <p className="text-xs leading-6 text-gray-400">
+                      <p className="text-xs leading-6 text-slate-500 dark:text-gray-400">
                         {infrastructureStatus.frontend?.note}
                       </p>
                     </>
@@ -1086,38 +1088,38 @@ const AdminSystemStatus = () => {
 
               {activeTab === "backend" && (
               <>
-              <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-5">
+              <div className="rounded-xl border border-blue-300 dark:border-blue-500/30 bg-blue-100 dark:bg-blue-500/10 p-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-300">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700 dark:text-blue-300">
                       Backend API
                     </p>
-                    <h3 className="mt-2 text-xl font-bold text-white">
+                    <h3 className="mt-2 text-xl font-bold text-slate-900 dark:text-white">
                       {infrastructureStatus.backend?.provider || "Unknown"}
                     </h3>
                   </div>
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-bold ${
                       infrastructureStatus.backend?.status === "UP"
-                        ? "bg-emerald-500/20 text-emerald-300"
-                        : "bg-rose-500/20 text-rose-300"
+                        ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
+                        : "bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300"
                     }`}
                   >
                     {infrastructureStatus.backend?.status || "Unknown"}
                   </span>
                 </div>
-                <div className="mt-4 space-y-3 text-sm text-gray-300">
+                <div className="mt-4 space-y-3 text-sm text-slate-600 dark:text-gray-300">
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
-                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                         API URL
                       </p>
-                      <p className="mt-2 break-all text-sm font-semibold text-white">
+                      <p className="mt-2 break-all text-sm font-semibold text-slate-900 dark:text-white">
                         {infrastructureStatus.backend?.publicUrl || "N/A"}
                       </p>
                     </div>
-                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                         Response
                       </p>
                       <p
@@ -1131,29 +1133,29 @@ const AdminSystemStatus = () => {
                       >
                         {infrastructureStatus.backend?.responseTime || "N/A"}
                       </p>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
                         {getSeverityLabel(backendResponseSeverity)} latency
                       </p>
                     </div>
-                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                         Memory
                       </p>
-                      <p className="mt-2 text-sm font-semibold text-white">
+                      <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">
                         {backendRuntime?.processMemory?.rss || "N/A"}
                       </p>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
                         RSS memory observed
                       </p>
                     </div>
-                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                         Location
                       </p>
-                      <p className="mt-2 text-sm font-semibold text-white">
+                      <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">
                         {backendLocation}
                       </p>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
                         Node {backendRuntime?.nodeVersion || "N/A"}
                       </p>
                     </div>
@@ -1163,41 +1165,41 @@ const AdminSystemStatus = () => {
                     <button
                       type="button"
                       onClick={() => toggleSystemDetails("backend")}
-                      className="rounded-lg border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-xs font-semibold text-blue-100 transition-colors hover:bg-blue-500/20"
+                      className="rounded-lg border border-blue-300 dark:border-blue-400/30 bg-blue-100 dark:bg-blue-500/10 px-4 py-2 text-xs font-semibold text-blue-800 dark:text-blue-100 transition-colors hover:bg-blue-200 dark:hover:bg-blue-500/20"
                     >
                       {expandedSystems.backend ? "Show less" : "Show more"}
                     </button>
                   </div>
 
                   {expandedSystems.backend && backendRuntime ? (
-                    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                    <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 p-4">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-gray-400">
                             Function Runtime
                           </p>
-                          <h4 className="mt-2 text-lg font-semibold text-white">
+                          <h4 className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">
                             {backendRuntime.provider || "Backend Runtime"}
                           </h4>
-                          <p className="mt-1 text-xs leading-6 text-gray-400">
+                          <p className="mt-1 text-xs leading-6 text-slate-500 dark:text-gray-400">
                             {backendRuntime.runtimeType || "Runtime"} in{" "}
                             {backendRuntime.environment || "unknown"}
                           </p>
                         </div>
 
                         <div className="flex flex-wrap gap-2">
-                          <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1 text-[11px] font-semibold text-gray-200">
+                          <span className="rounded-full border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20 px-3 py-1 text-[11px] font-semibold text-slate-700 dark:text-gray-200">
                             {backendLocation}
                           </span>
-                          <span className="rounded-full border border-blue-500/30 bg-blue-500/20 px-3 py-1 text-[11px] font-semibold text-blue-100">
+                          <span className="rounded-full border border-blue-300 dark:border-blue-500/30 bg-blue-100 dark:bg-blue-500/20 px-3 py-1 text-[11px] font-semibold text-blue-800 dark:text-blue-100">
                             Node {backendRuntime.nodeVersion || "N/A"}
                           </span>
                         </div>
                       </div>
 
                       <div className="mt-4 grid grid-cols-1 gap-3 text-[11px] md:grid-cols-2 xl:grid-cols-3">
-                        <div className="rounded-md border border-white/10 bg-black/20 p-3">
-                          <p className="text-gray-400">Response</p>
+                        <div className="rounded-md border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-black/20">
+                          <p className="text-slate-500 dark:text-gray-400">Response</p>
                           <p
                             className={`mt-1 text-base font-semibold ${getUsageTextClass(
                               backendResponseSeverity === "critical"
@@ -1210,7 +1212,7 @@ const AdminSystemStatus = () => {
                             {infrastructureStatus.backend?.responseTime ||
                               "N/A"}
                           </p>
-                          <p className="mt-1 text-[10px] text-gray-500">
+                          <p className="mt-1 text-[10px] text-slate-400 dark:text-gray-500">
                             {getSeverityLabel(backendResponseSeverity)} latency
                           </p>
                         </div>
@@ -1240,21 +1242,21 @@ const AdminSystemStatus = () => {
                           }
                           subtitle="Used / free / total heap inside the current function instance"
                         />
-                        <div className="rounded-md border border-white/10 bg-black/20 p-3">
-                          <p className="text-gray-400">RSS Memory</p>
-                          <p className="mt-1 text-base font-semibold text-white">
+                        <div className="rounded-md border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-black/20">
+                          <p className="text-slate-500 dark:text-gray-400">RSS Memory</p>
+                          <p className="mt-1 text-base font-semibold text-slate-900 dark:text-white">
                             {backendRuntime.processMemory?.rss || "N/A"}
                           </p>
-                          <p className="mt-1 text-[10px] text-gray-500">
+                          <p className="mt-1 text-[10px] text-slate-400 dark:text-gray-500">
                             Resident process memory
                           </p>
                         </div>
-                        <div className="rounded-md border border-white/10 bg-black/20 p-3">
-                          <p className="text-gray-400">Location</p>
-                          <p className="mt-1 text-base font-semibold text-white">
+                        <div className="rounded-md border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-black/20">
+                          <p className="text-slate-500 dark:text-gray-400">Location</p>
+                          <p className="mt-1 text-base font-semibold text-slate-900 dark:text-white">
                             {backendLocation}
                           </p>
-                          <p className="mt-1 text-[10px] text-gray-500">
+                          <p className="mt-1 text-[10px] text-slate-400 dark:text-gray-500">
                             {backendRuntime.functionUptime ||
                               "Current function instance"}
                           </p>
@@ -1262,37 +1264,37 @@ const AdminSystemStatus = () => {
                       </div>
 
                       <div className="mt-3 grid grid-cols-1 gap-2 text-[11px] sm:grid-cols-2">
-                        <div className="rounded-md border border-white/10 bg-black/20 p-3 text-gray-200">
+                        <div className="rounded-md border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-black/20 text-slate-700 dark:text-gray-200">
                           <p>
                             Deployment:{" "}
-                            <span className="font-mono text-white break-all">
+                            <span className="font-mono text-slate-900 dark:text-white break-all">
                               {backendRuntime.deploymentUrl || "N/A"}
                             </span>
                           </p>
                           <p className="mt-2">
                             Platform:{" "}
-                            <span className="text-white">
+                            <span className="text-slate-900 dark:text-white">
                               {backendRuntime.platform || "N/A"} /{" "}
                               {backendRuntime.arch || "N/A"}
                             </span>
                           </p>
                           <p className="mt-2">
                             Service memory:{" "}
-                            <span className="text-white">
+                            <span className="text-slate-900 dark:text-white">
                               {backendRssMb !== null
                                 ? `${backendRssMb.toFixed(2)} MB observed`
                                 : "N/A"}
                             </span>
                           </p>
                         </div>
-                        <div className="rounded-md border border-white/10 bg-black/20 p-3 text-gray-300">
+                        <div className="rounded-md border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-black/20 text-slate-600 dark:text-gray-300">
                           <p className="leading-6">{backendRuntime.note}</p>
                         </div>
                       </div>
                     </div>
                   ) : null}
                   {expandedSystems.backend ? (
-                    <p className="text-xs leading-6 text-gray-400">
+                    <p className="text-xs leading-6 text-slate-500 dark:text-gray-400">
                       {infrastructureStatus.backend?.note}
                     </p>
                   ) : null}
@@ -1303,13 +1305,13 @@ const AdminSystemStatus = () => {
 
               {activeTab === "database" && (
               <>
-              <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-5">
+              <div className="rounded-xl border border-emerald-300 dark:border-emerald-500/30 bg-emerald-100 dark:bg-emerald-500/10 p-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">
                       Database / VPS
                     </p>
-                    <h3 className="mt-2 text-xl font-bold text-white">
+                    <h3 className="mt-2 text-xl font-bold text-slate-900 dark:text-white">
                       {infrastructureStatus.databaseServer?.provider ||
                         "Unknown"}
                     </h3>
@@ -1318,24 +1320,24 @@ const AdminSystemStatus = () => {
                     className={`rounded-full px-3 py-1 text-xs font-bold ${
                       infrastructureStatus.databaseServer?.databaseStatus ===
                       "UP"
-                        ? "bg-emerald-500/20 text-emerald-300"
-                        : "bg-rose-500/20 text-rose-300"
+                        ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
+                        : "bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300"
                     }`}
                   >
                     {infrastructureStatus.databaseServer?.databaseStatus ||
                       "Unknown"}
                   </span>
                 </div>
-                <div className="mt-4 space-y-3 text-sm text-gray-300">
+                <div className="mt-4 space-y-3 text-sm text-slate-600 dark:text-gray-300">
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-5">
-                    <div className="rounded-lg border border-white/10 bg-black/20 p-4 md:col-span-2">
-                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20 md:col-span-2">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                         Host
                       </p>
-                      <p className="mt-2 break-all text-sm font-semibold text-white">
+                      <p className="mt-2 break-all text-sm font-semibold text-slate-900 dark:text-white">
                         {infrastructureStatus.databaseServer?.host || "N/A"}
                       </p>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
                         {DECLARED_SYSTEMS.database.location} • Infrastructure
                         check{" "}
                         {infrastructureStatus.databaseServer
@@ -1345,20 +1347,20 @@ const AdminSystemStatus = () => {
                           onClick={() =>
                             setIsInfrastructureCheckModalOpen(true)
                           }
-                          className="ml-1 inline-flex rounded-md border border-emerald-400/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-200 transition-colors hover:bg-emerald-500/20"
+                          className="ml-1 inline-flex rounded-md border border-emerald-300 dark:border-emerald-400/30 bg-emerald-100 dark:bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-200 transition-colors hover:bg-emerald-200 dark:hover:bg-emerald-500/20"
                         >
                           More
                         </button>
                       </p>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
                         Checked:{" "}
                         {formatMetricTimestamp(
                           infrastructureStatus.databaseServer?.checkedAt,
                         )}
                       </p>
                     </div>
-                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                         CPU
                       </p>
                       <p
@@ -1366,10 +1368,10 @@ const AdminSystemStatus = () => {
                       >
                         {vpsMetricsData?.cpu?.usagePercent || "N/A"}
                       </p>
-                      <p className="mt-1 text-xs text-gray-500">Host usage</p>
+                      <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">Host usage</p>
                     </div>
-                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                         RAM
                       </p>
                       <p
@@ -1377,15 +1379,15 @@ const AdminSystemStatus = () => {
                       >
                         {vpsMetricsData?.memory?.usagePercent || "N/A"}
                       </p>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
                         {vpsMetricsData?.memory?.used || "N/A"}
                         {vpsMetricsData?.memory?.total
                           ? ` / ${vpsMetricsData.memory.total}`
                           : ""}
                       </p>
                     </div>
-                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                         DB Pressure
                       </p>
                       <p
@@ -1393,7 +1395,7 @@ const AdminSystemStatus = () => {
                       >
                         {vpsMetricsData?.postgres?.usagePercent || "N/A"}
                       </p>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
                         {vpsMetricsData?.postgres?.activeConnections || "N/A"} /{" "}
                         {vpsMetricsData?.postgres?.maxConnections || "N/A"}
                       </p>
@@ -1404,7 +1406,7 @@ const AdminSystemStatus = () => {
                     <button
                       type="button"
                       onClick={() => toggleSystemDetails("database")}
-                      className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-xs font-semibold text-emerald-100 transition-colors hover:bg-emerald-500/20"
+                      className="rounded-lg border border-emerald-300 dark:border-emerald-400/30 bg-emerald-100 dark:bg-emerald-500/10 px-4 py-2 text-xs font-semibold text-emerald-800 dark:text-emerald-100 transition-colors hover:bg-emerald-200 dark:hover:bg-emerald-500/20"
                     >
                       {expandedSystems.database ? "Show less" : "Show more"}
                     </button>
@@ -1413,16 +1415,16 @@ const AdminSystemStatus = () => {
                   {expandedSystems.database &&
                   vpsMetrics?.configured &&
                   vpsMetricsData ? (
-                    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                    <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 p-4">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-gray-400">
                             IONOS Host Overview
                           </p>
-                          <h4 className="mt-2 text-lg font-semibold text-white">
+                          <h4 className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">
                             {vpsMetricsData.server?.hostname || "IONOS VPS"}
                           </h4>
-                          <p className="mt-1 text-xs leading-6 text-gray-400">
+                          <p className="mt-1 text-xs leading-6 text-slate-500 dark:text-gray-400">
                             Last updated{" "}
                             {formatMetricTimestamp(vpsMetrics?.checkedAt)}
                           </p>
@@ -1436,7 +1438,7 @@ const AdminSystemStatus = () => {
                           >
                             {getSeverityLabel(vpsOverallSeverity)}
                           </span>
-                          <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1 text-[11px] font-semibold text-gray-200">
+                          <span className="rounded-full border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20 px-3 py-1 text-[11px] font-semibold text-slate-700 dark:text-gray-200">
                             Endpoint {vpsMetrics.status}
                           </span>
                         </div>
@@ -1574,7 +1576,7 @@ const AdminSystemStatus = () => {
                   {expandedSystems.database &&
                   infrastructureStatus.databaseServer?.vpsMetrics
                     ?.configured ? (
-                    <div className="space-y-3 rounded-lg border border-emerald-500/20 bg-black/10 p-3 text-xs text-emerald-100">
+                    <div className="space-y-3 rounded-lg border border-emerald-300 dark:border-emerald-500/20 bg-emerald-50 dark:bg-black/10 p-3 text-xs text-emerald-800 dark:text-emerald-100">
                       <p>
                         VPS metrics endpoint:{" "}
                         {infrastructureStatus.databaseServer.vpsMetrics.status}
@@ -1589,8 +1591,8 @@ const AdminSystemStatus = () => {
                         .metrics ? (
                         <>
                           <div className="grid grid-cols-2 gap-2 text-[11px] sm:grid-cols-4">
-                            <div className="rounded-md border border-white/10 bg-white/5 p-2">
-                              <p className="text-gray-400">CPU</p>
+                            <div className="rounded-md border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 p-2">
+                              <p className="text-slate-500 dark:text-gray-400">CPU</p>
                               <p
                                 className={`mt-1 text-sm font-semibold ${getUsageTextClass(
                                   infrastructureStatus.databaseServer.vpsMetrics
@@ -1601,9 +1603,9 @@ const AdminSystemStatus = () => {
                                   .metrics?.cpu?.usagePercent || "N/A"}
                               </p>
                             </div>
-                            <div className="rounded-md border border-white/10 bg-white/5 p-2">
-                              <p className="text-gray-400">RAM</p>
-                              <p className="mt-1 text-sm font-semibold text-white">
+                            <div className="rounded-md border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 p-2">
+                              <p className="text-slate-500 dark:text-gray-400">RAM</p>
+                              <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">
                                 {infrastructureStatus.databaseServer.vpsMetrics
                                   .metrics?.memory?.used || "N/A"}
                                 {infrastructureStatus.databaseServer.vpsMetrics
@@ -1614,14 +1616,14 @@ const AdminSystemStatus = () => {
                                     }`
                                   : ""}
                               </p>
-                              <p className="mt-1 text-[10px] text-gray-400">
+                              <p className="mt-1 text-[10px] text-slate-500 dark:text-gray-400">
                                 {infrastructureStatus.databaseServer.vpsMetrics
                                   .metrics?.memory?.usagePercent || "N/A"}
                               </p>
                             </div>
-                            <div className="rounded-md border border-white/10 bg-white/5 p-2">
-                              <p className="text-gray-400">Disk</p>
-                              <p className="mt-1 text-sm font-semibold text-white">
+                            <div className="rounded-md border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 p-2">
+                              <p className="text-slate-500 dark:text-gray-400">Disk</p>
+                              <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">
                                 {infrastructureStatus.databaseServer.vpsMetrics
                                   .metrics?.disk?.used || "N/A"}
                                 {infrastructureStatus.databaseServer.vpsMetrics
@@ -1632,14 +1634,14 @@ const AdminSystemStatus = () => {
                                     }`
                                   : ""}
                               </p>
-                              <p className="mt-1 text-[10px] text-gray-400">
+                              <p className="mt-1 text-[10px] text-slate-500 dark:text-gray-400">
                                 {infrastructureStatus.databaseServer.vpsMetrics
                                   .metrics?.disk?.usagePercent || "N/A"}
                               </p>
                             </div>
-                            <div className="rounded-md border border-white/10 bg-white/5 p-2">
-                              <p className="text-gray-400">Processes</p>
-                              <p className="mt-1 text-sm font-semibold text-white">
+                            <div className="rounded-md border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 p-2">
+                              <p className="text-slate-500 dark:text-gray-400">Processes</p>
+                              <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">
                                 {infrastructureStatus.databaseServer.vpsMetrics
                                   .metrics?.processes?.count || "N/A"}
                               </p>
@@ -1647,14 +1649,14 @@ const AdminSystemStatus = () => {
                           </div>
 
                           <div className="grid grid-cols-1 gap-2 text-[11px] sm:grid-cols-3">
-                            <div className="rounded-md border border-white/10 bg-white/5 p-3 text-gray-200">
-                              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                            <div className="rounded-md border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 p-3 text-slate-700 dark:text-gray-200">
+                              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-gray-400">
                                 Network Usage
                               </p>
                               <div className="mt-2 space-y-1">
                                 <p>
                                   Interface:{" "}
-                                  <span className="font-mono text-white">
+                                  <span className="font-mono text-slate-900 dark:text-white">
                                     {infrastructureStatus.databaseServer
                                       .vpsMetrics.metrics?.network?.interface ||
                                       "N/A"}
@@ -1662,7 +1664,7 @@ const AdminSystemStatus = () => {
                                 </p>
                                 <p>
                                   RX / TX:{" "}
-                                  <span className="text-white">
+                                  <span className="text-slate-900 dark:text-white">
                                     {infrastructureStatus.databaseServer
                                       .vpsMetrics.metrics?.network?.received ||
                                       "N/A"}
@@ -1674,7 +1676,7 @@ const AdminSystemStatus = () => {
                                 </p>
                                 <p>
                                   Rate:{" "}
-                                  <span className="text-white">
+                                  <span className="text-slate-900 dark:text-white">
                                     {infrastructureStatus.databaseServer
                                       .vpsMetrics.metrics?.network
                                       ?.receiveRate || "N/A"}
@@ -1687,8 +1689,8 @@ const AdminSystemStatus = () => {
                               </div>
                             </div>
 
-                            <div className="rounded-md border border-white/10 bg-white/5 p-3 text-gray-200">
-                              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                            <div className="rounded-md border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 p-3 text-slate-700 dark:text-gray-200">
+                              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-gray-400">
                                 PostgreSQL Usage
                               </p>
                               <div className="mt-2 space-y-1">
@@ -1697,7 +1699,7 @@ const AdminSystemStatus = () => {
                                   <>
                                     <p>
                                       Database:{" "}
-                                      <span className="font-mono text-white">
+                                      <span className="font-mono text-slate-900 dark:text-white">
                                         {infrastructureStatus.databaseServer
                                           .vpsMetrics.metrics.postgres
                                           .databaseName || "N/A"}
@@ -1705,7 +1707,7 @@ const AdminSystemStatus = () => {
                                     </p>
                                     <p>
                                       Size:{" "}
-                                      <span className="text-white">
+                                      <span className="text-slate-900 dark:text-white">
                                         {infrastructureStatus.databaseServer
                                           .vpsMetrics.metrics.postgres
                                           .databaseSize || "N/A"}
@@ -1713,7 +1715,7 @@ const AdminSystemStatus = () => {
                                     </p>
                                     <p>
                                       Connections:{" "}
-                                      <span className="text-white">
+                                      <span className="text-slate-900 dark:text-white">
                                         {infrastructureStatus.databaseServer
                                           .vpsMetrics.metrics.postgres
                                           .activeConnections || "N/A"}
@@ -1739,14 +1741,14 @@ const AdminSystemStatus = () => {
                                     </p>
                                   </>
                                 ) : (
-                                  <p className="text-gray-400">
+                                  <p className="text-slate-500 dark:text-gray-400">
                                     PostgreSQL metrics unavailable
                                   </p>
                                 )}
                               </div>
                             </div>
-                            <div className="rounded-md border border-white/10 bg-white/5 p-3 text-gray-200">
-                              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                            <div className="rounded-md border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 p-3 text-slate-700 dark:text-gray-200">
+                              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-gray-400">
                                 Connection Pool (PgBouncer)
                               </p>
                               {infrastructureStatus.databaseServer?.pgBouncer
@@ -1759,15 +1761,15 @@ const AdminSystemStatus = () => {
                                         (infrastructureStatus.databaseServer
                                           .pgBouncer.totalClientsWaiting || 0) >
                                         0
-                                          ? "font-semibold text-amber-300"
-                                          : "font-semibold text-emerald-300"
+                                          ? "font-semibold text-amber-700 dark:text-amber-300"
+                                          : "font-semibold text-emerald-700 dark:text-emerald-300"
                                       }
                                     >
                                       {infrastructureStatus.databaseServer
                                         .pgBouncer.totalClientsWaiting ?? "N/A"}
                                     </span>
                                   </p>
-                                  <div className="space-y-1 text-[10px] text-gray-300">
+                                  <div className="space-y-1 text-[10px] text-slate-600 dark:text-gray-300">
                                     {(
                                       infrastructureStatus.databaseServer
                                         .pgBouncer.pools || []
@@ -1777,7 +1779,7 @@ const AdminSystemStatus = () => {
                                       )
                                       .map((pool) => (
                                         <p key={pool.database}>
-                                          <span className="font-mono text-white">
+                                          <span className="font-mono text-slate-900 dark:text-white">
                                             {pool.database}
                                           </span>
                                           : {pool.clientsActive} client
@@ -1799,7 +1801,7 @@ const AdminSystemStatus = () => {
                                   </div>
                                 </div>
                               ) : (
-                                <p className="mt-2 text-gray-400">
+                                <p className="mt-2 text-slate-500 dark:text-gray-400">
                                   {infrastructureStatus.databaseServer
                                     ?.pgBouncer?.note ||
                                     "PgBouncer stats unavailable"}
@@ -1809,7 +1811,7 @@ const AdminSystemStatus = () => {
                           </div>
                         </>
                       ) : (
-                        <p className="text-gray-300">
+                        <p className="text-slate-600 dark:text-gray-300">
                           Detailed VPS metrics are not available yet.
                         </p>
                       )}
@@ -1818,44 +1820,44 @@ const AdminSystemStatus = () => {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-5">
+              <div className="rounded-xl border border-amber-300 dark:border-amber-500/30 bg-amber-100 dark:bg-amber-500/10 p-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-300">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700 dark:text-amber-300">
                       Redis
                     </p>
-                    <h3 className="mt-2 text-xl font-bold text-white">
+                    <h3 className="mt-2 text-xl font-bold text-slate-900 dark:text-white">
                       Upstash
                     </h3>
                   </div>
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-bold ${
                       infrastructureStatus.redis?.status === "UP"
-                        ? "bg-emerald-500/20 text-emerald-300"
-                        : "bg-rose-500/20 text-rose-300"
+                        ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
+                        : "bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300"
                     }`}
                   >
                     {infrastructureStatus.redis?.status || "Unknown"}
                   </span>
                 </div>
-                <div className="mt-4 space-y-3 text-sm text-gray-300">
+                <div className="mt-4 space-y-3 text-sm text-slate-600 dark:text-gray-300">
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
-                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                         Response
                       </p>
-                      <p className="mt-2 text-xl font-bold text-white">
+                      <p className="mt-2 text-xl font-bold text-slate-900 dark:text-white">
                         {infrastructureStatus.redis?.responseTime || "N/A"}
                       </p>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
                         Backs rate limiting and the word-list cache
                       </p>
                     </div>
-                    <div className="rounded-lg border border-white/10 bg-black/20 p-4 md:col-span-3">
-                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20 md:col-span-3">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                         Word List Cache Hit Rate
                       </p>
-                      <p className="mt-2 text-xl font-bold text-white">
+                      <p className="mt-2 text-xl font-bold text-slate-900 dark:text-white">
                         {infrastructureStatus.redis?.wordListCache
                           ?.hitRatePercent !== null &&
                         infrastructureStatus.redis?.wordListCache
@@ -1863,7 +1865,7 @@ const AdminSystemStatus = () => {
                           ? `${infrastructureStatus.redis.wordListCache.hitRatePercent}%`
                           : "No traffic yet"}
                       </p>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
                         {infrastructureStatus.redis?.wordListCache?.hits ?? 0}{" "}
                         hits /{" "}
                         {infrastructureStatus.redis?.wordListCache?.misses ??
@@ -1880,80 +1882,80 @@ const AdminSystemStatus = () => {
 
               {activeTab === "ai" && (
               <>
-              <div className="rounded-xl border border-violet-500/30 bg-violet-500/10 p-5">
+              <div className="rounded-xl border border-violet-300 dark:border-violet-500/30 bg-violet-100 dark:bg-violet-500/10 p-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-300">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-700 dark:text-violet-300">
                       AI Service
                     </p>
-                    <h3 className="mt-2 text-xl font-bold text-white">
+                    <h3 className="mt-2 text-xl font-bold text-slate-900 dark:text-white">
                       {infrastructureStatus.aiService?.provider || "Unknown"}
                     </h3>
                   </div>
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-bold ${
                       infrastructureStatus.aiService?.status === "UP"
-                        ? "bg-emerald-500/20 text-emerald-300"
+                        ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
                         : infrastructureStatus.aiService?.status ===
                             "UNCONFIGURED"
-                          ? "bg-gray-500/20 text-gray-300"
-                          : "bg-rose-500/20 text-rose-300"
+                          ? "bg-slate-200 dark:bg-gray-500/20 text-slate-600 dark:text-gray-300"
+                          : "bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300"
                     }`}
                   >
                     {infrastructureStatus.aiService?.status || "Unknown"}
                   </span>
                 </div>
-                <div className="mt-4 space-y-3 text-sm text-gray-300">
+                <div className="mt-4 space-y-3 text-sm text-slate-600 dark:text-gray-300">
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
-                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                         Public URL
                       </p>
-                      <p className="mt-2 break-all text-sm font-semibold text-white">
+                      <p className="mt-2 break-all text-sm font-semibold text-slate-900 dark:text-white">
                         {infrastructureStatus.aiService?.publicUrl || "N/A"}
                       </p>
                     </div>
-                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                         Response
                       </p>
-                      <p className="mt-2 text-xl font-bold text-white">
+                      <p className="mt-2 text-xl font-bold text-slate-900 dark:text-white">
                         {infrastructureStatus.aiService?.responseTime ||
                           "N/A"}
                       </p>
                     </div>
-                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                         Database
                       </p>
                       <p
                         className={`mt-2 text-sm font-semibold ${
                           infrastructureStatus.aiService?.database ===
                           "connected"
-                            ? "text-emerald-300"
+                            ? "text-emerald-700 dark:text-emerald-300"
                             : infrastructureStatus.aiService?.database
-                              ? "text-rose-300"
-                              : "text-gray-400"
+                              ? "text-rose-700 dark:text-rose-300"
+                              : "text-slate-500 dark:text-gray-400"
                         }`}
                       >
                         {infrastructureStatus.aiService?.database || "N/A"}
                       </p>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
                         Own database, separate from the main backend
                       </p>
                     </div>
-                    <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-black/20">
+                      <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-gray-400">
                         Checked
                       </p>
-                      <p className="mt-2 text-sm font-semibold text-white">
+                      <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">
                         {infrastructureStatus.aiService?.checkedAt
                           ? new Date(
                               infrastructureStatus.aiService.checkedAt,
                             ).toLocaleTimeString()
                           : "N/A"}
                       </p>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
                         {infrastructureStatus.aiService?.note || ""}
                       </p>
                     </div>
@@ -1970,11 +1972,11 @@ const AdminSystemStatus = () => {
         {activeTab === "backend" && (
         <>
         {/* Database Statistics */}
-        <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-6xl mx-auto mt-6">
-          <h2 className="text-2xl font-bold text-white mb-4">
+        <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto dark:bg-gray-900 dark:border-gray-700 dark:shadow-none mt-6">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
             🗄️ Database Layer Metrics
           </h2>
-          <p className="mb-4 text-sm text-gray-400">
+          <p className="mb-4 text-sm text-slate-500 dark:text-gray-400">
             These metrics come from the backend querying the configured
             database. They represent database connectivity and query
             performance, not the full VPS host resource panel.
@@ -1982,19 +1984,19 @@ const AdminSystemStatus = () => {
           {databaseStats ? (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
-                  <p className="text-gray-400 text-sm mb-3 font-medium">
+                <div className="p-4 bg-slate-50 dark:bg-gray-800/50 border border-slate-200 dark:border-gray-700 rounded-lg">
+                  <p className="text-slate-500 dark:text-gray-400 text-sm mb-3 font-medium">
                     Record Counts
                   </p>
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-gray-300 text-sm">Users</span>
-                        <span className="text-blue-400 font-bold">
+                        <span className="text-slate-600 dark:text-gray-300 text-sm">Users</span>
+                        <span className="text-blue-600 dark:text-blue-400 font-bold">
                           {databaseStats.recordCounts?.users || 0}
                         </span>
                       </div>
-                      <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div className="w-full bg-slate-200 dark:bg-gray-700 rounded-full h-2">
                         <div
                           className="h-2 rounded-full bg-blue-500"
                           style={{
@@ -2006,12 +2008,12 @@ const AdminSystemStatus = () => {
 
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-gray-300 text-sm">Words</span>
-                        <span className="text-green-400 font-bold">
+                        <span className="text-slate-600 dark:text-gray-300 text-sm">Words</span>
+                        <span className="text-green-600 dark:text-green-400 font-bold">
                           {databaseStats.recordCounts?.words || 0}
                         </span>
                       </div>
-                      <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div className="w-full bg-slate-200 dark:bg-gray-700 rounded-full h-2">
                         <div
                           className="h-2 rounded-full bg-green-500"
                           style={{
@@ -2022,21 +2024,21 @@ const AdminSystemStatus = () => {
                     </div>
                   </div>
                 </div>
-                <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
-                  <p className="text-gray-400 text-sm mb-3 font-medium">
+                <div className="p-4 bg-slate-50 dark:bg-gray-800/50 border border-slate-200 dark:border-gray-700 rounded-lg">
+                  <p className="text-slate-500 dark:text-gray-400 text-sm mb-3 font-medium">
                     Performance
                   </p>
                   <div className="space-y-3">
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-gray-300 text-sm">
+                        <span className="text-slate-600 dark:text-gray-300 text-sm">
                           Sample Query Time
                         </span>
                         <span className="text-yellow-400 font-bold">
                           {databaseStats.performance?.queryTime}
                         </span>
                       </div>
-                      <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div className="w-full bg-slate-200 dark:bg-gray-700 rounded-full h-2">
                         <div
                           className={`h-2 rounded-full ${
                             parseInt(
@@ -2054,7 +2056,7 @@ const AdminSystemStatus = () => {
                           }}
                         />
                       </div>
-                      <p className="text-gray-400 text-xs">
+                      <p className="text-slate-500 dark:text-gray-400 text-xs">
                         {parseInt(databaseStats.performance?.queryTime || 0) >
                         100
                           ? "⚠️ Slower sample query"
@@ -2066,32 +2068,32 @@ const AdminSystemStatus = () => {
               </div>
             </div>
           ) : (
-            <p className="text-gray-400">Loading database stats...</p>
+            <p className="text-slate-500 dark:text-gray-400">Loading database stats...</p>
           )}
         </div>
 
         {/* Rate Limiting Status */}
-        <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-6xl mx-auto mt-6">
-          <h2 className="text-2xl font-bold text-white mb-4">
+        <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto dark:bg-gray-900 dark:border-gray-700 dark:shadow-none mt-6">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
             🔄 Rate Limiting Status
           </h2>
           {rateLimitStatus ? (
             <div className="space-y-4">
-              <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                <p className="text-green-300 font-medium">
+              <div className="p-4 bg-green-100 dark:bg-green-500/10 border border-green-300 dark:border-green-500/30 rounded-lg">
+                <p className="text-green-700 dark:text-green-300 font-medium">
                   ✅ Rate Limiting Active
                 </p>
               </div>
 
-              <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
-                <p className="text-gray-400 text-sm font-medium mb-3">
+              <div className="p-4 bg-slate-50 dark:bg-gray-800/50 border border-slate-200 dark:border-gray-700 rounded-lg">
+                <p className="text-slate-500 dark:text-gray-400 text-sm font-medium mb-3">
                   Global Limit
                 </p>
                 <div className="space-y-2">
-                  <p className="text-gray-300 text-sm">
+                  <p className="text-slate-600 dark:text-gray-300 text-sm">
                     {rateLimitStatus.global?.limit}
                   </p>
-                  <div className="flex justify-between text-xs text-gray-400 mb-1">
+                  <div className="flex justify-between text-xs text-slate-500 dark:text-gray-400 mb-1">
                     <span>
                       {rateLimitStatus.global?.current} /{" "}
                       {rateLimitStatus.global?.limit?.split(" ")[0] || "1000"}{" "}
@@ -2099,7 +2101,7 @@ const AdminSystemStatus = () => {
                     </span>
                     <span>Reset in {rateLimitStatus.global?.resetIn}</span>
                   </div>
-                  <div className="w-full bg-gray-700 rounded-full h-2">
+                  <div className="w-full bg-slate-200 dark:bg-gray-700 rounded-full h-2">
                     <div
                       className="h-2 rounded-full bg-blue-500"
                       style={{
@@ -2116,36 +2118,36 @@ const AdminSystemStatus = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
-                  <p className="text-gray-400 text-sm font-medium mb-3">
+                <div className="p-4 bg-slate-50 dark:bg-gray-800/50 border border-slate-200 dark:border-gray-700 rounded-lg">
+                  <p className="text-slate-500 dark:text-gray-400 text-sm font-medium mb-3">
                     Per IP Limit
                   </p>
-                  <p className="text-gray-300 text-sm">
+                  <p className="text-slate-600 dark:text-gray-300 text-sm">
                     {rateLimitStatus.perIP?.limit}
                   </p>
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
                     Window: {rateLimitStatus.perIP?.window || "N/A"}
                   </p>
                 </div>
-                <div className="p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
-                  <p className="text-gray-400 text-sm font-medium mb-3">
+                <div className="p-4 bg-slate-50 dark:bg-gray-800/50 border border-slate-200 dark:border-gray-700 rounded-lg">
+                  <p className="text-slate-500 dark:text-gray-400 text-sm font-medium mb-3">
                     Per User Limit
                   </p>
-                  <p className="text-gray-300 text-sm">
+                  <p className="text-slate-600 dark:text-gray-300 text-sm">
                     {rateLimitStatus.perUser?.limit}
                   </p>
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
                     Window: {rateLimitStatus.perUser?.window || "N/A"}
                   </p>
                 </div>
               </div>
-              <p className="mt-3 text-xs text-gray-500">
+              <p className="mt-3 text-xs text-slate-400 dark:text-gray-500">
                 {rateLimitStatus.backend ||
                   "Per-IP/per-user request counts are enforced server-side but not exposed here to avoid an expensive live scan on every dashboard refresh."}
               </p>
             </div>
           ) : (
-            <p className="text-gray-400">Loading rate limit status...</p>
+            <p className="text-slate-500 dark:text-gray-400">Loading rate limit status...</p>
           )}
         </div>
         </>
@@ -2154,8 +2156,8 @@ const AdminSystemStatus = () => {
         {activeTab === "logs" && (
         <>
         {/* Alert History */}
-        <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-6xl mx-auto mt-6">
-          <h2 className="text-2xl font-bold text-white mb-4">
+        <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto dark:bg-gray-900 dark:border-gray-700 dark:shadow-none mt-6">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
             🚨 Alert History
           </h2>
           {alertHistory.length > 0 ? (
@@ -2168,17 +2170,17 @@ const AdminSystemStatus = () => {
                       ? "bg-red-500/10 border-red-500/30"
                       : alert.severity === "medium"
                         ? "bg-yellow-500/10 border-yellow-500/30"
-                        : "bg-blue-500/10 border-blue-500/30"
+                        : "bg-blue-100 dark:bg-blue-500/10 border-blue-300 dark:border-blue-500/30"
                   }`}
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-gray-300 font-medium text-sm">
+                      <p className="text-slate-600 dark:text-gray-300 font-medium text-sm">
                         {alert.type}
                       </p>
-                      <p className="text-gray-400 text-xs">{alert.message}</p>
+                      <p className="text-slate-500 dark:text-gray-400 text-xs">{alert.message}</p>
                     </div>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-slate-400 dark:text-gray-500">
                       {new Date(alert.timestamp).toLocaleTimeString()}
                     </span>
                   </div>
@@ -2186,13 +2188,13 @@ const AdminSystemStatus = () => {
               ))}
             </div>
           ) : (
-            <p className="text-gray-400">No alerts recorded</p>
+            <p className="text-slate-500 dark:text-gray-400">No alerts recorded</p>
           )}
         </div>
 
         {/* Error Logs */}
-        <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-6xl mx-auto mt-6">
-          <h2 className="text-2xl font-bold text-white mb-4">
+        <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto dark:bg-gray-900 dark:border-gray-700 dark:shadow-none mt-6">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
             ❌ Recent Error Logs
           </h2>
           {errorLogs.length > 0 ? (
@@ -2207,11 +2209,11 @@ const AdminSystemStatus = () => {
                       <p className="text-red-300 font-medium text-sm">
                         {log.service}
                       </p>
-                      <p className="text-gray-400 text-xs font-mono">
+                      <p className="text-slate-500 dark:text-gray-400 text-xs font-mono">
                         {log.error}
                       </p>
                     </div>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-slate-400 dark:text-gray-500">
                       {new Date(log.timestamp).toLocaleTimeString()}
                     </span>
                   </div>
@@ -2219,13 +2221,13 @@ const AdminSystemStatus = () => {
               ))}
             </div>
           ) : (
-            <p className="text-gray-400">No errors recorded</p>
+            <p className="text-slate-500 dark:text-gray-400">No errors recorded</p>
           )}
         </div>
 
         {/* Activity Logs */}
-        <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-6xl mx-auto mt-6">
-          <h2 className="text-2xl font-bold text-white mb-4">
+        <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto dark:bg-gray-900 dark:border-gray-700 dark:shadow-none mt-6">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
             📝 Recent Activity
           </h2>
           {activityLogs.length > 0 ? (
@@ -2233,16 +2235,16 @@ const AdminSystemStatus = () => {
               {activityLogs.map((log, idx) => (
                 <div
                   key={idx}
-                  className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg text-sm"
+                  className="p-3 bg-blue-100 dark:bg-blue-500/10 border border-blue-300 dark:border-blue-500/30 rounded-lg text-sm"
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-blue-300 font-medium">{log.action}</p>
-                      <p className="text-gray-400 text-xs">
+                      <p className="text-blue-700 dark:text-blue-300 font-medium">{log.action}</p>
+                      <p className="text-slate-500 dark:text-gray-400 text-xs">
                         {JSON.stringify(log.details).substring(0, 100)}...
                       </p>
                     </div>
-                    <span className="text-xs text-gray-500 whitespace-nowrap">
+                    <span className="text-xs text-slate-400 dark:text-gray-500 whitespace-nowrap">
                       {new Date(log.timestamp).toLocaleTimeString()}
                     </span>
                   </div>
@@ -2250,21 +2252,21 @@ const AdminSystemStatus = () => {
               ))}
             </div>
           ) : (
-            <p className="text-gray-400">No activity recorded</p>
+            <p className="text-slate-500 dark:text-gray-400">No activity recorded</p>
           )}
         </div>
 
         {/* SSL Certificate Status */}
-        <div className="p-6 bg-gray-900 rounded-xl border border-gray-700 max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold text-white mb-4">
+        <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto dark:bg-gray-900 dark:border-gray-700 dark:shadow-none">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
             🔒 SSL Certificate Status
           </h2>
-          <p className="text-gray-400 text-sm mb-4">
+          <p className="text-slate-500 dark:text-gray-400 text-sm mb-4">
             UptimeRobot monitors your SSL certificate validity and will alert
             you before expiry.
           </p>
-          <div className="p-4 bg-green-500/20 border border-green-500/50 rounded-lg">
-            <p className="text-green-300 font-medium">
+          <div className="p-4 bg-green-100 dark:bg-green-500/20 border border-green-300 dark:border-green-500/50 rounded-lg">
+            <p className="text-green-700 dark:text-green-300 font-medium">
               ✅ SSL is monitored by UptimeRobot
             </p>
           </div>
@@ -2279,30 +2281,30 @@ const AdminSystemStatus = () => {
           onClick={() => setIsInfrastructureCheckModalOpen(false)}
         >
           <div
-            className="w-full max-w-sm rounded-2xl border border-emerald-500/30 bg-gray-900 p-5 shadow-2xl"
+            className="w-full max-w-sm rounded-2xl border border-emerald-300 dark:border-emerald-500/30 bg-white dark:bg-gray-900 p-5 shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">
                   Infrastructure check{" "}
                   {infrastructureStatus.databaseServer?.databaseResponseTime ||
                     "N/A"}{" "}
                 </p>
-                <h3 className="mt-2 text-lg font-semibold text-white">
+                <h3 className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">
                   Infrastructure check
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsInfrastructureCheckModalOpen(false)}
-                className="rounded-md border border-white/10 bg-black/20 px-2 py-1 text-xs font-semibold text-gray-200 transition-colors hover:bg-white/10"
+                className="rounded-md border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20 px-2 py-1 text-xs font-semibold text-slate-700 dark:text-gray-200 transition-colors hover:bg-slate-200 dark:hover:bg-white/10"
               >
                 Close
               </button>
             </div>
 
-            <div className="mt-4 space-y-3 text-sm leading-6 text-gray-300">
+            <div className="mt-4 space-y-3 text-sm leading-6 text-slate-600 dark:text-gray-300">
               <p>
                 Infrastructure check = database response time measured during
                 the full system status check.
