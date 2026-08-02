@@ -13,6 +13,7 @@ export const PART_OF_SPEECH_DISPLAY_ORDER = [
   "conjunction",
   "phrase",
   "pronoun",
+  "prefix",
   "interjection",
   "numeral",
 ];

@@ -137,6 +137,11 @@ const POS_BADGE_CONFIG = {
     className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-fuchsia-300`,
     tooltipText: "Pronoun",
   },
+  prefix: {
+    text: "pfx.",
+    className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-indigo-300`,
+    tooltipText: "Prefix",
+  },
   interjection: {
     text: "intj.",
     className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-orange-300`,
