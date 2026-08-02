@@ -1,5 +1,6 @@
 import api, { publicApi } from "../axios";
 import { useSyncExternalStore } from "react";
+import { invalidateWordsCache } from "../utils/storage";
 
 const FORCED_LOGOUT_NOTICE_KEY = "forcedLogoutNotice";
 const AUTH_SESSION_HINT_KEY = "authSessionHint";
@@ -19,6 +20,18 @@ export const normalizeRole = (role) =>
   String(role || "")
     .trim()
     .toLowerCase();
+
+// The word list's local IndexedDB cache was always safe to share across
+// whoever was logged in, since a hidden level didn't exist yet — every
+// account saw the same word-list response. Now that a response can
+// legitimately differ by role (hidden-level content visible to
+// ADMIN/SUPER_ADMIN, not to anyone else), reusing a cache written by one
+// account for a different one is a real staleness/leak risk — e.g.
+// switching from an admin session to a basic-user session in the same
+// browser would otherwise keep showing the admin's cached, hidden-content-
+// inclusive word list until its 15-minute TTL happened to expire.
+const getIdentityKey = (userInfo) =>
+  userInfo?.id ? `${userInfo.id}:${normalizeRole(userInfo.role)}` : "anonymous";
 
 export const hasAllowedRole = (currentRole, allowedRoles = []) => {
   if (!Array.isArray(allowedRoles) || allowedRoles.length === 0) {
@@ -126,10 +139,23 @@ const writeLogoutInProgress = (isActive) => {
 };
 
 export const storeUserInfo = (userInfo) => {
+  // Called on every successful "/auth/me" resolution — both a fresh login
+  // and every routine background re-sync (tab focus, periodic check) of an
+  // already-logged-in session — so only invalidate the word-list cache
+  // when the resolved identity actually changed, not on every call.
+  const identityChanged =
+    getIdentityKey(authStore.userInfo) !== getIdentityKey(userInfo);
+
   // ✅ Store user metadata in memory (not token)
   writeSessionHint(!!userInfo);
   writeLogoutInProgress(false);
-  return setCachedUserInfo(userInfo);
+  const result = setCachedUserInfo(userInfo);
+
+  if (identityChanged) {
+    void invalidateWordsCache();
+  }
+
+  return result;
 };
 
 export const getUserInfo = () => {
@@ -148,11 +174,20 @@ export const getAuthState = () =>
   createAuthState(authStore.userInfo, authStore.isBootstrapResolved);
 
 export const clearUserInfo = () => {
+  const hadUser = !!authStore.userInfo;
+
   writeSessionHint(false);
   if (typeof window !== "undefined") {
     window.sessionStorage.removeItem("token");
   }
   setCachedUserInfo(null);
+
+  // Going from "logged in as an admin who could see hidden content" to
+  // logged out is also an identity change the word-list cache needs to
+  // reflect immediately — see getIdentityKey.
+  if (hadUser) {
+    void invalidateWordsCache();
+  }
 };
 
 export const hasAuthSessionHint = () =>
