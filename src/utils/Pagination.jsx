@@ -1,4 +1,19 @@
+import {
+  HiChevronDoubleLeft,
+  HiChevronLeft,
+  HiChevronRight,
+  HiChevronDoubleRight,
+} from "react-icons/hi2";
 import { useAuth } from "../services/auth.services";
+
+// One shared style for every nav button so First/Prev/Next/Last are the
+// same fixed-size icon buttons that never appear/disappear or change
+// color — only their disabled state changes at the boundaries. Distinct
+// bright colors + buttons popping in/out of the row (the previous design)
+// is what made "Last" easy to mis-click for "Next": the row's contents
+// shifted position as pages changed instead of staying put.
+const navButtonClass =
+  "flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-full bg-gray-700 text-white transition-all duration-150 hover:bg-gray-600 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:scale-100 disabled:hover:bg-gray-700";
 
 const Pagination = ({
   currentPage,
@@ -10,6 +25,7 @@ const Pagination = ({
   showAction,
 }) => {
   const { isAdmin, isLoggedIn: userLoggedIn } = useAuth();
+
   return (
     // <div className="flex flex-col md:flex-row lg:flex-row justify-between items-center gap-4 md:gap-8 mb-2 mt-6">
     <div
@@ -53,31 +69,28 @@ const Pagination = ({
       {/* Pagination Buttons */}
       <div className="flex justify-between md:justify-end items-center gap-4 w-full md:w-auto">
         <div className="w-full">
-          <div className="flex  gap-2 md:gap-3 lg:gap-3 justify-center items-center">
-            {currentPage > 1 && (
-              <button
-                onClick={() => {
-                  setTimeout(() => {
-                    setCurrentPage(1);
-                  }, 300);
-                }}
-                className="px-2 md:px-4 lg:px-4  md:py-2 py-1 lg:py-2 bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 rounded-full font-thin md:font-semibold lg:font-semibold text-sm md:text-md lg:text-md text-white  transition-all duration-300 hover:scale-105 shadow-md"
-              >
-                First
-              </button>
-            )}
+          <div className="flex gap-1.5 md:gap-2 justify-center items-center">
             <button
-              onClick={() => {
-                setTimeout(() => {
-                  setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
-                }, 300);
-              }}
+              onClick={() => setCurrentPage(1)}
               disabled={currentPage === 1}
-              className="px-2 md:px-4 lg:px-4  md:py-2 py-1 lg:py-2 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed rounded-full font-thin md:font-semibold lg:font-semibold text-sm md:text-md lg:text-md text-white  transition-all duration-300 hover:scale-105 shadow-md disabled:opacity-50 disabled:hover:scale-100"
+              className={navButtonClass}
+              title="First page"
+              aria-label="First page"
             >
-              Prev
+              <HiChevronDoubleLeft size={19} className="text-cyan-300" />
             </button>
-            <span className="px-2 md:px-4 lg:px-4  md:py-2 py-1 lg:py-2 bg-gradient-to-r from-gray-800/80 to-gray-900/80 border border-gray-700 rounded-full text-white font-thin md:font-semibold lg:font-semibold text-sm md:text-md lg:text-md backdrop-blur-sm">
+            <button
+              onClick={() =>
+                setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
+              }
+              disabled={currentPage === 1}
+              className={navButtonClass}
+              title="Previous page"
+              aria-label="Previous page"
+            >
+              <HiChevronLeft size={21} className="text-cyan-300" />
+            </button>
+            <span className="px-3 md:px-4 py-1.5 md:py-2 bg-gradient-to-r from-gray-800/80 to-gray-900/80 border border-gray-700 rounded-full text-white font-thin md:font-semibold lg:font-semibold text-sm md:text-md lg:text-md backdrop-blur-sm">
               <span className="hidden sm:inline">Page </span>
               {currentPage}
               <span className="hidden sm:inline"> of </span>
@@ -85,30 +98,27 @@ const Pagination = ({
               {totalPages}
             </span>
             <button
-              onClick={() => {
-                setTimeout(() => {
-                  setCurrentPage((prevPage) =>
-                    Math.min(prevPage + 1, totalPages),
-                  );
-                }, 300);
-              }}
+              onClick={() =>
+                setCurrentPage((prevPage) =>
+                  Math.min(prevPage + 1, totalPages),
+                )
+              }
               disabled={currentPage === totalPages}
-              className="px-2 md:px-4 lg:px-4  md:py-2 py-1 lg:py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed rounded-full font-thin md:font-semibold lg:font-semibold text-sm md:text-md lg:text-md text-white  transition-all duration-300 hover:scale-105 shadow-md disabled:opacity-50 disabled:hover:scale-100 mr-2 md:mr-6"
+              className={navButtonClass}
+              title="Next page"
+              aria-label="Next page"
             >
-              Next
+              <HiChevronRight size={21} className="text-cyan-300" />
             </button>
-            {currentPage < totalPages && (
-              <button
-                onClick={() => {
-                  setTimeout(() => {
-                    setCurrentPage(totalPages);
-                  }, 300);
-                }}
-                className="px-2 md:px-4 lg:px-4  md:py-2 py-1 lg:py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 rounded-full font-thin md:font-semibold lg:font-semibold text-sm md:text-md lg:text-md text-white  transition-all duration-300 hover:scale-105 shadow-md mr-2 md:mr-6"
-              >
-                Last
-              </button>
-            )}
+            <button
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+              className={navButtonClass}
+              title="Last page"
+              aria-label="Last page"
+            >
+              <HiChevronDoubleRight size={19} className="text-cyan-300" />
+            </button>
           </div>
         </div>
       </div>
