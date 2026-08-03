@@ -651,6 +651,112 @@ const WordForm = () => {
       return; // User cancelled the operation
     }
 
+    // Links every synonym/antonym/similarWord chip to the just-created
+    // word, one /word/relation/add call per chip (id-based — never goes
+    // through the backend's value-based lookup, so it can't collide with
+    // another Word row sharing the same spelling). Shared by both the
+    // normal creation path and the "this word's own value was ambiguous"
+    // path below — relations must never depend on which branch created
+    // the word, or they silently vanish in whichever branch forgets them.
+    const linkAllRelations = async (createdWordId) => {
+      const addRelation = async (chip, relationType) => {
+        let selectedVariant = null;
+
+        if (chip.wordId !== null) {
+          // Already resolved live, while the chip was being added — the
+          // common case now that every chip is resolved as soon as it's
+          // committed.
+          selectedVariant = { id: chip.wordId };
+        } else {
+          // Safety net for a chip that's somehow still unresolved at
+          // submit time (e.g. resolution was still in flight).
+          const variants = await fetchWordVariants(chip.value);
+          if (!variants || variants.length === 0) return;
+
+          if (variants.length === 1) {
+            selectedVariant = variants[0];
+          } else {
+            let disabledVariantId = null;
+            if (
+              normalizeWordValue(chip.value) ===
+                normalizeWordValue(wordData.value) &&
+              wordData.partOfSpeechIds.length > 0
+            ) {
+              const same = variants.find((v) =>
+                arePosIdSetsEqual(
+                  v.partsOfSpeech.map((p) => p.id),
+                  wordData.partOfSpeechIds,
+                ),
+              );
+              if (same) disabledVariantId = same.id;
+            }
+            selectedVariant = await showPOSSelectionPopup(
+              `${chip.value} (${relationType})`,
+              variants,
+              null,
+              disabledVariantId,
+            );
+          }
+
+          if (!selectedVariant?.id) return;
+
+          // Block same-value + identical-POS-set as the new word — only
+          // checkable here, where selectedVariant was just freshly
+          // fetched and carries a real partsOfSpeech id list (a
+          // pre-resolved chip's variant was necessarily fetched before
+          // this word existed, so it can never coincide with it).
+          if (
+            normalizeWordValue(chip.value) ===
+              normalizeWordValue(wordData.value) &&
+            wordData.partOfSpeechIds.length > 0 &&
+            arePosIdSetsEqual(
+              selectedVariant.partsOfSpeech.map((p) => p.id),
+              wordData.partOfSpeechIds,
+            )
+          ) {
+            await Swal.fire({
+              title: "Invalid relation",
+              text: `A word cannot reference itself as a ${relationType}.`,
+              icon: "warning",
+              timer: 2200,
+              showConfirmButton: false,
+            });
+            return;
+          }
+        }
+
+        if (!selectedVariant?.id) return;
+
+        // Block if the selected variant is the newly-created word itself
+        if (Number(selectedVariant.id) === Number(createdWordId)) {
+          await Swal.fire({
+            title: "Invalid relation",
+            text: `A word cannot reference itself as a ${relationType}.`,
+            icon: "warning",
+            timer: 2200,
+            showConfirmButton: false,
+          });
+          return;
+        }
+
+        await api.post("/word/relation/add", {
+          wordId: createdWordId,
+          relatedWordId: selectedVariant.id,
+          relationType,
+        });
+      };
+
+      for (const chip of newWordData.synonyms) {
+        await addRelation(chip, "synonym");
+      }
+      for (const chip of newWordData.antonyms) {
+        await addRelation(chip, "antonym");
+      }
+      for (const chip of newWordData.similarWords) {
+        await addRelation(chip, "similarWord");
+      }
+    };
+
     try {
       const wordDataToSubmit = {
         ...newWordData,
@@ -729,10 +835,20 @@ const WordForm = () => {
         }
 
         // Call the confirmation endpoint with POS selections
-        await api.post("/word/create/with-pos-selection", {
-          wordData: createResponse.data.data.pendingWordData,
-          posSelections,
-        });
+        const posSelectionResponse = await api.post(
+          "/word/create/with-pos-selection",
+          {
+            wordData: createResponse.data.data.pendingWordData,
+            posSelections,
+          },
+        );
+
+        // This word's own value was ambiguous, but its synonym/antonym/
+        // similarWord chips are completely unrelated to that — they still
+        // need linking here too, exactly like the normal path below.
+        // Previously skipped entirely in this branch, silently dropping
+        // every relation typed before hitting the ambiguous-value popup.
+        await linkAllRelations(posSelectionResponse.data.data.id);
 
         await invalidateWordsCache();
         setWordData(initialWordData);
@@ -750,104 +866,7 @@ const WordForm = () => {
         // Normal flow - word created without ambiguous words
         const createdWordId = createResponse.data.data.id;
 
-        const addRelation = async (chip, relationType) => {
-          let selectedVariant = null;
-
-          if (chip.wordId !== null) {
-            // Already resolved live, while the chip was being added — the
-            // common case now that every chip is resolved as soon as it's
-            // committed.
-            selectedVariant = { id: chip.wordId };
-          } else {
-            // Safety net for a chip that's somehow still unresolved at
-            // submit time (e.g. resolution was still in flight).
-            const variants = await fetchWordVariants(chip.value);
-            if (!variants || variants.length === 0) return;
-
-            if (variants.length === 1) {
-              selectedVariant = variants[0];
-            } else {
-              let disabledVariantId = null;
-              if (
-                normalizeWordValue(chip.value) ===
-                  normalizeWordValue(wordData.value) &&
-                wordData.partOfSpeechIds.length > 0
-              ) {
-                const same = variants.find((v) =>
-                  arePosIdSetsEqual(
-                    v.partsOfSpeech.map((p) => p.id),
-                    wordData.partOfSpeechIds,
-                  ),
-                );
-                if (same) disabledVariantId = same.id;
-              }
-              selectedVariant = await showPOSSelectionPopup(
-                `${chip.value} (${relationType})`,
-                variants,
-                null,
-                disabledVariantId,
-              );
-            }
-
-            if (!selectedVariant?.id) return;
-
-            // Block same-value + identical-POS-set as the new word — only
-            // checkable here, where selectedVariant was just freshly
-            // fetched and carries a real partsOfSpeech id list (a
-            // pre-resolved chip's variant was necessarily fetched before
-            // this word existed, so it can never coincide with it).
-            if (
-              normalizeWordValue(chip.value) ===
-                normalizeWordValue(wordData.value) &&
-              wordData.partOfSpeechIds.length > 0 &&
-              arePosIdSetsEqual(
-                selectedVariant.partsOfSpeech.map((p) => p.id),
-                wordData.partOfSpeechIds,
-              )
-            ) {
-              await Swal.fire({
-                title: "Invalid relation",
-                text: `A word cannot reference itself as a ${relationType}.`,
-                icon: "warning",
-                timer: 2200,
-                showConfirmButton: false,
-              });
-              return;
-            }
-          }
-
-          if (!selectedVariant?.id) return;
-
-          // Block if the selected variant is the newly-created word itself
-          if (Number(selectedVariant.id) === Number(createdWordId)) {
-            await Swal.fire({
-              title: "Invalid relation",
-              text: `A word cannot reference itself as a ${relationType}.`,
-              icon: "warning",
-              timer: 2200,
-              showConfirmButton: false,
-            });
-            return;
-          }
-
-          await api.post("/word/relation/add", {
-            wordId: createdWordId,
-            relatedWordId: selectedVariant.id,
-            relationType,
-          });
-        };
-
-        for (const chip of newWordData.synonyms) {
-          await addRelation(chip, "synonym");
-        }
-
-        for (const chip of newWordData.antonyms) {
-          await addRelation(chip, "antonym");
-        }
-
-        for (const chip of newWordData.similarWords) {
-          await addRelation(chip, "similarWord");
-        }
+        await linkAllRelations(createdWordId);
 
         await invalidateWordsCache();
         setWordData(initialWordData);
