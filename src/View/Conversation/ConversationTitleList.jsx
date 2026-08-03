@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   MessageCircle,
@@ -27,6 +27,111 @@ const DEFAULT_BADGE =
   "bg-slate-100 text-slate-700 dark:bg-slate-500/15 dark:text-slate-300";
 const CEFR_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"];
 const CONVERSATIONS_PER_PAGE = 9;
+
+// A custom dropdown instead of a native <select> — the closed pill button
+// keeps the rounded, centered-text look, but a native select can't give
+// the OPEN option list its own modern (rounded, shadowed) panel or
+// left-aligned option rows; the browser controls that part entirely.
+const CategoryFilterDropdown = ({
+  categories,
+  allLabel,
+  activeCategory,
+  onSelect,
+  isLight,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (event) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
+
+  const selected = categories.find(
+    (category) => String(category.id) === activeCategory,
+  );
+  const summaryLabel = selected
+    ? `${selected.name} (${selected.count})`
+    : allLabel;
+
+  const optionClass = (isActive) =>
+    `block w-full px-4 py-2.5 text-left text-sm font-semibold transition-colors ${
+      isActive
+        ? isLight
+          ? "bg-teal-50 text-teal-700"
+          : "bg-teal-500/15 text-teal-300"
+        : isLight
+          ? "text-slate-700 hover:bg-slate-50"
+          : "text-slate-200 hover:bg-slate-800"
+    }`;
+
+  const select = (value) => {
+    onSelect(value);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative w-full max-w-xs" ref={containerRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen((prev) => !prev)}
+        aria-label="Filter by category"
+        className={`flex w-full items-center justify-center gap-2 rounded-2xl border-2 px-4 py-2.5 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500/50 ${
+          isLight
+            ? "border-teal-200 bg-white text-slate-700 hover:border-teal-300"
+            : "border-teal-700/60 bg-slate-900 text-slate-200 hover:border-teal-500/60"
+        }`}
+      >
+        <span className="truncate">{summaryLabel}</span>
+        <ChevronDown
+          size={18}
+          className={`flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""} ${
+            isLight ? "text-teal-500" : "text-teal-400"
+          }`}
+        />
+      </button>
+
+      {isOpen && (
+        <div
+          className={`absolute z-20 mt-2 w-full overflow-hidden rounded-2xl border shadow-lg ${
+            isLight ? "border-slate-200 bg-white" : "border-slate-700 bg-slate-900"
+          }`}
+        >
+          <div className="max-h-72 overflow-y-auto py-1.5">
+            <button
+              type="button"
+              onClick={() => select("")}
+              className={optionClass(!activeCategory)}
+            >
+              {allLabel}
+            </button>
+            {categories.map((category) => (
+              <button
+                key={category.id}
+                type="button"
+                onClick={() => select(String(category.id))}
+                className={optionClass(activeCategory === String(category.id))}
+              >
+                {category.name} ({category.count})
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ConversationTitleList = () => {
   const { theme } = useTheme();
@@ -199,37 +304,18 @@ const ConversationTitleList = () => {
             fixed, small set of CEFR levels above). */}
         {!loading && availableCategories.length > 0 && (
           <div className="mb-8 mt-4 flex justify-center">
-            <div className="relative w-full max-w-xs">
-              <select
-                value={activeCategory}
-                onChange={(event) => handleSelectCategory(event.target.value)}
-                aria-label="Filter by category"
-                className={`w-full appearance-none rounded-2xl border-2 py-2.5 pl-4 pr-10 text-center text-sm font-semibold shadow-sm transition-colors [text-align-last:center] focus:outline-none focus:ring-2 focus:ring-teal-500/50 ${
-                  isLight
-                    ? "border-teal-200 bg-white text-slate-700 hover:border-teal-300"
-                    : "border-teal-700/60 bg-slate-900 text-slate-200 hover:border-teal-500/60"
-                }`}
-              >
-                <option value="">All Categories ({conversations.length})</option>
-                {availableCategories.map((category) => {
-                  const count = conversations.filter((c) =>
-                    (c.categories || []).some((cat) => cat.id === category.id),
-                  ).length;
-
-                  return (
-                    <option key={category.id} value={category.id}>
-                      {category.name} ({count})
-                    </option>
-                  );
-                })}
-              </select>
-              <ChevronDown
-                size={18}
-                className={`pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 ${
-                  isLight ? "text-teal-500" : "text-teal-400"
-                }`}
-              />
-            </div>
+            <CategoryFilterDropdown
+              categories={availableCategories.map((category) => ({
+                ...category,
+                count: conversations.filter((c) =>
+                  (c.categories || []).some((cat) => cat.id === category.id),
+                ).length,
+              }))}
+              allLabel={`All Categories (${conversations.length})`}
+              activeCategory={activeCategory}
+              onSelect={handleSelectCategory}
+              isLight={isLight}
+            />
           </div>
         )}
 
@@ -250,7 +336,7 @@ const ConversationTitleList = () => {
             No topics yet for this filter.
           </p>
         ) : (
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {paginatedConversations.map((conversation) => {
               const level = conversation.levels?.level;
               const badgeClass = LEVEL_BADGES[level] || DEFAULT_BADGE;
@@ -263,23 +349,23 @@ const ConversationTitleList = () => {
                   key={conversation.id}
                   type="button"
                   onClick={() => navigate(`/conversation/${conversation.id}`)}
-                  className={`group flex flex-col items-start rounded-2xl border p-5 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${
+                  className={`group flex flex-col items-start rounded-3xl border p-6 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg md:p-7 ${
                     isLight
                       ? "border-slate-200 bg-white hover:border-orange-300"
                       : "border-slate-800 bg-slate-900/70 hover:border-orange-500/40"
                   }`}
                 >
-                  <div className="mb-3 flex w-full items-center justify-between">
-                    <div className="flex flex-wrap items-center gap-1.5">
+                  <div className="mb-4 flex w-full items-center justify-between">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span
-                        className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide ${badgeClass}`}
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide ${badgeClass}`}
                       >
                         {level || "General"}
                       </span>
                       {(conversation.categories || []).map((category) => (
                         <span
                           key={category.id}
-                          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
+                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
                             isLight
                               ? "bg-teal-100 text-teal-700"
                               : "bg-teal-500/15 text-teal-300"
@@ -294,21 +380,25 @@ const ConversationTitleList = () => {
                       className={isLight ? "text-slate-300" : "text-slate-600"}
                     />
                   </div>
-                  <div className="mb-4">
+                  <div className="mb-6">
                     <p
-                      className={`text-lg font-bold ${isLight ? "text-slate-900" : "text-white"}`}
+                      className={`text-xl font-bold leading-snug ${isLight ? "text-slate-900" : "text-white"}`}
                     >
                       {english}
                     </p>
                     {german && (
                       <p
-                        className={`mt-1 text-sm font-medium italic ${isLight ? "text-teal-600" : "text-teal-400"}`}
+                        className={`mt-2 text-base font-medium italic leading-relaxed ${isLight ? "text-teal-600" : "text-teal-400"}`}
                       >
                         {german}
                       </p>
                     )}
                   </div>
-                  <div className="mt-auto flex items-center gap-1 text-sm font-semibold text-orange-500 transition-transform group-hover:gap-2 dark:text-orange-400">
+                  <div
+                    className={`mt-auto flex w-full items-center gap-1 border-t pt-4 text-sm font-semibold text-orange-500 transition-transform group-hover:gap-2 dark:text-orange-400 ${
+                      isLight ? "border-slate-100" : "border-slate-800"
+                    }`}
+                  >
                     <span>Practice this dialogue</span>
                     <ChevronRight size={16} />
                   </div>
