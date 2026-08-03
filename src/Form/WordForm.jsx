@@ -1348,6 +1348,7 @@ const WordForm = () => {
                   <div className="mt-2">
                     <RelationTagInput
                       id="synonyms"
+                      currentWordValue={wordData.value}
                       values={wordData.synonyms}
                       onChange={(next) =>
                         handleRelationChipsChange("synonyms", next)
@@ -1379,6 +1380,7 @@ const WordForm = () => {
                   <div className="mt-2">
                     <RelationTagInput
                       id="antonyms"
+                      currentWordValue={wordData.value}
                       values={wordData.antonyms}
                       onChange={(next) =>
                         handleRelationChipsChange("antonyms", next)
@@ -1410,6 +1412,7 @@ const WordForm = () => {
                   <div className="mt-2">
                     <RelationTagInput
                       id="similarWords"
+                      currentWordValue={wordData.value}
                       values={wordData.similarWords}
                       onChange={(next) =>
                         handleRelationChipsChange("similarWords", next)

@@ -421,6 +421,18 @@ const UpdateWord = () => {
     antonym: new Set(),
     similarWord: new Set(),
   });
+  // The full backend relation objects (id + partsOfSpeech), in the exact
+  // order the backend returns them — same order formData.synonyms/etc is
+  // built from at load. Unlike currentRelationPOSNames (keyed by text,
+  // collapses duplicate spellings to one), this is read by INDEX, so two
+  // rows with the same text each show their own correct POS. Refreshed on
+  // every refetch — briefly stale (falls back to no label) right after a
+  // local-only add/remove/reorder, until the matching refetch lands.
+  const [relationVariantDetails, setRelationVariantDetails] = useState({
+    synonyms: [],
+    antonyms: [],
+    similarWords: [],
+  });
   // The variant ID currently linked for each existing relation word
   const [currentRelationIds, setCurrentRelationIds] = useState({
     synonym: {},
@@ -557,6 +569,11 @@ const UpdateWord = () => {
         showConfirmButton: false,
         icon: "success",
       });
+
+      // Refetch so relationVariantDetails picks up this new relation's
+      // real POS — the local push above shows the word immediately, but
+      // its per-row POS label only appears once this lands.
+      setRefetchTrigger((prev) => prev + 1);
     } catch {
       Swal.fire({
         title: "Error",
@@ -969,6 +986,15 @@ const UpdateWord = () => {
 
         setFormData(loadedFormData);
         setInitialFormData(loadedFormData);
+
+        // Full relation objects, same order as loadedFormData.synonyms/etc
+        // (both derive from the same word.synonyms/antonyms/similarWords
+        // arrays) — read by index in the JSX below for a per-row POS label.
+        setRelationVariantDetails({
+          synonyms: word.synonyms || [],
+          antonyms: word.antonyms || [],
+          similarWords: word.similarWords || [],
+        });
 
         wordCurrentIds = {
           synonym: Object.fromEntries(
@@ -2063,6 +2089,21 @@ const UpdateWord = () => {
     (initialFormData !== null &&
       JSON.stringify(formData) !== JSON.stringify(initialFormData));
 
+  // Read-only POS label for one existing-relation row, by index — safe for
+  // duplicate-text rows (unlike multiPOSExisting/relPOSOverrides, which
+  // are keyed by text and can't tell two "kühler" rows apart). Falls back
+  // to no label rather than a wrong one if the row was just added/removed/
+  // reordered locally and the matching refetch hasn't landed yet.
+  const getRelationPOSLabel = (field, index, item) => {
+    const detail = relationVariantDetails[field]?.[index];
+    if (!detail || detail.value !== item) {
+      return null;
+    }
+    return detail.partsOfSpeech?.length > 0
+      ? detail.partsOfSpeech.map((p) => p.name).join(", ")
+      : null;
+  };
+
   return (
     <Container>
       <h2 className="text-3xl font-semibold mb-6 text-center mt-8 text-white">
@@ -2555,6 +2596,8 @@ const UpdateWord = () => {
                   </label>
                   <RelationTagInput
                     id="update-synonyms"
+                    currentWordId={formData.id}
+                    currentWordValue={formData.value}
                     values={inputData.synonyms}
                     onChange={(next) =>
                       handleRelationChipsChange("synonyms", next)
@@ -2579,7 +2622,16 @@ const UpdateWord = () => {
                         key={index}
                         className="flex items-center justify-between bg-slate-300 p-2 rounded-lg mb-2 shadow-sm"
                       >
-                        <li>{item}</li>
+                        <li>
+                          {item}
+                          {getRelationPOSLabel("synonyms", index, item) && (
+                            <span className="ml-2 text-xs font-semibold text-slate-600">
+                              (
+                              {getRelationPOSLabel("synonyms", index, item)}
+                              )
+                            </span>
+                          )}
+                        </li>
                         <div className="flex gap-2">
                           {multiPOSExisting.synonym.has(item) &&
                             formData.synonyms.filter((v) => v === item)
@@ -2623,6 +2675,8 @@ const UpdateWord = () => {
 
                   <RelationTagInput
                     id="update-antonyms"
+                    currentWordId={formData.id}
+                    currentWordValue={formData.value}
                     values={inputData.antonyms}
                     onChange={(next) =>
                       handleRelationChipsChange("antonyms", next)
@@ -2647,7 +2701,16 @@ const UpdateWord = () => {
                         key={index}
                         className="flex items-center justify-between bg-slate-300 p-2 rounded-lg mb-2 shadow-sm"
                       >
-                        <li>{item}</li>
+                        <li>
+                          {item}
+                          {getRelationPOSLabel("antonyms", index, item) && (
+                            <span className="ml-2 text-xs font-semibold text-slate-600">
+                              (
+                              {getRelationPOSLabel("antonyms", index, item)}
+                              )
+                            </span>
+                          )}
+                        </li>
                         <div className="flex gap-2">
                           {multiPOSExisting.antonym.has(item) &&
                             formData.antonyms.filter((v) => v === item)
@@ -2691,6 +2754,8 @@ const UpdateWord = () => {
 
                   <RelationTagInput
                     id="update-similarWords"
+                    currentWordId={formData.id}
+                    currentWordValue={formData.value}
                     values={inputData.similarWords}
                     onChange={(next) =>
                       handleRelationChipsChange("similarWords", next)
@@ -2715,7 +2780,20 @@ const UpdateWord = () => {
                         key={index}
                         className="flex items-center justify-between bg-slate-300 p-2 rounded-lg mb-2 shadow-sm"
                       >
-                        <li>{item}</li>
+                        <li>
+                          {item}
+                          {getRelationPOSLabel("similarWords", index, item) && (
+                            <span className="ml-2 text-xs font-semibold text-slate-600">
+                              (
+                              {getRelationPOSLabel(
+                                "similarWords",
+                                index,
+                                item,
+                              )}
+                              )
+                            </span>
+                          )}
+                        </li>
                         <div className="flex gap-2">
                           {multiPOSExisting.similarWord.has(item) &&
                             formData.similarWords.filter((v) => v === item)

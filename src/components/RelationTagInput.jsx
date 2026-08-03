@@ -6,6 +6,8 @@ const SUGGESTION_DEBOUNCE_MS = 250;
 const MIN_QUERY_LENGTH = 2;
 const MAX_SUGGESTIONS = 10;
 
+const normalize = (value) => String(value || "").trim().toLowerCase();
+
 // Shared "type a word, see it become a removable chip" input used by both
 // the create-word and update-word forms for synonyms/antonyms/similar words.
 // Existing words matching what's typed are suggested (via /word/suggest —
@@ -26,6 +28,13 @@ const RelationTagInput = ({
   values,
   onChange,
   placeholder = "Type a word and press comma…",
+  // Identifies the word this input belongs to, so its own entry can be
+  // flagged (and blocked) in the suggestion dropdown instead of just
+  // silently failing self-reference validation later. UpdateWord.jsx has
+  // a real id; WordForm.jsx doesn't yet (word not created), so it passes
+  // only currentWordValue.
+  currentWordId = null,
+  currentWordValue = null,
 }) => {
   const [text, setText] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -71,7 +80,20 @@ const RelationTagInput = ({
     ]);
   };
 
+  // True when a suggestion IS the word this input belongs to — offering it
+  // as its own synonym/antonym/similar word would always be rejected as a
+  // self-reference, so it's flagged instead of left to look like any other
+  // pickable option.
+  const isSelfSuggestion = (word) =>
+    (currentWordId !== null && word.id === currentWordId) ||
+    (currentWordValue !== null &&
+      normalize(word.value) === normalize(currentWordValue));
+
   const commitSuggestion = (word) => {
+    if (isSelfSuggestion(word)) {
+      return;
+    }
+
     const pos =
       word.partsOfSpeech?.length > 0
         ? word.partsOfSpeech.map((p) => p.name).join(", ")
@@ -215,31 +237,47 @@ const RelationTagInput = ({
 
       {showSuggestions && (
         <div className="absolute z-10 mt-1 w-full rounded-lg border border-gray-300 bg-white shadow-lg max-h-56 overflow-y-auto">
-          {suggestions.map((word) => (
-            <button
-              key={word.id}
-              type="button"
-              onClick={() => commitSuggestion(word)}
-              className="block w-full text-left px-3 py-2 text-sm text-gray-800 hover:bg-blue-50"
-            >
-              {word.isFuzzy ? (
-                <>
-                  <span className="italic text-amber-700">Did you mean</span>{" "}
-                  <span className="font-semibold not-italic">
-                    {word.value}
+          {suggestions.map((word) => {
+            const isSelf = isSelfSuggestion(word);
+
+            return (
+              <button
+                key={word.id}
+                type="button"
+                disabled={isSelf}
+                onClick={() => commitSuggestion(word)}
+                className={`block w-full text-left px-3 py-2 text-sm ${
+                  isSelf
+                    ? "cursor-not-allowed bg-gray-100 text-gray-400"
+                    : "text-gray-800 hover:bg-blue-50"
+                }`}
+              >
+                {word.isFuzzy ? (
+                  <>
+                    <span className="italic text-amber-700">
+                      Did you mean
+                    </span>{" "}
+                    <span className="font-semibold not-italic">
+                      {word.value}
+                    </span>
+                    <span className="italic text-amber-700">?</span>
+                  </>
+                ) : (
+                  word.value
+                )}
+                {word.partsOfSpeech?.length > 0 && (
+                  <span className="ml-2 text-xs text-gray-500">
+                    ({word.partsOfSpeech.map((p) => p.name).join(", ")})
                   </span>
-                  <span className="italic text-amber-700">?</span>
-                </>
-              ) : (
-                word.value
-              )}
-              {word.partsOfSpeech?.length > 0 && (
-                <span className="ml-2 text-xs text-gray-500">
-                  ({word.partsOfSpeech.map((p) => p.name).join(", ")})
-                </span>
-              )}
-            </button>
-          ))}
+                )}
+                {isSelf && (
+                  <span className="ml-2 text-xs font-semibold text-orange-500">
+                    (this word)
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
