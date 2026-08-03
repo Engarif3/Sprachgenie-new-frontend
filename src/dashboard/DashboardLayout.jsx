@@ -1,16 +1,16 @@
-import { Link, Navigate, Outlet, NavLink, useLocation } from "react-router-dom";
+import { Navigate, Outlet, NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../services/auth.services";
 import { useNotifications } from "../hooks/useNotifications";
 import { useProfileSettings } from "../hooks/useProfileSettings";
 import { getAvatarUrl } from "../utils/avatar";
 import Container from "../utils/Container";
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IoClose, IoMenu } from "react-icons/io5";
+import { ChevronRight } from "lucide-react";
 
-// Which section each route lives under — used to auto-expand the relevant
-// section on load/navigation instead of making a super admin (who sees all
-// six sections) hunt through collapsed menus for whichever page they're
-// already on.
+// Which section each route lives under — used only to visually highlight the
+// relevant section header on load/navigation (the flyout itself never
+// auto-opens; it's transient, shown only while an admin has clicked it).
 const SECTION_ROUTES = {
   admin: [
     "/dashboard/update-user-status",
@@ -52,6 +52,84 @@ const SECTION_ROUTES = {
   ],
 };
 
+// Data-driven so every section renders through the same trigger+flyout
+// markup below instead of six hand-written near-duplicates. `roles` on an
+// item restricts it to that role only; items with no `roles` are visible to
+// both admin and super_admin (the outer gate that wraps this whole block).
+const NAV_SECTIONS = [
+  {
+    key: "admin",
+    icon: "👥",
+    label: "Admin",
+    items: [
+      { to: "/dashboard/update-user-status", icon: "👤", label: "All Users", roles: ["super_admin"] },
+      { to: "/dashboard/update-basic-user-status", icon: "👤", label: "Users", roles: ["admin"] },
+    ],
+  },
+  {
+    key: "content",
+    icon: "📝",
+    label: "Content",
+    items: [
+      { to: "/dashboard/create-word", icon: "➕", label: "Create Word" },
+      { to: "/dashboard/level", icon: "🎚️", label: "Create Level" },
+      { to: "/dashboard/topic", icon: "📚", label: "Create Topic", roles: ["super_admin"] },
+      { to: "/dashboard/update-topic", icon: "✏️", label: "Update Topic", roles: ["super_admin"] },
+      { to: "/dashboard/generate-story", icon: "📖", label: "Generate Story" },
+      { to: "/dashboard/stories-management", icon: "🗂️", label: "Stories Management" },
+      { to: "/dashboard/create-conversation", icon: "➕", label: "Create Conversation" },
+      { to: "/dashboard/update-conversation", icon: "✏️", label: "Update Conversation" },
+      { to: "/dashboard/conversation-category", icon: "🏷️", label: "Create Category", roles: ["super_admin"] },
+      { to: "/dashboard/update-conversation-category", icon: "✏️", label: "Update Category", roles: ["super_admin"] },
+    ],
+  },
+  {
+    key: "reports",
+    icon: "🚩",
+    label: "Reports",
+    items: [
+      { to: "/dashboard/word-reports", icon: "🚩", label: "Word Reports", roles: ["super_admin"] },
+      { to: "/dashboard/get-reports", icon: "📋", label: "AI Paragraph Reports" },
+      { to: "/dashboard/conjugation-reports", icon: "🔤", label: "Conjugation Reports" },
+    ],
+  },
+  {
+    key: "settings",
+    icon: "⚙️",
+    label: "Settings",
+    items: [
+      { to: "/dashboard/global-limits", icon: "🌍", label: "Global Limits" },
+      { to: "/dashboard/user-limits", icon: "⚙️", label: "User Limits" },
+      { to: "/dashboard/ip-rate-limits", icon: "🛡️", label: "IP Rate Limits" },
+      { to: "/dashboard/profile-photo-settings", icon: "🖼️", label: "Profile Photo Settings", roles: ["super_admin"] },
+    ],
+  },
+  {
+    key: "analytics",
+    icon: "📊",
+    label: "Analytics",
+    items: [
+      { to: "/dashboard/users-favorite-count", icon: "❤️", label: "Favorites Stats" },
+      { to: "/dashboard/get-usage", icon: "🤖", label: "AI Usage" },
+      { to: "/dashboard/ip-usage", icon: "📡", label: "IP Usage" },
+    ],
+  },
+  {
+    key: "monitoring",
+    icon: "🩺",
+    label: "Monitoring",
+    items: [
+      { to: "/dashboard/registration-metadata", icon: "🛡️", label: "Registration Signals" },
+      { to: "/dashboard/system-status", icon: "🖥️", label: "System Status" },
+      { to: "/dashboard/visitors-info", icon: "👥", label: "Visitors Info" },
+      { to: "/dashboard/visitors", icon: "🌍", label: "Visitors Detail" },
+      { to: "/dashboard/error-logs", icon: "🚨", label: "Error Logs" },
+    ],
+  },
+];
+
+const FLYOUT_WIDTH = 256; // matches w-64 below
+
 const getActiveSection = (pathname) =>
   Object.keys(SECTION_ROUTES).find((section) =>
     SECTION_ROUTES[section].some((route) => pathname.startsWith(route)),
@@ -83,15 +161,13 @@ const formatRoleLabel = (role) => {
 const DashboardLayout = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const [expandedSections, setExpandedSections] = useState(() => ({
-    admin: false,
-    content: false,
-    reports: false,
-    settings: false,
-    analytics: false,
-    monitoring: false,
-    [getActiveSection(location.pathname)]: true,
-  }));
+
+  // Which section's flyout is currently open (null = none). Only one at a
+  // time — opening a new one implicitly replaces the last.
+  const [openSection, setOpenSection] = useState(null);
+  const [flyoutStyle, setFlyoutStyle] = useState({});
+  const sectionButtonRefs = useRef({});
+  const flyoutRef = useRef(null);
 
   const {
     safeUserInfo: userInfo,
@@ -105,24 +181,71 @@ const DashboardLayout = () => {
     ? getAvatarUrl(userInfo, profileSettings)
     : null;
 
-  // Keep the relevant section open as the admin navigates around (e.g. via
-  // a link that isn't in the sidebar itself) — never collapses a section
-  // the admin opened manually, only ensures the current page's section
-  // is (still) expanded.
+  const activeSection = getActiveSection(location.pathname);
+
+  // A flyout is transient — never carry it across a navigation.
   useEffect(() => {
-    const activeSection = getActiveSection(location.pathname);
-    if (activeSection) {
-      setExpandedSections((prev) =>
-        prev[activeSection] ? prev : { ...prev, [activeSection]: true },
-      );
-    }
+    setOpenSection(null);
   }, [location.pathname]);
 
-  const toggleSection = (section) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
+  // Close on outside click (not on the trigger button that opened it, and
+  // not on the flyout panel itself).
+  useEffect(() => {
+    if (!openSection) return;
+
+    const handleClickOutside = (event) => {
+      const buttonNode = sectionButtonRefs.current[openSection];
+      const clickedButton = buttonNode && buttonNode.contains(event.target);
+      const clickedFlyout =
+        flyoutRef.current && flyoutRef.current.contains(event.target);
+
+      if (!clickedButton && !clickedFlyout) {
+        setOpenSection(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [openSection]);
+
+  // The flyout's fixed position is computed once, from the trigger button's
+  // rect, at the moment it opens — rather than trying to keep it live in
+  // sync, just close it if the layout underneath it could have shifted.
+  useEffect(() => {
+    if (!openSection) return;
+
+    const close = () => setOpenSection(null);
+    window.addEventListener("resize", close);
+    return () => window.removeEventListener("resize", close);
+  }, [openSection]);
+
+  const toggleSection = (key) => {
+    if (openSection === key) {
+      setOpenSection(null);
+      return;
+    }
+
+    const node = sectionButtonRefs.current[key];
+    if (node) {
+      const rect = node.getBoundingClientRect();
+      const left = Math.min(
+        rect.right + 8,
+        window.innerWidth - FLYOUT_WIDTH - 8,
+      );
+
+      setFlyoutStyle({
+        top: rect.top,
+        left,
+        maxHeight: window.innerHeight - rect.top - 16,
+      });
+    }
+
+    setOpenSection(key);
+  };
+
+  const closeFlyoutAndDrawer = () => {
+    setOpenSection(null);
+    setIsOpen(false);
   };
 
   if (!userId) {
@@ -136,9 +259,9 @@ const DashboardLayout = () => {
         : "border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:border-slate-800 dark:hover:bg-white/5 dark:hover:text-white"
     }`;
 
-  const sectionHeaderClass = (isExpanded) =>
-    `flex cursor-pointer items-center justify-between rounded-2xl border px-4 py-3 text-sm font-semibold transition-all duration-300 ${
-      isExpanded
+  const sectionHeaderClass = (isHighlighted) =>
+    `flex w-full cursor-pointer items-center justify-between rounded-2xl border px-4 py-3 text-sm font-semibold transition-all duration-300 ${
+      isHighlighted
         ? "border-sky-200 bg-sky-50/80 text-sky-800 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-200"
         : "border-transparent text-slate-700 hover:border-slate-200 hover:bg-slate-100 dark:text-slate-200 dark:hover:border-slate-800 dark:hover:bg-white/5"
     }`;
@@ -199,7 +322,10 @@ const DashboardLayout = () => {
             </div>
           </div>
 
-          <nav className="sidebar-scrollbar flex-1 space-y-1 overflow-y-auto px-4 py-5">
+          <nav
+            className="sidebar-scrollbar flex-1 space-y-1 overflow-y-auto px-4 py-5"
+            onScroll={() => setOpenSection(null)}
+          >
             <NavLink
               to="/dashboard"
               end
@@ -209,9 +335,6 @@ const DashboardLayout = () => {
             >
               <span className="text-lg">🏠</span>
               <span>Overview</span>
-              {expandedSections.admin === false && (
-                <span className="absolute right-3 text-xs opacity-0 transition-opacity group-hover:opacity-100"></span>
-              )}
             </NavLink>
 
             <NavLink
@@ -280,391 +403,71 @@ const DashboardLayout = () => {
                   Management
                 </p>
 
-                {/* Accounts: who can access the app and at what role.
-                    Nav visibility intentionally mirrors each route's actual
-                    role check (see Routes.jsx) — do not widen these. */}
-                <div
-                  onClick={() => toggleSection("admin")}
-                  className={sectionHeaderClass(expandedSections.admin)}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <span className="flex items-center gap-2">
-                    <span>👥</span>
-                    <span>Admin</span>
-                  </span>
-                  <span
-                    className={`text-sm transition-transform duration-300 ${
-                      expandedSections.admin ? "rotate-180" : ""
-                    }`}
-                  >
-                    ▼
-                  </span>
-                </div>
-                {expandedSections.admin && (
-                  <div className="ml-3 space-y-1 border-l border-slate-200 py-2 pl-4 animate-in fade-in slide-in-from-top-2 duration-200 dark:border-slate-700/60">
-                    {role === "super_admin" && (
-                      <NavLink
-                        to="/dashboard/update-user-status"
-                        className={({ isActive }) => navItemClass(isActive)}
-                        onClick={() => setIsOpen(false)}
+                {NAV_SECTIONS.map((section) => {
+                  const visibleItems = section.items.filter(
+                    (item) => !item.roles || item.roles.includes(role),
+                  );
+                  if (visibleItems.length === 0) return null;
+
+                  const isOpenSection = openSection === section.key;
+                  const isHighlighted =
+                    isOpenSection || activeSection === section.key;
+
+                  return (
+                    <div key={section.key} className="relative">
+                      <button
+                        ref={(node) => {
+                          sectionButtonRefs.current[section.key] = node;
+                        }}
+                        type="button"
+                        onClick={() => toggleSection(section.key)}
+                        className={sectionHeaderClass(isHighlighted)}
+                        aria-expanded={isOpenSection}
+                        aria-haspopup="true"
                       >
-                        <span>👤</span>
-                        <span>All Users</span>
-                      </NavLink>
-                    )}
-                    {role === "admin" && (
-                      <NavLink
-                        to="/dashboard/update-basic-user-status"
-                        className={({ isActive }) => navItemClass(isActive)}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <span>👤</span>
-                        <span>Users</span>
-                      </NavLink>
-                    )}
-                  </div>
-                )}
+                        <span className="flex items-center gap-2">
+                          <span>{section.icon}</span>
+                          <span>{section.label}</span>
+                        </span>
+                        <ChevronRight
+                          size={16}
+                          className={`shrink-0 transition-colors duration-200 ${
+                            isHighlighted
+                              ? "text-sky-500"
+                              : "text-slate-400 dark:text-slate-500"
+                          }`}
+                        />
+                      </button>
 
-                {/* Content: creating/editing what learners see (words,
-                    topics, stories, conversations). Topic management stays
-                    super_admin-only in the nav, same as before this
-                    reorganization — only its section changed, not who can
-                    see it. */}
-                <div
-                  onClick={() => toggleSection("content")}
-                  className={sectionHeaderClass(expandedSections.content)}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <span className="flex items-center gap-2">
-                    <span>📝</span>
-                    <span>Content</span>
-                  </span>
-                  <span
-                    className={`text-sm transition-transform duration-300 ${
-                      expandedSections.content ? "rotate-180" : ""
-                    }`}
-                  >
-                    ▼
-                  </span>
-                </div>
-                {expandedSections.content && (
-                  <div className="ml-3 space-y-1 border-l border-slate-200 py-2 pl-4 animate-in fade-in slide-in-from-top-2 duration-200 dark:border-slate-700/60">
-                    <NavLink
-                      to="/dashboard/create-word"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>➕</span>
-                      <span>Create Word</span>
-                    </NavLink>
-                    <NavLink
-                      to="/dashboard/level"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>🎚️</span>
-                      <span>Create Level</span>
-                    </NavLink>
-                    {role === "super_admin" && (
-                      <>
-                        <NavLink
-                          to="/dashboard/topic"
-                          className={({ isActive }) => navItemClass(isActive)}
-                          onClick={() => setIsOpen(false)}
+                      {isOpenSection && (
+                        <div
+                          ref={flyoutRef}
+                          style={{
+                            top: flyoutStyle.top,
+                            left: flyoutStyle.left,
+                            maxHeight: flyoutStyle.maxHeight,
+                            width: FLYOUT_WIDTH,
+                          }}
+                          className="fixed z-50 space-y-1 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl shadow-slate-900/20 dark:border-slate-700 dark:bg-slate-900"
+                          role="menu"
                         >
-                          <span>📚</span>
-                          <span>Create Topic</span>
-                        </NavLink>
-                        <NavLink
-                          to="/dashboard/update-topic"
-                          className={({ isActive }) => navItemClass(isActive)}
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <span>✏️</span>
-                          <span>Update Topic</span>
-                        </NavLink>
-                      </>
-                    )}
-                    <NavLink
-                      to="/dashboard/generate-story"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>📖</span>
-                      <span>Generate Story</span>
-                    </NavLink>
-                    <NavLink
-                      to="/dashboard/stories-management"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>🗂️</span>
-                      <span>Stories Management</span>
-                    </NavLink>
-                    <NavLink
-                      to="/dashboard/create-conversation"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>➕</span>
-                      <span>Create Conversation</span>
-                    </NavLink>
-                    <NavLink
-                      to="/dashboard/update-conversation"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>✏️</span>
-                      <span>Update Conversation</span>
-                    </NavLink>
-                    {role === "super_admin" && (
-                      <>
-                        <NavLink
-                          to="/dashboard/conversation-category"
-                          className={({ isActive }) => navItemClass(isActive)}
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <span>🏷️</span>
-                          <span>Create Category</span>
-                        </NavLink>
-                        <NavLink
-                          to="/dashboard/update-conversation-category"
-                          className={({ isActive }) => navItemClass(isActive)}
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <span>✏️</span>
-                          <span>Update Category</span>
-                        </NavLink>
-                      </>
-                    )}
-                  </div>
-                )}
-
-                {/* Reports: all user-submitted content reports live here,
-                    top-level and separate from Content/Analytics. */}
-                <div
-                  onClick={() => toggleSection("reports")}
-                  className={sectionHeaderClass(expandedSections.reports)}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <span className="flex items-center gap-2">
-                    <span>🚩</span>
-                    <span>Reports</span>
-                  </span>
-                  <span
-                    className={`text-sm transition-transform duration-300 ${
-                      expandedSections.reports ? "rotate-180" : ""
-                    }`}
-                  >
-                    ▼
-                  </span>
-                </div>
-                {expandedSections.reports && (
-                  <div className="ml-3 space-y-1 border-l border-slate-200 py-2 pl-4 animate-in fade-in slide-in-from-top-2 duration-200 dark:border-slate-700/60">
-                    {role === "super_admin" && (
-                      <NavLink
-                        to="/dashboard/word-reports"
-                        className={({ isActive }) => navItemClass(isActive)}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <span>🚩</span>
-                        <span>Word Reports</span>
-                      </NavLink>
-                    )}
-                    <NavLink
-                      to="/dashboard/get-reports"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>📋</span>
-                      <span>AI Paragraph Reports</span>
-                    </NavLink>
-                    <NavLink
-                      to="/dashboard/conjugation-reports"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>🔤</span>
-                      <span>Conjugation Reports</span>
-                    </NavLink>
-                  </div>
-                )}
-
-                {/* Settings: numeric caps/config you set, not data you
-                    view — separated from Analytics below. */}
-                <div
-                  onClick={() => toggleSection("settings")}
-                  className={sectionHeaderClass(expandedSections.settings)}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <span className="flex items-center gap-2">
-                    <span>⚙️</span>
-                    <span>Settings</span>
-                  </span>
-                  <span
-                    className={`text-sm transition-transform duration-300 ${
-                      expandedSections.settings ? "rotate-180" : ""
-                    }`}
-                  >
-                    ▼
-                  </span>
-                </div>
-                {expandedSections.settings && (
-                  <div className="ml-3 space-y-1 border-l border-slate-200 py-2 pl-4 animate-in fade-in slide-in-from-top-2 duration-200 dark:border-slate-700/60">
-                    <NavLink
-                      to="/dashboard/global-limits"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>🌍</span>
-                      <span>Global Limits</span>
-                    </NavLink>
-                    <NavLink
-                      to="/dashboard/user-limits"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>⚙️</span>
-                      <span>User Limits</span>
-                    </NavLink>
-                    <NavLink
-                      to="/dashboard/ip-rate-limits"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>🛡️</span>
-                      <span>IP Rate Limits</span>
-                    </NavLink>
-                    {role === "super_admin" && (
-                      <NavLink
-                        to="/dashboard/profile-photo-settings"
-                        className={({ isActive }) => navItemClass(isActive)}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <span>🖼️</span>
-                        <span>Profile Photo Settings</span>
-                      </NavLink>
-                    )}
-                  </div>
-                )}
-
-                {/* Analytics: data you view (usage/report stats). */}
-                <div
-                  onClick={() => toggleSection("analytics")}
-                  className={sectionHeaderClass(expandedSections.analytics)}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <span className="flex items-center gap-2">
-                    <span>📊</span>
-                    <span>Analytics</span>
-                  </span>
-                  <span
-                    className={`text-sm transition-transform duration-300 ${
-                      expandedSections.analytics ? "rotate-180" : ""
-                    }`}
-                  >
-                    ▼
-                  </span>
-                </div>
-                {expandedSections.analytics && (
-                  <div className="ml-3 space-y-1 border-l border-slate-200 py-2 pl-4 animate-in fade-in slide-in-from-top-2 duration-200 dark:border-slate-700/60">
-                    <NavLink
-                      to="/dashboard/users-favorite-count"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>❤️</span>
-                      <span>Favorites Stats</span>
-                    </NavLink>
-                    <NavLink
-                      to="/dashboard/get-usage"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>🤖</span>
-                      <span>AI Usage</span>
-                    </NavLink>
-                    <NavLink
-                      to="/dashboard/ip-usage"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>📡</span>
-                      <span>IP Usage</span>
-                    </NavLink>
-                  </div>
-                )}
-
-                {/* Monitoring: security/traffic/health signals — grouped
-                    together instead of split between Analytics and an
-                    unlabeled trailing list. */}
-                <div
-                  onClick={() => toggleSection("monitoring")}
-                  className={sectionHeaderClass(expandedSections.monitoring)}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <span className="flex items-center gap-2">
-                    <span>🩺</span>
-                    <span>Monitoring</span>
-                  </span>
-                  <span
-                    className={`text-sm transition-transform duration-300 ${
-                      expandedSections.monitoring ? "rotate-180" : ""
-                    }`}
-                  >
-                    ▼
-                  </span>
-                </div>
-                {expandedSections.monitoring && (
-                  <div className="ml-3 space-y-1 border-l border-slate-200 py-2 pl-4 animate-in fade-in slide-in-from-top-2 duration-200 dark:border-slate-700/60">
-                    <NavLink
-                      to="/dashboard/registration-metadata"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>🛡️</span>
-                      <span>Registration Signals</span>
-                    </NavLink>
-                    <NavLink
-                      to="/dashboard/system-status"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>🖥️</span>
-                      <span>System Status</span>
-                    </NavLink>
-                    <NavLink
-                      to="/dashboard/visitors-info"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>👥</span>
-                      <span>Visitors Info</span>
-                    </NavLink>
-                    <NavLink
-                      to="/dashboard/visitors"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>🌍</span>
-                      <span>Visitors Detail</span>
-                    </NavLink>
-                    <NavLink
-                      to="/dashboard/error-logs"
-                      className={({ isActive }) => navItemClass(isActive)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>🚨</span>
-                      <span>Error Logs</span>
-                    </NavLink>
-                  </div>
-                )}
+                          {visibleItems.map((item) => (
+                            <NavLink
+                              key={item.to}
+                              to={item.to}
+                              className={({ isActive }) => navItemClass(isActive)}
+                              onClick={closeFlyoutAndDrawer}
+                              role="menuitem"
+                            >
+                              <span>{item.icon}</span>
+                              <span>{item.label}</span>
+                            </NavLink>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </>
             )}
           </nav>
