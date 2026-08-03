@@ -240,16 +240,22 @@ const DashboardLayout = () => {
 
     const rect = node.getBoundingClientRect();
     const left = Math.min(rect.right + 8, window.innerWidth - FLYOUT_WIDTH - 8);
-
-    // Clamp so the panel never runs past the bottom (or top) edge of the
-    // viewport — it stays anchored to the button's top when there's room,
-    // and slides up just enough to keep FLYOUT_MARGIN of breathing room
-    // otherwise, rather than being cut off or forced to scroll internally.
     const height = estimateFlyoutHeight(
       (visibleSectionItems[key] || []).length,
     );
-    const maxTop = window.innerHeight - FLYOUT_MARGIN - height;
-    const top = Math.max(FLYOUT_MARGIN, Math.min(rect.top, maxTop));
+
+    // Anchored to the button's top edge whenever there's room below it —
+    // same as just following the button. Only when a long list opened near
+    // the bottom of the screen wouldn't fit does it flip to hang from the
+    // button's BOTTOM edge and grow upward instead, so it stays right next
+    // to the button (e.g. near the footer) rather than jumping away to
+    // wherever there happens to be enough clear space.
+    const fitsBelow = rect.top + height + FLYOUT_MARGIN <= window.innerHeight;
+    let top = fitsBelow ? rect.top : rect.bottom - height;
+    top = Math.max(
+      FLYOUT_MARGIN,
+      Math.min(top, window.innerHeight - FLYOUT_MARGIN - height),
+    );
 
     return { top, left };
   };
