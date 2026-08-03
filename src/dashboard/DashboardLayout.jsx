@@ -183,7 +183,6 @@ const DashboardLayout = () => {
   const [flyoutStyle, setFlyoutStyle] = useState({});
   const sectionButtonRefs = useRef({});
   const flyoutRef = useRef(null);
-  const navRef = useRef(null);
 
   const {
     safeUserInfo: userInfo,
@@ -260,32 +259,6 @@ const DashboardLayout = () => {
     return { top, left };
   };
 
-  // The flyout is fixed-positioned (portaled to document.body — see below)
-  // so it isn't trapped by the sidebar's own translate-x transform, but that
-  // means it doesn't automatically move when the *sidebar's own* nav list
-  // scrolls (that scroll never touches the window, so plain CSS position:
-  // fixed just sits there — "stuck" instead of following its button).
-  // Re-measuring the button's rect on every nav scroll (and window resize)
-  // keeps it visually anchored to the button instead. Deliberately NOT
-  // rAF-throttled — that extra frame of delay was visible as the flyout
-  // lagging behind/detaching from its button during an active scroll.
-  useEffect(() => {
-    if (!openSection) return;
-
-    const reposition = () => {
-      const style = computeFlyoutStyle(openSection);
-      if (style) setFlyoutStyle(style);
-    };
-
-    const navEl = navRef.current;
-    navEl?.addEventListener("scroll", reposition, { passive: true });
-    window.addEventListener("resize", reposition);
-
-    return () => {
-      navEl?.removeEventListener("scroll", reposition);
-      window.removeEventListener("resize", reposition);
-    };
-  }, [openSection]);
 
   const toggleSection = (key) => {
     if (openSection === key) {
@@ -377,10 +350,7 @@ const DashboardLayout = () => {
             </div>
           </div>
 
-          <nav
-            ref={navRef}
-            className="sidebar-scrollbar flex-1 space-y-1 overflow-y-auto px-4 pb-10 pt-5"
-          >
+          <nav className="sidebar-scrollbar flex-1 space-y-1 overflow-y-auto px-4 pb-10 pt-5">
             <NavLink
               to="/dashboard"
               end
