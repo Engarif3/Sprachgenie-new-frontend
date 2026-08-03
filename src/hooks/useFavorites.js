@@ -7,7 +7,7 @@ import { useAuth } from "../services/auth.services";
 // flow, the title-list pages already fetch full item data separately — this
 // only tracks the favorited id set, used to color each card's heart icon and
 // drive the "favorites only" filter.
-export const useFavorites = (resource, idField) => {
+export const useFavorites = (resource, idField, itemLabel = "item") => {
   const { userId, isLoggedIn } = useAuth();
   const endpoint = `/favorite-${resource}`;
 
@@ -51,6 +51,20 @@ export const useFavorites = (resource, idField) => {
       if (loadingIds[id]) return;
 
       const wasFavorite = favoriteIds.includes(id);
+
+      if (wasFavorite) {
+        const result = await Swal.fire({
+          title: "Remove from favorites?",
+          text: `This ${itemLabel} will be removed from your favorites.`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Yes, remove",
+          cancelButtonText: "Cancel",
+          reverseButtons: true,
+        });
+        if (!result.isConfirmed) return;
+      }
+
       setLoadingIds((prev) => ({ ...prev, [id]: true }));
 
       try {
@@ -76,7 +90,7 @@ export const useFavorites = (resource, idField) => {
         setLoadingIds((prev) => ({ ...prev, [id]: false }));
       }
     },
-    [endpoint, favoriteIds, idField, isLoggedIn, loadingIds],
+    [endpoint, favoriteIds, idField, isLoggedIn, itemLabel, loadingIds],
   );
 
   const deleteAllFavorites = useCallback(async () => {

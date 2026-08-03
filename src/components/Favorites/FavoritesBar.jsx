@@ -28,7 +28,7 @@ const FavoritesBar = ({
         {active ? `Showing Favorites (${count})` : "Show Favorites Only"}
       </button>
 
-      {active && count > 0 && (
+      {count > 0 && (
         <button
           type="button"
           onClick={onRequestDeleteAll}

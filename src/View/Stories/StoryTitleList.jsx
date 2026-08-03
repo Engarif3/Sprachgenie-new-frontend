@@ -54,7 +54,7 @@ const StoryTitleList = () => {
     deleteAllFavorites,
     showFavoritesOnly,
     setShowFavoritesOnly,
-  } = useFavorites("stories", "storyId");
+  } = useFavorites("stories", "storyId", "story");
 
   const fetchStories = async () => {
     setLoading(true);

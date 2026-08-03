@@ -151,7 +151,7 @@ const ConversationTitleList = () => {
     deleteAllFavorites,
     showFavoritesOnly,
     setShowFavoritesOnly,
-  } = useFavorites("conversations", "conversationId");
+  } = useFavorites("conversations", "conversationId", "conversation");
 
   const fetchConversations = async () => {
     try {
