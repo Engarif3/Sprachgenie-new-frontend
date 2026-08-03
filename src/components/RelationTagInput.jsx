@@ -35,6 +35,11 @@ const RelationTagInput = ({
   // only currentWordValue.
   currentWordId = null,
   currentWordValue = null,
+  // Word ids already linked as this relation type (from already-saved
+  // relations, not just the chips currently staged in `values`) — lets
+  // the update form block re-adding something that's already connected,
+  // not just duplicates within this one input box.
+  alreadyLinkedIds = [],
 }) => {
   const [text, setText] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -66,9 +71,9 @@ const RelationTagInput = ({
     // unresolved chips sharing text are fine — they may resolve to
     // different POS variants.
     if (wordId !== null) {
-      const alreadyPresent = values.some(
-        (existing) => existing.wordId === wordId,
-      );
+      const alreadyPresent =
+        values.some((existing) => existing.wordId === wordId) ||
+        alreadyLinkedIds.includes(wordId);
       if (alreadyPresent) {
         return;
       }
@@ -139,10 +144,12 @@ const RelationTagInput = ({
           ? response.data.data
           : [];
         // Exclude a suggestion only if that exact Word row is already a
-        // chip — a different POS variant with the same spelling must stay
-        // offered.
+        // chip, or already linked as a saved relation — a different POS
+        // variant with the same spelling must stay offered.
         const filtered = results.filter(
-          (word) => !values.some((existing) => existing.wordId === word.id),
+          (word) =>
+            !values.some((existing) => existing.wordId === word.id) &&
+            !alreadyLinkedIds.includes(word.id),
         );
 
         setSuggestions(filtered);

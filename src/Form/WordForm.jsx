@@ -138,6 +138,16 @@ const WordForm = () => {
     fetchData();
   }, []);
 
+  // True when some OTHER chip in this field already resolved to the same
+  // Word row — catches the case where the admin types the same text twice
+  // and both happen to resolve to the identical (single) variant, which
+  // would otherwise slip past the wordId dedupe in RelationTagInput (that
+  // only runs at commit time, before resolution has happened).
+  const isWordIdUsedElsewhere = (field, wordId, excludeChipKey = null) =>
+    wordData[field].some(
+      (c) => c.wordId === wordId && c.key !== excludeChipKey,
+    );
+
   // Writes a resolution directly onto one specific chip (by key), never
   // onto every chip sharing its text.
   const applyChipResolution = (field, chipKey, resolution) => {
@@ -195,6 +205,17 @@ const WordForm = () => {
         title: "Invalid relation",
         text: `A word cannot reference itself as a ${pending.relationType}.`,
         icon: "warning",
+        timer: 2200,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
+    if (isWordIdUsedElsewhere(pending.field, selected.id, chipKey)) {
+      Swal.fire({
+        title: "Already added",
+        text: `"${pending.value}" (${selected.partsOfSpeech.map((p) => p.name).join(", ")}) is already in this list.`,
+        icon: "info",
         timer: 2200,
         showConfirmButton: false,
       });
@@ -265,6 +286,24 @@ const WordForm = () => {
             );
 
           if (isSelfReference) {
+            continue;
+          }
+
+          if (isWordIdUsedElsewhere(field, variant.id, chip.key)) {
+            // Same text, only one variant to resolve to, and that variant
+            // is already on another chip in this field — remove this one
+            // rather than silently creating a duplicate relation.
+            setWordData((prev) => ({
+              ...prev,
+              [field]: prev[field].filter((c) => c.key !== chip.key),
+            }));
+            Swal.fire({
+              title: "Already added",
+              text: `"${chip.value}" is already in this list.`,
+              icon: "info",
+              timer: 1800,
+              showConfirmButton: false,
+            });
             continue;
           }
 

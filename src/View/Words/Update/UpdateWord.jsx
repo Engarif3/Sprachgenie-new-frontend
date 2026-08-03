@@ -469,6 +469,18 @@ const UpdateWord = () => {
     }),
   );
 
+  // True when a Word row is already linked as this relation type — either
+  // already saved (relationVariantDetails, kept in sync locally by every
+  // add below) or resolved on another chip still sitting in the "add new"
+  // box. Catches a word being added twice, whether by re-suggesting the
+  // same exact variant or by two free-typed chips resolving to the same
+  // single variant.
+  const isWordIdAlreadyLinked = (field, wordId, excludeChipKey = null) =>
+    relationVariantDetails[field].some((d) => d.id === wordId) ||
+    inputData[field].some(
+      (c) => c.wordId === wordId && c.key !== excludeChipKey,
+    );
+
   // Writes a resolution directly onto one specific chip (by key) in
   // inputData, never onto every chip sharing its text.
   const applyChipResolution = (field, chipKey, resolution) => {
@@ -509,6 +521,17 @@ const UpdateWord = () => {
       return;
     }
 
+    if (isWordIdAlreadyLinked(pending.field, selected.id, chipKey)) {
+      Swal.fire({
+        title: "Already added",
+        text: `"${pending.value}" (${selected.partsOfSpeech.map((p) => p.name).join(", ")}) is already linked to this word.`,
+        icon: "info",
+        timer: 2200,
+        showConfirmButton: false,
+      });
+      return;
+    }
+
     try {
       await api.post("/word/relation/add", {
         wordId: formData.id,
@@ -533,6 +556,22 @@ const UpdateWord = () => {
       setFormData((prev) => ({
         ...prev,
         [pending.field]: [...prev[pending.field], pending.value],
+      }));
+
+      // Update relationVariantDetails in the SAME step, synchronously —
+      // this (not a background refetch) is what the per-row POS label
+      // reads, so it's correct immediately regardless of refetch timing,
+      // caching, or ordering from the backend.
+      setRelationVariantDetails((prev) => ({
+        ...prev,
+        [pending.field]: [
+          ...prev[pending.field],
+          {
+            id: selected.id,
+            value: pending.value,
+            partsOfSpeech: selected.partsOfSpeech,
+          },
+        ],
       }));
 
       // Tracked separately from currentRelationIds (owned by the
@@ -569,11 +608,6 @@ const UpdateWord = () => {
         showConfirmButton: false,
         icon: "success",
       });
-
-      // Refetch so relationVariantDetails picks up this new relation's
-      // real POS — the local push above shows the word immediately, but
-      // its per-row POS label only appears once this lands.
-      setRefetchTrigger((prev) => prev + 1);
     } catch {
       Swal.fire({
         title: "Error",
@@ -728,6 +762,24 @@ const UpdateWord = () => {
           if (Number(variant.id) === Number(formData.id)) {
             // Self-reference — leave unresolved, same as today's
             // behavior; caught again defensively at submit time.
+            continue;
+          }
+
+          if (isWordIdAlreadyLinked(field, variant.id, chip.key)) {
+            // Same text, only one variant to resolve to, and that variant
+            // is already linked (saved or on another pending chip) —
+            // remove this one rather than silently creating a duplicate.
+            setInputData((prev) => ({
+              ...prev,
+              [field]: prev[field].filter((c) => c.key !== chip.key),
+            }));
+            Swal.fire({
+              title: "Already added",
+              text: `"${chip.value}" is already linked to this word.`,
+              icon: "info",
+              timer: 1800,
+              showConfirmButton: false,
+            });
             continue;
           }
 
@@ -2598,6 +2650,9 @@ const UpdateWord = () => {
                     id="update-synonyms"
                     currentWordId={formData.id}
                     currentWordValue={formData.value}
+                    alreadyLinkedIds={relationVariantDetails.synonyms.map(
+                      (d) => d.id,
+                    )}
                     values={inputData.synonyms}
                     onChange={(next) =>
                       handleRelationChipsChange("synonyms", next)
@@ -2677,6 +2732,9 @@ const UpdateWord = () => {
                     id="update-antonyms"
                     currentWordId={formData.id}
                     currentWordValue={formData.value}
+                    alreadyLinkedIds={relationVariantDetails.antonyms.map(
+                      (d) => d.id,
+                    )}
                     values={inputData.antonyms}
                     onChange={(next) =>
                       handleRelationChipsChange("antonyms", next)
@@ -2756,6 +2814,9 @@ const UpdateWord = () => {
                     id="update-similarWords"
                     currentWordId={formData.id}
                     currentWordValue={formData.value}
+                    alreadyLinkedIds={relationVariantDetails.similarWords.map(
+                      (d) => d.id,
+                    )}
                     values={inputData.similarWords}
                     onChange={(next) =>
                       handleRelationChipsChange("similarWords", next)
