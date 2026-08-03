@@ -97,6 +97,8 @@ const MAX_WEEKLY_XP_PER_LEVEL = 20 * 10 * 7;
 
 const isValidLevel = (value) => LEVELS.some((level) => level.key === value);
 
+const REAL_ONLY_STORAGE_KEY = "leaderboardRealOnly";
+
 // Fake rows shown (blurred, behind a login overlay) to logged-out visitors
 // so the page still communicates "there's a leaderboard here" without ever
 // sending the real names/scores to an unauthenticated request.
@@ -141,8 +143,37 @@ const Leaderboard = () => {
   const [deployingBots, setDeployingBots] = useState(false);
   // Super-admin-only view filter — excludes bots from this request's list
   // and rank math entirely, so a super admin can check who the real users
-  // actually are without turning bots off for everyone else.
-  const [realOnly, setRealOnly] = useState(false);
+  // actually are without turning bots off for everyone else. Persisted to
+  // the URL (survives a refresh, same as activeLevel below) with a
+  // localStorage fallback (survives navigating away and back via a plain
+  // link with no query string) — previously plain useState(false), which
+  // silently reset to off on either.
+  const requestedRealOnlyParam = searchParams.get("realOnly");
+  const [realOnly, setRealOnly] = useState(() => {
+    if (requestedRealOnlyParam !== null) {
+      return requestedRealOnlyParam === "true";
+    }
+    try {
+      return localStorage.getItem(REAL_ONLY_STORAGE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleRealOnly = () => {
+    const next = !realOnly;
+    setRealOnly(next);
+    try {
+      localStorage.setItem(REAL_ONLY_STORAGE_KEY, String(next));
+    } catch {
+      // Ignore storage errors (private browsing, quota, disabled storage) —
+      // the toggle still works for this session via component state and the
+      // URL param, it just won't survive a future remount.
+    }
+    const params = { level: activeLevel };
+    if (next) params.realOnly = "true";
+    setSearchParams(params);
+  };
 
   const refresh = useCallback(
     async (signal) => {
@@ -402,7 +433,11 @@ const Leaderboard = () => {
               <button
                 key={key}
                 type="button"
-                onClick={() => setSearchParams({ level: key })}
+                onClick={() => {
+                  const params = { level: key };
+                  if (realOnly) params.realOnly = "true";
+                  setSearchParams(params);
+                }}
                 className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition-all ${
                   isActive
                     ? `shadow-lg ${LEVEL_THEME[key].tabActive}`
@@ -510,7 +545,7 @@ const Leaderboard = () => {
             {isSuperAdmin ? (
               <button
                 type="button"
-                onClick={() => setRealOnly((prev) => !prev)}
+                onClick={toggleRealOnly}
                 className={`flex items-center justify-between gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors ${cardClass}`}
               >
                 <span
