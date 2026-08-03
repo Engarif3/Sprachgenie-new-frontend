@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import axios from "../axios";
 import { useAuth } from "../services/auth.services";
 
@@ -45,7 +46,12 @@ const LevelList = () => {
   // Handle level delete
   const handleDeleteLevel = async () => {
     if (confirmationInput !== "DELETE") {
-      alert("Please type DELETE to confirm deletion.");
+      await Swal.fire({
+        icon: "warning",
+        title: "Please type DELETE to confirm deletion.",
+        timer: 1800,
+        showConfirmButton: false,
+      });
       return;
     }
     try {
@@ -56,7 +62,11 @@ const LevelList = () => {
       setConfirmationInput("");
     } catch (error) {
       console.error("Error deleting level", error);
-      alert("Failed to delete level. Please try again.");
+      await Swal.fire({
+        icon: "error",
+        title: "Failed to delete level",
+        text: "Please try again.",
+      });
     }
   };
 

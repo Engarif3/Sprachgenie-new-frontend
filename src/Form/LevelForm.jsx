@@ -40,7 +40,12 @@ const LevelForm = () => {
     const trimmedName = levelName.trim();
 
     if (!trimmedName) {
-      alert("Level name is required");
+      await Swal.fire({
+        icon: "warning",
+        title: "Level name is required",
+        timer: 1800,
+        showConfirmButton: false,
+      });
       return;
     }
 

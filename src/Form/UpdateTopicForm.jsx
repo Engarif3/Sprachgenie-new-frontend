@@ -118,7 +118,12 @@ const UpdateTopicForm = () => {
     event.preventDefault();
 
     if (!selectedTopicId) {
-      alert("Please select a topic to update");
+      await Swal.fire({
+        icon: "warning",
+        title: "Please select a topic to update",
+        timer: 1800,
+        showConfirmButton: false,
+      });
       return;
     }
 
@@ -274,7 +279,12 @@ const UpdateTopicForm = () => {
 
   const handleDelete = async () => {
     if (!selectedTopicId) {
-      alert("Please select a topic to delete");
+      await Swal.fire({
+        icon: "warning",
+        title: "Please select a topic to delete",
+        timer: 1800,
+        showConfirmButton: false,
+      });
       return;
     }
 

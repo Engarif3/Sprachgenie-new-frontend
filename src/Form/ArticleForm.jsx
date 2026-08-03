@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Navigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import axios from "../axios";
 import { useAuth } from "../services/auth.services";
 import Button from "../components/UI/Button";
@@ -29,11 +30,20 @@ const ArticleForm = () => {
     try {
       const response = await axios.post("/articles", articleData);
       console.log("Article added successfully:", response.data);
-      alert("Article created successfully");
+      await Swal.fire({
+        icon: "success",
+        title: "Article created successfully",
+        timer: 1500,
+        showConfirmButton: false,
+      });
       setArticleData({ name: "" }); // Clear form after successful submission
     } catch (error) {
       console.error("Error adding article:", error);
-      alert("Error creating article");
+      await Swal.fire({
+        icon: "error",
+        title: "Error creating article",
+        text: error.response?.data?.message || "Please try again.",
+      });
     } finally {
       setLoading(false); // Set loading to false after submission attempt
     }

@@ -73,6 +73,7 @@
 
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import axios from "../axios";
 import Container from "../utils/Container";
 import { useAuth } from "../services/auth.services";
@@ -97,7 +98,11 @@ const TopicForm = () => {
         setLevels(response.data.data || []);
       } catch (error) {
         console.error("Failed to fetch levels:", error);
-        alert("Unable to load levels");
+        await Swal.fire({
+          icon: "error",
+          title: "Unable to load levels",
+          text: "Please refresh and try again.",
+        });
       }
     };
 
@@ -124,11 +129,20 @@ const TopicForm = () => {
         levelId: topicData.levelId ? parseInt(topicData.levelId, 10) : null,
       });
       await invalidateWordsCache();
-      alert("Topic created successfully");
+      await Swal.fire({
+        icon: "success",
+        title: "Topic created successfully",
+        timer: 1500,
+        showConfirmButton: false,
+      });
       setTopicData({ name: "", levelId: "" });
     } catch (error) {
       console.error("Error creating topic:", error);
-      alert(error.response?.data?.message || "Error creating topic");
+      await Swal.fire({
+        icon: "error",
+        title: "Error creating topic",
+        text: error.response?.data?.message || "Please try again.",
+      });
     } finally {
       setLoading(false);
     }

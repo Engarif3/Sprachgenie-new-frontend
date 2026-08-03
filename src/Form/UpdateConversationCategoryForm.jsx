@@ -81,7 +81,12 @@ const UpdateConversationCategoryForm = () => {
     event.preventDefault();
 
     if (!selectedCategoryId) {
-      alert("Please select a category to update");
+      await Swal.fire({
+        icon: "warning",
+        title: "Please select a category to update",
+        timer: 1800,
+        showConfirmButton: false,
+      });
       return;
     }
 
@@ -197,7 +202,12 @@ const UpdateConversationCategoryForm = () => {
 
   const handleDelete = async () => {
     if (!selectedCategoryId) {
-      alert("Please select a category to delete");
+      await Swal.fire({
+        icon: "warning",
+        title: "Please select a category to delete",
+        timer: 1800,
+        showConfirmButton: false,
+      });
       return;
     }
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import Swal from "sweetalert2";
 import api from "../../axios";
 import aiApi from "../../AI_axios";
 import PageHeader from "../../components/UI/PageHeader";
@@ -92,7 +93,16 @@ const StoriesManagement = () => {
   };
 
   const handlePublish = async (storyId) => {
-    if (!window.confirm("Are you sure you want to publish this story?")) {
+    const result = await Swal.fire({
+      title: "Publish this story?",
+      text: "Are you sure you want to publish this story?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, publish",
+      cancelButtonText: "Cancel",
+      reverseButtons: true,
+    });
+    if (!result.isConfirmed) {
       return;
     }
 
@@ -109,7 +119,16 @@ const StoriesManagement = () => {
   };
 
   const handleUnpublish = async (storyId) => {
-    if (!window.confirm("Are you sure you want to unpublish this story?")) {
+    const result = await Swal.fire({
+      title: "Unpublish this story?",
+      text: "Are you sure you want to unpublish this story?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, unpublish",
+      cancelButtonText: "Cancel",
+      reverseButtons: true,
+    });
+    if (!result.isConfirmed) {
       return;
     }
 
@@ -126,11 +145,17 @@ const StoriesManagement = () => {
   };
 
   const handleDelete = async (storyId) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to delete this story? This cannot be undone.",
-      )
-    ) {
+    const result = await Swal.fire({
+      title: "Delete this story?",
+      text: "Are you sure you want to delete this story? This cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#e11d48",
+      reverseButtons: true,
+    });
+    if (!result.isConfirmed) {
       return;
     }
 

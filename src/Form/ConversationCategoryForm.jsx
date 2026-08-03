@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import axios from "../axios";
 import Container from "../utils/Container";
 import { useAuth } from "../services/auth.services";
@@ -26,11 +27,20 @@ const ConversationCategoryForm = () => {
 
     try {
       await axios.post("/conversation-category/create", categoryData);
-      alert("Category created successfully");
+      await Swal.fire({
+        icon: "success",
+        title: "Category created successfully",
+        timer: 1500,
+        showConfirmButton: false,
+      });
       setCategoryData({ name: "" });
     } catch (error) {
       console.error("Error creating category:", error);
-      alert(error.response?.data?.message || "Error creating category");
+      await Swal.fire({
+        icon: "error",
+        title: "Error creating category",
+        text: error.response?.data?.message || "Please try again.",
+      });
     } finally {
       setLoading(false);
     }

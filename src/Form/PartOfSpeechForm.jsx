@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Navigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import axios from "../axios";
 import { useAuth } from "../services/auth.services";
 import Button from "../components/UI/Button";
@@ -29,11 +30,20 @@ const PartOfSpeechForm = () => {
     try {
       const response = await axios.post("/part-of-speech", posData);
       console.log("Part of Speech added successfully:", response.data);
-      alert("Part of Speech created successfully");
+      await Swal.fire({
+        icon: "success",
+        title: "Part of Speech created successfully",
+        timer: 1500,
+        showConfirmButton: false,
+      });
       setPosData({ name: "" }); // Clear form after successful submission
     } catch (error) {
       console.error("Error adding part of speech:", error);
-      alert("Error creating part of speech");
+      await Swal.fire({
+        icon: "error",
+        title: "Error creating part of speech",
+        text: error.response?.data?.message || "Please try again.",
+      });
     } finally {
       setLoading(false); // Set loading to false after submission attempt
     }
