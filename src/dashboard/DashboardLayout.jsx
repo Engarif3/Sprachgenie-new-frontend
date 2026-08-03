@@ -169,6 +169,7 @@ const DashboardLayout = () => {
   const [flyoutStyle, setFlyoutStyle] = useState({});
   const sectionButtonRefs = useRef({});
   const flyoutRef = useRef(null);
+  const navRef = useRef(null);
 
   const {
     safeUserInfo: userInfo,
@@ -210,15 +211,45 @@ const DashboardLayout = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [openSection]);
 
-  // The flyout's fixed position is computed once, from the trigger button's
-  // rect, at the moment it opens — rather than trying to keep it live in
-  // sync, just close it if the layout underneath it could have shifted.
+  const computeFlyoutStyle = (key) => {
+    const node = sectionButtonRefs.current[key];
+    if (!node) return null;
+
+    const rect = node.getBoundingClientRect();
+    const left = Math.min(rect.right + 8, window.innerWidth - FLYOUT_WIDTH - 8);
+
+    return { top: rect.top, left };
+  };
+
+  // The flyout is fixed-positioned (portaled to document.body — see below)
+  // so it isn't trapped by the sidebar's own translate-x transform, but that
+  // means it doesn't automatically move when the *sidebar's own* nav list
+  // scrolls (that scroll never touches the window, so plain CSS position:
+  // fixed just sits there — "stuck" instead of following its button).
+  // Re-measuring the button's rect on every nav scroll (and window resize)
+  // keeps it visually anchored to the button instead.
   useEffect(() => {
     if (!openSection) return;
 
-    const close = () => setOpenSection(null);
-    window.addEventListener("resize", close);
-    return () => window.removeEventListener("resize", close);
+    let frame = null;
+    const reposition = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = null;
+        const style = computeFlyoutStyle(openSection);
+        if (style) setFlyoutStyle(style);
+      });
+    };
+
+    const navEl = navRef.current;
+    navEl?.addEventListener("scroll", reposition, { passive: true });
+    window.addEventListener("resize", reposition);
+
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      navEl?.removeEventListener("scroll", reposition);
+      window.removeEventListener("resize", reposition);
+    };
   }, [openSection]);
 
   const toggleSection = (key) => {
@@ -227,21 +258,8 @@ const DashboardLayout = () => {
       return;
     }
 
-    const node = sectionButtonRefs.current[key];
-    if (node) {
-      const rect = node.getBoundingClientRect();
-      const left = Math.min(
-        rect.right + 8,
-        window.innerWidth - FLYOUT_WIDTH - 8,
-      );
-
-      setFlyoutStyle({
-        top: rect.top,
-        left,
-        maxHeight: window.innerHeight - rect.top - 16,
-      });
-    }
-
+    const style = computeFlyoutStyle(key);
+    if (style) setFlyoutStyle(style);
     setOpenSection(key);
   };
 
@@ -325,8 +343,8 @@ const DashboardLayout = () => {
           </div>
 
           <nav
+            ref={navRef}
             className="sidebar-scrollbar flex-1 space-y-1 overflow-y-auto px-4 pb-10 pt-5"
-            onScroll={() => setOpenSection(null)}
           >
             <NavLink
               to="/dashboard"
@@ -448,10 +466,9 @@ const DashboardLayout = () => {
                             style={{
                               top: flyoutStyle.top,
                               left: flyoutStyle.left,
-                              maxHeight: flyoutStyle.maxHeight,
                               width: FLYOUT_WIDTH,
                             }}
-                            className="fixed z-50 space-y-1 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl shadow-slate-900/20 dark:border-slate-700 dark:bg-slate-900"
+                            className="fixed z-50 space-y-1 rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl shadow-slate-900/20 dark:border-slate-700 dark:bg-slate-900"
                             role="menu"
                           >
                             {visibleItems.map((item) => (
