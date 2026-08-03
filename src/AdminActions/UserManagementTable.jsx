@@ -135,7 +135,7 @@ const UserManagementTable = ({
                     >
                       <td className="px-4 py-2.5 align-top">
                         <div className="flex items-center gap-2.5">
-                          <div className="mr-2 flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md border border-slate-400 dark:border-gray-500 bg-slate-700 text-xs font-bold text-white">
+                          <div className="mr-2 flex h-9 w-9  shrink-0 items-center justify-center overflow-hidden rounded-full  border-sky-400 dark:border-gray-500 bg-slate-700 text-xs font-bold text-white">
                             {getAvatarUrl(user, profileSettings) ? (
                               <img
                                 src={getAvatarUrl(user, profileSettings)}
@@ -192,8 +192,8 @@ const UserManagementTable = ({
                           </span>
                         )}
                       </td>
-                      <td className="px-3 py-1 text-center">
-                        <div className="flex items-center gap-3">
+                      <td className="px-1 py-1 text-center bg-sky-900 ">
+                        <div className="flex justify-center items-center gap-1">
                           <span
                             className={`inline-flex w-24 justify-center rounded-lg border px-1 py-1 text-center text-[10px] font-semibold uppercase tracking-[0.18em] ${getStatusBadgeClass(
                               user.status,
@@ -224,7 +224,7 @@ const UserManagementTable = ({
                               String(user.status || "").toUpperCase() !==
                               "DELETED"
                             }
-                            className="rounded-lg border border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-900/60 px-3 py-1 text-[11px] font-semibold text-slate-700 dark:text-gray-200 transition hover:border-slate-400 dark:hover:border-gray-500 hover:bg-slate-100 dark:hover:bg-gray-800 disabled:cursor-not-allowed disabled:border-slate-200 dark:disabled:border-gray-700 disabled:bg-slate-100 dark:disabled:bg-gray-800 disabled:text-slate-400 dark:disabled:text-gray-500"
+                            className="rounded-lg border border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-900/60 px-2 py-1 text-[11px] font-semibold text-slate-700 dark:text-gray-200 transition hover:border-slate-400 dark:hover:border-gray-500 hover:bg-slate-100 dark:hover:bg-gray-800 disabled:cursor-not-allowed disabled:border-slate-200 dark:disabled:border-gray-700 disabled:bg-slate-100 dark:disabled:bg-gray-800 disabled:text-slate-400 dark:disabled:text-gray-500"
                             title={
                               String(user.status || "").toUpperCase() ===
                               "DELETED"
@@ -236,9 +236,9 @@ const UserManagementTable = ({
                           </button>
                         </td>
                       )}
-                      <td className="px-3 py-1 text-center text-xs text-slate-700 dark:text-gray-300">
+                      <td className="px-1 py-1 text-center text-xs text-slate-700 dark:text-gray-300">
                         <div className="flex items-center gap-1 leading-tight">
-                          <span className="rounded-lg bg-slate-100 dark:bg-gray-700 px-3 py-1 font-medium text-slate-700 dark:text-gray-200">
+                          <span className="rounded-lg bg-slate-100 dark:bg-gray-700 px-1 py-1 font-medium text-slate-700 dark:text-gray-200">
                             {formattedDateTime[0]}
                           </span>
                           <span>-</span>
