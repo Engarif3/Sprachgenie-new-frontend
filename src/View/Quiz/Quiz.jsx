@@ -275,7 +275,7 @@ const Quiz = () => {
   if (loading) {
     return (
       <Container>
-        <div className="p-4 bg-gray-800 text-white rounded min-h-[50vh] flex justify-center items-center ">
+        <div className="flex min-h-[50vh] items-center justify-center rounded-2xl border border-slate-200 bg-white p-4 text-slate-600 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300">
           <p>Loading Quiz Data....</p>
         </div>
       </Container>
@@ -284,43 +284,41 @@ const Quiz = () => {
 
   if (!quizStarted) {
     return (
-      <div className=" flex justify-center p-2">
-        <div className="relative  p-3 md:p-5 text-white rounded-2xl flex flex-col justify-center items-center  mb-4 bg-gradient-to-br from-gray-900 via-gray-800 to-black  w-full md:w-8/12 lg:w-8/12">
-          {/* Background decoration */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-orange-500/5 rounded-2xl"></div>
-          <div className="absolute inset-0 backdrop-blur-3xl opacity-30 rounded-2xl "></div>
+      <Container>
+        <div className="mx-auto w-full max-w-xl px-2 py-6 md:py-8">
+          {/* Main Title */}
+          <div className="mb-4 text-center">
+            <h1 className="mb-1 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-3xl font-bold text-transparent md:text-4xl">
+              Quiz
+            </h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400 md:text-base">
+              Test your vocabulary and improve your German skills
+            </p>
+          </div>
 
-          <div className="relative z-10 w-full max-w-2xl px-4 ">
-            {/* Main Title */}
-            <div className="text-center mb-3">
-              <h1 className="text-3xl md:text-4xl font-bold mb-1 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
-                Quiz
-              </h1>
-              <p className="text-gray-300 text-sm md:text-base ">
-                Test your vocabulary and improve your German skills
-              </p>
-            </div>
+          {/* Difficulty Selection */}
+          <div className="mb-4">
+            <h2 className="mb-3 text-center text-lg font-bold text-blue-600 dark:text-blue-400">
+              Select Your Level
+            </h2>
 
-            {/* Difficulty Selection */}
-            <div className="mb-4">
-              <h2 className="text-lg  font-bold text-center mb-3 text-blue-400">
-                Select Your Level
-              </h2>
-
-              <div className="flex flex-col gap-3">
-                {Object.entries(DIFFICULTY_LEVELS).map(([level, config]) => (
+            <div className="flex flex-col gap-3">
+              {Object.entries(DIFFICULTY_LEVELS).map(([level, config]) => {
+                const isSelected =
+                  source === "difficulty" && difficulty === parseInt(level);
+                return (
                   <button
                     key={level}
                     onClick={() => handleSelectDifficulty(parseInt(level))}
-                    className={`group relative py-2 pl-6 pr-4 rounded-2xl transition-all duration-300 overflow-hidden ${
-                      source === "difficulty" && difficulty === parseInt(level)
-                        ? "bg-gradient-to-r from-blue-600 to-purple-600 border-2 border-blue-400 shadow-lg shadow-blue-500/50 scale-105"
-                        : "bg-gradient-to-br from-gray-800/60 to-gray-900/60 border-2 border-cyan-700 hover:border-blue-500 hover:bg-gray-800/80"
+                    className={`group relative overflow-hidden rounded-2xl border-2 py-3 pl-6 pr-4 transition-all duration-300 ${
+                      isSelected
+                        ? "scale-105 border-blue-400 bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/50"
+                        : "border-slate-200 bg-white text-slate-700 hover:border-blue-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-slate-800"
                     }`}
                   >
-                    <div className="flex items-start justify-between ">
+                    <div className="flex items-start justify-between">
                       <div className="text-left">
-                        <div className="font-bold text-base md:text-lg mb-0.5">
+                        <div className="mb-0.5 text-lg font-bold md:text-xl">
                           {level === "1"
                             ? "🟢 Easy"
                             : level === "2"
@@ -328,258 +326,265 @@ const Quiz = () => {
                               : "🟡 Mixed"}
                         </div>
                         <div
-                          className={`text-xs md:text-sm ${source === "difficulty" && difficulty === parseInt(level) ? "text-white" : "text-gray-400"}`}
+                          className={`text-sm md:text-base ${
+                            isSelected
+                              ? "text-white"
+                              : "text-slate-500 dark:text-slate-400"
+                          }`}
                         >
                           {config.description}
                         </div>
                       </div>
-                      <div className="text-xl md:text-2xl">
-                        {source === "difficulty" && difficulty === parseInt(level)
-                          ? "✓"
-                          : ""}
+                      <div className="text-2xl md:text-3xl">
+                        {isSelected ? "✓" : ""}
                       </div>
                     </div>
                   </button>
-                ))}
+                );
+              })}
 
-                {/* Favorites — visible to guests too; clicking without being
-                    logged in prompts a login instead of hiding the option. */}
-                <button
-                  onClick={handleSelectFavorites}
-                  className={`group relative py-2 pl-6 pr-4 rounded-2xl transition-all duration-300 overflow-hidden ${
-                    source === "favorites"
-                      ? "bg-gradient-to-r from-pink-600 to-rose-600 border-2 border-pink-400 shadow-lg shadow-pink-500/50 scale-105"
-                      : "bg-gradient-to-br from-gray-800/60 to-gray-900/60 border-2 border-cyan-700 hover:border-pink-500 hover:bg-gray-800/80"
-                  }`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="text-left">
-                      <div className="font-bold text-base md:text-lg mb-0.5">
-                        ❤️ My Favorites
-                      </div>
-                      <div
-                        className={`text-xs md:text-sm ${source === "favorites" ? "text-white" : "text-gray-400"}`}
-                      >
-                        {isLoggedIn
-                          ? "Revise the words you've favorited"
-                          : "Sign in to quiz yourself on your favorites"}
-                      </div>
-                    </div>
-                    <div className="text-xl md:text-2xl">
-                      {source === "favorites" ? "✓" : ""}
-                    </div>
-                  </div>
-                </button>
-              </div>
-            </div>
-
-            {/* Stats Card */}
-            <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-md border-2 border-blue-500/30 rounded-2xl p-2 mb-3 shadow-xl hover:border-blue-500/50 transition-all duration-300">
-              <div className="grid grid-cols-2 gap-4 text-center">
-                <div>
-                  <div className="text-gray-400 text-xs mb-1">Quiz Length</div>
-                  <div className="text-xl font-bold text-blue-400">
-                    {QUIZ_LENGTH}
-                  </div>
-                  <div className="text-gray-500 text-xs mt-0.5">Questions</div>
-                </div>
-                <div>
-                  <div className="text-gray-400 text-xs mb-1">
-                    Available Words
-                  </div>
-                  <div className="text-xl font-bold text-purple-400">
-                    {availableWordsCount > 0
-                      ? availableWordsCount.toLocaleString()
-                      : source === "favorites"
-                        ? "0"
-                        : "Loading..."}
-                  </div>
-                  <div className="text-gray-500 text-xs mt-0.5">
-                    {source === "favorites"
-                      ? "In Your Favorites"
-                      : `For ${DIFFICULTY_LEVELS[difficulty].name}`}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Start Button */}
-            <div className="text-center">
+              {/* Favorites — visible to guests too; clicking without being
+                  logged in prompts a login instead of hiding the option. */}
               <button
-                disabled={!canStartQuiz}
-                onClick={startQuiz}
-                className={`relative px-8 md:px-12 py-2.5 md:py-3 rounded-full font-bold text-base md:text-lg transition-all duration-300 overflow-hidden group ${
-                  !canStartQuiz
-                    ? "bg-gray-600 text-gray-400 cursor-not-allowed opacity-50"
-                    : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white hover:scale-110 hover:shadow-green-500/50 shadow-xl hover:shadow-2xl"
+                onClick={handleSelectFavorites}
+                className={`group relative overflow-hidden rounded-2xl border-2 py-3 pl-6 pr-4 transition-all duration-300 ${
+                  source === "favorites"
+                    ? "scale-105 border-pink-400 bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow-lg shadow-pink-500/50"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-pink-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200 dark:hover:border-pink-500 dark:hover:bg-slate-800"
                 }`}
               >
-                <span className="relative z-10 flex items-center justify-center gap-3">
-                  Start Quiz
-                </span>
+                <div className="flex items-start justify-between">
+                  <div className="text-left">
+                    <div className="mb-0.5 text-lg font-bold md:text-xl">
+                      ❤️ My Favorites
+                    </div>
+                    <div
+                      className={`text-sm md:text-base ${
+                        source === "favorites"
+                          ? "text-white"
+                          : "text-slate-500 dark:text-slate-400"
+                      }`}
+                    >
+                      {isLoggedIn
+                        ? "Revise the words you've favorited"
+                        : "Sign in to quiz yourself on your favorites"}
+                    </div>
+                  </div>
+                  <div className="text-2xl md:text-3xl">
+                    {source === "favorites" ? "✓" : ""}
+                  </div>
+                </div>
               </button>
-
-              {!notEligibleForFavorites && preparedQuizWords.length === 0 && (
-                <p className="text-orange-400 text-xs mt-2 animate-pulse">
-                  ⚠️ Loading words... Please wait
-                </p>
-              )}
             </div>
-
-            {/* Info Footer */}
-            <p className="mt-3 text-center text-gray-500 text-xs">
-              ⏱️ No time limit · 📈 Track your progress
-            </p>
           </div>
+
+          {/* Stats Card */}
+          <div className="mb-3 rounded-2xl border-2 border-blue-200 bg-white p-2 shadow-sm transition-all duration-300 hover:border-blue-300 dark:border-blue-500/30 dark:bg-gradient-to-br dark:from-gray-800/60 dark:to-gray-900/60 dark:shadow-xl dark:hover:border-blue-500/50">
+            <div className="grid grid-cols-2 gap-4 text-center">
+              <div>
+                <div className="mb-1 text-xs text-slate-500 dark:text-gray-400">
+                  Quiz Length
+                </div>
+                <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                  {QUIZ_LENGTH}
+                </div>
+                <div className="mt-0.5 text-xs text-slate-400 dark:text-gray-500">
+                  Questions
+                </div>
+              </div>
+              <div>
+                <div className="mb-1 text-xs text-slate-500 dark:text-gray-400">
+                  Available Words
+                </div>
+                <div className="text-xl font-bold text-purple-600 dark:text-purple-400">
+                  {availableWordsCount > 0
+                    ? availableWordsCount.toLocaleString()
+                    : source === "favorites"
+                      ? "0"
+                      : "Loading..."}
+                </div>
+                <div className="mt-0.5 text-xs text-slate-400 dark:text-gray-500">
+                  {source === "favorites"
+                    ? "In Your Favorites"
+                    : `For ${DIFFICULTY_LEVELS[difficulty].name}`}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Start Button */}
+          <div className="text-center">
+            <button
+              disabled={!canStartQuiz}
+              onClick={startQuiz}
+              className={`relative overflow-hidden rounded-full px-10 py-3 text-lg font-bold transition-all duration-300 md:px-14 md:py-3.5 md:text-xl ${
+                !canStartQuiz
+                  ? "cursor-not-allowed bg-slate-200 text-slate-400 dark:bg-gray-600 dark:text-gray-400"
+                  : "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-xl hover:scale-110 hover:from-green-600 hover:to-emerald-700 hover:shadow-2xl hover:shadow-green-500/50"
+              }`}
+            >
+              <span className="relative z-10 flex items-center justify-center gap-3">
+                Start Quiz
+              </span>
+            </button>
+
+            {!notEligibleForFavorites && preparedQuizWords.length === 0 && (
+              <p className="mt-2 animate-pulse text-xs text-orange-500 dark:text-orange-400">
+                ⚠️ Loading words... Please wait
+              </p>
+            )}
+          </div>
+
+          {/* Info Footer */}
+          <p className="mt-3 text-center text-xs text-slate-400 dark:text-gray-500">
+            ⏱️ No time limit · 📈 Track your progress
+          </p>
         </div>
-      </div>
+      </Container>
     );
   }
 
   const currentWord = quizWords[currentIndex];
 
   return (
-    <div className="flex justify-center p-2">
-      <div className="relative p-3 md:p-5 text-white rounded-2xl flex flex-col items-center mt-3 mb-6 bg-gradient-to-br from-gray-900 via-gray-800 to-black w-full md:w-8/12 lg:w-8/12">
-        {/* Background decoration */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-orange-500/5 rounded-2xl"></div>
-        <div className="absolute inset-0 backdrop-blur-3xl opacity-30 rounded-2xl"></div>
+    <Container>
+      <div className="mx-auto w-full max-w-2xl px-2 py-6 md:py-8">
+        {/* Header with difficulty and reset */}
+        <div className="mb-4 flex w-full flex-col items-center justify-between gap-4 sm:flex-row">
+          <div className="rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm text-slate-700 dark:border-blue-500/50 dark:bg-gradient-to-r dark:from-blue-500/20 dark:to-purple-500/20 dark:text-slate-200 dark:backdrop-blur-sm">
+            {source === "favorites" ? (
+              <>
+                Source:{" "}
+                <span className="font-bold text-pink-600 dark:text-pink-400">
+                  ❤️ My Favorites
+                </span>
+              </>
+            ) : (
+              <>
+                Difficulty:{" "}
+                <span className="font-bold text-blue-600 dark:text-blue-400">
+                  {DIFFICULTY_LEVELS[difficulty].name}
+                </span>
+              </>
+            )}
+          </div>
+          <button
+            onClick={resetQuiz}
+            className="rounded-full bg-gradient-to-r from-orange-500 to-red-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-orange-600 hover:to-red-600 hover:shadow-orange-500/50 md:px-7 md:text-base"
+          >
+            Reset Quiz
+          </button>
+        </div>
 
-        <div className="relative z-10 w-full max-w-6xl">
-          {/* Header with difficulty and reset */}
-          <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
-            <div className="text-sm bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/50 px-4 py-2 rounded-full backdrop-blur-sm">
-              {source === "favorites" ? (
-                <>
-                  Source: <span className="font-bold text-pink-400">❤️ My Favorites</span>
-                </>
+        {/* Word counter */}
+        <div className="mb-3 text-center">
+          <div className="inline-block rounded-full border border-slate-200 bg-slate-100 px-6 py-2 dark:border-gray-700 dark:bg-gradient-to-r dark:from-gray-800/80 dark:to-gray-900/80 dark:backdrop-blur-sm">
+            <span className="text-slate-500 dark:text-gray-300">Question</span>{" "}
+            <span className="text-xl font-bold text-slate-900 dark:text-white">
+              {currentIndex + 1}
+            </span>
+            <span className="text-slate-400 dark:text-gray-400"> of </span>
+            <span className="text-xl font-bold text-slate-900 dark:text-white">
+              {quizWords.length}
+            </span>
+          </div>
+        </div>
+
+        {/* Instruction */}
+        <p className="mb-3 text-center text-base italic text-pink-600 dark:text-pink-400">
+          💡 Guess the meaning of the word
+        </p>
+
+        {/* Main word display */}
+        <div className="mb-4 rounded-3xl border-2 border-purple-200 bg-white p-4 shadow-sm transition-all duration-300 hover:border-purple-300 dark:border-purple-500/30 dark:bg-gradient-to-br dark:from-gray-800/50 dark:to-gray-900/50 dark:shadow-2xl dark:hover:border-purple-500/50 md:p-5">
+          <div className="text-center">
+            <div className="mb-2 flex items-center justify-center gap-2 md:mb-3 md:gap-4">
+              <button
+                onClick={() =>
+                  pronounceWord(
+                    `${currentWord?.article?.name ?? ""} ${
+                      currentWord?.value ?? ""
+                    }`.trim(),
+                  )
+                }
+                className="text-3xl transition-transform duration-300 hover:scale-110 hover:drop-shadow-[0_0_15px_rgba(59,130,246,0.8)] md:text-4xl"
+                title="Pronounce word"
+              >
+                🔊
+              </button>
+              <div className="text-2xl font-bold md:text-4xl">
+                <span className="mr-2 italic text-orange-500 dark:text-orange-400 md:mr-3">
+                  {currentWord?.article?.name || ""}
+                </span>
+                <span className="text-slate-900 dark:text-white">
+                  {currentWord?.value
+                    ? currentWord.value.charAt(0).toUpperCase() +
+                      currentWord.value.slice(1)
+                    : "No word"}
+                </span>
+              </div>
+            </div>
+
+            {/* Meaning reveal area */}
+            <div className="flex min-h-[80px] items-center justify-center">
+              {showMeaning ? (
+                <div className="animate-fade-in rounded-2xl border border-yellow-300 bg-yellow-50 px-6 py-3 text-lg font-semibold text-yellow-700 dark:border-yellow-500/30 dark:bg-gradient-to-r dark:from-yellow-500/10 dark:to-orange-500/10 dark:text-yellow-300">
+                  {(currentWord?.meaning && currentWord.meaning.join(", ")) ||
+                    "No meaning"}
+                </div>
               ) : (
-                <>
-                  Difficulty:{" "}
-                  <span className="font-bold text-blue-400">
-                    {DIFFICULTY_LEVELS[difficulty].name}
-                  </span>
-                </>
-              )}
-            </div>
-            <button
-              onClick={resetQuiz}
-              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 px-4 md:px-6 py-2 rounded-full font-semibold text-sm md:text-base transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-orange-500/50"
-            >
-              Reset Quiz
-            </button>
-          </div>
-
-          {/* Word counter */}
-          <div className="text-center mb-3">
-            <div className="inline-block px-6 py-2 bg-gradient-to-r from-gray-800/80 to-gray-900/80 border border-gray-700 rounded-full backdrop-blur-sm">
-              <span className="text-gray-300">Question</span>{" "}
-              <span className="font-bold text-white text-xl">
-                {currentIndex + 1}
-              </span>
-              <span className="text-gray-400"> of </span>
-              <span className="font-bold text-white text-xl">
-                {quizWords.length}
-              </span>
-            </div>
-          </div>
-
-          {/* Instruction */}
-          <p className="text-center text-pink-400 italic mb-3 text-base">
-            💡 Guess the meaning of the word
-          </p>
-
-          {/* Main word display */}
-          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-md border-2 border-purple-500/30 rounded-3xl p-4 md:p-5 mb-4 shadow-2xl hover:border-purple-500/50 transition-all duration-300">
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-2 md:gap-4 mb-2 md:mb-3">
                 <button
                   onClick={() =>
-                    pronounceWord(
-                      `${currentWord?.article?.name ?? ""} ${
-                        currentWord?.value ?? ""
-                      }`.trim(),
-                    )
+                    dispatch({ type: "SET_SHOW_MEANING", payload: true })
                   }
-                  className="text-3xl md:text-4xl hover:scale-110 transition-transform duration-300 hover:drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]"
-                  title="Pronounce word"
+                  className="rounded-full bg-gradient-to-r from-blue-500 to-purple-500 px-7 py-3.5 text-lg font-bold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:from-blue-600 hover:to-purple-600 hover:shadow-blue-500/50"
                 >
-                  🔊
+                  🔍 Reveal Meaning
                 </button>
-                <div className="text-2xl md:text-4xl font-bold">
-                  <span className="text-orange-400 italic mr-2 md:mr-3">
-                    {currentWord?.article?.name || ""}
-                  </span>
-                  <span className="text-white">
-                    {currentWord?.value
-                      ? currentWord.value.charAt(0).toUpperCase() +
-                        currentWord.value.slice(1)
-                      : "No word"}
-                  </span>
-                </div>
-              </div>
-
-              {/* Meaning reveal area */}
-              <div className="min-h-[80px] flex items-center justify-center">
-                {showMeaning ? (
-                  <div className="text-lg text-yellow-300 font-semibold animate-fade-in bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-2xl px-6 py-3">
-                    {(currentWord?.meaning && currentWord.meaning.join(", ")) ||
-                      "No meaning"}
-                  </div>
-                ) : (
-                  <button
-                    onClick={() =>
-                      dispatch({ type: "SET_SHOW_MEANING", payload: true })
-                    }
-                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-6 py-3 rounded-full font-bold text-base transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-blue-500/50"
-                  >
-                    🔍 Reveal Meaning
-                  </button>
-                )}
-              </div>
+              )}
             </div>
           </div>
+        </div>
 
-          {/* Player score card */}
-          <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-8 mb-4">
-            <div className="w-full md:flex-1 md:max-w-sm bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-md border-2 border-blue-500/30 rounded-2xl p-3 md:p-5 shadow-xl hover:border-blue-500/50 transition-all duration-300">
-              <div className="text-center mb-2">
-                <div className="text-base md:text-xl font-bold text-blue-400 mb-1">
-                  YOUR SCORE
-                </div>
-                <div className="text-3xl md:text-4xl font-bold text-white">
-                  {score}
-                </div>
+        {/* Player score card */}
+        <div className="mb-4 flex flex-col justify-center gap-4 md:flex-row md:gap-8">
+          <div className="w-full rounded-2xl border-2 border-blue-200 bg-white p-3 shadow-sm transition-all duration-300 hover:border-blue-300 dark:border-blue-500/30 dark:bg-gradient-to-br dark:from-gray-800/60 dark:to-gray-900/60 dark:shadow-xl dark:hover:border-blue-500/50 md:max-w-sm md:flex-1 md:p-5">
+            <div className="mb-2 text-center">
+              <div className="mb-1 text-base font-bold text-blue-600 dark:text-blue-400 md:text-xl">
+                YOUR SCORE
               </div>
-              <div className="flex justify-center gap-8 md:gap-12 mt-4">
-                <button
-                  onClick={() => handleScoreAndNext(false)}
-                  disabled={usedScore}
-                  className={`bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-4 md:px-8 py-2 md:py-2.5 rounded-full font-bold text-base md:text-lg transition-all duration-300 hover:scale-110 shadow-lg ${
-                    usedScore
-                      ? "opacity-50 cursor-not-allowed"
-                      : "hover:shadow-red-500/50"
-                  }`}
-                >
-                  <span className="text-white"> X</span>
-                </button>
-                <button
-                  onClick={() => handleScoreAndNext(true)}
-                  disabled={usedScore}
-                  className={`bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-4 md:px-8 py-2 md:py-2.5 rounded-full font-bold text-base md:text-lg transition-all duration-300 hover:scale-110 shadow-lg ${
-                    usedScore
-                      ? "opacity-50 cursor-not-allowed"
-                      : "hover:shadow-green-500/50"
-                  }`}
-                >
-                  ✓
-                </button>
+              <div className="text-3xl font-bold text-slate-900 dark:text-white md:text-4xl">
+                {score}
               </div>
+            </div>
+            <div className="mt-4 flex justify-center gap-8 md:gap-12">
+              <button
+                onClick={() => handleScoreAndNext(false)}
+                disabled={usedScore}
+                className={`rounded-full bg-gradient-to-r from-red-500 to-red-600 px-5 py-2.5 text-lg font-bold text-white shadow-lg transition-all duration-300 hover:scale-110 md:px-9 md:py-3 md:text-xl ${
+                  usedScore
+                    ? "cursor-not-allowed opacity-50"
+                    : "hover:from-red-600 hover:to-red-700 hover:shadow-red-500/50"
+                }`}
+              >
+                <span> X</span>
+              </button>
+              <button
+                onClick={() => handleScoreAndNext(true)}
+                disabled={usedScore}
+                className={`rounded-full bg-gradient-to-r from-green-500 to-green-600 px-5 py-2.5 text-lg font-bold text-white shadow-lg transition-all duration-300 hover:scale-110 md:px-9 md:py-3 md:text-xl ${
+                  usedScore
+                    ? "cursor-not-allowed opacity-50"
+                    : "hover:from-green-600 hover:to-green-700 hover:shadow-green-500/50"
+                }`}
+              >
+                ✓
+              </button>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </Container>
   );
 };
 
