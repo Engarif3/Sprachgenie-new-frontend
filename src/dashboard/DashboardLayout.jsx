@@ -130,6 +130,20 @@ const NAV_SECTIONS = [
 ];
 
 const FLYOUT_WIDTH = 256; // matches w-64 below
+// Keeps the flyout fully on-screen (with breathing room) instead of running
+// off the bottom edge for a button near the end of the list. There's no DOM
+// node to measure yet when we compute this (it's used to position the panel
+// before/as it renders), so the height is estimated from each nav item's
+// known rendered size (px-4 py-3 text-sm row) rather than measured live.
+const FLYOUT_MARGIN = 16;
+const FLYOUT_ITEM_HEIGHT = 46;
+const FLYOUT_ITEM_GAP = 4;
+const FLYOUT_PADDING = 16;
+
+const estimateFlyoutHeight = (itemCount) =>
+  itemCount * FLYOUT_ITEM_HEIGHT +
+  Math.max(itemCount - 1, 0) * FLYOUT_ITEM_GAP +
+  FLYOUT_PADDING;
 
 const getActiveSection = (pathname) =>
   Object.keys(SECTION_ROUTES).find((section) =>
@@ -186,6 +200,15 @@ const DashboardLayout = () => {
   const activeSection = getActiveSection(location.pathname);
   const roleLabel = formatRoleLabel(role);
 
+  // Computed once per render (role rarely changes) so both the flyout
+  // positioning math and the render map below read from the same list.
+  const visibleSectionItems = NAV_SECTIONS.reduce((acc, section) => {
+    acc[section.key] = section.items.filter(
+      (item) => !item.roles || item.roles.includes(role),
+    );
+    return acc;
+  }, {});
+
   // A flyout is transient — never carry it across a navigation.
   useEffect(() => {
     setOpenSection(null);
@@ -218,7 +241,17 @@ const DashboardLayout = () => {
     const rect = node.getBoundingClientRect();
     const left = Math.min(rect.right + 8, window.innerWidth - FLYOUT_WIDTH - 8);
 
-    return { top: rect.top, left };
+    // Clamp so the panel never runs past the bottom (or top) edge of the
+    // viewport — it stays anchored to the button's top when there's room,
+    // and slides up just enough to keep FLYOUT_MARGIN of breathing room
+    // otherwise, rather than being cut off or forced to scroll internally.
+    const height = estimateFlyoutHeight(
+      (visibleSectionItems[key] || []).length,
+    );
+    const maxTop = window.innerHeight - FLYOUT_MARGIN - height;
+    const top = Math.max(FLYOUT_MARGIN, Math.min(rect.top, maxTop));
+
+    return { top, left };
   };
 
   // The flyout is fixed-positioned (portaled to document.body — see below)
@@ -227,18 +260,15 @@ const DashboardLayout = () => {
   // scrolls (that scroll never touches the window, so plain CSS position:
   // fixed just sits there — "stuck" instead of following its button).
   // Re-measuring the button's rect on every nav scroll (and window resize)
-  // keeps it visually anchored to the button instead.
+  // keeps it visually anchored to the button instead. Deliberately NOT
+  // rAF-throttled — that extra frame of delay was visible as the flyout
+  // lagging behind/detaching from its button during an active scroll.
   useEffect(() => {
     if (!openSection) return;
 
-    let frame = null;
     const reposition = () => {
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        frame = null;
-        const style = computeFlyoutStyle(openSection);
-        if (style) setFlyoutStyle(style);
-      });
+      const style = computeFlyoutStyle(openSection);
+      if (style) setFlyoutStyle(style);
     };
 
     const navEl = navRef.current;
@@ -246,7 +276,6 @@ const DashboardLayout = () => {
     window.addEventListener("resize", reposition);
 
     return () => {
-      if (frame) cancelAnimationFrame(frame);
       navEl?.removeEventListener("scroll", reposition);
       window.removeEventListener("resize", reposition);
     };
@@ -424,9 +453,7 @@ const DashboardLayout = () => {
                 </p>
 
                 {NAV_SECTIONS.map((section) => {
-                  const visibleItems = section.items.filter(
-                    (item) => !item.roles || item.roles.includes(role),
-                  );
+                  const visibleItems = visibleSectionItems[section.key];
                   if (visibleItems.length === 0) return null;
 
                   const isOpenSection = openSection === section.key;
