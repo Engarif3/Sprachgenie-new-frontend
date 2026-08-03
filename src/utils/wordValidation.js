@@ -1,6 +1,31 @@
 import Swal from "sweetalert2";
 import api from "../axios";
 
+let chipKeyCounter = 0;
+// Stable per-chip identity, independent of the word's text — this is what
+// lets two chips share the same spelling (e.g. "kühler" as noun AND as
+// adjective) without colliding. Falls back to a counter if crypto.randomUUID
+// isn't available (older browser / non-secure context).
+const makeChipKey = () =>
+  typeof crypto !== "undefined" && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `chip-${Date.now()}-${chipKeyCounter++}`;
+
+/**
+ * A relation chip: { key, value, wordId, pos }
+ * - key: stable client id, generated once when the chip is created.
+ * - value: the word text as typed or selected.
+ * - wordId: the specific Word row this resolves to, or null until resolved
+ *   (brand-new word text, or ambiguous text awaiting a POS pick).
+ * - pos: display label ("noun"), or null until resolved.
+ */
+export const makeChip = ({ value, wordId = null, pos = null }) => ({
+  key: makeChipKey(),
+  value,
+  wordId,
+  pos,
+});
+
 /**
  * Constants for default values when creating non-existent words
  */

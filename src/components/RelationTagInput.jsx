@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { publicApi } from "../axios";
+import { makeChip } from "../utils/wordValidation";
 
 const SUGGESTION_DEBOUNCE_MS = 250;
 const MIN_QUERY_LENGTH = 2;
 const MAX_SUGGESTIONS = 10;
-
-const normalize = (value) => String(value || "").trim().toLowerCase();
 
 // Shared "type a word, see it become a removable chip" input used by both
 // the create-word and update-word forms for synonyms/antonyms/similar words.
@@ -14,9 +13,14 @@ const normalize = (value) => String(value || "").trim().toLowerCase();
 // genuine word typed with a typo still gets a "Did you mean" suggestion
 // instead of showing nothing) so the admin can click one instead of
 // retyping it; anything else becomes a chip the moment it's comma- or
-// Enter-terminated. What happens to a chip after that (multi-POS detection,
-// self-reference checks, actually linking the relation) is unchanged — this
-// component only owns the chip list itself.
+// Enter-terminated.
+//
+// Chips are identified by `wordId` once resolved, NOT by text — a word's
+// spelling can be shared by several distinct Word rows (different parts of
+// speech), and each needs to be addable independently. Two unresolved
+// (wordId: null) chips with the same text are allowed to coexist; each
+// resolves to its own Word row later via the POS-selection flow the parent
+// form owns. Only an exact wordId match is treated as a true duplicate.
 const RelationTagInput = ({
   id,
   values,
@@ -37,7 +41,7 @@ const RelationTagInput = ({
     };
   }, []);
 
-  const commitChip = (rawValue) => {
+  const commitChip = (rawValue, resolved = {}) => {
     const trimmed = rawValue.trim();
     setText("");
     setSuggestions([]);
@@ -47,19 +51,36 @@ const RelationTagInput = ({
       return;
     }
 
-    const alreadyPresent = values.some(
-      (existing) => normalize(existing) === normalize(trimmed),
-    );
+    const wordId = resolved.wordId ?? null;
 
-    if (alreadyPresent) {
-      return;
+    // Only an exact same-Word-row match counts as a duplicate. Two
+    // unresolved chips sharing text are fine — they may resolve to
+    // different POS variants.
+    if (wordId !== null) {
+      const alreadyPresent = values.some(
+        (existing) => existing.wordId === wordId,
+      );
+      if (alreadyPresent) {
+        return;
+      }
     }
 
-    onChange([...values, trimmed]);
+    onChange([
+      ...values,
+      makeChip({ value: trimmed, wordId, pos: resolved.pos ?? null }),
+    ]);
   };
 
-  const removeChip = (index) => {
-    onChange(values.filter((_, i) => i !== index));
+  const commitSuggestion = (word) => {
+    const pos =
+      word.partsOfSpeech?.length > 0
+        ? word.partsOfSpeech.map((p) => p.name).join(", ")
+        : null;
+    commitChip(word.value, { wordId: word.id, pos });
+  };
+
+  const removeChip = (key) => {
+    onChange(values.filter((chip) => chip.key !== key));
   };
 
   const fetchSuggestions = (query) => {
@@ -95,11 +116,11 @@ const RelationTagInput = ({
         const results = Array.isArray(response.data?.data)
           ? response.data.data
           : [];
+        // Exclude a suggestion only if that exact Word row is already a
+        // chip — a different POS variant with the same spelling must stay
+        // offered.
         const filtered = results.filter(
-          (word) =>
-            !values.some(
-              (existing) => normalize(existing) === normalize(word.value),
-            ),
+          (word) => !values.some((existing) => existing.wordId === word.id),
         );
 
         setSuggestions(filtered);
@@ -120,7 +141,10 @@ const RelationTagInput = ({
       const parts = nextValue.split(",");
       const remainder = parts.pop();
 
-      parts.map((part) => part.trim()).filter(Boolean).forEach(commitChip);
+      parts
+        .map((part) => part.trim())
+        .filter(Boolean)
+        .forEach((part) => commitChip(part));
 
       setText(remainder);
       fetchSuggestions(remainder);
@@ -139,7 +163,7 @@ const RelationTagInput = ({
     }
 
     if (e.key === "Backspace" && text === "" && values.length > 0) {
-      removeChip(values.length - 1);
+      removeChip(values[values.length - 1].key);
     }
   };
 
@@ -154,18 +178,23 @@ const RelationTagInput = ({
   return (
     <div className="relative">
       <div className="w-full min-h-[3rem] p-2 border border-gray-300 rounded-lg shadow-sm flex flex-wrap items-center gap-2 bg-white focus-within:ring-2 focus-within:ring-blue-500">
-        {values.map((value, index) => (
+        {values.map((chip) => (
           <span
-            key={`${value}-${index}`}
+            key={chip.key}
             className="inline-flex items-center gap-1 rounded-full border border-blue-400 bg-blue-50 px-3 py-1 text-sm text-blue-900"
           >
-            {value}
+            {chip.value}
+            {chip.pos && (
+              <span className="text-xs font-semibold text-blue-600">
+                · {chip.pos}
+              </span>
+            )}
             <button
               type="button"
-              onClick={() => removeChip(index)}
+              onClick={() => removeChip(chip.key)}
               className="text-blue-700 hover:text-red-600 font-bold leading-none"
-              aria-label={`Remove ${value}`}
-              title={`Remove ${value}`}
+              aria-label={`Remove ${chip.value}`}
+              title={`Remove ${chip.value}`}
             >
               ×
             </button>
@@ -190,7 +219,7 @@ const RelationTagInput = ({
             <button
               key={word.id}
               type="button"
-              onClick={() => commitChip(word.value)}
+              onClick={() => commitSuggestion(word)}
               className="block w-full text-left px-3 py-2 text-sm text-gray-800 hover:bg-blue-50"
             >
               {word.isFuzzy ? (

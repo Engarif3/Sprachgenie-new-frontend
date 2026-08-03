@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import api from "../axios";
 import { invalidateWordsCache } from "../utils/storage";
 import {
   validateRelationWords,
-  detectWordsNeedingPOSSelection,
   showPOSSelectionPopup,
   fetchWordVariants,
 } from "../utils/wordValidation";
@@ -102,20 +101,16 @@ const WordForm = () => {
   const [topics, setTopics] = useState([]);
   const [articles, setArticles] = useState([]);
   const [partsOfSpeech, setPartsOfSpeech] = useState([]);
-  const [wordsNeedingPOSSelection, setWordsNeedingPOSSelection] = useState([]);
-  const [posSelections, setPOSSelections] = useState({});
-  // Relation words whose text matches the word currently being created AND
-  // that already exist as a *different* word in the DB. Unlike Update (where
-  // the word being edited already has its own row, so its own text always
-  // counts toward its variant lookup), a brand-new word here never counts
-  // toward its own lookup — so an existing word sharing the same text looks
-  // "unambiguous" (exactly 1 variant) even though it's a distinct entity.
-  // Without tracking this separately, the plain text-equality self-reference
-  // check below would wrongly block it instead of letting addRelation's
-  // existing id/POS-aware logic resolve it after creation.
-  const [selfTextExistingWords, setSelfTextExistingWords] = useState(
-    new Set(),
-  );
+  // Chips still awaiting a manual POS pick (their text matches more than
+  // one existing Word row) — keyed by the chip's own stable `key`, not its
+  // text, so two chips that happen to share a spelling (e.g. "kühler" as
+  // noun AND as adjective) are tracked independently instead of colliding.
+  const [ambiguousChips, setAmbiguousChips] = useState({});
+  // Chip keys already sent through fetchWordVariants — each chip only
+  // needs resolving once. Removing a chip and re-adding the same text
+  // creates a brand-new key (see makeChip in RelationTagInput), so nothing
+  // ever needs to be cleared out of this ref.
+  const processedChipKeysRef = useRef(new Set());
 
   // Fetch the options for level, topic, article, and partOfSpeech
   useEffect(() => {
@@ -143,44 +138,53 @@ const WordForm = () => {
     fetchData();
   }, []);
 
-  // Handle POS selection for a specific relation word
-  const handlePOSSelection = async (word, relationType) => {
-    const variants = await fetchWordVariants(word);
-    if (variants.length === 0) return;
+  // Writes a resolution directly onto one specific chip (by key), never
+  // onto every chip sharing its text.
+  const applyChipResolution = (field, chipKey, resolution) => {
+    setWordData((prev) => ({
+      ...prev,
+      [field]: prev[field].map((chip) =>
+        chip.key === chipKey ? { ...chip, ...resolution } : chip,
+      ),
+    }));
+    setAmbiguousChips((prev) => {
+      if (!(chipKey in prev)) return prev;
+      const next = { ...prev };
+      delete next[chipKey];
+      return next;
+    });
+  };
 
-    let selected;
-    if (variants.length === 1) {
-      selected = variants[0];
-    } else {
-      // Disable the variant that is really the word being created (same
-      // value + identical POS-tag set) — only relevant when the relation
-      // word's text matches the new word's own value.
-      let disabledVariantId = null;
-      if (
-        normalizeWordValue(word) === normalizeWordValue(wordData.value) &&
-        wordData.partOfSpeechIds.length > 0
-      ) {
-        const samePOSVariant = variants.find((v) =>
-          arePosIdSetsEqual(
-            v.partsOfSpeech.map((p) => p.id),
-            wordData.partOfSpeechIds,
-          ),
-        );
-        if (samePOSVariant) disabledVariantId = samePOSVariant.id;
-      }
+  // Resolve one ambiguous chip's POS via the picker popup.
+  const resolveChipPOS = async (chipKey) => {
+    const pending = ambiguousChips[chipKey];
+    if (!pending) return;
 
-      selected = await showPOSSelectionPopup(
-        `${word} (${relationType})`,
-        variants,
-        null,
-        disabledVariantId,
+    let disabledVariantId = null;
+    if (
+      normalizeWordValue(pending.value) === normalizeWordValue(wordData.value) &&
+      wordData.partOfSpeechIds.length > 0
+    ) {
+      const samePOSVariant = pending.variants.find((v) =>
+        arePosIdSetsEqual(
+          v.partsOfSpeech.map((p) => p.id),
+          wordData.partOfSpeechIds,
+        ),
       );
-      if (!selected) return;
+      if (samePOSVariant) disabledVariantId = samePOSVariant.id;
     }
+
+    const selected = await showPOSSelectionPopup(
+      `${pending.value} (${pending.relationType})`,
+      pending.variants,
+      null,
+      disabledVariantId,
+    );
+    if (!selected) return;
 
     // Safety check: block same-value + identical-POS-set (true self-reference)
     if (
-      normalizeWordValue(word) === normalizeWordValue(wordData.value) &&
+      normalizeWordValue(pending.value) === normalizeWordValue(wordData.value) &&
       wordData.partOfSpeechIds.length > 0 &&
       arePosIdSetsEqual(
         selected.partsOfSpeech.map((p) => p.id),
@@ -189,7 +193,7 @@ const WordForm = () => {
     ) {
       Swal.fire({
         title: "Invalid relation",
-        text: `A word cannot reference itself as a ${relationType}.`,
+        text: `A word cannot reference itself as a ${pending.relationType}.`,
         icon: "warning",
         timer: 2200,
         showConfirmButton: false,
@@ -197,88 +201,97 @@ const WordForm = () => {
       return;
     }
 
-    setPOSSelections((prev) => ({
-      ...prev,
-      [`${word}-${relationType}`]: selected,
-    }));
+    applyChipResolution(pending.field, chipKey, {
+      wordId: selected.id,
+      pos: selected.partsOfSpeech.map((p) => p.name).join(", "),
+    });
   };
 
-  // Check for words needing POS selection when relations change
+  // Resolve every not-yet-linked chip's word id/POS as soon as it's added:
+  // 0 variants → new word text, left unresolved (existing plain-text
+  // create-time behavior, unchanged); 1 variant → silently auto-resolved;
+  // >1 variants → surfaced as an ambiguous chip needing a manual pick. Each
+  // chip is identified by its own stable key, so two chips sharing a
+  // spelling (different POS) resolve completely independently.
   useEffect(() => {
-    const checkRelations = async () => {
-      const dedupeChips = (chips) => Array.from(new Set(chips.filter(Boolean)));
+    const relationLists = [
+      { chips: wordData.synonyms, type: "synonym", field: "synonyms" },
+      { chips: wordData.antonyms, type: "antonym", field: "antonyms" },
+      {
+        chips: wordData.similarWords,
+        type: "similarWord",
+        field: "similarWords",
+      },
+    ];
 
-      const relationsToCheck = {
-        synonyms: dedupeChips(wordData.synonyms),
-        antonyms: dedupeChips(wordData.antonyms),
-        similarWords: dedupeChips(wordData.similarWords),
-      };
+    const toResolve = [];
+    relationLists.forEach(({ chips, type, field }) => {
+      chips.forEach((chip) => {
+        if (
+          chip.wordId === null &&
+          !processedChipKeysRef.current.has(chip.key)
+        ) {
+          toResolve.push({ chip, type, field });
+        }
+      });
+    });
 
-      const wordsNeeding =
-        await detectWordsNeedingPOSSelection(relationsToCheck);
+    if (toResolve.length === 0) return;
 
-      // Add unique index to handle duplicate words in different relation types
-      const wordsWithIndex = wordsNeeding.map((w, idx) => ({
-        ...w,
-        uniqueKey: `${w.word}-${w.relationType}-${idx}`,
-      }));
+    toResolve.forEach(({ chip }) =>
+      processedChipKeysRef.current.add(chip.key),
+    );
 
-      setWordsNeedingPOSSelection(wordsWithIndex);
+    let cancelled = false;
+
+    (async () => {
+      for (const { chip, type, field } of toResolve) {
+        const variants = await fetchWordVariants(chip.value);
+        if (cancelled) return;
+
+        if (variants.length === 0) {
+          continue;
+        }
+
+        if (variants.length === 1) {
+          const variant = variants[0];
+          const isSelfReference =
+            normalizeWordValue(chip.value) ===
+              normalizeWordValue(wordData.value) &&
+            wordData.partOfSpeechIds.length > 0 &&
+            arePosIdSetsEqual(
+              variant.partsOfSpeech.map((p) => p.id),
+              wordData.partOfSpeechIds,
+            );
+
+          if (isSelfReference) {
+            continue;
+          }
+
+          applyChipResolution(field, chip.key, {
+            wordId: variant.id,
+            pos: variant.partsOfSpeech.map((p) => p.name).join(", "),
+          });
+          continue;
+        }
+
+        setAmbiguousChips((prev) => ({
+          ...prev,
+          [chip.key]: {
+            value: chip.value,
+            relationType: type,
+            field,
+            variants,
+          },
+        }));
+      }
+    })();
+
+    return () => {
+      cancelled = true;
     };
-
-    checkRelations();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wordData.synonyms, wordData.antonyms, wordData.similarWords]);
-
-  // Separately track relation words that share text with the word being
-  // created (see selfTextExistingWords above) — these need an existence
-  // check regardless of variant count, unlike the >1 threshold used for
-  // detecting genuinely ambiguous (multi-POS) relation words.
-  useEffect(() => {
-    const checkSelfTextCandidates = async () => {
-      const newWordValue = normalizeWordValue(wordData.value);
-
-      if (!newWordValue) {
-        setSelfTextExistingWords(new Set());
-        return;
-      }
-
-      const candidateWords = [
-        ...wordData.synonyms,
-        ...wordData.antonyms,
-        ...wordData.similarWords,
-      ].filter(
-        (word) => Boolean(word) && normalizeWordValue(word) === newWordValue,
-      );
-
-      if (candidateWords.length === 0) {
-        setSelfTextExistingWords(new Set());
-        return;
-      }
-
-      const uniqueCandidates = [...new Set(candidateWords)];
-      const results = await Promise.all(
-        uniqueCandidates.map(async (word) => ({
-          word,
-          variants: await fetchWordVariants(word),
-        })),
-      );
-
-      setSelfTextExistingWords(
-        new Set(
-          results
-            .filter((r) => r.variants.length >= 1)
-            .map((r) => normalizeWordValue(r.word)),
-        ),
-      );
-    };
-
-    checkSelfTextCandidates();
-  }, [
-    wordData.value,
-    wordData.synonyms,
-    wordData.antonyms,
-    wordData.similarWords,
-  ]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -443,22 +456,16 @@ const WordForm = () => {
       return;
     }
 
-    // Check if all required POS selections have been made
-    if (wordsNeedingPOSSelection.length > 0) {
-      const allSelectionsComplete = wordsNeedingPOSSelection.every(
-        (w) => posSelections[`${w.word}-${w.relationType}`],
-      );
-
-      if (!allSelectionsComplete) {
-        Swal.fire({
-          title: "POS Selection Required",
-          text: "Please select the part of speech for all related words with multiple meanings.",
-          icon: "warning",
-          timer: 2000,
-          showConfirmButton: false,
-        });
-        return;
-      }
+    // Block submit while any chip still needs a manual POS pick.
+    if (Object.keys(ambiguousChips).length > 0) {
+      Swal.fire({
+        title: "POS Selection Required",
+        text: "Please select the part of speech for all related words with multiple meanings.",
+        icon: "warning",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      return;
     }
 
     const parseIntOrNull = (value) =>
@@ -487,17 +494,13 @@ const WordForm = () => {
       topicId: parseIntOrNull(wordData.topicId) || 1,
       articleId: parseIntOrNull(wordData.articleId) || 4,
       partOfSpeechIds: wordData.partOfSpeechIds.map((id) => Number(id)),
-      synonyms: Array.from(
-        new Set(wordData.synonyms.map((item) => item.trim()).filter(Boolean)),
-      ),
-      antonyms: Array.from(
-        new Set(wordData.antonyms.map((item) => item.trim()).filter(Boolean)),
-      ),
-      similarWords: Array.from(
-        new Set(
-          wordData.similarWords.map((item) => item.trim()).filter(Boolean),
-        ),
-      ),
+      // Chip objects ({key, value, wordId, pos}) carried through as-is —
+      // each may resolve to a different Word row even when their `value`
+      // text is identical, so they can't be deduped/flattened to plain
+      // strings here the way they used to be.
+      synonyms: wordData.synonyms,
+      antonyms: wordData.antonyms,
+      similarWords: wordData.similarWords,
     };
 
     // Add verbAttributes only if there are non-default values
@@ -571,24 +574,16 @@ const WordForm = () => {
 
     newWordData.createdBy = userId;
 
-    // Skip multi-POS words, and same-text-as-new-word words that already
-    // exist elsewhere, from the value-level self-reference check — both are
-    // validated individually in addRelation via id/POS-set comparison instead
-    // of plain text equality.
-    const multiPOSValues = new Set([
-      ...wordsNeedingPOSSelection.map((w) => normalizeWordValue(w.word)),
-      ...selfTextExistingWords,
-    ]);
+    // Only chips that are still unresolved (no linked Word row yet) can
+    // possibly collide with the word being created here — a resolved chip
+    // always points to a pre-existing, different row, so by definition it
+    // can never be this not-yet-created word.
+    const unresolvedTextOf = (chips) =>
+      chips.filter((c) => c.wordId === null).map((c) => c.value);
     const relationsForSelfRefCheck = {
-      synonyms: newWordData.synonyms.filter(
-        (v) => !multiPOSValues.has(normalizeWordValue(v)),
-      ),
-      antonyms: newWordData.antonyms.filter(
-        (v) => !multiPOSValues.has(normalizeWordValue(v)),
-      ),
-      similarWords: newWordData.similarWords.filter(
-        (v) => !multiPOSValues.has(normalizeWordValue(v)),
-      ),
+      synonyms: unresolvedTextOf(newWordData.synonyms),
+      antonyms: unresolvedTextOf(newWordData.antonyms),
+      similarWords: unresolvedTextOf(newWordData.similarWords),
     };
     const selfReferenceMessage = getSelfReferenceMessage(
       newWordData.value,
@@ -608,9 +603,9 @@ const WordForm = () => {
 
     // Validate relation words (synonyms, antonyms, similar words)
     const validation = await validateRelationWords({
-      synonyms: newWordData.synonyms,
-      antonyms: newWordData.antonyms,
-      similarWords: newWordData.similarWords,
+      synonyms: newWordData.synonyms.map((c) => c.value),
+      antonyms: newWordData.antonyms.map((c) => c.value),
+      similarWords: newWordData.similarWords.map((c) => c.value),
     });
 
     if (!validation.valid) {
@@ -702,7 +697,8 @@ const WordForm = () => {
 
         await invalidateWordsCache();
         setWordData(initialWordData);
-        setPOSSelections({});
+        setAmbiguousChips({});
+        processedChipKeysRef.current.clear();
 
         Swal.fire({
           title: "Created",
@@ -715,13 +711,18 @@ const WordForm = () => {
         // Normal flow - word created without ambiguous words
         const createdWordId = createResponse.data.data.id;
 
-        const addRelation = async (relatedWordValue, relationType) => {
-          let selectedVariant =
-            posSelections[`${relatedWordValue}-${relationType}`];
+        const addRelation = async (chip, relationType) => {
+          let selectedVariant = null;
 
-          if (!selectedVariant) {
-            // Fallback for words that bypassed the POS selection buttons
-            const variants = await fetchWordVariants(relatedWordValue);
+          if (chip.wordId !== null) {
+            // Already resolved live, while the chip was being added — the
+            // common case now that every chip is resolved as soon as it's
+            // committed.
+            selectedVariant = { id: chip.wordId };
+          } else {
+            // Safety net for a chip that's somehow still unresolved at
+            // submit time (e.g. resolution was still in flight).
+            const variants = await fetchWordVariants(chip.value);
             if (!variants || variants.length === 0) return;
 
             if (variants.length === 1) {
@@ -729,7 +730,7 @@ const WordForm = () => {
             } else {
               let disabledVariantId = null;
               if (
-                normalizeWordValue(relatedWordValue) ===
+                normalizeWordValue(chip.value) ===
                   normalizeWordValue(wordData.value) &&
                 wordData.partOfSpeechIds.length > 0
               ) {
@@ -742,11 +743,37 @@ const WordForm = () => {
                 if (same) disabledVariantId = same.id;
               }
               selectedVariant = await showPOSSelectionPopup(
-                `${relatedWordValue} (${relationType})`,
+                `${chip.value} (${relationType})`,
                 variants,
                 null,
                 disabledVariantId,
               );
+            }
+
+            if (!selectedVariant?.id) return;
+
+            // Block same-value + identical-POS-set as the new word — only
+            // checkable here, where selectedVariant was just freshly
+            // fetched and carries a real partsOfSpeech id list (a
+            // pre-resolved chip's variant was necessarily fetched before
+            // this word existed, so it can never coincide with it).
+            if (
+              normalizeWordValue(chip.value) ===
+                normalizeWordValue(wordData.value) &&
+              wordData.partOfSpeechIds.length > 0 &&
+              arePosIdSetsEqual(
+                selectedVariant.partsOfSpeech.map((p) => p.id),
+                wordData.partOfSpeechIds,
+              )
+            ) {
+              await Swal.fire({
+                title: "Invalid relation",
+                text: `A word cannot reference itself as a ${relationType}.`,
+                icon: "warning",
+                timer: 2200,
+                showConfirmButton: false,
+              });
+              return;
             }
           }
 
@@ -764,26 +791,6 @@ const WordForm = () => {
             return;
           }
 
-          // Block same-value + identical-POS-set as the new word
-          if (
-            normalizeWordValue(relatedWordValue) ===
-              normalizeWordValue(wordData.value) &&
-            wordData.partOfSpeechIds.length > 0 &&
-            arePosIdSetsEqual(
-              selectedVariant.partsOfSpeech.map((p) => p.id),
-              wordData.partOfSpeechIds,
-            )
-          ) {
-            await Swal.fire({
-              title: "Invalid relation",
-              text: `A word cannot reference itself as a ${relationType}.`,
-              icon: "warning",
-              timer: 2200,
-              showConfirmButton: false,
-            });
-            return;
-          }
-
           await api.post("/word/relation/add", {
             wordId: createdWordId,
             relatedWordId: selectedVariant.id,
@@ -791,27 +798,22 @@ const WordForm = () => {
           });
         };
 
-        if (newWordData.synonyms.length > 0) {
-          for (const synonym of newWordData.synonyms) {
-            await addRelation(synonym, "synonym");
-          }
+        for (const chip of newWordData.synonyms) {
+          await addRelation(chip, "synonym");
         }
 
-        if (newWordData.antonyms.length > 0) {
-          for (const antonym of newWordData.antonyms) {
-            await addRelation(antonym, "antonym");
-          }
+        for (const chip of newWordData.antonyms) {
+          await addRelation(chip, "antonym");
         }
 
-        if (newWordData.similarWords.length > 0) {
-          for (const similarWord of newWordData.similarWords) {
-            await addRelation(similarWord, "similarWord");
-          }
+        for (const chip of newWordData.similarWords) {
+          await addRelation(chip, "similarWord");
         }
 
         await invalidateWordsCache();
         setWordData(initialWordData);
-        setPOSSelections({});
+        setAmbiguousChips({});
+        processedChipKeysRef.current.clear();
 
         Swal.fire({
           title: "Created",
@@ -1350,26 +1352,19 @@ const WordForm = () => {
                       onChange={(next) =>
                         handleRelationChipsChange("synonyms", next)
                       }
-                      relationType="synonyms"
                       placeholder="Type a synonym and press comma…"
                     />
                   </div>
-                  {wordsNeedingPOSSelection
-                    .filter((w) => w.relationType === "synonym")
-                    .map((w) => (
+                  {Object.entries(ambiguousChips)
+                    .filter(([, w]) => w.relationType === "synonym")
+                    .map(([chipKey, w]) => (
                       <button
-                        key={w.uniqueKey}
+                        key={chipKey}
                         type="button"
-                        onClick={() => handlePOSSelection(w.word, "synonym")}
-                        className={`mt-2 px-3 py-1 text-sm rounded ${
-                          posSelections[`${w.word}-synonym`]
-                            ? "bg-green-500 text-white"
-                            : "bg-orange-500 text-white"
-                        }`}
+                        onClick={() => resolveChipPOS(chipKey)}
+                        className="mt-2 mr-2 px-3 py-1 text-sm rounded bg-orange-500 text-white"
                       >
-                        {posSelections[`${w.word}-synonym`]
-                          ? `✓ ${w.word} (${posSelections[`${w.word}-synonym`].partsOfSpeech.map((p) => p.name).join(", ")})`
-                          : `Select POS for "${w.word}"`}
+                        {`Select POS for "${w.value}"`}
                       </button>
                     ))}
                 </div>
@@ -1388,26 +1383,19 @@ const WordForm = () => {
                       onChange={(next) =>
                         handleRelationChipsChange("antonyms", next)
                       }
-                      relationType="antonyms"
                       placeholder="Type an antonym and press comma…"
                     />
                   </div>
-                  {wordsNeedingPOSSelection
-                    .filter((w) => w.relationType === "antonym")
-                    .map((w) => (
+                  {Object.entries(ambiguousChips)
+                    .filter(([, w]) => w.relationType === "antonym")
+                    .map(([chipKey, w]) => (
                       <button
-                        key={w.uniqueKey}
+                        key={chipKey}
                         type="button"
-                        onClick={() => handlePOSSelection(w.word, "antonym")}
-                        className={`mt-2 px-3 py-1 text-sm rounded ${
-                          posSelections[`${w.word}-antonym`]
-                            ? "bg-green-500 text-white"
-                            : "bg-orange-500 text-white"
-                        }`}
+                        onClick={() => resolveChipPOS(chipKey)}
+                        className="mt-2 mr-2 px-3 py-1 text-sm rounded bg-orange-500 text-white"
                       >
-                        {posSelections[`${w.word}-antonym`]
-                          ? `✓ ${w.word} (${posSelections[`${w.word}-antonym`].partsOfSpeech.map((p) => p.name).join(", ")})`
-                          : `Select POS for "${w.word}"`}
+                        {`Select POS for "${w.value}"`}
                       </button>
                     ))}
                 </div>
@@ -1426,28 +1414,19 @@ const WordForm = () => {
                       onChange={(next) =>
                         handleRelationChipsChange("similarWords", next)
                       }
-                      relationType="similarWords"
                       placeholder="Type a word and press comma…"
                     />
                   </div>
-                  {wordsNeedingPOSSelection
-                    .filter((w) => w.relationType === "similarWord")
-                    .map((w) => (
+                  {Object.entries(ambiguousChips)
+                    .filter(([, w]) => w.relationType === "similarWord")
+                    .map(([chipKey, w]) => (
                       <button
-                        key={w.uniqueKey}
+                        key={chipKey}
                         type="button"
-                        onClick={() =>
-                          handlePOSSelection(w.word, "similarWord")
-                        }
-                        className={`mt-2 px-3 py-1 text-sm rounded ${
-                          posSelections[`${w.word}-similarWord`]
-                            ? "bg-green-500 text-white"
-                            : "bg-orange-500 text-white"
-                        }`}
+                        onClick={() => resolveChipPOS(chipKey)}
+                        className="mt-2 mr-2 px-3 py-1 text-sm rounded bg-orange-500 text-white"
                       >
-                        {posSelections[`${w.word}-similarWord`]
-                          ? `✓ ${w.word} (${posSelections[`${w.word}-similarWord`].partsOfSpeech.map((p) => p.name).join(", ")})`
-                          : `Select POS for "${w.word}"`}
+                        {`Select POS for "${w.value}"`}
                       </button>
                     ))}
                 </div>
