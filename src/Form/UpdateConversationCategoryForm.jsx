@@ -156,17 +156,19 @@ const UpdateConversationCategoryForm = () => {
 
   // SUPER_ADMIN escape hatch for the "still in use" block below: asks for
   // the caller's own password (re-verified server-side, independent of the
-  // session cookie) and, if confirmed, force-deletes the category — every
-  // conversation on it gets reassigned to "Uncategorized" first, never
-  // silently dropped. Returns { attempted: false } if the admin backs out
-  // of the password prompt, so the caller can tell "cancelled" apart from
-  // "failed".
+  // session cookie) and, if confirmed, force-deletes the category —
+  // untagging it from every conversation that had it (a conversation left
+  // with no categories is simply "Uncategorized", not a problem). Returns
+  // { attempted: false } if the admin backs out of the password prompt, so
+  // the caller can tell "cancelled" apart from "failed".
   const promptForceDelete = async (categoryId, categoryLabel, conversationCount) => {
     const passwordConfirmation = await Swal.fire({
       title: "Force delete category?",
-      html: `<strong>${categoryLabel}</strong> still has ${conversationCount} conversation${
+      html: `<strong>${categoryLabel}</strong> is still tagged on ${conversationCount} conversation${
         conversationCount === 1 ? "" : "s"
-      }. As SUPER_ADMIN you can delete it anyway — every conversation on it will be moved to <strong>&quot;Uncategorized&quot;</strong>, not deleted. Enter your password to confirm.`,
+      }. As SUPER_ADMIN you can delete it anyway — it'll be untagged from ${
+        conversationCount === 1 ? "that conversation" : "those conversations"
+      } (which become "Uncategorized" if this was their only category). Enter your password to confirm.`,
       icon: "warning",
       input: "password",
       inputPlaceholder: "Your password",

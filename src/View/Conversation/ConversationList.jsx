@@ -5,6 +5,7 @@ import Swal from "sweetalert2"; // Ensure SweetAlert2 is imported
 import { useAuth } from "../../services/auth.services";
 import { ScaleLoader } from "react-spinners";
 import api from "../../axios"; // Use configured axios instance
+import CategoryMultiSelect from "../../components/UI/CategoryMultiSelect";
 
 const ConversationsList = () => {
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
@@ -102,6 +103,7 @@ const ConversationsList = () => {
     setFormData({
       ...conversation,
       text: JSON.stringify(conversation.text, null, 2), // Convert `text` array to JSON string
+      categoryIds: (conversation.categories || []).map((c) => c.id),
     });
   };
 
@@ -128,10 +130,9 @@ const ConversationsList = () => {
     setFormData({ ...formData, levelId: selectedLevelId });
   };
 
-  // Handle category change
-  const handleCategoryChange = (e) => {
-    const selectedCategoryId = parseInt(e.target.value); // Ensure it's an integer
-    setFormData({ ...formData, categoryId: selectedCategoryId });
+  // Handle category selection (multi-select)
+  const handleCategoryIdsChange = (nextCategoryIds) => {
+    setFormData({ ...formData, categoryIds: nextCategoryIds });
   };
 
   // Update conversation
@@ -159,7 +160,7 @@ const ConversationsList = () => {
         topic: formData.topic,
         text: updatedText,
         levelId: formData.levelId,
-        categoryId: formData.categoryId,
+        categoryIds: formData.categoryIds,
       };
 
       // Log the updated data after parsing
@@ -259,9 +260,18 @@ const ConversationsList = () => {
             >
               <span>
                 {conversation.topic}
-                {conversation.category?.name && (
-                  <span className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-500/15 dark:text-blue-300">
-                    {conversation.category.name}
+                {conversation.categories?.length > 0 ? (
+                  conversation.categories.map((category) => (
+                    <span
+                      key={category.id}
+                      className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"
+                    >
+                      {category.name}
+                    </span>
+                  ))
+                ) : (
+                  <span className="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                    Uncategorized
                   </span>
                 )}
               </span>
@@ -339,21 +349,15 @@ const ConversationsList = () => {
                   htmlFor="edit-conversation-category"
                   className="block font-semibold"
                 >
-                  Category
+                  Categories
                 </label>
-                <select
+                <CategoryMultiSelect
                   id="edit-conversation-category"
-                  name="categoryId"
-                  value={formData.categoryId || ""}
-                  onChange={handleCategoryChange}
-                  className="border p-2 w-full"
-                >
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
+                  categories={categories}
+                  selectedIds={formData.categoryIds || []}
+                  onChange={handleCategoryIdsChange}
+                  placeholder="Uncategorized (optional)"
+                />
               </div>
 
               {/* Text Messages as JSON */}

@@ -62,13 +62,14 @@ const ConversationTitleList = () => {
   }, [conversations]);
 
   // Same idea for categories — only ones actually in use get a tab,
-  // alphabetical.
+  // alphabetical. A conversation can carry more than one category, so this
+  // collects every category across every conversation, not just the first.
   const availableCategories = useMemo(() => {
     const byId = new Map();
     conversations.forEach((c) => {
-      if (c.category?.id) {
-        byId.set(c.category.id, c.category.name);
-      }
+      (c.categories || []).forEach((category) => {
+        byId.set(category.id, category.name);
+      });
     });
     return [...byId.entries()]
       .map(([id, name]) => ({ id, name }))
@@ -90,7 +91,11 @@ const ConversationTitleList = () => {
   const filteredConversations = conversations
     .filter((c) => !activeLevel || c.levels?.level === activeLevel)
     .filter(
-      (c) => !activeCategory || String(c.category?.id) === activeCategory,
+      (c) =>
+        !activeCategory ||
+        (c.categories || []).some(
+          (category) => String(category.id) === activeCategory,
+        ),
     );
 
   const totalPages = Math.max(
@@ -203,8 +208,8 @@ const ConversationTitleList = () => {
               All Categories
             </button>
             {availableCategories.map((category) => {
-              const count = conversations.filter(
-                (c) => c.category?.id === category.id,
+              const count = conversations.filter((c) =>
+                (c.categories || []).some((cat) => cat.id === category.id),
               ).length;
 
               return (
@@ -266,17 +271,18 @@ const ConversationTitleList = () => {
                       >
                         {level || "General"}
                       </span>
-                      {conversation.category?.name && (
+                      {(conversation.categories || []).map((category) => (
                         <span
+                          key={category.id}
                           className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
                             isLight
                               ? "bg-teal-100 text-teal-700"
                               : "bg-teal-500/15 text-teal-300"
                           }`}
                         >
-                          {conversation.category.name}
+                          {category.name}
                         </span>
-                      )}
+                      ))}
                     </div>
                     <MessageCircle
                       size={18}
