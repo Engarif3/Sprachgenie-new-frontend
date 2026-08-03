@@ -433,10 +433,10 @@ const AdminVisitorsPage = () => {
   }, [visitorsByLocation, derivedCoordinatesByLocation]);
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.12),_transparent_30%),linear-gradient(180deg,_#020617_0%,_#0f172a_48%,_#020617_100%)] p-4 md:p-6">
+    <div className="min-h-screen  p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="mb-6 flex flex-col gap-4 rounded-3xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950/70 p-5 shadow-[0_24px_70px_rgba(2,6,23,0.45)] backdrop-blur-sm md:flex-row md:items-center md:justify-between md:p-6">
+        <div className="mb-6 flex flex-col gap-4 rounded-3xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950/70 p-5 shadow-[0_24px_20px_rgba(2,6,23,0.45)]  md:flex-row md:items-center md:justify-between md:p-6">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-sky-700 dark:text-sky-300/80">
               Security Analytics
@@ -525,7 +525,7 @@ const AdminVisitorsPage = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="rounded-3xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950/75 p-6 shadow-[0_18px_50px_rgba(2,6,23,0.35)]">
+              <div className="rounded-3xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950/75 p-6 shadow-[0_18px_10px_rgba(2,6,23,0.35)]">
                 <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div>
                     <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
@@ -659,7 +659,9 @@ const AdminVisitorsPage = () => {
                   </button>
                   <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
                     Page{" "}
-                    <span className="font-bold text-sky-700 dark:text-sky-300">{recentPage}</span>{" "}
+                    <span className="font-bold text-sky-700 dark:text-sky-300">
+                      {recentPage}
+                    </span>{" "}
                     • {recentTotal} total unique visitors
                   </span>
                   <button
@@ -899,8 +901,10 @@ const AdminVisitorsPage = () => {
               </button>
               <span className="flex-1 text-center font-medium text-slate-600 dark:text-slate-300">
                 Page{" "}
-                <span className="font-bold text-sky-700 dark:text-sky-300">{locationPage}</span> •{" "}
-                {locationTotal} total locations
+                <span className="font-bold text-sky-700 dark:text-sky-300">
+                  {locationPage}
+                </span>{" "}
+                • {locationTotal} total locations
               </span>
               <button
                 onClick={() => fetchVisitorsByLocation(locationPage + 1)}
