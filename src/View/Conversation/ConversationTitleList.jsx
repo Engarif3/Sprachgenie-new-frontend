@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  MessageCircle,
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
+} from "lucide-react";
 import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
 import api from "../../axios";
@@ -193,30 +198,38 @@ const ConversationTitleList = () => {
             category, since the list can grow arbitrarily long (unlike the
             fixed, small set of CEFR levels above). */}
         {!loading && availableCategories.length > 0 && (
-          <div className="mb-8 flex justify-center">
-            <select
-              value={activeCategory}
-              onChange={(event) => handleSelectCategory(event.target.value)}
-              aria-label="Filter by category"
-              className={`w-full max-w-xs rounded-full border px-4 py-2 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500/50 ${
-                isLight
-                  ? "border-slate-200 bg-white text-slate-700"
-                  : "border-slate-700 bg-slate-900 text-slate-200"
-              }`}
-            >
-              <option value="">All Categories ({conversations.length})</option>
-              {availableCategories.map((category) => {
-                const count = conversations.filter((c) =>
-                  (c.categories || []).some((cat) => cat.id === category.id),
-                ).length;
+          <div className="mb-8 mt-4 flex justify-center">
+            <div className="relative w-full max-w-xs">
+              <select
+                value={activeCategory}
+                onChange={(event) => handleSelectCategory(event.target.value)}
+                aria-label="Filter by category"
+                className={`w-full appearance-none rounded-2xl border-2 py-2.5 pl-4 pr-10 text-center text-sm font-semibold shadow-sm transition-colors [text-align-last:center] focus:outline-none focus:ring-2 focus:ring-teal-500/50 ${
+                  isLight
+                    ? "border-teal-200 bg-white text-slate-700 hover:border-teal-300"
+                    : "border-teal-700/60 bg-slate-900 text-slate-200 hover:border-teal-500/60"
+                }`}
+              >
+                <option value="">All Categories ({conversations.length})</option>
+                {availableCategories.map((category) => {
+                  const count = conversations.filter((c) =>
+                    (c.categories || []).some((cat) => cat.id === category.id),
+                  ).length;
 
-                return (
-                  <option key={category.id} value={category.id}>
-                    {category.name} ({count})
-                  </option>
-                );
-              })}
-            </select>
+                  return (
+                    <option key={category.id} value={category.id}>
+                      {category.name} ({count})
+                    </option>
+                  );
+                })}
+              </select>
+              <ChevronDown
+                size={18}
+                className={`pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 ${
+                  isLight ? "text-teal-500" : "text-teal-400"
+                }`}
+              />
+            </div>
           </div>
         )}
 
