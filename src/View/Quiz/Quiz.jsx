@@ -275,7 +275,7 @@ const Quiz = () => {
   if (loading) {
     return (
       <Container>
-        <div className="flex min-h-[50vh] items-center justify-center rounded-2xl border border-slate-200 bg-white p-4 text-slate-600 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300">
+        <div className="flex min-h-[50vh] items-center justify-center rounded-2xl border border-slate-200 bg-white p-4 text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
           <p>Loading Quiz Data....</p>
         </div>
       </Container>
@@ -313,7 +313,7 @@ const Quiz = () => {
                     className={`group relative overflow-hidden rounded-2xl border-2 py-3 pl-6 pr-4 transition-all duration-300 ${
                       isSelected
                         ? "scale-105 border-blue-400 bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/50"
-                        : "border-slate-200 bg-white text-slate-700 hover:border-blue-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-slate-800"
+                        : "border-slate-200 bg-white text-slate-700 hover:border-blue-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-slate-700"
                     }`}
                   >
                     <div className="flex items-start justify-between">
@@ -350,7 +350,7 @@ const Quiz = () => {
                 className={`group relative overflow-hidden rounded-2xl border-2 py-3 pl-6 pr-4 transition-all duration-300 ${
                   source === "favorites"
                     ? "scale-105 border-pink-400 bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow-lg shadow-pink-500/50"
-                    : "border-slate-200 bg-white text-slate-700 hover:border-pink-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-200 dark:hover:border-pink-500 dark:hover:bg-slate-800"
+                    : "border-slate-200 bg-white text-slate-700 hover:border-pink-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-pink-500 dark:hover:bg-slate-700"
                 }`}
               >
                 <div className="flex items-start justify-between">
@@ -379,7 +379,7 @@ const Quiz = () => {
           </div>
 
           {/* Stats Card */}
-          <div className="mb-3 rounded-2xl border-2 border-blue-200 bg-white p-2 shadow-sm transition-all duration-300 hover:border-blue-300 dark:border-blue-500/30 dark:bg-gradient-to-br dark:from-slate-800/60 dark:to-slate-900/60 dark:shadow-xl dark:hover:border-blue-500/50">
+          <div className="mb-3 rounded-2xl border-2 border-blue-200 bg-white p-2 shadow-sm transition-all duration-300 hover:border-blue-300 dark:border-blue-500/30 dark:bg-slate-900 dark:shadow-xl dark:hover:border-blue-500/50">
             <div className="grid grid-cols-2 gap-4 text-center">
               <div>
                 <div className="mb-1 text-xs text-slate-500 dark:text-slate-400">
@@ -451,7 +451,7 @@ const Quiz = () => {
       <div className="mx-auto w-full max-w-2xl px-2 py-6 md:py-8">
         {/* Header with difficulty and reset */}
         <div className="mb-4 flex w-full flex-col items-center justify-between gap-4 sm:flex-row">
-          <div className="rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm text-slate-700 dark:border-blue-500/50 dark:bg-gradient-to-r dark:from-blue-500/20 dark:to-purple-500/20 dark:text-slate-200 dark:backdrop-blur-sm">
+          <div className="rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm text-slate-700 dark:border-blue-500/40 dark:bg-slate-900 dark:text-slate-200">
             {source === "favorites" ? (
               <>
                 Source:{" "}
@@ -478,7 +478,7 @@ const Quiz = () => {
 
         {/* Word counter */}
         <div className="mb-3 text-center">
-          <div className="inline-block rounded-full border border-slate-200 bg-slate-100 px-6 py-2 dark:border-slate-700 dark:bg-gradient-to-r dark:from-slate-800/80 dark:to-slate-900/80 dark:backdrop-blur-sm">
+          <div className="inline-block rounded-full border border-slate-200 bg-slate-100 px-6 py-2 dark:border-slate-700 dark:bg-slate-800">
             <span className="text-slate-500 dark:text-slate-300">Question</span>{" "}
             <span className="text-xl font-bold text-slate-900 dark:text-white">
               {currentIndex + 1}
@@ -496,7 +496,7 @@ const Quiz = () => {
         </p>
 
         {/* Main word display */}
-        <div className="mb-4 rounded-3xl border-2 border-purple-200 bg-white p-4 shadow-sm transition-all duration-300 hover:border-purple-300 dark:border-purple-500/30 dark:bg-gradient-to-br dark:from-slate-800/50 dark:to-slate-900/50 dark:shadow-2xl dark:hover:border-purple-500/50 md:p-5">
+        <div className="mb-4 rounded-3xl border-2 border-purple-200 bg-white p-4 shadow-sm transition-all duration-300 hover:border-purple-300 dark:border-purple-500/30 dark:bg-slate-900 dark:shadow-2xl dark:hover:border-purple-500/50 md:p-5">
           <div className="text-center">
             <div className="mb-2 flex items-center justify-center gap-2 md:mb-3 md:gap-4">
               <button
@@ -528,7 +528,7 @@ const Quiz = () => {
             {/* Meaning reveal area */}
             <div className="flex min-h-[80px] items-center justify-center">
               {showMeaning ? (
-                <div className="animate-fade-in rounded-2xl border border-yellow-300 bg-yellow-50 px-6 py-3 text-lg font-semibold text-yellow-700 dark:border-yellow-500/30 dark:bg-gradient-to-r dark:from-yellow-500/10 dark:to-orange-500/10 dark:text-yellow-300">
+                <div className="animate-fade-in rounded-2xl border border-yellow-300 bg-yellow-50 px-6 py-3 text-lg font-semibold text-yellow-700 dark:border-yellow-500/30 dark:bg-slate-900 dark:text-yellow-300">
                   {(currentWord?.meaning && currentWord.meaning.join(", ")) ||
                     "No meaning"}
                 </div>
@@ -548,7 +548,7 @@ const Quiz = () => {
 
         {/* Player score card */}
         <div className="mb-4 flex flex-col justify-center gap-4 md:flex-row md:gap-8">
-          <div className="w-full rounded-2xl border-2 border-blue-200 bg-white p-3 shadow-sm transition-all duration-300 hover:border-blue-300 dark:border-blue-500/30 dark:bg-gradient-to-br dark:from-slate-800/60 dark:to-slate-900/60 dark:shadow-xl dark:hover:border-blue-500/50 md:max-w-sm md:flex-1 md:p-5">
+          <div className="w-full rounded-2xl border-2 border-blue-200 bg-white p-3 shadow-sm transition-all duration-300 hover:border-blue-300 dark:border-blue-500/30 dark:bg-slate-900 dark:shadow-xl dark:hover:border-blue-500/50 md:max-w-sm md:flex-1 md:p-5">
             <div className="mb-2 text-center">
               <div className="mb-1 text-base font-bold text-blue-600 dark:text-blue-400 md:text-xl">
                 YOUR SCORE
