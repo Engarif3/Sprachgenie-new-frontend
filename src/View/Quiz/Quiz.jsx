@@ -150,6 +150,16 @@ const Quiz = () => {
           type: "SET_AVAILABLE_WORDS_COUNT",
           payload: data.availableCount,
         });
+
+        if (source === "favorites" && data.availableCount < QUIZ_LENGTH) {
+          const missing = QUIZ_LENGTH - data.availableCount;
+          Swal.fire({
+            icon: "warning",
+            title: "You are not eligible",
+            text: `Add ${missing} more favorite word${missing === 1 ? "" : "s"} to play this quiz.`,
+            confirmButtonText: "Got it",
+          });
+        }
       } catch (error) {
         console.error(error);
         dispatch({ type: "SET_PREPARED_QUIZ_WORDS", payload: [] });
@@ -265,7 +275,7 @@ const Quiz = () => {
   if (loading) {
     return (
       <Container>
-        <div className="p-4 bg-gray-800 text-white rounded min-h-screen flex justify-center items-center ">
+        <div className="p-4 bg-gray-800 text-white rounded min-h-[50vh] flex justify-center items-center ">
           <p>Loading Quiz Data....</p>
         </div>
       </Container>
@@ -275,7 +285,7 @@ const Quiz = () => {
   if (!quizStarted) {
     return (
       <div className=" flex justify-center p-2">
-        <div className="relative  p-4 md:p-8 text-white rounded-2xl min-h-screen flex flex-col justify-center items-center  mb-4 bg-gradient-to-br from-gray-900 via-gray-800 to-black  w-full md:w-8/12 lg:w-8/12">
+        <div className="relative  p-4 md:p-8 text-white rounded-2xl flex flex-col justify-center items-center  mb-4 bg-gradient-to-br from-gray-900 via-gray-800 to-black  w-full md:w-8/12 lg:w-8/12">
           {/* Background decoration */}
           <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-orange-500/5 rounded-2xl"></div>
           <div className="absolute inset-0 backdrop-blur-3xl opacity-30 rounded-2xl "></div>
@@ -409,18 +419,10 @@ const Quiz = () => {
                 </span>
               </button>
 
-              {notEligibleForFavorites ? (
-                <p className="text-rose-400 text-sm mt-4">
-                  🚫 You are not eligible. Add {missingFavoritesCount} more
-                  favorite word{missingFavoritesCount === 1 ? "" : "s"} to play
-                  this quiz.
+              {!notEligibleForFavorites && preparedQuizWords.length === 0 && (
+                <p className="text-orange-400 text-sm mt-4 animate-pulse">
+                  ⚠️ Loading words... Please wait
                 </p>
-              ) : (
-                preparedQuizWords.length === 0 && (
-                  <p className="text-orange-400 text-sm mt-4 animate-pulse">
-                    ⚠️ Loading words... Please wait
-                  </p>
-                )
               )}
             </div>
 
@@ -442,7 +444,7 @@ const Quiz = () => {
 
   return (
     <div className="flex justify-center p-2">
-      <div className="relative p-4 md:p-8 text-white rounded-2xl min-h-screen flex flex-col items-center mt-4 mb-12 bg-gradient-to-br from-gray-900 via-gray-800 to-black w-full md:w-8/12 lg:w-8/12">
+      <div className="relative p-4 md:p-8 text-white rounded-2xl flex flex-col items-center mt-4 mb-12 bg-gradient-to-br from-gray-900 via-gray-800 to-black w-full md:w-8/12 lg:w-8/12">
         {/* Background decoration */}
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-orange-500/5 rounded-2xl"></div>
         <div className="absolute inset-0 backdrop-blur-3xl opacity-30 rounded-2xl"></div>
