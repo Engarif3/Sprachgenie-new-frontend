@@ -233,6 +233,29 @@ const DashboardLayout = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [openSection]);
 
+  // Close on any scroll. The flyout is fixed to a viewport position computed
+  // when it opens — but the sidebar itself is only position:fixed on mobile;
+  // on desktop it's a normal in-flow block that scrolls away with the rest
+  // of the page. So the moment ANY scrolling happens (the page itself, the
+  // sidebar's own nav list, or the main content area), the button can move
+  // out from under the flyout while the flyout stays put, leaving it
+  // floating disconnected over unrelated content. Listening on window with
+  // capture:true catches scroll events from all of those nested scrollable
+  // elements too (scroll doesn't bubble, but capturing on an ancestor still
+  // sees it), not just the window's own scroll.
+  useEffect(() => {
+    if (!openSection) return;
+
+    const close = () => setOpenSection(null);
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+
+    return () => {
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    };
+  }, [openSection]);
+
   const computeFlyoutStyle = (key) => {
     const node = sectionButtonRefs.current[key];
     if (!node) return null;
