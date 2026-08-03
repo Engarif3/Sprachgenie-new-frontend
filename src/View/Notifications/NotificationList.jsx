@@ -5,11 +5,18 @@ import { useTheme } from "../../context/ThemeContext";
 
 const formatNotificationDate = (dateValue) => {
   if (!dateValue) return "";
-  return new Date(dateValue).toLocaleDateString("en-GB", {
+  const date = new Date(dateValue);
+  const datePart = date.toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "long",
     year: "numeric",
   });
+  const timePart = date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+  return `${datePart}, ${timePart}`;
 };
 
 const isExternalLink = (link) => /^https?:\/\//i.test(link || "");
