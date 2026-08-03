@@ -312,7 +312,7 @@ const Quiz = () => {
                   <button
                     key={level}
                     onClick={() => handleSelectDifficulty(parseInt(level))}
-                    className={`group relative p-2 rounded-2xl   transition-all duration-300 overflow-hidden ${
+                    className={`group relative py-3 pl-6 pr-4 rounded-2xl transition-all duration-300 overflow-hidden ${
                       source === "difficulty" && difficulty === parseInt(level)
                         ? "bg-gradient-to-r from-blue-600 to-purple-600 border-2 border-blue-400 shadow-lg shadow-blue-500/50 scale-105"
                         : "bg-gradient-to-br from-gray-800/60 to-gray-900/60 border-2 border-cyan-700 hover:border-blue-500 hover:bg-gray-800/80"
@@ -346,7 +346,7 @@ const Quiz = () => {
                     logged in prompts a login instead of hiding the option. */}
                 <button
                   onClick={handleSelectFavorites}
-                  className={`group relative p-2 rounded-2xl transition-all duration-300 overflow-hidden ${
+                  className={`group relative py-3 pl-6 pr-4 rounded-2xl transition-all duration-300 overflow-hidden ${
                     source === "favorites"
                       ? "bg-gradient-to-r from-pink-600 to-rose-600 border-2 border-pink-400 shadow-lg shadow-pink-500/50 scale-105"
                       : "bg-gradient-to-br from-gray-800/60 to-gray-900/60 border-2 border-cyan-700 hover:border-pink-500 hover:bg-gray-800/80"
