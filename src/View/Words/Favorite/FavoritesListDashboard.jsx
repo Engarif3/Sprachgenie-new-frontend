@@ -665,19 +665,19 @@ const FavoritesListDashboard = () => {
             </div>
             <div className="flex gap-3">
               <button
+                onClick={handleDeleteAllFavorites}
+                disabled={deleteConfirmation.inputValue !== "ok"}
+                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-800 text-white rounded-lg font-medium transition-colors"
+              >
+                Delete All
+              </button>
+              <button
                 onClick={() =>
                   setDeleteConfirmation({ show: false, inputValue: "" })
                 }
                 className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
               >
                 Cancel
-              </button>
-              <button
-                onClick={handleDeleteAllFavorites}
-                disabled={deleteConfirmation.inputValue !== "ok"}
-                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-800 text-white rounded-lg font-medium transition-colors"
-              >
-                Delete All
               </button>
             </div>
           </div>

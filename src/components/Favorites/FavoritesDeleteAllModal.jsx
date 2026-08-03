@@ -72,6 +72,14 @@ const FavoritesDeleteAllModal = ({
         <div className="mt-6 flex gap-3">
           <button
             type="button"
+            onClick={handleConfirm}
+            disabled={!canConfirm || isDeleting}
+            className="flex-1 rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {isDeleting ? "Deleting..." : "Delete All"}
+          </button>
+          <button
+            type="button"
             onClick={onCancel}
             disabled={isDeleting}
             className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors disabled:opacity-50 ${
@@ -81,14 +89,6 @@ const FavoritesDeleteAllModal = ({
             }`}
           >
             Cancel
-          </button>
-          <button
-            type="button"
-            onClick={handleConfirm}
-            disabled={!canConfirm || isDeleting}
-            className="flex-1 rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {isDeleting ? "Deleting..." : "Delete All"}
           </button>
         </div>
       </div>

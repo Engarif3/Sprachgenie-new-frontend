@@ -60,7 +60,6 @@ export const useFavorites = (resource, idField, itemLabel = "item") => {
           showCancelButton: true,
           confirmButtonText: "Yes, remove",
           cancelButtonText: "Cancel",
-          reverseButtons: true,
         });
         if (!result.isConfirmed) return;
       }

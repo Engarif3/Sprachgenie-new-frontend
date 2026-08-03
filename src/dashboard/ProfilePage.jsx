@@ -285,7 +285,6 @@ const ProfilePage = () => {
       cancelButtonColor: "#334155",
       background: "#0f172a",
       color: "#f8fafc",
-      reverseButtons: true,
     });
 
     if (!result.isConfirmed) {

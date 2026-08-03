@@ -146,6 +146,12 @@ const LevelList = () => {
             />
             <div className="flex justify-end space-x-2">
               <button
+                onClick={handleDeleteLevel}
+                className="bg-red-500 text-white p-2 rounded"
+              >
+                Confirm
+              </button>
+              <button
                 onClick={() => {
                   setShowModal(false);
                   setConfirmationInput("");
@@ -153,12 +159,6 @@ const LevelList = () => {
                 className="bg-gray-500 text-white p-2 rounded"
               >
                 Cancel
-              </button>
-              <button
-                onClick={handleDeleteLevel}
-                className="bg-red-500 text-white p-2 rounded"
-              >
-                Confirm
               </button>
             </div>
           </div>

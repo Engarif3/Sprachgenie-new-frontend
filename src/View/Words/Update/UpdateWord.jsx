@@ -907,7 +907,6 @@ const UpdateWord = () => {
       showCancelButton: true,
       confirmButtonText: "Yes",
       cancelButtonText: "No",
-      reverseButtons: true,
     });
 
     if (!result.isConfirmed) {
@@ -1366,7 +1365,6 @@ const UpdateWord = () => {
       showCancelButton: true,
       cancelButtonText: "Cancel",
       confirmButtonText: "Remove",
-      reverseButtons: true,
     });
 
     if (result.isConfirmed) {
@@ -1501,7 +1499,6 @@ const UpdateWord = () => {
       showCancelButton: true,
       cancelButtonText: "Cancel",
       confirmButtonText: "Clear All",
-      reverseButtons: true,
       preConfirm: (value) => {
         if (value && value.toLowerCase() === "ok") {
           return true;
@@ -1561,7 +1558,6 @@ const UpdateWord = () => {
       showCancelButton: true,
       cancelButtonText: "Cancel",
       confirmButtonText: "Clear All",
-      reverseButtons: true,
       preConfirm: (value) => {
         if (value && value.toLowerCase() === "ok") {
           return true;

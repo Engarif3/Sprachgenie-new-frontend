@@ -100,7 +100,6 @@ const StoriesManagement = () => {
       showCancelButton: true,
       confirmButtonText: "Yes, publish",
       cancelButtonText: "Cancel",
-      reverseButtons: true,
     });
     if (!result.isConfirmed) {
       return;
@@ -126,7 +125,6 @@ const StoriesManagement = () => {
       showCancelButton: true,
       confirmButtonText: "Yes, unpublish",
       cancelButtonText: "Cancel",
-      reverseButtons: true,
     });
     if (!result.isConfirmed) {
       return;
@@ -153,7 +151,6 @@ const StoriesManagement = () => {
       confirmButtonText: "Yes, delete",
       cancelButtonText: "Cancel",
       confirmButtonColor: "#e11d48",
-      reverseButtons: true,
     });
     if (!result.isConfirmed) {
       return;
