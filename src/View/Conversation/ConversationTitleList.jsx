@@ -387,8 +387,8 @@ const ConversationTitleList = () => {
                           key={category.id}
                           className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
                             isLight
-                              ? "bg-teal-100 text-teal-700"
-                              : "bg-teal-500/15 text-teal-300"
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-blue-500/15 text-blue-300"
                           }`}
                         >
                           {category.name}
