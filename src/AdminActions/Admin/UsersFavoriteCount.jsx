@@ -1,60 +1,105 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../services/auth.services";
 import api from "../../axios";
 import { ScaleLoader } from "react-spinners";
 import PageHeader from "../../components/UI/PageHeader";
 
+const TABS = [
+  { key: "words", label: "Words", endpoint: "/users-favorite-count" },
+  {
+    key: "conversations",
+    label: "Conversations",
+    endpoint: "/favorite-conversations/users-count",
+  },
+  { key: "stories", label: "Stories", endpoint: "/favorite-stories/users-count" },
+];
+
 const UsersFavoriteCount = () => {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState("words");
+  // Keyed by tab key — fetched lazily, once per tab, and cached here so
+  // switching tabs back and forth doesn't refetch.
+  const [dataByTab, setDataByTab] = useState({});
+  const [loadingTab, setLoadingTab] = useState(null);
+  const [errorByTab, setErrorByTab] = useState({});
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
   const canAccess = userLoggedIn && userId && isAdmin;
 
-  const fetchData = async () => {
-    try {
-      const response = await api.get("/users-favorite-count");
-
-      if (response.data.success && Array.isArray(response.data.data)) {
-        setUsers(response.data.data);
-      } else {
-        setError("Invalid data format from server");
-      }
-    } catch (err) {
-      console.error("Error fetching favorite counts:", err);
-      setError("Error fetching favorite counts");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (!canAccess || dataByTab[activeTab]) return;
+
+    const tab = TABS.find((t) => t.key === activeTab);
+    setLoadingTab(activeTab);
+
+    api
+      .get(tab.endpoint)
+      .then((response) => {
+        if (response.data.success && Array.isArray(response.data.data)) {
+          setDataByTab((prev) => ({ ...prev, [activeTab]: response.data.data }));
+        } else {
+          setErrorByTab((prev) => ({
+            ...prev,
+            [activeTab]: "Invalid data format from server",
+          }));
+        }
+      })
+      .catch((err) => {
+        console.error(`Error fetching favorite ${activeTab} counts:`, err);
+        setErrorByTab((prev) => ({
+          ...prev,
+          [activeTab]: `Error fetching favorite ${activeTab} counts`,
+        }));
+      })
+      .finally(() => setLoadingTab(null));
+  }, [activeTab, canAccess, dataByTab]);
 
   if (!canAccess) {
     return <Navigate to="/" replace />;
   }
+
+  const users = dataByTab[activeTab] || [];
+  const error = errorByTab[activeTab];
+  const isLoading = loadingTab === activeTab;
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 md:p-8">
       <div className="mx-auto max-w-4xl">
         <div className="mb-8">
           <PageHeader
-            title="Users & Favorite Words Count"
-            subtitle="How many words each user has saved to their favorites."
+            title="Users & Favorites Count"
+            subtitle="How many words, conversations, and stories each user has saved to their favorites."
           />
         </div>
 
-        {loading ? (
+        <div className="mb-6 flex flex-wrap justify-center gap-2">
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setActiveTab(tab.key)}
+              className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+                activeTab === tab.key
+                  ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-md"
+                  : "border border-slate-200 bg-white text-slate-600 hover:border-orange-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-orange-500/50"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {isLoading ? (
           <div className="flex justify-center py-8">
-            <ScaleLoader color="oklch(0.5 0.134 242.749)" loading={loading} />
+            <ScaleLoader color="oklch(0.5 0.134 242.749)" loading={isLoading} />
           </div>
         ) : error ? (
           <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-center text-red-700 dark:border-red-700 dark:bg-red-900/30 dark:text-red-200">
             {error}
           </div>
+        ) : users.length === 0 ? (
+          <p className="text-center text-slate-500 dark:text-gray-400">
+            No users have favorited any {TABS.find((t) => t.key === activeTab)?.label.toLowerCase()} yet.
+          </p>
         ) : (
           <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
             <table className="min-w-full table-auto">
