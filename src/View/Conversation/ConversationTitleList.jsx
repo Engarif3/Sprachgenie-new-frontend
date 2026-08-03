@@ -336,7 +336,7 @@ const ConversationTitleList = () => {
             No topics yet for this filter.
           </p>
         ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">
             {paginatedConversations.map((conversation) => {
               const level = conversation.levels?.level;
               const badgeClass = LEVEL_BADGES[level] || DEFAULT_BADGE;
@@ -355,17 +355,17 @@ const ConversationTitleList = () => {
                       : "border-slate-800 bg-slate-900/70 hover:border-orange-500/40"
                   }`}
                 >
-                  <div className="mb-4 flex w-full items-center justify-between">
+                  <div className="mb-4 flex w-full items-start justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-2">
                       <span
-                        className={`inline-flex rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide ${badgeClass}`}
+                        className={`inline-flex flex-shrink-0 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide ${badgeClass}`}
                       >
                         {level || "General"}
                       </span>
                       {(conversation.categories || []).map((category) => (
                         <span
                           key={category.id}
-                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                          className={`inline-flex flex-shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
                             isLight
                               ? "bg-teal-100 text-teal-700"
                               : "bg-teal-500/15 text-teal-300"
@@ -377,7 +377,7 @@ const ConversationTitleList = () => {
                     </div>
                     <MessageCircle
                       size={18}
-                      className={isLight ? "text-slate-300" : "text-slate-600"}
+                      className={`flex-shrink-0 ${isLight ? "text-slate-300" : "text-slate-600"}`}
                     />
                   </div>
                   <div className="mb-6">
@@ -395,7 +395,7 @@ const ConversationTitleList = () => {
                     )}
                   </div>
                   <div
-                    className={`mt-auto flex w-full items-center gap-1 border-t pt-4 text-sm font-semibold text-orange-500 transition-transform group-hover:gap-2 dark:text-orange-400 ${
+                    className={`mt-auto flex w-full items-center justify-end gap-1 border-t pt-4 text-sm font-semibold text-orange-500 transition-transform group-hover:gap-2 dark:text-orange-400 ${
                       isLight ? "border-slate-100" : "border-slate-800"
                     }`}
                   >
