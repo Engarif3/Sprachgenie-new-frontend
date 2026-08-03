@@ -285,34 +285,34 @@ const Quiz = () => {
   if (!quizStarted) {
     return (
       <div className=" flex justify-center p-2">
-        <div className="relative  p-4 md:p-8 text-white rounded-2xl flex flex-col justify-center items-center  mb-4 bg-gradient-to-br from-gray-900 via-gray-800 to-black  w-full md:w-8/12 lg:w-8/12">
+        <div className="relative  p-3 md:p-5 text-white rounded-2xl flex flex-col justify-center items-center  mb-4 bg-gradient-to-br from-gray-900 via-gray-800 to-black  w-full md:w-8/12 lg:w-8/12">
           {/* Background decoration */}
           <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-orange-500/5 rounded-2xl"></div>
           <div className="absolute inset-0 backdrop-blur-3xl opacity-30 rounded-2xl "></div>
 
           <div className="relative z-10 w-full max-w-2xl px-4 ">
             {/* Main Title */}
-            <div className="text-center mb-4">
-              <h1 className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
+            <div className="text-center mb-3">
+              <h1 className="text-3xl md:text-4xl font-bold mb-1 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent">
                 Quiz
               </h1>
-              <p className="text-gray-300 text-lg md:text-xl ">
+              <p className="text-gray-300 text-sm md:text-base ">
                 Test your vocabulary and improve your German skills
               </p>
             </div>
 
             {/* Difficulty Selection */}
-            <div className="mb-8">
-              <h2 className="text-2xl  font-bold text-center mb-6 text-blue-400">
+            <div className="mb-4">
+              <h2 className="text-lg  font-bold text-center mb-3 text-blue-400">
                 Select Your Level
               </h2>
 
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3">
                 {Object.entries(DIFFICULTY_LEVELS).map(([level, config]) => (
                   <button
                     key={level}
                     onClick={() => handleSelectDifficulty(parseInt(level))}
-                    className={`group relative py-3 pl-6 pr-4 rounded-2xl transition-all duration-300 overflow-hidden ${
+                    className={`group relative py-2 pl-6 pr-4 rounded-2xl transition-all duration-300 overflow-hidden ${
                       source === "difficulty" && difficulty === parseInt(level)
                         ? "bg-gradient-to-r from-blue-600 to-purple-600 border-2 border-blue-400 shadow-lg shadow-blue-500/50 scale-105"
                         : "bg-gradient-to-br from-gray-800/60 to-gray-900/60 border-2 border-cyan-700 hover:border-blue-500 hover:bg-gray-800/80"
@@ -320,7 +320,7 @@ const Quiz = () => {
                   >
                     <div className="flex items-start justify-between ">
                       <div className="text-left">
-                        <div className="font-bold text-lg md:text-xl mb-2">
+                        <div className="font-bold text-base md:text-lg mb-0.5">
                           {level === "1"
                             ? "🟢 Easy"
                             : level === "2"
@@ -328,12 +328,12 @@ const Quiz = () => {
                               : "🟡 Mixed"}
                         </div>
                         <div
-                          className={`text-sm md:text-base ${source === "difficulty" && difficulty === parseInt(level) ? "text-white" : "text-gray-400"}`}
+                          className={`text-xs md:text-sm ${source === "difficulty" && difficulty === parseInt(level) ? "text-white" : "text-gray-400"}`}
                         >
                           {config.description}
                         </div>
                       </div>
-                      <div className="text-2xl md:text-3xl">
+                      <div className="text-xl md:text-2xl">
                         {source === "difficulty" && difficulty === parseInt(level)
                           ? "✓"
                           : ""}
@@ -346,7 +346,7 @@ const Quiz = () => {
                     logged in prompts a login instead of hiding the option. */}
                 <button
                   onClick={handleSelectFavorites}
-                  className={`group relative py-3 pl-6 pr-4 rounded-2xl transition-all duration-300 overflow-hidden ${
+                  className={`group relative py-2 pl-6 pr-4 rounded-2xl transition-all duration-300 overflow-hidden ${
                     source === "favorites"
                       ? "bg-gradient-to-r from-pink-600 to-rose-600 border-2 border-pink-400 shadow-lg shadow-pink-500/50 scale-105"
                       : "bg-gradient-to-br from-gray-800/60 to-gray-900/60 border-2 border-cyan-700 hover:border-pink-500 hover:bg-gray-800/80"
@@ -354,18 +354,18 @@ const Quiz = () => {
                 >
                   <div className="flex items-start justify-between">
                     <div className="text-left">
-                      <div className="font-bold text-lg md:text-xl mb-2">
+                      <div className="font-bold text-base md:text-lg mb-0.5">
                         ❤️ My Favorites
                       </div>
                       <div
-                        className={`text-sm md:text-base ${source === "favorites" ? "text-white" : "text-gray-400"}`}
+                        className={`text-xs md:text-sm ${source === "favorites" ? "text-white" : "text-gray-400"}`}
                       >
                         {isLoggedIn
                           ? "Revise the words you've favorited"
                           : "Sign in to quiz yourself on your favorites"}
                       </div>
                     </div>
-                    <div className="text-2xl md:text-3xl">
+                    <div className="text-xl md:text-2xl">
                       {source === "favorites" ? "✓" : ""}
                     </div>
                   </div>
@@ -374,27 +374,27 @@ const Quiz = () => {
             </div>
 
             {/* Stats Card */}
-            <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-md border-2 border-blue-500/30 rounded-2xl p-2 mb-4 shadow-xl hover:border-blue-500/50 transition-all duration-300">
+            <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-md border-2 border-blue-500/30 rounded-2xl p-2 mb-3 shadow-xl hover:border-blue-500/50 transition-all duration-300">
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
-                  <div className="text-gray-400 text-sm mb-2">Quiz Length</div>
-                  <div className="text-3xl font-bold text-blue-400">
+                  <div className="text-gray-400 text-xs mb-1">Quiz Length</div>
+                  <div className="text-xl font-bold text-blue-400">
                     {QUIZ_LENGTH}
                   </div>
-                  <div className="text-gray-500 text-xs mt-1">Questions</div>
+                  <div className="text-gray-500 text-xs mt-0.5">Questions</div>
                 </div>
                 <div>
-                  <div className="text-gray-400 text-sm mb-2">
+                  <div className="text-gray-400 text-xs mb-1">
                     Available Words
                   </div>
-                  <div className="text-3xl font-bold text-purple-400">
+                  <div className="text-xl font-bold text-purple-400">
                     {availableWordsCount > 0
                       ? availableWordsCount.toLocaleString()
                       : source === "favorites"
                         ? "0"
                         : "Loading..."}
                   </div>
-                  <div className="text-gray-500 text-xs mt-1">
+                  <div className="text-gray-500 text-xs mt-0.5">
                     {source === "favorites"
                       ? "In Your Favorites"
                       : `For ${DIFFICULTY_LEVELS[difficulty].name}`}
@@ -408,7 +408,7 @@ const Quiz = () => {
               <button
                 disabled={!canStartQuiz}
                 onClick={startQuiz}
-                className={`relative px-10 md:px-16 py-4 md:py-5 rounded-full font-bold text-lg md:text-xl transition-all duration-300 overflow-hidden group ${
+                className={`relative px-8 md:px-12 py-2.5 md:py-3 rounded-full font-bold text-base md:text-lg transition-all duration-300 overflow-hidden group ${
                   !canStartQuiz
                     ? "bg-gray-600 text-gray-400 cursor-not-allowed opacity-50"
                     : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white hover:scale-110 hover:shadow-green-500/50 shadow-xl hover:shadow-2xl"
@@ -420,20 +420,16 @@ const Quiz = () => {
               </button>
 
               {!notEligibleForFavorites && preparedQuizWords.length === 0 && (
-                <p className="text-orange-400 text-sm mt-4 animate-pulse">
+                <p className="text-orange-400 text-xs mt-2 animate-pulse">
                   ⚠️ Loading words... Please wait
                 </p>
               )}
             </div>
 
             {/* Info Footer */}
-            <div className="mt-12 text-center">
-              <div className="text-gray-400 text-sm space-y-2">
-                <p>Challenge yourself with German vocabulary</p>
-                <p>⏱️ No time limit, take your time!</p>
-                <p>📈 Track your progress and improve your skills</p>
-              </div>
-            </div>
+            <p className="mt-3 text-center text-gray-500 text-xs">
+              ⏱️ No time limit · 📈 Track your progress
+            </p>
           </div>
         </div>
       </div>
@@ -444,7 +440,7 @@ const Quiz = () => {
 
   return (
     <div className="flex justify-center p-2">
-      <div className="relative p-4 md:p-8 text-white rounded-2xl flex flex-col items-center mt-4 mb-12 bg-gradient-to-br from-gray-900 via-gray-800 to-black w-full md:w-8/12 lg:w-8/12">
+      <div className="relative p-3 md:p-5 text-white rounded-2xl flex flex-col items-center mt-3 mb-6 bg-gradient-to-br from-gray-900 via-gray-800 to-black w-full md:w-8/12 lg:w-8/12">
         {/* Background decoration */}
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-pink-500/5 to-orange-500/5 rounded-2xl"></div>
         <div className="absolute inset-0 backdrop-blur-3xl opacity-30 rounded-2xl"></div>
@@ -489,14 +485,14 @@ const Quiz = () => {
           </div>
 
           {/* Instruction */}
-          <p className="text-center text-pink-400 italic mb-8 text-lg">
+          <p className="text-center text-pink-400 italic mb-3 text-base">
             💡 Guess the meaning of the word
           </p>
 
           {/* Main word display */}
-          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-md border-2 border-purple-500/30 rounded-3xl p-6 md:p-6 mb-6 shadow-2xl hover:border-purple-500/50 transition-all duration-300">
+          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-md border-2 border-purple-500/30 rounded-3xl p-4 md:p-5 mb-4 shadow-2xl hover:border-purple-500/50 transition-all duration-300">
             <div className="text-center">
-              <div className="flex items-center justify-center gap-2 md:gap-4 mb-4 md:mb-6">
+              <div className="flex items-center justify-center gap-2 md:gap-4 mb-2 md:mb-3">
                 <button
                   onClick={() =>
                     pronounceWord(
@@ -505,12 +501,12 @@ const Quiz = () => {
                       }`.trim(),
                     )
                   }
-                  className="text-3xl md:text-5xl hover:scale-110 transition-transform duration-300 hover:drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]"
+                  className="text-3xl md:text-4xl hover:scale-110 transition-transform duration-300 hover:drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]"
                   title="Pronounce word"
                 >
                   🔊
                 </button>
-                <div className="text-2xl md:text-5xl lg:text-5xl font-bold">
+                <div className="text-2xl md:text-4xl font-bold">
                   <span className="text-orange-400 italic mr-2 md:mr-3">
                     {currentWord?.article?.name || ""}
                   </span>
@@ -524,9 +520,9 @@ const Quiz = () => {
               </div>
 
               {/* Meaning reveal area */}
-              <div className="min-h-[120px] flex items-center justify-center">
+              <div className="min-h-[80px] flex items-center justify-center">
                 {showMeaning ? (
-                  <div className="text-xl text-yellow-300 font-semibold animate-fade-in bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-2xl px-8 py-4">
+                  <div className="text-lg text-yellow-300 font-semibold animate-fade-in bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-2xl px-6 py-3">
                     {(currentWord?.meaning && currentWord.meaning.join(", ")) ||
                       "No meaning"}
                   </div>
@@ -535,7 +531,7 @@ const Quiz = () => {
                     onClick={() =>
                       dispatch({ type: "SET_SHOW_MEANING", payload: true })
                     }
-                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-blue-500/50"
+                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-6 py-3 rounded-full font-bold text-base transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-blue-500/50"
                   >
                     🔍 Reveal Meaning
                   </button>
@@ -545,21 +541,21 @@ const Quiz = () => {
           </div>
 
           {/* Player score card */}
-          <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-8 mb-8">
-            <div className="w-full md:flex-1 md:max-w-sm bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-md border-2 border-blue-500/30 rounded-2xl p-4 md:p-8 shadow-xl hover:border-blue-500/50 transition-all duration-300">
-              <div className="text-center mb-4">
-                <div className="text-lg md:text-2xl font-bold text-blue-400 mb-2">
+          <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-8 mb-4">
+            <div className="w-full md:flex-1 md:max-w-sm bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-md border-2 border-blue-500/30 rounded-2xl p-3 md:p-5 shadow-xl hover:border-blue-500/50 transition-all duration-300">
+              <div className="text-center mb-2">
+                <div className="text-base md:text-xl font-bold text-blue-400 mb-1">
                   YOUR SCORE
                 </div>
-                <div className="text-3xl md:text-5xl font-bold text-white">
+                <div className="text-3xl md:text-4xl font-bold text-white">
                   {score}
                 </div>
               </div>
-              <div className="flex justify-center gap-8 md:gap-12 mt-8">
+              <div className="flex justify-center gap-8 md:gap-12 mt-4">
                 <button
                   onClick={() => handleScoreAndNext(false)}
                   disabled={usedScore}
-                  className={`bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-4 md:px-8 py-2 md:py-3 rounded-full font-bold text-lg md:text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
+                  className={`bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-4 md:px-8 py-2 md:py-2.5 rounded-full font-bold text-base md:text-lg transition-all duration-300 hover:scale-110 shadow-lg ${
                     usedScore
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:shadow-red-500/50"
@@ -570,7 +566,7 @@ const Quiz = () => {
                 <button
                   onClick={() => handleScoreAndNext(true)}
                   disabled={usedScore}
-                  className={`bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-4 md:px-8 py-2 md:py-3 rounded-full font-bold text-lg md:text-xl transition-all duration-300 hover:scale-110 shadow-lg ${
+                  className={`bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-4 md:px-8 py-2 md:py-2.5 rounded-full font-bold text-base md:text-lg transition-all duration-300 hover:scale-110 shadow-lg ${
                     usedScore
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:shadow-green-500/50"
