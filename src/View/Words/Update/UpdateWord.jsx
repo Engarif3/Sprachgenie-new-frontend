@@ -2581,7 +2581,9 @@ const UpdateWord = () => {
                       >
                         <li>{item}</li>
                         <div className="flex gap-2">
-                          {multiPOSExisting.synonym.has(item) && (
+                          {multiPOSExisting.synonym.has(item) &&
+                            formData.synonyms.filter((v) => v === item)
+                              .length === 1 && (
                             <button
                               type="button"
                               onClick={() =>
@@ -2647,7 +2649,9 @@ const UpdateWord = () => {
                       >
                         <li>{item}</li>
                         <div className="flex gap-2">
-                          {multiPOSExisting.antonym.has(item) && (
+                          {multiPOSExisting.antonym.has(item) &&
+                            formData.antonyms.filter((v) => v === item)
+                              .length === 1 && (
                             <button
                               type="button"
                               onClick={() =>
@@ -2713,7 +2717,9 @@ const UpdateWord = () => {
                       >
                         <li>{item}</li>
                         <div className="flex gap-2">
-                          {multiPOSExisting.similarWord.has(item) && (
+                          {multiPOSExisting.similarWord.has(item) &&
+                            formData.similarWords.filter((v) => v === item)
+                              .length === 1 && (
                             <button
                               type="button"
                               onClick={() =>
