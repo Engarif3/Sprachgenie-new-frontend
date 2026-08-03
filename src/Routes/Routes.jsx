@@ -37,6 +37,12 @@ const ConversationsList = lazy(
 const CreateConversation = lazy(
   () => import("../View/Conversation/CreateConversation"),
 );
+const ConversationCategoryForm = lazy(
+  () => import("../Form/ConversationCategoryForm"),
+);
+const UpdateConversationCategoryForm = lazy(
+  () => import("../Form/UpdateConversationCategoryForm"),
+);
 const ConversationTitleList = lazy(
   () => import("../View/Conversation/ConversationTitleList"),
 );
@@ -147,6 +153,12 @@ const ConversationsListWithSuspense = withSuspense(ConversationsList);
 const CreateConversationWithSuspense = withSuspense(CreateConversation);
 const ConversationTitleListWithSuspense = withSuspense(ConversationTitleList);
 const ConversationPageWithSuspense = withSuspense(ConversationPage);
+const ConversationCategoryFormWithSuspense = withSuspense(
+  ConversationCategoryForm,
+);
+const UpdateConversationCategoryFormWithSuspense = withSuspense(
+  UpdateConversationCategoryForm,
+);
 const PrefixTypeListWithSuspense = withSuspense(PrefixTypeList);
 const PrefixListWithSuspense = withSuspense(PrefixList);
 const GrammarWithSuspense = withSuspense(Grammar);
@@ -255,6 +267,20 @@ export const router = createBrowserRouter(
           element: protectRoute(
             <CreateConversationWithSuspense />,
             ADMIN_ROLES,
+          ),
+        },
+        {
+          path: "/conversation-category",
+          element: protectRoute(
+            <ConversationCategoryFormWithSuspense />,
+            SUPER_ADMIN_ROLES,
+          ),
+        },
+        {
+          path: "/update-conversation-category",
+          element: protectRoute(
+            <UpdateConversationCategoryFormWithSuspense />,
+            SUPER_ADMIN_ROLES,
           ),
         },
         { path: "/prefix-types", element: <PrefixTypeListWithSuspense /> },
@@ -430,6 +456,20 @@ export const router = createBrowserRouter(
               element: protectRoute(
                 <ConversationsListWithSuspense />,
                 ADMIN_ROLES,
+              ),
+            },
+            {
+              path: "conversation-category",
+              element: protectRoute(
+                <ConversationCategoryFormWithSuspense />,
+                SUPER_ADMIN_ROLES,
+              ),
+            },
+            {
+              path: "update-conversation-category",
+              element: protectRoute(
+                <UpdateConversationCategoryFormWithSuspense />,
+                SUPER_ADMIN_ROLES,
               ),
             },
             {

@@ -61,14 +61,37 @@ const ConversationTitleList = () => {
     return [...known, ...unknown];
   }, [conversations]);
 
+  // Same idea for categories — only ones actually in use get a tab,
+  // alphabetical.
+  const availableCategories = useMemo(() => {
+    const byId = new Map();
+    conversations.forEach((c) => {
+      if (c.category?.id) {
+        byId.set(c.category.id, c.category.name);
+      }
+    });
+    return [...byId.entries()]
+      .map(([id, name]) => ({ id, name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [conversations]);
+
   const requestedLevel = searchParams.get("level") || "";
   const activeLevel = availableLevels.includes(requestedLevel)
     ? requestedLevel
     : "";
 
-  const filteredConversations = activeLevel
-    ? conversations.filter((c) => c.levels?.level === activeLevel)
-    : conversations;
+  const requestedCategory = searchParams.get("category") || "";
+  const activeCategory = availableCategories.some(
+    (category) => String(category.id) === requestedCategory,
+  )
+    ? requestedCategory
+    : "";
+
+  const filteredConversations = conversations
+    .filter((c) => !activeLevel || c.levels?.level === activeLevel)
+    .filter(
+      (c) => !activeCategory || String(c.category?.id) === activeCategory,
+    );
 
   const totalPages = Math.max(
     1,
@@ -82,12 +105,23 @@ const ConversationTitleList = () => {
   );
 
   const handleSelectLevel = (level) => {
-    setSearchParams(level ? { level } : {});
+    const params = {};
+    if (level) params.level = level;
+    if (activeCategory) params.category = activeCategory;
+    setSearchParams(params);
+  };
+
+  const handleSelectCategory = (categoryId) => {
+    const params = {};
+    if (activeLevel) params.level = activeLevel;
+    if (categoryId) params.category = categoryId;
+    setSearchParams(params);
   };
 
   const handleGoToPage = (page) => {
     const params = {};
     if (activeLevel) params.level = activeLevel;
+    if (activeCategory) params.category = activeCategory;
     if (page > 1) params.page = String(page);
     setSearchParams(params);
   };
@@ -99,6 +133,15 @@ const ConversationTitleList = () => {
         : isLight
           ? "border border-slate-200 bg-white text-slate-600 hover:border-orange-300"
           : "border border-slate-700 bg-slate-900 text-slate-300 hover:border-orange-500/50"
+    }`;
+
+  const categoryTabClass = (isActive) =>
+    `rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+      isActive
+        ? "bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md"
+        : isLight
+          ? "border border-slate-200 bg-white text-slate-600 hover:border-teal-300"
+          : "border border-slate-700 bg-slate-900 text-slate-300 hover:border-teal-500/50"
     }`;
 
   return (
@@ -149,6 +192,37 @@ const ConversationTitleList = () => {
           </div>
         )}
 
+        {/* Category tabs */}
+        {!loading && availableCategories.length > 0 && (
+          <div className="mb-8 flex flex-wrap justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleSelectCategory("")}
+              className={categoryTabClass(!activeCategory)}
+            >
+              All Categories
+            </button>
+            {availableCategories.map((category) => {
+              const count = conversations.filter(
+                (c) => c.category?.id === category.id,
+              ).length;
+
+              return (
+                <button
+                  key={category.id}
+                  type="button"
+                  onClick={() => handleSelectCategory(String(category.id))}
+                  className={categoryTabClass(
+                    activeCategory === String(category.id),
+                  )}
+                >
+                  {category.name} ({count})
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {loading ? (
           <div className="flex min-h-[50vh] items-center justify-center">
             <Loader loading={loading} />
@@ -163,7 +237,7 @@ const ConversationTitleList = () => {
           <p
             className={`text-center ${isLight ? "text-slate-500" : "text-slate-400"}`}
           >
-            No topics yet for {activeLevel}.
+            No topics yet for this filter.
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -186,11 +260,24 @@ const ConversationTitleList = () => {
                   }`}
                 >
                   <div className="mb-3 flex w-full items-center justify-between">
-                    <span
-                      className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide ${badgeClass}`}
-                    >
-                      {level || "General"}
-                    </span>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span
+                        className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide ${badgeClass}`}
+                      >
+                        {level || "General"}
+                      </span>
+                      {conversation.category?.name && (
+                        <span
+                          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
+                            isLight
+                              ? "bg-teal-100 text-teal-700"
+                              : "bg-teal-500/15 text-teal-300"
+                          }`}
+                        >
+                          {conversation.category.name}
+                        </span>
+                      )}
+                    </div>
                     <MessageCircle
                       size={18}
                       className={isLight ? "text-slate-300" : "text-slate-600"}

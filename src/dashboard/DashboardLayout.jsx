@@ -24,6 +24,8 @@ const SECTION_ROUTES = {
     "/dashboard/stories-management",
     "/dashboard/create-conversation",
     "/dashboard/update-conversation",
+    "/dashboard/conversation-category",
+    "/dashboard/update-conversation-category",
   ],
   reports: [
     "/dashboard/word-reports",
@@ -417,6 +419,26 @@ const DashboardLayout = () => {
                       <span>✏️</span>
                       <span>Update Conversation</span>
                     </NavLink>
+                    {role === "super_admin" && (
+                      <>
+                        <NavLink
+                          to="/dashboard/conversation-category"
+                          className={({ isActive }) => navItemClass(isActive)}
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <span>🏷️</span>
+                          <span>Create Category</span>
+                        </NavLink>
+                        <NavLink
+                          to="/dashboard/update-conversation-category"
+                          className={({ isActive }) => navItemClass(isActive)}
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <span>✏️</span>
+                          <span>Update Category</span>
+                        </NavLink>
+                      </>
+                    )}
                   </div>
                 )}
 

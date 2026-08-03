@@ -15,6 +15,7 @@ const ConversationsList = () => {
   const [fetchError, setFetchError] = useState("");
   const [editingConversation, setEditingConversation] = useState(null);
   const [formData, setFormData] = useState({});
+  const [categories, setCategories] = useState([]);
   // Guards against re-opening the modal if the admin closes it manually —
   // only ever auto-opens once per ?edit= deep link.
   const hasAutoOpenedRef = useRef(false);
@@ -39,6 +40,16 @@ const ConversationsList = () => {
       setFetchError("Failed to load conversations. Please refresh the page.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Fetch all conversation categories (for the edit modal's Category select)
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get("/conversation-category/all");
+      setCategories(response.data.data || []);
+    } catch (error) {
+      console.error("Error fetching conversation categories:", error);
     }
   };
 
@@ -117,6 +128,12 @@ const ConversationsList = () => {
     setFormData({ ...formData, levelId: selectedLevelId });
   };
 
+  // Handle category change
+  const handleCategoryChange = (e) => {
+    const selectedCategoryId = parseInt(e.target.value); // Ensure it's an integer
+    setFormData({ ...formData, categoryId: selectedCategoryId });
+  };
+
   // Update conversation
   const updateConversation = async () => {
     try {
@@ -142,6 +159,7 @@ const ConversationsList = () => {
         topic: formData.topic,
         text: updatedText,
         levelId: formData.levelId,
+        categoryId: formData.categoryId,
       };
 
       // Log the updated data after parsing
@@ -151,13 +169,11 @@ const ConversationsList = () => {
         `/conversation/update/${editingConversation.id}`,
         updatedData,
       );
-      setConversations(
-        conversations.map((conv) =>
-          conv.id === editingConversation.id
-            ? { ...conv, ...updatedData }
-            : conv,
-        ),
-      );
+      // Re-fetch rather than splicing the local state: the response only
+      // has scalar fields, but the list row displays the nested `category`
+      // relation, which a simple `{ ...conv, ...updatedData }` merge can't
+      // refresh.
+      await fetchConversations();
       closeEditModal();
       Swal.fire({
         title: "Success!",
@@ -178,6 +194,7 @@ const ConversationsList = () => {
 
   useEffect(() => {
     fetchConversations();
+    fetchCategories();
   }, []);
 
   // Deep link from the conversation detail page's Edit button
@@ -240,7 +257,14 @@ const ConversationsList = () => {
               key={conversation.id}
               className="flex justify-between items-center bg-gray-100 dark:bg-gray-800 text-slate-900 dark:text-white p-3 rounded shadow"
             >
-              <span>{conversation.topic}</span>
+              <span>
+                {conversation.topic}
+                {conversation.category?.name && (
+                  <span className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-500/15 dark:text-blue-300">
+                    {conversation.category.name}
+                  </span>
+                )}
+              </span>
               {isAdmin && (
                 <div className="space-x-2">
                   <button
@@ -304,6 +328,29 @@ const ConversationsList = () => {
                   {levels.map((level) => (
                     <option key={level.value} value={level.value}>
                       {level.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Category */}
+              <div>
+                <label
+                  htmlFor="edit-conversation-category"
+                  className="block font-semibold"
+                >
+                  Category
+                </label>
+                <select
+                  id="edit-conversation-category"
+                  name="categoryId"
+                  value={formData.categoryId || ""}
+                  onChange={handleCategoryChange}
+                  className="border p-2 w-full"
+                >
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
                     </option>
                   ))}
                 </select>

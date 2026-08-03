@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2"; // Ensure SweetAlert2 is imported
 import { useAuth } from "../../services/auth.services";
@@ -10,8 +10,23 @@ const CreateConversation = () => {
   const [formData, setFormData] = useState({
     topic: "",
     levelId: 1, // Default level A1
+    categoryId: "",
     text: "", // JSON string for text
   });
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await api.get("/conversation-category/all");
+        setCategories(response.data.data || []);
+      } catch (error) {
+        console.error("Failed to fetch conversation categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   // Levels mapping
   const levels = [
@@ -33,6 +48,12 @@ const CreateConversation = () => {
     setFormData({ ...formData, levelId: selectedLevelId });
   };
 
+  // Handle category change
+  const handleCategoryChange = (e) => {
+    const selectedCategoryId = parseInt(e.target.value); // Ensure it's an integer
+    setFormData({ ...formData, categoryId: selectedCategoryId });
+  };
+
   // Handle text change for JSON
   const handleTextChange = (e) => {
     setFormData({ ...formData, text: e.target.value });
@@ -41,6 +62,16 @@ const CreateConversation = () => {
   // Create conversation
   const createConversation = async () => {
     try {
+      if (!formData.categoryId) {
+        Swal.fire({
+          title: "Error!",
+          text: "Please select a category for this conversation.",
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+        return;
+      }
+
       // Ensure text is valid JSON
       let conversationText = [];
       try {
@@ -58,6 +89,7 @@ const CreateConversation = () => {
       const dataToSend = {
         topic: formData.topic,
         levelId: formData.levelId,
+        categoryId: formData.categoryId,
         text: conversationText,
         createdBy: userId,
       };
@@ -73,6 +105,7 @@ const CreateConversation = () => {
         setFormData({
           topic: "",
           levelId: 1,
+          categoryId: "",
           text: "",
         });
       } else {
@@ -123,6 +156,31 @@ const CreateConversation = () => {
             className={fieldClass}
             placeholder="Enter conversation topic"
           />
+        </div>
+
+        {/* Category */}
+        <div>
+          <label
+            htmlFor="conversation-category"
+            className="block font-semibold text-slate-800 dark:text-white"
+          >
+            Category
+          </label>
+          <select
+            id="conversation-category"
+            name="categoryId"
+            value={formData.categoryId}
+            onChange={handleCategoryChange}
+            className={fieldClass}
+            required
+          >
+            <option value="">Select a category</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Level */}
