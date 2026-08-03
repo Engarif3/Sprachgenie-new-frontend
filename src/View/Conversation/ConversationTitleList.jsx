@@ -344,28 +344,48 @@ const ConversationTitleList = () => {
                 conversation.topic,
               );
 
+              const categories = conversation.categories || [];
+
               return (
                 <button
                   key={conversation.id}
                   type="button"
                   onClick={() => navigate(`/conversation/${conversation.id}`)}
-                  className={`group flex flex-col items-start rounded-3xl border p-6 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg md:p-7 ${
+                  // `h-full` + the grid's default row stretch is what makes
+                  // every card in a row match height regardless of how much
+                  // text/badges any one of them has — `flex-1` further down
+                  // then absorbs the leftover space so the CTA always lands
+                  // on the same bottom line across the whole row.
+                  className={`group flex h-full flex-col rounded-3xl border p-6 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg md:p-7 ${
                     isLight
                       ? "border-slate-200 bg-white hover:border-orange-300"
                       : "border-slate-800 bg-slate-900/70 hover:border-orange-500/40"
                   }`}
                 >
-                  <div className="mb-4 flex w-full items-start justify-between gap-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span
-                        className={`inline-flex flex-shrink-0 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide ${badgeClass}`}
-                      >
-                        {level || "General"}
-                      </span>
-                      {(conversation.categories || []).map((category) => (
+                  {/* Level badge + icon: always their own line, so a long
+                      list of category tags below can never push them out
+                      of place or squeeze the icon smaller. */}
+                  <div className="flex items-center justify-between">
+                    <span
+                      className={`inline-flex rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide ${badgeClass}`}
+                    >
+                      {level || "General"}
+                    </span>
+                    <MessageCircle
+                      size={22}
+                      strokeWidth={2}
+                      className={isLight ? "text-slate-300" : "text-slate-600"}
+                    />
+                  </div>
+
+                  {/* Category tags: their own line below the level badge,
+                      never sharing a row with it. */}
+                  {categories.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {categories.map((category) => (
                         <span
                           key={category.id}
-                          className={`inline-flex flex-shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${
+                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
                             isLight
                               ? "bg-teal-100 text-teal-700"
                               : "bg-teal-500/15 text-teal-300"
@@ -375,12 +395,9 @@ const ConversationTitleList = () => {
                         </span>
                       ))}
                     </div>
-                    <MessageCircle
-                      size={18}
-                      className={`flex-shrink-0 ${isLight ? "text-slate-300" : "text-slate-600"}`}
-                    />
-                  </div>
-                  <div className="mb-6">
+                  )}
+
+                  <div className="my-6 flex-1">
                     <p
                       className={`text-xl font-bold leading-snug ${isLight ? "text-slate-900" : "text-white"}`}
                     >
@@ -394,8 +411,9 @@ const ConversationTitleList = () => {
                       </p>
                     )}
                   </div>
+
                   <div
-                    className={`mt-auto flex w-full items-center justify-end gap-1 border-t pt-4 text-sm font-semibold text-orange-500 transition-transform group-hover:gap-2 dark:text-orange-400 ${
+                    className={`flex w-full items-center justify-end gap-1 border-t pt-4 text-sm font-semibold text-orange-500 transition-transform group-hover:gap-2 dark:text-orange-400 ${
                       isLight ? "border-slate-100" : "border-slate-800"
                     }`}
                   >
