@@ -560,7 +560,7 @@ const WordListModal = ({
               <span className="mr-2 font-bold text-orange-400 text-center text-md md:text-lg lg:text-xl">
                 {selectedWord.article?.name}
               </span>
-              <span className="capitalize text-white font-bold text-sm md:text-lg lg:text-xl">
+              <span className="text-white font-bold text-sm md:text-lg lg:text-xl">
                 {renderWordWithPrefix(selectedWord)}
               </span>
             </p>

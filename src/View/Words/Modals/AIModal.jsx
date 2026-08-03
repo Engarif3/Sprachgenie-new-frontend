@@ -6,6 +6,14 @@ import aiApi from "../../../AI_axios";
 import api from "../../../axios";
 import { useAuth } from "../../../services/auth.services";
 
+// CSS text-transform: capitalize treats "/" as a word boundary too, which
+// wrongly capitalizes gendered nouns like "Abteilungsleiter/in" into
+// ".../In". Capitalize only the very first character in JS instead.
+const capitalizeFirstLetter = (str) => {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
 const splitItems = (value, separators) =>
   String(value || "")
     .split(separators)
@@ -444,12 +452,10 @@ const AIModal = ({
                 ? activeWord.article
                 : activeWord?.article?.name || ""}
             </span>{" "}
-            <span
-              className={`text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 ${
-                activeWord?.isShortForm ? "uppercase" : "capitalize"
-              }`}
-            >
-              {activeWord?.value}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400">
+              {activeWord?.isShortForm
+                ? activeWord.value?.toUpperCase()
+                : capitalizeFirstLetter(activeWord?.value)}
             </span>
           </h2>
           <div className="flex justify-center mb-6 ">
