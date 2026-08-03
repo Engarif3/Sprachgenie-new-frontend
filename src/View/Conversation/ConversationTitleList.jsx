@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import {
-  MessageCircle,
-  ChevronLeft,
-  ChevronRight,
-  ChevronDown,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
 import api from "../../axios";
 import { useTheme } from "../../context/ThemeContext";
+import { useAuth } from "../../services/auth.services";
+import { useFavorites } from "../../hooks/useFavorites";
+import FavoriteButton from "../Words/Modals/FavoriteButton";
+import FavoritesBar from "../../components/Favorites/FavoritesBar";
+import FavoritesDeleteAllModal from "../../components/Favorites/FavoritesDeleteAllModal";
 import { splitConversationTopic } from "../../utils/splitConversationTopic";
 
 // Color identity per CEFR level, consistent with the badge/chip style used
@@ -138,9 +138,20 @@ const ConversationTitleList = () => {
   const isLight = theme === "light";
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { isLoggedIn } = useAuth();
 
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [deleteAllModalOpen, setDeleteAllModalOpen] = useState(false);
+
+  const {
+    favoriteIds,
+    loadingIds: loadingFavorites,
+    toggleFavorite,
+    deleteAllFavorites,
+    showFavoritesOnly,
+    setShowFavoritesOnly,
+  } = useFavorites("conversations", "conversationId");
 
   const fetchConversations = async () => {
     try {
@@ -206,7 +217,8 @@ const ConversationTitleList = () => {
         (c.categories || []).some(
           (category) => String(category.id) === activeCategory,
         ),
-    );
+    )
+    .filter((c) => !showFavoritesOnly || favoriteIds.includes(c.id));
 
   const totalPages = Math.max(
     1,
@@ -319,6 +331,18 @@ const ConversationTitleList = () => {
           </div>
         )}
 
+        {!loading && isLoggedIn && conversations.length > 0 && (
+          <div className="mb-8">
+            <FavoritesBar
+              isLight={isLight}
+              active={showFavoritesOnly}
+              onToggle={() => setShowFavoritesOnly((prev) => !prev)}
+              count={favoriteIds.length}
+              onRequestDeleteAll={() => setDeleteAllModalOpen(true)}
+            />
+          </div>
+        )}
+
         {loading ? (
           <div className="flex min-h-[50vh] items-center justify-center">
             <Loader loading={loading} />
@@ -333,7 +357,9 @@ const ConversationTitleList = () => {
           <p
             className={`text-center ${isLight ? "text-slate-500" : "text-slate-400"}`}
           >
-            No topics yet for this filter.
+            {showFavoritesOnly
+              ? "You haven't favorited any conversations yet."
+              : "No topics yet for this filter."}
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">
@@ -346,17 +372,26 @@ const ConversationTitleList = () => {
 
               const categories = conversation.categories || [];
 
+              const isFavorite = favoriteIds.includes(conversation.id);
+
               return (
-                <button
+                <div
                   key={conversation.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => navigate(`/conversation/${conversation.id}`)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      navigate(`/conversation/${conversation.id}`);
+                    }
+                  }}
                   // `h-full` + the grid's default row stretch is what makes
                   // every card in a row match height regardless of how much
                   // text/badges any one of them has — `flex-1` further down
                   // then absorbs the leftover space so the CTA always lands
                   // on the same bottom line across the whole row.
-                  className={`group flex h-full flex-col rounded-3xl border p-6 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg md:p-7 ${
+                  className={`group flex h-full cursor-pointer flex-col rounded-3xl border p-6 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg md:p-7 ${
                     isLight
                       ? "border-slate-200 bg-white hover:border-orange-300"
                       : "border-slate-800 bg-slate-900/70 hover:border-orange-500/40"
@@ -371,10 +406,14 @@ const ConversationTitleList = () => {
                     >
                       {level || "General"}
                     </span>
-                    <MessageCircle
-                      size={22}
-                      strokeWidth={2}
-                      className={isLight ? "text-slate-300" : "text-slate-600"}
+                    <FavoriteButton
+                      isFavorite={isFavorite}
+                      loading={!!loadingFavorites[conversation.id]}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        toggleFavorite(conversation.id);
+                      }}
+                      className={isFavorite ? "" : "text-slate-300 dark:text-slate-600"}
                     />
                   </div>
 
@@ -420,7 +459,7 @@ const ConversationTitleList = () => {
                     <span>Practice this dialogue</span>
                     <ChevronRight size={16} />
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
@@ -460,6 +499,17 @@ const ConversationTitleList = () => {
           </div>
         )}
       </div>
+
+      <FavoritesDeleteAllModal
+        isOpen={deleteAllModalOpen}
+        isLight={isLight}
+        itemLabel="conversations"
+        onCancel={() => setDeleteAllModalOpen(false)}
+        onConfirm={async () => {
+          const success = await deleteAllFavorites();
+          if (success) setDeleteAllModalOpen(false);
+        }}
+      />
     </Container>
   );
 };

@@ -5,6 +5,11 @@ import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
 import api from "../../axios";
 import { useTheme } from "../../context/ThemeContext";
+import { useAuth } from "../../services/auth.services";
+import { useFavorites } from "../../hooks/useFavorites";
+import FavoriteButton from "../Words/Modals/FavoriteButton";
+import FavoritesBar from "../../components/Favorites/FavoritesBar";
+import FavoritesDeleteAllModal from "../../components/Favorites/FavoritesDeleteAllModal";
 
 // Color identity per CEFR level, consistent with the badge/chip style used
 // elsewhere in the app (Leaderboard, ChallengeSession, ConversationTitleList).
@@ -35,10 +40,21 @@ const StoryTitleList = () => {
   const isLight = theme === "light";
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { isLoggedIn } = useAuth();
 
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [deleteAllModalOpen, setDeleteAllModalOpen] = useState(false);
+
+  const {
+    favoriteIds,
+    loadingIds: loadingFavorites,
+    toggleFavorite,
+    deleteAllFavorites,
+    showFavoritesOnly,
+    setShowFavoritesOnly,
+  } = useFavorites("stories", "storyId");
 
   const fetchStories = async () => {
     setLoading(true);
@@ -78,9 +94,9 @@ const StoryTitleList = () => {
     ? requestedLevel
     : "";
 
-  const filteredStories = activeLevel
-    ? stories.filter((story) => story.level?.level === activeLevel)
-    : stories;
+  const filteredStories = stories
+    .filter((story) => !activeLevel || story.level?.level === activeLevel)
+    .filter((story) => !showFavoritesOnly || favoriteIds.includes(story.id));
 
   const totalPages = Math.max(
     1,
@@ -160,6 +176,18 @@ const StoryTitleList = () => {
           </div>
         )}
 
+        {!loading && isLoggedIn && stories.length > 0 && (
+          <div className="mb-8">
+            <FavoritesBar
+              isLight={isLight}
+              active={showFavoritesOnly}
+              onToggle={() => setShowFavoritesOnly((prev) => !prev)}
+              count={favoriteIds.length}
+              onRequestDeleteAll={() => setDeleteAllModalOpen(true)}
+            />
+          </div>
+        )}
+
         {loading ? (
           <div className="flex min-h-[18rem] items-center justify-center">
             <Loader loading={loading} />
@@ -180,20 +208,30 @@ const StoryTitleList = () => {
           <p
             className={`text-center ${isLight ? "text-slate-500" : "text-slate-400"}`}
           >
-            No stories yet for {activeLevel}.
+            {showFavoritesOnly
+              ? "You haven't favorited any stories yet."
+              : `No stories yet for ${activeLevel}.`}
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {paginatedStories.map((story) => {
               const level = story.level?.level;
               const badgeClass = LEVEL_BADGES[level] || DEFAULT_BADGE;
+              const isFavorite = favoriteIds.includes(story.id);
 
               return (
-                <button
+                <div
                   key={story.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => navigate(`/stories/${story.id}`)}
-                  className={`group flex flex-col overflow-hidden rounded-2xl border text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      navigate(`/stories/${story.id}`);
+                    }
+                  }}
+                  className={`group flex cursor-pointer flex-col overflow-hidden rounded-2xl border text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${
                     isLight
                       ? "border-slate-200 bg-white hover:border-orange-300"
                       : "border-slate-800 bg-slate-900/70 hover:border-orange-500/40"
@@ -225,6 +263,17 @@ const StoryTitleList = () => {
                     >
                       {level || "General"}
                     </span>
+                    <FavoriteButton
+                      isFavorite={isFavorite}
+                      loading={!!loadingFavorites[story.id]}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        toggleFavorite(story.id);
+                      }}
+                      className={`absolute right-3 top-3 bg-white/90 shadow-sm dark:bg-slate-900/80 ${
+                        isFavorite ? "" : "text-slate-400"
+                      }`}
+                    />
                   </div>
 
                   <div className="flex flex-1 flex-col p-4 ">
@@ -251,7 +300,7 @@ const StoryTitleList = () => {
                       )}
                     </div>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
@@ -291,6 +340,17 @@ const StoryTitleList = () => {
           </div>
         )}
       </div>
+
+      <FavoritesDeleteAllModal
+        isOpen={deleteAllModalOpen}
+        isLight={isLight}
+        itemLabel="stories"
+        onCancel={() => setDeleteAllModalOpen(false)}
+        onConfirm={async () => {
+          const success = await deleteAllFavorites();
+          if (success) setDeleteAllModalOpen(false);
+        }}
+      />
     </Container>
   );
 };
