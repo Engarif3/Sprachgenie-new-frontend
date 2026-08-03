@@ -379,21 +379,21 @@ const Quiz = () => {
           </div>
 
           {/* Stats Card */}
-          <div className="mb-3 rounded-2xl border-2 border-blue-200 bg-white p-2 shadow-sm transition-all duration-300 hover:border-blue-300 dark:border-blue-500/30 dark:bg-gradient-to-br dark:from-gray-800/60 dark:to-gray-900/60 dark:shadow-xl dark:hover:border-blue-500/50">
+          <div className="mb-3 rounded-2xl border-2 border-blue-200 bg-white p-2 shadow-sm transition-all duration-300 hover:border-blue-300 dark:border-blue-500/30 dark:bg-gradient-to-br dark:from-slate-800/60 dark:to-slate-900/60 dark:shadow-xl dark:hover:border-blue-500/50">
             <div className="grid grid-cols-2 gap-4 text-center">
               <div>
-                <div className="mb-1 text-xs text-slate-500 dark:text-gray-400">
+                <div className="mb-1 text-xs text-slate-500 dark:text-slate-400">
                   Quiz Length
                 </div>
                 <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
                   {QUIZ_LENGTH}
                 </div>
-                <div className="mt-0.5 text-xs text-slate-400 dark:text-gray-500">
+                <div className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
                   Questions
                 </div>
               </div>
               <div>
-                <div className="mb-1 text-xs text-slate-500 dark:text-gray-400">
+                <div className="mb-1 text-xs text-slate-500 dark:text-slate-400">
                   Available Words
                 </div>
                 <div className="text-xl font-bold text-purple-600 dark:text-purple-400">
@@ -403,7 +403,7 @@ const Quiz = () => {
                       ? "0"
                       : "Loading..."}
                 </div>
-                <div className="mt-0.5 text-xs text-slate-400 dark:text-gray-500">
+                <div className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
                   {source === "favorites"
                     ? "In Your Favorites"
                     : `For ${DIFFICULTY_LEVELS[difficulty].name}`}
@@ -419,7 +419,7 @@ const Quiz = () => {
               onClick={startQuiz}
               className={`relative overflow-hidden rounded-full px-10 py-3 text-lg font-bold transition-all duration-300 md:px-14 md:py-3.5 md:text-xl ${
                 !canStartQuiz
-                  ? "cursor-not-allowed bg-slate-200 text-slate-400 dark:bg-gray-600 dark:text-gray-400"
+                  ? "cursor-not-allowed bg-slate-200 text-slate-400 dark:bg-slate-600 dark:text-slate-400"
                   : "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-xl hover:scale-110 hover:from-green-600 hover:to-emerald-700 hover:shadow-2xl hover:shadow-green-500/50"
               }`}
             >
@@ -436,7 +436,7 @@ const Quiz = () => {
           </div>
 
           {/* Info Footer */}
-          <p className="mt-3 text-center text-xs text-slate-400 dark:text-gray-500">
+          <p className="mt-3 text-center text-xs text-slate-400 dark:text-slate-500">
             ⏱️ No time limit · 📈 Track your progress
           </p>
         </div>
@@ -478,12 +478,12 @@ const Quiz = () => {
 
         {/* Word counter */}
         <div className="mb-3 text-center">
-          <div className="inline-block rounded-full border border-slate-200 bg-slate-100 px-6 py-2 dark:border-gray-700 dark:bg-gradient-to-r dark:from-gray-800/80 dark:to-gray-900/80 dark:backdrop-blur-sm">
-            <span className="text-slate-500 dark:text-gray-300">Question</span>{" "}
+          <div className="inline-block rounded-full border border-slate-200 bg-slate-100 px-6 py-2 dark:border-slate-700 dark:bg-gradient-to-r dark:from-slate-800/80 dark:to-slate-900/80 dark:backdrop-blur-sm">
+            <span className="text-slate-500 dark:text-slate-300">Question</span>{" "}
             <span className="text-xl font-bold text-slate-900 dark:text-white">
               {currentIndex + 1}
             </span>
-            <span className="text-slate-400 dark:text-gray-400"> of </span>
+            <span className="text-slate-400 dark:text-slate-400"> of </span>
             <span className="text-xl font-bold text-slate-900 dark:text-white">
               {quizWords.length}
             </span>
@@ -496,7 +496,7 @@ const Quiz = () => {
         </p>
 
         {/* Main word display */}
-        <div className="mb-4 rounded-3xl border-2 border-purple-200 bg-white p-4 shadow-sm transition-all duration-300 hover:border-purple-300 dark:border-purple-500/30 dark:bg-gradient-to-br dark:from-gray-800/50 dark:to-gray-900/50 dark:shadow-2xl dark:hover:border-purple-500/50 md:p-5">
+        <div className="mb-4 rounded-3xl border-2 border-purple-200 bg-white p-4 shadow-sm transition-all duration-300 hover:border-purple-300 dark:border-purple-500/30 dark:bg-gradient-to-br dark:from-slate-800/50 dark:to-slate-900/50 dark:shadow-2xl dark:hover:border-purple-500/50 md:p-5">
           <div className="text-center">
             <div className="mb-2 flex items-center justify-center gap-2 md:mb-3 md:gap-4">
               <button
@@ -548,7 +548,7 @@ const Quiz = () => {
 
         {/* Player score card */}
         <div className="mb-4 flex flex-col justify-center gap-4 md:flex-row md:gap-8">
-          <div className="w-full rounded-2xl border-2 border-blue-200 bg-white p-3 shadow-sm transition-all duration-300 hover:border-blue-300 dark:border-blue-500/30 dark:bg-gradient-to-br dark:from-gray-800/60 dark:to-gray-900/60 dark:shadow-xl dark:hover:border-blue-500/50 md:max-w-sm md:flex-1 md:p-5">
+          <div className="w-full rounded-2xl border-2 border-blue-200 bg-white p-3 shadow-sm transition-all duration-300 hover:border-blue-300 dark:border-blue-500/30 dark:bg-gradient-to-br dark:from-slate-800/60 dark:to-slate-900/60 dark:shadow-xl dark:hover:border-blue-500/50 md:max-w-sm md:flex-1 md:p-5">
             <div className="mb-2 text-center">
               <div className="mb-1 text-base font-bold text-blue-600 dark:text-blue-400 md:text-xl">
                 YOUR SCORE
