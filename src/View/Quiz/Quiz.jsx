@@ -3,6 +3,7 @@ import { useState, useEffect, useReducer } from "react";
 import Swal from "sweetalert2";
 import api from "../../axios";
 import { pronounceWord } from "../../utils/wordPronounciation";
+import { useAuth } from "../../services/auth.services";
 
 const QUIZ_STORAGE_KEY = "quizState";
 const QUIZ_LENGTH = 30;
@@ -19,10 +20,12 @@ const DIFFICULTY_LEVELS = {
   },
 };
 
-const loadQuizWords = async (difficulty) => {
-  const response = await api.get(
-    `/word/quiz?difficulty=${difficulty}&limit=${QUIZ_LENGTH}`,
-  );
+const loadQuizWords = async (source, difficulty) => {
+  const query =
+    source === "favorites"
+      ? `source=favorites&limit=${QUIZ_LENGTH}`
+      : `difficulty=${difficulty}&limit=${QUIZ_LENGTH}`;
+  const response = await api.get(`/word/quiz?${query}`);
 
   return {
     words: response.data?.data?.words || [],
@@ -32,6 +35,7 @@ const loadQuizWords = async (difficulty) => {
 
 const Quiz = () => {
   const initialState = {
+    source: "difficulty",
     difficulty: 1,
     availableWordsCount: 0,
     preparedQuizWords: [],
@@ -48,6 +52,8 @@ const Quiz = () => {
     switch (action.type) {
       case "SET_DIFFICULTY":
         return { ...state, difficulty: action.payload };
+      case "SET_SOURCE":
+        return { ...state, source: action.payload };
       case "SET_AVAILABLE_WORDS_COUNT":
         return { ...state, availableWordsCount: action.payload };
       case "SET_PREPARED_QUIZ_WORDS":
@@ -77,8 +83,11 @@ const Quiz = () => {
 
   const [state, dispatch] = useReducer(quizReducer, initialState);
 
+  const { isLoggedIn } = useAuth();
+
   // Destructure for cleaner JSX
   const {
+    source,
     difficulty,
     availableWordsCount,
     preparedQuizWords,
@@ -103,7 +112,7 @@ const Quiz = () => {
 
       dispatch({ type: "SET_LOADING", payload: true });
       try {
-        const data = await loadQuizWords(difficulty);
+        const data = await loadQuizWords("difficulty", difficulty);
         dispatch({ type: "SET_PREPARED_QUIZ_WORDS", payload: data.words });
         dispatch({
           type: "SET_AVAILABLE_WORDS_COUNT",
@@ -123,8 +132,11 @@ const Quiz = () => {
     if (quizStarted) {
       return;
     }
+    if (source === "favorites" && !isLoggedIn) {
+      return;
+    }
 
-    const loadForDifficulty = async () => {
+    const loadForSelection = async () => {
       // Clear stale counts so the existing inline loading states (the
       // "Available Words" figure and the disabled Start Quiz button)
       // reflect the new selection — without hiding the whole level
@@ -132,7 +144,7 @@ const Quiz = () => {
       dispatch({ type: "SET_PREPARED_QUIZ_WORDS", payload: [] });
       dispatch({ type: "SET_AVAILABLE_WORDS_COUNT", payload: 0 });
       try {
-        const data = await loadQuizWords(difficulty);
+        const data = await loadQuizWords(source, difficulty);
         dispatch({ type: "SET_PREPARED_QUIZ_WORDS", payload: data.words });
         dispatch({
           type: "SET_AVAILABLE_WORDS_COUNT",
@@ -145,12 +157,13 @@ const Quiz = () => {
       }
     };
 
-    void loadForDifficulty();
-  }, [difficulty, quizStarted]);
+    void loadForSelection();
+  }, [difficulty, source, isLoggedIn, quizStarted]);
 
   useEffect(() => {
     if (quizStarted) {
       const save = {
+        source,
         difficulty,
         quizWords,
         currentIndex,
@@ -159,7 +172,38 @@ const Quiz = () => {
       };
       localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(save));
     }
-  }, [difficulty, quizWords, currentIndex, score, quizStarted]);
+  }, [source, difficulty, quizWords, currentIndex, score, quizStarted]);
+
+  const handleSelectDifficulty = (level) => {
+    dispatch({ type: "SET_SOURCE", payload: "difficulty" });
+    dispatch({ type: "SET_DIFFICULTY", payload: level });
+  };
+
+  const handleSelectFavorites = () => {
+    if (!isLoggedIn) {
+      Swal.fire({
+        icon: "info",
+        title: "Login to enjoy this feature",
+        text: "Sign in to quiz yourself on your favorite words",
+        confirmButtonText: "Go to Login",
+        confirmButtonColor: "#123456",
+        showCancelButton: true,
+        cancelButtonText: "Cancel",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = "/login";
+        }
+      });
+      return;
+    }
+
+    dispatch({ type: "SET_SOURCE", payload: "favorites" });
+  };
+
+  const missingFavoritesCount = Math.max(QUIZ_LENGTH - availableWordsCount, 0);
+  const notEligibleForFavorites =
+    source === "favorites" && missingFavoritesCount > 0;
+  const canStartQuiz = preparedQuizWords.length > 0 && !notEligibleForFavorites;
 
   const startQuiz = () => {
     const selected = preparedQuizWords.slice(
@@ -257,14 +301,9 @@ const Quiz = () => {
                 {Object.entries(DIFFICULTY_LEVELS).map(([level, config]) => (
                   <button
                     key={level}
-                    onClick={() =>
-                      dispatch({
-                        type: "SET_DIFFICULTY",
-                        payload: parseInt(level),
-                      })
-                    }
+                    onClick={() => handleSelectDifficulty(parseInt(level))}
                     className={`group relative p-2 rounded-2xl   transition-all duration-300 overflow-hidden ${
-                      difficulty === parseInt(level)
+                      source === "difficulty" && difficulty === parseInt(level)
                         ? "bg-gradient-to-r from-blue-600 to-purple-600 border-2 border-blue-400 shadow-lg shadow-blue-500/50 scale-105"
                         : "bg-gradient-to-br from-gray-800/60 to-gray-900/60 border-2 border-cyan-700 hover:border-blue-500 hover:bg-gray-800/80"
                     }`}
@@ -279,17 +318,48 @@ const Quiz = () => {
                               : "🟡 Mixed"}
                         </div>
                         <div
-                          className={`text-sm md:text-base ${difficulty === parseInt(level) ? "text-white" : "text-gray-400"}`}
+                          className={`text-sm md:text-base ${source === "difficulty" && difficulty === parseInt(level) ? "text-white" : "text-gray-400"}`}
                         >
                           {config.description}
                         </div>
                       </div>
                       <div className="text-2xl md:text-3xl">
-                        {difficulty === parseInt(level) ? "✓" : ""}
+                        {source === "difficulty" && difficulty === parseInt(level)
+                          ? "✓"
+                          : ""}
                       </div>
                     </div>
                   </button>
                 ))}
+
+                {/* Favorites — visible to guests too; clicking without being
+                    logged in prompts a login instead of hiding the option. */}
+                <button
+                  onClick={handleSelectFavorites}
+                  className={`group relative p-2 rounded-2xl transition-all duration-300 overflow-hidden ${
+                    source === "favorites"
+                      ? "bg-gradient-to-r from-pink-600 to-rose-600 border-2 border-pink-400 shadow-lg shadow-pink-500/50 scale-105"
+                      : "bg-gradient-to-br from-gray-800/60 to-gray-900/60 border-2 border-cyan-700 hover:border-pink-500 hover:bg-gray-800/80"
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="text-left">
+                      <div className="font-bold text-lg md:text-xl mb-2">
+                        ❤️ My Favorites
+                      </div>
+                      <div
+                        className={`text-sm md:text-base ${source === "favorites" ? "text-white" : "text-gray-400"}`}
+                      >
+                        {isLoggedIn
+                          ? "Revise the words you've favorited"
+                          : "Sign in to quiz yourself on your favorites"}
+                      </div>
+                    </div>
+                    <div className="text-2xl md:text-3xl">
+                      {source === "favorites" ? "✓" : ""}
+                    </div>
+                  </div>
+                </button>
               </div>
             </div>
 
@@ -310,10 +380,14 @@ const Quiz = () => {
                   <div className="text-3xl font-bold text-purple-400">
                     {availableWordsCount > 0
                       ? availableWordsCount.toLocaleString()
-                      : "Loading..."}
+                      : source === "favorites"
+                        ? "0"
+                        : "Loading..."}
                   </div>
                   <div className="text-gray-500 text-xs mt-1">
-                    For {DIFFICULTY_LEVELS[difficulty].name}
+                    {source === "favorites"
+                      ? "In Your Favorites"
+                      : `For ${DIFFICULTY_LEVELS[difficulty].name}`}
                   </div>
                 </div>
               </div>
@@ -322,10 +396,10 @@ const Quiz = () => {
             {/* Start Button */}
             <div className="text-center">
               <button
-                disabled={preparedQuizWords.length === 0}
+                disabled={!canStartQuiz}
                 onClick={startQuiz}
                 className={`relative px-10 md:px-16 py-4 md:py-5 rounded-full font-bold text-lg md:text-xl transition-all duration-300 overflow-hidden group ${
-                  preparedQuizWords.length === 0
+                  !canStartQuiz
                     ? "bg-gray-600 text-gray-400 cursor-not-allowed opacity-50"
                     : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white hover:scale-110 hover:shadow-green-500/50 shadow-xl hover:shadow-2xl"
                 }`}
@@ -335,10 +409,18 @@ const Quiz = () => {
                 </span>
               </button>
 
-              {preparedQuizWords.length === 0 && (
-                <p className="text-orange-400 text-sm mt-4 animate-pulse">
-                  ⚠️ Loading words... Please wait
+              {notEligibleForFavorites ? (
+                <p className="text-rose-400 text-sm mt-4">
+                  🚫 You are not eligible. Add {missingFavoritesCount} more
+                  favorite word{missingFavoritesCount === 1 ? "" : "s"} to play
+                  this quiz.
                 </p>
+              ) : (
+                preparedQuizWords.length === 0 && (
+                  <p className="text-orange-400 text-sm mt-4 animate-pulse">
+                    ⚠️ Loading words... Please wait
+                  </p>
+                )
               )}
             </div>
 
@@ -369,10 +451,18 @@ const Quiz = () => {
           {/* Header with difficulty and reset */}
           <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
             <div className="text-sm bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/50 px-4 py-2 rounded-full backdrop-blur-sm">
-              Difficulty:{" "}
-              <span className="font-bold text-blue-400">
-                {DIFFICULTY_LEVELS[difficulty].name}
-              </span>
+              {source === "favorites" ? (
+                <>
+                  Source: <span className="font-bold text-pink-400">❤️ My Favorites</span>
+                </>
+              ) : (
+                <>
+                  Difficulty:{" "}
+                  <span className="font-bold text-blue-400">
+                    {DIFFICULTY_LEVELS[difficulty].name}
+                  </span>
+                </>
+              )}
             </div>
             <button
               onClick={resetQuiz}
