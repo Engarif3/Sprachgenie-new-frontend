@@ -252,40 +252,44 @@ const ConversationsList = () => {
           </span>
         </p>
       ) : (
-        <ul className="space-y-2">
+        <ul className="space-y-3">
           {conversations.map((conversation) => (
             <li
               key={conversation.id}
-              className="flex justify-between items-center bg-gray-100 dark:bg-gray-800 text-slate-900 dark:text-white p-3 rounded shadow"
+              className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-slate-700/60 dark:bg-gray-800 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
             >
-              <span>
-                {conversation.topic}
-                {conversation.categories?.length > 0 ? (
-                  conversation.categories.map((category) => (
-                    <span
-                      key={category.id}
-                      className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"
-                    >
-                      {category.name}
+              <div className="min-w-0">
+                <p className="font-semibold text-slate-900 dark:text-white">
+                  {conversation.topic}
+                </p>
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {conversation.categories?.length > 0 ? (
+                    conversation.categories.map((category) => (
+                      <span
+                        key={category.id}
+                        className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-500/15 dark:text-blue-300"
+                      >
+                        {category.name}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="rounded-full bg-gray-200 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                      Uncategorized
                     </span>
-                  ))
-                ) : (
-                  <span className="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-700 dark:text-gray-300">
-                    Uncategorized
-                  </span>
-                )}
-              </span>
+                  )}
+                </div>
+              </div>
               {isAdmin && (
-                <div className="space-x-2">
+                <div className="flex flex-shrink-0 gap-2 self-start sm:self-center">
                   <button
                     onClick={() => openEditModal(conversation)}
-                    className="bg-blue-500 text-white px-3 py-1 rounded"
+                    className="rounded-full bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400"
                   >
                     Update
                   </button>
                   <button
                     onClick={() => deleteConversation(conversation.id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded"
+                    className="rounded-full bg-rose-600 px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-rose-700 dark:bg-rose-600 dark:hover:bg-rose-500"
                   >
                     Delete
                   </button>
@@ -298,15 +302,22 @@ const ConversationsList = () => {
 
       {/* Update Modal */}
       {editingConversation && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded shadow-lg w-[500px]">
-            <h2 className="text-lg font-bold mb-4">Edit Conversation</h2>
-            <form className="space-y-3">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeEditModal();
+          }}
+        >
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900">
+            <h2 className="mb-4 text-lg font-bold text-slate-900 dark:text-white">
+              Edit Conversation
+            </h2>
+            <form className="space-y-4">
               {/* Topic */}
               <div>
                 <label
                   htmlFor="edit-conversation-topic"
-                  className="block font-semibold"
+                  className="block font-semibold text-slate-800 dark:text-white"
                 >
                   Topic
                 </label>
@@ -316,7 +327,7 @@ const ConversationsList = () => {
                   name="topic"
                   value={formData.topic || ""}
                   onChange={handleInputChange}
-                  className="border p-2 w-full"
+                  className="mt-1 w-full rounded-md border border-slate-300 bg-white p-2 text-slate-900 shadow-sm focus:border-sky-500 focus:outline-none focus:ring focus:ring-sky-500 focus:ring-opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                 />
               </div>
 
@@ -324,7 +335,7 @@ const ConversationsList = () => {
               <div>
                 <label
                   htmlFor="edit-conversation-level"
-                  className="block font-semibold"
+                  className="block font-semibold text-slate-800 dark:text-white"
                 >
                   Level
                 </label>
@@ -333,7 +344,7 @@ const ConversationsList = () => {
                   name="levelId"
                   value={formData.levelId || ""}
                   onChange={handleLevelChange}
-                  className="border p-2 w-full"
+                  className="mt-1 w-full rounded-md border border-slate-300 bg-white p-2 text-slate-900 shadow-sm focus:border-sky-500 focus:outline-none focus:ring focus:ring-sky-500 focus:ring-opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                 >
                   {levels.map((level) => (
                     <option key={level.value} value={level.value}>
@@ -347,24 +358,26 @@ const ConversationsList = () => {
               <div>
                 <label
                   htmlFor="edit-conversation-category"
-                  className="block font-semibold"
+                  className="block font-semibold text-slate-800 dark:text-white"
                 >
                   Categories
                 </label>
-                <CategoryMultiSelect
-                  id="edit-conversation-category"
-                  categories={categories}
-                  selectedIds={formData.categoryIds || []}
-                  onChange={handleCategoryIdsChange}
-                  placeholder="Uncategorized (optional)"
-                />
+                <div className="mt-1">
+                  <CategoryMultiSelect
+                    id="edit-conversation-category"
+                    categories={categories}
+                    selectedIds={formData.categoryIds || []}
+                    onChange={handleCategoryIdsChange}
+                    placeholder="Uncategorized (optional)"
+                  />
+                </div>
               </div>
 
               {/* Text Messages as JSON */}
               <div>
                 <label
                   htmlFor="edit-conversation-text"
-                  className="block font-semibold"
+                  className="block font-semibold text-slate-800 dark:text-white"
                 >
                   Text (JSON format)
                 </label>
@@ -373,28 +386,28 @@ const ConversationsList = () => {
                   name="text"
                   value={formData.text || ""}
                   onChange={handleTextChange}
-                  className="border p-2 w-full"
+                  className="mt-1 w-full rounded-md border border-slate-300 bg-white p-2 text-slate-900 shadow-sm focus:border-sky-500 focus:outline-none focus:ring focus:ring-sky-500 focus:ring-opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                   rows="6"
                 />
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="mt-2 text-sm text-slate-500 dark:text-gray-400">
                   Please enter the text as valid JSON. For example:
                   <br />
                   <code>[{`{"speaker": "Lena", "message": "Hallo..."}`}]</code>
                 </p>
               </div>
 
-              <div className="flex justify-end space-x-2">
+              <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={closeEditModal}
-                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                  className="rounded-full bg-slate-500 px-4 py-2 font-semibold text-white transition-colors hover:bg-slate-600 dark:bg-slate-600 dark:hover:bg-slate-500"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={updateConversation}
-                  className="bg-green-500 text-white px-4 py-2 rounded"
+                  className="rounded-full bg-emerald-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500"
                 >
                   Save
                 </button>

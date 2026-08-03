@@ -140,14 +140,6 @@ const ConversationTitleList = () => {
           : "border border-slate-700 bg-slate-900 text-slate-300 hover:border-orange-500/50"
     }`;
 
-  const categoryTabClass = (isActive) =>
-    `rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-      isActive
-        ? "bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md"
-        : isLight
-          ? "border border-slate-200 bg-white text-slate-600 hover:border-teal-300"
-          : "border border-slate-700 bg-slate-900 text-slate-300 hover:border-teal-500/50"
-    }`;
 
   return (
     <Container>
@@ -197,34 +189,34 @@ const ConversationTitleList = () => {
           </div>
         )}
 
-        {/* Category tabs */}
+        {/* Category filter — a single dropdown instead of one button per
+            category, since the list can grow arbitrarily long (unlike the
+            fixed, small set of CEFR levels above). */}
         {!loading && availableCategories.length > 0 && (
-          <div className="mb-8 flex flex-wrap justify-center gap-2">
-            <button
-              type="button"
-              onClick={() => handleSelectCategory("")}
-              className={categoryTabClass(!activeCategory)}
+          <div className="mb-8 flex justify-center">
+            <select
+              value={activeCategory}
+              onChange={(event) => handleSelectCategory(event.target.value)}
+              aria-label="Filter by category"
+              className={`w-full max-w-xs rounded-full border px-4 py-2 text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500/50 ${
+                isLight
+                  ? "border-slate-200 bg-white text-slate-700"
+                  : "border-slate-700 bg-slate-900 text-slate-200"
+              }`}
             >
-              All Categories
-            </button>
-            {availableCategories.map((category) => {
-              const count = conversations.filter((c) =>
-                (c.categories || []).some((cat) => cat.id === category.id),
-              ).length;
+              <option value="">All Categories ({conversations.length})</option>
+              {availableCategories.map((category) => {
+                const count = conversations.filter((c) =>
+                  (c.categories || []).some((cat) => cat.id === category.id),
+                ).length;
 
-              return (
-                <button
-                  key={category.id}
-                  type="button"
-                  onClick={() => handleSelectCategory(String(category.id))}
-                  className={categoryTabClass(
-                    activeCategory === String(category.id),
-                  )}
-                >
-                  {category.name} ({count})
-                </button>
-              );
-            })}
+                return (
+                  <option key={category.id} value={category.id}>
+                    {category.name} ({count})
+                  </option>
+                );
+              })}
+            </select>
           </div>
         )}
 
