@@ -7,6 +7,8 @@ import Loader from "../../utils/Loader";
 import api from "../../axios";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../services/auth.services";
+import { useFavorites } from "../../hooks/useFavorites";
+import FavoriteButton from "../Words/Modals/FavoriteButton";
 import {
   getAvailableGermanVoices,
   getBestGermanVoice,
@@ -234,6 +236,12 @@ const StoryDetail = () => {
   const [story, setStory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const {
+    favoriteIds,
+    loadingIds: loadingFavorites,
+    toggleFavorite,
+  } = useFavorites("stories", "storyId", "story");
 
   // Full-story narration. Word-by-word highlighting was tried (via
   // currentWordIdRef below, still used internally to track ticker/onboundary
@@ -664,7 +672,19 @@ const StoryDetail = () => {
       <div className="mx-auto min-h-screen max-w-5xl px-4 py-8">
         {backLink}
 
-        <div className="mb-8 text-center">
+        <div className="relative mb-8 text-center">
+          <div className="absolute right-0 top-0">
+            <FavoriteButton
+              isFavorite={favoriteIds.includes(story.id)}
+              loading={!!loadingFavorites[story.id]}
+              onClick={() => toggleFavorite(story.id)}
+              className={
+                favoriteIds.includes(story.id)
+                  ? ""
+                  : "text-slate-300 dark:text-slate-600"
+              }
+            />
+          </div>
           <h1
             className={`mt-3 text-2xl font-bold md:text-3xl ${isLight ? "text-slate-900" : "text-white"}`}
           >

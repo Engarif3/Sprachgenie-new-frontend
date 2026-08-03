@@ -6,6 +6,8 @@ import Loader from "../../utils/Loader";
 import api, { publicApi } from "../../axios";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../services/auth.services";
+import { useFavorites } from "../../hooks/useFavorites";
+import FavoriteButton from "../Words/Modals/FavoriteButton";
 import { MdOutlineDoubleArrow } from "react-icons/md";
 import { SiGoogletranslate } from "react-icons/si";
 import { FaSpinner } from "react-icons/fa";
@@ -91,6 +93,12 @@ const ConversationPage = () => {
   // reuses the same translation instead of re-fetching it.
   const [translations, setTranslations] = useState({});
   const [loadingTranslations, setLoadingTranslations] = useState({});
+
+  const {
+    favoriteIds,
+    loadingIds: loadingFavorites,
+    toggleFavorite,
+  } = useFavorites("conversations", "conversationId", "conversation");
 
   useEffect(() => {
     setLoading(true);
@@ -193,7 +201,19 @@ const ConversationPage = () => {
       <div className="min-h-screen py-8">
         <div className="mx-auto max-w-3xl px-4">
           {/* Header */}
-          <div className="mb-8 text-center">
+          <div className="relative mb-8 text-center">
+            <div className="absolute right-0 top-0">
+              <FavoriteButton
+                isFavorite={favoriteIds.includes(conversation.id)}
+                loading={!!loadingFavorites[conversation.id]}
+                onClick={() => toggleFavorite(conversation.id)}
+                className={
+                  favoriteIds.includes(conversation.id)
+                    ? ""
+                    : "text-slate-300 dark:text-slate-600"
+                }
+              />
+            </div>
             <span className="mb-4 inline-block rounded-full border border-orange-500/50 bg-gradient-to-r from-orange-500/20 to-pink-500/20 px-6 py-2 text-sm font-semibold text-orange-500 dark:text-orange-400">
               💬 Conversation
             </span>
