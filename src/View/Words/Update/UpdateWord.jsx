@@ -267,6 +267,11 @@ const normalizeInsertedItems = (field, value) => {
 };
 
 const RELATION_FIELDS = ["synonyms", "antonyms", "similarWords"];
+const RELATION_ID_KEYS = {
+  synonyms: "synonymIds",
+  antonyms: "antonymIds",
+  similarWords: "similarWordIds",
+};
 
 const normalizeWordValue = (value) =>
   String(value || "")
@@ -820,6 +825,53 @@ const UpdateWord = () => {
     return payload;
   };
 
+  // Builds a PUT payload for a relation-list quick action (remove/reorder/
+  // quick-add) using explicit ids for ALL THREE relation types, not just
+  // the one being touched. Sending any relation field as plain text makes
+  // the backend re-resolve it by VALUE (batchUpsertRelatedWords), which
+  // collapses same-spelling multi-POS entries (e.g. two "kühler" rows) down
+  // to one — and since the untouched two relation fields were always sent
+  // as plain text here too (buildUpdatePayload only strips them for
+  // non-relation edits), removing one item from "Word to Watch" could
+  // silently corrupt an unrelated multi-POS synonym. `overrides` supplies
+  // the field actually being changed as its own already-spliced/reordered
+  // {values, details} pair; the other two fields use their current,
+  // unchanged state.
+  //
+  // Each field is partitioned position-by-position against
+  // relationVariantDetails: a position with a matching known id goes out
+  // as an id; anything else (freshly quick-added raw text with no
+  // resolved id yet, or a position that's drifted out of alignment) falls
+  // back to the plain-text value — exactly today's behavior for that one
+  // entry, never worse than before, just no longer applied to entries
+  // that ARE already known.
+  const buildRelationIdPayload = (overrides = {}) => {
+    const payload = { ...formData };
+
+    RELATION_FIELDS.forEach((field) => {
+      const values = overrides[field]?.values ?? formData[field];
+      const details = overrides[field]?.details ?? relationVariantDetails[field];
+      const idKey = RELATION_ID_KEYS[field];
+
+      const knownIds = [];
+      const unresolvedText = [];
+
+      values.forEach((value, i) => {
+        const detail = details[i];
+        if (detail && detail.value === value) {
+          knownIds.push(detail.id);
+        } else {
+          unresolvedText.push(value);
+        }
+      });
+
+      payload[field] = unresolvedText;
+      payload[idKey] = knownIds;
+    });
+
+    return payload;
+  };
+
   // Handle drag end
   const handleDragEnd = async (event) => {
     const { active, over } = event;
@@ -842,6 +894,10 @@ const UpdateWord = () => {
 
     // Update the array
     const updatedArray = arrayMove(formData[field], oldIndex, newIndex);
+    const isRelationField = RELATION_FIELDS.includes(field);
+    const updatedDetails = isRelationField
+      ? arrayMove(relationVariantDetails[field], oldIndex, newIndex)
+      : null;
 
     // Show confirmation dialog
     const result = await Swal.fire({
@@ -862,15 +918,23 @@ const UpdateWord = () => {
       ...prev,
       [field]: updatedArray,
     }));
+    if (isRelationField) {
+      setRelationVariantDetails((prev) => ({
+        ...prev,
+        [field]: updatedDetails,
+      }));
+    }
     setSelectedItems((prev) => ({ ...prev, [field]: new Set() }));
 
     // Save to backend
     setLoading(true);
     try {
-      await api.put(
-        `/word/update/${formData.id}`,
-        buildUpdatePayload(field, updatedArray),
-      );
+      const payload = isRelationField
+        ? buildRelationIdPayload({
+            [field]: { values: updatedArray, details: updatedDetails },
+          })
+        : buildUpdatePayload(field, updatedArray);
+      await api.put(`/word/update/${formData.id}`, payload);
 
       Swal.fire({
         title: "Reordered!",
@@ -910,7 +974,19 @@ const UpdateWord = () => {
     const insertIndex = position === "above" ? index : index + 1;
     updatedArray.splice(insertIndex, 0, ...itemsToInsert);
 
-    if (RELATION_FIELDS.includes(field)) {
+    const isRelationField = RELATION_FIELDS.includes(field);
+    // Placeholder `null`s at the insert position — the newly-typed text
+    // has no resolved id yet, so buildRelationIdPayload's partition below
+    // correctly sends just these positions as plain text (still going
+    // through the backend's value-based lookup, as today) while every
+    // pre-existing entry stays id-based.
+    let updatedDetails = null;
+    if (isRelationField) {
+      updatedDetails = [...relationVariantDetails[field]];
+      updatedDetails.splice(insertIndex, 0, ...itemsToInsert.map(() => null));
+    }
+
+    if (isRelationField) {
       const selfReferenceMessage = getSelfReferenceMessage(formData.value, {
         [field]: updatedArray,
       });
@@ -931,14 +1007,22 @@ const UpdateWord = () => {
       ...prev,
       [field]: updatedArray,
     }));
+    if (isRelationField) {
+      setRelationVariantDetails((prev) => ({
+        ...prev,
+        [field]: updatedDetails,
+      }));
+    }
 
     // Save to backend
     setLoading(true);
     try {
-      await api.put(
-        `/word/update/${formData.id}`,
-        buildUpdatePayload(field, updatedArray),
-      );
+      const payload = isRelationField
+        ? buildRelationIdPayload({
+            [field]: { values: updatedArray, details: updatedDetails },
+          })
+        : buildUpdatePayload(field, updatedArray);
+      await api.put(`/word/update/${formData.id}`, payload);
 
       Swal.fire({
         title: "Added!",
@@ -1294,19 +1378,34 @@ const UpdateWord = () => {
       // Remove empty strings from the array
       const filteredArray = updatedArray.filter((item) => item.trim() !== "");
 
+      const isRelationField = RELATION_FIELDS.includes(field);
+      let updatedDetails = null;
+      if (isRelationField) {
+        updatedDetails = [...relationVariantDetails[field]];
+        updatedDetails.splice(index, 1);
+      }
+
       // Update the state
       setFormData((prev) => ({
         ...prev,
         [field]: filteredArray,
       }));
+      if (isRelationField) {
+        setRelationVariantDetails((prev) => ({
+          ...prev,
+          [field]: updatedDetails,
+        }));
+      }
       setSelectedItems((prev) => ({ ...prev, [field]: new Set() }));
 
       try {
         // Send the updated data to the backend
-        await api.put(
-          `/word/update/${formData.id}`,
-          buildUpdatePayload(field, filteredArray),
-        );
+        const payload = isRelationField
+          ? buildRelationIdPayload({
+              [field]: { values: filteredArray, details: updatedDetails },
+            })
+          : buildUpdatePayload(field, filteredArray);
+        await api.put(`/word/update/${formData.id}`, payload);
 
         Swal.fire({
           title: "Removed!",
