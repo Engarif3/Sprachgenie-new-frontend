@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { Navigate, Outlet, NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../services/auth.services";
 import { useNotifications } from "../hooks/useNotifications";
@@ -439,32 +440,34 @@ const DashboardLayout = () => {
                         />
                       </button>
 
-                      {isOpenSection && (
-                        <div
-                          ref={flyoutRef}
-                          style={{
-                            top: flyoutStyle.top,
-                            left: flyoutStyle.left,
-                            maxHeight: flyoutStyle.maxHeight,
-                            width: FLYOUT_WIDTH,
-                          }}
-                          className="fixed z-50 space-y-1 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl shadow-slate-900/20 dark:border-slate-700 dark:bg-slate-900"
-                          role="menu"
-                        >
-                          {visibleItems.map((item) => (
-                            <NavLink
-                              key={item.to}
-                              to={item.to}
-                              className={({ isActive }) => navItemClass(isActive)}
-                              onClick={closeFlyoutAndDrawer}
-                              role="menuitem"
-                            >
-                              <span>{item.icon}</span>
-                              <span>{item.label}</span>
-                            </NavLink>
-                          ))}
-                        </div>
-                      )}
+                      {isOpenSection &&
+                        createPortal(
+                          <div
+                            ref={flyoutRef}
+                            style={{
+                              top: flyoutStyle.top,
+                              left: flyoutStyle.left,
+                              maxHeight: flyoutStyle.maxHeight,
+                              width: FLYOUT_WIDTH,
+                            }}
+                            className="fixed z-50 space-y-1 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl shadow-slate-900/20 dark:border-slate-700 dark:bg-slate-900"
+                            role="menu"
+                          >
+                            {visibleItems.map((item) => (
+                              <NavLink
+                                key={item.to}
+                                to={item.to}
+                                className={({ isActive }) => navItemClass(isActive)}
+                                onClick={closeFlyoutAndDrawer}
+                                role="menuitem"
+                              >
+                                <span>{item.icon}</span>
+                                <span>{item.label}</span>
+                              </NavLink>
+                            ))}
+                          </div>,
+                          document.body,
+                        )}
                     </div>
                   );
                 })}
