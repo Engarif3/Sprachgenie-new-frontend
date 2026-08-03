@@ -183,6 +183,7 @@ const DashboardLayout = () => {
     : null;
 
   const activeSection = getActiveSection(location.pathname);
+  const roleLabel = formatRoleLabel(role);
 
   // A flyout is transient — never carry it across a navigation.
   useEffect(() => {
@@ -324,7 +325,7 @@ const DashboardLayout = () => {
           </div>
 
           <nav
-            className="sidebar-scrollbar flex-1 space-y-1 overflow-y-auto px-4 py-5"
+            className="sidebar-scrollbar flex-1 space-y-1 overflow-y-auto px-4 pb-10 pt-5"
             onScroll={() => setOpenSection(null)}
           >
             <NavLink
@@ -475,7 +476,7 @@ const DashboardLayout = () => {
             )}
           </nav>
 
-          <div className="sticky bottom-0 border-t border-slate-200/80 bg-white/90 px-4 py-4 backdrop-blur-md dark:border-slate-800/60 dark:bg-slate-950/90">
+          <div className="sticky bottom-0 mt-4 border-t border-slate-200/80 bg-white/90 px-4 py-5 backdrop-blur-md dark:border-slate-800/60 dark:bg-slate-950/90">
             <div className="rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-50 to-sky-50/70 px-3 py-3 transition-colors duration-300 hover:border-sky-300/60 dark:border-sky-500/20 dark:from-sky-500/10 dark:to-indigo-500/10">
               <div className="flex items-center gap-3">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-sky-200 bg-gradient-to-br from-sky-500 to-indigo-600 text-sm font-bold text-white shadow-md dark:border-sky-500/20">
@@ -497,11 +498,16 @@ const DashboardLayout = () => {
                     User Profile
                   </p>
                   <p className="truncate bg-gradient-to-r from-sky-600 to-indigo-600 bg-clip-text text-sm font-bold text-transparent dark:from-sky-300 dark:to-indigo-300">
-                    {userInfo?.name || "User"}
+                    {userInfo?.name || roleLabel}
                   </p>
-                  <p className="mt-1 text-xs capitalize text-slate-500 dark:text-slate-400">
-                    {formatRoleLabel(role)}
-                  </p>
+                  {/* Skip a redundant second line when the account's name
+                      already IS the role (e.g. a generic "Super Admin"
+                      account) — showing the same text twice looked cluttered. */}
+                  {userInfo?.name && userInfo.name !== roleLabel && (
+                    <p className="mt-1 text-xs capitalize text-slate-500 dark:text-slate-400">
+                      {roleLabel}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
