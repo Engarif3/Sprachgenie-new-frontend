@@ -1078,21 +1078,24 @@ const RadioChannels = () => {
     //   }`}
     // >
     <div
-      className={`min-h-screen py-2 md:py-2 lg:py-12  ${
+      className={`min-h-screen py-2 md:py-2 lg:py-6  ${
         isLight ? "text-slate-900" : " text-white"
       }`}
     >
       <Container>
         <div className="md:min-h-[700px] lg:min-h-[700px] relative overflow-hidden rounded-[32px] border border-white/10 bg-slate-950 p-6 shadow-[0_28px_90px_rgba(15,23,42,0.18)] md:p-10">
           <div
-            className="absolute inset-0 bg-cover bg-center opacity-80"
+            className="absolute inset-0 bg-cover bg-center"
             style={{
               backgroundImage: "url('/radio.webp')",
               transform: "scaleX(-1)",
+              filter: "brightness(1.08) contrast(1.12) saturate(1.15)",
             }}
           />
-          {/* <div className="absolute inset-0 bg-[linear-gradient(145deg,rgba(15,23,42,0.82),rgba(249,115,22,0.22),rgba(59,130,246,0.20))]" /> */}
-          <div className="absolute -right-16 top-0 h-44 w-44 rounded-full bg-orange-400/20 blur-3xl" />
+          <div className="absolute inset-0 bg-[linear-gradient(100deg,rgba(2,6,23,0.95)_0%,rgba(2,6,23,0.72)_32%,rgba(2,6,23,0.28)_58%,rgba(2,6,23,0.08)_78%,rgba(2,6,23,0.35)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,6,23,0.35)_0%,rgba(2,6,23,0)_22%,rgba(2,6,23,0)_68%,rgba(2,6,23,0.65)_100%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_28%,rgba(255,214,150,0.22),transparent_45%)]" />
+          <div className="absolute -right-16 top-0 h-56 w-56 rounded-full bg-orange-400/25 blur-3xl" />
           <div className="absolute -left-10 bottom-0 h-40 w-40 rounded-full bg-sky-400/15 blur-3xl" />
 
           <div className="relative z-10 grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.9fr)] lg:items-end">
@@ -1124,14 +1127,6 @@ const RadioChannels = () => {
                   </div>
                   <div className="mt-2 text-2xl font-bold text-white">
                     {stations.length}
-                  </div>
-                </div>
-                <div className="rounded-2xl  bg-white/10 px-4 py-3 shadow-lg backdrop-blur text-center">
-                  <div className="text-xs uppercase tracking-[0.18em] text-orange-600">
-                    Pages
-                  </div>
-                  <div className="mt-2 text-2xl font-bold text-white">
-                    {totalPages}
                   </div>
                 </div>
                 <div className="rounded-2xl  bg-white/10 px-4 py-3 shadow-lg backdrop-blur text-center">
@@ -1362,195 +1357,243 @@ const RadioChannels = () => {
                 return (
                   <article
                     key={station.id}
-                    className={` group relative overflow-hidden rounded-[30px] border bg-red-700  p-5 shadow-[0_24px_60px_rgba(15,23,42,0.12)]  ${
+                    className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border p-5 transition-all duration-300 hover:-translate-y-0.5 ${
                       isLight
-                        ? "border-slate-200 bg-[linear-gradient(155deg,#ffffff_0%,#fff8ee_52%,#f1f7ff_100%)]"
-                        : "border-white/10 bg-[linear-gradient(155deg,rgba(15,23,42,0.92)_0%,rgba(30,41,59,0.92)_48%,rgba(17,24,39,0.95)_100%)]"
+                        ? isActive
+                          ? "border-orange-300 bg-gradient-to-b from-orange-50 to-white shadow-[0_14px_36px_-10px_rgba(249,115,22,0.45)]"
+                          : "border-slate-200 bg-white shadow-[0_6px_24px_rgba(15,23,42,0.06)] hover:border-slate-300 hover:shadow-[0_14px_36px_rgba(15,23,42,0.10)]"
+                        : isActive
+                          ? "border-orange-500/40 bg-gradient-to-b from-orange-500/10 to-slate-800/95 shadow-[0_16px_40px_-10px_rgba(249,115,22,0.5)]"
+                          : "border-slate-700/80 bg-slate-800/95 shadow-[0_10px_30px_rgba(0,0,0,0.45)] hover:border-slate-600 hover:shadow-[0_16px_40px_rgba(0,0,0,0.5)]"
                     }`}
                   >
-                    <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-orange-400/20 blur-3xl transition-opacity duration-300 group-hover:opacity-100" />
-
-                    <div className="relative z-10 flex h-full flex-col ">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex min-w-0 items-center gap-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="relative shrink-0">
                           {showFavicon ? (
                             <img
                               src={station.favicon}
                               alt={station.name}
-                              className="h-14 w-14 rounded-2xl border border-white/10 object-cover bg-white"
+                              className={`h-12 w-12 rounded-xl border object-cover bg-white ${
+                                isActive
+                                  ? "border-orange-400"
+                                  : isLight
+                                    ? "border-slate-200"
+                                    : "border-white/10"
+                              }`}
                               loading="lazy"
                               onError={() => markFaviconAsBroken(station.id)}
                             />
                           ) : (
-                            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-400/25 via-pink-400/20 to-sky-400/20 text-orange-200">
-                              <RiRadioFill className="h-8 w-8 text-sky-500" />
+                            <div
+                              className={`flex h-12 w-12 items-center justify-center rounded-xl border ${
+                                isActive
+                                  ? "border-orange-400 bg-orange-500/10 text-orange-500"
+                                  : isLight
+                                    ? "border-slate-200 bg-slate-100 text-slate-400"
+                                    : "border-white/10 bg-white/5 text-slate-500"
+                              }`}
+                            >
+                              <RiRadioFill className="h-6 w-6" />
                             </div>
                           )}
 
-                          <div className="min-w-0 ">
-                            <div className="inline-flex items-center gap-2 rounded-full border border-orange-400/20 bg-orange-400/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-orange-300">
-                              <RiRadioFill className="h-3.5 w-3.5" />
-                              Germany stream
-                            </div>
-                            <h2
-                              className={`mt-3 line-clamp-2 text-lg md:text-lg lg:text-xl font-bold ${
-                                isLight ? "text-slate-900" : "text-white"
-                              }`}
-                            >
-                              {station.name}
-                            </h2>
-                          </div>
+                          {isActive ? (
+                            <span className="absolute -bottom-1 -right-1 flex h-4 w-4">
+                              {isPlaying ? (
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75" />
+                              ) : null}
+                              <span
+                                className={`relative inline-flex h-4 w-4 rounded-full ring-2 ${
+                                  isLight
+                                    ? "ring-white"
+                                    : "ring-slate-800"
+                                } ${isPlaying ? "bg-orange-500" : "bg-slate-400"}`}
+                              />
+                            </span>
+                          ) : null}
                         </div>
 
-                        <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                          {formatNumber(station.votes)} votes
+                        <div className="min-w-0">
+                          <h2
+                            className={`truncate text-base font-bold leading-tight ${
+                              isLight ? "text-slate-900" : "text-white"
+                            }`}
+                            title={station.name}
+                          >
+                            {station.name}
+                          </h2>
+                          <p
+                            className={`mt-1 flex items-center gap-1 truncate text-xs ${
+                              isLight ? "text-slate-500" : "text-slate-400"
+                            }`}
+                          >
+                            <MapPin className="h-3 w-3 shrink-0" />
+                            {station.state || station.country}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex shrink-0 flex-col items-end gap-1.5">
+                        {isActive ? (
+                          <span
+                            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+                              isLight
+                                ? "bg-orange-100 text-orange-700"
+                                : "bg-orange-500/15 text-orange-300"
+                            }`}
+                          >
+                            <span
+                              className={`h-1.5 w-1.5 rounded-full ${
+                                isPlaying
+                                  ? "animate-pulse bg-orange-500"
+                                  : "bg-slate-400"
+                              }`}
+                            />
+                            {isPlaying ? "Live" : "Selected"}
+                          </span>
+                        ) : null}
+                        <span
+                          className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+                            isLight
+                              ? "bg-slate-100 text-slate-500"
+                              : "bg-white/5 text-slate-400"
+                          }`}
+                        >
+                          {formatNumber(station.votes)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div
+                      className={`mt-4 grid grid-cols-2 gap-2 ${
+                        isLight ? "text-slate-700" : "text-slate-200"
+                      }`}
+                    >
+                      <div
+                        className={`rounded-xl px-3 py-2 ${
+                          isLight ? "bg-slate-50" : "bg-white/5"
+                        }`}
+                      >
+                        <div
+                          className={`text-[10px] font-semibold uppercase tracking-wider ${
+                            isLight ? "text-slate-400" : "text-slate-500"
+                          }`}
+                        >
+                          Codec
+                        </div>
+                        <div className="mt-0.5 text-sm font-semibold">
+                          {currentStream?.codec || "Unknown"}
                         </div>
                       </div>
 
                       <div
-                        className={`mt-5 grid grid-cols-2 gap-3 text-sm ${
-                          isLight ? "text-slate-700" : "text-slate-200"
+                        className={`rounded-xl px-3 py-2 ${
+                          isLight ? "bg-slate-50" : "bg-white/5"
                         }`}
                       >
-                        <div className="rounded-2xl border border-cyan-700 bg-white/6 p-3">
-                          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-orange-300">
-                            <MapPin className="h-3.5 w-3.5" />
-                            Region
-                          </div>
-                          <div className="mt-2 font-semibold">
-                            {station.state || station.country}
-                          </div>
-                        </div>
-
-                        <div className="rounded-2xl border border-cyan-700 bg-white/6 p-3">
-                          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-sky-300">
-                            <Globe className="h-3.5 w-3.5" />
-                            Language
-                          </div>
-                          <div className="mt-2 font-semibold">
-                            {station.language}
-                          </div>
-                        </div>
-
-                        <div className="rounded-2xl border border-cyan-700 bg-white/6 p-3">
-                          <div className="text-xs uppercase tracking-[0.16em] text-pink-300">
-                            Codec
-                          </div>
-                          <div className="mt-2 font-semibold">
-                            {currentStream?.codec || "Unknown"}
-                          </div>
-                        </div>
-
-                        <div className="rounded-2xl border border-cyan-700 bg-white/6 p-3">
-                          <div className="text-xs uppercase tracking-[0.16em] text-emerald-300">
-                            Bitrate
-                          </div>
-                          <div className="mt-2 font-semibold">
-                            {currentStream?.bitrate > 0
-                              ? `${currentStream.bitrate} kbps`
-                              : "Unknown"}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-5">
                         <div
-                          className={`mb-3 text-xs font-semibold uppercase tracking-[0.16em] ${
-                            isLight ? "text-slate-500" : "text-slate-400"
+                          className={`text-[10px] font-semibold uppercase tracking-wider ${
+                            isLight ? "text-slate-400" : "text-slate-500"
                           }`}
                         >
-                          Available bitrates
+                          Bitrate
                         </div>
-                        <div className="flex flex-wrap gap-2">
-                          {station.streams.map((stream) => {
-                            const isSelected = activeStreamId === stream.id;
-
-                            return (
-                              <button
-                                key={stream.id}
-                                type="button"
-                                onClick={() =>
-                                  handleStreamSelect(station, stream.id)
-                                }
-                                className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-all ${
-                                  isSelected
-                                    ? "border-cyan-500 bg-gradient-to-r from-gray-500 to-cyan-500 text-white shadow-lg shadow-orange-500/20"
-                                    : isLight
-                                      ? "border-slate-200 bg-white/85 text-slate-600 hover:border-orange-300"
-                                      : "border-white/10 bg-white/5 text-slate-300 hover:border-orange-400/40"
-                                }`}
-                              >
-                                {stream.codec}{" "}
-                                {stream.bitrate > 0
-                                  ? `${stream.bitrate} kbps`
-                                  : "Variable"}
-                              </button>
-                            );
-                          })}
+                        <div className="mt-0.5 text-sm font-semibold">
+                          {currentStream?.bitrate > 0
+                            ? `${currentStream.bitrate} kbps`
+                            : "Variable"}
                         </div>
                       </div>
+                    </div>
 
-                      <div className="mt-5 flex flex-wrap gap-2 mb-4 ">
-                        {station.tags.length ? (
-                          station.tags.map((tag) => (
-                            <span
-                              key={`${station.id}-${tag}`}
-                              className={`rounded-full border px-3 py-1 text-xs font-medium ${
-                                isLight
-                                  ? "border-slate-200 bg-white/80 text-slate-600"
-                                  : "border-white/10 bg-white/5 text-slate-300"
-                              }`}
-                            >
-                              {tag}
-                            </span>
-                          ))
-                        ) : (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {station.streams.map((stream) => {
+                        const isSelected =
+                          activeStreamId === stream.id ||
+                          station.streams.length === 1;
+
+                        return (
+                          <button
+                            key={stream.id}
+                            type="button"
+                            onClick={() =>
+                              handleStreamSelect(station, stream.id)
+                            }
+                            disabled={station.streams.length === 1}
+                            className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors disabled:cursor-default ${
+                              isSelected
+                                ? "border-orange-500 bg-orange-500 text-white"
+                                : isLight
+                                  ? "border-slate-200 text-slate-500 hover:border-orange-300"
+                                  : "border-white/10 text-slate-400 hover:border-orange-400/40"
+                            }`}
+                          >
+                            {stream.bitrate > 0
+                              ? `${stream.bitrate} kbps`
+                              : "Variable"}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {station.tags.length ? (
+                        station.tags.map((tag) => (
                           <span
-                            className={`rounded-full border px-3 py-1 text-xs font-medium ${
+                            key={`${station.id}-${tag}`}
+                            className={`rounded-full px-2.5 py-1 text-[11px] ${
                               isLight
-                                ? "border-slate-200 bg-white/80 text-slate-500"
-                                : "border-white/10 bg-white/5 text-slate-400"
+                                ? "bg-slate-50 text-slate-500"
+                                : "bg-white/5 text-slate-400"
                             }`}
                           >
-                            No tags available
+                            {tag}
                           </span>
-                        )}
-                      </div>
-
-                      <div className="mt-auto pt-6 flex items-center justify-end gap-3 border-t border-white/10">
-                        <button
-                          type="button"
-                          onClick={() => handlePlayToggle(station)}
-                          className={`inline-flex  items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all ${
-                            isActive && isPlaying
-                              ? "bg-rose-500 text-white shadow-lg shadow-rose-500/25"
-                              : "bg-gradient-to-r from-sky-500 to-purple-500 text-white shadow-lg shadow-orange-500/20 hover:scale-[1.02]"
+                        ))
+                      ) : (
+                        <span
+                          className={`rounded-full px-2.5 py-1 text-[11px] ${
+                            isLight
+                              ? "bg-slate-50 text-slate-400"
+                              : "bg-white/5 text-slate-500"
                           }`}
                         >
-                          {isActive && isPlaying ? (
-                            <Pause className="h-4 w-4" />
-                          ) : (
-                            <Play className="h-4 w-4" />
-                          )}
-                          {isActive && isPlaying ? "Pause" : "Play stream"}
-                        </button>
+                          No tags
+                        </span>
+                      )}
+                    </div>
 
-                        {/* {station.homepage ? (
-                          <a
-                            href={station.homepage}
-                            target="_blank"
-                            rel="noreferrer"
-                            className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
-                              isLight
-                                ? "border-slate-300 text-slate-700 hover:bg-slate-100"
-                                : "border-white/10 text-slate-200 hover:bg-white/10"
-                            }`}
-                          >
-                            Visit site
-                            <ExternalLink className="h-4 w-4" />
-                          </a>
-                        ) : null} */}
+                    <div
+                      className={`mt-auto flex items-center justify-between gap-3 border-t pt-4 ${
+                        isLight ? "border-slate-100" : "border-slate-700/70"
+                      }`}
+                    >
+                      <div
+                        className={`flex min-w-0 items-center gap-1.5 text-xs ${
+                          isLight ? "text-slate-500" : "text-slate-400"
+                        }`}
+                      >
+                        <Globe className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">{station.language}</span>
                       </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handlePlayToggle(station)}
+                        className={`inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all ${
+                          isActive && isPlaying
+                            ? "bg-rose-500 text-white shadow-[0_8px_20px_-6px_rgba(244,63,94,0.6)] hover:bg-rose-600"
+                            : "bg-orange-500 text-white shadow-[0_8px_20px_-6px_rgba(249,115,22,0.55)] hover:bg-orange-600"
+                        }`}
+                      >
+                        {isActive && isPlaying ? (
+                          <Pause className="h-4 w-4" />
+                        ) : (
+                          <Play className="h-4 w-4" />
+                        )}
+                        {isActive && isPlaying ? "Pause" : "Play"}
+                      </button>
                     </div>
                   </article>
                 );
