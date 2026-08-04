@@ -1085,17 +1085,13 @@ const RadioChannels = () => {
       <Container>
         <div className="md:min-h-[700px] lg:min-h-[700px] relative overflow-hidden rounded-[32px] border border-white/10 bg-slate-950 p-6 shadow-[0_28px_90px_rgba(15,23,42,0.18)] md:p-10">
           <div
-            className="absolute inset-0 bg-cover bg-center"
+            className="absolute inset-0 bg-cover bg-center opacity-80"
             style={{
               backgroundImage: "url('/radio.webp')",
               transform: "scaleX(-1)",
-              filter: "brightness(1.08) contrast(1.12) saturate(1.15)",
             }}
           />
-          <div className="absolute inset-0 bg-[linear-gradient(100deg,rgba(2,6,23,0.95)_0%,rgba(2,6,23,0.72)_32%,rgba(2,6,23,0.28)_58%,rgba(2,6,23,0.08)_78%,rgba(2,6,23,0.35)_100%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,6,23,0.35)_0%,rgba(2,6,23,0)_22%,rgba(2,6,23,0)_68%,rgba(2,6,23,0.65)_100%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_28%,rgba(255,214,150,0.22),transparent_45%)]" />
-          <div className="absolute -right-16 top-0 h-56 w-56 rounded-full bg-orange-400/25 blur-3xl" />
+          <div className="absolute -right-16 top-0 h-44 w-44 rounded-full bg-orange-400/20 blur-3xl" />
           <div className="absolute -left-10 bottom-0 h-40 w-40 rounded-full bg-sky-400/15 blur-3xl" />
 
           <div className="relative z-10 grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.9fr)] lg:items-end">
