@@ -1,62 +1,73 @@
-# SprachGenie (Frontend) [Link](https://sprach-genie.netlify.app)
+# SprachGenie (Frontend)
 
-## Project Overview
+**Live:** [simplegerman.de](https://simplegerman.de)
 
-SprachGenie is an AI-powered language learning platform built with React JS, TypeScript, Express JS, and PostgreSQL, designed to help users improve their German vocabulary (A1–C1).
+## Overview
 
-- Words include pre-set meanings and example sentences
-- Users can click the AI button next to a word to generate:
-  - More meanings
-  - Additional sentences
-  - A short paragraph
-- Users can report incorrect AI-generated content
-- Search and filter words by language level (A1–C1) and topic
-- Add words to a Favorites list for better progress tracking
+SprachGenie is an AI-assisted German vocabulary and practice platform, covering levels A1–C1. This repository is the React/Vite frontend; it talks to a separate Express/PostgreSQL backend and a separate AI microservice.
 
-## Admin Features
+## Features
 
-- Manage users (suspend/unsuspend, assign roles)
-- Create and update words and conversations
-- Monitor favorite counts
-- Set global and per-user limits
-- Control overall usage
-- Review reported AI content
+### Vocabulary
 
-## Security & Authentication
+- Browse and search words by level (A1–C1) and topic, with part-of-speech filtering
+- Each word includes meanings, example sentences, synonyms/antonyms/similar words, and conjugation lookups
+- AI-generated extra meanings, sentences, and short paragraphs per word, with a report option for incorrect AI output
+- Favorite individual words for later review
 
-- Email verification ensures genuine accounts
-- Password reset available for forgotten credentials
-- Unverified accounts are automatically removed by cron jobs
+### Practice
 
-## Frontend & Backend Communication
+- **Quiz** — timed vocabulary quiz by difficulty (Easy / Difficult / Mixed) or generated from your own favorited words
+- **Conversations** — realistic German dialogues grouped by category and level, with per-line translation and pronunciation
+- **Stories** — short graded reading passages with narration and a vocabulary list
+- **Challenge & Leaderboard** — daily per-level challenges that earn XP, with a weekly leaderboard
 
-- Frontend communicates with backend via RESTful APIs using Axios
-- Redux handles state management for smooth experience
+### Personalization
 
-## Technologies
+- Favorite words, conversations, and stories independently, with a bulk "delete all" option
+- Daily streak and XP tracking
+- Light/dark theme, English/German UI language toggle
+- In-app notifications and admin broadcast announcements
 
-- Frontend: React JS, Tailwind CSS, TypeScript
-- State Management: Redux
-- API Communication: Axios, RESTful APIs
-- Backend: Express JS, PostgreSQL, Prisma
-- Authentication: JSON Web Token (JWT)
-- AI: OpenAI GPT-4.0 Mini
+### Extras
+
+- Live radio channel player
+- Word-of-the-day and quick vocabulary "balloon" practice on the home page
+
+## Admin Dashboard
+
+Role-gated (Admin / Super Admin) tools, including:
+
+- User management (suspend/unsuspend, role assignment)
+- Content management: words, levels, topics, conversations, conversation categories, stories
+- Word/AI-paragraph/conjugation report review
+- Global, per-user, and per-IP usage limits
+- Analytics: favorites stats (words/conversations/stories), AI usage, IP usage
+- Monitoring: system status, visitor analytics, registration signals, error logs
+
+## Tech Stack
+
+- **Frontend:** React 18, Vite, Tailwind CSS, Redux Toolkit
+- **API communication:** Axios (REST)
+- **Backend:** Express, PostgreSQL, Prisma (separate repo)
+- **Auth:** JWT, httpOnly cookies
+- **AI:** Separate microservice (OpenAI-backed) for generated content
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js v18+ installed
-- Setup SprachGenie Backend [Link](https://sprach-genie.netlify.app/backend)
-- Update the base API URL in `.env` file
+- Node.js v18+
+- Yarn
+- A running instance of the [SprachGenie backend](https://github.com/Engarif3/Sprcahgenie-new-backend) (and, for AI features, the AI microservice)
 
-### Run Locally
+### Setup
 
 1. Clone the repository:
 
    ```bash
-   git clone <https://github.com/Engarif3/Sprachgenie-new-frontend.git>
-   cd <repository-folder>
+   git clone https://github.com/Engarif3/Sprachgenie-new-frontend.git
+   cd Sprachgenie-new-frontend
    ```
 
 2. Install dependencies:
@@ -65,21 +76,34 @@ SprachGenie is an AI-powered language learning platform built with React JS, Typ
    yarn
    ```
 
-3. Start the app:
+3. Create a `.env` file in the project root with:
+
+   ```bash
+   VITE_BACKEND_API_URL=http://localhost:5001/api/v1
+   VITE_AI_API_URL=<ai-microservice-url>
+   VITE_ADMIN_EMAILS=<comma-separated admin emails>
+   VITE_DELETE_PASSWORD=<password required for destructive admin actions>
+   VITE_FACEBOOK_APP_ID=<facebook app id, for social login/share features>
+   ```
+
+4. Start the dev server:
 
    ```bash
    yarn dev
    ```
 
-4. Access the application locally:
-   ```bash
+5. Open the app:
    - http://localhost:5173
-   - http://127.0.0.1:5173
-   ```
 
-## 📞 Contact
+### Other scripts
 
-For any inquiries or issues, feel free to reach out:
+```bash
+yarn build     # production build
+yarn preview   # preview the production build locally
+yarn lint      # run ESLint
+```
+
+## Contact
 
 - **Email:** [arif.aust.eng@gmail.com](mailto:arif.aust.eng@gmail.com)
 - **LinkedIn:** [Md. Arifur Rahman](https://www.linkedin.com/in/engarif3/)
