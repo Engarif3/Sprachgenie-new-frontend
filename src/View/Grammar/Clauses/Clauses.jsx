@@ -98,6 +98,29 @@ const highlightConjunction = (sentence, conjunction, isLight) => {
   );
 };
 
+// Alternative-phrasing lines (see groupExamplesWithAlternatives below) swap
+// in an equivalent word — "weil" for a subordinating-clause rephrasing, or
+// "aufgrund" for a near-synonym of "wegen" — this highlights just that word
+// within the alternative, leaving the rest of the sentence in the normal
+// example text color instead of recoloring the whole line.
+const ALTERNATIVE_KEYWORDS = ["weil", "aufgrund"];
+
+const highlightAlternativeKeyword = (sentence, isLight) =>
+  sentence.split(/(\s+)/).map((token, index) => {
+    const clean = token.replace(/[.,!?;:()]/g, "").toLowerCase();
+
+    return ALTERNATIVE_KEYWORDS.includes(clean) ? (
+      <span
+        key={index}
+        className={`font-bold ${isLight ? "text-purple-600" : "text-purple-400"}`}
+      >
+        {token}
+      </span>
+    ) : (
+      token
+    );
+  });
+
 // Some example lists pair a main sentence with an alternative phrasing on
 // the next line, marked in the source data with a leading "--" (e.g. a
 // "wegen" sentence followed by its "weil" equivalent). Groups each
@@ -371,16 +394,21 @@ const Clauses = () => {
                                     (alternative, altIndex) => (
                                       <div
                                         key={altIndex}
-                                        className={`mt-1 text-sm font-normal italic ${
+                                        className={`mt-1 text-sm font-normal ${
                                           isLight
-                                            ? "text-purple-600"
-                                            : "text-purple-400"
+                                            ? "text-slate-700"
+                                            : "text-slate-200"
                                         }`}
                                       >
-                                        <span className="font-semibold not-italic">
+                                        <span
+                                          className={`font-semibold ${isLight ? "text-slate-500" : "text-slate-400"}`}
+                                        >
                                           Alternative:
                                         </span>{" "}
-                                        {alternative}
+                                        {highlightAlternativeKeyword(
+                                          alternative,
+                                          isLight,
+                                        )}
                                       </div>
                                     ),
                                   )}
