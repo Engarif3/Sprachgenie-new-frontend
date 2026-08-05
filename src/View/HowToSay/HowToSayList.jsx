@@ -190,13 +190,20 @@ const HowToSayList = () => {
                         titleItem.sentences.map((sentenceItem) => (
                           <p
                             key={sentenceItem.id}
-                            className={`w-fit rounded-xl border px-4 py-2 text-base font-medium leading-relaxed ${
-                              isLight
-                                ? "border-teal-200 bg-teal-50 text-teal-700"
-                                : "border-teal-500/20 bg-teal-500/10 text-teal-300"
+                            className={`flex items-center gap-2.5 text-base font-medium leading-relaxed ${
+                              isLight ? "text-slate-700" : "text-slate-200"
                             }`}
                           >
-                            🇩🇪 {sentenceItem.sentence}
+                            <span
+                              className={`flex-shrink-0 rounded-md border px-1.5 py-0.5 text-[11px] font-bold tracking-wide ${
+                                isLight
+                                  ? "border-teal-700 bg-teal-600 text-white"
+                                  : "border-teal-500 bg-teal-600 text-white"
+                              }`}
+                            >
+                              DE
+                            </span>
+                            {sentenceItem.sentence}
                           </p>
                         ))
                       )}
