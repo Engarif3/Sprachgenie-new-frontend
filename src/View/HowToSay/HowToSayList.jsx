@@ -32,13 +32,16 @@ import FavoritesDeleteAllModal from "../../components/Favorites/FavoritesDeleteA
 
 // Same drag-to-reorder row shape as the word-update form's DraggableItem —
 // a checkbox for bulk-select, a drag handle over the text, then edit/delete.
-const SortableSentenceRow = ({
-  sentenceItem,
+// Shared by both the sentences list and the rules list (they only differ in
+// which field of the underlying record holds the display text).
+const SortableTextRow = ({
+  id,
+  text,
   isLight,
   isSelected,
   onToggleSelect,
   isEditing,
-  editingSentenceText,
+  editingText,
   onEditingTextChange,
   onStartEdit,
   onSaveEdit,
@@ -47,9 +50,11 @@ const SortableSentenceRow = ({
   isSaving,
   isDeleting,
   modalInputClass,
+  editAriaLabel,
+  deleteAriaLabel,
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: sentenceItem.id });
+    useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -69,7 +74,7 @@ const SortableSentenceRow = ({
         <>
           <input
             type="text"
-            value={editingSentenceText}
+            value={editingText}
             onChange={(event) => onEditingTextChange(event.target.value)}
             className={modalInputClass}
             autoFocus
@@ -77,7 +82,7 @@ const SortableSentenceRow = ({
           <button
             type="button"
             onClick={onSaveEdit}
-            disabled={isSaving || !editingSentenceText.trim()}
+            disabled={isSaving || !editingText.trim()}
             className="flex-shrink-0 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
           >
             Save
@@ -100,7 +105,7 @@ const SortableSentenceRow = ({
           <input
             type="checkbox"
             checked={isSelected}
-            onChange={() => onToggleSelect(sentenceItem.id)}
+            onChange={() => onToggleSelect(id)}
             className="h-4 w-4 flex-shrink-0 cursor-pointer rounded border-gray-500 accent-sky-600"
           />
           <span
@@ -114,12 +119,12 @@ const SortableSentenceRow = ({
               size={14}
               className={`flex-shrink-0 ${isLight ? "text-slate-300" : "text-slate-600"}`}
             />
-            {sentenceItem.sentence}
+            {text}
           </span>
           <button
             type="button"
             onClick={onStartEdit}
-            aria-label="Edit sentence"
+            aria-label={editAriaLabel}
             className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border transition-colors ${
               isLight
                 ? "border-slate-200 text-slate-500 hover:border-sky-300 hover:text-sky-600"
@@ -132,7 +137,7 @@ const SortableSentenceRow = ({
             type="button"
             onClick={onDelete}
             disabled={isDeleting}
-            aria-label="Delete sentence"
+            aria-label={deleteAriaLabel}
             className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border transition-colors disabled:opacity-50 ${
               isLight
                 ? "border-slate-200 text-slate-500 hover:border-rose-300 hover:text-rose-600"
@@ -183,11 +188,12 @@ const HowToSayList = () => {
   const [deleteAllModalOpen, setDeleteAllModalOpen] = useState(false);
 
   // Modal state. modalTitleId is null (closed), "new" (create flow), or an
-  // existing title's id (edit flow) — sentences can only be managed once
-  // it's a real id, since a sentence needs a titleId to attach to.
+  // existing title's id (edit flow) — sentences/rules can only be managed
+  // once it's a real id, since they need a titleId to attach to.
   const [modalTitleId, setModalTitleId] = useState(null);
   const [modalTitleText, setModalTitleText] = useState("");
   const [modalSentences, setModalSentences] = useState([]);
+  const [modalRules, setModalRules] = useState([]);
   const [savingTitle, setSavingTitle] = useState(false);
   const [deletingTitleId, setDeletingTitleId] = useState(null);
 
@@ -201,7 +207,23 @@ const HowToSayList = () => {
   const [deletingSelectedSentences, setDeletingSelectedSentences] = useState(false);
   const [reorderingSentences, setReorderingSentences] = useState(false);
 
-  const sentenceDragSensors = useSensors(
+  // Rules mirror the sentences state/handlers exactly — same optional,
+  // pipeline-addable, drag-reorderable, multi-select-deletable list, just
+  // attached to the "rule" field instead of "sentence".
+  const [newRuleText, setNewRuleText] = useState("");
+  const [addingRule, setAddingRule] = useState(false);
+  const [editingRuleId, setEditingRuleId] = useState(null);
+  const [editingRuleText, setEditingRuleText] = useState("");
+  const [savingRuleId, setSavingRuleId] = useState(null);
+  const [deletingRuleId, setDeletingRuleId] = useState(null);
+  const [selectedRuleIds, setSelectedRuleIds] = useState(() => new Set());
+  const [deletingSelectedRules, setDeletingSelectedRules] = useState(false);
+  const [reorderingRules, setReorderingRules] = useState(false);
+
+  // One sensor config reused by both the sentences and rules drag contexts
+  // — sensors are stateless descriptors, each <DndContext> instantiates its
+  // own sensor instances from them.
+  const dragSensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
     useSensor(TouchSensor, {
       activationConstraint: { delay: 180, tolerance: 8 },
@@ -308,41 +330,51 @@ const HowToSayList = () => {
     setModalTitleId("new");
     setModalTitleText("");
     setModalSentences([]);
+    setModalRules([]);
     setSelectedSentenceIds(new Set());
+    setSelectedRuleIds(new Set());
   };
 
   const openEditModal = (titleItem) => {
     setModalTitleId(titleItem.id);
     setModalTitleText(titleItem.title);
     setModalSentences(titleItem.sentences || []);
+    setModalRules(titleItem.rules || []);
     setSelectedSentenceIds(new Set());
+    setSelectedRuleIds(new Set());
   };
 
   const closeModal = () => {
     setModalTitleId(null);
     setModalTitleText("");
     setModalSentences([]);
+    setModalRules([]);
     setNewSentenceText("");
     setEditingSentenceId(null);
     setEditingSentenceText("");
     setSelectedSentenceIds(new Set());
+    setNewRuleText("");
+    setEditingRuleId(null);
+    setEditingRuleText("");
+    setSelectedRuleIds(new Set());
     fetchTitles();
     if (showFavoritesOnly) {
       fetchAllTitlesForFavorites();
     }
   };
 
-  // Re-fetches just this title's sentences from the server — used to
-  // recover the authoritative order/list after a reorder or bulk-delete
-  // fails partway through, instead of leaving the modal showing a
-  // possibly-inconsistent local state.
-  const refetchModalSentences = async () => {
+  // Re-fetches just this title's sentences and rules from the server —
+  // used to recover the authoritative order/list after a reorder or
+  // bulk-delete fails partway through, instead of leaving the modal
+  // showing a possibly-inconsistent local state.
+  const refetchModalTitleData = async () => {
     if (!modalTitleId || modalTitleId === "new") return;
     try {
       const response = await api.get(`/how-to-say-titles/${modalTitleId}`);
       setModalSentences(response.data?.data?.sentences || []);
+      setModalRules(response.data?.data?.rules || []);
     } catch (error) {
-      console.error("Error refetching sentences:", error);
+      console.error("Error refetching title data:", error);
     }
   };
 
@@ -457,7 +489,7 @@ const HowToSayList = () => {
         title: "Could not add sentence(s)",
         text: error.response?.data?.message || "Please try again.",
       });
-      await refetchModalSentences();
+      await refetchModalTitleData();
     } finally {
       setAddingSentence(false);
     }
@@ -572,7 +604,7 @@ const HowToSayList = () => {
         title: "Could not delete selected sentences",
         text: error.response?.data?.message || "Please try again.",
       });
-      await refetchModalSentences();
+      await refetchModalTitleData();
     } finally {
       setDeletingSelectedSentences(false);
     }
@@ -613,9 +645,194 @@ const HowToSayList = () => {
         title: "Could not reorder",
         text: error.response?.data?.message || "Please try again.",
       });
-      await refetchModalSentences();
+      await refetchModalTitleData();
     } finally {
       setReorderingSentences(false);
+    }
+  };
+
+  // Rules mirror every one of the sentence handlers above — same pipeline
+  // add, inline edit, single/bulk delete, and drag reorder — just against
+  // the /how-to-say-rules endpoints and the "rule" field instead of
+  // "sentence". Rules are entirely optional, so an empty list is normal.
+  const handleAddRule = async () => {
+    const segments = newRuleText
+      .split("|")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (segments.length === 0 || !modalTitleId || modalTitleId === "new") {
+      return;
+    }
+
+    setAddingRule(true);
+    try {
+      const created = [];
+      for (const rule of segments) {
+        const response = await api.post("/how-to-say-rules/create", {
+          titleId: modalTitleId,
+          rule,
+        });
+        created.push(response.data.data);
+      }
+      setModalRules((prev) => [...prev, ...created]);
+      setNewRuleText("");
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Could not add rule(s)",
+        text: error.response?.data?.message || "Please try again.",
+      });
+      await refetchModalTitleData();
+    } finally {
+      setAddingRule(false);
+    }
+  };
+
+  const startEditRule = (ruleItem) => {
+    setEditingRuleId(ruleItem.id);
+    setEditingRuleText(ruleItem.rule);
+  };
+
+  const cancelEditRule = () => {
+    setEditingRuleId(null);
+    setEditingRuleText("");
+  };
+
+  const handleSaveRule = async (ruleId) => {
+    const rule = editingRuleText.trim();
+    if (!rule) return;
+
+    setSavingRuleId(ruleId);
+    try {
+      const response = await api.put(`/how-to-say-rules/update/${ruleId}`, {
+        rule,
+      });
+      setModalRules((prev) =>
+        prev.map((item) => (item.id === ruleId ? response.data.data : item)),
+      );
+      cancelEditRule();
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Could not update rule",
+        text: error.response?.data?.message || "Please try again.",
+      });
+    } finally {
+      setSavingRuleId(null);
+    }
+  };
+
+  const handleDeleteRule = async (ruleItem) => {
+    const result = await Swal.fire({
+      title: "Delete this rule?",
+      html: `Delete <strong>"${ruleItem.rule}"</strong>? This cannot be undone.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#e11d48",
+    });
+    if (!result.isConfirmed) return;
+
+    setDeletingRuleId(ruleItem.id);
+    try {
+      await api.delete(`/how-to-say-rules/delete/${ruleItem.id}`);
+      setModalRules((prev) => prev.filter((item) => item.id !== ruleItem.id));
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Could not delete rule",
+        text: error.response?.data?.message || "Please try again.",
+      });
+    } finally {
+      setDeletingRuleId(null);
+    }
+  };
+
+  const toggleSelectRule = (ruleId) => {
+    setSelectedRuleIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(ruleId)) {
+        next.delete(ruleId);
+      } else {
+        next.add(ruleId);
+      }
+      return next;
+    });
+  };
+
+  const deselectAllRules = () => setSelectedRuleIds(new Set());
+
+  const handleDeleteSelectedRules = async () => {
+    const ids = [...selectedRuleIds];
+    if (ids.length === 0) return;
+
+    const result = await Swal.fire({
+      title: `Delete ${ids.length} rule${ids.length > 1 ? "s" : ""}?`,
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+    });
+    if (!result.isConfirmed) return;
+
+    setDeletingSelectedRules(true);
+    try {
+      await Promise.all(
+        ids.map((ruleId) => api.delete(`/how-to-say-rules/delete/${ruleId}`)),
+      );
+      setModalRules((prev) =>
+        prev.filter((item) => !selectedRuleIds.has(item.id)),
+      );
+      setSelectedRuleIds(new Set());
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Could not delete selected rules",
+        text: error.response?.data?.message || "Please try again.",
+      });
+      await refetchModalTitleData();
+    } finally {
+      setDeletingSelectedRules(false);
+    }
+  };
+
+  const handleRuleDragEnd = async (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = modalRules.findIndex((r) => r.id === active.id);
+    const newIndex = modalRules.findIndex((r) => r.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const result = await Swal.fire({
+      title: "Reorder?",
+      text: `Position ${oldIndex + 1} → ${newIndex + 1}`,
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+    });
+    if (!result.isConfirmed) return;
+
+    const reordered = arrayMove(modalRules, oldIndex, newIndex);
+    setModalRules(reordered);
+    setReorderingRules(true);
+    try {
+      const response = await api.put("/how-to-say-rules/reorder", {
+        titleId: modalTitleId,
+        orderedIds: reordered.map((r) => r.id),
+      });
+      setModalRules(response.data.data);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Could not reorder",
+        text: error.response?.data?.message || "Please try again.",
+      });
+      await refetchModalTitleData();
+    } finally {
+      setReorderingRules(false);
     }
   };
 
@@ -795,6 +1012,30 @@ const HowToSayList = () => {
                         isLight ? "border-slate-100" : "border-slate-800"
                       }`}
                     >
+                      {titleItem.rules?.length > 0 && (
+                        <div className="space-y-2 pb-1">
+                          {titleItem.rules.map((ruleItem) => (
+                            <p
+                              key={ruleItem.id}
+                              className={`flex items-center gap-2.5 text-sm font-medium leading-relaxed ${
+                                isLight ? "text-slate-600" : "text-slate-300"
+                              }`}
+                            >
+                              <span
+                                className={`flex-shrink-0 rounded-md border px-1.5 py-0.5 text-[11px] font-bold tracking-wide ${
+                                  isLight
+                                    ? "border-amber-700 bg-amber-600 text-white"
+                                    : "border-amber-500 bg-amber-600 text-white"
+                                }`}
+                              >
+                                RULE
+                              </span>
+                              {ruleItem.rule}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+
                       {(titleItem.sentences || []).length === 0 ? (
                         <p
                           className={`text-sm italic ${isLight ? "text-slate-400" : "text-slate-500"}`}
@@ -910,6 +1151,126 @@ const HowToSayList = () => {
               </button>
             </div>
 
+            {/* Rules — optional, only once the title is a real saved record */}
+            {modalTitleId !== "new" && (
+              <div className="mb-6 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p
+                    className={`text-sm font-semibold ${isLight ? "text-slate-700" : "text-slate-200"}`}
+                  >
+                    Grammar rules{" "}
+                    <span
+                      className={`text-xs font-normal ${isLight ? "text-slate-400" : "text-slate-500"}`}
+                    >
+                      (optional — for multiple, use "|")
+                    </span>
+                  </p>
+                  {selectedRuleIds.size > 0 && (
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={deselectAllRules}
+                        disabled={deletingSelectedRules}
+                        className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition disabled:opacity-50 ${
+                          isLight
+                            ? "border-slate-300 text-slate-600 hover:bg-slate-50"
+                            : "border-slate-600 text-slate-300 hover:bg-slate-800"
+                        }`}
+                      >
+                        Deselect All
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleDeleteSelectedRules}
+                        disabled={deletingSelectedRules}
+                        className="rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-rose-700 disabled:opacity-50"
+                      >
+                        {deletingSelectedRules
+                          ? "Deleting..."
+                          : `Delete Selected (${selectedRuleIds.size})`}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {modalRules.length === 0 && (
+                  <p
+                    className={`text-sm italic ${isLight ? "text-slate-400" : "text-slate-500"}`}
+                  >
+                    No rules added — this section only shows on the phrase
+                    when at least one rule exists.
+                  </p>
+                )}
+
+                <DndContext
+                  sensors={dragSensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleRuleDragEnd}
+                >
+                  <SortableContext
+                    items={modalRules.map((r) => r.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-1.5">
+                      {modalRules.map((ruleItem) => (
+                        <SortableTextRow
+                          key={ruleItem.id}
+                          id={ruleItem.id}
+                          text={ruleItem.rule}
+                          isLight={isLight}
+                          isSelected={selectedRuleIds.has(ruleItem.id)}
+                          onToggleSelect={toggleSelectRule}
+                          isEditing={editingRuleId === ruleItem.id}
+                          editingText={editingRuleText}
+                          onEditingTextChange={setEditingRuleText}
+                          onStartEdit={() => startEditRule(ruleItem)}
+                          onSaveEdit={() => handleSaveRule(ruleItem.id)}
+                          onCancelEdit={cancelEditRule}
+                          onDelete={() => handleDeleteRule(ruleItem)}
+                          isSaving={savingRuleId === ruleItem.id}
+                          isDeleting={deletingRuleId === ruleItem.id}
+                          modalInputClass={modalInputClass}
+                          editAriaLabel="Edit rule"
+                          deleteAriaLabel="Delete rule"
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+                {reorderingRules && (
+                  <p
+                    className={`text-xs ${isLight ? "text-slate-400" : "text-slate-500"}`}
+                  >
+                    Saving new order...
+                  </p>
+                )}
+
+                <div className="flex gap-2 pt-1">
+                  <input
+                    type="text"
+                    value={newRuleText}
+                    onChange={(event) => setNewRuleText(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault();
+                        handleAddRule();
+                      }
+                    }}
+                    placeholder='Subject + Verb | ...'
+                    className={modalInputClass}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddRule}
+                    disabled={addingRule || !newRuleText.trim()}
+                    className="flex-shrink-0 rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:opacity-50"
+                  >
+                    {addingRule ? "Adding..." : "+ Add"}
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Sentences — only once the title is a real saved record */}
             {modalTitleId !== "new" && (
               <div className="space-y-3">
@@ -961,7 +1322,7 @@ const HowToSayList = () => {
                 )}
 
                 <DndContext
-                  sensors={sentenceDragSensors}
+                  sensors={dragSensors}
                   collisionDetection={closestCenter}
                   onDragEnd={handleSentenceDragEnd}
                 >
@@ -971,14 +1332,15 @@ const HowToSayList = () => {
                   >
                     <div className="space-y-1.5">
                       {modalSentences.map((sentenceItem) => (
-                        <SortableSentenceRow
+                        <SortableTextRow
                           key={sentenceItem.id}
-                          sentenceItem={sentenceItem}
+                          id={sentenceItem.id}
+                          text={sentenceItem.sentence}
                           isLight={isLight}
                           isSelected={selectedSentenceIds.has(sentenceItem.id)}
                           onToggleSelect={toggleSelectSentence}
                           isEditing={editingSentenceId === sentenceItem.id}
-                          editingSentenceText={editingSentenceText}
+                          editingText={editingSentenceText}
                           onEditingTextChange={setEditingSentenceText}
                           onStartEdit={() => startEditSentence(sentenceItem)}
                           onSaveEdit={() => handleSaveSentence(sentenceItem.id)}
@@ -986,6 +1348,8 @@ const HowToSayList = () => {
                           onDelete={() => handleDeleteSentence(sentenceItem)}
                           isSaving={savingSentenceId === sentenceItem.id}
                           isDeleting={deletingSentenceId === sentenceItem.id}
+                          editAriaLabel="Edit sentence"
+                          deleteAriaLabel="Delete sentence"
                           modalInputClass={modalInputClass}
                         />
                       ))}
@@ -1027,10 +1391,17 @@ const HowToSayList = () => {
             )}
 
             <div
-              className={`mt-6 flex justify-end border-t pt-4 ${
+              className={`mt-6 flex justify-between gap-3 border-t pt-4 ${
                 isLight ? "border-slate-100" : "border-slate-800"
               }`}
             >
+              <button
+                type="button"
+                onClick={closeModal}
+                className="rounded-lg bg-gradient-to-r from-orange-500 to-pink-500 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:opacity-90"
+              >
+                Done
+              </button>
               <button
                 type="button"
                 onClick={closeModal}
@@ -1040,7 +1411,7 @@ const HowToSayList = () => {
                     : "border-slate-600 text-slate-200 hover:bg-slate-800"
                 }`}
               >
-                Done
+                Cancel
               </button>
             </div>
           </div>
