@@ -136,7 +136,7 @@ const POS_BADGE_CONFIG = {
   phrase: {
     text: "phr.",
     className: `${ARTICLE_COLUMN_BASE_MARKER_CLASSNAME} text-cyan-400`,
-    tooltipText: "Phrase",
+    tooltipText: "Phrase / Expression",
   },
   pronoun: {
     text: "pron.",

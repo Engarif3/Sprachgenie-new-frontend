@@ -152,10 +152,12 @@ const getWordInfo = (word) => {
   const tagNames = getPosTagNames(word);
   const info = [];
 
-  // Add each part of speech as its own chip (skip "unknown")
+  // Add each part of speech as its own chip (skip "unknown"). "phrase" gets
+  // spelled out since many phrase-tagged entries are actually fixed
+  // expressions, not phrases in the grammatical sense.
   tagNames
     .filter((tag) => tag && tag !== "unknown")
-    .forEach((tag) => info.push(tag));
+    .forEach((tag) => info.push(tag === "phrase" ? "phrase / expression" : tag));
 
   if (tagNames.includes("verb")) {
     // Verb info
