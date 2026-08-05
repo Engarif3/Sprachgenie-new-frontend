@@ -130,7 +130,7 @@ const HowToSayReportSection = ({ titleId, sentences, isLight }) => {
   };
 
   return (
-    <div className="mt-3">
+    <div>
       <button
         type="button"
         onClick={handleExpand}

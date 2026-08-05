@@ -1042,68 +1042,72 @@ const HowToSayList = () => {
 
                   {isExpanded && (
                     <div
-                      className={`space-y-2.5 border-t pb-6 pl-10 pr-6 pt-4 md:pb-7 md:pl-14 md:pr-7 ${
+                      className={`flex flex-col gap-4 border-t pb-6 pl-10 pr-6 pt-4 md:flex-row md:pb-7 md:pl-14 md:pr-7 ${
                         isLight ? "border-slate-100" : "border-slate-800"
                       }`}
                     >
-                      {titleItem.rules?.length > 0 && (
-                        <div className="space-y-2 pb-1">
-                          {titleItem.rules.map((ruleItem) => (
+                      <div className="min-w-0 flex-1 space-y-2.5">
+                        {titleItem.rules?.length > 0 && (
+                          <div className="space-y-2 pb-1">
+                            {titleItem.rules.map((ruleItem) => (
+                              <p
+                                key={ruleItem.id}
+                                className={`flex items-center gap-2.5 text-sm font-medium leading-relaxed ${
+                                  isLight ? "text-slate-600" : "text-slate-300"
+                                }`}
+                              >
+                                <span
+                                  className={`flex-shrink-0 rounded-md border px-1.5 py-0.5 text-[11px] font-bold tracking-wide ${
+                                    isLight
+                                      ? "border-amber-700 bg-amber-600 text-white"
+                                      : "border-amber-500 bg-amber-600 text-white"
+                                  }`}
+                                >
+                                  RULE
+                                </span>
+                                {ruleItem.rule}
+                              </p>
+                            ))}
+                          </div>
+                        )}
+
+                        {(titleItem.sentences || []).length === 0 ? (
+                          <p
+                            className={`text-sm italic ${isLight ? "text-slate-400" : "text-slate-500"}`}
+                          >
+                            No German sentences yet.
+                          </p>
+                        ) : (
+                          titleItem.sentences.map((sentenceItem) => (
                             <p
-                              key={ruleItem.id}
-                              className={`flex items-center gap-2.5 text-sm font-medium leading-relaxed ${
-                                isLight ? "text-slate-600" : "text-slate-300"
+                              key={sentenceItem.id}
+                              className={`flex items-center gap-2.5 text-base font-medium leading-relaxed ${
+                                isLight ? "text-slate-700" : "text-slate-200"
                               }`}
                             >
                               <span
                                 className={`flex-shrink-0 rounded-md border px-1.5 py-0.5 text-[11px] font-bold tracking-wide ${
                                   isLight
-                                    ? "border-amber-700 bg-amber-600 text-white"
-                                    : "border-amber-500 bg-amber-600 text-white"
+                                    ? "border-teal-700 bg-teal-600 text-white"
+                                    : "border-teal-500 bg-teal-600 text-white"
                                 }`}
                               >
-                                RULE
+                                DE
                               </span>
-                              {ruleItem.rule}
+                              {sentenceItem.sentence}
                             </p>
-                          ))}
-                        </div>
-                      )}
-
-                      {(titleItem.sentences || []).length === 0 ? (
-                        <p
-                          className={`text-sm italic ${isLight ? "text-slate-400" : "text-slate-500"}`}
-                        >
-                          No German sentences yet.
-                        </p>
-                      ) : (
-                        titleItem.sentences.map((sentenceItem) => (
-                          <p
-                            key={sentenceItem.id}
-                            className={`flex items-center gap-2.5 text-base font-medium leading-relaxed ${
-                              isLight ? "text-slate-700" : "text-slate-200"
-                            }`}
-                          >
-                            <span
-                              className={`flex-shrink-0 rounded-md border px-1.5 py-0.5 text-[11px] font-bold tracking-wide ${
-                                isLight
-                                  ? "border-teal-700 bg-teal-600 text-white"
-                                  : "border-teal-500 bg-teal-600 text-white"
-                              }`}
-                            >
-                              DE
-                            </span>
-                            {sentenceItem.sentence}
-                          </p>
-                        ))
-                      )}
+                          ))
+                        )}
+                      </div>
 
                       {isLoggedIn && (
-                        <HowToSayReportSection
-                          titleId={titleItem.id}
-                          sentences={titleItem.sentences || []}
-                          isLight={isLight}
-                        />
+                        <div className="flex-shrink-0 md:w-64 md:pl-2">
+                          <HowToSayReportSection
+                            titleId={titleItem.id}
+                            sentences={titleItem.sentences || []}
+                            isLight={isLight}
+                          />
+                        </div>
                       )}
                     </div>
                   )}
