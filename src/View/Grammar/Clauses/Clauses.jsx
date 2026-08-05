@@ -274,9 +274,9 @@ const Clauses = () => {
         ) : (
           sections.map((category) => (
             <div key={category.key} className="mb-12 last:mb-0">
-              <div className="mb-4">
+              <div className="mb-4 px-6 md:px-7">
                 <h3
-                  className={`text-xl font-bold ${isLight ? "text-slate-900" : "text-white"}`}
+                  className={`text-xl font-bold ${isLight ? "text-orange-600" : "text-orange-400"}`}
                 >
                   {category.heading}
                 </h3>

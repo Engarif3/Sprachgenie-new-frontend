@@ -1,7 +1,25 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  MouseSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
 import api from "../../axios";
@@ -11,6 +29,123 @@ import { useFavorites } from "../../hooks/useFavorites";
 import FavoriteButton from "../Words/Modals/FavoriteButton";
 import FavoritesBar from "../../components/Favorites/FavoritesBar";
 import FavoritesDeleteAllModal from "../../components/Favorites/FavoritesDeleteAllModal";
+
+// Same drag-to-reorder row shape as the word-update form's DraggableItem —
+// a checkbox for bulk-select, a drag handle over the text, then edit/delete.
+const SortableSentenceRow = ({
+  sentenceItem,
+  isLight,
+  isSelected,
+  onToggleSelect,
+  isEditing,
+  editingSentenceText,
+  onEditingTextChange,
+  onStartEdit,
+  onSaveEdit,
+  onCancelEdit,
+  onDelete,
+  isSaving,
+  isDeleting,
+  modalInputClass,
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: sentenceItem.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-2 rounded-lg p-1.5 ${
+        isDragging ? "shadow-lg" : isSelected ? (isLight ? "bg-sky-50" : "bg-sky-500/10") : ""
+      }`}
+    >
+      {isEditing ? (
+        <>
+          <input
+            type="text"
+            value={editingSentenceText}
+            onChange={(event) => onEditingTextChange(event.target.value)}
+            className={modalInputClass}
+            autoFocus
+          />
+          <button
+            type="button"
+            onClick={onSaveEdit}
+            disabled={isSaving || !editingSentenceText.trim()}
+            className="flex-shrink-0 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            onClick={onCancelEdit}
+            disabled={isSaving}
+            className={`flex-shrink-0 rounded-lg border px-3 py-2 text-xs font-semibold transition disabled:opacity-50 ${
+              isLight
+                ? "border-slate-300 text-slate-600 hover:bg-slate-50"
+                : "border-slate-600 text-slate-300 hover:bg-slate-800"
+            }`}
+          >
+            Cancel
+          </button>
+        </>
+      ) : (
+        <>
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => onToggleSelect(sentenceItem.id)}
+            className="h-4 w-4 flex-shrink-0 cursor-pointer rounded border-gray-500 accent-sky-600"
+          />
+          <span
+            className={`flex flex-1 cursor-grab items-center gap-1.5 touch-none text-sm active:cursor-grabbing ${
+              isLight ? "text-slate-700" : "text-slate-200"
+            }`}
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical
+              size={14}
+              className={`flex-shrink-0 ${isLight ? "text-slate-300" : "text-slate-600"}`}
+            />
+            {sentenceItem.sentence}
+          </span>
+          <button
+            type="button"
+            onClick={onStartEdit}
+            aria-label="Edit sentence"
+            className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border transition-colors ${
+              isLight
+                ? "border-slate-200 text-slate-500 hover:border-sky-300 hover:text-sky-600"
+                : "border-slate-700 text-slate-400 hover:border-sky-500/50 hover:text-sky-400"
+            }`}
+          >
+            <Pencil size={12} />
+          </button>
+          <button
+            type="button"
+            onClick={onDelete}
+            disabled={isDeleting}
+            aria-label="Delete sentence"
+            className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border transition-colors disabled:opacity-50 ${
+              isLight
+                ? "border-slate-200 text-slate-500 hover:border-rose-300 hover:text-rose-600"
+                : "border-slate-700 text-slate-400 hover:border-rose-500/50 hover:text-rose-400"
+            }`}
+          >
+            <Trash2 size={12} />
+          </button>
+        </>
+      )}
+    </div>
+  );
+};
 
 // Smaller than the admin page's 40/page — this is a browsing grid for
 // learners, not a management table, so a denser page would just mean more
@@ -62,6 +197,20 @@ const HowToSayList = () => {
   const [editingSentenceText, setEditingSentenceText] = useState("");
   const [savingSentenceId, setSavingSentenceId] = useState(null);
   const [deletingSentenceId, setDeletingSentenceId] = useState(null);
+  const [selectedSentenceIds, setSelectedSentenceIds] = useState(() => new Set());
+  const [deletingSelectedSentences, setDeletingSelectedSentences] = useState(false);
+  const [reorderingSentences, setReorderingSentences] = useState(false);
+
+  const sentenceDragSensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 180, tolerance: 8 },
+    }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
   const requestedPage = parseInt(searchParams.get("page") || "1", 10);
   const currentPage = Math.max(requestedPage || 1, 1);
@@ -159,12 +308,14 @@ const HowToSayList = () => {
     setModalTitleId("new");
     setModalTitleText("");
     setModalSentences([]);
+    setSelectedSentenceIds(new Set());
   };
 
   const openEditModal = (titleItem) => {
     setModalTitleId(titleItem.id);
     setModalTitleText(titleItem.title);
     setModalSentences(titleItem.sentences || []);
+    setSelectedSentenceIds(new Set());
   };
 
   const closeModal = () => {
@@ -174,9 +325,24 @@ const HowToSayList = () => {
     setNewSentenceText("");
     setEditingSentenceId(null);
     setEditingSentenceText("");
+    setSelectedSentenceIds(new Set());
     fetchTitles();
     if (showFavoritesOnly) {
       fetchAllTitlesForFavorites();
+    }
+  };
+
+  // Re-fetches just this title's sentences from the server — used to
+  // recover the authoritative order/list after a reorder or bulk-delete
+  // fails partway through, instead of leaving the modal showing a
+  // possibly-inconsistent local state.
+  const refetchModalSentences = async () => {
+    if (!modalTitleId || modalTitleId === "new") return;
+    try {
+      const response = await api.get(`/how-to-say-titles/${modalTitleId}`);
+      setModalSentences(response.data?.data?.sentences || []);
+    } catch (error) {
+      console.error("Error refetching sentences:", error);
     }
   };
 
@@ -259,24 +425,39 @@ const HowToSayList = () => {
     }
   };
 
+  // Same "|" pipeline convention as the word update form: "Sentence A. |
+  // Sentence B. | Sentence C." creates three separate sentence rows in one
+  // go. Created sequentially (not Promise.all) so each one's server-side
+  // `order` (based on the current count under the title) accounts for the
+  // ones just created before it, landing them in the typed order.
   const handleAddSentence = async () => {
-    const sentence = newSentenceText.trim();
-    if (!sentence || !modalTitleId || modalTitleId === "new") return;
+    const segments = newSentenceText
+      .split("|")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (segments.length === 0 || !modalTitleId || modalTitleId === "new") {
+      return;
+    }
 
     setAddingSentence(true);
     try {
-      const response = await api.post("/how-to-say-sentences/create", {
-        titleId: modalTitleId,
-        sentence,
-      });
-      setModalSentences((prev) => [...prev, response.data.data]);
+      const created = [];
+      for (const sentence of segments) {
+        const response = await api.post("/how-to-say-sentences/create", {
+          titleId: modalTitleId,
+          sentence,
+        });
+        created.push(response.data.data);
+      }
+      setModalSentences((prev) => [...prev, ...created]);
       setNewSentenceText("");
     } catch (error) {
       Swal.fire({
         icon: "error",
-        title: "Could not add sentence",
+        title: "Could not add sentence(s)",
         text: error.response?.data?.message || "Please try again.",
       });
+      await refetchModalSentences();
     } finally {
       setAddingSentence(false);
     }
@@ -343,6 +524,98 @@ const HowToSayList = () => {
       });
     } finally {
       setDeletingSentenceId(null);
+    }
+  };
+
+  const toggleSelectSentence = (sentenceId) => {
+    setSelectedSentenceIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(sentenceId)) {
+        next.delete(sentenceId);
+      } else {
+        next.add(sentenceId);
+      }
+      return next;
+    });
+  };
+
+  const deselectAllSentences = () => setSelectedSentenceIds(new Set());
+
+  const handleDeleteSelectedSentences = async () => {
+    const ids = [...selectedSentenceIds];
+    if (ids.length === 0) return;
+
+    const result = await Swal.fire({
+      title: `Delete ${ids.length} sentence${ids.length > 1 ? "s" : ""}?`,
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+    });
+    if (!result.isConfirmed) return;
+
+    setDeletingSelectedSentences(true);
+    try {
+      await Promise.all(
+        ids.map((sentenceId) =>
+          api.delete(`/how-to-say-sentences/delete/${sentenceId}`),
+        ),
+      );
+      setModalSentences((prev) =>
+        prev.filter((item) => !selectedSentenceIds.has(item.id)),
+      );
+      setSelectedSentenceIds(new Set());
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Could not delete selected sentences",
+        text: error.response?.data?.message || "Please try again.",
+      });
+      await refetchModalSentences();
+    } finally {
+      setDeletingSelectedSentences(false);
+    }
+  };
+
+  // Same drag-then-confirm-then-persist flow as the word update form's
+  // handleDragEnd: reorder locally, ask for confirmation, then send the new
+  // id order to the backend so it survives a refresh.
+  const handleSentenceDragEnd = async (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = modalSentences.findIndex((s) => s.id === active.id);
+    const newIndex = modalSentences.findIndex((s) => s.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const result = await Swal.fire({
+      title: "Reorder?",
+      text: `Position ${oldIndex + 1} → ${newIndex + 1}`,
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+    });
+    if (!result.isConfirmed) return;
+
+    const reordered = arrayMove(modalSentences, oldIndex, newIndex);
+    setModalSentences(reordered);
+    setReorderingSentences(true);
+    try {
+      const response = await api.put("/how-to-say-sentences/reorder", {
+        titleId: modalTitleId,
+        orderedIds: reordered.map((s) => s.id),
+      });
+      setModalSentences(response.data.data);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Could not reorder",
+        text: error.response?.data?.message || "Please try again.",
+      });
+      await refetchModalSentences();
+    } finally {
+      setReorderingSentences(false);
     }
   };
 
@@ -447,12 +720,12 @@ const HowToSayList = () => {
                       : "border-slate-800 bg-slate-900/70 hover:border-orange-500/40"
                   }`}
                 >
-                  <div className="flex w-full items-center justify-between gap-2 px-6 py-3.5 md:px-7 md:py-4">
+                  <div className="flex w-full items-center gap-2">
                     <button
                       type="button"
                       onClick={() => toggleExpanded(titleItem.id)}
                       aria-expanded={isExpanded}
-                      className="flex flex-1 items-center justify-between gap-4 text-left"
+                      className="flex flex-1 items-center justify-between gap-4 px-6 py-3.5 text-left md:px-7 md:py-4"
                     >
                       <span
                         className={`text-xl font-bold leading-snug ${isLight ? "text-slate-900" : "text-white"}`}
@@ -472,46 +745,48 @@ const HowToSayList = () => {
                       </span>
                     </button>
 
-                    <FavoriteButton
-                      isFavorite={favoriteIds.includes(titleItem.id)}
-                      loading={!!loadingFavorites[titleItem.id]}
-                      onClick={() => toggleFavorite(titleItem.id)}
-                      className={`flex-shrink-0 ${
-                        favoriteIds.includes(titleItem.id)
-                          ? ""
-                          : "text-slate-300 dark:text-slate-600"
-                      }`}
-                    />
+                    <div className="flex flex-shrink-0 items-center gap-2 pr-6 md:pr-7">
+                      <FavoriteButton
+                        isFavorite={favoriteIds.includes(titleItem.id)}
+                        loading={!!loadingFavorites[titleItem.id]}
+                        onClick={() => toggleFavorite(titleItem.id)}
+                        className={
+                          favoriteIds.includes(titleItem.id)
+                            ? ""
+                            : "text-slate-300 dark:text-slate-600"
+                        }
+                      />
 
-                    {isSuperAdmin && (
-                      <div className="flex flex-shrink-0 items-center gap-1.5 pl-2">
-                        <button
-                          type="button"
-                          onClick={() => openEditModal(titleItem)}
-                          aria-label="Edit phrase"
-                          className={`flex h-8 w-8 items-center justify-center rounded-full border transition-colors ${
-                            isLight
-                              ? "border-slate-200 text-slate-500 hover:border-sky-300 hover:text-sky-600"
-                              : "border-slate-700 text-slate-400 hover:border-sky-500/50 hover:text-sky-400"
-                          }`}
-                        >
-                          <Pencil size={14} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteTitle(titleItem)}
-                          disabled={deletingTitleId === titleItem.id}
-                          aria-label="Delete phrase"
-                          className={`flex h-8 w-8 items-center justify-center rounded-full border transition-colors disabled:opacity-50 ${
-                            isLight
-                              ? "border-slate-200 text-slate-500 hover:border-rose-300 hover:text-rose-600"
-                              : "border-slate-700 text-slate-400 hover:border-rose-500/50 hover:text-rose-400"
-                          }`}
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    )}
+                      {isSuperAdmin && (
+                        <div className="flex flex-shrink-0 items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => openEditModal(titleItem)}
+                            aria-label="Edit phrase"
+                            className={`flex h-8 w-8 items-center justify-center rounded-full border transition-colors ${
+                              isLight
+                                ? "border-slate-200 text-slate-500 hover:border-sky-300 hover:text-sky-600"
+                                : "border-slate-700 text-slate-400 hover:border-sky-500/50 hover:text-sky-400"
+                            }`}
+                          >
+                            <Pencil size={14} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteTitle(titleItem)}
+                            disabled={deletingTitleId === titleItem.id}
+                            aria-label="Delete phrase"
+                            className={`flex h-8 w-8 items-center justify-center rounded-full border transition-colors disabled:opacity-50 ${
+                              isLight
+                                ? "border-slate-200 text-slate-500 hover:border-rose-300 hover:text-rose-600"
+                                : "border-slate-700 text-slate-400 hover:border-rose-500/50 hover:text-rose-400"
+                            }`}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {isExpanded && (
@@ -638,11 +913,44 @@ const HowToSayList = () => {
             {/* Sentences — only once the title is a real saved record */}
             {modalTitleId !== "new" && (
               <div className="space-y-3">
-                <p
-                  className={`text-sm font-semibold ${isLight ? "text-slate-700" : "text-slate-200"}`}
-                >
-                  German sentences
-                </p>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p
+                    className={`text-sm font-semibold ${isLight ? "text-slate-700" : "text-slate-200"}`}
+                  >
+                    German sentences{" "}
+                    <span
+                      className={`text-xs font-normal ${isLight ? "text-slate-400" : "text-slate-500"}`}
+                    >
+                      (for multiple, use "|" — e.g. Sentence A. | Sentence B.)
+                    </span>
+                  </p>
+                  {selectedSentenceIds.size > 0 && (
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={deselectAllSentences}
+                        disabled={deletingSelectedSentences}
+                        className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition disabled:opacity-50 ${
+                          isLight
+                            ? "border-slate-300 text-slate-600 hover:bg-slate-50"
+                            : "border-slate-600 text-slate-300 hover:bg-slate-800"
+                        }`}
+                      >
+                        Deselect All
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleDeleteSelectedSentences}
+                        disabled={deletingSelectedSentences}
+                        className="rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-rose-700 disabled:opacity-50"
+                      >
+                        {deletingSelectedSentences
+                          ? "Deleting..."
+                          : `Delete Selected (${selectedSentenceIds.size})`}
+                      </button>
+                    </div>
+                  )}
+                </div>
 
                 {modalSentences.length === 0 && (
                   <p
@@ -652,79 +960,45 @@ const HowToSayList = () => {
                   </p>
                 )}
 
-                {modalSentences.map((sentenceItem) => (
-                  <div key={sentenceItem.id} className="flex items-center gap-2">
-                    {editingSentenceId === sentenceItem.id ? (
-                      <>
-                        <input
-                          type="text"
-                          value={editingSentenceText}
-                          onChange={(event) =>
-                            setEditingSentenceText(event.target.value)
-                          }
-                          className={modalInputClass}
-                          autoFocus
+                <DndContext
+                  sensors={sentenceDragSensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleSentenceDragEnd}
+                >
+                  <SortableContext
+                    items={modalSentences.map((s) => s.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-1.5">
+                      {modalSentences.map((sentenceItem) => (
+                        <SortableSentenceRow
+                          key={sentenceItem.id}
+                          sentenceItem={sentenceItem}
+                          isLight={isLight}
+                          isSelected={selectedSentenceIds.has(sentenceItem.id)}
+                          onToggleSelect={toggleSelectSentence}
+                          isEditing={editingSentenceId === sentenceItem.id}
+                          editingSentenceText={editingSentenceText}
+                          onEditingTextChange={setEditingSentenceText}
+                          onStartEdit={() => startEditSentence(sentenceItem)}
+                          onSaveEdit={() => handleSaveSentence(sentenceItem.id)}
+                          onCancelEdit={cancelEditSentence}
+                          onDelete={() => handleDeleteSentence(sentenceItem)}
+                          isSaving={savingSentenceId === sentenceItem.id}
+                          isDeleting={deletingSentenceId === sentenceItem.id}
+                          modalInputClass={modalInputClass}
                         />
-                        <button
-                          type="button"
-                          onClick={() => handleSaveSentence(sentenceItem.id)}
-                          disabled={
-                            savingSentenceId === sentenceItem.id ||
-                            !editingSentenceText.trim()
-                          }
-                          className="flex-shrink-0 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
-                        >
-                          Save
-                        </button>
-                        <button
-                          type="button"
-                          onClick={cancelEditSentence}
-                          disabled={savingSentenceId === sentenceItem.id}
-                          className={`flex-shrink-0 rounded-lg border px-3 py-2 text-xs font-semibold transition disabled:opacity-50 ${
-                            isLight
-                              ? "border-slate-300 text-slate-600 hover:bg-slate-50"
-                              : "border-slate-600 text-slate-300 hover:bg-slate-800"
-                          }`}
-                        >
-                          Cancel
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <span
-                          className={`flex-1 text-sm ${isLight ? "text-slate-700" : "text-slate-200"}`}
-                        >
-                          {sentenceItem.sentence}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => startEditSentence(sentenceItem)}
-                          aria-label="Edit sentence"
-                          className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border transition-colors ${
-                            isLight
-                              ? "border-slate-200 text-slate-500 hover:border-sky-300 hover:text-sky-600"
-                              : "border-slate-700 text-slate-400 hover:border-sky-500/50 hover:text-sky-400"
-                          }`}
-                        >
-                          <Pencil size={12} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteSentence(sentenceItem)}
-                          disabled={deletingSentenceId === sentenceItem.id}
-                          aria-label="Delete sentence"
-                          className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border transition-colors disabled:opacity-50 ${
-                            isLight
-                              ? "border-slate-200 text-slate-500 hover:border-rose-300 hover:text-rose-600"
-                              : "border-slate-700 text-slate-400 hover:border-rose-500/50 hover:text-rose-400"
-                          }`}
-                        >
-                          <Trash2 size={12} />
-                        </button>
-                      </>
-                    )}
-                  </div>
-                ))}
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+                {reorderingSentences && (
+                  <p
+                    className={`text-xs ${isLight ? "text-slate-400" : "text-slate-500"}`}
+                  >
+                    Saving new order...
+                  </p>
+                )}
 
                 <div className="flex gap-2 pt-1">
                   <input
@@ -737,7 +1011,7 @@ const HowToSayList = () => {
                         handleAddSentence();
                       }
                     }}
-                    placeholder="Add a German sentence..."
+                    placeholder='Sentence A. | Sentence B. | Sentence C.'
                     className={modalInputClass}
                   />
                   <button
