@@ -83,9 +83,9 @@ const Contact = () => {
         <div className="flex flex-col lg:flex-row justify-center items-center gap-12 px-4 ">
           {/* Contact Info */}
           <div className="w-full lg:w-1/2 md:w-full lg:max-w-lg space-y-6">
-            <div className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-8 rounded-2xl border border-gray-700 hover:border-orange-500/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(249,115,22,0.2)]">
+            <div className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-8 rounded-2xl border border-gray-700 hover:border-blue-500/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)]">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-2xl">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-2xl">
                   ✉️
                 </div>
                 <h3 className="text-2xl font-bold text-white">{t("email")}</h3>
@@ -93,9 +93,9 @@ const Contact = () => {
               <p className="text-gray-300 text-lg">{t("dropMessage")}</p>
             </div>
 
-            <div className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-8 rounded-2xl border border-gray-700 hover:border-orange-500/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(249,115,22,0.2)]">
+            <div className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-8 rounded-2xl border border-gray-700 hover:border-blue-500/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)]">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-2xl">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-2xl">
                   💡
                 </div>
                 <h3 className="text-2xl font-bold text-white">
@@ -105,9 +105,9 @@ const Contact = () => {
               <p className="text-gray-300 text-lg">{t("feedbackDesc")}</p>
             </div>
 
-            <div className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-8 rounded-2xl border border-gray-700 hover:border-orange-500/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(249,115,22,0.2)]">
+            <div className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-8 rounded-2xl border border-gray-700 hover:border-blue-500/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)]">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-2xl">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-2xl">
                   🤝
                 </div>
                 <h3 className="text-2xl font-bold text-white">
@@ -123,7 +123,7 @@ const Contact = () => {
             <form
               ref={form}
               onSubmit={handleSubmit(onSubmit)}
-              className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-4 md:p-8 lg:p-8 rounded-2xl border-2 border-gray-700 hover:border-orange-500/50 transition-all duration-300 space-y-9 md:space-y-16 lg:space-y-9"
+              className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-4 md:p-8 lg:p-8 rounded-2xl border-2 border-gray-700 hover:border-blue-500/50 transition-all duration-300 space-y-9 md:space-y-16 lg:space-y-9"
             >
               <div>
                 <label
@@ -137,7 +137,7 @@ const Contact = () => {
                   autoComplete="name"
                   className={`w-full bg-gray-700/50 border-2 ${
                     errors.name ? "border-red-500" : "border-gray-600"
-                  } rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none transition-all duration-300`}
+                  } rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-all duration-300`}
                   type="text"
                   placeholder={t("enterYourName")}
                   {...register("name", { required: t("nameRequired") })}
@@ -161,7 +161,7 @@ const Contact = () => {
                   autoComplete="email"
                   className={`w-full bg-gray-700/50 border-2 ${
                     errors.email ? "border-red-500" : "border-gray-600"
-                  } rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none transition-all duration-300`}
+                  } rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-all duration-300`}
                   type="email"
                   placeholder={t("yourEmailPlaceholder")}
                   {...register("email", {
@@ -190,7 +190,7 @@ const Contact = () => {
                   id="contact-message"
                   className={`w-full bg-gray-700/50 border-2 ${
                     errors.message ? "border-red-500" : "border-gray-600"
-                  } rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none transition-all duration-300 min-h-[150px] resize-y`}
+                  } rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-all duration-300 min-h-[150px] resize-y`}
                   placeholder={t("enterYourMessage")}
                   {...register("message", {
                     required: t("messageRequired"),
@@ -208,7 +208,7 @@ const Contact = () => {
               </div>
 
               <button
-                className={`w-full px-8 py-4 bg-gradient-to-r from-orange-600 to-pink-600 text-white font-bold rounded-full hover:from-orange-500 hover:to-pink-500 transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(249,115,22,0.5)] transform hover:scale-[1.02] ${
+                className={`w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-full hover:from-blue-500 hover:to-cyan-500 transition-all duration-300 shadow-lg hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] transform hover:scale-[1.02] ${
                   isSubmitting ? "opacity-50 cursor-not-allowed" : ""
                 }`}
                 type="submit"
