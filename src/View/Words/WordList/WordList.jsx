@@ -407,7 +407,13 @@ const normalizePartOfSpeechOptions = (value) => {
 
       return {
         value: normalizedValue,
-        label: capitalizePartOfSpeechName(label),
+        // Many "phrase"-tagged entries are actually fixed expressions, not
+        // phrases in the grammatical sense — spelling that out in the filter
+        // label avoids users skipping past it while looking for expressions.
+        label:
+          normalizedValue === "phrase"
+            ? "Phrase / Expression"
+            : capitalizePartOfSpeechName(label),
       };
     })
     .filter(Boolean);
