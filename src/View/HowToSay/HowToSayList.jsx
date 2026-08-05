@@ -5,6 +5,7 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  Clock,
   Eye,
   EyeOff,
   GripVertical,
@@ -259,6 +260,10 @@ const HowToSayList = () => {
   const requestedPage = parseInt(searchParams.get("page") || "1", 10);
   const currentPage = Math.max(requestedPage || 1, 1);
   const appliedSearch = searchParams.get("q") || "";
+  // Default view is the manually-curated order (new phrases land at the
+  // bottom) — this toggle switches to most-recently-created-first instead,
+  // without touching that underlying order.
+  const sortNewest = searchParams.get("sort") === "newest";
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const fetchTitles = useCallback(async () => {
@@ -269,6 +274,7 @@ const HowToSayList = () => {
           page: currentPage,
           limit: PAGE_SIZE,
           search: appliedSearch || undefined,
+          sort: sortNewest ? "newest" : undefined,
         },
       });
       setTitles(response.data?.data || []);
@@ -281,7 +287,7 @@ const HowToSayList = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, appliedSearch]);
+  }, [currentPage, appliedSearch, sortNewest]);
 
   useEffect(() => {
     fetchTitles();
@@ -326,6 +332,7 @@ const HowToSayList = () => {
     const params = {};
     const trimmed = searchInput.trim();
     if (trimmed) params.q = trimmed;
+    if (sortNewest) params.sort = "newest";
     setSearchParams(params);
   };
 
@@ -333,6 +340,14 @@ const HowToSayList = () => {
     const params = {};
     if (appliedSearch) params.q = appliedSearch;
     if (page > 1) params.page = String(page);
+    if (sortNewest) params.sort = "newest";
+    setSearchParams(params);
+  };
+
+  const toggleSortNewest = () => {
+    const params = {};
+    if (appliedSearch) params.q = appliedSearch;
+    if (!sortNewest) params.sort = "newest";
     setSearchParams(params);
   };
 
@@ -383,6 +398,19 @@ const HowToSayList = () => {
     if (showFavoritesOnly) {
       fetchAllTitlesForFavorites();
     }
+  };
+
+  // "Done" saves whatever's still sitting in the sentence/rule pipeline
+  // inputs before closing, instead of silently discarding it — so an admin
+  // who typed a sentence but forgot to click "+ Add" doesn't lose it.
+  const handleDoneClick = async () => {
+    if (newSentenceText.trim()) {
+      await handleAddSentence();
+    }
+    if (newRuleText.trim()) {
+      await handleAddRule();
+    }
+    closeModal();
   };
 
   // Re-fetches just this title's sentences and rules from the server —
@@ -505,17 +533,10 @@ const HowToSayList = () => {
 
     const confirmation = await Swal.fire({
       title: "Move this phrase?",
-      html: `Type <strong>ok</strong> to move <strong>"${titleItem.title}"</strong> to position <strong>${position}</strong>.`,
+      html: `Move <strong>"${titleItem.title}"</strong> to position <strong>${position}</strong>?`,
       icon: "warning",
-      input: "text",
-      inputPlaceholder: "Type ok",
-      inputAutoTrim: true,
-      inputValidator: (value) =>
-        value?.trim().toLowerCase() === "ok"
-          ? null
-          : 'Please type "ok" to continue.',
       showCancelButton: true,
-      confirmButtonText: "Move",
+      confirmButtonText: "OK",
       cancelButtonText: "Cancel",
     });
     if (!confirmation.isConfirmed) return;
@@ -973,6 +994,22 @@ const HowToSayList = () => {
             </button>
           </form>
 
+          <button
+            type="button"
+            onClick={toggleSortNewest}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+              sortNewest
+                ? isLight
+                  ? "border-orange-300 bg-orange-50 text-orange-600"
+                  : "border-orange-500/50 bg-orange-500/10 text-orange-400"
+                : isLight
+                  ? "border-slate-300 text-slate-600 hover:bg-slate-50"
+                  : "border-slate-600 text-slate-300 hover:bg-slate-800"
+            }`}
+          >
+            <Clock size={16} /> Newest First
+          </button>
+
           {isSuperAdmin && (
             <div className="flex flex-wrap items-center justify-center gap-2">
               <button
@@ -1050,11 +1087,87 @@ const HowToSayList = () => {
                   }`}
                 >
                   <div className="flex w-full items-center gap-2">
+                    {isSuperAdmin &&
+                      showAdminControls &&
+                      !showFavoritesOnly &&
+                      !appliedSearch &&
+                      !sortNewest && (
+                        <div className="flex flex-shrink-0 items-center pl-6 md:pl-7">
+                          {editingPositionTitleId === titleItem.id ? (
+                            <div className="flex items-center gap-1">
+                              <input
+                                type="number"
+                                min={1}
+                                value={editingPositionValue}
+                                onChange={(e) =>
+                                  setEditingPositionValue(e.target.value)
+                                }
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    handleMoveTitleToPosition(titleItem);
+                                  }
+                                  if (e.key === "Escape") {
+                                    cancelEditPosition();
+                                  }
+                                }}
+                                autoFocus
+                                aria-label="Target position"
+                                className={`w-14 rounded-lg border px-2 py-1 text-center text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-orange-500/40 ${
+                                  isLight
+                                    ? "border-slate-300 bg-white text-slate-900"
+                                    : "border-slate-600 bg-slate-800 text-white"
+                                }`}
+                              />
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleMoveTitleToPosition(titleItem)
+                                }
+                                disabled={movingTitleId === titleItem.id}
+                                aria-label="Confirm move"
+                                className="flex h-8 w-8 items-center justify-center rounded-full border border-emerald-500/50 text-emerald-500 transition-colors hover:bg-emerald-500/10 disabled:opacity-50"
+                              >
+                                <Check size={14} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={cancelEditPosition}
+                                aria-label="Cancel move"
+                                className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-400/50 text-slate-400 transition-colors hover:bg-slate-400/10"
+                              >
+                                <X size={14} />
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => startEditPosition(titleItem)}
+                              title="Click to change position"
+                              className={`flex h-8 min-w-8 items-center justify-center rounded-full border px-2 text-xs font-bold transition-colors ${
+                                isLight
+                                  ? "border-slate-200 text-slate-500 hover:border-orange-300 hover:text-orange-600"
+                                  : "border-slate-700 text-slate-400 hover:border-orange-500/50 hover:text-orange-400"
+                              }`}
+                            >
+                              #{(titleItem.order ?? 0) + 1}
+                            </button>
+                          )}
+                        </div>
+                      )}
+
                     <button
                       type="button"
                       onClick={() => toggleExpanded(titleItem.id)}
                       aria-expanded={isExpanded}
-                      className="flex flex-1 items-center justify-between gap-4 px-6 py-3.5 text-left md:px-7 md:py-4"
+                      className={`flex flex-1 items-center justify-between gap-4 py-3.5 text-left md:py-4 ${
+                        isSuperAdmin &&
+                        showAdminControls &&
+                        !showFavoritesOnly &&
+                        !appliedSearch &&
+                        !sortNewest
+                          ? "pl-2 pr-6 md:pl-3 md:pr-7"
+                          : "px-6 md:px-7"
+                      }`}
                     >
                       <span
                         className={`text-xl font-bold leading-snug ${isLight ? "text-slate-900" : "text-white"}`}
@@ -1085,73 +1198,6 @@ const HowToSayList = () => {
                             : "text-slate-300 dark:text-slate-600"
                         }
                       />
-
-                      {isSuperAdmin &&
-                        showAdminControls &&
-                        !showFavoritesOnly &&
-                        !appliedSearch && (
-                          <div className="flex flex-shrink-0 items-center">
-                            {editingPositionTitleId === titleItem.id ? (
-                              <div className="flex items-center gap-1">
-                                <input
-                                  type="number"
-                                  min={1}
-                                  value={editingPositionValue}
-                                  onChange={(e) =>
-                                    setEditingPositionValue(e.target.value)
-                                  }
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                      handleMoveTitleToPosition(titleItem);
-                                    }
-                                    if (e.key === "Escape") {
-                                      cancelEditPosition();
-                                    }
-                                  }}
-                                  autoFocus
-                                  aria-label="Target position"
-                                  className={`w-14 rounded-lg border px-2 py-1 text-center text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-orange-500/40 ${
-                                    isLight
-                                      ? "border-slate-300 bg-white text-slate-900"
-                                      : "border-slate-600 bg-slate-800 text-white"
-                                  }`}
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    handleMoveTitleToPosition(titleItem)
-                                  }
-                                  disabled={movingTitleId === titleItem.id}
-                                  aria-label="Confirm move"
-                                  className="flex h-8 w-8 items-center justify-center rounded-full border border-emerald-500/50 text-emerald-500 transition-colors hover:bg-emerald-500/10 disabled:opacity-50"
-                                >
-                                  <Check size={14} />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={cancelEditPosition}
-                                  aria-label="Cancel move"
-                                  className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-400/50 text-slate-400 transition-colors hover:bg-slate-400/10"
-                                >
-                                  <X size={14} />
-                                </button>
-                              </div>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => startEditPosition(titleItem)}
-                                title="Click to change position"
-                                className={`flex h-8 min-w-8 items-center justify-center rounded-full border px-2 text-xs font-bold transition-colors ${
-                                  isLight
-                                    ? "border-slate-200 text-slate-500 hover:border-orange-300 hover:text-orange-600"
-                                    : "border-slate-700 text-slate-400 hover:border-orange-500/50 hover:text-orange-400"
-                                }`}
-                              >
-                                #{(titleItem.order ?? 0) + 1}
-                              </button>
-                            )}
-                          </div>
-                        )}
 
                       {isSuperAdmin && showAdminControls && (
                         <div className="flex flex-shrink-0 items-center gap-1.5">
@@ -1588,7 +1634,7 @@ const HowToSayList = () => {
             >
               <button
                 type="button"
-                onClick={closeModal}
+                onClick={handleDoneClick}
                 className="rounded-lg bg-gradient-to-r from-orange-500 to-pink-500 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:opacity-90"
               >
                 Done

@@ -224,12 +224,19 @@ const SentenceRenderer = memo(
       cleanSentence = sentence.replace(/^##\s*/, "");
     } else if (trimmed.startsWith("**")) {
       className =
-        "text-gray-400 list-none text-sm md:text-base lg:text-lg first-letter:uppercase pl-1 font-normal";
+        "text-gray-400 list-none text-sm md:text-base lg:text-lg first-letter:uppercase font-normal";
       cleanSentence = sentence
-        .replace(/^\*\*\s*/, "🟣 ")
+        .replace(/^\*\*\s*/, "")
         .replace(/\*\*$/, "")
         .trim();
     }
+
+    // "**"-prefixed lines (e.g. "Related") show a bullet marker — rendered
+    // as its own fixed-width flex item rather than concatenated into the
+    // text, so a wrapped second line aligns with the text start instead of
+    // hanging back under the bullet, matching how the speaker-icon lines
+    // (meaning/sentences) already wrap.
+    const isBulletLine = trimmed.startsWith("**");
 
     const showSpeakerButton =
       !trimmed.startsWith("##") && !trimmed.startsWith("**");
@@ -287,6 +294,11 @@ const SentenceRenderer = memo(
               <span className="hidden lg:inline">
                 <IoMdArrowDropright className="text-pink-600 mt-1" size={20} />
               </span>
+            </span>
+          )}
+          {isBulletLine && (
+            <span className="flex-shrink-0" aria-hidden="true">
+              🟣
             </span>
           )}
           <span className={className}>{sentenceContent}</span>
