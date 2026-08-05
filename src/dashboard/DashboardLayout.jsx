@@ -27,6 +27,7 @@ const SECTION_ROUTES = {
     "/dashboard/update-conversation",
     "/dashboard/conversation-category",
     "/dashboard/update-conversation-category",
+    "/dashboard/how-to-say-in-german",
   ],
   reports: [
     "/dashboard/word-reports",
@@ -82,6 +83,7 @@ const NAV_SECTIONS = [
       { to: "/dashboard/update-conversation", icon: "✏️", label: "Update Conversation" },
       { to: "/dashboard/conversation-category", icon: "🏷️", label: "Create Category", roles: ["super_admin"] },
       { to: "/dashboard/update-conversation-category", icon: "✏️", label: "Update Category", roles: ["super_admin"] },
+      { to: "/dashboard/how-to-say-in-german", icon: "🗣️", label: "How to Say It in German", roles: ["super_admin"] },
     ],
   },
   {
