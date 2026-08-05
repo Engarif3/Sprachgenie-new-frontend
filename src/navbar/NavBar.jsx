@@ -15,6 +15,7 @@ import {
   FaPuzzlePiece,
   FaQuestionCircle,
   FaTrophy,
+  FaLanguage,
 } from "react-icons/fa";
 import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
 import { RiRadioFill } from "react-icons/ri";
@@ -183,6 +184,11 @@ const NavBar = () => {
     { to: "/radio", label: t("navbar.radio"), Icon: RiRadioFill },
     { to: "/grammar", label: t("navbar.grammar"), Icon: FaBrain },
     { to: "/prefix-types", label: t("navbar.prefixes"), Icon: FaPuzzlePiece },
+    {
+      to: "/how-to-say-in-german",
+      label: t("navbar.howToSay"),
+      Icon: FaLanguage,
+    },
     { to: "/quiz", label: t("navbar.quiz"), Icon: FaQuestionCircle },
     { to: "/challenge", label: t("navbar.dailyChallenge"), Icon: FaTrophy },
   ];

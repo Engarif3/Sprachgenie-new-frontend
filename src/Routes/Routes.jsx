@@ -76,6 +76,7 @@ const WordReports = lazy(
 const HowToSayManagement = lazy(
   () => import("../AdminActions/SuperAdmin/HowToSayManagement"),
 );
+const HowToSayList = lazy(() => import("../View/HowToSay/HowToSayList"));
 const NotificationsPage = lazy(
   () => import("../View/Notifications/NotificationsPage"),
 );
@@ -177,6 +178,7 @@ const BroadcastNotificationsWithSuspense = withSuspense(
 );
 const WordReportsWithSuspense = withSuspense(WordReports);
 const HowToSayManagementWithSuspense = withSuspense(HowToSayManagement);
+const HowToSayListWithSuspense = withSuspense(HowToSayList);
 const NotificationsPageWithSuspense = withSuspense(NotificationsPage);
 const PerfectAndPastFormWithSuspense = withSuspense(PerfectAndPastForm);
 const StoryTitleListWithSuspense = withSuspense(StoryTitleList);
@@ -295,6 +297,10 @@ export const router = createBrowserRouter(
         { path: "/clause/:id", element: <ClauseWithSuspense /> },
         { path: "/stories", element: <StoryTitleListWithSuspense /> },
         { path: "/stories/:id", element: <StoryDetailWithSuspense /> },
+        {
+          path: "/how-to-say-in-german",
+          element: <HowToSayListWithSuspense />,
+        },
         { path: "/radio", element: <RadioChannelsWithSuspense /> },
         {
           path: "/update-user-status",
