@@ -292,6 +292,16 @@ const AIModal = ({
       return;
     }
 
+    const confirmation = await Swal.fire({
+      title: "Submit this report?",
+      text: "Let the admin know about this mistake.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Submit",
+      cancelButtonText: "Cancel",
+    });
+    if (!confirmation.isConfirmed) return;
+
     try {
       setReportLoading(true);
       const response = await aiApi.post("/paragraphs/report", {

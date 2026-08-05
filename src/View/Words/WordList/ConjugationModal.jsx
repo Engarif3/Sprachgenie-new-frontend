@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import aiApi from "../../../AI_axios";
 import { useLockBodyScroll } from "../Modals/ModalScrolling";
 
@@ -198,6 +199,16 @@ const ConjugationModal = ({
       setReportError(`Your note must be ${reportMaxCharacters} characters or fewer.`);
       return;
     }
+
+    const confirmation = await Swal.fire({
+      title: "Submit this report?",
+      text: "Let the admin know about this mistake.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Submit",
+      cancelButtonText: "Cancel",
+    });
+    if (!confirmation.isConfirmed) return;
 
     setReportSubmitting(true);
     try {

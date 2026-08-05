@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Swal from "sweetalert2";
 import api from "../../axios";
 
 // Module-level so it survives across every HowToSayReportSection mount
@@ -106,6 +107,16 @@ const HowToSayReportSection = ({ titleId, sentences, isLight }) => {
       setSubmitError(`Your note must be ${maxCharacters} characters or fewer.`);
       return;
     }
+
+    const confirmation = await Swal.fire({
+      title: "Submit this report?",
+      text: "Let the admin know about this mistake.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Submit",
+      cancelButtonText: "Cancel",
+    });
+    if (!confirmation.isConfirmed) return;
 
     setSubmitting(true);
     try {
