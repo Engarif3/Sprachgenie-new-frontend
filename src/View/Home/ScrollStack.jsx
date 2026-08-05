@@ -28,6 +28,14 @@ const ScrollStack = ({
   const childArray = Children.toArray(children);
   const stackTop = `${Math.round(stackPosition * 100)}vh`;
   const lastIndex = childArray.length - 1;
+  // The container needs enough trailing height below the last card for
+  // every earlier sticky card to keep holding its own stickyTop offset once
+  // the last card has fully arrived — a sticky item only stays pinned while
+  // its containing block still has room left below it. A plain trailing
+  // spacer (rather than extra margin on the sticky card itself, which
+  // doesn't reliably extend its own sticky range) reserves that room, scaled
+  // to however many cards are stacked.
+  const stackBuffer = itemStackDistance * lastIndex + 120;
   const stickyChildren = childArray.map((child, index) => {
     // Spread the scale evenly across however many cards there are, so the
     // progression always lands on exactly 1 at the true last card instead
@@ -48,8 +56,7 @@ const ScrollStack = ({
             position: "sticky",
             top: stickyTop,
             zIndex: index + 1,
-            marginBottom:
-              index === childArray.length - 1 ? 0 : `${itemDistance}px`,
+            marginBottom: index === lastIndex ? 0 : `${itemDistance}px`,
             transform: `translate3d(0,0,0) scale(${scale})`,
             transformOrigin: "top center",
           },
@@ -66,7 +73,10 @@ const ScrollStack = ({
         className="scroll-stack-inner px-4 pt-[20vh] md:px-10 lg:px-20"
       >
         {stickyChildren}
-        <div className="scroll-stack-end h-px w-full" />
+        <div
+          className="scroll-stack-end w-full"
+          style={{ height: `${stackBuffer}px` }}
+        />
       </div>
     </div>
   );
