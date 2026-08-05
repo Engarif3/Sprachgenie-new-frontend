@@ -24,6 +24,7 @@ const ScrollStack = ({
   scaleEndPosition = 0.1,
   baseScale = 0.85,
   useWindowScroll = true,
+  holdDistance = 600,
 }) => {
   const childArray = Children.toArray(children);
   const stackTop = `${Math.round(stackPosition * 100)}vh`;
@@ -34,8 +35,11 @@ const ScrollStack = ({
   // its containing block still has room left below it. A plain trailing
   // spacer (rather than extra margin on the sticky card itself, which
   // doesn't reliably extend its own sticky range) reserves that room, scaled
-  // to however many cards are stacked.
-  const stackBuffer = itemStackDistance * lastIndex + 120;
+  // to however many cards are stacked. holdDistance is extra padding on top
+  // of the bare minimum so the fully-fanned arrangement survives a
+  // comfortable amount of continued scrolling instead of collapsing again
+  // within the very next scroll step.
+  const stackBuffer = itemStackDistance * lastIndex + 120 + holdDistance;
   const stickyChildren = childArray.map((child, index) => {
     // Spread the scale evenly across however many cards there are, so the
     // progression always lands on exactly 1 at the true last card instead
