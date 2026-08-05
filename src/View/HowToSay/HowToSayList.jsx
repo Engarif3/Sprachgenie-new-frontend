@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import {
-  Check,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -12,7 +11,6 @@ import {
   Pencil,
   Plus,
   Trash2,
-  X,
 } from "lucide-react";
 import {
   DndContext,
@@ -165,6 +163,209 @@ const SortableTextRow = ({
   );
 };
 
+// A whole title card (English title, expand toggle, favorite/edit/delete,
+// and — once expanded — its rules/sentences/report section). Extracted out
+// of the list's map() so useSortable can be called per-card, matching how
+// SortableTextRow already does it for the sentences/rules lists. Dragging
+// is confined to the current page: titles are paginated, so dnd-kit never
+// even sees a title from another page to drag against.
+const SortableTitleCard = ({
+  titleItem,
+  isExpanded,
+  onToggleExpanded,
+  isLight,
+  isSuperAdmin,
+  showAdminControls,
+  canReorder,
+  favoriteIds,
+  loadingFavorites,
+  toggleFavorite,
+  openEditModal,
+  handleDeleteTitle,
+  deletingTitleId,
+  isLoggedIn,
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: titleItem.id, disabled: !canReorder });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`w-full overflow-hidden rounded-3xl border shadow-sm transition-colors duration-200 ${
+        isDragging ? "shadow-lg" : ""
+      } ${
+        isLight
+          ? "border-slate-200 bg-white hover:border-orange-300"
+          : "border-slate-800 bg-slate-900/70 hover:border-orange-500/40"
+      }`}
+    >
+      <div className="flex w-full items-center gap-2">
+        {canReorder && (
+          <span
+            {...attributes}
+            {...listeners}
+            aria-label="Drag to reorder"
+            className={`flex flex-shrink-0 cursor-grab touch-none items-center pl-6 active:cursor-grabbing md:pl-7 ${
+              isLight
+                ? "text-slate-300 hover:text-orange-500"
+                : "text-slate-600 hover:text-orange-400"
+            }`}
+          >
+            <GripVertical size={18} />
+          </span>
+        )}
+
+        <button
+          type="button"
+          onClick={onToggleExpanded}
+          aria-expanded={isExpanded}
+          className={`flex flex-1 items-center justify-between gap-4 py-3.5 text-left md:py-4 ${
+            canReorder ? "pl-2 pr-6 md:pl-3 md:pr-7" : "px-6 md:px-7"
+          }`}
+        >
+          <span
+            className={`text-xl font-bold leading-snug ${isLight ? "text-slate-900" : "text-white"}`}
+          >
+            {titleItem.title}
+          </span>
+          <span
+            className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border transition-transform duration-200 ${
+              isExpanded ? "rotate-45" : ""
+            } ${
+              isLight
+                ? "border-orange-300 text-orange-500"
+                : "border-orange-500/40 text-orange-400"
+            }`}
+          >
+            <Plus size={18} />
+          </span>
+        </button>
+
+        <div className="flex flex-shrink-0 items-center gap-2 pr-6 md:pr-7">
+          <FavoriteButton
+            isFavorite={favoriteIds.includes(titleItem.id)}
+            loading={!!loadingFavorites[titleItem.id]}
+            onClick={() => toggleFavorite(titleItem.id)}
+            className={
+              favoriteIds.includes(titleItem.id)
+                ? ""
+                : "text-slate-300 dark:text-slate-600"
+            }
+          />
+
+          {isSuperAdmin && showAdminControls && (
+            <div className="flex flex-shrink-0 items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => openEditModal(titleItem)}
+                aria-label="Edit phrase"
+                className={`flex h-8 w-8 items-center justify-center rounded-full border transition-colors ${
+                  isLight
+                    ? "border-slate-200 text-slate-500 hover:border-sky-300 hover:text-sky-600"
+                    : "border-slate-700 text-slate-400 hover:border-sky-500/50 hover:text-sky-400"
+                }`}
+              >
+                <Pencil size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDeleteTitle(titleItem)}
+                disabled={deletingTitleId === titleItem.id}
+                aria-label="Delete phrase"
+                className={`flex h-8 w-8 items-center justify-center rounded-full border transition-colors disabled:opacity-50 ${
+                  isLight
+                    ? "border-slate-200 text-slate-500 hover:border-rose-300 hover:text-rose-600"
+                    : "border-slate-700 text-slate-400 hover:border-rose-500/50 hover:text-rose-400"
+                }`}
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {isExpanded && (
+        <div
+          className={`space-y-2.5 border-t pb-6 pl-10 pr-6 pt-4 md:pb-7 md:pl-14 md:pr-7 ${
+            isLight ? "border-slate-100" : "border-slate-800"
+          }`}
+        >
+          <div className="space-y-2.5">
+            {titleItem.rules?.length > 0 && (
+              <div className="space-y-2 pb-1">
+                {titleItem.rules.map((ruleItem) => (
+                  <p
+                    key={ruleItem.id}
+                    className={`flex items-center gap-2.5 text-sm font-medium leading-relaxed ${
+                      isLight ? "text-slate-600" : "text-slate-300"
+                    }`}
+                  >
+                    <span
+                      className={`flex-shrink-0 rounded-md border px-1.5 py-0.5 text-[11px] font-bold tracking-wide ${
+                        isLight
+                          ? "border-amber-700 bg-amber-600 text-white"
+                          : "border-amber-500 bg-amber-600 text-white"
+                      }`}
+                    >
+                      RULE
+                    </span>
+                    {ruleItem.rule}
+                  </p>
+                ))}
+              </div>
+            )}
+
+            {(titleItem.sentences || []).length === 0 ? (
+              <p
+                className={`text-sm italic ${isLight ? "text-slate-400" : "text-slate-500"}`}
+              >
+                No German sentences yet.
+              </p>
+            ) : (
+              titleItem.sentences.map((sentenceItem) => (
+                <p
+                  key={sentenceItem.id}
+                  className={`flex items-center gap-2.5 text-base font-medium leading-relaxed ${
+                    isLight ? "text-slate-700" : "text-slate-200"
+                  }`}
+                >
+                  <span
+                    className={`flex-shrink-0 rounded-md border px-1.5 py-0.5 text-[11px] font-bold tracking-wide ${
+                      isLight
+                        ? "border-teal-700 bg-teal-600 text-white"
+                        : "border-teal-500 bg-teal-600 text-white"
+                    }`}
+                  >
+                    DE
+                  </span>
+                  {sentenceItem.sentence}
+                </p>
+              ))
+            )}
+          </div>
+
+          {isLoggedIn && (
+            <div className="ml-auto w-full sm:max-w-md">
+              <HowToSayReportSection
+                titleId={titleItem.id}
+                sentences={titleItem.sentences || []}
+                isLight={isLight}
+              />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Smaller than the admin page's 40/page — this is a browsing grid for
 // learners, not a management table, so a denser page would just mean more
 // scrolling before reaching the pager.
@@ -203,12 +404,7 @@ const HowToSayList = () => {
   // icons on every card — a super admin opts into seeing them.
   const [showAdminControls, setShowAdminControls] = useState(false);
 
-  // Titles are paginated, so drag-and-drop can't reach a title on another
-  // page — instead a super admin types a target position number. Only one
-  // title's position editor is open at a time.
-  const [editingPositionTitleId, setEditingPositionTitleId] = useState(null);
-  const [editingPositionValue, setEditingPositionValue] = useState("");
-  const [movingTitleId, setMovingTitleId] = useState(null);
+  const [reorderingTitles, setReorderingTitles] = useState(false);
 
   // Modal state. modalTitleId is null (closed), "new" (create flow), or an
   // existing title's id (edit flow) — sentences/rules can only be managed
@@ -326,6 +522,17 @@ const HowToSayList = () => {
   const displayedTitles = showFavoritesOnly
     ? allTitles.filter((titleItem) => favoriteIds.includes(titleItem.id))
     : titles;
+
+  // Dragging is confined to the plain, unfiltered browse view — a
+  // favorites/search/newest-first list is either a different underlying
+  // set or a different order than the manually-curated one, so "reorder"
+  // wouldn't mean anything consistent there.
+  const canReorderTitles =
+    isSuperAdmin &&
+    showAdminControls &&
+    !showFavoritesOnly &&
+    !appliedSearch &&
+    !sortNewest;
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
@@ -507,65 +714,49 @@ const HowToSayList = () => {
     }
   };
 
-  const startEditPosition = (titleItem) => {
-    setEditingPositionTitleId(titleItem.id);
-    setEditingPositionValue(String((titleItem.order ?? 0) + 1));
-  };
+  // Drag-and-drop reorder within the current page only — titles are
+  // paginated, so the ids dnd-kit ever sees are exactly the ones on this
+  // page; the backend reassigns just the order values this page's titles
+  // already occupy, leaving every other page untouched.
+  const handleTitleDragEnd = async (event) => {
+    if (!canReorderTitles) return;
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
 
-  const cancelEditPosition = () => {
-    setEditingPositionTitleId(null);
-    setEditingPositionValue("");
-  };
+    const oldIndex = titles.findIndex((t) => t.id === active.id);
+    const newIndex = titles.findIndex((t) => t.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
 
-  // Titles are paginated, so an admin can't drag one from another page into
-  // view — typing a target position (1-indexed across the whole list) and
-  // confirming moves it there instead, wherever it currently sits.
-  const handleMoveTitleToPosition = async (titleItem) => {
-    const position = Number(editingPositionValue);
-    if (!Number.isInteger(position) || position < 1) {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid position",
-        text: "Enter a positive whole number.",
-      });
-      return;
-    }
-
-    const confirmation = await Swal.fire({
-      title: "Move this phrase?",
-      html: `Move <strong>"${titleItem.title}"</strong> to position <strong>${position}</strong>?`,
+    const result = await Swal.fire({
+      title: "Reorder this phrase?",
+      text: `Position ${oldIndex + 1} → ${newIndex + 1}`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "OK",
       cancelButtonText: "Cancel",
     });
-    if (!confirmation.isConfirmed) return;
+    if (!result.isConfirmed) return;
 
-    setMovingTitleId(titleItem.id);
+    const reordered = arrayMove(titles, oldIndex, newIndex);
+    setTitles(reordered);
+    setReorderingTitles(true);
     try {
-      const response = await api.put(
-        `/how-to-say-titles/move/${titleItem.id}`,
-        { position },
-      );
-      cancelEditPosition();
-      const newOrder = response.data?.data?.order ?? 0;
-      const newPage = Math.floor(newOrder / PAGE_SIZE) + 1;
-      if (newPage === currentPage) {
-        await fetchTitles();
-      } else {
-        handleGoToPage(newPage);
-      }
+      await api.put("/how-to-say-titles/reorder", {
+        orderedIds: reordered.map((t) => t.id),
+      });
+      await fetchTitles();
       if (showFavoritesOnly) {
         await fetchAllTitlesForFavorites();
       }
     } catch (error) {
       Swal.fire({
         icon: "error",
-        title: "Could not move phrase",
+        title: "Could not reorder",
         text: error.response?.data?.message || "Please try again.",
       });
+      await fetchTitles();
     } finally {
-      setMovingTitleId(null);
+      setReorderingTitles(false);
     }
   };
 
@@ -1073,239 +1264,47 @@ const HowToSayList = () => {
                 : "No phrases have been added yet."}
           </p>
         ) : (
-          <div className="space-y-4">
-            {displayedTitles.map((titleItem) => {
-              const isExpanded = expandedIds.has(titleItem.id);
-
-              return (
-                <div
-                  key={titleItem.id}
-                  className={`w-full overflow-hidden rounded-3xl border shadow-sm transition-colors duration-200 ${
-                    isLight
-                      ? "border-slate-200 bg-white hover:border-orange-300"
-                      : "border-slate-800 bg-slate-900/70 hover:border-orange-500/40"
-                  }`}
-                >
-                  <div className="flex w-full items-center gap-2">
-                    {isSuperAdmin &&
-                      showAdminControls &&
-                      !showFavoritesOnly &&
-                      !appliedSearch &&
-                      !sortNewest && (
-                        <div className="flex flex-shrink-0 items-center pl-6 md:pl-7">
-                          {editingPositionTitleId === titleItem.id ? (
-                            <div className="flex items-center gap-1">
-                              <input
-                                type="number"
-                                min={1}
-                                value={editingPositionValue}
-                                onChange={(e) =>
-                                  setEditingPositionValue(e.target.value)
-                                }
-                                onKeyDown={(e) => {
-                                  if (e.key === "Enter") {
-                                    handleMoveTitleToPosition(titleItem);
-                                  }
-                                  if (e.key === "Escape") {
-                                    cancelEditPosition();
-                                  }
-                                }}
-                                autoFocus
-                                aria-label="Target position"
-                                className={`w-14 rounded-lg border px-2 py-1 text-center text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-orange-500/40 ${
-                                  isLight
-                                    ? "border-slate-300 bg-white text-slate-900"
-                                    : "border-slate-600 bg-slate-800 text-white"
-                                }`}
-                              />
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleMoveTitleToPosition(titleItem)
-                                }
-                                disabled={movingTitleId === titleItem.id}
-                                aria-label="Confirm move"
-                                className="flex h-8 w-8 items-center justify-center rounded-full border border-emerald-500/50 text-emerald-500 transition-colors hover:bg-emerald-500/10 disabled:opacity-50"
-                              >
-                                <Check size={14} />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={cancelEditPosition}
-                                aria-label="Cancel move"
-                                className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-400/50 text-slate-400 transition-colors hover:bg-slate-400/10"
-                              >
-                                <X size={14} />
-                              </button>
-                            </div>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => startEditPosition(titleItem)}
-                              title="Click to change position"
-                              className={`flex h-8 min-w-8 items-center justify-center rounded-full border px-2 text-xs font-bold transition-colors ${
-                                isLight
-                                  ? "border-slate-200 text-slate-500 hover:border-orange-300 hover:text-orange-600"
-                                  : "border-slate-700 text-slate-400 hover:border-orange-500/50 hover:text-orange-400"
-                              }`}
-                            >
-                              #{(titleItem.order ?? 0) + 1}
-                            </button>
-                          )}
-                        </div>
-                      )}
-
-                    <button
-                      type="button"
-                      onClick={() => toggleExpanded(titleItem.id)}
-                      aria-expanded={isExpanded}
-                      className={`flex flex-1 items-center justify-between gap-4 py-3.5 text-left md:py-4 ${
-                        isSuperAdmin &&
-                        showAdminControls &&
-                        !showFavoritesOnly &&
-                        !appliedSearch &&
-                        !sortNewest
-                          ? "pl-2 pr-6 md:pl-3 md:pr-7"
-                          : "px-6 md:px-7"
-                      }`}
-                    >
-                      <span
-                        className={`text-xl font-bold leading-snug ${isLight ? "text-slate-900" : "text-white"}`}
-                      >
-                        {titleItem.title}
-                      </span>
-                      <span
-                        className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border transition-transform duration-200 ${
-                          isExpanded ? "rotate-45" : ""
-                        } ${
-                          isLight
-                            ? "border-orange-300 text-orange-500"
-                            : "border-orange-500/40 text-orange-400"
-                        }`}
-                      >
-                        <Plus size={18} />
-                      </span>
-                    </button>
-
-                    <div className="flex flex-shrink-0 items-center gap-2 pr-6 md:pr-7">
-                      <FavoriteButton
-                        isFavorite={favoriteIds.includes(titleItem.id)}
-                        loading={!!loadingFavorites[titleItem.id]}
-                        onClick={() => toggleFavorite(titleItem.id)}
-                        className={
-                          favoriteIds.includes(titleItem.id)
-                            ? ""
-                            : "text-slate-300 dark:text-slate-600"
-                        }
-                      />
-
-                      {isSuperAdmin && showAdminControls && (
-                        <div className="flex flex-shrink-0 items-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => openEditModal(titleItem)}
-                            aria-label="Edit phrase"
-                            className={`flex h-8 w-8 items-center justify-center rounded-full border transition-colors ${
-                              isLight
-                                ? "border-slate-200 text-slate-500 hover:border-sky-300 hover:text-sky-600"
-                                : "border-slate-700 text-slate-400 hover:border-sky-500/50 hover:text-sky-400"
-                            }`}
-                          >
-                            <Pencil size={14} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteTitle(titleItem)}
-                            disabled={deletingTitleId === titleItem.id}
-                            aria-label="Delete phrase"
-                            className={`flex h-8 w-8 items-center justify-center rounded-full border transition-colors disabled:opacity-50 ${
-                              isLight
-                                ? "border-slate-200 text-slate-500 hover:border-rose-300 hover:text-rose-600"
-                                : "border-slate-700 text-slate-400 hover:border-rose-500/50 hover:text-rose-400"
-                            }`}
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {isExpanded && (
-                    <div
-                      className={`space-y-2.5 border-t pb-6 pl-10 pr-6 pt-4 md:pb-7 md:pl-14 md:pr-7 ${
-                        isLight ? "border-slate-100" : "border-slate-800"
-                      }`}
-                    >
-                      <div className="space-y-2.5">
-                        {titleItem.rules?.length > 0 && (
-                          <div className="space-y-2 pb-1">
-                            {titleItem.rules.map((ruleItem) => (
-                              <p
-                                key={ruleItem.id}
-                                className={`flex items-center gap-2.5 text-sm font-medium leading-relaxed ${
-                                  isLight ? "text-slate-600" : "text-slate-300"
-                                }`}
-                              >
-                                <span
-                                  className={`flex-shrink-0 rounded-md border px-1.5 py-0.5 text-[11px] font-bold tracking-wide ${
-                                    isLight
-                                      ? "border-amber-700 bg-amber-600 text-white"
-                                      : "border-amber-500 bg-amber-600 text-white"
-                                  }`}
-                                >
-                                  RULE
-                                </span>
-                                {ruleItem.rule}
-                              </p>
-                            ))}
-                          </div>
-                        )}
-
-                        {(titleItem.sentences || []).length === 0 ? (
-                          <p
-                            className={`text-sm italic ${isLight ? "text-slate-400" : "text-slate-500"}`}
-                          >
-                            No German sentences yet.
-                          </p>
-                        ) : (
-                          titleItem.sentences.map((sentenceItem) => (
-                            <p
-                              key={sentenceItem.id}
-                              className={`flex items-center gap-2.5 text-base font-medium leading-relaxed ${
-                                isLight ? "text-slate-700" : "text-slate-200"
-                              }`}
-                            >
-                              <span
-                                className={`flex-shrink-0 rounded-md border px-1.5 py-0.5 text-[11px] font-bold tracking-wide ${
-                                  isLight
-                                    ? "border-teal-700 bg-teal-600 text-white"
-                                    : "border-teal-500 bg-teal-600 text-white"
-                                }`}
-                              >
-                                DE
-                              </span>
-                              {sentenceItem.sentence}
-                            </p>
-                          ))
-                        )}
-                      </div>
-
-                      {isLoggedIn && (
-                        <div className="ml-auto w-full sm:max-w-md">
-                          <HowToSayReportSection
-                            titleId={titleItem.id}
-                            sentences={titleItem.sentences || []}
-                            isLight={isLight}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  )}
+          <>
+            <DndContext
+              sensors={dragSensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleTitleDragEnd}
+            >
+              <SortableContext
+                items={displayedTitles.map((t) => t.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-4">
+                  {displayedTitles.map((titleItem) => (
+                    <SortableTitleCard
+                      key={titleItem.id}
+                      titleItem={titleItem}
+                      isExpanded={expandedIds.has(titleItem.id)}
+                      onToggleExpanded={() => toggleExpanded(titleItem.id)}
+                      isLight={isLight}
+                      isSuperAdmin={isSuperAdmin}
+                      showAdminControls={showAdminControls}
+                      canReorder={canReorderTitles}
+                      favoriteIds={favoriteIds}
+                      loadingFavorites={loadingFavorites}
+                      toggleFavorite={toggleFavorite}
+                      openEditModal={openEditModal}
+                      handleDeleteTitle={handleDeleteTitle}
+                      deletingTitleId={deletingTitleId}
+                      isLoggedIn={isLoggedIn}
+                    />
+                  ))}
                 </div>
-              );
-            })}
-          </div>
+              </SortableContext>
+            </DndContext>
+            {reorderingTitles && (
+              <p
+                className={`mt-2 text-center text-xs ${isLight ? "text-slate-400" : "text-slate-500"}`}
+              >
+                Saving new order...
+              </p>
+            )}
+          </>
         )}
 
         {!loading && !showFavoritesOnly && totalPages > 1 && (
