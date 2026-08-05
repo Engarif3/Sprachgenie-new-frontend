@@ -848,7 +848,7 @@ const Home = () => {
                   />
                   <div className="relative flex h-full flex-col justify-between pb-4 text-left text-white ">
                     <div>
-                      <div className="mb-5 flex items-start justify-between gap-5 rounded-[24px] bg-slate-950/70 p-4 shadow-[inset_0_2px_0_rgba(255,255,255,0.06)] border-b-2 border-cyan-950 ">
+                      <div className="mb-5 flex items-start justify-between gap-5 rounded-[24px] bg-slate-950/28 p-4 shadow-[inset_0_2px_0_rgba(255,255,255,0.06)] backdrop-blur-md  border-b-2 border-cyan-950 ">
                         <div>
                           <div className="mb-3 inline-flex items-center rounded-full border border-white/30 bg-slate-950/60 px-3 py-1.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-white shadow-[0_4px_20px_rgba(0,0,0,0.18)]">
                             {feature.eyebrow}
