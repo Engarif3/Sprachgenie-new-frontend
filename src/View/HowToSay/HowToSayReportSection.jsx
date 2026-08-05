@@ -130,7 +130,7 @@ const HowToSayReportSection = ({ titleId, sentences, isLight }) => {
   };
 
   return (
-    <div>
+    <div className="text-right">
       <button
         type="button"
         onClick={handleExpand}
@@ -141,7 +141,7 @@ const HowToSayReportSection = ({ titleId, sentences, isLight }) => {
 
       {expanded && (
         <div
-          className={`mt-3 rounded-2xl border p-4 ${
+          className={`mt-3 rounded-2xl border p-4 text-left ${
             isLight
               ? "border-slate-200 bg-slate-50"
               : "border-slate-700/60 bg-slate-950/40"

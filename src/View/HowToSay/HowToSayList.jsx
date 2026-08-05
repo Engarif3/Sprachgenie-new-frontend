@@ -1042,11 +1042,11 @@ const HowToSayList = () => {
 
                   {isExpanded && (
                     <div
-                      className={`flex flex-col gap-4 border-t pb-6 pl-10 pr-6 pt-4 md:flex-row md:pb-7 md:pl-14 md:pr-7 ${
+                      className={`space-y-2.5 border-t pb-6 pl-10 pr-6 pt-4 md:pb-7 md:pl-14 md:pr-7 ${
                         isLight ? "border-slate-100" : "border-slate-800"
                       }`}
                     >
-                      <div className="min-w-0 flex-1 space-y-2.5">
+                      <div className="space-y-2.5">
                         {titleItem.rules?.length > 0 && (
                           <div className="space-y-2 pb-1">
                             {titleItem.rules.map((ruleItem) => (
@@ -1101,7 +1101,7 @@ const HowToSayList = () => {
                       </div>
 
                       {isLoggedIn && (
-                        <div className="flex-shrink-0 md:w-64 md:pl-2">
+                        <div className="ml-auto w-full sm:max-w-md">
                           <HowToSayReportSection
                             titleId={titleItem.id}
                             sentences={titleItem.sentences || []}
