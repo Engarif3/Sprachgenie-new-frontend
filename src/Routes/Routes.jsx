@@ -73,6 +73,9 @@ const BroadcastNotifications = lazy(
 const WordReports = lazy(
   () => import("../AdminActions/SuperAdmin/WordReports"),
 );
+const HowToSayReports = lazy(
+  () => import("../AdminActions/SuperAdmin/HowToSayReports"),
+);
 const HowToSayManagement = lazy(
   () => import("../AdminActions/SuperAdmin/HowToSayManagement"),
 );
@@ -177,6 +180,7 @@ const BroadcastNotificationsWithSuspense = withSuspense(
   BroadcastNotifications,
 );
 const WordReportsWithSuspense = withSuspense(WordReports);
+const HowToSayReportsWithSuspense = withSuspense(HowToSayReports);
 const HowToSayManagementWithSuspense = withSuspense(HowToSayManagement);
 const HowToSayListWithSuspense = withSuspense(HowToSayList);
 const NotificationsPageWithSuspense = withSuspense(NotificationsPage);
@@ -447,6 +451,13 @@ export const router = createBrowserRouter(
               path: "word-reports",
               element: protectRoute(
                 <WordReportsWithSuspense />,
+                SUPER_ADMIN_ROLES,
+              ),
+            },
+            {
+              path: "how-to-say-reports",
+              element: protectRoute(
+                <HowToSayReportsWithSuspense />,
                 SUPER_ADMIN_ROLES,
               ),
             },

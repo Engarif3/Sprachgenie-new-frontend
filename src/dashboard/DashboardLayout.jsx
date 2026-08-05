@@ -31,6 +31,7 @@ const SECTION_ROUTES = {
   ],
   reports: [
     "/dashboard/word-reports",
+    "/dashboard/how-to-say-reports",
     "/dashboard/get-reports",
     "/dashboard/conjugation-reports",
   ],
@@ -92,6 +93,7 @@ const NAV_SECTIONS = [
     label: "Reports",
     items: [
       { to: "/dashboard/word-reports", icon: "🚩", label: "Word Reports", roles: ["super_admin"] },
+      { to: "/dashboard/how-to-say-reports", icon: "🚩", label: "How to Say Reports", roles: ["super_admin"] },
       { to: "/dashboard/get-reports", icon: "📋", label: "AI Paragraph Reports" },
       { to: "/dashboard/conjugation-reports", icon: "🔤", label: "Conjugation Reports" },
     ],

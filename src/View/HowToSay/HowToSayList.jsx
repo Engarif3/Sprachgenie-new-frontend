@@ -29,6 +29,7 @@ import { useFavorites } from "../../hooks/useFavorites";
 import FavoriteButton from "../Words/Modals/FavoriteButton";
 import FavoritesBar from "../../components/Favorites/FavoritesBar";
 import FavoritesDeleteAllModal from "../../components/Favorites/FavoritesDeleteAllModal";
+import HowToSayReportSection from "./HowToSayReportSection";
 
 // Same drag-to-reorder row shape as the word-update form's DraggableItem —
 // a checkbox for bulk-select, a drag handle over the text, then edit/delete.
@@ -1062,6 +1063,14 @@ const HowToSayList = () => {
                             {sentenceItem.sentence}
                           </p>
                         ))
+                      )}
+
+                      {isLoggedIn && (
+                        <HowToSayReportSection
+                          titleId={titleItem.id}
+                          sentences={titleItem.sentences || []}
+                          isLight={isLight}
+                        />
                       )}
                     </div>
                   )}
