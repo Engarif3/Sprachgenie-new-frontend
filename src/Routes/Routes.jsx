@@ -107,6 +107,11 @@ const FavoritesListDashboard = lazy(
 );
 const Backend = lazy(() => import("../Backend/Backend"));
 
+// Legal
+const PrivacyPolicy = lazy(() => import("../View/Legal/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("../View/Legal/TermsOfService"));
+const Impressum = lazy(() => import("../View/Legal/Impressum"));
+
 // AI Pages
 const GlobalLimits = lazy(() => import("../AI/GlobalLimits"));
 const UserLimits = lazy(() => import("../AI/UserLimits"));
@@ -201,6 +206,9 @@ const AdminRegistrationMetadataPageWithSuspense = withSuspense(
 const ErrorLogsPageWithSuspense = withSuspense(ErrorLogsPage);
 const FavoritesListDashboardWithSuspense = withSuspense(FavoritesListDashboard);
 const BackendWithSuspense = withSuspense(Backend);
+const PrivacyPolicyWithSuspense = withSuspense(PrivacyPolicy);
+const TermsOfServiceWithSuspense = withSuspense(TermsOfService);
+const ImpressumWithSuspense = withSuspense(Impressum);
 const GlobalLimitsWithSuspense = withSuspense(GlobalLimits);
 const UserLimitsWithSuspense = withSuspense(UserLimits);
 const IpRateLimitsWithSuspense = withSuspense(IpRateLimits);
@@ -306,6 +314,9 @@ export const router = createBrowserRouter(
           element: <HowToSayListWithSuspense />,
         },
         { path: "/radio", element: <RadioChannelsWithSuspense /> },
+        { path: "/privacy-policy", element: <PrivacyPolicyWithSuspense /> },
+        { path: "/terms-of-service", element: <TermsOfServiceWithSuspense /> },
+        { path: "/impressum", element: <ImpressumWithSuspense /> },
         {
           path: "/update-user-status",
           element: protectRoute(

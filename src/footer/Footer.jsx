@@ -1,119 +1,127 @@
+import { Link } from "react-router-dom";
 import { FaLinkedinIn, FaGlobe, FaEnvelope } from "react-icons/fa";
-import { useTheme } from "../context/ThemeContext";
+
+const EXPLORE_LINKS = [
+  { to: "/words", label: "Vocabulary" },
+  { to: "/grammar", label: "Grammar" },
+  { to: "/stories", label: "Stories" },
+  { to: "/conversation-titles", label: "Conversations" },
+  { to: "/how-to-say-in-german", label: "How to Say It" },
+  { to: "/radio", label: "Radio" },
+];
+
+const LEGAL_LINKS = [
+  { to: "/privacy-policy", label: "Privacy Policy" },
+  { to: "/terms-of-service", label: "Terms of Service" },
+  { to: "/impressum", label: "Impressum" },
+];
+
+const SOCIAL_LINKS = [
+  {
+    href: "https://www.linkedin.com/in/engarif3",
+    label: "LinkedIn",
+    Icon: FaLinkedinIn,
+  },
+  {
+    href: "mailto:arif.aust.eng@gmail.com",
+    label: "Email",
+    Icon: FaEnvelope,
+  },
+  {
+    href: "https://md-arifur-rahman-portfolio.netlify.app/",
+    label: "Portfolio",
+    Icon: FaGlobe,
+  },
+];
+
+const FooterHeading = ({ children }) => (
+  <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-400">
+    {children}
+  </h3>
+);
+
+const FooterLink = ({ to, children }) => (
+  <Link
+    to={to}
+    className="text-sm text-slate-400 transition-colors hover:text-white"
+  >
+    {children}
+  </Link>
+);
 
 const Footer = () => {
-  const { theme } = useTheme();
   return (
-    <div className="relative footer footer-center bg-gradient-to-br from-gray-900 via-gray-900 to-black">
-      <footer className="relative footer p-6 md:p-8 lg:p-10 text-white overflow-hidden border-t-2 border-gray-700/50">
-        <div className="relative z-10 w-full flex flex-col justify-center items-center md:block lg:block">
-          <div className="mb-6 relative group">
-            {/* <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 rounded-lg blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200 animate-tilt"></div> */}
-            <p className="relative text-4xl md:text-5xl font-bold">
-              <span className="text-orange-600 font-extrabold">Sprach</span>
-              <span className="text-sky-500 font-extrabold">Genie</span>
-              {/* <HiSparkles className="inline ml-2 text-yellow-400 animate-pulse" /> */}
+    <footer className="border-t border-slate-800 bg-slate-950 text-white">
+      <div className="mx-auto max-w-6xl px-6 py-12 md:px-10">
+        <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
+          <div className="col-span-2 md:col-span-1">
+            <p className="text-2xl font-bold">
+              <span className="text-orange-500">Sprach</span>
+              <span className="text-sky-400">Genie</span>
             </p>
-          </div>
-          <div className="text-center md:text-left ">
-            <p
-              className={`${theme === "dark" ? "text-gray-400" : "text-black"} font-semibold text-sm mb-1 text-center md:text-left lg::text-left `}
-            >
-              <span className="text-pink-400"></span> Created By
+            <p className="mt-3 text-sm text-slate-400">
+              A German learning platform for vocabulary, grammar, and
+              real-world phrases.
             </p>
-            <p className="text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400">
-              Md Arifur Rahman
+            <p className="mt-4 text-xs text-slate-500">
+              Created by{" "}
+              <span className="font-semibold text-slate-300">
+                Md Arifur Rahman
+              </span>
+              <br />
+              Chemnitz, Germany
             </p>
-            <p className="text-xs text-gray-500 mt-1">
-              🎓 Full Stack Developer
-            </p>
-          </div>
-        </div>
-
-        <div className="relative z-10 flex flex-row   justify-center md:justify-between lg:justify-between w-full gap-8 mt-8">
-          <div className="flex flex-col justify-center ">
-            <h3 className="mb-4 text-lg md:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 ">
-              🌐 Connect With Me
-            </h3>
-            <div className="flex gap-4 justify-center md:justify-start">
-              <a
-                target="_blank"
-                href="https://www.linkedin.com/in/engarif3"
-                className="group relative bg-gradient-to-r from-blue-500/20 to-blue-600/20 hover:from-blue-500 hover:to-blue-600 border border-blue-500/50 hover:border-blue-400 p-4 rounded-full transition-all duration-300 hover:scale-125 hover:rotate-12 shadow-lg hover:shadow-blue-500/50"
-              >
-                <FaLinkedinIn
-                  className="text-white group-hover:animate-bounce"
-                  size={24}
-                />
-              </a>
-              <a
-                target="_blank"
-                href="mailto:arif.aust.eng@gmail.com"
-                className="group relative bg-gradient-to-r from-orange-500/20 to-orange-600/20 hover:from-orange-500 hover:to-orange-600 border border-orange-500/50 hover:border-orange-400 p-4 rounded-full transition-all duration-300 hover:scale-125 hover:rotate-12 shadow-lg hover:shadow-orange-500/50"
-              >
-                <FaEnvelope
-                  className="text-white group-hover:animate-bounce"
-                  size={24}
-                />
-              </a>
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://md-arifur-rahman-portfolio.netlify.app/"
-                className="group relative bg-gradient-to-r from-blue-400/20 to-blue-500/20 hover:from-blue-400 hover:to-blue-500 border border-blue-400/50 hover:border-blue-300 p-4 rounded-full transition-all duration-300 hover:scale-125 hover:rotate-12 shadow-lg hover:shadow-blue-500/50"
-              >
-                <FaGlobe
-                  className="text-white group-hover:animate-bounce"
-                  size={24}
-                />
-              </a>
-            </div>
           </div>
 
-          <div className="hidden md:flex lg:flex justify-center items-center">
-            <div>
-              <p className="text-white dark:text-gray-400 text-sm font-semibold mb-3">
-                Chemnitz, Germany
-              </p>
-              <p
-                className={`text-xs ${theme === "dark" ? "text-gray-500" : "text-white"} text-center`}
-              >
-                Full Stack Developer | German Learning Platform Builder
-              </p>
+          <div className="flex flex-col gap-2">
+            <FooterHeading>Explore</FooterHeading>
+            {EXPLORE_LINKS.map((link) => (
+              <FooterLink key={link.to} to={link.to}>
+                {link.label}
+              </FooterLink>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <FooterHeading>Legal</FooterHeading>
+            {LEGAL_LINKS.map((link) => (
+              <FooterLink key={link.to} to={link.to}>
+                {link.label}
+              </FooterLink>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <FooterHeading>Connect</FooterHeading>
+            <div className="flex gap-3">
+              {SOCIAL_LINKS.map(({ href, label, Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-700 text-slate-400 transition-colors hover:border-orange-500/60 hover:text-orange-400"
+                >
+                  <Icon size={16} />
+                </a>
+              ))}
             </div>
-          </div>
-        </div>
-      </footer>
-      <footer className="relative footer footer-center   text-white overflow-hidden pb-8 ">
-        <div className="relative z-10 max-w-3xl mx-auto">
-          <div className="flex items-center justify-center gap-2 ">
-            <span className="text-2xl animate-pulse">©</span>
-            <p
-              className={`${theme === "dark" ? "text-gray-300" : "text-white"} font-semibold`}
-            >
-              Copyright {new Date().getFullYear()} - All rights reserved.
-            </p>
-          </div>
-          <div className="flex items-center justify-center gap-2 ">
-            <FaEnvelope className="text-blue-400 animate-bounce mt-2" />
             <a
               href="mailto:arif.aust.eng@gmail.com"
-              className="text-sm text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 hover:from-blue-500 hover:to-cyan-500 font-bold transition-all duration-300"
+              className="text-sm text-slate-400 transition-colors hover:text-white"
             >
               arif.aust.eng@gmail.com
             </a>
           </div>
-          <div className="inline-block px-4   mt-2">
-            <p
-              className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-white"} flex items-center gap-2`}
-            >
-              <span className="text-yellow-400">💡</span>
-              <span>Topic titles inspired by Telc A1–B2 books</span>
-            </p>
-          </div>
         </div>
-      </footer>
-    </div>
+
+        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-slate-800 pt-6 text-xs text-slate-500 md:flex-row">
+          <p>© {new Date().getFullYear()} SprachGenie. All rights reserved.</p>
+          <p>Topic titles inspired by Telc A1–B2 books.</p>
+        </div>
+      </div>
+    </footer>
   );
 };
 
