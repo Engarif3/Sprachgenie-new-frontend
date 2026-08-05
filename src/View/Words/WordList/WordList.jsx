@@ -48,6 +48,19 @@ const WORD_LIST_QUERY_VERSION = 3;
 
 const UNKNOWN_TOPIC_ID = 1;
 const RESTRICTED_LEVEL_ID = 6;
+// The backend returns levels in raw DB row order (not CEFR order), and the
+// restricted "Unknown" level (id 6, RESTRICTED_LEVEL_ID above) happens to
+// sit between B1 and B2 there — this puts it back in proper CEFR order for
+// the filter dropdown, with "Unknown" always last regardless of its id.
+const CEFR_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"];
+const compareLevelsCefrFirst = (a, b) => {
+  const aIndex = CEFR_ORDER.indexOf(a.level);
+  const bIndex = CEFR_ORDER.indexOf(b.level);
+  if (aIndex === -1 && bIndex === -1) return a.level.localeCompare(b.level);
+  if (aIndex === -1) return 1;
+  if (bIndex === -1) return -1;
+  return aIndex - bIndex;
+};
 const NOT_SPECIFIED_PART_OF_SPEECH = "not_specified";
 const HIDDEN_PART_OF_SPEECH_IDS = new Set([3]);
 const DEFAULT_PART_OF_SPEECH_OPTIONS = [
@@ -1475,12 +1488,14 @@ const WordList = () => {
 
   const allowedLevels = useMemo(
     () =>
-      levels.filter((level) => {
-        if (level.id === RESTRICTED_LEVEL_ID && !isAdmin) {
-          return false;
-        }
-        return true;
-      }),
+      levels
+        .filter((level) => {
+          if (level.id === RESTRICTED_LEVEL_ID && !isAdmin) {
+            return false;
+          }
+          return true;
+        })
+        .sort(compareLevelsCefrFirst),
     [levels, isAdmin],
   );
 
@@ -1541,7 +1556,7 @@ const WordList = () => {
       const levelB = levelIdToLevelMap.get(b.levelId);
 
       if (levelA && levelB) {
-        return levelA.id - levelB.id;
+        return compareLevelsCefrFirst(levelA, levelB);
       }
       return 0;
     });
