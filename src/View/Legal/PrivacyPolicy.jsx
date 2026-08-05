@@ -1,4 +1,4 @@
-import LegalPageLayout, { H2, P, Ul, Placeholder } from "./LegalPageLayout";
+import LegalPageLayout, { H2, P, Ul } from "./LegalPageLayout";
 
 const PrivacyPolicy = () => {
   return (
@@ -12,8 +12,7 @@ const PrivacyPolicy = () => {
       <P>
         Md Arifur Rahman
         <br />
-        <Placeholder>[street address and postal code]</Placeholder>, Chemnitz,
-        Germany
+        Vetterstraße 52, 09126 Chemnitz, Germany
         <br />
         Email:{" "}
         <a

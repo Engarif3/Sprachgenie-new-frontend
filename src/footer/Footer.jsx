@@ -52,7 +52,7 @@ const FooterLink = ({ to, children }) => (
 const Footer = () => {
   return (
     <footer className="border-t border-slate-800 bg-slate-950 text-white">
-      <div className="mx-auto max-w-6xl px-6 py-12 md:px-10">
+      <div className="w-full px-6 py-12 md:px-12 lg:px-20">
         <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
           <div className="col-span-2 md:col-span-1">
             <p className="text-2xl font-bold">

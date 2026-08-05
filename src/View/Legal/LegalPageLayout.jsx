@@ -19,12 +19,6 @@ export const Ul = ({ children }) => (
   </ul>
 );
 
-export const Placeholder = ({ children }) => (
-  <span className="rounded bg-amber-100 px-1.5 py-0.5 font-mono text-sm text-amber-800 dark:bg-amber-500/10 dark:text-amber-400">
-    {children}
-  </span>
-);
-
 const LegalPageLayout = ({ title, lastUpdated, children }) => {
   return (
     <div className="mx-auto min-h-screen max-w-3xl px-4 py-10 md:py-14">

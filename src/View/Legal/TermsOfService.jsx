@@ -72,11 +72,15 @@ const TermsOfService = () => {
 
       <H2>6. Intellectual Property</H2>
       <P>
-        The Service's design, code, and original content are owned by
-        SprachGenie unless otherwise noted. Vocabulary and grammar reference
-        material may be adapted from publicly available learning resources
-        for educational purposes. You may not copy, redistribute, or
-        commercially exploit the Service's content without permission.
+        The Service's design, code, vocabulary entries, example sentences,
+        and grammar explanations are original content owned by SprachGenie
+        unless otherwise noted. Some grammar topic names (chapter-style
+        labels such as level or category titles) take inspiration from the
+        structure of publicly known German-learning curricula, including
+        Telc-style course books — only the topic names, not their text,
+        exercises, or other content, which are not reproduced anywhere on
+        the Service. You may not copy, redistribute, or commercially exploit
+        the Service's content without permission.
       </P>
 
       <H2>7. Third-Party Links &amp; Content</H2>

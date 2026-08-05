@@ -1,4 +1,4 @@
-import LegalPageLayout, { H2, P, Placeholder } from "./LegalPageLayout";
+import LegalPageLayout, { H2, P } from "./LegalPageLayout";
 
 const Impressum = () => {
   return (
@@ -8,9 +8,9 @@ const Impressum = () => {
       <P>
         Md Arifur Rahman
         <br />
-        <Placeholder>[street and house number]</Placeholder>
+        Vetterstraße 52
         <br />
-        <Placeholder>[postal code]</Placeholder> Chemnitz, Germany
+        09126 Chemnitz, Germany
       </P>
 
       <H2>Contact</H2>
@@ -87,10 +87,9 @@ const Impressum = () => {
 
       <P>
         <em>
-          This page is provided as a good-faith Impressum template and is not
-          legal advice. Please verify it meets the current legal requirements
-          for your situation, and fill in the placeholder address fields
-          above.
+          This page is provided in good faith to meet the § 5 TMG disclosure
+          requirements and is not legal advice. If you have any doubt about
+          your specific obligations, please consult a qualified lawyer.
         </em>
       </P>
     </LegalPageLayout>
