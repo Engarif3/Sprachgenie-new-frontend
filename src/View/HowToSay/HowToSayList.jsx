@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
 import api from "../../axios";
@@ -20,6 +20,9 @@ const HowToSayList = () => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [searchInput, setSearchInput] = useState(searchParams.get("q") || "");
+  // Collapsed by default — only the English title shows until a learner
+  // opens it, so a page of 12 titles doesn't dump every sentence at once.
+  const [expandedIds, setExpandedIds] = useState(() => new Set());
 
   const requestedPage = parseInt(searchParams.get("page") || "1", 10);
   const currentPage = Math.max(requestedPage || 1, 1);
@@ -65,6 +68,18 @@ const HowToSayList = () => {
     if (appliedSearch) params.q = appliedSearch;
     if (page > 1) params.page = String(page);
     setSearchParams(params);
+  };
+
+  const toggleExpanded = (titleId) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(titleId)) {
+        next.delete(titleId);
+      } else {
+        next.add(titleId);
+      }
+      return next;
+    });
   };
 
   return (
@@ -122,42 +137,70 @@ const HowToSayList = () => {
               : "No phrases have been added yet."}
           </p>
         ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">
-            {titles.map((titleItem) => (
-              <div
-                key={titleItem.id}
-                className={`flex h-full flex-col rounded-3xl border p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg md:p-7 ${
-                  isLight
-                    ? "border-slate-200 bg-white hover:border-orange-300"
-                    : "border-slate-800 bg-slate-900/70 hover:border-orange-500/40"
-                }`}
-              >
-                <p
-                  className={`text-xl font-bold leading-snug ${isLight ? "text-slate-900" : "text-white"}`}
-                >
-                  {titleItem.title}
-                </p>
+          <div className="space-y-4">
+            {titles.map((titleItem) => {
+              const isExpanded = expandedIds.has(titleItem.id);
 
-                <div className="mt-4 flex-1 space-y-2">
-                  {(titleItem.sentences || []).length === 0 ? (
-                    <p
-                      className={`text-sm italic ${isLight ? "text-slate-400" : "text-slate-500"}`}
+              return (
+                <div
+                  key={titleItem.id}
+                  className={`w-full overflow-hidden rounded-3xl border shadow-sm transition-colors duration-200 ${
+                    isLight
+                      ? "border-slate-200 bg-white hover:border-orange-300"
+                      : "border-slate-800 bg-slate-900/70 hover:border-orange-500/40"
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleExpanded(titleItem.id)}
+                    aria-expanded={isExpanded}
+                    className="flex w-full items-center justify-between gap-4 p-6 text-left md:p-7"
+                  >
+                    <span
+                      className={`text-xl font-bold leading-snug ${isLight ? "text-slate-900" : "text-white"}`}
                     >
-                      No German sentences yet.
-                    </p>
-                  ) : (
-                    titleItem.sentences.map((sentenceItem) => (
-                      <p
-                        key={sentenceItem.id}
-                        className={`text-base font-medium leading-relaxed ${isLight ? "text-teal-600" : "text-teal-400"}`}
-                      >
-                        🇩🇪 {sentenceItem.sentence}
-                      </p>
-                    ))
+                      {titleItem.title}
+                    </span>
+                    <span
+                      className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border transition-transform duration-200 ${
+                        isExpanded ? "rotate-45" : ""
+                      } ${
+                        isLight
+                          ? "border-orange-300 text-orange-500"
+                          : "border-orange-500/40 text-orange-400"
+                      }`}
+                    >
+                      <Plus size={18} />
+                    </span>
+                  </button>
+
+                  {isExpanded && (
+                    <div
+                      className={`space-y-2 border-t px-6 pb-6 pt-4 md:px-7 md:pb-7 ${
+                        isLight ? "border-slate-100" : "border-slate-800"
+                      }`}
+                    >
+                      {(titleItem.sentences || []).length === 0 ? (
+                        <p
+                          className={`text-sm italic ${isLight ? "text-slate-400" : "text-slate-500"}`}
+                        >
+                          No German sentences yet.
+                        </p>
+                      ) : (
+                        titleItem.sentences.map((sentenceItem) => (
+                          <p
+                            key={sentenceItem.id}
+                            className={`text-base font-medium leading-relaxed ${isLight ? "text-teal-600" : "text-teal-400"}`}
+                          >
+                            🇩🇪 {sentenceItem.sentence}
+                          </p>
+                        ))
+                      )}
+                    </div>
                   )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
