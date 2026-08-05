@@ -98,6 +98,30 @@ const highlightConjunction = (sentence, conjunction, isLight) => {
   );
 };
 
+// Some example lists pair a main sentence with an alternative phrasing on
+// the next line, marked in the source data with a leading "--" (e.g. a
+// "wegen" sentence followed by its "weil" equivalent). Groups each
+// alternative under the main sentence it belongs to instead of rendering
+// the raw "--" marker as its own bullet.
+const groupExamplesWithAlternatives = (examples) => {
+  const groups = [];
+
+  examples.forEach((example) => {
+    const trimmed = example.trim();
+
+    if (trimmed.startsWith("--") && groups.length > 0) {
+      groups[groups.length - 1].alternatives.push(
+        trimmed.replace(/^--+\s*/, ""),
+      );
+      return;
+    }
+
+    groups.push({ main: example, alternatives: [] });
+  });
+
+  return groups;
+};
+
 const Clauses = () => {
   const { theme } = useTheme();
   const isLight = theme === "light";
@@ -334,12 +358,31 @@ const Clauses = () => {
                                   : "border-pink-500 text-slate-200"
                               }`}
                             >
-                              {item.examples.map((example, exampleIndex) => (
-                                <li key={exampleIndex}>
+                              {groupExamplesWithAlternatives(
+                                item.examples,
+                              ).map((group, groupIndex) => (
+                                <li key={groupIndex}>
                                   {highlightConjunction(
-                                    example,
+                                    group.main,
                                     item.conjunction,
                                     isLight,
+                                  )}
+                                  {group.alternatives.map(
+                                    (alternative, altIndex) => (
+                                      <div
+                                        key={altIndex}
+                                        className={`mt-1 text-sm font-normal italic ${
+                                          isLight
+                                            ? "text-purple-600"
+                                            : "text-purple-400"
+                                        }`}
+                                      >
+                                        <span className="font-semibold not-italic">
+                                          Alternative:
+                                        </span>{" "}
+                                        {alternative}
+                                      </div>
+                                    ),
                                   )}
                                 </li>
                               ))}
