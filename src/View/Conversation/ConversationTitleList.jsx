@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
+import Swal from "sweetalert2";
+import { ChevronLeft, ChevronRight, ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
 import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
 import api from "../../axios";
@@ -10,6 +11,7 @@ import { useFavorites } from "../../hooks/useFavorites";
 import FavoriteButton from "../Words/Modals/FavoriteButton";
 import FavoritesBar from "../../components/Favorites/FavoritesBar";
 import FavoritesDeleteAllModal from "../../components/Favorites/FavoritesDeleteAllModal";
+import CategoryMultiSelect from "../../components/UI/CategoryMultiSelect";
 import { splitConversationTopic } from "../../utils/splitConversationTopic";
 
 // Color identity per CEFR level, consistent with the badge/chip style used
@@ -138,11 +140,24 @@ const ConversationTitleList = () => {
   const isLight = theme === "light";
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isAdmin } = useAuth();
 
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [deleteAllModalOpen, setDeleteAllModalOpen] = useState(false);
+
+  // In-page admin create/edit — same idea as the "How to Say It" modal, so
+  // an admin never has to leave this page to manage conversations.
+  const [allCategories, setAllCategories] = useState([]);
+  const [levels, setLevels] = useState([]);
+  const [modalMode, setModalMode] = useState(null); // null | "create" | "edit"
+  const [editingConversationId, setEditingConversationId] = useState(null);
+  const [formTopic, setFormTopic] = useState("");
+  const [formLevelId, setFormLevelId] = useState("");
+  const [formCategoryIds, setFormCategoryIds] = useState([]);
+  const [formText, setFormText] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
   const {
     favoriteIds,
@@ -168,6 +183,140 @@ const ConversationTitleList = () => {
   useEffect(() => {
     fetchConversations();
   }, []);
+
+  // Categories/levels for the create/edit form's pickers — only needed by
+  // admins, and levels here are fetched from the real API (unlike the
+  // existing create/edit dashboard forms, which hardcode a 5-level list).
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    api
+      .get("/conversation-category/all")
+      .then((response) => setAllCategories(response.data?.data || []))
+      .catch((error) =>
+        console.error("Error fetching conversation categories:", error),
+      );
+
+    api
+      .get("/level/all")
+      .then((response) => setLevels(response.data?.data || []))
+      .catch((error) => console.error("Error fetching levels:", error));
+  }, [isAdmin]);
+
+  const openCreateModal = () => {
+    setModalMode("create");
+    setEditingConversationId(null);
+    setFormTopic("");
+    setFormLevelId("");
+    setFormCategoryIds([]);
+    setFormText('[\n  { "speaker": "Lena", "message": "Hallo! Wie geht es dir?" }\n]');
+  };
+
+  const openEditModal = (conversation) => {
+    setModalMode("edit");
+    setEditingConversationId(conversation.id);
+    setFormTopic(conversation.topic);
+    setFormLevelId(String(conversation.levelId));
+    setFormCategoryIds((conversation.categories || []).map((c) => c.id));
+    setFormText(JSON.stringify(conversation.text, null, 2));
+  };
+
+  const closeModal = () => {
+    setModalMode(null);
+    setEditingConversationId(null);
+    setFormTopic("");
+    setFormLevelId("");
+    setFormCategoryIds([]);
+    setFormText("");
+  };
+
+  const handleSaveConversation = async () => {
+    if (!formTopic.trim()) {
+      Swal.fire({ icon: "warning", title: "Topic is required", timer: 1800, showConfirmButton: false });
+      return;
+    }
+    if (!formLevelId) {
+      Swal.fire({ icon: "warning", title: "Please select a level", timer: 1800, showConfirmButton: false });
+      return;
+    }
+
+    let parsedText;
+    try {
+      parsedText = JSON.parse(formText);
+    } catch {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid dialogue JSON",
+        text: 'Dialogue must be valid JSON, e.g. [{ "speaker": "Lena", "message": "..." }]',
+      });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      if (modalMode === "create") {
+        await api.post("/conversation/create", {
+          topic: formTopic.trim(),
+          levelId: Number(formLevelId),
+          categoryIds: formCategoryIds,
+          text: parsedText,
+        });
+      } else {
+        await api.put(`/conversation/update/${editingConversationId}`, {
+          topic: formTopic.trim(),
+          levelId: Number(formLevelId),
+          categoryIds: formCategoryIds,
+          text: parsedText,
+        });
+      }
+      closeModal();
+      await fetchConversations();
+      Swal.fire({
+        icon: "success",
+        title: modalMode === "create" ? "Conversation created!" : "Conversation updated!",
+        timer: 1400,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Error saving conversation:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Could not save",
+        text: error.response?.data?.message || "Please try again.",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteConversation = async (conversation) => {
+    const { english } = splitConversationTopic(conversation.topic);
+    const result = await Swal.fire({
+      title: "Delete this conversation?",
+      html: `Delete <strong>"${english}"</strong>? This cannot be undone.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#e11d48",
+    });
+    if (!result.isConfirmed) return;
+
+    setDeletingId(conversation.id);
+    try {
+      await api.delete(`/conversation/delete/${conversation.id}`);
+      setConversations((prev) => prev.filter((c) => c.id !== conversation.id));
+    } catch (error) {
+      console.error("Error deleting conversation:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Could not delete",
+        text: error.response?.data?.message || "Please try again.",
+      });
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   // Only the levels that actually have at least one topic get a tab, in
   // standard CEFR order (any unexpected level string is appended, sorted).
@@ -280,6 +429,19 @@ const ConversationTitleList = () => {
             Choose a level, then pick a topic to practice a real-world German
             dialogue.
           </p>
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={openCreateModal}
+              className={`mt-5 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+                isLight
+                  ? "border-orange-300 text-orange-600 hover:bg-orange-50"
+                  : "border-orange-500/40 text-orange-400 hover:bg-orange-500/10"
+              }`}
+            >
+              <Plus size={16} /> Add New Conversation
+            </button>
+          )}
         </div>
 
         {/* Level tabs */}
@@ -406,15 +568,52 @@ const ConversationTitleList = () => {
                     >
                       {level || "General"}
                     </span>
-                    <FavoriteButton
-                      isFavorite={isFavorite}
-                      loading={!!loadingFavorites[conversation.id]}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        toggleFavorite(conversation.id);
-                      }}
-                      className={isFavorite ? "" : "text-slate-300 dark:text-slate-600"}
-                    />
+                    <div className="flex flex-shrink-0 items-center gap-1.5">
+                      <FavoriteButton
+                        isFavorite={isFavorite}
+                        loading={!!loadingFavorites[conversation.id]}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          toggleFavorite(conversation.id);
+                        }}
+                        className={isFavorite ? "" : "text-slate-300 dark:text-slate-600"}
+                      />
+                      {isAdmin && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              openEditModal(conversation);
+                            }}
+                            aria-label="Edit conversation"
+                            className={`flex h-7 w-7 items-center justify-center rounded-full border transition-colors ${
+                              isLight
+                                ? "border-slate-200 text-slate-500 hover:border-sky-300 hover:text-sky-600"
+                                : "border-slate-700 text-slate-400 hover:border-sky-500/50 hover:text-sky-400"
+                            }`}
+                          >
+                            <Pencil size={12} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleDeleteConversation(conversation);
+                            }}
+                            disabled={deletingId === conversation.id}
+                            aria-label="Delete conversation"
+                            className={`flex h-7 w-7 items-center justify-center rounded-full border transition-colors disabled:opacity-50 ${
+                              isLight
+                                ? "border-slate-200 text-slate-500 hover:border-rose-300 hover:text-rose-600"
+                                : "border-slate-700 text-slate-400 hover:border-rose-500/50 hover:text-rose-400"
+                            }`}
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
 
                   {/* Category tags: their own line below the level badge,
@@ -499,6 +698,140 @@ const ConversationTitleList = () => {
           </div>
         )}
       </div>
+
+      {/* Create/Edit modal (admin only) */}
+      {modalMode !== null && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) closeModal();
+          }}
+        >
+          <div
+            className={`max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border p-6 shadow-2xl ${
+              isLight ? "border-slate-200 bg-white" : "border-slate-700 bg-slate-900"
+            }`}
+          >
+            <h3
+              className={`mb-4 text-xl font-bold ${isLight ? "text-slate-900" : "text-white"}`}
+            >
+              {modalMode === "create" ? "Add New Conversation" : "Edit Conversation"}
+            </h3>
+
+            <div className="space-y-4">
+              <div>
+                <label
+                  htmlFor="conversation-topic"
+                  className={`mb-1 block text-sm font-semibold ${isLight ? "text-slate-700" : "text-slate-200"}`}
+                >
+                  Topic
+                </label>
+                <input
+                  id="conversation-topic"
+                  type="text"
+                  value={formTopic}
+                  onChange={(event) => setFormTopic(event.target.value)}
+                  placeholder='e.g. "At the Doctor / Beim Arzt"'
+                  className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/30 ${
+                    isLight
+                      ? "border-slate-300 bg-white text-slate-900 placeholder-slate-400"
+                      : "border-slate-600 bg-slate-800 text-white placeholder-slate-500"
+                  }`}
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="conversation-level"
+                  className={`mb-1 block text-sm font-semibold ${isLight ? "text-slate-700" : "text-slate-200"}`}
+                >
+                  Level
+                </label>
+                <select
+                  id="conversation-level"
+                  value={formLevelId}
+                  onChange={(event) => setFormLevelId(event.target.value)}
+                  className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/30 ${
+                    isLight
+                      ? "border-slate-300 bg-white text-slate-900"
+                      : "border-slate-600 bg-slate-800 text-white"
+                  }`}
+                >
+                  <option value="">Select a level</option>
+                  {levels.map((level) => (
+                    <option key={level.id} value={level.id}>
+                      {level.level}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label
+                  className={`mb-1 block text-sm font-semibold ${isLight ? "text-slate-700" : "text-slate-200"}`}
+                >
+                  Categories
+                </label>
+                <CategoryMultiSelect
+                  categories={allCategories}
+                  selectedIds={formCategoryIds}
+                  onChange={setFormCategoryIds}
+                  placeholder="Select categories (optional)"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="conversation-text"
+                  className={`mb-1 block text-sm font-semibold ${isLight ? "text-slate-700" : "text-slate-200"}`}
+                >
+                  Dialogue (JSON)
+                </label>
+                <textarea
+                  id="conversation-text"
+                  value={formText}
+                  onChange={(event) => setFormText(event.target.value)}
+                  rows={8}
+                  className={`w-full rounded-lg border px-3 py-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-orange-500/30 ${
+                    isLight
+                      ? "border-slate-300 bg-white text-slate-900 placeholder-slate-400"
+                      : "border-slate-600 bg-slate-800 text-white placeholder-slate-500"
+                  }`}
+                  placeholder='[{ "speaker": "Lena", "message": "Hallo!" }]'
+                />
+              </div>
+            </div>
+
+            <div
+              className={`mt-6 flex justify-between gap-3 border-t pt-4 ${
+                isLight ? "border-slate-100" : "border-slate-800"
+              }`}
+            >
+              <button
+                type="button"
+                onClick={handleSaveConversation}
+                disabled={saving}
+                className="rounded-lg bg-gradient-to-r from-orange-500 to-pink-500 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:opacity-90 disabled:opacity-50"
+              >
+                {saving ? "Saving..." : modalMode === "create" ? "Create" : "Save"}
+              </button>
+              <button
+                type="button"
+                onClick={closeModal}
+                disabled={saving}
+                className={`rounded-lg border px-5 py-2 text-sm font-semibold transition disabled:opacity-50 ${
+                  isLight
+                    ? "border-slate-300 text-slate-700 hover:bg-slate-50"
+                    : "border-slate-600 text-slate-200 hover:bg-slate-800"
+                }`}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <FavoritesDeleteAllModal
         isOpen={deleteAllModalOpen}
