@@ -9,6 +9,8 @@ import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../services/auth.services";
 import { useFavorites } from "../../hooks/useFavorites";
 import FavoriteButton from "../Words/Modals/FavoriteButton";
+import FavoritesBar from "../../components/Favorites/FavoritesBar";
+import FavoritesDeleteAllModal from "../../components/Favorites/FavoritesDeleteAllModal";
 
 // Smaller than the admin page's 40/page — this is a browsing grid for
 // learners, not a management table, so a denser page would just mean more
@@ -18,12 +20,15 @@ const PAGE_SIZE = 12;
 const HowToSayList = () => {
   const { theme } = useTheme();
   const isLight = theme === "light";
-  const { isSuperAdmin } = useAuth();
+  const { isSuperAdmin, isLoggedIn } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const {
     favoriteIds,
     loadingIds: loadingFavorites,
     toggleFavorite,
+    deleteAllFavorites,
+    showFavoritesOnly,
+    setShowFavoritesOnly,
   } = useFavorites("how-to-say", "titleId", "phrase");
 
   const [titles, setTitles] = useState([]);
@@ -33,6 +38,14 @@ const HowToSayList = () => {
   // Collapsed by default — only the English title shows until a learner
   // opens it, so a page of 12 titles doesn't dump every sentence at once.
   const [expandedIds, setExpandedIds] = useState(() => new Set());
+
+  // Favorites are scattered across whatever server page they happen to
+  // land on, so "favorites only" can't just filter the current page — it
+  // pulls every title (looping the same paginated endpoint at its max
+  // limit) once, then filters that full set client-side by favoriteIds.
+  const [allTitles, setAllTitles] = useState([]);
+  const [loadingAllTitles, setLoadingAllTitles] = useState(false);
+  const [deleteAllModalOpen, setDeleteAllModalOpen] = useState(false);
 
   // Modal state. modalTitleId is null (closed), "new" (create flow), or an
   // existing title's id (edit flow) — sentences can only be managed once
@@ -81,6 +94,40 @@ const HowToSayList = () => {
     fetchTitles();
   }, [fetchTitles]);
 
+  const fetchAllTitlesForFavorites = useCallback(async () => {
+    setLoadingAllTitles(true);
+    try {
+      const ADMIN_MAX_LIMIT = 40;
+      let page = 1;
+      let collected = [];
+      while (true) {
+        const response = await api.get("/how-to-say-titles/all", {
+          params: { page, limit: ADMIN_MAX_LIMIT },
+        });
+        const data = response.data?.data || [];
+        collected = collected.concat(data);
+        const metaTotal = response.data?.meta?.total ?? collected.length;
+        if (data.length === 0 || collected.length >= metaTotal) break;
+        page += 1;
+      }
+      setAllTitles(collected);
+    } catch (error) {
+      console.error("Error fetching all phrases for favorites:", error);
+    } finally {
+      setLoadingAllTitles(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (showFavoritesOnly) {
+      fetchAllTitlesForFavorites();
+    }
+  }, [showFavoritesOnly, fetchAllTitlesForFavorites]);
+
+  const displayedTitles = showFavoritesOnly
+    ? allTitles.filter((titleItem) => favoriteIds.includes(titleItem.id))
+    : titles;
+
   const handleSearchSubmit = (event) => {
     event.preventDefault();
     const params = {};
@@ -128,6 +175,9 @@ const HowToSayList = () => {
     setEditingSentenceId(null);
     setEditingSentenceText("");
     fetchTitles();
+    if (showFavoritesOnly) {
+      fetchAllTitlesForFavorites();
+    }
   };
 
   const handleSaveTitle = async () => {
@@ -162,20 +212,27 @@ const HowToSayList = () => {
 
   const handleDeleteTitle = async (titleItem) => {
     const sentenceCount = titleItem.sentences?.length || 0;
-    const result = await Swal.fire({
+    const confirmation = await Swal.fire({
       title: "Delete this phrase?",
-      html: `Delete <strong>"${titleItem.title}"</strong>${
+      html: `Type <strong>ok</strong> to permanently delete <strong>"${titleItem.title}"</strong>${
         sentenceCount > 0
           ? ` and its ${sentenceCount} German sentence${sentenceCount === 1 ? "" : "s"}`
           : ""
-      }? This cannot be undone.`,
+      }. This can't be undone.`,
       icon: "warning",
+      input: "text",
+      inputPlaceholder: "Type ok",
+      inputAutoTrim: true,
+      inputValidator: (value) =>
+        value?.trim().toLowerCase() === "ok"
+          ? null
+          : 'Please type "ok" to continue.',
       showCancelButton: true,
-      confirmButtonText: "Yes, delete",
+      confirmButtonText: "Delete",
       cancelButtonText: "Cancel",
       confirmButtonColor: "#e11d48",
     });
-    if (!result.isConfirmed) return;
+    if (!confirmation.isConfirmed) return;
 
     setDeletingTitleId(titleItem.id);
     try {
@@ -187,6 +244,9 @@ const HowToSayList = () => {
         handleGoToPage(currentPage - 1);
       } else {
         await fetchTitles();
+      }
+      if (showFavoritesOnly) {
+        await fetchAllTitlesForFavorites();
       }
     } catch (error) {
       Swal.fire({
@@ -347,21 +407,35 @@ const HowToSayList = () => {
           )}
         </div>
 
-        {loading ? (
-          <div className="flex min-h-[40vh] items-center justify-center">
-            <Loader loading={loading} />
+        {isLoggedIn && (total > 0 || favoriteIds.length > 0) && (
+          <div className="mb-8">
+            <FavoritesBar
+              isLight={isLight}
+              active={showFavoritesOnly}
+              onToggle={() => setShowFavoritesOnly((prev) => !prev)}
+              count={favoriteIds.length}
+              onRequestDeleteAll={() => setDeleteAllModalOpen(true)}
+            />
           </div>
-        ) : titles.length === 0 ? (
+        )}
+
+        {loading || (showFavoritesOnly && loadingAllTitles) ? (
+          <div className="flex min-h-[40vh] items-center justify-center">
+            <Loader loading={true} />
+          </div>
+        ) : displayedTitles.length === 0 ? (
           <p
             className={`text-center ${isLight ? "text-slate-500" : "text-slate-400"}`}
           >
-            {appliedSearch
-              ? "No phrases match your search."
-              : "No phrases have been added yet."}
+            {showFavoritesOnly
+              ? "You haven't favorited any phrases yet."
+              : appliedSearch
+                ? "No phrases match your search."
+                : "No phrases have been added yet."}
           </p>
         ) : (
           <div className="space-y-4">
-            {titles.map((titleItem) => {
+            {displayedTitles.map((titleItem) => {
               const isExpanded = expandedIds.has(titleItem.id);
 
               return (
@@ -481,7 +555,7 @@ const HowToSayList = () => {
           </div>
         )}
 
-        {!loading && totalPages > 1 && (
+        {!loading && !showFavoritesOnly && totalPages > 1 && (
           <div className="mt-10 flex items-center justify-center gap-4">
             <button
               type="button"
@@ -698,6 +772,17 @@ const HowToSayList = () => {
           </div>
         </div>
       )}
+
+      <FavoritesDeleteAllModal
+        isOpen={deleteAllModalOpen}
+        isLight={isLight}
+        itemLabel="phrases"
+        onCancel={() => setDeleteAllModalOpen(false)}
+        onConfirm={async () => {
+          const success = await deleteAllFavorites();
+          if (success) setDeleteAllModalOpen(false);
+        }}
+      />
     </Container>
   );
 };
