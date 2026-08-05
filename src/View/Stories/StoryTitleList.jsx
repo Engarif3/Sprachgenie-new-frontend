@@ -75,7 +75,6 @@ const StoryTitleList = () => {
   const [formImagePreview, setFormImagePreview] = useState(null);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
-  const [togglingPublishId, setTogglingPublishId] = useState(null);
 
   const {
     favoriteIds,
@@ -297,29 +296,6 @@ const StoryTitleList = () => {
       });
     } finally {
       setDeletingId(null);
-    }
-  };
-
-  const handleTogglePublish = async (story) => {
-    setTogglingPublishId(story.id);
-    try {
-      await api.put(`/stories/${story.id}/publish`, {
-        isPublished: !story.isPublished,
-      });
-      setStories((prev) =>
-        prev.map((s) =>
-          s.id === story.id ? { ...s, isPublished: !s.isPublished } : s,
-        ),
-      );
-    } catch (error) {
-      console.error("Error toggling publish state:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Could not update",
-        text: error.response?.data?.message || "Please try again.",
-      });
-    } finally {
-      setTogglingPublishId(null);
     }
   };
 
@@ -578,32 +554,6 @@ const StoryTitleList = () => {
                     >
                       {story.title}
                     </h3>
-
-                    {isAdmin && (
-                      <button
-                        type="button"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleTogglePublish(story);
-                        }}
-                        disabled={togglingPublishId === story.id}
-                        className={`mt-1 self-start rounded-full border px-2.5 py-1 text-xs font-semibold transition-colors disabled:opacity-50 ${
-                          story.isPublished
-                            ? isLight
-                              ? "border-emerald-300 text-emerald-700 hover:bg-emerald-50"
-                              : "border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
-                            : isLight
-                              ? "border-amber-300 text-amber-700 hover:bg-amber-50"
-                              : "border-amber-500/40 text-amber-400 hover:bg-amber-500/10"
-                        }`}
-                      >
-                        {togglingPublishId === story.id
-                          ? "Updating..."
-                          : story.isPublished
-                            ? "Unpublish"
-                            : "Publish"}
-                      </button>
-                    )}
 
                     <div className="mt-auto pt-4 flex items-center justify-between text-sm font-semibold text-orange-500 dark:text-orange-400">
                       <span className="flex items-center gap-1">

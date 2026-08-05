@@ -196,7 +196,7 @@ const NavBar = () => {
   const renderContentMenu = (menuRef) => (
     <div
       ref={menuRef}
-      className="absolute right-0 top-full z-30 mt-2 w-56 overflow-hidden rounded-2xl border border-sky-800/60 bg-gray-900/95 p-2 shadow-2xl backdrop-blur-sm"
+      className="absolute right-0 top-full z-30 mt-2 w-64 overflow-hidden rounded-2xl border border-sky-800/60 bg-gray-900/95 p-2 shadow-2xl backdrop-blur-sm"
     >
       <div className="flex flex-col gap-1">
         {contentLinks.map(({ to, label, Icon }) => (
@@ -204,11 +204,11 @@ const NavBar = () => {
             key={to}
             to={to}
             onClick={() => setIsContentMenuOpen(false)}
-            className="group flex items-center gap-2 rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
+            className="group flex items-center gap-2 whitespace-nowrap rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
           >
             <Icon
               size={16}
-              className="text-sky-500 transition-colors group-hover:text-sky-400"
+              className="flex-shrink-0 text-sky-500 transition-colors group-hover:text-sky-400"
             />
             {label}
           </Link>

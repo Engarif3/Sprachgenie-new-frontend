@@ -1,7 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Swal from "sweetalert2";
-import { ChevronLeft, ChevronRight, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  EyeOff,
+  GripVertical,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -187,6 +196,9 @@ const HowToSayList = () => {
   const [allTitles, setAllTitles] = useState([]);
   const [loadingAllTitles, setLoadingAllTitles] = useState(false);
   const [deleteAllModalOpen, setDeleteAllModalOpen] = useState(false);
+  // Hidden by default so browsing the list isn't cluttered with edit/delete
+  // icons on every card — a super admin opts into seeing them.
+  const [showAdminControls, setShowAdminControls] = useState(false);
 
   // Modal state. modalTitleId is null (closed), "new" (create flow), or an
   // existing title's id (edit flow) — sentences/rules can only be managed
@@ -884,17 +896,38 @@ const HowToSayList = () => {
           </form>
 
           {isSuperAdmin && (
-            <button
-              type="button"
-              onClick={openCreateModal}
-              className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
-                isLight
-                  ? "border-orange-300 text-orange-600 hover:bg-orange-50"
-                  : "border-orange-500/40 text-orange-400 hover:bg-orange-500/10"
-              }`}
-            >
-              <Plus size={16} /> Add New Phrase
-            </button>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={openCreateModal}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+                  isLight
+                    ? "border-orange-300 text-orange-600 hover:bg-orange-50"
+                    : "border-orange-500/40 text-orange-400 hover:bg-orange-500/10"
+                }`}
+              >
+                <Plus size={16} /> Add New Phrase
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowAdminControls((prev) => !prev)}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+                  isLight
+                    ? "border-slate-300 text-slate-600 hover:bg-slate-50"
+                    : "border-slate-600 text-slate-300 hover:bg-slate-800"
+                }`}
+              >
+                {showAdminControls ? (
+                  <>
+                    <EyeOff size={16} /> Hide Edit Controls
+                  </>
+                ) : (
+                  <>
+                    <Eye size={16} /> Show Edit Controls
+                  </>
+                )}
+              </button>
+            </div>
           )}
         </div>
 
@@ -975,7 +1008,7 @@ const HowToSayList = () => {
                         }
                       />
 
-                      {isSuperAdmin && (
+                      {isSuperAdmin && showAdminControls && (
                         <div className="flex flex-shrink-0 items-center gap-1.5">
                           <button
                             type="button"
