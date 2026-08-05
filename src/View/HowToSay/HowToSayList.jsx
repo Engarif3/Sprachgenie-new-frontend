@@ -154,7 +154,7 @@ const HowToSayList = () => {
                     type="button"
                     onClick={() => toggleExpanded(titleItem.id)}
                     aria-expanded={isExpanded}
-                    className="flex w-full items-center justify-between gap-4 p-6 text-left md:p-7"
+                    className="flex w-full items-center justify-between gap-4 px-6 py-3.5 text-left md:px-7 md:py-4"
                   >
                     <span
                       className={`text-xl font-bold leading-snug ${isLight ? "text-slate-900" : "text-white"}`}
@@ -176,7 +176,7 @@ const HowToSayList = () => {
 
                   {isExpanded && (
                     <div
-                      className={`space-y-2 border-t px-6 pb-6 pt-4 md:px-7 md:pb-7 ${
+                      className={`space-y-2.5 border-t pb-6 pl-10 pr-6 pt-4 md:pb-7 md:pl-14 md:pr-7 ${
                         isLight ? "border-slate-100" : "border-slate-800"
                       }`}
                     >
@@ -190,7 +190,11 @@ const HowToSayList = () => {
                         titleItem.sentences.map((sentenceItem) => (
                           <p
                             key={sentenceItem.id}
-                            className={`text-base font-medium leading-relaxed ${isLight ? "text-teal-600" : "text-teal-400"}`}
+                            className={`w-fit rounded-xl border px-4 py-2 text-base font-medium leading-relaxed ${
+                              isLight
+                                ? "border-teal-200 bg-teal-50 text-teal-700"
+                                : "border-teal-500/20 bg-teal-500/10 text-teal-300"
+                            }`}
                           >
                             🇩🇪 {sentenceItem.sentence}
                           </p>
