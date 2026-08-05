@@ -19,7 +19,6 @@ const ScrollStack = ({
   className = "",
   layoutVersion,
   itemDistance = 120,
-  itemScale = 0.04,
   itemStackDistance = 40,
   stackPosition = 0.2,
   scaleEndPosition = 0.1,
@@ -28,8 +27,18 @@ const ScrollStack = ({
 }) => {
   const childArray = Children.toArray(children);
   const stackTop = `${Math.round(stackPosition * 100)}vh`;
+  const lastIndex = childArray.length - 1;
   const stickyChildren = childArray.map((child, index) => {
-    const scale = Math.min(1, baseScale + index * itemScale);
+    // Spread the scale evenly across however many cards there are, so the
+    // progression always lands on exactly 1 at the true last card instead
+    // of a fixed per-card increment capping out early (e.g. baseScale +
+    // index * itemScale hitting the Math.min(1, ...) ceiling a couple of
+    // cards before the end) — a cap there makes the last few cards render
+    // at an identical size and overlap instead of continuing the fan.
+    const scale =
+      lastIndex > 0
+        ? baseScale + (index / lastIndex) * (1 - baseScale)
+        : 1;
     const stickyTop = `calc(${stackTop} + ${index * itemStackDistance}px)`;
 
     const childWithScale = isValidElement(child)
