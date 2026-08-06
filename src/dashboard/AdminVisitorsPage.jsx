@@ -346,6 +346,24 @@ const AdminVisitorsPage = () => {
     return locationParts.length > 0 ? locationParts.join(", ") : "Unknown";
   };
 
+  const renderRegisteredUsersBadge = (registeredUsers) => {
+    if (!registeredUsers || registeredUsers.length === 0) {
+      return null;
+    }
+
+    const emails = registeredUsers.map((user) => user.email);
+    const label = emails.length === 1 ? emails[0] : `${emails.length} accounts`;
+
+    return (
+      <span
+        title={emails.join(", ")}
+        className="mt-1 inline-flex w-fit max-w-[16rem] items-center gap-1 truncate rounded-full border border-emerald-300 dark:border-emerald-500/30 bg-emerald-100 dark:bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-800 dark:text-emerald-200"
+      >
+        ✓ Registered: {label}
+      </span>
+    );
+  };
+
   const getRecentVisitorMapUrl = (visitor) => {
     if (hasStoredCoordinates(visitor)) {
       return getGoogleMapsUrl(visitor.latitude, visitor.longitude);
@@ -587,7 +605,10 @@ const AdminVisitorsPage = () => {
                               {new Date(visitor.visitedAt).toLocaleString()}
                             </td>
                             <td className="px-4 py-3 font-mono text-slate-600 dark:text-slate-400">
-                              {visitor.ipAddress}
+                              <div className="flex flex-col items-start gap-1">
+                                <span>{visitor.ipAddress}</span>
+                                {renderRegisteredUsersBadge(visitor.registeredUsers)}
+                              </div>
                             </td>
                             <td className="px-4 py-3">
                               <div className="flex flex-col gap-1">
@@ -789,7 +810,10 @@ const AdminVisitorsPage = () => {
                                 className="border-b border-slate-200 dark:border-slate-800/80 transition-colors hover:bg-slate-50 dark:hover:bg-slate-900/70"
                               >
                                 <td className="px-4 py-3 font-mono text-slate-600 dark:text-slate-400">
-                                  {visitor.ipAddress}
+                                  <div className="flex flex-col items-start gap-1">
+                                    <span>{visitor.ipAddress}</span>
+                                    {renderRegisteredUsersBadge(visitor.registeredUsers)}
+                                  </div>
                                 </td>
                                 <td className="px-4 py-3">{visitor.browser}</td>
                                 <td className="px-4 py-3">
