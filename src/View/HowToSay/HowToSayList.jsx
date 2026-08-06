@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import {
+  Check,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -11,6 +12,7 @@ import {
   Pencil,
   Plus,
   Trash2,
+  X,
 } from "lucide-react";
 import {
   DndContext,
@@ -184,6 +186,13 @@ const SortableTitleCard = ({
   handleDeleteTitle,
   deletingTitleId,
   isLoggedIn,
+  editingPositionTitleId,
+  editingPositionValue,
+  onEditingPositionValueChange,
+  onStartEditPosition,
+  onCancelEditPosition,
+  onConfirmMovePosition,
+  movingTitleId,
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: titleItem.id, disabled: !canReorder });
@@ -207,18 +216,72 @@ const SortableTitleCard = ({
     >
       <div className="flex w-full items-center gap-2">
         {canReorder && (
-          <span
-            {...attributes}
-            {...listeners}
-            aria-label="Drag to reorder"
-            className={`flex flex-shrink-0 cursor-grab touch-none items-center pl-6 active:cursor-grabbing md:pl-7 ${
-              isLight
-                ? "text-slate-300 hover:text-orange-500"
-                : "text-slate-600 hover:text-orange-400"
-            }`}
-          >
-            <GripVertical size={18} />
-          </span>
+          <div className="flex flex-shrink-0 items-center gap-1.5 pl-6 md:pl-7">
+            <span
+              {...attributes}
+              {...listeners}
+              aria-label="Drag to reorder"
+              className={`flex cursor-grab touch-none items-center active:cursor-grabbing ${
+                isLight
+                  ? "text-slate-300 hover:text-orange-500"
+                  : "text-slate-600 hover:text-orange-400"
+              }`}
+            >
+              <GripVertical size={18} />
+            </span>
+
+            {editingPositionTitleId === titleItem.id ? (
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  min={1}
+                  value={editingPositionValue}
+                  onChange={(e) => onEditingPositionValueChange(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") onConfirmMovePosition(titleItem);
+                    if (e.key === "Escape") onCancelEditPosition();
+                  }}
+                  autoFocus
+                  aria-label="Target position"
+                  className={`w-14 rounded-lg border px-2 py-1 text-center text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-orange-500/40 ${
+                    isLight
+                      ? "border-slate-300 bg-white text-slate-900"
+                      : "border-slate-600 bg-slate-800 text-white"
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => onConfirmMovePosition(titleItem)}
+                  disabled={movingTitleId === titleItem.id}
+                  aria-label="Confirm move"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-emerald-500/50 text-emerald-500 transition-colors hover:bg-emerald-500/10 disabled:opacity-50"
+                >
+                  <Check size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={onCancelEditPosition}
+                  aria-label="Cancel move"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-400/50 text-slate-400 transition-colors hover:bg-slate-400/10"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => onStartEditPosition(titleItem)}
+                title="Click to type a target position"
+                className={`flex h-8 min-w-8 items-center justify-center rounded-full border px-2 text-xs font-bold transition-colors ${
+                  isLight
+                    ? "border-slate-200 text-slate-500 hover:border-orange-300 hover:text-orange-600"
+                    : "border-slate-700 text-slate-400 hover:border-orange-500/50 hover:text-orange-400"
+                }`}
+              >
+                #{(titleItem.order ?? 0) + 1}
+              </button>
+            )}
+          </div>
         )}
 
         <button
@@ -405,6 +468,13 @@ const HowToSayList = () => {
   const [showAdminControls, setShowAdminControls] = useState(false);
 
   const [reorderingTitles, setReorderingTitles] = useState(false);
+  // Same-page drag-and-drop (above) can't reach a title on another page —
+  // typing a target position and confirming moves it there instead,
+  // wherever it currently sits. Only one title's position editor is open
+  // at a time.
+  const [editingPositionTitleId, setEditingPositionTitleId] = useState(null);
+  const [editingPositionValue, setEditingPositionValue] = useState("");
+  const [movingTitleId, setMovingTitleId] = useState(null);
 
   // Modal state. modalTitleId is null (closed), "new" (create flow), or an
   // existing title's id (edit flow) — sentences/rules can only be managed
@@ -711,6 +781,69 @@ const HowToSayList = () => {
       });
     } finally {
       setDeletingTitleId(null);
+    }
+  };
+
+  const startEditPosition = (titleItem) => {
+    setEditingPositionTitleId(titleItem.id);
+    setEditingPositionValue(String((titleItem.order ?? 0) + 1));
+  };
+
+  const cancelEditPosition = () => {
+    setEditingPositionTitleId(null);
+    setEditingPositionValue("");
+  };
+
+  // Complements drag-and-drop below — that one only ever sees the titles on
+  // the current page, so it can't move something to another page. Typing a
+  // target position (1-indexed across the whole list) and confirming moves
+  // it there instead, wherever it currently sits.
+  const handleMoveTitleToPosition = async (titleItem) => {
+    const position = Number(editingPositionValue);
+    if (!Number.isInteger(position) || position < 1) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid position",
+        text: "Enter a positive whole number.",
+      });
+      return;
+    }
+
+    const confirmation = await Swal.fire({
+      title: "Move this phrase?",
+      html: `Move <strong>"${titleItem.title}"</strong> to position <strong>${position}</strong>?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "OK",
+      cancelButtonText: "Cancel",
+    });
+    if (!confirmation.isConfirmed) return;
+
+    setMovingTitleId(titleItem.id);
+    try {
+      const response = await api.put(
+        `/how-to-say-titles/move/${titleItem.id}`,
+        { position },
+      );
+      cancelEditPosition();
+      const newOrder = response.data?.data?.order ?? 0;
+      const newPage = Math.floor(newOrder / PAGE_SIZE) + 1;
+      if (newPage === currentPage) {
+        await fetchTitles();
+      } else {
+        handleGoToPage(newPage);
+      }
+      if (showFavoritesOnly) {
+        await fetchAllTitlesForFavorites();
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Could not move phrase",
+        text: error.response?.data?.message || "Please try again.",
+      });
+    } finally {
+      setMovingTitleId(null);
     }
   };
 
@@ -1292,6 +1425,13 @@ const HowToSayList = () => {
                       handleDeleteTitle={handleDeleteTitle}
                       deletingTitleId={deletingTitleId}
                       isLoggedIn={isLoggedIn}
+                      editingPositionTitleId={editingPositionTitleId}
+                      editingPositionValue={editingPositionValue}
+                      onEditingPositionValueChange={setEditingPositionValue}
+                      onStartEditPosition={startEditPosition}
+                      onCancelEditPosition={cancelEditPosition}
+                      onConfirmMovePosition={handleMoveTitleToPosition}
+                      movingTitleId={movingTitleId}
                     />
                   ))}
                 </div>
