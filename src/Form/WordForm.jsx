@@ -97,6 +97,11 @@ const WordForm = () => {
   };
 
   const [wordData, setWordData] = useState(initialWordData);
+  // Guards against duplicate submissions (double-click, or repeated clicks
+  // while a slow/stalled request is still in flight) — without this the
+  // Submit button had no disabled state at all, so every click fired an
+  // independent POST /word/create.
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [levels, setLevels] = useState([]);
   const [topics, setTopics] = useState([]);
   const [articles, setArticles] = useState([]);
@@ -446,6 +451,8 @@ const WordForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    if (isSubmitting) return;
+
     if (!wordData.levelId) {
       Swal.fire({
         title: "Level Required",
@@ -757,6 +764,7 @@ const WordForm = () => {
       }
     };
 
+    setIsSubmitting(true);
     try {
       const wordDataToSubmit = {
         ...newWordData,
@@ -899,6 +907,8 @@ const WordForm = () => {
           ? { confirmButtonText: "OK" }
           : { timer: 2000, showConfirmButton: false }),
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -1497,8 +1507,13 @@ const WordForm = () => {
         </div>
         {/* Submit Button */}
         <div>
-          <Button type="submit" fullWidth className="my-8">
-            Submit
+          <Button
+            type="submit"
+            fullWidth
+            className="my-8"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Submitting..." : "Submit"}
           </Button>
         </div>
       </form>
