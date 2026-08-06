@@ -2,7 +2,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import api from "../axios";
 import { useAuth } from "../services/auth.services";
 
-const POLL_INTERVAL_MS = 30000;
+// Every open tab of every logged-in user runs this loop, and each poll
+// passes through the backend's Redis-backed rate limiter — 90s instead of
+// 30s cuts that load by two thirds with no perceptible difference in how
+// fresh the unread badge feels.
+const POLL_INTERVAL_MS = 90000;
 
 // Polls the unread broadcast-notification count for the logged-in user, and
 // provides on-demand fetching of the full list + marking items as read.

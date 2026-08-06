@@ -22,7 +22,13 @@ import { RadioPlayerProvider } from "./context/RadioPlayerContext";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import { LanguageProvider } from "./context/LanguageContext";
 
-const AUTH_SYNC_INTERVAL_MS = 60000;
+// Runs in every open tab of every logged-in user, each one passing through
+// the backend's Redis-backed rate limiter — the focus/visibilitychange
+// triggers elsewhere in this file already catch a session change the
+// moment someone comes back to the tab, so this periodic timer only needs
+// to cover a tab left open and idle in the background; 3 minutes instead
+// of 1 cuts that idle-tab cost by two thirds with no user-visible effect.
+const AUTH_SYNC_INTERVAL_MS = 180000;
 const VISITOR_TRACK_DELAY_MS = 1500;
 // Gates the exact-GPS request to once per tab session — without this, every
 // refresh re-triggers navigator.geolocation.getCurrentPosition(), which
