@@ -2085,38 +2085,6 @@ const AdminSystemStatus = () => {
                 </p>
               </div>
 
-              <div className="p-4 bg-slate-50 dark:bg-gray-800/50 border border-slate-200 dark:border-gray-700 rounded-lg">
-                <p className="text-slate-500 dark:text-gray-400 text-sm font-medium mb-3">
-                  Global Limit
-                </p>
-                <div className="space-y-2">
-                  <p className="text-slate-600 dark:text-gray-300 text-sm">
-                    {rateLimitStatus.global?.limit}
-                  </p>
-                  <div className="flex justify-between text-xs text-slate-500 dark:text-gray-400 mb-1">
-                    <span>
-                      {rateLimitStatus.global?.current} /{" "}
-                      {rateLimitStatus.global?.limit?.split(" ")[0] || "1000"}{" "}
-                      used
-                    </span>
-                    <span>Reset in {rateLimitStatus.global?.resetIn}</span>
-                  </div>
-                  <div className="w-full bg-slate-200 dark:bg-gray-700 rounded-full h-2">
-                    <div
-                      className="h-2 rounded-full bg-blue-500"
-                      style={{
-                        width: `${
-                          (rateLimitStatus.global?.current /
-                            (rateLimitStatus.global?.limit?.split(" ")[0] ||
-                              1000)) *
-                          100
-                        }%`,
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="p-4 bg-slate-50 dark:bg-gray-800/50 border border-slate-200 dark:border-gray-700 rounded-lg">
                   <p className="text-slate-500 dark:text-gray-400 text-sm font-medium mb-3">
