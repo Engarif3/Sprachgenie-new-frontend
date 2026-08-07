@@ -30,10 +30,16 @@ import { LanguageProvider } from "./context/LanguageContext";
 // of 1 cuts that idle-tab cost by two thirds with no user-visible effect.
 const AUTH_SYNC_INTERVAL_MS = 180000;
 const VISITOR_TRACK_DELAY_MS = 1500;
-// Gates the exact-GPS request to once per tab session — without this, every
-// refresh re-triggers navigator.geolocation.getCurrentPosition(), which
-// re-shows the browser's native permission prompt each time.
-const LOCATION_SESSION_CAPTURED_KEY = "sg_visitor_location_captured_session";
+// Gates the exact-GPS request to once ever per browser (localStorage, not
+// sessionStorage) — a sessionStorage flag only stopped the prompt from
+// repeating on every refresh within the same tab session, but since consent
+// itself is remembered forever, every NEW session (closing and reopening
+// the browser, a fresh tab after sessionStorage clears) still re-triggered
+// navigator.geolocation.getCurrentPosition() and re-showed the browser's
+// native permission prompt — the exact "it's asking again" complaint this
+// is meant to fix. One data point is enough for visit analytics; there's no
+// need to ever ask again after the first successful capture.
+const LOCATION_CAPTURED_KEY = "sg_visitor_location_captured";
 const DarkVeil = lazy(() => import("./View/Home/DarkVeil"));
 
 const AppContent = () => {
@@ -85,10 +91,10 @@ const AppContent = () => {
   useEffect(() => {
     const trackVisitor = async () => {
       try {
-        let alreadyCapturedThisSession = false;
+        let alreadyCapturedEver = false;
         try {
-          alreadyCapturedThisSession = Boolean(
-            window.sessionStorage.getItem(LOCATION_SESSION_CAPTURED_KEY),
+          alreadyCapturedEver = Boolean(
+            window.localStorage.getItem(LOCATION_CAPTURED_KEY),
           );
         } catch {
           // Storage disabled (e.g. private browsing) — fall back to
@@ -96,7 +102,7 @@ const AppContent = () => {
         }
 
         const shouldCaptureGeolocation =
-          hasGrantedLocation && !alreadyCapturedThisSession;
+          hasGrantedLocation && !alreadyCapturedEver;
 
         const browserGeolocation = shouldCaptureGeolocation
           ? await requestBrowserGeolocation()
@@ -104,7 +110,7 @@ const AppContent = () => {
 
         if (shouldCaptureGeolocation) {
           try {
-            window.sessionStorage.setItem(LOCATION_SESSION_CAPTURED_KEY, "1");
+            window.localStorage.setItem(LOCATION_CAPTURED_KEY, "1");
           } catch {
             // Ignore — worst case we ask again next reload.
           }
