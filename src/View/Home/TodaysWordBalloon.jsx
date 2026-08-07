@@ -229,53 +229,53 @@ const TodaysWordBalloon = () => {
   };
 
   return (
-    <div className="relative mx-auto mt-10 flex min-h-[24rem] w-full max-w-3xl items-center justify-center overflow-visible px-4">
+    <div className="relative mx-auto mt-[6px] flex min-h-[24rem] w-full max-w-3xl items-center justify-center overflow-visible px-4">
       <div
-        className={`relative flex min-h-[22rem] w-full items-center justify-center transition-all duration-300 ${
+        className={`relative flex min-h-[8rem] w-full items-center justify-center transition-all duration-300 ${
           phase === "revealed" ? "scale-100 opacity-100" : ""
         }`}
       >
         {phase !== "revealed" && (
-          <button
-            type="button"
-            className={`hero-balloon ${phase === "burst" ? "hero-balloon-burst" : "hero-balloon-float"} ${isBalloonReady ? "cursor-pointer" : "cursor-wait"}`}
-            onPointerDown={handleBalloonPress}
-            onKeyDown={handleBalloonKeyDown}
-            aria-label="Reveal today's word"
-            aria-disabled={!isBalloonReady}
-            disabled={phase === "burst"}
-          >
-            <div className="hero-balloon-glow" />
-            <div className="hero-balloon-surface">
-              <span className="hero-balloon-shine" />
-              <div className="relative z-10 flex h-full flex-col items-center justify-center px-8 text-center text-slate-950">
-                <span className="mb-3 inline-flex rounded-full border border-white/70 bg-white/70 px-3 py-1 text-[11px] font-black uppercase tracking-[0.28em] text-sky-700 shadow-sm">
-                  Surprise Drop
-                </span>
-                <p className="text-2xl font-black uppercase tracking-[0.18em] text-slate-900 md:text-3xl">
-                  Today&apos;s Word
-                </p>
-                <p className="mt-4 text-sm font-semibold uppercase tracking-[0.18em] text-slate-800/90 ">
-                  {isBalloonReady ? "Tap to burst" : "Loading surprise..."}
-                </p>
+          <div className="flex w-full scale-75 items-center justify-center">
+            <button
+              type="button"
+              className={`hero-balloon ${phase === "burst" ? "hero-balloon-burst" : "hero-balloon-float"} ${isBalloonReady ? "cursor-pointer" : "cursor-wait"}`}
+              onPointerDown={handleBalloonPress}
+              onKeyDown={handleBalloonKeyDown}
+              aria-label="Reveal today's word"
+              aria-disabled={!isBalloonReady}
+              disabled={phase === "burst"}
+            >
+              <div className="hero-balloon-glow" />
+              <div className="hero-balloon-surface">
+                <span className="hero-balloon-shine" />
+                <div className="relative z-10 flex h-full flex-col items-center justify-center px-8 text-center text-slate-950">
+                  <span className="mb-3 inline-flex rounded-full border border-white/70 bg-white/70 px-3 py-1 text-[11px] font-black uppercase tracking-[0.28em] text-sky-700 shadow-sm">
+                    Surprise Drop
+                  </span>
+                  <p className="text-2xl font-black uppercase tracking-[0.18em] text-slate-900 md:text-3xl">
+                    Today&apos;s Word
+                  </p>
+                  <p className="mt-4 text-sm font-semibold uppercase tracking-[0.18em] text-slate-800/90 ">
+                    {isBalloonReady ? "Tap to burst" : "Loading surprise..."}
+                  </p>
+                </div>
               </div>
-            </div>
-            {/* <div className="hero-balloon-knot " /> */}
-            {/* <div className="hero-balloon-string" /> */}
-            <div className="hero-balloon-knot absolute left-1/2 top-full translate-x-[14px] -translate-y-0.5" />
+              <div className="hero-balloon-knot absolute left-1/2 top-full translate-x-[14px] -translate-y-0.5" />
 
-            <div className="hero-balloon-string absolute top-full left-1/2 translate-x-[14px] translate-y-[30%] w-[2px] h-96 bg-gray-500" />
+              <div className="hero-balloon-string absolute top-full left-1/2 translate-x-[14px] translate-y-[30%] w-[2px] h-96 bg-gray-500" />
 
-            <span className="hero-balloon-spark hero-balloon-spark-a" />
-            <span className="hero-balloon-spark hero-balloon-spark-b" />
-            <span className="hero-balloon-spark hero-balloon-spark-c" />
-            <span className="hero-balloon-spark hero-balloon-spark-d" />
-          </button>
+              <span className="hero-balloon-spark hero-balloon-spark-a" />
+              <span className="hero-balloon-spark hero-balloon-spark-b" />
+              <span className="hero-balloon-spark hero-balloon-spark-c" />
+              <span className="hero-balloon-spark hero-balloon-spark-d" />
+            </button>
+          </div>
         )}
 
         {phase === "revealed" && selectedWord && (
-          <div className="hero-word-reveal animate-today-word-reveal  rounded-[2rem] border border-orange-200/70 bg-white/90 px-8 py-8 text-center shadow-[0_30px_80px_rgba(249,115,22,0.18)] backdrop-blur-xl dark:border-white/30 dark:bg-slate-950/80 dark:shadow-[0_30px_80px_rgba(14,165,233,0.18)] w-full">
-            <span className="mb-4 inline-flex rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-black uppercase tracking-[0.26em] text-orange-700 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-300 ">
+          <div className="hero-word-reveal animate-today-word-reveal  rounded-[2rem] border border-orange-200/70 bg-white/90 px-6 py-5 md:px-8 md:py-6 text-center shadow-[0_30px_80px_rgba(249,115,22,0.18)] backdrop-blur-xl dark:border-white/30 dark:bg-slate-950/80 dark:shadow-[0_30px_80px_rgba(14,165,233,0.18)] w-full">
+            <span className="mb-3 inline-flex rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-[11px] font-black uppercase tracking-[0.26em] text-orange-700 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-300 ">
               Today&apos;s Word
             </span>
             <p className="text-xl md:text-3xl font-black tracking-tight text-slate-900 dark:text-white w-full">
@@ -289,7 +289,7 @@ const TodaysWordBalloon = () => {
             {wordMeaning && (
               <button
                 type="button"
-                className={`mt-3 w-full text-base font-medium text-slate-600 transition-colors duration-200 md:text-lg dark:text-slate-300 ${shouldTruncateMeaning ? "cursor-pointer hover:text-slate-900 dark:hover:text-white" : "cursor-default"}`}
+                className={`mt-2 w-full text-base font-medium text-slate-600 transition-colors duration-200 md:text-lg dark:text-slate-300 ${shouldTruncateMeaning ? "cursor-pointer hover:text-slate-900 dark:hover:text-white" : "cursor-default"}`}
                 onClick={() => {
                   if (shouldTruncateMeaning) {
                     setIsMeaningExpanded((currentValue) => !currentValue);
@@ -311,7 +311,7 @@ const TodaysWordBalloon = () => {
             )}
             <Link
               to="/words"
-              className="mt-6 inline-flex items-center rounded-full bg-gradient-to-r from-orange-500 to-pink-500 px-5 py-2.5 text-sm font-bold text-white transition-transform duration-200 hover:scale-105"
+              className="mt-4 inline-flex items-center rounded-full bg-gradient-to-r from-orange-500 to-pink-500 px-5 py-2.5 text-sm font-bold text-white transition-transform duration-200 hover:scale-105"
             >
               Explore Vocabulary
             </Link>

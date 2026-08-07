@@ -29,14 +29,28 @@ const formatWordCountLabel = (totalWords) => {
 const Home = () => {
   const { isLoggedIn: userLoggedIn } = useAuth();
   const [visibleSections, setVisibleSections] = useState(new Set());
+  // The ScrollStack cards are much taller than their title marker, so by
+  // the time you've scrolled partway through the sticky stack, the title
+  // has long since scrolled out of view and visibleSections would flip
+  // its fade back to invisible mid-scroll. Reveal once and keep it that
+  // way instead of toggling with the (now offscreen) title.
+  const [featureCardsRevealed, setFeatureCardsRevealed] = useState(false);
   const { t } = useTranslation("home");
   const { theme } = useTheme();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
-  // Falls back to "many" until the real count loads (or if the request
-  // ever fails) rather than showing a blank/undefined number.
   const [wordCountLabel, setWordCountLabel] = useState(null);
-  const wordCountText = wordCountLabel || "many";
+  // Counts up (never down) through placeholder numbers while the real
+  // count is loading, instead of a static "many" — looping back to the
+  // start if it reaches the cap before the real count arrives.
+  const [randomCount, setRandomCount] = useState(1000);
+  const wordCountText = wordCountLabel || `${randomCount}+`;
+  // Split the translated "Explore {{count}} Vocabulary Words" string around
+  // the count placeholder so the number can get its own loading styling,
+  // regardless of where the placeholder falls in a given language.
+  const [beforeCount, afterCount] = t("exploreVocabulary", {
+    count: "__COUNT__",
+  }).split("__COUNT__");
 
   useEffect(() => {
     let isMounted = true;
@@ -45,7 +59,9 @@ const Home = () => {
       .get("/word/all", { params: { limit: 1 } })
       .then((response) => {
         if (!isMounted) return;
-        setWordCountLabel(formatWordCountLabel(response.data?.data?.totalWords));
+        setWordCountLabel(
+          formatWordCountLabel(response.data?.data?.totalWords),
+        );
       })
       .catch((error) => {
         console.error("Failed to load total word count:", error);
@@ -55,6 +71,20 @@ const Home = () => {
       isMounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (wordCountLabel) return;
+
+    const intervalId = setInterval(() => {
+      setRandomCount((prev) => {
+        const step = (Math.floor(Math.random() * 2) + 1) * 100;
+        const next = prev + step;
+        return next > 5000 ? 1000 : next;
+      });
+    }, 350);
+
+    return () => clearInterval(intervalId);
+  }, [wordCountLabel]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -92,6 +122,12 @@ const Home = () => {
 
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (visibleSections.has("features-title")) {
+      setFeatureCardsRevealed(true);
+    }
+  }, [visibleSections]);
 
   const featureCards = [
     {
@@ -434,285 +470,277 @@ const Home = () => {
             </div>
           </div>
         )} */}
-        <CircularText
-          text="PRACTICE *MAKES *PERFECT *"
-          centerText1="Sprach"
-          centerText2="Genie"
-          onHover="speedUp"
-          spinDuration={25}
-          className="font-custom3"
-        />
-
-        {/* Hero Content */}
-        <div className="text-center pt-6 md:pt-0 lg:pt-0 pb-24 md:pb-[280px] px-4">
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-800 dark:text-white mb-6 leading-tight">
-            {t("heroTitle")}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">
-              {" "}
-              {t("heroTitleHighlight")}{" "}
-            </span>
-            {t("heroTitleEnd")}
-          </h1>
-          <p className="text-sm md:text-2xl text-gray-800 dark:text-gray-300 mb-1 max-w-3xl mx-auto">
-            {t("heroDescription")}
-          </p>
-
-          <TodaysWordBalloon />
-
-          {/* Benefits Section */}
-          {!userLoggedIn && (
-            <div className="mb-16 mt-8 max-w-4xl mx-auto">
-              <p className="text-lg text-cyan-500 dark:text-cyan-400 font-semibold mb-8">
-                {t("featuresUnlocked")}
-              </p>
-              <div className="flex flex-wrap justify-center gap-1 md:gap-8 lg:gap-8">
-                {isMobile ? (
-                  <div
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
-                  >
-                    ❤️ {t("favoriteWords")}
-                  </div>
-                ) : (
-                  <SplitText
-                    text={`❤️ ${t("favoriteWords")}`}
-                    delay={20}
-                    duration={0.6}
-                    ease="power3.out"
-                    splitType="chars"
-                    from={{ opacity: 0, y: 20 }}
-                    to={{ opacity: 1, y: 0 }}
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
-                    threshold={0.1}
-                    rootMargin="-100px"
-                    initialDelay={0}
-                  />
-                )}
-                {isMobile ? (
-                  <div
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
-                  >
-                    🤖 {t("aiPoweredLearning")}
-                  </div>
-                ) : (
-                  <SplitText
-                    text={`🤖 ${t("aiPoweredLearning")}`}
-                    delay={20}
-                    duration={0.6}
-                    ease="power3.out"
-                    splitType="chars"
-                    from={{ opacity: 0, y: 20 }}
-                    to={{ opacity: 1, y: 0 }}
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
-                    threshold={0.1}
-                    rootMargin="-100px"
-                    initialDelay={600}
-                  />
-                )}
-                {isMobile ? (
-                  <div
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
-                  >
-                    🌐 {t("translationFeatures")}
-                  </div>
-                ) : (
-                  <SplitText
-                    text={`🌐 ${t("translationFeatures")}`}
-                    delay={20}
-                    duration={0.6}
-                    ease="power3.out"
-                    splitType="chars"
-                    from={{ opacity: 0, y: 20 }}
-                    to={{ opacity: 1, y: 0 }}
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
-                    threshold={0.1}
-                    rootMargin="-100px"
-                    initialDelay={1200}
-                  />
-                )}
-                {isMobile ? (
-                  <div
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
-                  >
-                    📊 {t("personalDashboard")}
-                  </div>
-                ) : (
-                  <SplitText
-                    text={`📊 ${t("personalDashboard")}`}
-                    delay={20}
-                    duration={0.6}
-                    ease="power3.out"
-                    splitType="chars"
-                    from={{ opacity: 0, y: 20 }}
-                    to={{ opacity: 1, y: 0 }}
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
-                    threshold={0.1}
-                    rootMargin="-100px"
-                    initialDelay={1800}
-                  />
-                )}
-                {isMobile ? (
-                  <div
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
-                  >
-                    📈 {t("progressTracking")}
-                  </div>
-                ) : (
-                  <SplitText
-                    text={`📈 ${t("progressTracking")}`}
-                    delay={20}
-                    duration={0.6}
-                    ease="power3.out"
-                    splitType="chars"
-                    from={{ opacity: 0, y: 20 }}
-                    to={{ opacity: 1, y: 0 }}
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
-                    threshold={0.1}
-                    rootMargin="-100px"
-                    initialDelay={2400}
-                  />
-                )}
-                {isMobile ? (
-                  <div
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
-                  >
-                    ⚡ {t("muchMore")}
-                  </div>
-                ) : (
-                  <SplitText
-                    text={`⚡ ${t("muchMore")}`}
-                    delay={20}
-                    duration={0.6}
-                    ease="power3.out"
-                    splitType="chars"
-                    from={{ opacity: 0, y: 20 }}
-                    to={{ opacity: 1, y: 0 }}
-                    className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
-                    threshold={0.1}
-                    rootMargin="-100px"
-                    initialDelay={3000}
-                  />
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Featured Vocabulary Access */}
-          <div className="mt-16 mb-6">
-            <Link
-              to="/words"
-              className={`group relative inline-flex items-center gap-3 overflow-hidden rounded-full px-10 py-4 font-bold transition-all duration-300 hover:scale-[1.03] ${
-                theme === "light"
-                  ? "border border-slate-200 bg-white text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.08)]"
-                  : "bg-slate-950 text-white"
-              }`}
-            >
-              {/* 1. The Full-Border Spark Layer */}
-              <span className="absolute inset-0 block rounded-full">
-                <span
-                  className="absolute aspect-square w-[200%] animate-rotate [left:50%] [top:50%] [transform-origin:0_0] blur-sm"
-                  style={{
-                    backgroundImage:
-                      theme === "light"
-                        ? "conic-gradient(from 0deg, transparent 0deg 340deg, rgba(59,130,246,0.95) 360deg)"
-                        : "conic-gradient(from 0deg, transparent 0deg 340deg, white 360deg)",
-                  }}
-                />
-              </span>
-
-              {/* 2. The Thick Glow Effect (Extra layer for "thickness") */}
-              <span className="absolute inset-0 block rounded-full">
-                <span
-                  className="absolute aspect-square w-[200%] animate-rotate [left:50%] [top:50%] [transform-origin:0_0] blur-xl opacity-50"
-                  style={{
-                    backgroundImage:
-                      theme === "light"
-                        ? "conic-gradient(from 0deg, transparent 0deg 340deg, rgba(56,189,248,0.7) 360deg)"
-                        : "conic-gradient(from 0deg, transparent 0deg 340deg, rgba(255,255,255,0.8) 360deg)",
-                  }}
-                />
-              </span>
-
-              {/* 3. The Center Background (Covers the middle of the spark) */}
-              <span
-                className={`absolute inset-[3px] rounded-full ${
-                  theme === "light"
-                    ? "bg-[linear-gradient(135deg,#ffffff,#f8fafc)]"
-                    : "bg-gradient-to-r from-orange-900 via-pink-900 to-purple-900"
-                }`}
-              />
-
-              {/* 4. Content */}
-              <span
-                className={`relative z-10 flex items-center gap-3 text-lg ${
-                  theme === "light" ? "text-slate-900" : "text-white"
-                }`}
-              >
-                <span
-                // className={`flex h-10 w-10 items-center justify-center text-xl ${
-                //   theme === "light"
-                //     ? "bg-sky-50 text-sky-700"
-                //     : "bg-white/10 text-white"
-                // }`}
-                >
-                  📖
-                </span>
-                <span
-                  className={
-                    theme === "light" ? "text-slate-900" : "text-white"
-                  }
-                >
-                  {t("exploreVocabulary", { count: wordCountText })}
-                </span>
-                <span
-                  className={`text-xl transition-transform group-hover:translate-x-1 ${
-                    theme === "light" ? "text-sky-700" : "text-white"
-                  }`}
-                >
-                  →
-                </span>
-              </span>
-            </Link>
-            {/* ================== */}
+        {/* Circular badge pulled out of normal document flow into an
+        absolute top-left corner — same distance (top-8) from the navbar
+        above as from the left edge — instead of taking its own full-width
+        row above the headline, which pushed the headline, balloon, and
+        everything after it further down the page than the first screen.
+        Scaled down modestly (still clearly readable) so it only needs a
+        little clearance above the headline, instead of the ~240px its full
+        size required — that's what was pushing Benefits below the fold. */}
+        <div className="relative">
+          <div className="pointer-events-none absolute -top-12 z-10 hidden origin-top-left md:scale-[0.6] md:-left-1 md:block lg:scale-[0.7] lg:-left-2 xl:scale-[0.8] xl:-left-2 2xl:scale-[0.8] 2xl:-left-2">
+            <CircularText
+              text="PRACTICE *MAKES *PERFECT *"
+              centerText1="Sprach"
+              centerText2="Genie"
+              onHover="speedUp"
+              spinDuration={25}
+              className="font-custom3"
+            />
           </div>
 
-          {!userLoggedIn && (
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              {/* <Link
-                to="/register"
-                className={`px-8 py-3 font-bold rounded-full transition-all duration-300 text-lg hover:scale-[1.03] ${
+          {/* Hero Content */}
+          <div className="text-center pt-6 md:pt-28 xl:pt-16 pb-36 px-4">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-800 dark:text-white mb-6 leading-tight">
+              {t("heroTitle")}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">
+                {" "}
+                {t("heroTitleHighlight")}{" "}
+              </span>
+              {t("heroTitleEnd")}
+            </h1>
+            <p className="text-sm md:text-2xl text-gray-800 dark:text-gray-300 mb-1 max-w-3xl mx-auto">
+              {t("heroDescription")}
+            </p>
+
+            <TodaysWordBalloon />
+
+            {/* Benefits Section */}
+            {!userLoggedIn && (
+              <div className="mb-3 mt-0 max-w-4xl mx-auto">
+                <p className="text-lg text-cyan-500 dark:text-cyan-400 font-semibold mb-3">
+                  {t("featuresUnlocked")}
+                </p>
+                <div className="flex flex-wrap justify-center gap-x-1 gap-y-1 md:gap-x-8 md:gap-y-2 lg:gap-x-8 lg:gap-y-2">
+                  {isMobile ? (
+                    <div
+                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
+                    >
+                      ❤️ {t("favoriteWords")}
+                    </div>
+                  ) : (
+                    <SplitText
+                      text={`❤️ ${t("favoriteWords")}`}
+                      delay={20}
+                      duration={0.6}
+                      ease="power3.out"
+                      splitType="chars"
+                      from={{ opacity: 0, y: 20 }}
+                      to={{ opacity: 1, y: 0 }}
+                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                      threshold={0.1}
+                      rootMargin="-100px"
+                      initialDelay={0}
+                      scrollTrigger={false}
+                    />
+                  )}
+                  {isMobile ? (
+                    <div
+                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
+                    >
+                      🤖 {t("aiPoweredLearning")}
+                    </div>
+                  ) : (
+                    <SplitText
+                      text={`🤖 ${t("aiPoweredLearning")}`}
+                      delay={20}
+                      duration={0.6}
+                      ease="power3.out"
+                      splitType="chars"
+                      from={{ opacity: 0, y: 20 }}
+                      to={{ opacity: 1, y: 0 }}
+                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                      threshold={0.1}
+                      rootMargin="-100px"
+                      initialDelay={600}
+                      scrollTrigger={false}
+                    />
+                  )}
+                  {isMobile ? (
+                    <div
+                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
+                    >
+                      🌐 {t("translationFeatures")}
+                    </div>
+                  ) : (
+                    <SplitText
+                      text={`🌐 ${t("translationFeatures")}`}
+                      delay={20}
+                      duration={0.6}
+                      ease="power3.out"
+                      splitType="chars"
+                      from={{ opacity: 0, y: 20 }}
+                      to={{ opacity: 1, y: 0 }}
+                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                      threshold={0.1}
+                      rootMargin="-100px"
+                      initialDelay={1200}
+                      scrollTrigger={false}
+                    />
+                  )}
+                  {isMobile ? (
+                    <div
+                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
+                    >
+                      📊 {t("personalDashboard")}
+                    </div>
+                  ) : (
+                    <SplitText
+                      text={`📊 ${t("personalDashboard")}`}
+                      delay={20}
+                      duration={0.6}
+                      ease="power3.out"
+                      splitType="chars"
+                      from={{ opacity: 0, y: 20 }}
+                      to={{ opacity: 1, y: 0 }}
+                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                      threshold={0.1}
+                      rootMargin="-100px"
+                      initialDelay={1800}
+                      scrollTrigger={false}
+                    />
+                  )}
+                  {isMobile ? (
+                    <div
+                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
+                    >
+                      📈 {t("progressTracking")}
+                    </div>
+                  ) : (
+                    <SplitText
+                      text={`📈 ${t("progressTracking")}`}
+                      delay={20}
+                      duration={0.6}
+                      ease="power3.out"
+                      splitType="chars"
+                      from={{ opacity: 0, y: 20 }}
+                      to={{ opacity: 1, y: 0 }}
+                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                      threshold={0.1}
+                      rootMargin="-100px"
+                      initialDelay={2400}
+                      scrollTrigger={false}
+                    />
+                  )}
+                  {isMobile ? (
+                    <div
+                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
+                    >
+                      ⚡ {t("muchMore")}
+                    </div>
+                  ) : (
+                    <SplitText
+                      text={`⚡ ${t("muchMore")}`}
+                      delay={20}
+                      duration={0.6}
+                      ease="power3.out"
+                      splitType="chars"
+                      from={{ opacity: 0, y: 20 }}
+                      to={{ opacity: 1, y: 0 }}
+                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                      threshold={0.1}
+                      rootMargin="-100px"
+                      initialDelay={3000}
+                      scrollTrigger={false}
+                    />
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-1 mb-6 flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link
+                to="/words"
+                className={`group relative inline-flex items-center gap-2 md:gap-3 overflow-hidden rounded-full px-6 py-2.5 md:px-10 md:py-4 font-bold transition-all duration-300 hover:scale-[1.03] ${
                   theme === "light"
-                    ? "bg-[linear-gradient(135deg,#f97316,#ec4899)] text-white shadow-[0_18px_34px_rgba(244,114,182,0.22)] hover:shadow-[0_22px_42px_rgba(244,114,182,0.28)]"
-                    : "bg-gradient-to-r from-red-500 to-blue-900 text-white hover:shadow-2xl"
+                    ? "border border-slate-200 bg-white text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.08)]"
+                    : "bg-slate-950 text-white"
                 }`}
               >
-                {t("startLearning")}
-              </Link> */}
-              <Link
-                to="/login"
-                className={`px-8 py-2 bg-transparent border-2 border-sky-500 ${theme === "dark" ? "text-white" : "text-black"} font-bold rounded-full hover:bg-sky-700 hover:text-white transition-all duration-300 text-lg capitalize`}
-              >
-                {t("login")}
+                {/* 1. The Full-Border Spark Layer */}
+                <span className="absolute inset-0 block rounded-full">
+                  <span
+                    className="absolute aspect-square w-[200%] animate-rotate [left:50%] [top:50%] [transform-origin:0_0] blur-sm"
+                    style={{
+                      backgroundImage:
+                        theme === "light"
+                          ? "conic-gradient(from 0deg, transparent 0deg 340deg, rgba(59,130,246,0.95) 360deg)"
+                          : "conic-gradient(from 0deg, transparent 0deg 340deg, white 360deg)",
+                    }}
+                  />
+                </span>
+
+                {/* 2. The Thick Glow Effect (Extra layer for "thickness") */}
+                <span className="absolute inset-0 block rounded-full">
+                  <span
+                    className="absolute aspect-square w-[200%] animate-rotate [left:50%] [top:50%] [transform-origin:0_0] blur-xl opacity-50"
+                    style={{
+                      backgroundImage:
+                        theme === "light"
+                          ? "conic-gradient(from 0deg, transparent 0deg 340deg, rgba(56,189,248,0.7) 360deg)"
+                          : "conic-gradient(from 0deg, transparent 0deg 340deg, rgba(255,255,255,0.8) 360deg)",
+                    }}
+                  />
+                </span>
+
+                {/* 3. The Center Background (Covers the middle of the spark) */}
+                <span
+                  className={`absolute inset-[3px] rounded-full ${
+                    theme === "light"
+                      ? "bg-[linear-gradient(135deg,#ffffff,#f8fafc)]"
+                      : "bg-gradient-to-r from-orange-900 via-pink-900 to-purple-900"
+                  }`}
+                />
+
+                {/* 4. Content */}
+                <span
+                  className={`relative z-10 flex items-center gap-2 md:gap-3 text-sm md:text-lg ${
+                    theme === "light" ? "text-slate-900" : "text-white"
+                  }`}
+                >
+                  <span>📖</span>
+                  <span
+                    className={
+                      theme === "light" ? "text-slate-900" : "text-white"
+                    }
+                  >
+                    {beforeCount}
+                    <span className="tabular-nums">{wordCountText}</span>
+                    {afterCount}
+                  </span>
+                </span>
               </Link>
+
+              {!userLoggedIn && (
+                <Link
+                  to="/login"
+                  className={`px-6 py-1.5 md:px-8 md:py-2 bg-transparent border-2 border-sky-500 ${theme === "dark" ? "text-white" : "text-black"} font-bold rounded-full hover:bg-sky-700 hover:text-white transition-all duration-300 text-sm md:text-lg capitalize`}
+                >
+                  {t("login")}
+                </Link>
+              )}
             </div>
-          )}
-          {/* Scroll Hint */}
-          <div className=" absolute  left-1/2 -translate-x-1/2 flex flex-col items-center text-gray-800 dark:text-white/80 pointer-events-none mb-2">
-            <span className="text-xs font-bold tracking-widest uppercase mt-20">
-              {t("scrollToExplore")}
-            </span>
-            <svg
-              className="w-5 h-5 animate-bounce mt-2 font-bolder text-orange-600"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="4"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
+
+            {/* Scroll Hint */}
+            <div className=" absolute  left-1/2 -translate-x-1/2 flex flex-col items-center text-gray-800 dark:text-white/80 pointer-events-none mb-2">
+              <span className="text-xs font-bold tracking-widest uppercase mt-20">
+                {t("scrollToExplore")}
+              </span>
+              <svg
+                className="w-5 h-5 animate-bounce mt-2 font-bolder text-orange-600"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="4"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
           </div>
         </div>
       </Container>
@@ -808,12 +836,19 @@ const Home = () => {
       </div>
 
       {/* Why Choose SprachGenie? */}
-      <div className="py-20" id="features" data-animate>
-        {/* TITLE inside Container (safe) */}
+      <div className="py-20" id="features">
+        {/* TITLE inside Container (safe) — data-animate lives on just this
+        block (not the whole section) so the fade-in triggers based on the
+        title's own visibility, not on 20% of the entire ScrollStack below
+        it being in view, which could take a long scroll to satisfy. */}
         <Container>
           <div
+            id="features-title"
+            data-animate
             className={`text-center mb-16  transition-all duration-1000 ${
-              visibleSections.has("features") ? "opacity-100" : "opacity-0"
+              visibleSections.has("features-title")
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-10"
             }`}
           >
             <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 dark:text-white pb-8">
@@ -830,10 +865,24 @@ const Home = () => {
           </div>
         </Container>
 
-        {/* ScrollStack */}
+        {/* ScrollStack — opacity-only fade (no translate-y/transform) since
+        the cards rely on position: sticky for the stacking-scroll effect,
+        and a transform on any ancestor breaks sticky positioning in most
+        browsers. Uses featureCardsRevealed (reveal-once) rather than the
+        toggling visibleSections, since the title marker used to detect
+        entry scrolls out of view long before you're done scrolling through
+        the (much taller) sticky stack — toggling on that would fade the
+        cards back out mid-scroll, well before the section actually ends. */}
         {isDesktop ? (
-          <div className="mx-auto w-full max-w-6xl px-4 ">
-            <ScrollStack layoutVersion={userLoggedIn ? "logged-in" : "guest"}>
+          <div
+            className={`mx-auto w-full max-w-6xl px-4 transition-opacity duration-1000 delay-300 ${
+              featureCardsRevealed ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <ScrollStack
+              layoutVersion={userLoggedIn ? "logged-in" : "guest"}
+              revealed={featureCardsRevealed}
+            >
               {featureCards.map((feature, index) => (
                 <ScrollStackItem
                   key={feature.title}
@@ -890,7 +939,13 @@ const Home = () => {
           </div>
         ) : (
           <Container>
-            <div className="grid grid-cols-1 gap-6 px-4 md:grid-cols-2">
+            <div
+              className={`grid grid-cols-1 gap-6 px-4 md:grid-cols-2 transition-all duration-1000 delay-300 ${
+                featureCardsRevealed
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-10"
+              }`}
+            >
               {featureCards.map((feature, index) => (
                 <div
                   key={feature.title}

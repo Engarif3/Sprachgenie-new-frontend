@@ -21,6 +21,13 @@ const SplitText = ({
   tag = "p",
   onLetterAnimationComplete,
   initialDelay = 0,
+  // When false, animates immediately on mount instead of waiting for the
+  // element to scroll into view — for content that's already visible in
+  // the first screen (e.g. above-the-fold hero content), gating on scroll
+  // position means the animation never fires until the visitor scrolls
+  // away and back, since it's already "in view" with nothing left to
+  // trigger.
+  scrollTrigger: useScrollTrigger = true,
 }) => {
   const ref = useRef(null);
   const animationCompletedRef = useRef(false);
@@ -100,13 +107,17 @@ const SplitText = ({
               ease,
               delay: initialDelay / 1000,
               stagger: delay / 1000,
-              scrollTrigger: {
-                trigger: el,
-                start,
-                once: true,
-                fastScrollEnd: true,
-                anticipatePin: 0.4,
-              },
+              ...(useScrollTrigger
+                ? {
+                    scrollTrigger: {
+                      trigger: el,
+                      start,
+                      once: true,
+                      fastScrollEnd: true,
+                      anticipatePin: 0.4,
+                    },
+                  }
+                : {}),
               onComplete: () => {
                 animationCompletedRef.current = true;
                 onCompleteRef.current?.();
@@ -144,6 +155,7 @@ const SplitText = ({
         rootMargin,
         fontsLoaded,
         initialDelay,
+        useScrollTrigger,
       ],
       scope: ref,
     },
