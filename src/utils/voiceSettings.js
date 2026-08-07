@@ -83,22 +83,20 @@ export const saveVoiceSettings = (voiceSettings) => {
   }
 };
 
-/**
- * Get the best available German voice
- * Prioritizes: 1) Saved preference, 2) Google voices, 3) Any German voice
- * @returns {Promise<SpeechSynthesisVoice|null>}
- */
-export const getBestGermanVoice = async () => {
-  const voices = await getAvailableGermanVoices();
-
-  if (voices.length === 0) {
+// Shared preference order — Prioritizes: 1) Saved preference, 2) Google
+// voices, 3) female voices, 4) whatever's first. Used by both the async,
+// wait-for-voiceschanged path (getBestGermanVoice, for non-gesture contexts
+// like a settings dropdown) and the synchronous path (getBestGermanVoiceSync,
+// for inside a click handler — see the comment there for why this can't
+// just always be the async version).
+const pickPreferredGermanVoice = (germanVoices) => {
+  if (germanVoices.length === 0) {
     return null;
   }
 
-  // Check for saved preference
   const savedSettings = getSavedVoiceSettings();
   if (savedSettings) {
-    const savedVoice = voices.find(
+    const savedVoice = germanVoices.find(
       (voice) =>
         voice.name === savedSettings.name && voice.lang === savedSettings.lang,
     );
@@ -107,16 +105,14 @@ export const getBestGermanVoice = async () => {
     }
   }
 
-  // Prioritize Google voices (usually highest quality)
-  const googleVoice = voices.find((voice) =>
+  const googleVoice = germanVoices.find((voice) =>
     voice.name.toLowerCase().includes("google"),
   );
   if (googleVoice) {
     return googleVoice;
   }
 
-  // Prioritize female voices (often clearer for language learning)
-  const femaleVoice = voices.find(
+  const femaleVoice = germanVoices.find(
     (voice) =>
       voice.name.toLowerCase().includes("female") ||
       voice.name.toLowerCase().includes("anna") ||
@@ -127,9 +123,56 @@ export const getBestGermanVoice = async () => {
     return femaleVoice;
   }
 
-  // Return first German voice as fallback
-  return voices[0];
+  return germanVoices[0];
 };
+
+/**
+ * Get the best available German voice
+ * Prioritizes: 1) Saved preference, 2) Google voices, 3) Any German voice
+ * @returns {Promise<SpeechSynthesisVoice|null>}
+ */
+export const getBestGermanVoice = async () => {
+  const voices = await getAvailableGermanVoices();
+  return pickPreferredGermanVoice(voices);
+};
+
+// Synchronous voice pick — deliberately does NOT wait for the
+// "voiceschanged" event the way getBestGermanVoice()/getAvailableGermanVoices()
+// do. speechSynthesis.speak() has to run in the same synchronous tick as the
+// click that triggered it, or mobile Safari/Chrome silently drop it (it no
+// longer counts as originating from a user gesture) — that's the "takes
+// multiple clicks to hear pronunciation" bug. Any `await` before speak(),
+// including waiting for voices to load, breaks that chain. This just uses
+// whichever voices speechSynthesis.getVoices() already has cached right
+// now; warmUpVoiceList() below is what makes sure that list is usually
+// already populated by the time a real click happens.
+export const getBestGermanVoiceSync = () => {
+  if (typeof speechSynthesis === "undefined") {
+    return null;
+  }
+
+  const allVoices = speechSynthesis.getVoices();
+  const germanVoices = allVoices.filter(
+    (voice) => voice.lang.startsWith("de-") || voice.lang.startsWith("de_"),
+  );
+
+  return pickPreferredGermanVoice(germanVoices);
+};
+
+// Chrome (and some other browsers) only populate speechSynthesis.getVoices()
+// asynchronously, and only after it's been called at least once — calling
+// it here, once, as soon as this module loads (well before any click can
+// happen) gets that population started early instead of waiting for the
+// first pronunciation click to discover the list is still empty.
+export const warmUpVoiceList = () => {
+  if (typeof speechSynthesis === "undefined") {
+    return;
+  }
+
+  speechSynthesis.getVoices();
+};
+
+warmUpVoiceList();
 
 /**
  * Get voice by name and language

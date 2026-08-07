@@ -1,37 +1,24 @@
-import { getBestGermanVoice } from "./voiceSettings";
+import { getBestGermanVoiceSync } from "./voiceSettings";
 
-// let canPronounce = true;
-
-// export const pronounceWord = (word) => {
-//   if (!canPronounce) return;
-
-//   canPronounce = false;
-
-//   const utterance = new SpeechSynthesisUtterance(word);
-//   utterance.lang = "de-DE"; // German pronunciation
-//   speechSynthesis.speak(utterance);
-
-//   // Cooldown period (e.g., 500ms)
-//   setTimeout(() => {
-//     canPronounce = true;
-//   }, 900);
-// };
-
-export const pronounceWord = async (word) => {
-  // Cancel any queued or ongoing speech
+// Deliberately synchronous, all the way through — speechSynthesis.speak()
+// has to run in the same tick as the click that triggered this, or mobile
+// Safari/Chrome silently drop it (it stops counting as a user gesture).
+// This used to `await getBestGermanVoice()` before calling speak(), which
+// is exactly what broke it: the await handed control back to the browser
+// between the click and the actual speak() call, so on a cold voice-list
+// load the request got silently dropped — the user saw nothing happen and
+// had to click again (by which point the voice list was cached and the
+// second click's speak() call, still not gesture-safe in principle, just
+// happened to be fast enough to often go through).
+export const pronounceWord = (word) => {
   speechSynthesis.cancel();
 
   const utterance = new SpeechSynthesisUtterance(word);
   utterance.lang = "de-DE";
 
-  // Try to get the best/preferred German voice
-  try {
-    const preferredVoice = await getBestGermanVoice();
-    if (preferredVoice) {
-      utterance.voice = preferredVoice;
-    }
-  } catch (error) {
-    console.warn("Failed to load preferred voice, using default:", error);
+  const preferredVoice = getBestGermanVoiceSync();
+  if (preferredVoice) {
+    utterance.voice = preferredVoice;
   }
 
   speechSynthesis.speak(utterance);
