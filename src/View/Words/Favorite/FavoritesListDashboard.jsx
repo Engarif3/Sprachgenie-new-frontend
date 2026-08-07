@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import axios from "../../../axios";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -43,6 +43,18 @@ const FavoritesListDashboard = () => {
   const [conjugationData, setConjugationData] = useState(null);
   const [conjugationError, setConjugationError] = useState(null);
   const conjugationCache = useRef({});
+
+  // See WordList.jsx for the full explanation — the paragraph-AI and
+  // conjugation-AI buttons fire into two separate state trees with no
+  // shared lock, so clicking both before either request resolves let both
+  // modals open at once. This disables every AI/conjugate button in the
+  // table while ANY AI request is in flight, so only one can run at a time.
+  const isAnyAiActionPending = useMemo(
+    () =>
+      Object.values(loadingParagraphs).some(Boolean) ||
+      Object.values(loadingConjugations).some(Boolean),
+    [loadingParagraphs, loadingConjugations],
+  );
   const reportedConjugations = useRef(new Set());
   // =================conjugation===========================
 
@@ -549,6 +561,7 @@ const FavoritesListDashboard = () => {
                     loadingParagraphs={loadingParagraphs}
                     handleConjugate={handleConjugate}
                     loadingConjugations={loadingConjugations}
+                    isAnyAiActionPending={isAnyAiActionPending}
                     conjugationModalProps={{
                       isOpen: isConjugationModalOpen,
                       word: conjugationWord,

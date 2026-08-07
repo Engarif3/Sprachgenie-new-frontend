@@ -175,6 +175,7 @@ const FavoriteWordsTable = ({
   loadingParagraphs,
   handleConjugate,
   loadingConjugations,
+  isAnyAiActionPending,
   conjugationModalProps,
   handleRemoveFavorite,
 }) => {
@@ -265,7 +266,7 @@ const FavoriteWordsTable = ({
                           type="button"
                           onClick={() => generateParagraph(word)}
                           className="relative border-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white italic px-2 py-1 text-xs font-semibold md:font-bold lg:font-bold rounded-full md:mt-4 h-6 w-6 cursor-pointer hover:scale-110 border-emerald-400 transition-all duration-200 shadow-lg hover:shadow-green-500/50 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
-                          disabled={loadingParagraphs[word.id]}
+                          disabled={isAnyAiActionPending}
                           title="Generate AI paragraph"
                           aria-label="Generate AI paragraph"
                         >
@@ -303,7 +304,7 @@ const FavoriteWordsTable = ({
                         type="button"
                         onClick={() => handleConjugate?.(word)}
                         className="relative border-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white italic px-2 py-1 text-xs font-semibold md:font-bold lg:font-bold rounded-full h-6 w-6 cursor-pointer hover:scale-105 border-violet-400 transition-all duration-200 shadow-lg hover:shadow-violet-500/50 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
-                        disabled={!!loadingConjugations?.[word.id]}
+                        disabled={isAnyAiActionPending}
                         title="Show conjugation table"
                         aria-label="Show conjugation table"
                       >

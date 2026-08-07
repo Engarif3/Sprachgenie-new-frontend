@@ -510,6 +510,23 @@ const WordList = () => {
   const [isConjugationModalOpen, setIsConjugationModalOpen] = useState(false);
   const [conjugationWord, setConjugationWord] = useState(null);
   const [conjugationData, setConjugationData] = useState(null);
+
+  // The paragraph-AI and conjugation-AI buttons fire into two entirely
+  // separate state trees (loadingParagraphs/isAIModalOpen vs
+  // loadingConjugations/isConjugationModalOpen) with no shared lock between
+  // them — clicking one button and then the other before the first request
+  // resolves let both requests land and both modals open at once, an
+  // unpredictable race depending purely on which response arrived first.
+  // This flag is true while ANY AI request (paragraph or conjugation, for
+  // any word) is in flight, and disables every AI/conjugate button in the
+  // table while it's true, so only one AI action can ever be in progress at
+  // a time.
+  const isAnyAiActionPending = useMemo(
+    () =>
+      Object.values(loadingParagraphs).some(Boolean) ||
+      Object.values(loadingConjugations).some(Boolean),
+    [loadingParagraphs, loadingConjugations],
+  );
   const [conjugationError, setConjugationError] = useState(null);
   // Session-level cache: avoids hitting the backend for a verb already fetched this session
   const conjugationCache = useRef({});
@@ -2338,6 +2355,7 @@ const WordList = () => {
                       loadingFavorites={loadingFavorites}
                       loadingParagraphs={loadingParagraphs}
                       loadingConjugations={loadingConjugations}
+                      isAnyAiActionPending={isAnyAiActionPending}
                       focusElement={focusElement}
                       revealMeaning={revealMeaning}
                       openModal={openModal}
