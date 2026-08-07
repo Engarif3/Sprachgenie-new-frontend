@@ -2,22 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../../axios";
 import Button from "../../components/UI/Button";
 import PageHeader from "../../components/UI/PageHeader";
-
-const formatDate = (dateValue) => {
-  if (!dateValue) return "";
-  const date = new Date(dateValue);
-  const datePart = date.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-  const timePart = date.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
-  return `${datePart}, ${timePart}`;
-};
+import DateTime from "../../components/UI/DateTime";
 
 const BroadcastNotifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -510,7 +495,7 @@ const BroadcastNotifications = () => {
                       </p>
                     )}
                     <p className="text-xs text-slate-400 dark:text-gray-500">
-                      Broadcast {formatDate(notification.createdAt)}
+                      Broadcast <DateTime value={notification.createdAt} />
                       {notification.creator?.name &&
                         ` by ${notification.creator.name}`}
                     </p>

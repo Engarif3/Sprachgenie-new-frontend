@@ -5,6 +5,7 @@ import api from "../axios";
 import { useAuth } from "../services/auth.services";
 import PageHeader from "../components/UI/PageHeader";
 import Button from "../components/UI/Button";
+import DateTime from "../components/UI/DateTime";
 
 const CATEGORY_OPTIONS = [
   { value: "", label: "All categories" },
@@ -52,17 +53,6 @@ const getEnvironmentBadgeClass = (environment) =>
   environment === "DEVELOPMENT"
     ? "border-fuchsia-300/60 bg-fuchsia-50 text-fuchsia-700 dark:border-fuchsia-500/20 dark:bg-fuchsia-500/10 dark:text-fuchsia-200"
     : "border-emerald-300/60 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200";
-
-const formatDate = (value) => {
-  if (!value) {
-    return "Unknown";
-  }
-
-  return new Date(value).toLocaleString(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-};
 
 const buildQueryParams = (filters, page) => {
   const params = { page, limit: 20 };
@@ -668,7 +658,7 @@ const ErrorLogsPage = () => {
                           {record.ipAddress || "—"}
                         </td>
                         <td className="whitespace-nowrap px-4 py-4 text-slate-600 dark:text-slate-300">
-                          {formatDate(record.createdAt)}
+                          <DateTime value={record.createdAt} />
                         </td>
                         <td className="sticky right-0 border-l border-slate-200 bg-white px-4 py-4 dark:border-slate-800 dark:bg-slate-900">
                           <button
@@ -727,7 +717,7 @@ const ErrorLogsPage = () => {
                     <div className="mt-3 grid gap-1 text-xs text-slate-500 dark:text-slate-400">
                       {record.email && <p>Email: {record.email}</p>}
                       {record.path && <p>Path: {record.path}</p>}
-                      <p>{formatDate(record.createdAt)}</p>
+                      <p><DateTime value={record.createdAt} /></p>
                     </div>
                   </article>
                 ))}
@@ -800,7 +790,7 @@ const ErrorLogsPage = () => {
                       Time
                     </p>
                     <p className="mt-2 text-sm text-slate-900 dark:text-white">
-                      {formatDate(selectedRecord.createdAt)}
+                      <DateTime value={selectedRecord.createdAt} />
                     </p>
                   </div>
                   <div className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">

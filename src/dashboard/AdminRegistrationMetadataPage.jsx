@@ -5,6 +5,7 @@ import api, { externalApi } from "../axios";
 import { useAuth } from "../services/auth.services";
 import PageHeader from "../components/UI/PageHeader";
 import Button from "../components/UI/Button";
+import DateTime from "../components/UI/DateTime";
 
 const GEOCODING_ENDPOINT = "https://nominatim.openstreetmap.org/search";
 
@@ -23,16 +24,6 @@ const buildQueryParams = (filters, page) => {
   return params;
 };
 
-const formatDate = (value) => {
-  if (!value) {
-    return "Unknown";
-  }
-
-  return new Date(value).toLocaleString(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-};
 
 const decodeDisplayValue = (value) => {
   if (typeof value !== "string") {
@@ -656,7 +647,7 @@ const AdminRegistrationMetadataPage = () => {
                           {getLocationSourceLabel(record.source)}
                         </td>
                         <td className="px-4 py-4 text-slate-600 dark:text-slate-300">
-                          {formatDate(record.createdAt)}
+                          <DateTime value={record.createdAt} />
                         </td>
                         <td className="px-4 py-4">
                           <button
@@ -725,7 +716,7 @@ const AdminRegistrationMetadataPage = () => {
                         <span className="font-semibold text-slate-900 dark:text-white">
                           Registered:
                         </span>{" "}
-                        {formatDate(record.createdAt)}
+                        <DateTime value={record.createdAt} />
                       </p>
                     </div>
                   </article>
@@ -861,7 +852,7 @@ const AdminRegistrationMetadataPage = () => {
                             Account Created
                           </p>
                           <p className="mt-2 text-sm text-slate-900 dark:text-white">
-                            {formatDate(selectedUserProfile?.createdAt)}
+                            <DateTime value={selectedUserProfile?.createdAt} />
                           </p>
                         </div>
                       </div>
@@ -913,7 +904,7 @@ const AdminRegistrationMetadataPage = () => {
                           Registered At
                         </p>
                         <p className="mt-2 text-sm text-slate-900 dark:text-white">
-                          {formatDate(selectedRecord.createdAt)}
+                          <DateTime value={selectedRecord.createdAt} />
                         </p>
                       </div>
                     </div>
@@ -952,7 +943,7 @@ const AdminRegistrationMetadataPage = () => {
                       {selectedRecord?.preciseLocationCapturedAt && (
                         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                           Captured at:{" "}
-                          {formatDate(selectedRecord.preciseLocationCapturedAt)}
+                          <DateTime value={selectedRecord.preciseLocationCapturedAt} />
                         </p>
                       )}
                       {(selectedRecord.latitude ||

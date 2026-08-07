@@ -13,6 +13,8 @@ import {
   getAvailableGermanVoices,
   getBestGermanVoice,
 } from "../../utils/voiceSettings";
+import { formatDateOnly } from "../../utils/formatDateTime";
+import { pronounceWord } from "../../utils/wordPronounciation";
 
 // Chrome (and Chromium derivatives) has a long-standing bug where
 // utterance.onboundary never fires for remote/"network" voices — which is
@@ -203,29 +205,7 @@ const splitIntoParagraphs = (text) => {
 
 const formatPublishedDate = (dateValue) => {
   if (!dateValue) return null;
-  return new Date(dateValue).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-};
-
-const pronounceWord = async (word) => {
-  window.speechSynthesis.cancel();
-
-  const utterance = new SpeechSynthesisUtterance(word);
-  utterance.lang = "de-DE";
-
-  try {
-    const preferredVoice = await getBestGermanVoice();
-    if (preferredVoice) {
-      utterance.voice = preferredVoice;
-    }
-  } catch (voiceError) {
-    console.warn("Failed to load preferred voice:", voiceError);
-  }
-
-  window.speechSynthesis.speak(utterance);
+  return formatDateOnly(dateValue);
 };
 
 const StoryDetail = () => {

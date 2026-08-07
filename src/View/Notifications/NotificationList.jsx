@@ -2,22 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Trash2 } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
-
-const formatNotificationDate = (dateValue) => {
-  if (!dateValue) return "";
-  const date = new Date(dateValue);
-  const datePart = date.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-  const timePart = date.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
-  return `${datePart}, ${timePart}`;
-};
+import DateTime from "../../components/UI/DateTime";
 
 const isExternalLink = (link) => /^https?:\/\//i.test(link || "");
 
@@ -167,11 +152,10 @@ const NotificationList = ({
                     {notification.topic}
                   </p>
                   <span className="flex shrink-0 items-center gap-2">
-                    <span
-                      className={`text-xs ${isLight ? "text-slate-400" : "text-slate-500"}`}
-                    >
-                      {formatNotificationDate(notification.createdAt)}
-                    </span>
+                    <DateTime
+                      value={notification.createdAt}
+                      className="text-xs"
+                    />
                     {selectable && (
                       <button
                         type="button"

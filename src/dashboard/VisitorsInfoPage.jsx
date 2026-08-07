@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import api from "../axios";
+import { formatDateOnly } from "../utils/formatDateTime";
 
 const VisitorsInfoPage = () => {
   const [uniqueVisitors, setUniqueVisitors] = useState(0);
@@ -179,13 +180,10 @@ const VisitorsInfoPage = () => {
                             minHeight: "10px",
                             height: `${Math.max(heightPercent, 8)}px`,
                           }}
-                          title={`${new Date(date).toLocaleDateString()}: ${normalizedCount} visitors`}
+                          title={`${formatDateOnly(date)}: ${normalizedCount} visitors`}
                         />
                         <p className="text-center text-[10px] text-slate-400 dark:text-gray-400 whitespace-nowrap">
-                          {new Date(date).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                          })}
+                          {formatDateOnly(date, { withYear: false })}
                         </p>
                       </div>
                     );

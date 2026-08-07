@@ -3,15 +3,7 @@ import api from "../../axios";
 import WordListModal from "../../View/Words/Modals/WordListModal";
 import Button from "../../components/UI/Button";
 import PageHeader from "../../components/UI/PageHeader";
-
-const formatDate = (dateValue) => {
-  if (!dateValue) return "";
-  return new Date(dateValue).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-};
+import { formatDateOnly as formatDate } from "../../utils/formatDateTime";
 
 const WordReports = () => {
   const [error, setError] = useState("");

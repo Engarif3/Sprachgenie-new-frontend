@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api, { externalApi } from "../axios";
+import DateTime from "../components/UI/DateTime";
+import { formatTimeOnly } from "../utils/formatDateTime";
 
 const DASHBOARD_TABS = [
   { key: "overview", label: "Overview", icon: "🚦" },
@@ -341,7 +343,7 @@ const formatMetricTimestamp = (value) => {
     return value;
   }
 
-  return date.toLocaleString();
+  return <DateTime value={date} />;
 };
 
 const MetricProgressCard = ({
@@ -1950,9 +1952,7 @@ const AdminSystemStatus = () => {
                       </p>
                       <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">
                         {infrastructureStatus.aiService?.checkedAt
-                          ? new Date(
-                              infrastructureStatus.aiService.checkedAt,
-                            ).toLocaleTimeString()
+                          ? formatTimeOnly(infrastructureStatus.aiService.checkedAt)
                           : "N/A"}
                       </p>
                       <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">
@@ -2149,7 +2149,7 @@ const AdminSystemStatus = () => {
                       <p className="text-slate-500 dark:text-gray-400 text-xs">{alert.message}</p>
                     </div>
                     <span className="text-xs text-slate-400 dark:text-gray-500">
-                      {new Date(alert.timestamp).toLocaleTimeString()}
+                      {formatTimeOnly(alert.timestamp)}
                     </span>
                   </div>
                 </div>
@@ -2182,7 +2182,7 @@ const AdminSystemStatus = () => {
                       </p>
                     </div>
                     <span className="text-xs text-slate-400 dark:text-gray-500">
-                      {new Date(log.timestamp).toLocaleTimeString()}
+                      {formatTimeOnly(log.timestamp)}
                     </span>
                   </div>
                 </div>
@@ -2213,7 +2213,7 @@ const AdminSystemStatus = () => {
                       </p>
                     </div>
                     <span className="text-xs text-slate-400 dark:text-gray-500 whitespace-nowrap">
-                      {new Date(log.timestamp).toLocaleTimeString()}
+                      {formatTimeOnly(log.timestamp)}
                     </span>
                   </div>
                 </div>

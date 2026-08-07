@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import api from "../../axios";
 import aiApi from "../../AI_axios";
 import PageHeader from "../../components/UI/PageHeader";
+import { formatDateOnly } from "../../utils/formatDateTime";
 
 const StoriesManagement = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -508,8 +509,7 @@ const StoriesManagement = () => {
                       </span>
                     </p>
                     <p>
-                      📅 Created:{" "}
-                      {new Date(story.createdAt).toLocaleDateString()}
+                      📅 Created: {formatDateOnly(story.createdAt)}
                     </p>
                   </div>
 

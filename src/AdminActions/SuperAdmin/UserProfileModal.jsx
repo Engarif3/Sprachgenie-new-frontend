@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { dateTimeFormatter } from "../../utils/formatDateTime";
+import DateTime from "../../components/UI/DateTime";
 import {
   createInitials,
   formatRoleLabel,
@@ -65,9 +65,11 @@ const UserProfileModal = ({ isOpen, user, isLoading, onClose }) => {
 
   const normalizedRole = String(user?.role || "").toLowerCase();
   const displayName = user?.name || user?.email || "User profile";
-  const formattedCreatedAt = user?.createdAt
-    ? dateTimeFormatter(user.createdAt)
-    : "Not available";
+  const formattedCreatedAt = user?.createdAt ? (
+    <DateTime value={user.createdAt} />
+  ) : (
+    "Not available"
+  );
 
   return (
     <div

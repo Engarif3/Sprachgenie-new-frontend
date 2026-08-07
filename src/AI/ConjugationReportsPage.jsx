@@ -6,6 +6,7 @@ import { ScaleLoader } from "react-spinners";
 import { useAuth } from "../services/auth.services";
 import aiApi from "../AI_axios";
 import ConjugationModal from "../View/Words/WordList/ConjugationModal";
+import { formatDateOnly } from "../utils/formatDateTime";
 
 const ConjugationReportsPage = () => {
   const { isAdmin, isSuperAdmin, isLoggedIn, userId } = useAuth();
@@ -609,7 +610,7 @@ const ConjugationReportsPage = () => {
                           className="flex items-start gap-3 rounded-lg bg-slate-50 dark:bg-gray-900/40 px-3 py-2 text-sm"
                         >
                           <span className="text-slate-400 dark:text-gray-500 text-xs mt-0.5 shrink-0">
-                            {new Date(r.createdAt).toLocaleDateString()}
+                            {formatDateOnly(r.createdAt)}
                           </span>
                           <span className="text-slate-500 dark:text-gray-400 text-xs">
                             {r.userId ? `User: ${r.userId.slice(0, 8)}…` : "Anonymous"}

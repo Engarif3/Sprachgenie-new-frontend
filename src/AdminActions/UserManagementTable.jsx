@@ -1,5 +1,5 @@
 import Pagination from "./AdminPaginationForUsers";
-import { dateTimeFormatter } from "../utils/formatDateTime";
+import DateTime from "../components/UI/DateTime";
 import {
   createInitials,
   formatRoleLabel,
@@ -123,9 +123,6 @@ const UserManagementTable = ({
                 </tr>
               ) : (
                 users.map((user) => {
-                  const formattedDateTime = dateTimeFormatter(
-                    user.createdAt,
-                  ).split(" - ");
                   const resolvedRole = user.role || fallbackRoleLabel;
 
                   return (
@@ -237,15 +234,7 @@ const UserManagementTable = ({
                         </td>
                       )}
                       <td className="px-1 py-1 text-center text-xs text-slate-700 dark:text-gray-300">
-                        <div className="flex items-center gap-1 leading-tight">
-                          <span className="rounded-lg bg-slate-100 dark:bg-gray-700 px-1 py-1 font-medium text-slate-700 dark:text-gray-200">
-                            {formattedDateTime[0]}
-                          </span>
-                          <span>-</span>
-                          <span className="rounded-lg bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 font-medium text-emerald-700 dark:text-emerald-300">
-                            {formattedDateTime[1]}
-                          </span>
-                        </div>
+                        <DateTime value={user.createdAt} />
                       </td>
                     </tr>
                   );

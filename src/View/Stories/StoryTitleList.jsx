@@ -13,6 +13,7 @@ import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
 import api from "../../axios";
 import { useTheme } from "../../context/ThemeContext";
+import { formatDateOnly } from "../../utils/formatDateTime";
 import { useAuth } from "../../services/auth.services";
 import { useFavorites } from "../../hooks/useFavorites";
 import FavoriteButton from "../Words/Modals/FavoriteButton";
@@ -36,11 +37,7 @@ const STORIES_PER_PAGE = 9;
 
 const formatPublishedDate = (dateValue) => {
   if (!dateValue) return null;
-  return new Date(dateValue).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
+  return formatDateOnly(dateValue);
 };
 
 const StoryTitleList = () => {
