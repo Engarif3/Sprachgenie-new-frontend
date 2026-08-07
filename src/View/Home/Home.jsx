@@ -1,9 +1,7 @@
 import Container from "../../utils/Container";
 import HomeCard from "./HomeCard";
 import CircularText from "./CircularText";
-import SplashCursor from "./SplashCursor";
 import SplitText from "./SplitText";
-import Marquee from "react-fast-marquee";
 import { useAuth } from "../../services/auth.services";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -649,7 +647,20 @@ const Home = () => {
               </div>
             )}
 
-            <div className="mt-1 mb-6 flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div
+              className={`flex flex-col sm:flex-row gap-4 justify-center items-center ${
+                // The "Scroll to explore" hint below is position:absolute
+                // with no top/bottom set, so it derives its position from
+                // where it would've naturally landed in flow — pushing this
+                // block down with mt would push that hint down with it. The
+                // negative -mb-5 cancels that: mt-12 + (-mb-5) = 28px net,
+                // the exact same flow contribution as the logged-out
+                // mt-1 + mb-6, so the hint's position is unaffected while
+                // this block still renders visibly lower for more breathing
+                // room under the balloon.
+                userLoggedIn ? "mt-12 -mb-5" : "mt-1 mb-6"
+              }`}
+            >
               <Link
                 to="/words"
                 className={`group relative inline-flex items-center gap-2 md:gap-3 overflow-hidden rounded-full px-6 py-2.5 md:px-10 md:py-4 font-bold transition-all duration-300 hover:scale-[1.03] ${
