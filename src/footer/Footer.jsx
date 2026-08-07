@@ -53,8 +53,8 @@ const Footer = () => {
   return (
     <footer className="border-t border-slate-800 bg-slate-950 text-white">
       <div className="mx-auto max-w-7xl px-6 py-12 md:px-10">
-        <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
-          <div className="col-span-2 md:col-span-1">
+        <div className="grid grid-cols-2 gap-10 lg:grid-cols-4">
+          <div className="col-span-2 lg:col-span-1">
             <p className="text-2xl font-bold">
               <span className="text-orange-500">Sprach</span>
               <span className="text-sky-400">Genie</span>
@@ -91,7 +91,7 @@ const Footer = () => {
             ))}
           </div>
 
-          <div className="flex flex-col items-start gap-3 md:items-end md:text-right">
+          <div className="flex flex-col items-start gap-3 lg:items-end lg:text-right">
             <FooterHeading>Connect</FooterHeading>
             <div className="flex gap-3">
               {SOCIAL_LINKS.map(({ href, label, Icon }) => (

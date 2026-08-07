@@ -341,7 +341,7 @@ const NavBar = () => {
           </div>
         )}
         {!isMobile && (
-          <div className="mt-1 hidden items-center justify-between rounded-xl border border-slate-700/70 px-3 py-2 md:flex lg:hidden">
+          <div className="mt-1 hidden items-center justify-between rounded-xl border border-slate-700/70 px-3 py-2 lg:flex xl:hidden">
             <button
               onClick={() => {
                 toggleLanguage();
@@ -424,7 +424,7 @@ const NavBar = () => {
           <div className="h-1 -mt-2  " />
           <div className="flex flex-wrap items-center justify-between py-3 px-2 text-lg font-semibold relative border-b border-slate-800 mt-0 md:flex-nowrap">
             {/* Title and Mobile Actions */}
-            <div className="flex min-w-0 flex-1 items-center justify-between gap-2 px-2 md:w-auto md:flex-none md:px-4">
+            <div className="flex min-w-0 flex-1 items-center justify-between gap-2 px-2 lg:w-auto lg:flex-none lg:px-4">
               <Link
                 className="mb-1 whitespace-nowrap text-2xl transition-transform hover:scale-105 sm:text-3xl"
                 to="/"
@@ -433,7 +433,7 @@ const NavBar = () => {
                 <span className="text-sky-500 font-extrabold">Genie</span>
               </Link>
 
-              <div className="ml-auto flex items-center md:hidden">
+              <div className="ml-auto flex items-center lg:hidden">
                 <div className="mr-2 flex items-center gap-2">
                   {location.pathname !== "/words" && (
                     <Link
@@ -559,16 +559,16 @@ const NavBar = () => {
               </div>
             </div>
             {/* Navigation Links */}
-            <div className="hidden md:ml-auto md:flex md:flex-row md:flex-nowrap rounded-xl items-center gap-2 md:gap-2 lg:gap-16 w-full md:w-auto px-2 lg:px-4 mt-2 md:mt-0 md:static md:py-0 md:border-0 md:bg-transparent">
+            <div className="hidden lg:ml-auto lg:flex lg:flex-row lg:flex-nowrap rounded-xl items-center gap-2 lg:gap-2 xl:gap-16 w-full lg:w-auto px-2 xl:px-4 mt-2 lg:mt-0 lg:static lg:py-0 lg:border-0 lg:bg-transparent">
               {location.pathname !== "/" && (
                 <Link
                   to="/"
-                  className="group hidden md:flex items-center justify-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 transition-all duration-300"
+                  className="group hidden lg:flex items-center justify-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 transition-all duration-300"
                 >
-                  <FaHome className="text-2xl lg:text-3xl text-sky-500 group-hover:text-sky-500 transition-colors group-hover:animate-bounce" />
+                  <FaHome className="text-2xl xl:text-3xl text-sky-500 group-hover:text-sky-500 transition-colors group-hover:animate-bounce" />
                   <span
                     className={
-                      "ml-1 lg:ml-2 text-base lg:text-xl text-white group-hover:text-sky-400 transition-colors"
+                      "ml-1 xl:ml-2 text-base xl:text-xl text-white group-hover:text-sky-400 transition-colors"
                     }
                   >
                     {t("navbar.home")}
@@ -579,13 +579,13 @@ const NavBar = () => {
               {location.pathname !== "/words" && (
                 <Link
                   to="/words"
-                  className="group hidden md:flex w-full md:w-auto items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 mt-0 transition-all duration-300"
+                  className="group hidden lg:flex w-full lg:w-auto items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 mt-0 transition-all duration-300"
                 >
                   <FaBook
                     className="text-sky-500 group-hover:text-sky-500 transition-colors group-hover:animate-bounce"
                     size={18}
                   />
-                  <span className="ml-1 lg:ml-2 text-base lg:text-xl text-white group-hover:text-sky-400 transition-colors">
+                  <span className="ml-1 xl:ml-2 text-base xl:text-xl text-white group-hover:text-sky-400 transition-colors">
                     {t("navbar.vocabulary")}
                   </span>
                 </Link>
@@ -593,18 +593,18 @@ const NavBar = () => {
               {location.pathname !== "/radio" && (
                 <Link
                   to="/radio"
-                  className="group hidden md:flex w-full md:w-auto items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 mt-0 transition-all duration-300"
+                  className="group hidden lg:flex w-full lg:w-auto items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 mt-0 transition-all duration-300"
                 >
                   <RiRadioFill
                     className="text-sky-500 group-hover:text-sky-500 transition-colors group-hover:animate-bounce"
                     size={20}
                   />
-                  <span className="ml-1 lg:ml-2 text-base lg:text-xl text-white group-hover:text-sky-400 transition-colors">
+                  <span className="ml-1 xl:ml-2 text-base xl:text-xl text-white group-hover:text-sky-400 transition-colors">
                     {t("navbar.radio")}
                   </span>
                 </Link>
               )}
-              <div className="relative hidden md:block">
+              <div className="relative hidden lg:block">
                 <button
                   ref={desktopContentToggleRef}
                   type="button"
@@ -615,7 +615,7 @@ const NavBar = () => {
                     className="text-sky-500 group-hover:text-sky-500 transition-colors group-hover:animate-bounce"
                     size={18}
                   />
-                  <span className="ml-1 lg:ml-2 text-base lg:text-xl text-white group-hover:text-sky-400 transition-colors">
+                  <span className="ml-1 xl:ml-2 text-base xl:text-xl text-white group-hover:text-sky-400 transition-colors">
                     {t("navbar.content")}
                   </span>
                   <FaChevronDown
@@ -632,7 +632,7 @@ const NavBar = () => {
                 <>
                   <Link
                     to="/favorites"
-                    className="group hidden lg:flex items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 transition-all duration-300"
+                    className="group hidden xl:flex items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 transition-all duration-300"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -659,14 +659,14 @@ const NavBar = () => {
               {/* Language Toggle Button with SVG Flags */}
               <button
                 onClick={toggleLanguage}
-                className={`${languageToggleButtonClass} ${userLoggedIn ? "hidden lg:flex" : "hidden md:flex"}`}
+                className={`${languageToggleButtonClass} ${userLoggedIn ? "hidden xl:flex" : "hidden lg:flex"}`}
                 title={`Switch to ${language === "en" ? "Deutsch" : "English"}`}
               >
                 {renderLanguageToggle()}
               </button>
 
               {/* Theme Toggle Button */}
-              <div className={userLoggedIn ? "hidden lg:block" : "block"}>
+              <div className={userLoggedIn ? "hidden xl:block" : "block"}>
                 <button
                   onClick={toggleTheme}
                   className="flex p-1 rounded-full transition-all duration-300  border
@@ -691,7 +691,7 @@ const NavBar = () => {
                       onClick={() =>
                         setIsProfileMenuOpen((current) => !current)
                       }
-                      className="hidden h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-sky-400/70 bg-gradient-to-br from-sky-500 to-indigo-600 text-sm font-bold text-white shadow-md transition-transform duration-300 hover:scale-105 md:flex"
+                      className="hidden h-11 w-11 items-center justify-center overflow-hidden rounded-full border-2 border-sky-400/70 bg-gradient-to-br from-sky-500 to-indigo-600 text-sm font-bold text-white shadow-md transition-transform duration-300 hover:scale-105 lg:flex"
                       title="Open account menu"
                     >
                       {avatarUrl ? (
@@ -709,7 +709,7 @@ const NavBar = () => {
                     </button>
                     {unreadCount > 0 && (
                       <span
-                        className="absolute right-0 top-0 hidden h-5 min-w-5 items-center justify-center rounded-full border-2 border-gray-800 bg-orange-500 px-1 text-[10px] font-bold leading-none text-white md:flex"
+                        className="absolute right-0 top-0 hidden h-5 min-w-5 items-center justify-center rounded-full border-2 border-gray-800 bg-orange-500 px-1 text-[10px] font-bold leading-none text-white lg:flex"
                         aria-label={`${unreadCount} unread notifications`}
                       >
                         {unreadCount > 9 ? "9+" : unreadCount}
