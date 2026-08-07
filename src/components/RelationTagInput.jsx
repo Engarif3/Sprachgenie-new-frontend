@@ -89,10 +89,19 @@ const RelationTagInput = ({
   // as its own synonym/antonym/similar word would always be rejected as a
   // self-reference, so it's flagged instead of left to look like any other
   // pickable option.
+  //
+  // Once currentWordId is known (update flow), ID is authoritative and
+  // used exclusively — several distinct Word rows can share the same
+  // spelling (e.g. "Morgen" the noun vs. "morgen" the adverb), and a
+  // value-only comparison would wrongly flag every same-spelling POS
+  // variant as "this word" too, not just the one actually being edited.
+  // Value comparison is only the right signal during word CREATION, where
+  // the word has no ID yet.
   const isSelfSuggestion = (word) =>
-    (currentWordId !== null && word.id === currentWordId) ||
-    (currentWordValue !== null &&
-      normalize(word.value) === normalize(currentWordValue));
+    currentWordId !== null
+      ? word.id === currentWordId
+      : currentWordValue !== null &&
+        normalize(word.value) === normalize(currentWordValue);
 
   const commitSuggestion = (word) => {
     if (isSelfSuggestion(word)) {
