@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import { toast } from "sonner";
 import api, { externalApi } from "../axios";
+import { useAuth } from "../services/auth.services";
+import DateTime from "../components/UI/DateTime";
 
 const GEOCODING_ENDPOINT = "https://nominatim.openstreetmap.org/search";
 
@@ -102,7 +104,12 @@ const RECENT_VISITORS_PAGE_SIZE = 20;
 const VISITORS_PER_LOCATION_PAGE = 10;
 
 const AdminVisitorsPage = () => {
+  const { isSuperAdmin } = useAuth();
   const [viewMode, setViewMode] = useState("recent");
+  // Only meaningful for super admins — registered-match data is empty for a
+  // plain admin (see the backend's exposeFullIp gate), so filtering by it
+  // would just silently return nothing without explaining why.
+  const [onlyRegistered, setOnlyRegistered] = useState(false);
   const [recentVisitors, setRecentVisitors] = useState([]);
   const [recentLoading, setRecentLoading] = useState(true);
   const [recentPage, setRecentPage] = useState(1);
@@ -122,6 +129,12 @@ const AdminVisitorsPage = () => {
     data: null,
     inputValue: "",
   });
+  const [ipInspection, setIpInspection] = useState({
+    show: false,
+    loading: false,
+    ipAddress: null,
+    records: [],
+  });
 
   const fetchRecentVisitors = async (page = 1) => {
     setRecentLoading(true);
@@ -129,7 +142,9 @@ const AdminVisitorsPage = () => {
     try {
       const offset = (page - 1) * RECENT_VISITORS_PAGE_SIZE;
       const res = await api.get(
-        `/visitors/list?limit=${RECENT_VISITORS_PAGE_SIZE}&offset=${offset}`,
+        `/visitors/list?limit=${RECENT_VISITORS_PAGE_SIZE}&offset=${offset}${
+          onlyRegistered ? "&onlyRegistered=true" : ""
+        }`,
       );
       const data = res.data?.data || {};
       const total = data.total || 0;
@@ -150,7 +165,9 @@ const AdminVisitorsPage = () => {
     setLocationLoading(true);
     try {
       const res = await api.get(
-        `/visitors/by-location?page=${page}&limit=${LOCATION_PAGE_SIZE}`,
+        `/visitors/by-location?page=${page}&limit=${LOCATION_PAGE_SIZE}${
+          onlyRegistered ? "&onlyRegistered=true" : ""
+        }`,
       );
       const data = res.data;
       setVisitorsByLocation(data.data?.locations || []);
@@ -346,21 +363,74 @@ const AdminVisitorsPage = () => {
     return locationParts.length > 0 ? locationParts.join(", ") : "Unknown";
   };
 
-  const renderRegisteredUsersBadge = (registeredUsers) => {
+  const handleInspectIp = async (ipAddress, registeredUsers) => {
+    setIpInspection({ show: true, loading: true, ipAddress, records: [] });
+
+    try {
+      const settled = await Promise.allSettled(
+        registeredUsers.map(async (match) => {
+          const [metadataResult, userResult] = await Promise.allSettled([
+            api.get(`/user/registration-metadata/${match.userId}`),
+            api.get(`/user/${match.userId}`),
+          ]);
+
+          return {
+            userId: match.userId,
+            email: match.email,
+            metadata:
+              metadataResult.status === "fulfilled"
+                ? metadataResult.value.data?.data
+                : null,
+            profile:
+              userResult.status === "fulfilled"
+                ? userResult.value.data?.data
+                : null,
+          };
+        }),
+      );
+
+      const records = settled
+        .filter((result) => result.status === "fulfilled")
+        .map((result) => result.value);
+
+      setIpInspection((prev) => ({ ...prev, loading: false, records }));
+    } catch (error) {
+      console.error("Failed to load registered account details:", error);
+      setIpInspection((prev) => ({ ...prev, loading: false, records: [] }));
+      toast.error("Failed to load account details.");
+    }
+  };
+
+  const closeIpInspection = () => {
+    setIpInspection({ show: false, loading: false, ipAddress: null, records: [] });
+  };
+
+  const formatIpLocation = (record) => {
+    const parts = [record?.city, record?.region, record?.country]
+      .map(decodeDisplayValue)
+      .filter((value) => value && value !== "Unknown");
+    return parts.length > 0 ? parts.join(", ") : "Unknown";
+  };
+
+  // The IP itself takes on the "registered" styling (instead of a separate
+  // badge underneath) and becomes clickable — a click opens the inspection
+  // modal for whichever account(s) share this IP.
+  const renderIpAddress = (ipAddress, registeredUsers) => {
     if (!registeredUsers || registeredUsers.length === 0) {
-      return null;
+      return <span>{ipAddress}</span>;
     }
 
     const emails = registeredUsers.map((user) => user.email);
-    const label = emails.length === 1 ? emails[0] : `${emails.length} accounts`;
 
     return (
-      <span
-        title={emails.join(", ")}
-        className="mt-1 inline-flex w-fit max-w-[16rem] items-center gap-1 truncate rounded-full border border-emerald-300 dark:border-emerald-500/30 bg-emerald-100 dark:bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-800 dark:text-emerald-200"
+      <button
+        type="button"
+        onClick={() => handleInspectIp(ipAddress, registeredUsers)}
+        title={`Registered: ${emails.join(", ")} — click for details`}
+        className="inline-flex items-center gap-1 rounded-full border border-emerald-300 dark:border-emerald-500/30 bg-emerald-100 dark:bg-emerald-500/10 px-2.5 py-1 font-mono text-xs font-semibold text-emerald-800 dark:text-emerald-200 transition hover:border-emerald-400 hover:bg-emerald-200 dark:hover:border-emerald-400/50 dark:hover:bg-emerald-500/20"
       >
-        ✓ Registered: {label}
-      </span>
+        ✓ {ipAddress}
+      </button>
     );
   };
 
@@ -383,6 +453,25 @@ const AdminVisitorsPage = () => {
       fetchVisitorsByLocation(1);
     }
   }, [viewMode, visitorsByLocation.length]);
+
+  // Refetches whichever view is active when the filter is toggled — skips
+  // the mount render since the two effects above already cover the initial
+  // load with the default (off) filter state.
+  const isFirstOnlyRegisteredRender = useRef(true);
+  useEffect(() => {
+    if (isFirstOnlyRegisteredRender.current) {
+      isFirstOnlyRegisteredRender.current = false;
+      return;
+    }
+
+    if (viewMode === "recent") {
+      setRecentPage(1);
+      fetchRecentVisitors(1);
+    } else {
+      setLocationPage(1);
+      fetchVisitorsByLocation(1);
+    }
+  }, [onlyRegistered]);
 
   useEffect(() => {
     if (visitorsByLocation.length === 0) {
@@ -449,6 +538,24 @@ const AdminVisitorsPage = () => {
       abortController.abort();
     };
   }, [visitorsByLocation, derivedCoordinatesByLocation]);
+
+  useEffect(() => {
+    if (!ipInspection.show) {
+      return undefined;
+    }
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        closeIpInspection();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [ipInspection.show]);
 
   return (
     <div className="min-h-screen  p-4 md:p-6">
@@ -525,6 +632,21 @@ const AdminVisitorsPage = () => {
           >
             Location Groups
           </button>
+
+          {isSuperAdmin && (
+            <button
+              type="button"
+              onClick={() => setOnlyRegistered((prev) => !prev)}
+              title="Show only visitors whose IP matches a registered account"
+              className={`${dashboardTabClass} ml-auto ${
+                onlyRegistered
+                  ? "border-emerald-300 dark:border-emerald-400/45 bg-emerald-100 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-100 shadow-lg shadow-emerald-950/20"
+                  : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/80 text-slate-600 dark:text-slate-300 hover:border-emerald-300 dark:hover:border-emerald-500/50 hover:text-slate-900 dark:hover:text-white"
+              }`}
+            >
+              ✓ Only Registered Matches
+            </button>
+          )}
         </div>
 
         {/* Content */}
@@ -602,13 +724,10 @@ const AdminVisitorsPage = () => {
                             className="border-b border-slate-200 dark:border-slate-800/80 transition-colors hover:bg-slate-50 dark:hover:bg-slate-900/70"
                           >
                             <td className="px-4 py-3 whitespace-nowrap">
-                              {new Date(visitor.visitedAt).toLocaleString()}
+                              <DateTime value={visitor.visitedAt} />
                             </td>
                             <td className="px-4 py-3 font-mono text-slate-600 dark:text-slate-400">
-                              <div className="flex flex-col items-start gap-1">
-                                <span>{visitor.ipAddress}</span>
-                                {renderRegisteredUsersBadge(visitor.registeredUsers)}
-                              </div>
+                              {renderIpAddress(visitor.ipAddress, visitor.registeredUsers)}
                             </td>
                             <td className="px-4 py-3">
                               <div className="flex flex-col gap-1">
@@ -810,10 +929,7 @@ const AdminVisitorsPage = () => {
                                 className="border-b border-slate-200 dark:border-slate-800/80 transition-colors hover:bg-slate-50 dark:hover:bg-slate-900/70"
                               >
                                 <td className="px-4 py-3 font-mono text-slate-600 dark:text-slate-400">
-                                  <div className="flex flex-col items-start gap-1">
-                                    <span>{visitor.ipAddress}</span>
-                                    {renderRegisteredUsersBadge(visitor.registeredUsers)}
-                                  </div>
+                                  {renderIpAddress(visitor.ipAddress, visitor.registeredUsers)}
                                 </td>
                                 <td className="px-4 py-3">{visitor.browser}</td>
                                 <td className="px-4 py-3">
@@ -826,7 +942,7 @@ const AdminVisitorsPage = () => {
                                   {visitor.visitCount}
                                 </td>
                                 <td className="px-4 py-3">
-                                  {new Date(visitor.visitedAt).toLocaleString()}
+                                  <DateTime value={visitor.visitedAt} />
                                 </td>
                                 <td className="px-4 py-3">
                                   <div className="flex flex-wrap gap-2">
@@ -1042,6 +1158,91 @@ const AdminVisitorsPage = () => {
               >
                 Delete
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* IP → Registered Account Inspection Modal */}
+      {ipInspection.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4 py-6 backdrop-blur-sm">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900">
+            <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5 dark:border-slate-800">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                  Registered Account{ipInspection.records.length === 1 ? "" : "s"}
+                </h2>
+                <p className="mt-1 font-mono text-sm text-slate-500 dark:text-slate-400">
+                  {ipInspection.ipAddress}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeIpInspection}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                aria-label="Close account details"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="max-h-[calc(90vh-5.5rem)] overflow-y-auto px-6 py-6">
+              {ipInspection.loading ? (
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-400">
+                  Loading account details...
+                </div>
+              ) : ipInspection.records.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-5 text-sm leading-6 text-slate-500 dark:border-slate-700 dark:bg-slate-950/50 dark:text-slate-400">
+                  Could not load account details for this IP.
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {ipInspection.records.map((record) => (
+                    <div
+                      key={record.userId}
+                      className="rounded-2xl border border-slate-200 p-4 dark:border-slate-800"
+                    >
+                      <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-950/60">
+                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                          Account
+                        </p>
+                        <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">
+                          {record.profile?.name || "Unknown name"}
+                        </p>
+                        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                          {record.email}
+                        </p>
+                        <p className="mt-1 font-mono text-xs text-slate-500 dark:text-slate-400">
+                          {record.userId}
+                        </p>
+                      </div>
+
+                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950/60">
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                            Registered At
+                          </p>
+                          <p className="mt-2 text-sm text-slate-900 dark:text-white">
+                            {record.metadata?.createdAt ? (
+                              <DateTime value={record.metadata.createdAt} />
+                            ) : (
+                              "Unknown"
+                            )}
+                          </p>
+                        </div>
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950/60">
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                            Location
+                          </p>
+                          <p className="mt-2 text-sm text-slate-900 dark:text-white">
+                            {formatIpLocation(record.metadata)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
