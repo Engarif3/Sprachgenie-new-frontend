@@ -70,12 +70,7 @@ const StoriesManagement = lazy(
 const BroadcastNotifications = lazy(
   () => import("../AdminActions/SuperAdmin/BroadcastNotifications"),
 );
-const WordReports = lazy(
-  () => import("../AdminActions/SuperAdmin/WordReports"),
-);
-const HowToSayReports = lazy(
-  () => import("../AdminActions/SuperAdmin/HowToSayReports"),
-);
+const ReportsDashboard = lazy(() => import("../dashboard/ReportsDashboard"));
 const HowToSayManagement = lazy(
   () => import("../AdminActions/SuperAdmin/HowToSayManagement"),
 );
@@ -121,8 +116,6 @@ const ProfilePhotoSettings = lazy(
   () => import("../AdminActions/SuperAdmin/ProfilePhotoSettings"),
 );
 const Usage = lazy(() => import("../AI/Usage"));
-const ReportsByUsers = lazy(() => import("../AI/ReportsByUsers"));
-const ConjugationReportsPage = lazy(() => import("../AI/ConjugationReportsPage"));
 
 //translator
 const Translator = lazy(() => import("../Translate/Translator"));
@@ -184,8 +177,7 @@ const StoriesManagementWithSuspense = withSuspense(StoriesManagement);
 const BroadcastNotificationsWithSuspense = withSuspense(
   BroadcastNotifications,
 );
-const WordReportsWithSuspense = withSuspense(WordReports);
-const HowToSayReportsWithSuspense = withSuspense(HowToSayReports);
+const ReportsDashboardWithSuspense = withSuspense(ReportsDashboard);
 const HowToSayManagementWithSuspense = withSuspense(HowToSayManagement);
 const HowToSayListWithSuspense = withSuspense(HowToSayList);
 const NotificationsPageWithSuspense = withSuspense(NotificationsPage);
@@ -215,8 +207,6 @@ const IpRateLimitsWithSuspense = withSuspense(IpRateLimits);
 const IpUsageWithSuspense = withSuspense(IpUsage);
 const ProfilePhotoSettingsWithSuspense = withSuspense(ProfilePhotoSettings);
 const UsageWithSuspense = withSuspense(Usage);
-const ReportsByUsersWithSuspense = withSuspense(ReportsByUsers);
-const ConjugationReportsPageWithSuspense = withSuspense(ConjugationReportsPage);
 
 //translator
 const TranslatorWithSuspense = withSuspense(Translator);
@@ -459,17 +449,10 @@ export const router = createBrowserRouter(
               ),
             },
             {
-              path: "word-reports",
+              path: "reports",
               element: protectRoute(
-                <WordReportsWithSuspense />,
-                SUPER_ADMIN_ROLES,
-              ),
-            },
-            {
-              path: "how-to-say-reports",
-              element: protectRoute(
-                <HowToSayReportsWithSuspense />,
-                SUPER_ADMIN_ROLES,
+                <ReportsDashboardWithSuspense />,
+                ADMIN_ROLES,
               ),
             },
             {
@@ -548,20 +531,6 @@ export const router = createBrowserRouter(
             {
               path: "get-usage",
               element: protectRoute(<UsageWithSuspense />, ADMIN_ROLES),
-            },
-            {
-              path: "get-reports",
-              element: protectRoute(
-                <ReportsByUsersWithSuspense />,
-                ADMIN_ROLES,
-              ),
-            },
-            {
-              path: "conjugation-reports",
-              element: protectRoute(
-                <ConjugationReportsPageWithSuspense />,
-                ADMIN_ROLES,
-              ),
             },
             {
               path: "system-status",

@@ -29,12 +29,7 @@ const SECTION_ROUTES = {
     "/dashboard/update-conversation-category",
     "/dashboard/how-to-say-in-german",
   ],
-  reports: [
-    "/dashboard/word-reports",
-    "/dashboard/how-to-say-reports",
-    "/dashboard/get-reports",
-    "/dashboard/conjugation-reports",
-  ],
+  reports: ["/dashboard/reports"],
   settings: [
     "/dashboard/global-limits",
     "/dashboard/user-limits",
@@ -92,10 +87,7 @@ const NAV_SECTIONS = [
     icon: "🚩",
     label: "Reports",
     items: [
-      { to: "/dashboard/word-reports", icon: "🚩", label: "Word Reports", roles: ["super_admin"] },
-      { to: "/dashboard/how-to-say-reports", icon: "🚩", label: "How to Say Reports", roles: ["super_admin"] },
-      { to: "/dashboard/get-reports", icon: "📋", label: "AI Paragraph Reports" },
-      { to: "/dashboard/conjugation-reports", icon: "🔤", label: "Conjugation Reports" },
+      { to: "/dashboard/reports", icon: "🚩", label: "Reports" },
     ],
   },
   {
