@@ -13,6 +13,11 @@ const TABS = [
     endpoint: "/favorite-conversations/users-count",
   },
   { key: "stories", label: "Stories", endpoint: "/favorite-stories/users-count" },
+  {
+    key: "howToSay",
+    label: "How To Say It",
+    endpoint: "/favorite-how-to-say/users-count",
+  },
 ];
 
 const UsersFavoriteCount = () => {
@@ -67,7 +72,7 @@ const UsersFavoriteCount = () => {
         <div className="mb-8">
           <PageHeader
             title="Users & Favorites Count"
-            subtitle="How many words, conversations, and stories each user has saved to their favorites."
+            subtitle="How many words, conversations, stories, and How To Say It phrases each user has saved to their favorites."
           />
         </div>
 
