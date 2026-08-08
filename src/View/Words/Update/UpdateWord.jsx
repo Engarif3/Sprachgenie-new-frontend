@@ -3,7 +3,7 @@ import { Link, useParams, Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { FaChevronCircleUp, FaChevronCircleDown } from "react-icons/fa";
 import Container from "../../../utils/Container";
-import api, { publicApi } from "../../../axios";
+import api from "../../../axios";
 import { useAuth } from "../../../services/auth.services";
 import { invalidateWordsCache } from "../../../utils/storage";
 import RelationTagInput from "../../../components/RelationTagInput";
@@ -326,11 +326,6 @@ const UpdateWord = () => {
   const { id } = useParams();
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
   const canAccess = userLoggedIn && userId && isAdmin;
-  const [, setSuggestions] = useState({
-    synonyms: [],
-    antonyms: [],
-    similarWords: [],
-  });
 
   const [formData, setFormData] = useState({
     id: id,
@@ -1205,7 +1200,7 @@ const UpdateWord = () => {
     fetchAllData();
   }, [id, refetchTrigger]);
 
-  const handleInputChange = async (e) => {
+  const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
 
     // Handle verb attributes nested object
@@ -1290,29 +1285,6 @@ const UpdateWord = () => {
         ...prevData,
         [name]: value,
       }));
-
-      if (value.length >= 2) {
-        try {
-          const response = await publicApi.get("/words/suggestions", {
-            params: {
-              query: value,
-              type: name,
-            },
-          });
-
-          setSuggestions((prevSuggestions) => ({
-            ...prevSuggestions,
-            [name]: response.data,
-          }));
-        } catch {
-          // Suggestions API call failed, continue without suggestions
-        }
-      } else {
-        setSuggestions((prevSuggestions) => ({
-          ...prevSuggestions,
-          [name]: [],
-        }));
-      }
     }
   };
 
@@ -3069,11 +3041,11 @@ const UpdateWord = () => {
 
                 {/* Part of Speech — multi-select checkboxes */}
                 <div>
-                  <label className="block mb-2 text-white">
+                  <p className="block mb-2 text-white">
                     <span className="font-medium text-lg">
                       Part(s) of Speech
                     </span>
-                  </label>
+                  </p>
                   <p className="text-xs text-gray-400 mb-2">
                     Select one or more (e.g. Adjective + Adverb). Phrase and
                     Unknown can't be combined with anything else.
@@ -3104,6 +3076,8 @@ const UpdateWord = () => {
                         >
                           <input
                             type="checkbox"
+                            id={`pos-${pos.id}`}
+                            name="partOfSpeechIds"
                             checked={isChecked}
                             disabled={disabled}
                             onChange={() => togglePartOfSpeech(pos)}
