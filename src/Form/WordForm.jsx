@@ -1062,9 +1062,9 @@ const WordForm = () => {
             <div className="space-y-6">
               {/* Part of Speech — multi-select checkboxes */}
               <div>
-                <label className="block text-sm font-medium text-white">
+                <p className="block text-sm font-medium text-white">
                   Part(s) of Speech
-                </label>
+                </p>
                 <p className="text-xs text-gray-400 mb-2">
                   Select one or more (e.g. Adjective + Adverb). Phrase and
                   Unknown can't be combined with anything else.
@@ -1094,6 +1094,8 @@ const WordForm = () => {
                         >
                           <input
                             type="checkbox"
+                            id={`pos-${pos.id}`}
+                            name="partOfSpeechIds"
                             checked={isChecked}
                             disabled={disabled}
                             onChange={() => togglePartOfSpeech(pos)}
