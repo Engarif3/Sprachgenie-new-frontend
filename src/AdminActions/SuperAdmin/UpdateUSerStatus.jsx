@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { ScaleLoader } from "react-spinners";
 import api from "../../axios";
@@ -43,7 +43,23 @@ const UpdateUserStatus = () => {
   const [adminTotalPages, setAdminTotalPages] = useState(1);
   const [basicPage, setBasicPage] = useState(1);
   const [basicTotalPages, setBasicTotalPages] = useState(1);
-  const [activeTab, setActiveTab] = useState("users");
+  // Kept in the URL (?tab=...) instead of plain component state so a page
+  // refresh lands back on the same tab instead of resetting to "users".
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedTab = searchParams.get("tab");
+  const activeTab = ["admins", "users"].includes(requestedTab)
+    ? requestedTab
+    : "users";
+  const setActiveTab = (key) => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("tab", key);
+        return next;
+      },
+      { replace: true },
+    );
+  };
   const [searchTerm, setSearchTerm] = useState("");
   const [profileCache, setProfileCache] = useState({});
   const [selectedProfile, setSelectedProfile] = useState(null);

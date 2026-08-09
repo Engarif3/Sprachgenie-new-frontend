@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { toast } from "sonner";
 import api, { externalApi } from "../axios";
@@ -105,7 +106,23 @@ const VISITORS_PER_LOCATION_PAGE = 10;
 
 const AdminVisitorsPage = () => {
   const { isSuperAdmin } = useAuth();
-  const [viewMode, setViewMode] = useState("recent");
+  // Kept in the URL (?tab=...) instead of plain component state so a page
+  // refresh lands back on the same view instead of resetting to "recent".
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedView = searchParams.get("tab");
+  const viewMode = ["recent", "location"].includes(requestedView)
+    ? requestedView
+    : "recent";
+  const setViewMode = (key) => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("tab", key);
+        return next;
+      },
+      { replace: true },
+    );
+  };
   // Only meaningful for super admins — registered-match data is empty for a
   // plain admin (see the backend's exposeFullIp gate), so filtering by it
   // would just silently return nothing without explaining why.

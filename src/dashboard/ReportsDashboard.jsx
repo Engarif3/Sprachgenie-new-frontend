@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../services/auth.services";
 import PageHeader from "../components/UI/PageHeader";
 import WordReports from "../AdminActions/SuperAdmin/WordReports";
@@ -28,7 +27,23 @@ const ReportsDashboard = () => {
     (tab) => !tab.roles || tab.roles.includes(role),
   );
 
-  const [activeTab, setActiveTab] = useState(visibleTabs[0]?.key);
+  // Kept in the URL (?tab=...) instead of plain component state so a page
+  // refresh lands back on the same tab instead of resetting to the first one.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedTab = searchParams.get("tab");
+  const activeTab = visibleTabs.some((tab) => tab.key === requestedTab)
+    ? requestedTab
+    : visibleTabs[0]?.key;
+  const setActiveTab = (key) => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("tab", key);
+        return next;
+      },
+      { replace: true },
+    );
+  };
 
   if (!canAccess) {
     return <Navigate to="/" replace />;

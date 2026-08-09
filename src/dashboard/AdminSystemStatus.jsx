@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import api, { externalApi } from "../axios";
 import DateTime from "../components/UI/DateTime";
 import { formatTimeOnly } from "../utils/formatDateTime";
@@ -477,7 +478,24 @@ const AdminSystemStatus = () => {
     backend: false,
     database: false,
   });
-  const [activeTab, setActiveTab] = useState("overview");
+  // Kept in the URL (?tab=...) instead of plain component state so a page
+  // refresh — or sharing/bookmarking the link — lands back on the same
+  // tab instead of always resetting to "overview".
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedTab = searchParams.get("tab");
+  const activeTab = DASHBOARD_TABS.some((tab) => tab.key === requestedTab)
+    ? requestedTab
+    : "overview";
+  const setActiveTab = (key) => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("tab", key);
+        return next;
+      },
+      { replace: true },
+    );
+  };
 
   const frontendResponseSeverity = getResponseSeverity(
     infrastructureStatus?.frontend?.responseTime,

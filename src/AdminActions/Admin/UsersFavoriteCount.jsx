@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../services/auth.services";
 import api from "../../axios";
 import { ScaleLoader } from "react-spinners";
@@ -21,7 +21,23 @@ const TABS = [
 ];
 
 const UsersFavoriteCount = () => {
-  const [activeTab, setActiveTab] = useState("words");
+  // Kept in the URL (?tab=...) instead of plain component state so a page
+  // refresh lands back on the same tab instead of resetting to "words".
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedTab = searchParams.get("tab");
+  const activeTab = TABS.some((tab) => tab.key === requestedTab)
+    ? requestedTab
+    : "words";
+  const setActiveTab = (key) => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("tab", key);
+        return next;
+      },
+      { replace: true },
+    );
+  };
   // Keyed by tab key — fetched lazily, once per tab, and cached here so
   // switching tabs back and forth doesn't refetch.
   const [dataByTab, setDataByTab] = useState({});
