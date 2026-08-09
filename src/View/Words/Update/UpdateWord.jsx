@@ -964,6 +964,29 @@ const UpdateWord = () => {
       return;
     }
 
+    // Quick add-above/add-below saves immediately via api.put below,
+    // bypassing handleSubmit entirely — so it also has to repeat
+    // handleSubmit's noun/article check itself, or a word that's already
+    // sitting in an invalid state (noun with no article, e.g. from data
+    // predating this rule) 400s on every unrelated edit with no explanation,
+    // instead of guiding the admin to fix the article like the main form
+    // does.
+    const selectedPosNames = partOfSpeeches
+      .filter((p) => formData.partOfSpeechIds.includes(p.id))
+      .map((p) => p.name.toLowerCase());
+    const isNoun = selectedPosNames.includes("noun");
+    const hasRealArticle =
+      !!formData.articleId && Number(formData.articleId) !== 4;
+
+    if (isNoun && !hasRealArticle) {
+      Swal.fire({
+        title: "Article Required",
+        text: "This word is a noun but has no article set. Please select an article (in the main form) before adding more items.",
+        icon: "warning",
+      });
+      return;
+    }
+
     const updatedArray = [...formData[field]];
     const insertIndex = position === "above" ? index : index + 1;
     updatedArray.splice(insertIndex, 0, ...itemsToInsert);

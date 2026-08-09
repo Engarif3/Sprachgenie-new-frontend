@@ -497,7 +497,17 @@ const AdminVisitorsPage = () => {
 
   useEffect(() => {
     if (visitorsByLocation.length === 0) {
-      setDerivedCoordinatesByLocation({});
+      // Bail out without a new object reference when it's already empty —
+      // `derivedCoordinatesByLocation` is itself a dependency of this
+      // effect, so unconditionally setting a fresh `{}` here would change
+      // its reference every run, retrigger the effect, and loop forever
+      // ("Maximum update depth exceeded") for as long as there's no
+      // location data loaded (e.g. the whole time the "recent" tab is
+      // active). The functional-updater form lets React bail out via
+      // Object.is when nothing actually changed.
+      setDerivedCoordinatesByLocation((current) =>
+        Object.keys(current).length === 0 ? current : {},
+      );
       return undefined;
     }
 
