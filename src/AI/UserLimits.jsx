@@ -7,6 +7,7 @@ import api from "../axios";
 import { useAuth } from "../services/auth.services";
 import PageHeader from "../components/UI/PageHeader";
 import Button from "../components/UI/Button";
+import { fetchAllUsers } from "../utils/fetchAllUsers";
 
 const UserLimits = () => {
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
@@ -41,8 +42,8 @@ const UserLimits = () => {
         setGlobalLimits(fetchedGlobalLimits);
 
         // 2️⃣ Fetch users - exclude only pending users
-        const userRes = await api.get("/user");
-        const usersData = userRes.data.data.filter(
+        const allUsers = await fetchAllUsers(api);
+        const usersData = allUsers.filter(
           (user) => user.status && user.status.toLowerCase() !== "pending",
         );
 
@@ -170,6 +171,18 @@ const UserLimits = () => {
     );
   };
 
+  // A limit input holding "0" means a real override ("block this user"),
+  // not a missing value — only an emptied/cleared field should be sent as
+  // undefined (leave unchanged). A plain truthy check would wrongly treat
+  // "0" the same as "".
+  const toLimitPayload = (value) => {
+    if (value === "" || value === null || value === undefined) {
+      return undefined;
+    }
+    const parsed = parseInt(value, 10);
+    return Number.isNaN(parsed) ? undefined : parsed;
+  };
+
   const handleUpdateLimits = async (userId) => {
     const user = users.find((u) => u.id === userId);
     if (!user) return;
@@ -179,11 +192,9 @@ const UserLimits = () => {
     try {
       await aiApi.post("/paragraphs/update-limit", {
         userId,
-        dailyLimit: user.dailyLimit ? parseInt(user.dailyLimit) : undefined,
-        monthlyLimit: user.monthlyLimit
-          ? parseInt(user.monthlyLimit)
-          : undefined,
-        yearlyLimit: user.yearlyLimit ? parseInt(user.yearlyLimit) : undefined,
+        dailyLimit: toLimitPayload(user.dailyLimit),
+        monthlyLimit: toLimitPayload(user.monthlyLimit),
+        yearlyLimit: toLimitPayload(user.yearlyLimit),
       });
 
       Swal.fire({
@@ -291,21 +302,17 @@ const UserLimits = () => {
                       {user.id}
                     </td>
                   )}
-                  <td className="p-3 text-center text-slate-800 dark:text-gray-200">
+                  <td className="p-3 text-left text-slate-800 dark:text-gray-200">
                     {user.name}
                   </td>
-                  <td className="p-3 text-center text-slate-600 dark:text-gray-300">
+                  <td className="p-3 text-left text-slate-600 dark:text-gray-300">
                     {user.email}
                   </td>
 
                   <td className="p-3 text-center">
                     <input
                       type="number"
-                      value={
-                        user.dailyLimit != null && user.dailyLimit !== 0
-                          ? user.dailyLimit
-                          : globalLimits.dailyLimit
-                      }
+                      value={user.dailyLimit ?? globalLimits.dailyLimit}
                       onChange={(e) =>
                         handleLimitChange(
                           user.id,
@@ -319,11 +326,7 @@ const UserLimits = () => {
                   <td className="p-3 text-center">
                     <input
                       type="number"
-                      value={
-                        user.monthlyLimit != null && user.monthlyLimit !== 0
-                          ? user.monthlyLimit
-                          : globalLimits.monthlyLimit
-                      }
+                      value={user.monthlyLimit ?? globalLimits.monthlyLimit}
                       onChange={(e) =>
                         handleLimitChange(
                           user.id,
@@ -337,11 +340,7 @@ const UserLimits = () => {
                   <td className="p-3 text-center">
                     <input
                       type="number"
-                      value={
-                        user.yearlyLimit != null && user.yearlyLimit !== 0
-                          ? user.yearlyLimit
-                          : globalLimits.yearlyLimit
-                      }
+                      value={user.yearlyLimit ?? globalLimits.yearlyLimit}
                       onChange={(e) =>
                         handleLimitChange(
                           user.id,

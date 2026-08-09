@@ -152,10 +152,10 @@ const Usage = () => {
                       {u.userId}
                     </td>
                   )}
-                  <td className="p-3 text-center text-slate-800 dark:text-gray-200">
+                  <td className="p-3 text-left text-slate-800 dark:text-gray-200">
                     {u.name}
                   </td>
-                  <td className="p-3 text-center text-slate-600 dark:text-gray-300">
+                  <td className="p-3 text-left text-slate-600 dark:text-gray-300">
                     {u.email}
                   </td>
                   <td className="p-3 text-center text-slate-600 dark:text-gray-300">

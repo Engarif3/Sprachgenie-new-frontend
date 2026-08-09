@@ -7,6 +7,7 @@ import api from "../axios";
 import { useAuth } from "../services/auth.services";
 import PageHeader from "../components/UI/PageHeader";
 import Button from "../components/UI/Button";
+import { fetchAllUsers } from "../utils/fetchAllUsers";
 
 // Shows current burst/daily usage per client IP against the IP-based
 // generation limiter (see IpRateLimits.jsx for editing the caps themselves).
@@ -24,18 +25,18 @@ const IpUsage = () => {
   const fetchUsage = async () => {
     try {
       setLoading(true);
-      const [usageRes, usersRes] = await Promise.all([
+      const [usageRes, allUsers] = await Promise.all([
         aiApi.get("/rate-limit/usage"),
         // Best-effort only — the userIdHint on each row comes straight from
         // the client's request body, unverified, so it may not match any
         // real account (or may be stale/spoofed). Never used for anything
-        // security-sensitive, just a display label.
-        api.get("/user").catch(() => null),
+        // security-sensitive, just a display label. GET /user is paginated,
+        // so every page must be walked or users outside the first page
+        // would never get matched.
+        fetchAllUsers(api).catch(() => []),
       ]);
 
-      const usersById = new Map(
-        (usersRes?.data?.data || []).map((u) => [u.id, u]),
-      );
+      const usersById = new Map(allUsers.map((u) => [u.id, u]));
 
       setUsage(
         usageRes.data.map((row) => {

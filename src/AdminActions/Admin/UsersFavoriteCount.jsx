@@ -123,10 +123,10 @@ const UsersFavoriteCount = () => {
                     key={user.id}
                     className="border-t border-slate-200 odd:bg-white even:bg-slate-50 dark:border-gray-700 dark:odd:bg-gray-800/30 dark:even:bg-gray-800/60"
                   >
-                    <td className="p-3 text-center text-slate-800 dark:text-gray-200">
+                    <td className="p-3 text-left text-slate-800 dark:text-gray-200">
                       {user.name}
                     </td>
-                    <td className="p-3 text-center text-slate-600 dark:text-gray-300">
+                    <td className="p-3 text-left text-slate-600 dark:text-gray-300">
                       {user.email}
                     </td>
                     <td className="p-3 text-center font-bold text-sky-600 dark:text-sky-400">
