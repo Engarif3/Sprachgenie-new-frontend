@@ -11,14 +11,16 @@ const DateTime = ({
   value,
   showTime = true,
   className = "",
-  dateClassName = "rounded-lg bg-slate-100 dark:bg-gray-700 px-1 py-1 font-medium text-slate-700 dark:text-gray-200",
-  timeClassName = "rounded-lg bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 font-medium text-emerald-700 dark:text-emerald-300",
+  dateClassName = "rounded-lg bg-slate-500/30 dark:bg-gray-700 px-1 py-1 font-medium text-slate-700 dark:text-gray-200",
+  timeClassName = "rounded-lg bg-emerald-500/30 dark:bg-emerald-500/50 px-3 py-1 font-medium text-emerald-700 dark:text-emerald-300",
 }) => {
   const datePart = formatDateOnly(value);
   const timePart = showTime ? formatTimeOnly(value) : "";
 
   return (
-    <span className={`inline-flex items-center gap-1 leading-tight ${className}`}>
+    <span
+      className={`inline-flex items-center gap-1 leading-tight ${className}`}
+    >
       <span className={dateClassName}>{datePart}</span>
       {timePart && <span className={timeClassName}>{timePart}</span>}
     </span>

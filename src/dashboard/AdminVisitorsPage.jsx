@@ -92,7 +92,7 @@ const buildLocationQuery = (location) => {
 };
 
 const buttonBaseClass =
-  "inline-flex items-center justify-center rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex items-center justify-center rounded-xl border px-3 py-2 text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50";
 const primaryButtonClass = `${buttonBaseClass} border-sky-300 dark:border-sky-500/40 bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-lg shadow-sky-950/25 hover:-translate-y-0.5 hover:from-sky-400 hover:to-blue-500 hover:shadow-xl hover:shadow-sky-950/35 focus:ring-sky-400/45`;
 const secondaryButtonClass = `${buttonBaseClass} border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/80 text-slate-900 dark:text-slate-100 shadow-lg shadow-slate-950/25 hover:-translate-y-0.5 hover:border-slate-400 dark:hover:border-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 focus:ring-slate-400/30`;
 const dangerButtonClass = `${buttonBaseClass} border-rose-300 dark:border-rose-500/45 bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-lg shadow-rose-950/30 hover:-translate-y-0.5 hover:from-rose-500 hover:to-red-500 hover:shadow-xl hover:shadow-rose-950/40 focus:ring-rose-400/45`;
@@ -402,7 +402,12 @@ const AdminVisitorsPage = () => {
   };
 
   const closeIpInspection = () => {
-    setIpInspection({ show: false, loading: false, ipAddress: null, records: [] });
+    setIpInspection({
+      show: false,
+      loading: false,
+      ipAddress: null,
+      records: [],
+    });
   };
 
   const formatIpLocation = (record) => {
@@ -604,7 +609,7 @@ const AdminVisitorsPage = () => {
               }
               className={dangerButtonClass}
             >
-              🗑️ Delete All
+              Delete All
             </button>
           </div>
         </div>
@@ -691,28 +696,28 @@ const AdminVisitorsPage = () => {
                     <table className="w-full text-sm text-slate-600 dark:text-slate-300">
                       <thead className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/85">
                         <tr>
-                          <th className="px-4 py-3 text-left font-semibold">
+                          <th className="px-4 py-3 text-center font-semibold">
                             Visited At
                           </th>
-                          <th className="px-4 py-3 text-left font-semibold">
+                          <th className="px-4 py-3 text-center font-semibold">
                             IP Address
                           </th>
-                          <th className="px-4 py-3 text-left font-semibold">
+                          <th className="px-4 py-3 text-center font-semibold">
                             Location
                           </th>
-                          <th className="px-4 py-3 text-left font-semibold">
+                          <th className="px-4 py-3 text-center font-semibold">
                             Browser
                           </th>
-                          <th className="px-4 py-3 text-left font-semibold">
+                          <th className="px-4 py-3 text-center font-semibold">
                             Device
                           </th>
-                          <th className="px-4 py-3 text-left font-semibold">
+                          <th className="px-4 py-3 text-center font-semibold">
                             OS
                           </th>
-                          <th className="px-4 py-3 text-left font-semibold">
+                          <th className="px-4 py-3 text-center font-semibold">
                             Visits
                           </th>
-                          <th className="px-4 py-3 text-left font-semibold">
+                          <th className="px-4 py-3 text-center font-semibold">
                             Action
                           </th>
                         </tr>
@@ -726,8 +731,11 @@ const AdminVisitorsPage = () => {
                             <td className="px-4 py-3 whitespace-nowrap">
                               <DateTime value={visitor.visitedAt} />
                             </td>
-                            <td className="px-4 py-3 font-mono text-slate-600 dark:text-slate-400">
-                              {renderIpAddress(visitor.ipAddress, visitor.registeredUsers)}
+                            <td className="px-1 py-3 font-mono text-slate-600 dark:text-slate-400 min-w-[150px] text-start ">
+                              {renderIpAddress(
+                                visitor.ipAddress,
+                                visitor.registeredUsers,
+                              )}
                             </td>
                             <td className="px-4 py-3">
                               <div className="flex flex-col gap-1">
@@ -752,9 +760,11 @@ const AdminVisitorsPage = () => {
                               {decodeDisplayValue(visitor.operatingSystem) ||
                                 "Unknown"}
                             </td>
-                            <td className="px-4 py-3">{visitor.visitCount}</td>
-                            <td className="px-4 py-3">
-                              <div className="flex flex-wrap gap-2">
+                            <td className="px-1 py-3 text-center">
+                              {visitor.visitCount}
+                            </td>
+                            <td className="px-1 py-3 min-w-[150px] ">
+                              <div className="flex flex-wrap gap-1 justify-center">
                                 {getRecentVisitorMapUrl(visitor) && (
                                   <a
                                     href={getRecentVisitorMapUrl(visitor)}
@@ -776,7 +786,7 @@ const AdminVisitorsPage = () => {
                                       inputValue: "",
                                     })
                                   }
-                                  className="rounded-lg border border-rose-300 dark:border-rose-500/25 bg-rose-100 dark:bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-800 dark:text-rose-100 transition-all duration-200 hover:border-rose-400 dark:hover:border-rose-400/50 hover:bg-rose-200 dark:hover:bg-rose-500/20 hover:text-white"
+                                  className=" rounded-lg border border-rose-300 dark:border-rose-500/25 bg-rose-100 dark:bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-800 dark:text-rose-100 transition-all duration-200 hover:border-rose-400 dark:hover:border-rose-400/50 hover:bg-rose-200 dark:hover:bg-rose-500/20 hover:text-white"
                                 >
                                   Delete
                                 </button>
@@ -929,7 +939,10 @@ const AdminVisitorsPage = () => {
                                 className="border-b border-slate-200 dark:border-slate-800/80 transition-colors hover:bg-slate-50 dark:hover:bg-slate-900/70"
                               >
                                 <td className="px-4 py-3 font-mono text-slate-600 dark:text-slate-400">
-                                  {renderIpAddress(visitor.ipAddress, visitor.registeredUsers)}
+                                  {renderIpAddress(
+                                    visitor.ipAddress,
+                                    visitor.registeredUsers,
+                                  )}
                                 </td>
                                 <td className="px-4 py-3">{visitor.browser}</td>
                                 <td className="px-4 py-3">
@@ -1170,7 +1183,8 @@ const AdminVisitorsPage = () => {
             <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5 dark:border-slate-800">
               <div>
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                  Registered Account{ipInspection.records.length === 1 ? "" : "s"}
+                  Registered Account
+                  {ipInspection.records.length === 1 ? "" : "s"}
                 </h2>
                 <p className="mt-1 font-mono text-sm text-slate-500 dark:text-slate-400">
                   {ipInspection.ipAddress}
