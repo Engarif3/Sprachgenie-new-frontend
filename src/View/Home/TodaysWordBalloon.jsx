@@ -229,14 +229,14 @@ const TodaysWordBalloon = () => {
   };
 
   return (
-    <div className="relative mx-auto mt-[6px] flex min-h-[24rem] w-full max-w-3xl items-center justify-center overflow-visible px-4">
+    <div className="relative mx-auto mt-[6px] flex min-h-[25rem] w-full max-w-3xl items-center justify-center overflow-visible px-4">
       <div
         className={`relative flex min-h-[8rem] w-full items-center justify-center transition-all duration-300 ${
           phase === "revealed" ? "scale-100 opacity-100" : ""
         }`}
       >
         {phase !== "revealed" && (
-          <div className="flex w-full scale-75 items-center justify-center">
+          <div className="flex w-full scale-[.90] items-center justify-center">
             <button
               type="button"
               className={`hero-balloon ${phase === "burst" ? "hero-balloon-burst" : "hero-balloon-float"} ${isBalloonReady ? "cursor-pointer" : "cursor-wait"}`}

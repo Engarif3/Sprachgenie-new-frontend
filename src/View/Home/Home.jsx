@@ -468,16 +468,9 @@ const Home = () => {
             </div>
           </div>
         )} */}
-        {/* Circular badge pulled out of normal document flow into an
-        absolute top-left corner — same distance (top-8) from the navbar
-        above as from the left edge — instead of taking its own full-width
-        row above the headline, which pushed the headline, balloon, and
-        everything after it further down the page than the first screen.
-        Scaled down modestly (still clearly readable) so it only needs a
-        little clearance above the headline, instead of the ~240px its full
-        size required — that's what was pushing Benefits below the fold. */}
+
         <div className="relative">
-          <div className="pointer-events-none absolute -top-12 z-10 hidden origin-top-left md:scale-[0.6] md:-left-1 md:block lg:scale-[0.7] lg:-left-2 xl:scale-[0.8] xl:-left-2 2xl:scale-[0.8] 2xl:-left-2">
+          <div className="pointer-events-none absolute -top-8 z-10 hidden origin-top-left md:scale-[0.6] md:-left-1 md:block lg:scale-[0.7] lg:-left-2 xl:scale-[0.8] xl:-left-2 2xl:scale-[0.8] 2xl:-left-2">
             <CircularText
               text="PRACTICE *MAKES *PERFECT *"
               centerText1="Sprach"
@@ -490,7 +483,7 @@ const Home = () => {
 
           {/* Hero Content */}
           <div className="text-center pt-6 md:pt-28 xl:pt-16 pb-36 px-4">
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-800 dark:text-white mb-6 leading-tight">
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-800 dark:text-white mb-4 leading-tight">
               {t("heroTitle")}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">
                 {" "}
@@ -506,7 +499,7 @@ const Home = () => {
 
             {/* Benefits Section */}
             {!userLoggedIn && (
-              <div className="mb-3 mt-0 max-w-4xl mx-auto">
+              <div className="mb-4 mt-0 max-w-4xl mx-auto">
                 <p className="text-lg text-cyan-500 dark:text-cyan-400 font-semibold mb-3">
                   {t("featuresUnlocked")}
                 </p>
@@ -649,21 +642,12 @@ const Home = () => {
 
             <div
               className={`flex flex-col sm:flex-row gap-4 justify-center items-center ${
-                // The "Scroll to explore" hint below is position:absolute
-                // with no top/bottom set, so it derives its position from
-                // where it would've naturally landed in flow — pushing this
-                // block down with mt would push that hint down with it. The
-                // negative -mb-5 cancels that: mt-12 + (-mb-5) = 28px net,
-                // the exact same flow contribution as the logged-out
-                // mt-1 + mb-6, so the hint's position is unaffected while
-                // this block still renders visibly lower for more breathing
-                // room under the balloon.
                 userLoggedIn ? "mt-12 -mb-5" : "mt-1 mb-6"
               }`}
             >
               <Link
                 to="/words"
-                className={`group relative inline-flex items-center gap-2 md:gap-3 overflow-hidden rounded-full px-6 py-2.5 md:px-10 md:py-4 font-bold transition-all duration-300 hover:scale-[1.03] ${
+                className={`group relative inline-flex items-center gap-2 md:gap-3 overflow-hidden rounded-full px-6 py-2.5 md:px-5 md:py-4 font-bold transition-all duration-300 hover:scale-[1.03] ${
                   theme === "light"
                     ? "border border-slate-200 bg-white text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.08)]"
                     : "bg-slate-950 text-white"
@@ -726,7 +710,7 @@ const Home = () => {
               {!userLoggedIn && (
                 <Link
                   to="/login"
-                  className={`px-6 py-1.5 md:px-8 md:py-2 bg-transparent border-2 border-sky-500 ${theme === "dark" ? "text-white" : "text-black"} font-bold rounded-full hover:bg-sky-700 hover:text-white transition-all duration-300 text-sm md:text-lg capitalize`}
+                  className={`px-6 py-1.5 md:px-5 md:py-2 bg-transparent border-2 border-sky-500 ${theme === "dark" ? "text-white" : "text-black"} font-bold rounded-full hover:bg-sky-700 hover:text-white transition-all duration-300 text-sm md:text-lg capitalize`}
                 >
                   {t("login")}
                 </Link>
