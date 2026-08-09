@@ -369,14 +369,17 @@ const ChallengeSession = () => {
 
           const isLastQuestion = currentIndex + 1 >= questions.length;
 
-          if (!isLastQuestion) {
-            setDeadlineAt(Date.now() + QUESTION_TIME_SECONDS * 1000);
-          }
-
           setTimeout(() => {
             setAnswerFeedback(null);
 
             if (!isLastQuestion) {
+              // Set fresh at reveal time, not at answer time — deadlineAt
+              // used to be set immediately above, before this 1.1s feedback
+              // pause even started, so by the time the next question (and
+              // its now-unpaused CountdownRing) became visible, ~1.1s of
+              // its 15s was already gone: it would always visibly start at
+              // 14, not 15.
+              setDeadlineAt(Date.now() + QUESTION_TIME_SECONDS * 1000);
               setCurrentIndex((index) => index + 1);
             } else {
               setLevelFinished(true);
@@ -413,13 +416,6 @@ const ChallengeSession = () => {
           xpDelta,
         });
 
-        if (result?.nextQuestionStartedAt) {
-          setDeadlineAt(
-            new Date(result.nextQuestionStartedAt).getTime() +
-              QUESTION_TIME_SECONDS * 1000,
-          );
-        }
-
         if (!streakLoggedToday) {
           await api.post("/challenge/complete-session", { localDate });
           setStreakLoggedToday(true);
@@ -432,6 +428,16 @@ const ChallengeSession = () => {
           setAnswerFeedback(null);
 
           if (!isLastQuestion) {
+            // Set fresh at reveal time, not at answer time (same fix as the
+            // guest path above) — the backend's own currentQuestionStartedAt
+            // stamp for this next question is already correct (see
+            // challenge.service.ts), but this client-side countdown display
+            // was still being unpaused ~1.1s after that stamp, always
+            // visibly starting at 14 instead of 15. The backend's
+            // QUESTION_TIME_GRACE_MS (3s) comfortably covers this gap, so an
+            // answer submitted right as this display hits 0 is still scored
+            // as on-time.
+            setDeadlineAt(Date.now() + QUESTION_TIME_SECONDS * 1000);
             setCurrentIndex((index) => index + 1);
           } else {
             setLevelFinished(true);
