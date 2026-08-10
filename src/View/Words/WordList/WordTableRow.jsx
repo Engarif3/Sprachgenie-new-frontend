@@ -226,6 +226,7 @@ const WordTableRow = ({
   word,
   index,
   learningMode,
+  isMouseActive,
   currentIndex,
   revealedWords,
   showActionColumn,
@@ -381,23 +382,73 @@ const WordTableRow = ({
 
       {/* Meaning */}
       <td
-        className={`pl-1 p-0 md:p-3 lg:p-3 text-sm md:text-lg lg:text-lg ${
-          learningMode && index === currentIndex
-            ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold"
-            : "text-cyan-500 dark:text-cyan-300 font-serif"
+        className={`pl-1 p-0 md:p-3 lg:p-3 text-sm md:text-lg lg:text-lg text-cyan-500 dark:text-cyan-300 font-serif outline-none focus:outline-none focus-visible:outline-none ${
+          learningMode
+            ? isMouseActive
+              ? "hover:cursor-pointer"
+              : // Without this, removing hover:cursor-pointer just falls
+                // back to the browser's own default cursor for text
+                // content (an I-beam), not "no styling" — this explicitly
+                // forces a plain arrow instead while keyboard-driven.
+                "cursor-default"
+            : ""
+        } ${
+          learningMode &&
+          index === currentIndex &&
+          revealedWords.includes(word.id)
+            ? "rounded-lg ring-1 ring-inset ring-blue-500 bg-cyan-50 dark:ring-blue-400 dark:bg-cyan-900/20"
+            : ""
         }`}
-        onClick={() => learningMode && revealMeaning(word.id)}
+        onClick={() => learningMode && revealMeaning(word.id, index)}
         tabIndex="0"
         onKeyDown={(e) => handleArrowKeyPress(e, index)}
         ref={currentIndex === index ? focusElement : null}
       >
-        {learningMode && !revealedWords.includes(word.id) ? (
-          <span className="opacity-0">Hidden</span>
-        ) : (
-          <span className="line-clamp-2 hover:line-clamp-none break-words max-w-[120px] md:max-w-full">
-            {word.meaning?.join(", ")}
-          </span>
-        )}
+        <div className="flex flex-col items-start gap-1">
+          {learningMode && !revealedWords.includes(word.id) ? (
+            <span className="self-center text-center text-xs font-semibold italic text-gray-700 dark:text-gray-300 sm:text-sm">
+              Click to reveal
+            </span>
+          ) : (
+            <span
+              className={`break-words max-w-[120px] md:max-w-full ${
+                learningMode && index === currentIndex
+                  ? // The row actually being revealed via keyboard should
+                    // always show its full meaning immediately — the whole
+                    // point of pressing ↓ to reveal it, not something that
+                    // should still need an extra hover step to actually
+                    // read past 2 lines.
+                    "line-clamp-none"
+                  : // Every other row: clamped by default, expandable on
+                    // genuine mouse hover — gated by isMouseActive (same as
+                    // the cursor above) so a mouse merely resting motionless
+                    // over some OTHER row doesn't keep expanding it via
+                    // real CSS :hover while the user is purely arrow-key
+                    // navigating elsewhere (:hover can't tell keyboard
+                    // input from mouse input on its own).
+                    `line-clamp-2 ${
+                      learningMode && !isMouseActive
+                        ? ""
+                        : "hover:line-clamp-none"
+                    }`
+              }`}
+            >
+              {word.meaning?.join(", ")}
+            </span>
+          )}
+          {/* Only once THIS row is both current and already revealed —
+              not the instant it becomes current, or it would show next
+              to "Click to reveal" on a still-hidden row (e.g. row 0 the
+              moment learning mode turns on, before anything's been
+              clicked). Desktop-only: no arrow keys on mobile. */}
+          {learningMode &&
+            index === currentIndex &&
+            revealedWords.includes(word.id) && (
+              <span className="hidden self-center text-center text-xs font-bold text-gray-700 dark:text-gray-300 md:inline">
+                Press arrow key ↓
+              </span>
+            )}
+        </div>
       </td>
 
       {/* Conjugate — verbs only */}

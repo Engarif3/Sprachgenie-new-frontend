@@ -5,7 +5,6 @@ import { useAuth } from "../services/auth.services";
 import {
   FaBook,
   FaHome,
-  FaSun,
   FaMoon,
   FaLayerGroup,
   FaChevronDown,
@@ -17,6 +16,7 @@ import {
   FaTrophy,
   FaLanguage,
 } from "react-icons/fa";
+import { FiSun } from "react-icons/fi";
 import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
 import { RiRadioFill } from "react-icons/ri";
 import { useTheme } from "../context/ThemeContext";
@@ -335,7 +335,7 @@ const NavBar = () => {
               {theme === "light" ? (
                 <FaMoon className="text-lg text-yellow-500 hover:scale-110" />
               ) : (
-                <FaSun className="text-lg hover:scale-110" />
+                <FiSun className="text-lg hover:scale-110" />
               )}
             </button>
           </div>
@@ -364,7 +364,7 @@ const NavBar = () => {
               {theme === "light" ? (
                 <FaMoon className="text-lg text-yellow-500 hover:scale-110" />
               ) : (
-                <FaSun className="text-lg hover:scale-110" />
+                <FiSun className="text-lg hover:scale-110" />
               )}
             </button>
           </div>
@@ -405,7 +405,7 @@ const NavBar = () => {
             {theme === "light" ? (
               <FaMoon className="text-lg text-yellow-500 hover:scale-110" />
             ) : (
-              <FaSun className="text-lg hover:scale-110" />
+              <FiSun className="text-lg hover:scale-110" />
             )}
           </button>
         </div>
@@ -677,7 +677,7 @@ const NavBar = () => {
                   {theme === "light" ? (
                     <FaMoon className="text-lg  text-yellow-500 hover:scale-110" />
                   ) : (
-                    <FaSun className="text-lg hover:scale-110 " />
+                    <FiSun className="text-lg hover:scale-110 " />
                   )}
                 </button>
               </div>

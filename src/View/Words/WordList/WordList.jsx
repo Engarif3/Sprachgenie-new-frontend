@@ -464,6 +464,23 @@ const WordList = () => {
   const [learningMode, setLearningMode] = useState(false);
   const [revealedWords, setRevealedWords] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(null);
+  // Whether the mouse (rather than the keyboard) was the most recent
+  // input — CSS :hover alone can't express "but a key was just pressed",
+  // since the mouse never actually left the element, so the meaning
+  // column's pointer cursor is gated on this instead of pure :hover: set
+  // true on mouse movement, set false the instant an arrow key is
+  // handled, so pressing ↓ hides the cursor even with the mouse sitting
+  // motionless over the column, and moving the mouse again brings it back.
+  const [isMouseActive, setIsMouseActive] = useState(true);
+  // The active row auto-scrolls into view on every arrow-key press (see
+  // the focus-management effect below) — several browsers re-fire mouse
+  // events when page content shifts underneath a stationary cursor during
+  // that scroll, even though the mouse itself never moved, which would
+  // otherwise immediately flip isMouseActive back to true right after the
+  // keypress set it false. Tracking the actual last coordinates and only
+  // reacting to a genuine change filters those scroll-triggered false
+  // positives out while still catching real movement.
+  const lastMousePositionRef = useRef({ x: null, y: null });
   const focusElement = useRef(null);
   const [showActionColumn, setShowActionColumn] = useState(false);
   const [loadingFavorites, setLoadingFavorites] = useState({});
@@ -1453,10 +1470,103 @@ const WordList = () => {
   );
 
   //learning mode
+  // Learning mode's own accumulating word list — separate from
+  // paginatedWords (the normal, page-swapping view). Starts as a snapshot
+  // of the current page and grows by appending subsequent pages' words as
+  // the user keeps pressing ↓ past the end, so the table keeps growing
+  // (40, 80, 120...) instead of ever swapping to a visually different
+  // "page 2". learningPageCursorRef tracks the highest page number
+  // already folded into it.
+  const [learningWords, setLearningWords] = useState([]);
+  const learningPageCursorRef = useRef(1);
+  // Tracks every page number already fetched (or currently being fetched)
+  // into learningWords, keyed to its request promise. Both trigger points
+  // below (proactive top-up on every keypress, and the just-in-case
+  // fallback at the literal boundary) call the SAME function for the SAME
+  // page — this makes that safe to do without ever double-appending the
+  // same 40 words twice, since a page already in this map just returns
+  // its existing promise instead of fetching/appending again.
+  const learningPageRequestsRef = useRef(new Map());
+
+  const activeWords = learningMode ? learningWords : paginatedWords;
+
+  // Fetches `page` in the background (prefetch: true — never touches
+  // currentPage or the visible pagination) and, the moment it lands,
+  // appends it straight into learningWords — NOT gated behind the user's
+  // arrow-key position actually reaching it. That's the difference from
+  // just warming the cache: the table itself grows as soon as data is
+  // ready, so by the time keyboard navigation gets there, the rows are
+  // normally already on screen instead of the user ever seeing the
+  // table's current bottom edge while pressing ↓.
+  const ensureLearningPageLoaded = useCallback(
+    (page) => {
+      if (page > totalPages) {
+        return Promise.resolve([]);
+      }
+
+      const existing = learningPageRequestsRef.current.get(page);
+      if (existing) {
+        return existing;
+      }
+
+      const request = fetchWordsPage({
+        queryState: activeQuery,
+        queryKey: activeQueryKey,
+        page,
+        preferCache: true,
+        prefetch: true,
+      })
+        .then((normalizedPage) => {
+          const newWords = normalizedPage.words || [];
+          if (newWords.length > 0) {
+            setLearningWords((prev) => [...prev, ...newWords]);
+            learningPageCursorRef.current = Math.max(
+              learningPageCursorRef.current,
+              page,
+            );
+          }
+          return newWords;
+        })
+        .catch((error) => {
+          console.error("Failed to load learning-mode page:", error);
+          // Wasn't actually loaded — allow a later call to retry it.
+          learningPageRequestsRef.current.delete(page);
+          throw error;
+        });
+
+      learningPageRequestsRef.current.set(page, request);
+      return request;
+    },
+    [totalPages, fetchWordsPage, activeQuery, activeQueryKey],
+  );
+
   const toggleLearningMode = useCallback(() => {
-    setLearningMode((prev) => !prev);
+    // Read directly off current render state rather than a functional
+    // updater — this callback is only ever invoked from a single button's
+    // onClick (never from rapid overlapping calls where a stale closure
+    // would matter), and reading `learningMode` directly here means every
+    // other line below can stay a plain, ordinary call instead of a
+    // setState updater — updater functions must stay side-effect-free
+    // (React 18 Strict Mode deliberately double-invokes them in dev to
+    // catch exactly that), and ensureLearningPageLoaded below is a real
+    // side effect (an API call).
+    const next = !learningMode;
+    setLearningMode(next);
+    // currentIndex is null only while learning mode is off (nothing else
+    // ever sets it to null) — needed so the "current row" reveal hint can
+    // appear on row 0 the moment learning mode turns on, instead of
+    // staying null until the first arrow-key press.
+    setCurrentIndex(next ? 0 : null);
     setRevealedWords([]);
-  }, []);
+    setLearningWords(paginatedWords);
+    learningPageCursorRef.current = currentPage;
+    learningPageRequestsRef.current = new Map();
+    if (next) {
+      // Immediately start warming + appending page 2 — turning learning
+      // mode off is a no-op here (nothing left to load ahead toward).
+      void ensureLearningPageLoaded(currentPage + 1);
+    }
+  }, [learningMode, paginatedWords, currentPage, ensureLearningPageLoaded]);
 
   const revealMeaning = useCallback((wordId) => {
     setRevealedWords((prev) =>
@@ -1466,8 +1576,31 @@ const WordList = () => {
     );
   }, []);
 
+  // Clicking a row only ever called revealMeaning, never touched
+  // currentIndex — so clicking some OTHER row than whichever one was
+  // already "current" revealed that row's meaning while the "Press down
+  // key" hint stayed stuck on the old current row instead of following
+  // the click. Arrow-key navigation already keeps the two in sync (see
+  // handleArrowKeyPress below); this is the click-path equivalent.
+  const handleRevealClick = useCallback(
+    (wordId, index) => {
+      revealMeaning(wordId);
+      setCurrentIndex(index);
+    },
+    [revealMeaning],
+  );
+
   const handleArrowKeyPress = useCallback(
     (e, index) => {
+      // e.repeat is true for the auto-repeated keydown events the browser
+      // fires while a key is held — without this guard, holding an arrow
+      // key down would race through many words instead of moving exactly
+      // one per actual press-and-release.
+      if (e.repeat) {
+        e.preventDefault();
+        return;
+      }
+
       const keyActions = {
         ArrowRight: () => index + 1,
         ArrowDown: () => index + 1,
@@ -1476,22 +1609,74 @@ const WordList = () => {
       };
 
       const action = keyActions[e.key];
-      if (action) {
-        e.preventDefault();
-        const newIndex = action();
-        if (newIndex >= 0 && newIndex < paginatedWords.length) {
-          revealMeaning(paginatedWords[newIndex].id);
-          setCurrentIndex(newIndex);
-        }
+      if (!action) {
+        return;
       }
+
+      e.preventDefault();
+      setIsMouseActive(false);
+      const newIndex = action();
+      const isForward = e.key === "ArrowRight" || e.key === "ArrowDown";
+
+      if (newIndex >= 0 && newIndex < activeWords.length) {
+        revealMeaning(activeWords[newIndex].id);
+        setCurrentIndex(newIndex);
+
+        // Once navigation is within one page's worth of the current
+        // tail, top up the buffer by one more page — keeps roughly a
+        // full page of lookahead ahead of actual progress at all times
+        // (not the whole rest of the list eagerly, just one page beyond
+        // wherever the user actually is), so the table's growing edge
+        // stays out of view during normal keyboard pacing.
+        if (
+          isForward &&
+          learningMode &&
+          activeWords.length - newIndex <= WORDS_PER_PAGE
+        ) {
+          void ensureLearningPageLoaded(learningPageCursorRef.current + 1);
+        }
+        return;
+      }
+
+      // Reached the literal end of what's loaded so far — normally the
+      // top-up above already means this doesn't happen, but as a
+      // fallback (e.g. very fast key-repeat outrunning a slow network),
+      // load + append the next page now and continue the reveal flow
+      // onto its first word once it lands. ensureLearningPageLoaded is
+      // idempotent per page, so this can never double-append even if the
+      // top-up above already has this same page in flight.
+      if (!isForward || !learningMode || newIndex < activeWords.length) {
+        return;
+      }
+
+      const appendStartIndex = activeWords.length;
+
+      ensureLearningPageLoaded(learningPageCursorRef.current + 1).then(
+        (newWords) => {
+          if (newWords.length > 0) {
+            revealMeaning(newWords[0].id);
+            setCurrentIndex(appendStartIndex);
+          }
+        },
+      );
     },
-    [paginatedWords, revealMeaning],
+    [activeWords, revealMeaning, learningMode, ensureLearningPageLoaded],
   );
 
   // Focus management
   useEffect(() => {
     if (currentIndex !== null && focusElement.current) {
-      focusElement.current.focus();
+      // preventScroll + an explicit centered scrollIntoView, rather than
+      // letting .focus() do its own default scroll — the default only
+      // scrolls the minimum distance needed to bring the row into view,
+      // which near the bottom of the page can land it right at the
+      // viewport edge with the next row (where ↓ goes next) still
+      // off-screen. Centering guarantees headroom on both sides.
+      focusElement.current.focus({ preventScroll: true });
+      focusElement.current.scrollIntoView({
+        block: "center",
+        behavior: "smooth",
+      });
     }
   }, [currentIndex]);
 
@@ -2302,7 +2487,21 @@ const WordList = () => {
             )}
           </div>
           <div className="overflow-x-auto  border-gray-700/50 rounded-2xl shadow-2xl">
-            <table className="w-full border-collapse">
+            <table
+              className="w-full border-collapse"
+              onMouseMove={(e) => {
+                if (
+                  e.clientX !== lastMousePositionRef.current.x ||
+                  e.clientY !== lastMousePositionRef.current.y
+                ) {
+                  lastMousePositionRef.current = {
+                    x: e.clientX,
+                    y: e.clientY,
+                  };
+                  setIsMouseActive(true);
+                }
+              }}
+            >
               <thead>
                 <tr className="bg-slate-900 dark:bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 text-sm md:text-xl lg:text-xl text-white">
                   <th className="py-3 text-sm md:text-lg lg:text-lg text-center text-slate-200 font-bold w-[5%] md:w-[3%] lg:w-[3%] rounded-tl-xl border-b-2 border-slate-700/70">
@@ -2331,7 +2530,7 @@ const WordList = () => {
                     Level
                   </th>
                   <th
-                    className={`py-3 text-center text-slate-200 font-bold border-b-2 border-slate-700/70 ${
+                    className={`py-3 text-center text-slate-200 font-bold w-[10%] border-b-2 border-slate-700/70 ${
                       showActionColumn ? "table-cell" : "hidden"
                     } `}
                   >
@@ -2356,13 +2555,14 @@ const WordList = () => {
 
               {/* Table body */}
               <tbody>
-                {paginatedWords.length > 0 ? (
-                  paginatedWords.map((word, index) => (
+                {activeWords.length > 0 ? (
+                  activeWords.map((word, index) => (
                     <WordTableRow
                       key={word.id}
                       word={word}
                       index={index}
                       learningMode={learningMode}
+                      isMouseActive={isMouseActive}
                       currentIndex={currentIndex}
                       revealedWords={revealedWords}
                       showActionColumn={showActionColumn}
@@ -2374,7 +2574,7 @@ const WordList = () => {
                       loadingConjugations={loadingConjugations}
                       isAnyAiActionPending={isAnyAiActionPending}
                       focusElement={focusElement}
-                      revealMeaning={revealMeaning}
+                      revealMeaning={handleRevealClick}
                       openModal={openModal}
                       generateParagraph={generateParagraph}
                       handleConjugate={handleConjugate}
