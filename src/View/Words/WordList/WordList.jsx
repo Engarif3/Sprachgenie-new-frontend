@@ -2398,11 +2398,14 @@ const WordList = () => {
                       className="text-center py-4 font-bold text-gray-500 h-96 align-middle text-xl sm:text-2xl"
                     >
                       {hasActiveFilterExcludingSearch ? (
-                        <div className="flex flex-col items-center gap-3">
+                        <div className="flex flex-col items-center gap-2">
                           <span>No words match your current filters.</span>
+                          <span className="text-sm sm:text-base font-normal text-sky-500">
+                            Try again after resetting the filters.
+                          </span>
                           <button
                             onClick={handleResetFilters}
-                            className="rounded-full bg-gradient-to-r from-red-500 to-pink-500 px-4 py-1.5 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-red-600 hover:to-pink-600"
+                            className="mt-1 rounded-full bg-gradient-to-r from-red-500 to-pink-500 px-4 py-1.5 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-red-600 hover:to-pink-600"
                           >
                             Reset Filters
                           </button>
