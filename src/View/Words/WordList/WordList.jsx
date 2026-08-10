@@ -1915,6 +1915,23 @@ const WordList = () => {
 
   const hasActiveFilters = hasResettableFilters || showRecentOnly;
 
+  // Deliberately excludes searchValue — a search with no other filter
+  // active has genuinely searched the whole word list, so "will be added
+  // soon" is accurate. A search combined with a filter (e.g. "Recently
+  // Added") may just not exist within that narrower filter while still
+  // existing elsewhere, so the empty state should point at clearing
+  // filters instead of implying the word is entirely missing.
+  const hasActiveFilterExcludingSearch = Boolean(
+    selectedLevel ||
+      selectedTopic ||
+      selectedPartOfSpeech ||
+      selectedVerbFilter ||
+      selectedPrepositionFilter ||
+      selectedAdjectiveFilter ||
+      adminCompletenessFilter ||
+      showRecentOnly,
+  );
+
   const displayedWordsCount =
     typeof cache.totalWords === "number" && Number.isFinite(cache.totalWords)
       ? cache.totalWords
@@ -2380,7 +2397,19 @@ const WordList = () => {
                       colSpan={showAdminControls ? 11 : 10}
                       className="text-center py-4 font-bold text-gray-500 h-96 align-middle text-xl sm:text-2xl"
                     >
-                      No words available. Will be added soon!
+                      {hasActiveFilterExcludingSearch ? (
+                        <div className="flex flex-col items-center gap-3">
+                          <span>No words match your current filters.</span>
+                          <button
+                            onClick={handleResetFilters}
+                            className="rounded-full bg-gradient-to-r from-red-500 to-pink-500 px-4 py-1.5 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-red-600 hover:to-pink-600"
+                          >
+                            Reset Filters
+                          </button>
+                        </div>
+                      ) : (
+                        "No words available. Will be added soon!"
+                      )}
                     </td>
                   </tr>
                 )}
