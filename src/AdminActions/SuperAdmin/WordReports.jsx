@@ -4,6 +4,12 @@ import WordListModal from "../../View/Words/Modals/WordListModal";
 import Button from "../../components/UI/Button";
 import PageHeader from "../../components/UI/PageHeader";
 import { formatDateOnly as formatDate } from "../../utils/formatDateTime";
+import {
+  IoClipboardOutline,
+  IoSettingsOutline,
+  IoFlagOutline,
+  IoWarningOutline,
+} from "react-icons/io5";
 
 const WordReports = () => {
   const [error, setError] = useState("");
@@ -327,8 +333,9 @@ const WordReports = () => {
 
         {/* Reasons management */}
         <div className="rounded-lg border border-slate-200 bg-white p-8 mb-8 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
-            📋 Report Reasons
+          <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white mb-4">
+            <IoClipboardOutline aria-hidden="true" />
+            Report Reasons
           </h2>
 
           {reasonsLoading ? (
@@ -443,8 +450,9 @@ const WordReports = () => {
 
         {/* Settings */}
         <div className="rounded-lg border border-slate-200 bg-white p-8 mb-8 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
-            ⚙️ Note Field Settings
+          <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white mb-4">
+            <IoSettingsOutline aria-hidden="true" />
+            Note Field Settings
           </h2>
           {settingsLoading ? (
             <p className="text-slate-500 dark:text-gray-400">Loading...</p>
@@ -489,8 +497,9 @@ const WordReports = () => {
 
         {/* Reported words */}
         <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
-            🚩 Reported Words
+          <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white mb-4">
+            <IoFlagOutline aria-hidden="true" />
+            Reported Words
           </h2>
 
           {!summaryLoading && summary.length > 0 && (
@@ -653,8 +662,9 @@ const WordReports = () => {
         {deleteTarget && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full border border-red-700">
-              <h2 className="text-2xl font-bold text-red-400 mb-4">
-                ⚠️ Permanently Delete{" "}
+              <h2 className="flex items-center gap-2 text-2xl font-bold text-red-400 mb-4">
+                <IoWarningOutline aria-hidden="true" />
+                Permanently Delete{" "}
                 {deleteTarget.type === "allForWord"
                   ? "All Reports"
                   : deleteTarget.type === "bulkWords"
