@@ -2143,6 +2143,21 @@ const WordList = () => {
     adminCompletenessFilter,
   );
 
+  // Dropdown filters only — excludes searchValue (typing alone shouldn't
+  // surface a filter-reset action, just a plain clear-text one) and
+  // showRecentOnly (that toggle button already doubles as its own
+  // on/off control). Drives the standalone "Reset Filters" button next
+  // to the Recently Added toggle.
+  const hasDropdownFilters = Boolean(
+    selectedLevel ||
+    selectedTopic ||
+    selectedPartOfSpeech ||
+    selectedVerbFilter ||
+    selectedPrepositionFilter ||
+    selectedAdjectiveFilter ||
+    adminCompletenessFilter,
+  );
+
   const hasActiveFilters = hasResettableFilters || showRecentOnly;
 
   // Deliberately excludes searchValue — a search with no other filter
@@ -2321,7 +2336,7 @@ const WordList = () => {
               >
                 {showRecentOnly ? "Recently added X" : "Recently added"}
               </Button>
-              {hasResettableFilters && (
+              {hasDropdownFilters && (
                 <Button
                   variant="danger"
                   size="sm"
