@@ -7,6 +7,7 @@ import { useAuth } from "../services/auth.services";
 import aiApi from "../AI_axios";
 import ConjugationModal from "../View/Words/WordList/ConjugationModal";
 import { formatDateOnly } from "../utils/formatDateTime";
+import { IoClipboardOutline, IoSettingsOutline } from "react-icons/io5";
 
 const ConjugationReportsPage = () => {
   const { isAdmin, isSuperAdmin, isLoggedIn, userId } = useAuth();
@@ -282,8 +283,9 @@ const ConjugationReportsPage = () => {
 
       {isSuperAdmin && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6 mb-6 shadow-sm dark:border-gray-700 dark:bg-gray-800/60 dark:shadow-none">
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-            📋 Report Reasons
+          <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white mb-4">
+            <IoClipboardOutline aria-hidden="true" />
+            Report Reasons
           </h2>
           {reasonsLoading ? (
             <p className="text-slate-500 dark:text-gray-400 text-sm">
@@ -374,8 +376,9 @@ const ConjugationReportsPage = () => {
 
       {isSuperAdmin && (
         <div className="rounded-2xl border border-slate-200 bg-white p-6 mb-6 shadow-sm dark:border-gray-700 dark:bg-gray-800/60 dark:shadow-none">
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-            ⚙️ Note Field Settings
+          <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white mb-4">
+            <IoSettingsOutline aria-hidden="true" />
+            Note Field Settings
           </h2>
           {settingsLoading ? (
             <p className="text-slate-500 dark:text-gray-400 text-sm">

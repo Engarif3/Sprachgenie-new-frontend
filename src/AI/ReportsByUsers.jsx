@@ -6,6 +6,11 @@ import aiApi from "../AI_axios";
 import { ScaleLoader, PuffLoader } from "react-spinners";
 import { useAuth } from "../services/auth.services";
 import AIModal from "../View/Words/Modals/AIModal";
+import {
+  IoClipboardOutline,
+  IoSettingsOutline,
+  IoClose,
+} from "react-icons/io5";
 
 const ReportsByUsers = () => {
   const { isAdmin, isSuperAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
@@ -501,8 +506,9 @@ const ReportsByUsers = () => {
 
         {isSuperAdmin && (
           <div className="rounded-lg border border-slate-200 bg-white p-6 mb-6 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-              📋 Report Reasons
+            <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white mb-4">
+              <IoClipboardOutline aria-hidden="true" />
+              Report Reasons
             </h2>
             {reasonsLoading ? (
               <p className="text-slate-500 dark:text-gray-400 text-sm">
@@ -593,8 +599,9 @@ const ReportsByUsers = () => {
 
         {isSuperAdmin && (
           <div className="rounded-lg border border-slate-200 bg-white p-6 mb-8 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">
-              ⚙️ Note Field Settings
+            <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white mb-4">
+              <IoSettingsOutline aria-hidden="true" />
+              Note Field Settings
             </h2>
             {settingsLoading ? (
               <p className="text-slate-500 dark:text-gray-400 text-sm">
@@ -815,8 +822,9 @@ const ReportsByUsers = () => {
               <button
                 className="absolute top-3 right-3 text-gray-400 hover:text-white font-bold"
                 onClick={() => setSelectedMessage(null)}
+                aria-label="Close"
               >
-                ✕
+                <IoClose aria-hidden="true" />
               </button>
               <h3 className="text-lg font-bold mb-4 text-white">Full Message</h3>
               <p className="text-gray-300 text-sm">{selectedMessage}</p>
