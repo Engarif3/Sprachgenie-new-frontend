@@ -6,6 +6,7 @@ import Loader from "../../utils/Loader";
 import api, { publicApi } from "../../axios";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../services/auth.services";
+import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import { useFavorites } from "../../hooks/useFavorites";
 import FavoriteButton from "../Words/Modals/FavoriteButton";
 import { MdOutlineDoubleArrow } from "react-icons/md";
@@ -140,7 +141,7 @@ const ConversationPage = () => {
       setTranslations((prev) => ({ ...prev, [text]: data.data.translated }));
     } catch (err) {
       console.error("Translation failed:", err);
-      setTranslations((prev) => ({ ...prev, [text]: `❌ ${err.message}` }));
+      setTranslations((prev) => ({ ...prev, [text]: err.message }));
     } finally {
       setLoadingTranslations((prev) => ({ ...prev, [text]: false }));
     }
@@ -214,8 +215,9 @@ const ConversationPage = () => {
                 }
               />
             </div>
-            <span className="mb-4 inline-block rounded-full border border-orange-500/50 bg-gradient-to-r from-orange-500/20 to-pink-500/20 px-6 py-2 text-sm font-semibold text-orange-500 dark:text-orange-400">
-              💬 Conversation
+            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-orange-500/50 bg-gradient-to-r from-orange-500/20 to-pink-500/20 px-6 py-2 text-sm font-semibold text-orange-500 dark:text-orange-400">
+              <IoChatbubbleEllipsesOutline size={16} aria-hidden="true" />
+              Conversation
             </span>
             <h2
               className={`mt-4 text-3xl font-bold md:text-4xl ${isLight ? "text-slate-900" : "text-white"}`}

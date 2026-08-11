@@ -4,6 +4,7 @@ import { useTheme } from "../../context/ThemeContext";
 import { useNotifications } from "../../hooks/useNotifications";
 import NotificationList from "./NotificationList";
 import PageHeader from "../../components/UI/PageHeader";
+import { IoNotificationsOutline } from "react-icons/io5";
 
 const confirmDelete = ({ title, text }) =>
   Swal.fire({
@@ -90,7 +91,12 @@ const NotificationsPage = () => {
     <div className="mx-auto max-w-3xl p-4 pb-12 md:p-8">
       <div className="mb-6">
         <PageHeader
-          title="🔔 Notifications"
+          title={
+            <span className="inline-flex items-center gap-2">
+              <IoNotificationsOutline aria-hidden="true" />
+              Notifications
+            </span>
+          }
           subtitle="Announcements from the Sprachgenie team."
         />
       </div>

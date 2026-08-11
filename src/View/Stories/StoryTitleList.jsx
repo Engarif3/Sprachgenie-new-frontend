@@ -8,6 +8,7 @@ import {
   Pencil,
   Plus,
   Trash2,
+  Image,
 } from "lucide-react";
 import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
@@ -354,8 +355,9 @@ const StoryTitleList = () => {
       <div className="mx-auto min-h-screen max-w-6xl p-4 pb-12">
         {/* Header */}
         <div className="mb-10 mt-8 text-center">
-          <span className="mb-4 inline-block rounded-full border border-orange-500/50 bg-gradient-to-r from-orange-500/20 to-pink-500/20 px-6 py-2 text-sm font-semibold text-orange-500 dark:text-orange-400">
-            📗 Read & Learn
+          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-orange-500/50 bg-gradient-to-r from-orange-500/20 to-pink-500/20 px-6 py-2 text-sm font-semibold text-orange-500 dark:text-orange-400">
+            <BookOpen size={16} aria-hidden="true" />
+            Read & Learn
           </span>
           <h2 className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-4xl font-bold text-transparent md:text-5xl">
             German Stories
@@ -707,9 +709,10 @@ const StoryTitleList = () => {
                 }`}
               >
                 <p
-                  className={`mb-2 text-sm font-semibold ${isLight ? "text-slate-700" : "text-slate-200"}`}
+                  className={`mb-2 flex items-center gap-1.5 text-sm font-semibold ${isLight ? "text-slate-700" : "text-slate-200"}`}
                 >
-                  📖 Vocabulary
+                  <BookOpen size={14} aria-hidden="true" />
+                  Vocabulary
                 </p>
 
                 {formVocabulary.length > 0 && (
@@ -794,9 +797,10 @@ const StoryTitleList = () => {
                 }`}
               >
                 <p
-                  className={`mb-2 text-sm font-semibold ${isLight ? "text-slate-700" : "text-slate-200"}`}
+                  className={`mb-2 flex items-center gap-1.5 text-sm font-semibold ${isLight ? "text-slate-700" : "text-slate-200"}`}
                 >
-                  📸 Story Image
+                  <Image size={14} aria-hidden="true" />
+                  Story Image
                 </p>
                 {formImagePreview && (
                   <img

@@ -13,6 +13,7 @@ import {
   Plus,
   Trash2,
   X,
+  MessageCircle,
 } from "lucide-react";
 import {
   DndContext,
@@ -1283,8 +1284,9 @@ const HowToSayList = () => {
       <div className="mx-auto min-h-screen max-w-6xl p-4 pb-12">
         {/* Header */}
         <div className="mb-10 mt-8 text-center">
-          <span className="mb-4 inline-block rounded-full border border-orange-500/50 bg-gradient-to-r from-orange-500/20 to-pink-500/20 px-6 py-2 text-sm font-semibold text-orange-500 dark:text-orange-400">
-            🗣️ Learn Phrases
+          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-orange-500/50 bg-gradient-to-r from-orange-500/20 to-pink-500/20 px-6 py-2 text-sm font-semibold text-orange-500 dark:text-orange-400">
+            <MessageCircle size={16} aria-hidden="true" />
+            Learn Phrases
           </span>
           <h2 className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-4xl font-bold text-transparent md:text-5xl">
             How to Say It in German

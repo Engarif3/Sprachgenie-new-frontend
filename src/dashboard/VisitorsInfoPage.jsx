@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import api from "../axios";
 import { formatDateOnly } from "../utils/formatDateTime";
+import { IoPeopleOutline, IoEarthOutline } from "react-icons/io5";
 
 const VisitorsInfoPage = () => {
   const [uniqueVisitors, setUniqueVisitors] = useState(0);
@@ -85,8 +86,9 @@ const VisitorsInfoPage = () => {
 
       <div className="p-6 bg-white dark:bg-gray-900 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm dark:shadow-none max-w-6xl mx-auto">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-            👥 Visitors Overview
+          <h2 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white">
+            <IoPeopleOutline aria-hidden="true" />
+            Visitors Overview
           </h2>
           <p className="mt-2 text-sm text-slate-500 dark:text-gray-400">
             Start here for visitor totals and recent activity before opening the
@@ -202,8 +204,9 @@ const VisitorsInfoPage = () => {
       <div className="p-6 bg-white dark:bg-gray-900 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm dark:shadow-none max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-              🌍 Visitors by Location
+            <h2 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white">
+              <IoEarthOutline aria-hidden="true" />
+              Visitors by Location
             </h2>
             <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">
               Full visitor analytics and detailed location breakdown
