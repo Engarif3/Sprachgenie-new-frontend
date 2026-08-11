@@ -5,6 +5,17 @@ import api from "../../axios";
 import aiApi from "../../AI_axios";
 import PageHeader from "../../components/UI/PageHeader";
 import { formatDateOnly } from "../../utils/formatDateTime";
+import {
+  IoCheckmarkCircleOutline,
+  IoDocumentTextOutline,
+  IoPencilOutline,
+  IoRefreshOutline,
+  IoClose,
+  IoLibraryOutline,
+  IoCalendarOutline,
+  IoBookOutline,
+  IoImageOutline,
+} from "react-icons/io5";
 
 const StoriesManagement = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -485,12 +496,14 @@ const StoriesManagement = () => {
                   {/* Status Badge */}
                   <div className="mb-3">
                     {story.isPublished ? (
-                      <span className="inline-block px-3 py-1 bg-green-100 border border-green-400 text-green-700 text-xs font-semibold rounded-full dark:bg-green-600/30 dark:border-green-500 dark:text-green-300">
-                        ✅ Published
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-100 border border-green-400 text-green-700 text-xs font-semibold rounded-full dark:bg-green-600/30 dark:border-green-500 dark:text-green-300">
+                        <IoCheckmarkCircleOutline size={14} aria-hidden="true" />
+                        Published
                       </span>
                     ) : (
-                      <span className="inline-block px-3 py-1 bg-yellow-100 border border-yellow-400 text-yellow-700 text-xs font-semibold rounded-full dark:bg-yellow-600/30 dark:border-yellow-500 dark:text-yellow-300">
-                        📝 Draft
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-yellow-100 border border-yellow-400 text-yellow-700 text-xs font-semibold rounded-full dark:bg-yellow-600/30 dark:border-yellow-500 dark:text-yellow-300">
+                        <IoDocumentTextOutline size={14} aria-hidden="true" />
+                        Draft
                       </span>
                     )}
                   </div>
@@ -502,14 +515,16 @@ const StoriesManagement = () => {
 
                   {/* Metadata */}
                   <div className="text-xs text-slate-500 dark:text-gray-400 mb-4 space-y-1">
-                    <p>
-                      📚 Level:{" "}
+                    <p className="flex items-center gap-1.5">
+                      <IoLibraryOutline size={14} aria-hidden="true" />
+                      Level:{" "}
                       <span className="text-orange-600 dark:text-orange-400">
                         {story.level?.level || "N/A"}
                       </span>
                     </p>
-                    <p>
-                      📅 Created: {formatDateOnly(story.createdAt)}
+                    <p className="flex items-center gap-1.5">
+                      <IoCalendarOutline size={14} aria-hidden="true" />
+                      Created: {formatDateOnly(story.createdAt)}
                     </p>
                   </div>
 
@@ -517,16 +532,18 @@ const StoriesManagement = () => {
                   <div className="flex gap-2 flex-wrap">
                     <button
                       onClick={() => openEditModal(story)}
-                      className="flex-1 min-w-[100px] px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded transition"
+                      className="flex flex-1 min-w-[100px] items-center justify-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded transition"
                     >
-                      ✏️ Edit
+                      <IoPencilOutline size={14} aria-hidden="true" />
+                      Edit
                     </button>
                     <button
                       onClick={() => openRegenerateModal(story)}
-                      className="flex-1 min-w-[100px] px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold rounded transition"
+                      className="flex flex-1 min-w-[100px] items-center justify-center gap-1.5 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold rounded transition"
                       title="Regenerate with new prompt"
                     >
-                      🔄 Regenerate
+                      <IoRefreshOutline size={14} aria-hidden="true" />
+                      Regenerate
                     </button>
                     {!story.isPublished ? (
                       <button
@@ -628,8 +645,9 @@ const StoriesManagement = () => {
 
               {/* Vocabulary Editor */}
               <div className="mb-6 bg-gray-700/50 p-4 rounded-lg border border-gray-600">
-                <h4 className="text-white font-semibold mb-3">
-                  📖 Vocabulary
+                <h4 className="flex items-center gap-2 text-white font-semibold mb-3">
+                  <IoBookOutline size={16} aria-hidden="true" />
+                  Vocabulary
                 </h4>
 
                 {editVocabulary.length > 0 && (
@@ -664,7 +682,7 @@ const StoriesManagement = () => {
                           className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition"
                           title="Delete this word"
                         >
-                          ✕
+                          <IoClose size={16} aria-hidden="true" />
                         </button>
                       </div>
                     ))}
@@ -700,8 +718,9 @@ const StoriesManagement = () => {
               {/* Image Upload Section */}
               {editSection === "full" && (
                 <div className="mb-6 bg-gray-700/50 p-4 rounded-lg border border-gray-600">
-                  <h4 className="text-white font-semibold mb-3">
-                    📸 Story Image
+                  <h4 className="flex items-center gap-2 text-white font-semibold mb-3">
+                    <IoImageOutline size={16} aria-hidden="true" />
+                    Story Image
                   </h4>
                   {editImagePreview ? (
                     <div className="space-y-3">
@@ -754,20 +773,26 @@ const StoriesManagement = () => {
                 <button
                   onClick={handleSaveEdit}
                   disabled={editLoading || uploadingEditImage}
-                  className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg disabled:opacity-50 transition"
+                  className="flex flex-1 items-center justify-center gap-1.5 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg disabled:opacity-50 transition"
                 >
-                  {editLoading
-                    ? "Saving..."
-                    : uploadingEditImage
-                      ? "Uploading image..."
-                      : "✅ Save Changes"}
+                  {editLoading ? (
+                    "Saving..."
+                  ) : uploadingEditImage ? (
+                    "Uploading image..."
+                  ) : (
+                    <>
+                      <IoCheckmarkCircleOutline size={16} aria-hidden="true" />
+                      Save Changes
+                    </>
+                  )}
                 </button>
                 <button
                   onClick={closeEditModal}
                   disabled={editLoading || uploadingEditImage}
-                  className="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg disabled:opacity-50 transition"
+                  className="flex flex-1 items-center justify-center gap-1.5 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg disabled:opacity-50 transition"
                 >
-                  ❌ Cancel
+                  <IoClose size={16} aria-hidden="true" />
+                  Cancel
                 </button>
               </div>
             </div>
@@ -778,8 +803,9 @@ const StoriesManagement = () => {
         {regenerateModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-gray-800 rounded-lg p-8 max-w-2xl w-full border border-gray-700">
-              <h2 className="text-2xl font-bold text-white mb-6">
-                🔄 Regenerate Story
+              <h2 className="flex items-center gap-2 text-2xl font-bold text-white mb-6">
+                <IoRefreshOutline aria-hidden="true" />
+                Regenerate Story
               </h2>
 
               {/* Level Selection */}
@@ -826,16 +852,24 @@ const StoriesManagement = () => {
                 <button
                   onClick={handleRegenerate}
                   disabled={regenerateLoading}
-                  className="flex-1 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg disabled:opacity-50 transition"
+                  className="flex flex-1 items-center justify-center gap-1.5 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg disabled:opacity-50 transition"
                 >
-                  {regenerateLoading ? "Regenerating..." : "🔄 Regenerate"}
+                  {regenerateLoading ? (
+                    "Regenerating..."
+                  ) : (
+                    <>
+                      <IoRefreshOutline size={16} aria-hidden="true" />
+                      Regenerate
+                    </>
+                  )}
                 </button>
                 <button
                   onClick={closeRegenerateModal}
                   disabled={regenerateLoading}
-                  className="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg disabled:opacity-50 transition"
+                  className="flex flex-1 items-center justify-center gap-1.5 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg disabled:opacity-50 transition"
                 >
-                  ❌ Cancel
+                  <IoClose size={16} aria-hidden="true" />
+                  Cancel
                 </button>
               </div>
             </div>

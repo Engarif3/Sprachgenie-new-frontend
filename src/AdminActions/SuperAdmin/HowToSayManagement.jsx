@@ -4,6 +4,7 @@ import api from "../../axios";
 import Container from "../../utils/Container";
 import PageHeader from "../../components/UI/PageHeader";
 import Button from "../../components/UI/Button";
+import { IoPencilOutline, IoTrashOutline } from "react-icons/io5";
 
 const PAGE_LIMIT = 40;
 
@@ -433,7 +434,10 @@ const HowToSayManagement = () => {
                           size="sm"
                           onClick={() => startEditTitle(titleItem)}
                         >
-                          ✏️ Edit
+                          <span className="inline-flex items-center gap-1.5">
+                            <IoPencilOutline size={14} aria-hidden="true" />
+                            Edit
+                          </span>
                         </Button>
                         <Button
                           type="button"
@@ -442,7 +446,14 @@ const HowToSayManagement = () => {
                           onClick={() => deleteTitle(titleItem)}
                           disabled={deletingTitleId === titleItem.id}
                         >
-                          {deletingTitleId === titleItem.id ? "Deleting..." : "🗑️ Delete"}
+                          {deletingTitleId === titleItem.id ? (
+                            "Deleting..."
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5">
+                              <IoTrashOutline size={14} aria-hidden="true" />
+                              Delete
+                            </span>
+                          )}
                         </Button>
                       </div>
                     </>
@@ -507,7 +518,7 @@ const HowToSayManagement = () => {
                               size="sm"
                               onClick={() => startEditSentence(sentenceItem)}
                             >
-                              ✏️
+                              <IoPencilOutline size={14} aria-hidden="true" />
                             </Button>
                             <Button
                               type="button"
@@ -516,7 +527,7 @@ const HowToSayManagement = () => {
                               onClick={() => deleteSentence(titleItem.id, sentenceItem)}
                               disabled={deletingSentenceId === sentenceItem.id}
                             >
-                              🗑️
+                              <IoTrashOutline size={14} aria-hidden="true" />
                             </Button>
                           </div>
                         </>
