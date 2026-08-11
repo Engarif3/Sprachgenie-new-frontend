@@ -6,7 +6,38 @@ import { useProfileSettings } from "../hooks/useProfileSettings";
 import { getAvatarUrl } from "../utils/avatar";
 import Container from "../utils/Container";
 import { useEffect, useRef, useState } from "react";
-import { IoClose, IoMenu } from "react-icons/io5";
+import {
+  IoClose,
+  IoMenu,
+  IoHomeOutline,
+  IoPersonOutline,
+  IoHeartOutline,
+  IoTrophyOutline,
+  IoNotificationsOutline,
+  IoMegaphoneOutline,
+  IoPeopleOutline,
+  IoDocumentTextOutline,
+  IoFlagOutline,
+  IoSettingsOutline,
+  IoStatsChartOutline,
+  IoPulseOutline,
+  IoAddOutline,
+  IoOptionsOutline,
+  IoLibraryOutline,
+  IoPencilOutline,
+  IoBookOutline,
+  IoFolderOpenOutline,
+  IoPricetagOutline,
+  IoVolumeHighOutline,
+  IoGlobeOutline,
+  IoShieldOutline,
+  IoImageOutline,
+  IoHardwareChipOutline,
+  IoRadioOutline,
+  IoShieldCheckmarkOutline,
+  IoDesktopOutline,
+  IoAlertCircleOutline,
+} from "react-icons/io5";
 import { ChevronRight } from "lucide-react";
 
 // Which section each route lives under — used only to visually highlight the
@@ -57,70 +88,170 @@ const SECTION_ROUTES = {
 const NAV_SECTIONS = [
   {
     key: "admin",
-    icon: "👥",
+    icon: IoPeopleOutline,
     label: "Admin",
     items: [
-      { to: "/dashboard/update-user-status", icon: "👤", label: "All Users", roles: ["super_admin"] },
-      { to: "/dashboard/update-basic-user-status", icon: "👤", label: "Users", roles: ["admin"] },
+      {
+        to: "/dashboard/update-user-status",
+        icon: IoPersonOutline,
+        label: "All Users",
+        roles: ["super_admin"],
+      },
+      {
+        to: "/dashboard/update-basic-user-status",
+        icon: IoPersonOutline,
+        label: "Users",
+        roles: ["admin"],
+      },
     ],
   },
   {
     key: "content",
-    icon: "📝",
+    icon: IoDocumentTextOutline,
     label: "Content",
     items: [
-      { to: "/dashboard/create-word", icon: "➕", label: "Create Word" },
-      { to: "/dashboard/level", icon: "🎚️", label: "Create Level" },
-      { to: "/dashboard/topic", icon: "📚", label: "Create Topic", roles: ["super_admin"] },
-      { to: "/dashboard/update-topic", icon: "✏️", label: "Update Topic", roles: ["super_admin"] },
-      { to: "/dashboard/generate-story", icon: "📖", label: "Generate Story" },
-      { to: "/dashboard/stories-management", icon: "🗂️", label: "Stories Management" },
-      { to: "/dashboard/create-conversation", icon: "➕", label: "Create Conversation" },
-      { to: "/dashboard/update-conversation", icon: "✏️", label: "Update Conversation" },
-      { to: "/dashboard/conversation-category", icon: "🏷️", label: "Create Category", roles: ["super_admin"] },
-      { to: "/dashboard/update-conversation-category", icon: "✏️", label: "Update Category", roles: ["super_admin"] },
-      { to: "/dashboard/how-to-say-in-german", icon: "🗣️", label: "How to Say It in German", roles: ["super_admin"] },
+      {
+        to: "/dashboard/create-word",
+        icon: IoAddOutline,
+        label: "Create Word",
+      },
+      { to: "/dashboard/level", icon: IoOptionsOutline, label: "Create Level" },
+      {
+        to: "/dashboard/topic",
+        icon: IoLibraryOutline,
+        label: "Create Topic",
+        roles: ["super_admin"],
+      },
+      {
+        to: "/dashboard/update-topic",
+        icon: IoPencilOutline,
+        label: "Update Topic",
+        roles: ["super_admin"],
+      },
+      {
+        to: "/dashboard/generate-story",
+        icon: IoBookOutline,
+        label: "Generate Story",
+      },
+      {
+        to: "/dashboard/stories-management",
+        icon: IoFolderOpenOutline,
+        label: "Stories Management",
+      },
+      {
+        to: "/dashboard/create-conversation",
+        icon: IoAddOutline,
+        label: "Create Conversation",
+      },
+      {
+        to: "/dashboard/update-conversation",
+        icon: IoPencilOutline,
+        label: "Update Conversation",
+      },
+      {
+        to: "/dashboard/conversation-category",
+        icon: IoPricetagOutline,
+        label: "Create Category",
+        roles: ["super_admin"],
+      },
+      {
+        to: "/dashboard/update-conversation-category",
+        icon: IoPencilOutline,
+        label: "Update Category",
+        roles: ["super_admin"],
+      },
+      {
+        to: "/dashboard/how-to-say-in-german",
+        icon: IoVolumeHighOutline,
+        label: "How to Say It in German",
+        roles: ["super_admin"],
+      },
     ],
   },
   {
     key: "reports",
-    icon: "🚩",
+    icon: IoFlagOutline,
     label: "Reports",
     items: [
-      { to: "/dashboard/reports", icon: "🚩", label: "Reports" },
+      { to: "/dashboard/reports", icon: IoFlagOutline, label: "Reports" },
     ],
   },
   {
     key: "settings",
-    icon: "⚙️",
+    icon: IoSettingsOutline,
     label: "Settings",
     items: [
-      { to: "/dashboard/global-limits", icon: "🌍", label: "Global Limits" },
-      { to: "/dashboard/user-limits", icon: "⚙️", label: "User Limits" },
-      { to: "/dashboard/ip-rate-limits", icon: "🛡️", label: "IP Rate Limits" },
-      { to: "/dashboard/profile-photo-settings", icon: "🖼️", label: "Profile Photo Settings", roles: ["super_admin"] },
+      {
+        to: "/dashboard/global-limits",
+        icon: IoGlobeOutline,
+        label: "Global Limits",
+      },
+      {
+        to: "/dashboard/user-limits",
+        icon: IoSettingsOutline,
+        label: "User Limits",
+      },
+      {
+        to: "/dashboard/ip-rate-limits",
+        icon: IoShieldOutline,
+        label: "IP Rate Limits",
+      },
+      {
+        to: "/dashboard/profile-photo-settings",
+        icon: IoImageOutline,
+        label: "Profile Photo Settings",
+        roles: ["super_admin"],
+      },
     ],
   },
   {
     key: "analytics",
-    icon: "📊",
+    icon: IoStatsChartOutline,
     label: "Analytics",
     items: [
-      { to: "/dashboard/users-favorite-count", icon: "❤️", label: "Favorites Stats" },
-      { to: "/dashboard/get-usage", icon: "🤖", label: "AI Usage" },
-      { to: "/dashboard/ip-usage", icon: "📡", label: "IP Usage" },
+      {
+        to: "/dashboard/users-favorite-count",
+        icon: IoHeartOutline,
+        label: "Favorites Stats",
+      },
+      {
+        to: "/dashboard/get-usage",
+        icon: IoHardwareChipOutline,
+        label: "AI Usage",
+      },
+      { to: "/dashboard/ip-usage", icon: IoRadioOutline, label: "IP Usage" },
     ],
   },
   {
     key: "monitoring",
-    icon: "🩺",
+    icon: IoPulseOutline,
     label: "Monitoring",
     items: [
-      { to: "/dashboard/registration-metadata", icon: "🛡️", label: "Registration Signals" },
-      { to: "/dashboard/system-status", icon: "🖥️", label: "System Status" },
-      { to: "/dashboard/visitors-info", icon: "👥", label: "Visitors Info" },
-      { to: "/dashboard/visitors", icon: "🌍", label: "Visitors Detail" },
-      { to: "/dashboard/error-logs", icon: "🚨", label: "Error Logs" },
+      {
+        to: "/dashboard/registration-metadata",
+        icon: IoShieldCheckmarkOutline,
+        label: "Registration Signals",
+      },
+      {
+        to: "/dashboard/system-status",
+        icon: IoDesktopOutline,
+        label: "System Status",
+      },
+      {
+        to: "/dashboard/visitors-info",
+        icon: IoPeopleOutline,
+        label: "Visitors Info",
+      },
+      {
+        to: "/dashboard/visitors",
+        icon: IoGlobeOutline,
+        label: "Visitors Detail",
+      },
+      {
+        to: "/dashboard/error-logs",
+        icon: IoAlertCircleOutline,
+        label: "Error Logs",
+      },
     ],
   },
 ];
@@ -278,7 +409,6 @@ const DashboardLayout = () => {
     return { top, left };
   };
 
-
   const toggleSection = (key) => {
     if (openSection === key) {
       setOpenSection(null);
@@ -377,7 +507,7 @@ const DashboardLayout = () => {
               onClick={() => setIsOpen(false)}
               title="Dashboard Overview"
             >
-              <span className="text-lg">🏠</span>
+              <IoHomeOutline size={18} aria-hidden="true" />
               <span>Overview</span>
             </NavLink>
 
@@ -387,7 +517,7 @@ const DashboardLayout = () => {
               onClick={() => setIsOpen(false)}
               title="Manage Your Profile"
             >
-              <span className="text-lg">👤</span>
+              <IoPersonOutline size={18} aria-hidden="true" />
               <span>Profile</span>
             </NavLink>
 
@@ -397,7 +527,7 @@ const DashboardLayout = () => {
               onClick={() => setIsOpen(false)}
               title="Your Favorite Words"
             >
-              <span className="text-lg">❤️</span>
+              <IoHeartOutline size={18} aria-hidden="true" />
               <span>Favorites</span>
             </NavLink>
 
@@ -407,7 +537,7 @@ const DashboardLayout = () => {
               onClick={() => setIsOpen(false)}
               title="Weekly XP Leaderboard"
             >
-              <span className="text-lg">🏆</span>
+              <IoTrophyOutline size={18} aria-hidden="true" />
               <span>Leaderboard</span>
             </NavLink>
 
@@ -417,7 +547,7 @@ const DashboardLayout = () => {
               onClick={() => setIsOpen(false)}
               title="Announcements"
             >
-              <span className="text-lg">🔔</span>
+              <IoNotificationsOutline size={18} aria-hidden="true" />
               <span>Notifications</span>
               {unreadCount > 0 && (
                 <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1.5 text-xs font-bold text-white">
@@ -433,7 +563,7 @@ const DashboardLayout = () => {
                 onClick={() => setIsOpen(false)}
                 title="Broadcast an announcement to all users"
               >
-                <span className="text-lg">📢</span>
+                <IoMegaphoneOutline size={18} aria-hidden="true" />
                 <span>Broadcast Notifications</span>
               </NavLink>
             )}
@@ -468,7 +598,7 @@ const DashboardLayout = () => {
                         aria-haspopup="true"
                       >
                         <span className="flex items-center gap-2">
-                          <span>{section.icon}</span>
+                          <section.icon size={16} aria-hidden="true" />
                           <span>{section.label}</span>
                         </span>
                         <ChevronRight
@@ -497,11 +627,13 @@ const DashboardLayout = () => {
                               <NavLink
                                 key={item.to}
                                 to={item.to}
-                                className={({ isActive }) => navItemClass(isActive)}
+                                className={({ isActive }) =>
+                                  navItemClass(isActive)
+                                }
                                 onClick={closeFlyoutAndDrawer}
                                 role="menuitem"
                               >
-                                <span>{item.icon}</span>
+                                <item.icon size={16} aria-hidden="true" />
                                 <span>{item.label}</span>
                               </NavLink>
                             ))}

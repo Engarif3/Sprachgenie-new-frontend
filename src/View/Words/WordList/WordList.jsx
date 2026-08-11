@@ -8,10 +8,11 @@ import {
   Suspense,
 } from "react";
 
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import Container from "../../../utils/Container";
 import Pagination from "../../../utils/Pagination";
+import Button from "../../../components/UI/Button";
 import { useAuth } from "../../../services/auth.services";
 import {
   capitalizePartOfSpeechName,
@@ -27,7 +28,14 @@ import {
   WORD_LIST_PAGE_CACHE_KEY,
 } from "../../../utils/storage";
 import aiApi from "../../../AI_axios";
-import { IoSearch } from "react-icons/io5";
+import {
+  IoSearch,
+  IoClose,
+  IoFunnelOutline,
+  IoGameControllerOutline,
+  IoTrophyOutline,
+  IoLibraryOutline,
+} from "react-icons/io5";
 import useDebounce from "../../../hooks/useDebounce";
 import WordTableRow from "./WordTableRow";
 import { IoInformationCircleOutline } from "react-icons/io5";
@@ -509,6 +517,12 @@ const WordList = () => {
   // see selectSuggestion.
   const suppressSuggestionsUntilRef = useRef(0);
   // =========Search suggestions ===============
+
+  // =========Global-match recovery (see the effect near the bottom that
+  // populates this) ===============
+  const [globalMatches, setGlobalMatches] = useState([]);
+  const globalMatchAbortRef = useRef(null);
+  // =========Global-match recovery ===============
 
   // ===================
   const { isAdmin, isSuperAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
@@ -1140,6 +1154,18 @@ const WordList = () => {
     const value = event.target.value;
     setSearchValue(value);
     setCurrentPage(1);
+    setHighlightedSuggestionIndex(-1);
+  }, []);
+
+  // Plain "clear the text I typed" — distinct from handleResetFiltersOnly
+  // (which clears filters and keeps the text) and handleResetFilters
+  // (which clears everything). Only ever shown when no other filter is
+  // active, so there's nothing else to reset.
+  const handleClearSearchText = useCallback(() => {
+    setSearchValue("");
+    setCurrentPage(1);
+    setSuggestions([]);
+    setSuggestionsOpen(false);
     setHighlightedSuggestionIndex(-1);
   }, []);
 
@@ -1981,6 +2007,23 @@ const WordList = () => {
     setFilteredTopics(topics); // Reset filtered topics back to the full list
   }, [topics]);
 
+  // Same as handleResetFilters but leaves the typed search text (and search
+  // type) alone — used wherever the goal is "search all words instead",
+  // not "start over", so the word the user already typed keeps searching
+  // instead of the box going blank.
+  const handleResetFiltersOnly = useCallback(() => {
+    setSelectedLevel("");
+    setSelectedTopic("");
+    setSelectedPartOfSpeech("");
+    setSelectedVerbFilter("");
+    setSelectedPrepositionFilter("");
+    setSelectedAdjectiveFilter("");
+    setShowRecentOnly(false);
+    setAdminCompletenessFilter("");
+    setCurrentPage(1);
+    setFilteredTopics(topics);
+  }, [topics]);
+
   const handleToggleRecentWords = useCallback(() => {
     setShowRecentOnly((prev) => !prev);
     setCurrentPage(1);
@@ -2046,7 +2089,9 @@ const WordList = () => {
       const response = await api.patch("/word/settings", {
         recentlyAddedLimit: Number(enteredLimit),
       });
-      setRecentlyAddedLimit(response.data?.data?.recentlyAddedLimit ?? Number(enteredLimit));
+      setRecentlyAddedLimit(
+        response.data?.data?.recentlyAddedLimit ?? Number(enteredLimit),
+      );
       await invalidateWordsCache();
       Swal.fire({
         toast: true,
@@ -2106,16 +2151,18 @@ const WordList = () => {
   // Added") may just not exist within that narrower filter while still
   // existing elsewhere, so the empty state should point at clearing
   // filters instead of implying the word is entirely missing.
-  const hasActiveFilterExcludingSearch = Boolean(
-    selectedLevel ||
-      selectedTopic ||
-      selectedPartOfSpeech ||
-      selectedVerbFilter ||
-      selectedPrepositionFilter ||
-      selectedAdjectiveFilter ||
-      adminCompletenessFilter ||
-      showRecentOnly,
-  );
+  const activeFilterValues = [
+    selectedLevel,
+    selectedTopic,
+    selectedPartOfSpeech,
+    selectedVerbFilter,
+    selectedPrepositionFilter,
+    selectedAdjectiveFilter,
+    adminCompletenessFilter,
+    showRecentOnly ? "recentOnly" : "",
+  ].filter(Boolean);
+  const hasActiveFilterExcludingSearch = activeFilterValues.length > 0;
+  const activeFilterCount = activeFilterValues.length;
 
   const displayedWordsCount =
     typeof cache.totalWords === "number" && Number.isFinite(cache.totalWords)
@@ -2125,25 +2172,76 @@ const WordList = () => {
   const wordCountLabel = hasActiveFilters ? "Filtered" : "Total";
   const showAdminControls = userLoggedIn && isAdmin;
 
+  // =========Global-match recovery for an empty filtered search ===========
+  // When a search matches nothing inside the current filters, checks
+  // (against /word/suggest, which never applies level/topic/part-of-speech
+  // filters) whether the word actually exists elsewhere, so the empty
+  // state can point at it directly instead of leaving the user to guess
+  // they left a filter on.
+  const trimmedSearchValue = debouncedSearchValue.trim();
+  const shouldCheckGlobalMatch =
+    !isLoading &&
+    !isRefreshingPage &&
+    paginatedWords.length === 0 &&
+    hasActiveFilterExcludingSearch &&
+    trimmedSearchValue.length > 0;
+
+  useEffect(() => {
+    if (globalMatchAbortRef.current) {
+      globalMatchAbortRef.current.abort();
+      globalMatchAbortRef.current = null;
+    }
+
+    if (!shouldCheckGlobalMatch) {
+      setGlobalMatches([]);
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    globalMatchAbortRef.current = controller;
+
+    api
+      .get(
+        `/word/suggest?search=${encodeURIComponent(trimmedSearchValue)}&searchType=${searchType}&limit=5`,
+        { signal: controller.signal },
+      )
+      .then((response) => {
+        const results = Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
+        // Only genuine matches count as "it exists elsewhere" — a fuzzy
+        // "did you mean" correction is a different word than what was
+        // actually typed.
+        setGlobalMatches(results.filter((item) => !item.isFuzzy));
+      })
+      .catch((error) => {
+        if (error.name === "CanceledError" || error.name === "AbortError") {
+          return;
+        }
+        setGlobalMatches([]);
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, [shouldCheckGlobalMatch, trimmedSearchValue, searchType]);
+  // =========Global-match recovery for an empty filtered search ===========
+
   return (
     <Container>
       {/* Modern Header Section */}
       <div className="text-center my-2 md:my-8 lg:my-8 ">
         <div className="flex justify-between items-center mb-2 md:mb-6 lg:mb-6 ml-2">
           <div className="flex items-center gap-1.5 md:gap-3 lg:gap-3">
-            <Link
-              to="/quiz"
-              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-1 md:px-2 lg:px-2 py-1 md:py-1 lg:py-1 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/50"
-            >
-              🎮 Play Quiz
-            </Link>
+            <Button to="/quiz" variant="primary" size="sm">
+              <IoGameControllerOutline size={16} aria-hidden="true" />
+              Play Quiz
+            </Button>
 
-            <Link
-              to="/challenge"
-              className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 px-1 md:px-2 lg:px-2 py-1 md:py-1 lg:py-1 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-emerald-500/50"
-            >
-              🎯 Daily Challenge
-            </Link>
+            <Button to="/challenge" variant="success" size="sm">
+              <IoTrophyOutline size={16} aria-hidden="true" />
+              Daily Challenge
+            </Button>
           </div>
 
           <span className="text-sm block md:hidden lg:hidden text-pink-400 font-bold mr-2">
@@ -2162,8 +2260,9 @@ const WordList = () => {
           )} */}
         </div>
         <div className="mb-4 hidden md:inline-block lg:inline-block">
-          <span className=" px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
-            📚 Learn Vocabulary
+          <span className="inline-flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
+            <IoLibraryOutline size={16} aria-hidden="true" />
+            Learn Vocabulary
           </span>
         </div>
         <h2 className="text-2xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-1 md:pb-4 lg:pb-4">
@@ -2214,29 +2313,23 @@ const WordList = () => {
               Loading page...
             </span>
           )} */}
-              <button
+              <Button
+                variant={showRecentOnly ? "danger" : "secondary"}
+                size="sm"
+                className="mr-2"
                 onClick={handleToggleRecentWords}
-                className={`min-h-[30px] mr-2 w-auto flex-shrink-0 px-2 py-1 md:px-2.5 md:py-1.5 rounded-full font-semibold text-[11px] sm:text-sm transition-all duration-300 hover:scale-105 shadow-lg ${
-                  showRecentOnly
-                    ? "bg-gradient-to-r from-red-500 to-orange-500 text-white hover:from-red-600 hover:to-orange-600 px-2"
-                    : "bg-gradient-to-r from-slate-700 to-slate-800 text-white hover:from-slate-600 hover:to-slate-700 px-2"
-                }`}
               >
-                <span className="hidden sm:inline">
-                  {showRecentOnly ? "Recently added X" : "Recently added"}
-                </span>
-                <span className="sm:hidden ">
-                  {showRecentOnly ? "Recently added X" : "Recently added"}
-                </span>
-              </button>
-              {hasResettableFilters && (
-                <button
+                {showRecentOnly ? "Recently added X" : "Recently added"}
+              </Button>
+              {hasActiveFilterExcludingSearch && (
+                <Button
+                  variant="danger"
+                  size="sm"
+                  className="mr-2"
                   onClick={handleResetFilters}
-                  className="min-h-[30px] mr-2 w-auto flex-shrink-0 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 px-2 py-1 md:px-2.5 md:py-1.5 rounded-full font-semibold text-[11px] sm:text-sm transition-all duration-300 hover:scale-105 shadow-lg "
                 >
-                  <span className="hidden sm:inline">Reset Filters</span>
-                  <span className="sm:hidden">Reset Filters</span>
-                </button>
+                  Reset Filters
+                </Button>
               )}
             </div>
           </div>
@@ -2306,7 +2399,13 @@ const WordList = () => {
                   setSuggestionsOpen(true);
                 }
               }}
-              className="border border-gray-600 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl px-4 py-3 w-full pl-12 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all"
+              className={`border border-gray-600 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl px-4 py-3 w-full pl-12 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-all ${
+                hasActiveFilterExcludingSearch
+                  ? "pr-16 sm:pr-32"
+                  : searchValue
+                    ? "pr-10"
+                    : ""
+              }`}
               aria-label={
                 searchType === "word" ? "Search by word" : "Search by meaning "
               }
@@ -2321,6 +2420,47 @@ const WordList = () => {
               size={22}
               aria-hidden="true"
             />
+            {/* Only visible while a filter (besides the search text itself)
+                is active — tells the user, right where they're typing, that
+                results are being narrowed and lets them drop that scope in
+                one click without losing what they've typed. The "filter(s)"
+                word is always rendered (not hover/title-only) from `sm` up,
+                since a title tooltip never shows on touch devices — a
+                phone-sized screen still gets the icon + count, which stays
+                accessible via aria-label either way. */}
+            {hasActiveFilterExcludingSearch && (
+              <button
+                type="button"
+                onClick={handleResetFiltersOnly}
+                title={`Search is limited to ${activeFilterCount} active filter${
+                  activeFilterCount > 1 ? "s" : ""
+                }. Click to search all words instead.`}
+                aria-label={`${activeFilterCount} active filter${
+                  activeFilterCount > 1 ? "s" : ""
+                } active — click to clear filters and search all words`}
+                className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/20 py-1 pl-2.5 pr-2 text-xs font-semibold text-amber-300 transition-colors hover:bg-amber-500/30"
+              >
+                <IoFunnelOutline size={13} aria-hidden="true" />
+                <span aria-hidden="true">{activeFilterCount}</span>
+                <span aria-hidden="true" className="hidden sm:inline">
+                  filter{activeFilterCount > 1 ? "s" : ""}
+                </span>
+                <IoClose size={15} aria-hidden="true" className="ml-0.5" />
+              </button>
+            )}
+            {/* No filter active — just a plain clear-text button, not a
+                filter reset, since there's no filter to reset. */}
+            {!hasActiveFilterExcludingSearch && searchValue && (
+              <button
+                type="button"
+                onClick={handleClearSearchText}
+                title="Clear search"
+                aria-label="Clear search"
+                className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
+              >
+                <IoClose size={20} aria-hidden="true" />
+              </button>
+            )}
           </div>
 
           {/* In normal document flow (not absolutely positioned) so it pushes
@@ -2541,7 +2681,7 @@ const WordList = () => {
                       !userLoggedIn ? "rounded-tr-xl" : ""
                     }`}
                   >
-                    ❤️
+                    <span className="text-base md:text-xl lg:text-2xl">❤️</span>
                   </th>
                   {userLoggedIn && isAdmin && (
                     <>
@@ -2598,18 +2738,45 @@ const WordList = () => {
                       className="text-center py-4 font-bold text-gray-500 h-96 align-middle text-xl sm:text-2xl"
                     >
                       {hasActiveFilterExcludingSearch ? (
-                        <div className="flex flex-col items-center gap-2">
-                          <span>No words match your current filters.</span>
-                          <span className="text-sm sm:text-base font-normal text-sky-500">
-                            Try again after resetting the filters.
-                          </span>
-                          <button
-                            onClick={handleResetFilters}
-                            className="mt-1 rounded-full bg-gradient-to-r from-red-500 to-pink-500 px-4 py-1.5 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-red-600 hover:to-pink-600"
-                          >
-                            Reset Filters
-                          </button>
-                        </div>
+                        trimmedSearchValue && globalMatches.length > 0 ? (
+                          <div className="flex flex-col items-center gap-2">
+                            <span>
+                              {`"${trimmedSearchValue}"`} is not available in
+                              your filtered scope.
+                            </span>
+                            <span className="text-sm sm:text-base font-normal text-emerald-400">
+                              But found globally:{" "}
+                              <span className="font-semibold text-white">
+                                {globalMatches[0].value}
+                              </span>
+                              {globalMatches.length > 1 &&
+                                ` (+${globalMatches.length - 1} more)`}
+                            </span>
+                            <Button
+                              variant="success"
+                              size="sm"
+                              className="mt-1"
+                              onClick={handleResetFiltersOnly}
+                            >
+                              Reset Filters & Show
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center gap-2">
+                            <span>No words match your current filters.</span>
+                            <span className="text-sm sm:text-base font-normal text-sky-500">
+                              Try again after resetting the filters.
+                            </span>
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              className="mt-1"
+                              onClick={handleResetFilters}
+                            >
+                              Reset Filters
+                            </Button>
+                          </div>
+                        )
                       ) : (
                         "No words available. Will be added soon!"
                       )}

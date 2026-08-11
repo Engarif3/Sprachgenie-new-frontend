@@ -1,9 +1,10 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
+import { IoVolumeHighOutline } from "react-icons/io5";
 import { pronounceWord } from "../../../utils/wordPronounciation";
 import FavoriteButton from "../Modals/FavoriteButton";
 import { PuffLoader } from "react-spinners";
+import Button from "../../../components/UI/Button";
 
 // Helper function to capitalize only the first letter of the string
 const capitalizeFirstLetter = (str) => {
@@ -332,10 +333,11 @@ const WordTableRow = ({
           <div className="flex gap-1 self-end md:gap-4 md:self-auto lg:gap-4">
             <button
               onClick={() => pronounceWord(word.value)}
-              className="text-md md:text-2xl lg:text-2xl hover:scale-110 transition-transform duration-200 hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]"
+              className="flex items-center text-blue-600 dark:text-blue-300 hover:scale-110 transition-transform duration-200 hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]"
               title="Pronounce word"
+              aria-label="Pronounce word"
             >
-              🔊
+              <IoVolumeHighOutline size={20} aria-hidden="true" />
             </button>
 
             {userLoggedIn ? (
@@ -542,18 +544,16 @@ const WordTableRow = ({
         } `}
       >
         <div className="flex gap-2 justify-center">
-          <Link
-            to={`/edit-word/${word.id}`}
-            className="px-3 py-1 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 rounded-lg font-semibold text-white text-xs sm:text-sm transition-colors duration-200 hover:scale-105 shadow-md"
-          >
+          <Button to={`/edit-word/${word.id}`} variant="secondary" size="sm">
             Edit
-          </Link>
-          <button
+          </Button>
+          <Button
+            variant="danger"
+            size="sm"
             onClick={() => handleDelete(word.id, word.value)}
-            className="px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 rounded-lg font-semibold text-white text-xs sm:text-sm transition-colors duration-200 hover:scale-105 shadow-md"
           >
             Delete
-          </button>
+          </Button>
         </div>
       </td>
 

@@ -1,8 +1,16 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import axios from "../../../axios";
-import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
+import {
+  IoHeartOutline,
+  IoTrashOutline,
+  IoEyeOutline,
+  IoLibraryOutline,
+  IoHeartDislikeOutline,
+  IoWarningOutline,
+} from "react-icons/io5";
 import WordListModal from "../Modals/WordListModal";
+import Button from "../../../components/UI/Button";
 import Container from "../../../utils/Container";
 import { useAuth } from "../../../services/auth.services";
 import Pagination from "./Pagination";
@@ -535,10 +543,15 @@ const FavoritesList = () => {
     // <Container>
     <Container>
       <div className="text-center mb-8">
-        <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 via-red-400 to-orange-400 mb-3">
-          ❤️ Favorite Words
+        <h2 className="inline-flex items-center justify-center gap-2 text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 via-red-400 to-orange-400 mb-3 ">
+          <IoHeartOutline
+            size={34}
+            className="text-pink-500 mt-2"
+            aria-hidden="true"
+          />
+          Favorite Words
         </h2>
-        <div className="inline-flex gap-4 items-center">
+        <div className="flex flex-wrap justify-center gap-3 items-center">
           <div className="inline-block px-4 py-1 bg-gradient-to-r from-pink-500/20 to-red-500/20 border border-pink-500/50 rounded-full">
             <span className="text-sm md:text-2xl lg:text-2xl font-bold dark:text-white">
               {favoriteWords.length}
@@ -546,14 +559,15 @@ const FavoritesList = () => {
             <span className="dark:text-gray-300 ml-2">words saved</span>
           </div>
           {favoriteWords.length > 0 && (
-            <button
+            <Button
+              variant="danger"
               onClick={() =>
                 setDeleteConfirmation({ show: true, inputValue: "" })
               }
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full font-bold transition-colors"
             >
-              🗑️ Delete All
-            </button>
+              <IoTrashOutline size={16} aria-hidden="true" />
+              Delete All
+            </Button>
           )}
         </div>
       </div>
@@ -575,7 +589,7 @@ const FavoritesList = () => {
                 <>
                   <div className="flex justify-end items-center mb-4">
                     <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300 bg-gradient-to-r from-emerald-50 to-teal-50 px-4 py-2 font-semibold text-emerald-700 dark:border-green-500/50 dark:from-green-500/20 dark:to-emerald-500/20 dark:text-green-400">
-                      <span className="text-xl">👀</span> Showing{" "}
+                      <IoEyeOutline size={18} aria-hidden="true" /> Showing{" "}
                       {paginatedFavorites.length}
                     </span>
                   </div>
@@ -617,19 +631,21 @@ const FavoritesList = () => {
               ) : (
                 <div className="min-h-screen flex justify-center items-center">
                   <div className="rounded-3xl border-2 border-slate-200 bg-white p-12 text-center shadow-xl dark:border-gray-700/50 dark:bg-slate-950 dark:bg-gradient-to-br dark:from-gray-800 dark:via-gray-900 dark:to-black dark:shadow-2xl">
-                    <div className="text-6xl mb-6">💔</div>
+                    <IoHeartDislikeOutline
+                      size={56}
+                      className="mx-auto mb-6 text-pink-400"
+                      aria-hidden="true"
+                    />
                     <p className="mb-4 bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-2xl font-bold text-transparent dark:from-pink-400 dark:to-red-400">
                       No Favorite Words Yet
                     </p>
                     <p className="mb-6 text-slate-600 dark:text-gray-300">
                       Start building your vocabulary collection!
                     </p>
-                    <Link
-                      to="/words"
-                      className="inline-block bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 px-8 py-3 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/50"
-                    >
-                      📚 Browse Words
-                    </Link>
+                    <Button to="/words" variant="primary" size="lg">
+                      <IoLibraryOutline size={18} aria-hidden="true" />
+                      Browse Words
+                    </Button>
                   </div>
                 </div>
               )}
@@ -667,8 +683,9 @@ const FavoritesList = () => {
       {deleteConfirmation.show && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-900 border border-red-600 rounded-lg p-8 max-w-md w-full mx-4">
-            <h2 className="text-2xl font-bold text-red-400 mb-4">
-              ⚠️ Confirm Deletion
+            <h2 className="flex items-center gap-2 text-2xl font-bold text-red-400 mb-4">
+              <IoWarningOutline size={24} aria-hidden="true" />
+              Confirm Deletion
             </h2>
             <p className="text-gray-300 mb-6">
               Are you sure you want to delete ALL favorite words? This action
@@ -704,21 +721,25 @@ const FavoritesList = () => {
               />
             </div>
             <div className="flex gap-3">
-              <button
+              <Button
+                variant="danger"
+                surface="dark"
+                fullWidth
                 onClick={handleDeleteAllFavorites}
                 disabled={deleteConfirmation.inputValue !== "ok"}
-                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-800 text-white rounded-lg font-medium transition-colors"
               >
                 Delete All
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="secondary"
+                surface="dark"
+                fullWidth
                 onClick={() =>
                   setDeleteConfirmation({ show: false, inputValue: "" })
                 }
-                className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
               >
                 Cancel
-              </button>
+              </Button>
             </div>
           </div>
         </div>
