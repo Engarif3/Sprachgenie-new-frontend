@@ -11,6 +11,20 @@ import { useTheme } from "../../context/ThemeContext";
 import ScrollStack, { ScrollStackItem } from "./ScrollStack";
 import TodaysWordBalloon from "./TodaysWordBalloon";
 import { publicApi } from "../../axios";
+import {
+  IoHeartOutline,
+  IoSparklesOutline,
+  IoGlobeOutline,
+  IoStatsChartOutline,
+  IoTrendingUpOutline,
+  IoFlashOutline,
+  IoHardwareChipOutline,
+  IoLibraryOutline,
+  IoChatbubblesOutline,
+  IoBookOutline,
+  IoSchoolOutline,
+  IoGameControllerOutline,
+} from "react-icons/io5";
 
 // Rounds down to the nearest hundred and appends "+", so the displayed
 // count never needs a manual edit as the vocabulary grows (4680 -> "4600+",
@@ -129,7 +143,7 @@ const Home = () => {
 
   const featureCards = [
     {
-      icon: "🤖",
+      icon: IoHardwareChipOutline,
       eyebrow: "Smart Engine",
       title: t("aiPoweredContent"),
       description: t("aiContentDesc"),
@@ -141,7 +155,7 @@ const Home = () => {
       chip: "AI-first",
     },
     {
-      icon: "📚",
+      icon: IoLibraryOutline,
       eyebrow: "Vocabulary System",
       title: t("wordsLibrary", { count: wordCountText }),
       description: t("wordsLibraryDesc"),
@@ -153,7 +167,7 @@ const Home = () => {
       chip: "Structured",
     },
     {
-      icon: "💬",
+      icon: IoChatbubblesOutline,
       eyebrow: "Practical Speaking",
       title: t("realConversations"),
       description: t("realConversationsDesc"),
@@ -165,7 +179,7 @@ const Home = () => {
       chip: "Real-world",
     },
     {
-      icon: "📖",
+      icon: IoBookOutline,
       eyebrow: "Immersive Reading",
       title: t("interactiveStories"),
       description: t("interactiveStoriesDesc"),
@@ -177,7 +191,7 @@ const Home = () => {
       chip: "Context-rich",
     },
     {
-      icon: "🧠",
+      icon: IoSchoolOutline,
       eyebrow: "Deep Understanding",
       title: t("grammarMastery"),
       description: t("grammarMasteryDesc"),
@@ -189,7 +203,7 @@ const Home = () => {
       chip: "Clarity",
     },
     {
-      icon: "🎮",
+      icon: IoGameControllerOutline,
       eyebrow: "Motivation Loop",
       title: t("funQuizzes"),
       description: t("funQuizzesDesc"),
@@ -504,138 +518,174 @@ const Home = () => {
                   {t("featuresUnlocked")}
                 </p>
                 <div className="flex flex-wrap justify-center gap-x-1 gap-y-1 md:gap-x-8 md:gap-y-2 lg:gap-x-8 lg:gap-y-2">
-                  {isMobile ? (
-                    <div
-                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
-                    >
-                      ❤️ {t("favoriteWords")}
-                    </div>
-                  ) : (
-                    <SplitText
-                      text={`❤️ ${t("favoriteWords")}`}
-                      delay={20}
-                      duration={0.6}
-                      ease="power3.out"
-                      splitType="chars"
-                      from={{ opacity: 0, y: 20 }}
-                      to={{ opacity: 1, y: 0 }}
-                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
-                      threshold={0.1}
-                      rootMargin="-100px"
-                      initialDelay={0}
-                      scrollTrigger={false}
+                  <div className="inline-flex items-center gap-1.5">
+                    <IoHeartOutline
+                      aria-hidden="true"
+                      className={theme === "dark" ? "text-white" : "text-black"}
                     />
-                  )}
-                  {isMobile ? (
-                    <div
-                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
-                    >
-                      🤖 {t("aiPoweredLearning")}
-                    </div>
-                  ) : (
-                    <SplitText
-                      text={`🤖 ${t("aiPoweredLearning")}`}
-                      delay={20}
-                      duration={0.6}
-                      ease="power3.out"
-                      splitType="chars"
-                      from={{ opacity: 0, y: 20 }}
-                      to={{ opacity: 1, y: 0 }}
-                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
-                      threshold={0.1}
-                      rootMargin="-100px"
-                      initialDelay={600}
-                      scrollTrigger={false}
+                    {isMobile ? (
+                      <div
+                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
+                      >
+                        {t("favoriteWords")}
+                      </div>
+                    ) : (
+                      <SplitText
+                        text={t("favoriteWords")}
+                        delay={20}
+                        duration={0.6}
+                        ease="power3.out"
+                        splitType="chars"
+                        from={{ opacity: 0, y: 20 }}
+                        to={{ opacity: 1, y: 0 }}
+                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                        threshold={0.1}
+                        rootMargin="-100px"
+                        initialDelay={0}
+                        scrollTrigger={false}
+                      />
+                    )}
+                  </div>
+                  <div className="inline-flex items-center gap-1.5">
+                    <IoSparklesOutline
+                      aria-hidden="true"
+                      className={theme === "dark" ? "text-white" : "text-black"}
                     />
-                  )}
-                  {isMobile ? (
-                    <div
-                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
-                    >
-                      🌐 {t("translationFeatures")}
-                    </div>
-                  ) : (
-                    <SplitText
-                      text={`🌐 ${t("translationFeatures")}`}
-                      delay={20}
-                      duration={0.6}
-                      ease="power3.out"
-                      splitType="chars"
-                      from={{ opacity: 0, y: 20 }}
-                      to={{ opacity: 1, y: 0 }}
-                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
-                      threshold={0.1}
-                      rootMargin="-100px"
-                      initialDelay={1200}
-                      scrollTrigger={false}
+                    {isMobile ? (
+                      <div
+                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
+                      >
+                        {t("aiPoweredLearning")}
+                      </div>
+                    ) : (
+                      <SplitText
+                        text={t("aiPoweredLearning")}
+                        delay={20}
+                        duration={0.6}
+                        ease="power3.out"
+                        splitType="chars"
+                        from={{ opacity: 0, y: 20 }}
+                        to={{ opacity: 1, y: 0 }}
+                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                        threshold={0.1}
+                        rootMargin="-100px"
+                        initialDelay={600}
+                        scrollTrigger={false}
+                      />
+                    )}
+                  </div>
+                  <div className="inline-flex items-center gap-1.5">
+                    <IoGlobeOutline
+                      aria-hidden="true"
+                      className={theme === "dark" ? "text-white" : "text-black"}
                     />
-                  )}
-                  {isMobile ? (
-                    <div
-                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
-                    >
-                      📊 {t("personalDashboard")}
-                    </div>
-                  ) : (
-                    <SplitText
-                      text={`📊 ${t("personalDashboard")}`}
-                      delay={20}
-                      duration={0.6}
-                      ease="power3.out"
-                      splitType="chars"
-                      from={{ opacity: 0, y: 20 }}
-                      to={{ opacity: 1, y: 0 }}
-                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
-                      threshold={0.1}
-                      rootMargin="-100px"
-                      initialDelay={1800}
-                      scrollTrigger={false}
+                    {isMobile ? (
+                      <div
+                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
+                      >
+                        {t("translationFeatures")}
+                      </div>
+                    ) : (
+                      <SplitText
+                        text={t("translationFeatures")}
+                        delay={20}
+                        duration={0.6}
+                        ease="power3.out"
+                        splitType="chars"
+                        from={{ opacity: 0, y: 20 }}
+                        to={{ opacity: 1, y: 0 }}
+                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                        threshold={0.1}
+                        rootMargin="-100px"
+                        initialDelay={1200}
+                        scrollTrigger={false}
+                      />
+                    )}
+                  </div>
+                  <div className="inline-flex items-center gap-1.5">
+                    <IoStatsChartOutline
+                      aria-hidden="true"
+                      className={theme === "dark" ? "text-white" : "text-black"}
                     />
-                  )}
-                  {isMobile ? (
-                    <div
-                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
-                    >
-                      📈 {t("progressTracking")}
-                    </div>
-                  ) : (
-                    <SplitText
-                      text={`📈 ${t("progressTracking")}`}
-                      delay={20}
-                      duration={0.6}
-                      ease="power3.out"
-                      splitType="chars"
-                      from={{ opacity: 0, y: 20 }}
-                      to={{ opacity: 1, y: 0 }}
-                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
-                      threshold={0.1}
-                      rootMargin="-100px"
-                      initialDelay={2400}
-                      scrollTrigger={false}
+                    {isMobile ? (
+                      <div
+                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
+                      >
+                        {t("personalDashboard")}
+                      </div>
+                    ) : (
+                      <SplitText
+                        text={t("personalDashboard")}
+                        delay={20}
+                        duration={0.6}
+                        ease="power3.out"
+                        splitType="chars"
+                        from={{ opacity: 0, y: 20 }}
+                        to={{ opacity: 1, y: 0 }}
+                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                        threshold={0.1}
+                        rootMargin="-100px"
+                        initialDelay={1800}
+                        scrollTrigger={false}
+                      />
+                    )}
+                  </div>
+                  <div className="inline-flex items-center gap-1.5">
+                    <IoTrendingUpOutline
+                      aria-hidden="true"
+                      className={theme === "dark" ? "text-white" : "text-black"}
                     />
-                  )}
-                  {isMobile ? (
-                    <div
-                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
-                    >
-                      ⚡ {t("muchMore")}
-                    </div>
-                  ) : (
-                    <SplitText
-                      text={`⚡ ${t("muchMore")}`}
-                      delay={20}
-                      duration={0.6}
-                      ease="power3.out"
-                      splitType="chars"
-                      from={{ opacity: 0, y: 20 }}
-                      to={{ opacity: 1, y: 0 }}
-                      className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
-                      threshold={0.1}
-                      rootMargin="-100px"
-                      initialDelay={3000}
-                      scrollTrigger={false}
+                    {isMobile ? (
+                      <div
+                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
+                      >
+                        {t("progressTracking")}
+                      </div>
+                    ) : (
+                      <SplitText
+                        text={t("progressTracking")}
+                        delay={20}
+                        duration={0.6}
+                        ease="power3.out"
+                        splitType="chars"
+                        from={{ opacity: 0, y: 20 }}
+                        to={{ opacity: 1, y: 0 }}
+                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                        threshold={0.1}
+                        rootMargin="-100px"
+                        initialDelay={2400}
+                        scrollTrigger={false}
+                      />
+                    )}
+                  </div>
+                  <div className="inline-flex items-center gap-1.5">
+                    <IoFlashOutline
+                      aria-hidden="true"
+                      className={theme === "dark" ? "text-white" : "text-black"}
                     />
-                  )}
+                    {isMobile ? (
+                      <div
+                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
+                      >
+                        {t("muchMore")}
+                      </div>
+                    ) : (
+                      <SplitText
+                        text={t("muchMore")}
+                        delay={20}
+                        duration={0.6}
+                        ease="power3.out"
+                        splitType="chars"
+                        from={{ opacity: 0, y: 20 }}
+                        to={{ opacity: 1, y: 0 }}
+                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
+                        threshold={0.1}
+                        rootMargin="-100px"
+                        initialDelay={3000}
+                        scrollTrigger={false}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -694,7 +744,7 @@ const Home = () => {
                     theme === "light" ? "text-slate-900" : "text-white"
                   }`}
                 >
-                  <span>📖</span>
+                  <IoBookOutline aria-hidden="true" size={20} />
                   <span
                     className={
                       theme === "light" ? "text-slate-900" : "text-white"
@@ -898,8 +948,8 @@ const Home = () => {
                             {feature.eyebrow}
                           </div>
                           <div className="flex items-center gap-3">
-                            <div className="flex h-14 w-14 items-center justify-center rounded-[18px] border border-white/30 bg-slate-950/60 text-3xl shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_10px_28px_rgba(0,0,0,0.18)]">
-                              {feature.icon}
+                            <div className="flex h-14 w-14 items-center justify-center rounded-[18px] border border-white/30 bg-slate-950/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_10px_28px_rgba(0,0,0,0.18)]">
+                              <feature.icon size={28} aria-hidden="true" />
                             </div>
                             <div className="rounded-full border border-white/30 bg-slate-950/60 px-3 py-1.5 text-sm font-semibold tracking-[0.14em] text-white shadow-[0_8px_24px_rgba(0,0,0,0.18)]">
                               {String(index + 1).padStart(2, "0")}
@@ -953,8 +1003,8 @@ const Home = () => {
 
                   <div className="relative">
                     <div className="mb-5 flex items-center justify-between gap-4 rounded-[22px] bg-slate-950/28 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-sm">
-                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/30 bg-slate-950/60 text-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_10px_24px_rgba(0,0,0,0.18)]">
-                        {feature.icon}
+                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/30 bg-slate-950/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_10px_24px_rgba(0,0,0,0.18)]">
+                        <feature.icon size={24} aria-hidden="true" />
                       </div>
                       <div className="rounded-full border border-white/30 bg-slate-950/60 px-3 py-1.5 text-sm font-semibold tracking-[0.14em] text-white shadow-[0_8px_20px_rgba(0,0,0,0.18)]">
                         {String(index + 1).padStart(2, "0")}
