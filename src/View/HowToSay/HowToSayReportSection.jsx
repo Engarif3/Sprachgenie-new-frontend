@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
 import api from "../../axios";
+import { IoFlagOutline, IoCheckmarkCircleOutline } from "react-icons/io5";
 
 // Module-level so it survives across every HowToSayReportSection mount
 // within the page session (report reasons/settings rarely change) —
@@ -145,9 +146,10 @@ const HowToSayReportSection = ({ titleId, sentences, isLight }) => {
       <button
         type="button"
         onClick={handleExpand}
-        className="text-sm font-semibold text-rose-500 transition-colors hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300"
+        className="inline-flex items-center gap-1.5 text-sm font-semibold text-rose-500 transition-colors hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300"
       >
-        🚩 {expanded ? "Hide report" : "Report a problem"}
+        <IoFlagOutline size={14} aria-hidden="true" />
+        {expanded ? "Hide report" : "Report a problem"}
       </button>
 
       {expanded && (
@@ -165,8 +167,9 @@ const HowToSayReportSection = ({ titleId, sentences, isLight }) => {
               Loading...
             </p>
           ) : submitted ? (
-            <p className="text-sm font-medium text-emerald-500 dark:text-emerald-400">
-              ✅ Thanks — your report has been submitted.
+            <p className="flex items-center gap-1.5 text-sm font-medium text-emerald-500 dark:text-emerald-400">
+              <IoCheckmarkCircleOutline size={16} aria-hidden="true" />
+              Thanks — your report has been submitted.
             </p>
           ) : alreadyReported ? (
             <p className="text-sm font-medium text-amber-500 dark:text-amber-400">

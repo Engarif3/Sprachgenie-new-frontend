@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
 import api from "../../../axios";
+import { IoFlagOutline, IoCheckmarkCircleOutline } from "react-icons/io5";
 
 // Module-level so it survives across every WordReportSection mount within
 // the page session (report reasons/settings rarely change) — cleared on
@@ -152,9 +153,10 @@ const WordReportSection = ({ wordId, sentences }) => {
       <button
         type="button"
         onClick={handleExpand}
-        className="text-sm font-semibold text-red-400 hover:text-red-300 transition-colors ml-4"
+        className="inline-flex items-center gap-1.5 text-sm font-semibold text-red-400 hover:text-red-300 transition-colors ml-4"
       >
-        🚩 {expanded ? "Hide report" : "Report a problem"}
+        <IoFlagOutline size={14} aria-hidden="true" />
+        {expanded ? "Hide report" : "Report a problem"}
       </button>
 
       {expanded && (
@@ -162,8 +164,9 @@ const WordReportSection = ({ wordId, sentences }) => {
           {loading ? (
             <p className="text-gray-400 text-sm">Loading...</p>
           ) : submitted ? (
-            <p className="text-emerald-400 text-sm font-medium">
-              ✅ Thanks — your report has been submitted.
+            <p className="flex items-center gap-1.5 text-emerald-400 text-sm font-medium">
+              <IoCheckmarkCircleOutline size={16} aria-hidden="true" />
+              Thanks — your report has been submitted.
             </p>
           ) : alreadyReported ? (
             <p className="text-amber-400 text-sm font-medium">

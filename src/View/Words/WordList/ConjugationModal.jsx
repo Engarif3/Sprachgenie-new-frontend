@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import aiApi from "../../../AI_axios";
 import { useLockBodyScroll } from "../Modals/ModalScrolling";
+import { IoWarningOutline, IoCheckmark } from "react-icons/io5";
 
 const TENSE_LABELS = {
   präsens: "Präsens",
@@ -284,7 +285,7 @@ const ConjugationModal = ({
 
           {error && !isLoading && (
             <div className="flex flex-col items-center justify-center py-12 gap-3 text-center">
-              <span className="text-3xl">⚠️</span>
+              <IoWarningOutline size={30} className="text-red-400" aria-hidden="true" />
               <p className="text-red-400 font-semibold">
                 Failed to generate conjugation
               </p>
@@ -465,7 +466,10 @@ const ConjugationModal = ({
               {userId &&
                 !reportOpen &&
                 (reportDone ? (
-                  <span className="text-xs text-green-500">✓ Reported</span>
+                  <span className="inline-flex items-center gap-1 text-xs text-green-500">
+                    <IoCheckmark size={12} aria-hidden="true" />
+                    Reported
+                  </span>
                 ) : (
                   <button
                     onClick={handleOpenReport}
