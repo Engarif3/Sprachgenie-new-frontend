@@ -8,6 +8,7 @@ import { useAuth } from "../services/auth.services";
 import PageHeader from "../components/UI/PageHeader";
 import Button from "../components/UI/Button";
 import { fetchAllUsers } from "../utils/fetchAllUsers";
+import { IoRefreshOutline, IoTrashOutline } from "react-icons/io5";
 
 // Shows current burst/daily usage per client IP against the IP-based
 // generation limiter (see IpRateLimits.jsx for editing the caps themselves).
@@ -243,14 +244,24 @@ const IpUsage = () => {
           />
           <div className="flex gap-2">
             <Button variant="secondary" onClick={fetchUsage}>
-              🔄 Refresh
+              <span className="inline-flex items-center gap-1.5">
+                <IoRefreshOutline size={14} aria-hidden="true" />
+                Refresh
+              </span>
             </Button>
             <Button
               variant="danger"
               onClick={handleResetAll}
               disabled={resettingAll || !usage.length}
             >
-              {resettingAll ? "Resetting..." : "🗑️ Reset All"}
+              {resettingAll ? (
+                "Resetting..."
+              ) : (
+                <span className="inline-flex items-center gap-1.5">
+                  <IoTrashOutline size={14} aria-hidden="true" />
+                  Reset All
+                </span>
+              )}
             </Button>
           </div>
         </div>

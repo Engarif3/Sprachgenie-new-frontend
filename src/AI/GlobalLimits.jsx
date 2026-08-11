@@ -4,6 +4,7 @@ import aiApi from "../AI_axios";
 import { useAuth } from "../services/auth.services";
 import PageHeader from "../components/UI/PageHeader";
 import Button from "../components/UI/Button";
+import { IoCheckmarkCircleOutline, IoCloseCircleOutline } from "react-icons/io5";
 
 const GlobalLimits = () => {
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
@@ -14,7 +15,7 @@ const GlobalLimits = () => {
     yearlyLimit: "",
   });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     const fetchGlobalLimits = async () => {
@@ -33,17 +34,17 @@ const GlobalLimits = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
+    setMessage(null);
     try {
       await aiApi.post("/paragraphs/update-limit", {
         dailyLimit: parseInt(limits.dailyLimit),
         monthlyLimit: parseInt(limits.monthlyLimit),
         yearlyLimit: parseInt(limits.yearlyLimit),
       });
-      setMessage("✅ Global limits updated successfully!");
+      setMessage({ type: "success", text: "Global limits updated successfully!" });
     } catch (err) {
       console.error(err);
-      setMessage("❌ Failed to update global limits.");
+      setMessage({ type: "error", text: "Failed to update global limits." });
     } finally {
       setLoading(false);
     }
@@ -124,8 +125,19 @@ const GlobalLimits = () => {
             </Button>
           </form>
           {message && (
-            <p className="text-sm text-slate-700 dark:text-gray-300">
-              {message}
+            <p
+              className={`flex items-center gap-1.5 text-sm ${
+                message.type === "success"
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : "text-red-600 dark:text-red-400"
+              }`}
+            >
+              {message.type === "success" ? (
+                <IoCheckmarkCircleOutline size={16} aria-hidden="true" />
+              ) : (
+                <IoCloseCircleOutline size={16} aria-hidden="true" />
+              )}
+              {message.text}
             </p>
           )}
         </div>

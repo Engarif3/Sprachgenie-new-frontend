@@ -4,6 +4,7 @@ import aiApi from "../AI_axios";
 import { useAuth } from "../services/auth.services";
 import PageHeader from "../components/UI/PageHeader";
 import Button from "../components/UI/Button";
+import { IoCheckmarkCircleOutline, IoCloseCircleOutline } from "react-icons/io5";
 
 // Controls the IP-based generation limiter (shared/rateLimiter.js on the AI
 // service) — the shared, per-network cap that sits in front of every
@@ -18,7 +19,7 @@ const IpRateLimits = () => {
     dailyLimit: "",
   });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     const fetchIpLimits = async () => {
@@ -35,16 +36,16 @@ const IpRateLimits = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
+    setMessage(null);
     try {
       await aiApi.post("/rate-limit/config", {
         burstLimit: parseInt(limits.burstLimit),
         dailyLimit: parseInt(limits.dailyLimit),
       });
-      setMessage("✅ IP rate limits updated successfully!");
+      setMessage({ type: "success", text: "IP rate limits updated successfully!" });
     } catch (err) {
       console.error(err);
-      setMessage("❌ Failed to update IP rate limits.");
+      setMessage({ type: "error", text: "Failed to update IP rate limits." });
     } finally {
       setLoading(false);
     }
@@ -108,8 +109,19 @@ const IpRateLimits = () => {
             </Button>
           </form>
           {message && (
-            <p className="text-sm text-slate-700 dark:text-gray-300">
-              {message}
+            <p
+              className={`flex items-center gap-1.5 text-sm ${
+                message.type === "success"
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : "text-red-600 dark:text-red-400"
+              }`}
+            >
+              {message.type === "success" ? (
+                <IoCheckmarkCircleOutline size={16} aria-hidden="true" />
+              ) : (
+                <IoCloseCircleOutline size={16} aria-hidden="true" />
+              )}
+              {message.text}
             </p>
           )}
         </div>

@@ -8,6 +8,7 @@ import Pagination from "../AdminActions/AdminPaginationForUsers";
 import { useAuth } from "../services/auth.services";
 import PageHeader from "../components/UI/PageHeader";
 import Button from "../components/UI/Button";
+import { IoLockClosedOutline, IoEyeOutline } from "react-icons/io5";
 
 const Usage = () => {
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
@@ -116,7 +117,14 @@ const Usage = () => {
             subtitle="AI generation usage against each user's daily/monthly/yearly cap."
           />
           <Button variant="secondary" onClick={() => setShowUserId(!showUserId)}>
-            {showUserId ? "🔒 Hide ID" : "👁️ Show ID"}
+            <span className="inline-flex items-center gap-1.5">
+              {showUserId ? (
+                <IoLockClosedOutline size={14} aria-hidden="true" />
+              ) : (
+                <IoEyeOutline size={14} aria-hidden="true" />
+              )}
+              {showUserId ? "Hide ID" : "Show ID"}
+            </span>
           </Button>
         </div>
 

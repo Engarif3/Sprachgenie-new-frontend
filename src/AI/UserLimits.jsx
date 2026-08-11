@@ -8,6 +8,7 @@ import { useAuth } from "../services/auth.services";
 import PageHeader from "../components/UI/PageHeader";
 import Button from "../components/UI/Button";
 import { fetchAllUsers } from "../utils/fetchAllUsers";
+import { IoLockClosedOutline, IoEyeOutline } from "react-icons/io5";
 
 const UserLimits = () => {
   const { isAdmin, isLoggedIn: userLoggedIn, userId } = useAuth();
@@ -263,7 +264,14 @@ const UserLimits = () => {
 
         <div className="mb-4 flex justify-between items-center gap-2">
           <Button variant="secondary" onClick={() => setShowUserId(!showUserId)}>
-            {showUserId ? "🔒 Hide ID" : "👁️ Show ID"}
+            <span className="inline-flex items-center gap-1.5">
+              {showUserId ? (
+                <IoLockClosedOutline size={14} aria-hidden="true" />
+              ) : (
+                <IoEyeOutline size={14} aria-hidden="true" />
+              )}
+              {showUserId ? "Hide ID" : "Show ID"}
+            </span>
           </Button>
           <Button variant="danger" onClick={handleResetAllToGlobal}>
             Reset All to Global
