@@ -15,10 +15,21 @@ import {
   FaQuestionCircle,
   FaTrophy,
   FaLanguage,
+  FaHeart,
 } from "react-icons/fa";
 import { FiSun } from "react-icons/fi";
 import { PiToggleLeftFill, PiToggleRightFill } from "react-icons/pi";
 import { RiRadioFill } from "react-icons/ri";
+import {
+  IoStatsChartOutline,
+  IoPersonOutline,
+  IoNotificationsOutline,
+  IoHeartOutline,
+  IoFlameOutline,
+  IoPodiumOutline,
+  IoCreateOutline,
+  IoShareSocialOutline,
+} from "react-icons/io5";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import { useTranslation } from "react-i18next";
@@ -233,16 +244,18 @@ const NavBar = () => {
         <Link
           to="/dashboard"
           onClick={() => setIsProfileMenuOpen(false)}
-          className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
+          className="flex items-center gap-2 rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
         >
-          📊 {t("navbar.dashboard")}
+          <IoStatsChartOutline size={16} aria-hidden="true" />
+          {t("navbar.dashboard")}
         </Link>
         <Link
           to="/dashboard/profile"
           onClick={() => setIsProfileMenuOpen(false)}
-          className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
+          className="flex items-center gap-2 rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
         >
-          👤 Profile
+          <IoPersonOutline size={16} aria-hidden="true" />
+          Profile
         </Link>
         {/* ========================================== */}
         {userLoggedIn && (
@@ -251,7 +264,10 @@ const NavBar = () => {
             onClick={() => setIsProfileMenuOpen(false)}
             className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30 flex items-center justify-between gap-2"
           >
-            <span className="flex items-center gap-2">🔔 Notifications</span>
+            <span className="flex items-center gap-2">
+              <IoNotificationsOutline size={16} aria-hidden="true" />
+              Notifications
+            </span>
             {unreadCount > 0 ? (
               <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1.5 text-xs font-bold text-white">
                 {unreadCount}
@@ -265,7 +281,8 @@ const NavBar = () => {
             onClick={() => setIsProfileMenuOpen(false)}
             className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30 flex items-center gap-2"
           >
-            ❤️ {t("navbar.favorites")}
+            <IoHeartOutline size={16} aria-hidden="true" />
+            {t("navbar.favorites")}
           </Link>
         )}
         {userLoggedIn && (
@@ -274,9 +291,15 @@ const NavBar = () => {
             onClick={() => setIsProfileMenuOpen(false)}
             className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30 flex items-center justify-between gap-2"
           >
-            <span className="flex items-center gap-2">🎯 Daily Challenge</span>
+            <span className="flex items-center gap-2">
+              <FaTrophy size={14} aria-hidden="true" />
+              Daily Challenge
+            </span>
             {currentStreak > 0 ? (
-              <span className="text-xs text-slate-400">🔥{currentStreak}</span>
+              <span className="flex items-center gap-1 text-xs text-slate-400">
+                <IoFlameOutline size={14} aria-hidden="true" />
+                {currentStreak}
+              </span>
             ) : null}
           </Link>
         )}
@@ -286,7 +309,8 @@ const NavBar = () => {
             onClick={() => setIsProfileMenuOpen(false)}
             className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30 flex items-center gap-2"
           >
-            🏆 Leaderboard
+            <IoPodiumOutline size={16} aria-hidden="true" />
+            Leaderboard
           </Link>
         )}
         {/* ========================================== */}
@@ -296,9 +320,10 @@ const NavBar = () => {
           <Link
             to="/create-word"
             onClick={() => setIsProfileMenuOpen(false)}
-            className="rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
+            className="flex items-center gap-2 rounded-xl border border-transparent px-3 py-2 text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
           >
-            📝 Create Word
+            <IoCreateOutline size={16} aria-hidden="true" />
+            Create Word
           </Link>
         )}
         <button
@@ -307,9 +332,10 @@ const NavBar = () => {
             setIsProfileMenuOpen(false);
             setIsShareModalOpen(true);
           }}
-          className="rounded-xl border border-transparent px-3 py-2 text-left text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
+          className="flex items-center gap-2 rounded-xl border border-transparent px-3 py-2 text-left text-sm font-medium text-white transition-all duration-200 hover:border-sky-500/30 hover:bg-sky-500/15 hover:text-sky-100 hover:shadow-sm hover:shadow-sky-900/30"
         >
-          🔗 Share with Friends
+          <IoShareSocialOutline size={16} aria-hidden="true" />
+          Share with Friends
         </button>
         {isMobile && (
           <div className="mt-1 flex items-center justify-between rounded-xl border border-slate-700/70 px-3 py-2">
@@ -634,13 +660,10 @@ const NavBar = () => {
                     to="/favorites"
                     className="group hidden xl:flex items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 transition-all duration-300"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 122.88 107.39"
-                      className="w-6 h-6 fill-red-600 hover:fill-red-500 transition-colors group-hover:animate-bounce"
-                    >
-                      <path d="M60.83,17.18c8-8.35,13.62-15.57,26-17C110-2.46,131.27,21.26,119.57,44.61c-3.33,6.65-10.11,14.56-17.61,22.32-8.23,8.52-17.34,16.87-23.72,23.2l-17.4,17.26L46.46,93.55C29.16,76.89,1,55.92,0,29.94-.63,11.74,13.73.08,30.25.29c14.76.2,21,7.54,30.58,16.89Z" />
-                    </svg>
+                    <FaHeart
+                      className="text-sky-500 group-hover:text-sky-500 transition-colors group-hover:animate-bounce"
+                      size={18}
+                    />
                     <span className="ml-2 text-xl text-white group-hover:text-sky-400 transition-colors">
                       {t("navbar.favorites")}
                     </span>
@@ -740,9 +763,10 @@ const NavBar = () => {
             <button
               type="button"
               onClick={() => setIsShareModalOpen(true)}
-              className="rounded-xl border border-sky-500/40 bg-sky-500/10 p-2 text-sm font-semibold text-sky-700 transition-all duration-200 hover:border-sky-500/70 hover:bg-sky-500/15 hover:text-sky-600 dark:text-sky-300 dark:hover:text-sky-200"
+              className="flex items-center gap-2 rounded-xl border border-sky-500/40 bg-sky-500/10 p-2 text-sm font-semibold text-sky-700 transition-all duration-200 hover:border-sky-500/70 hover:bg-sky-500/15 hover:text-sky-600 dark:text-sky-300 dark:hover:text-sky-200"
             >
-              🔗 Share with Friends
+              <IoShareSocialOutline size={16} aria-hidden="true" />
+              Share with Friends
             </button>
           </div>
         )}

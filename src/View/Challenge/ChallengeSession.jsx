@@ -6,6 +6,7 @@ import {
   Clock,
   Flame,
   Leaf,
+  Lock,
   RotateCcw,
   Sparkles,
   Trophy,
@@ -113,9 +114,10 @@ const UnlockCountdown = ({ isLight }) => {
 
   return (
     <p
-      className={`mt-3 text-xs font-medium ${isLight ? "text-slate-500" : "text-slate-400"}`}
+      className={`mt-3 flex items-center justify-center gap-1.5 text-xs font-medium ${isLight ? "text-slate-500" : "text-slate-400"}`}
     >
-      🔒 Unlocks in {formatDuration(msLeft)}
+      <Lock size={12} aria-hidden="true" />
+      Unlocks in {formatDuration(msLeft)}
     </p>
   );
 };
@@ -743,11 +745,20 @@ const ChallengeSession = () => {
                     : "text-rose-500"
                 }`}
               >
-                {answerFeedback.timedOut
-                  ? "⏱ Time's up! "
-                  : answerFeedback.correct
-                    ? "✓ Correct! "
-                    : "✗ Wrong. "}
+                <span className="inline-flex items-center gap-1">
+                  {answerFeedback.timedOut ? (
+                    <Clock size={14} aria-hidden="true" />
+                  ) : answerFeedback.correct ? (
+                    <Check size={14} aria-hidden="true" />
+                  ) : (
+                    <X size={14} aria-hidden="true" />
+                  )}
+                  {answerFeedback.timedOut
+                    ? "Time's up! "
+                    : answerFeedback.correct
+                      ? "Correct! "
+                      : "Wrong. "}
+                </span>
                 {answerFeedback.xpDelta > 0
                   ? `+${answerFeedback.xpDelta}`
                   : answerFeedback.xpDelta}{" "}

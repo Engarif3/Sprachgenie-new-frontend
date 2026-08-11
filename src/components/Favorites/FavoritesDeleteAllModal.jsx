@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { IoWarningOutline } from "react-icons/io5";
 
 // Same "type ok to confirm" pattern as the word-favorites delete-all modal,
 // rebuilt theme-aware (light/dark) for reuse on the conversation/story
@@ -33,9 +34,10 @@ const FavoritesDeleteAllModal = ({
         }`}
       >
         <h3
-          className={`text-xl font-bold ${isLight ? "text-rose-600" : "text-rose-400"}`}
+          className={`flex items-center gap-2 text-xl font-bold ${isLight ? "text-rose-600" : "text-rose-400"}`}
         >
-          ⚠️ Delete all favorite {itemLabel}?
+          <IoWarningOutline size={22} aria-hidden="true" />
+          Delete all favorite {itemLabel}?
         </h3>
         <p
           className={`mt-2 text-sm ${isLight ? "text-slate-600" : "text-slate-300"}`}
