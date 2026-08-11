@@ -24,6 +24,11 @@ import {
   IoBookOutline,
   IoSchoolOutline,
   IoGameControllerOutline,
+  IoPersonAddOutline,
+  IoCompassOutline,
+  IoRocketOutline,
+  IoChevronDownOutline,
+  IoHelpCircleOutline,
 } from "react-icons/io5";
 
 // Rounds down to the nearest hundred and appends "+", so the displayed
@@ -109,20 +114,26 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
+    // Reveal-once: once a section has faded in, it stays visible. A
+    // toggling observer (hide again on scroll-away) breaks on refresh when
+    // the page loads scrolled past the top (browsers restore scroll
+    // position on reload) — sections above the fold never get their
+    // "entering" intersection and can be crossed going the other direction
+    // without ever registering as visible. Matches the same fix already
+    // applied to the ScrollStack title below.
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+
           setVisibleSections((prev) => {
+            if (prev.has(entry.target.id)) return prev;
             const next = new Set(prev);
-
-            if (entry.isIntersecting) {
-              next.add(entry.target.id);
-            } else {
-              next.delete(entry.target.id);
-            }
-
+            next.add(entry.target.id);
             return next;
           });
+
+          observer.unobserve(entry.target);
         });
       },
       { threshold: 0.2, rootMargin: "50px" },
@@ -455,6 +466,35 @@ const Home = () => {
         </svg>
       ),
     },
+  ];
+
+  const howItWorksSteps = [
+    {
+      number: "1",
+      icon: IoPersonAddOutline,
+      title: t("signUp"),
+      description: t("signUpDesc"),
+    },
+    {
+      number: "2",
+      icon: IoCompassOutline,
+      title: t("chooseYourPath"),
+      description: `${t("chooseYourPathDesc")} on your goals`,
+    },
+    {
+      number: "3",
+      icon: IoRocketOutline,
+      title: t("learnAndPractice"),
+      description: `${t("learnAndPracticeDesc")} skills consistently`,
+    },
+  ];
+
+  const faqItems = [
+    { question: t("isFree"), answer: t("isFreeAnswer") },
+    { question: t("levelsQuestion"), answer: t("levelsAnswer") },
+    { question: t("aiQuestion"), answer: t("aiAnswer") },
+    { question: t("offlineQuestion"), answer: t("offlineAnswer") },
+    { question: t("fluencyQuestion"), answer: t("fluencyAnswer") },
   ];
 
   return (
@@ -1056,61 +1096,39 @@ const Home = () => {
           </div>
 
           <div
-            className={`grid grid-cols-1 md:grid-cols-3 gap-8 px-4 transition-all duration-1000 delay-300 ${
+            className={`grid grid-cols-1 gap-8 px-4 transition-all duration-1000 delay-300 md:grid-cols-3 ${
               visibleSections.has("how-it-works")
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-10"
             }`}
           >
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-3xl font-bold text-white mx-auto mb-6 shadow-lg shadow-orange-500/50">
-                1
+            {howItWorksSteps.map((step) => (
+              <div
+                key={step.number}
+                className={`group relative flex flex-col rounded-3xl border p-8 text-center shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl ${
+                  theme === "dark"
+                    ? "border-white/10 bg-gradient-to-br from-gray-800/80 to-gray-900/80 hover:border-orange-400/40"
+                    : "border-slate-200 bg-white hover:border-orange-300"
+                }`}
+              >
+                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-pink-500 shadow-lg shadow-orange-500/30 transition-transform duration-300 group-hover:scale-105">
+                  <step.icon size={32} className="text-white" aria-hidden="true" />
+                </div>
+                <span className="mx-auto mb-3 inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-r from-orange-500 to-pink-500 text-sm font-bold text-white">
+                  {step.number}
+                </span>
+                <h3
+                  className={`mb-3 text-2xl font-bold ${theme === "dark" ? "text-white" : "text-black"}`}
+                >
+                  {step.title}
+                </h3>
+                <p
+                  className={`text-lg ${theme === "dark" ? "text-gray-300" : "text-slate-600"}`}
+                >
+                  {step.description}
+                </p>
               </div>
-              <h3
-                className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-black"} mb-4`}
-              >
-                {t("signUp")}
-              </h3>
-              <p
-                className={`${theme === "dark" ? "text-white" : "text-black"} text-lg`}
-              >
-                {t("signUpDesc")}
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-3xl font-bold text-white mx-auto mb-6 shadow-lg shadow-orange-500/50">
-                2
-              </div>
-              <h3
-                className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-black"} mb-4`}
-              >
-                {t("chooseYourPath")}
-              </h3>
-              <p
-                className={`${theme === "dark" ? "text-white" : "text-black"} text-lg`}
-              >
-                {t("chooseYourPathDesc")}
-                on your goals
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-3xl font-bold text-white mx-auto mb-6 shadow-lg shadow-orange-500/50">
-                3
-              </div>
-              <h3
-                className={`text-2xl font-bold ${theme === "dark" ? "text-white" : "text-black"} mb-4`}
-              >
-                {t("learnAndPractice")}
-              </h3>
-              <p
-                className={`${theme === "dark" ? "text-white" : "text-black"} text-lg`}
-              >
-                {t("learnAndPracticeDesc")}
-                skills consistently
-              </p>
-            </div>
+            ))}
           </div>
         </Container>
       </div>
@@ -1193,79 +1211,39 @@ const Home = () => {
                 : "opacity-0 translate-y-10"
             }`}
           >
-            <details className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-700 group">
-              <summary className="text-xl font-bold text-white cursor-pointer list-none flex items-center justify-between">
-                <span>{t("isFree")}</span>
-                <span className="text-cyan-500 text-2xl group-open:rotate-180 transition-transform">
-                  ▼
-                </span>
-              </summary>
-              <p className="text-gray-300 mt-4 leading-relaxed">
-                {t("isFreeAnswer")}
-              </p>
-            </details>
-
-            <details className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-700 group">
-              <summary className="text-xl font-bold text-white cursor-pointer list-none flex items-center justify-between">
-                <span>{t("levelsQuestion")}</span>
-                <span className="text-cyan-500  text-2xl group-open:rotate-180 transition-transform">
-                  ▼
-                </span>
-              </summary>
-              <p className="text-gray-300 mt-4 leading-relaxed">
-                {t("levelsAnswer")}
-              </p>
-            </details>
-
-            <details className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-700 group">
-              <summary className="text-xl font-bold text-white cursor-pointer list-none flex items-center justify-between">
-                <span>{t("aiQuestion")}</span>
-                <span className="text-cyan-500 text-2xl group-open:rotate-180 transition-transform">
-                  ▼
-                </span>
-              </summary>
-              <p className="text-gray-300 mt-4 leading-relaxed">
-                {t("aiAnswer")}
-              </p>
-            </details>
-
-            <details className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-700 group">
-              <summary className="text-xl font-bold text-white cursor-pointer list-none flex items-center justify-between">
-                <span>{t("offlineQuestion")}</span>
-                <span className="text-cyan-500 text-2xl group-open:rotate-180 transition-transform">
-                  ▼
-                </span>
-              </summary>
-              <p className="text-gray-300 mt-4 leading-relaxed">
-                {t("offlineAnswer")}
-              </p>
-            </details>
-
-            <details className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-700 group">
-              <summary className="text-xl font-bold text-white cursor-pointer list-none flex items-center justify-between">
-                <span>{t("fluencyQuestion")}</span>
-                <span className="text-cyan-500 text-2xl group-open:rotate-180 transition-transform">
-                  ▼
-                </span>
-              </summary>
-              <p className="text-gray-300 mt-4 leading-relaxed">
-                {t("fluencyAnswer")}
-              </p>
-            </details>
-
-            {/* <details className="bg-gradient-to-br from-gray-700 to-gray-800 p-6 rounded-xl border border-gray-700 group">
-              <summary className="text-xl font-bold text-white cursor-pointer list-none flex items-center justify-between">
-                <span>Can I get a certificate?</span>
-                <span className="text-orange-500 text-2xl group-open:rotate-180 transition-transform">
-                  ▼
-                </span>
-              </summary>
-              <p className="text-gray-300 mt-4 leading-relaxed">
-                While SprachGenie doesn't offer official language certificates,
-                our comprehensive learning system prepares you excellently for
-                recognized exams like Goethe-Zertifikat, TestDaF, and TELC.
-              </p>
-            </details> */}
+            {faqItems.map((item) => (
+              <details
+                key={item.question}
+                className={`group rounded-2xl border p-6 transition-colors duration-300 ${
+                  theme === "dark"
+                    ? "border-white/10 bg-gradient-to-br from-gray-800/80 to-gray-900/80 open:border-orange-400/40"
+                    : "border-slate-200 bg-white open:border-orange-300"
+                }`}
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
+                  <span
+                    className={`flex items-center gap-3 text-xl font-bold ${theme === "dark" ? "text-white" : "text-black"}`}
+                  >
+                    <IoHelpCircleOutline
+                      aria-hidden="true"
+                      size={22}
+                      className="shrink-0 text-orange-500"
+                    />
+                    {item.question}
+                  </span>
+                  <IoChevronDownOutline
+                    aria-hidden="true"
+                    size={20}
+                    className={`shrink-0 transition-transform duration-300 group-open:rotate-180 ${theme === "dark" ? "text-cyan-400" : "text-cyan-600"}`}
+                  />
+                </summary>
+                <p
+                  className={`mt-4 leading-relaxed ${theme === "dark" ? "text-gray-300" : "text-slate-600"}`}
+                >
+                  {item.answer}
+                </p>
+              </details>
+            ))}
           </div>
         </Container>
       </div>
