@@ -3,6 +3,14 @@ import api from "../../axios";
 import Button from "../../components/UI/Button";
 import PageHeader from "../../components/UI/PageHeader";
 import DateTime from "../../components/UI/DateTime";
+import {
+  IoSettingsOutline,
+  IoMegaphoneOutline,
+  IoLinkOutline,
+  IoCheckmark,
+  IoClose,
+  IoWarningOutline,
+} from "react-icons/io5";
 
 const BroadcastNotifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -273,8 +281,9 @@ const BroadcastNotifications = () => {
 
         {/* Settings */}
         <div className="rounded-lg border border-slate-200 bg-white p-8 mb-8 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
-            ⚙️ Settings
+          <h2 className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white mb-4">
+            <IoSettingsOutline aria-hidden="true" />
+            Settings
           </h2>
 
           {settingsLoading ? (
@@ -407,7 +416,14 @@ const BroadcastNotifications = () => {
           </div>
 
           <Button type="submit" disabled={broadcasting} fullWidth size="lg">
-            {broadcasting ? "Broadcasting..." : "📢 Broadcast to All Users"}
+            {broadcasting ? (
+              "Broadcasting..."
+            ) : (
+              <span className="inline-flex items-center gap-1.5">
+                <IoMegaphoneOutline size={16} aria-hidden="true" />
+                Broadcast to All Users
+              </span>
+            )}
           </Button>
         </form>
 
@@ -490,8 +506,9 @@ const BroadcastNotifications = () => {
                       {notification.message}
                     </p>
                     {notification.link && (
-                      <p className="text-sm text-orange-600 dark:text-orange-400 mb-2 truncate">
-                        🔗 {notification.link}
+                      <p className="flex items-center gap-1.5 text-sm text-orange-600 dark:text-orange-400 mb-2 truncate">
+                        <IoLinkOutline size={14} className="shrink-0" aria-hidden="true" />
+                        {notification.link}
                       </p>
                     )}
                     <p className="text-xs text-slate-400 dark:text-gray-500">
@@ -587,16 +604,24 @@ const BroadcastNotifications = () => {
                 <button
                   onClick={handleSaveEdit}
                   disabled={editLoading}
-                  className="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg disabled:opacity-50 transition"
+                  className="flex flex-1 items-center justify-center gap-1.5 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg disabled:opacity-50 transition"
                 >
-                  {editLoading ? "Saving..." : "✅ Save Changes"}
+                  {editLoading ? (
+                    "Saving..."
+                  ) : (
+                    <>
+                      <IoCheckmark size={16} aria-hidden="true" />
+                      Save Changes
+                    </>
+                  )}
                 </button>
                 <button
                   onClick={closeEditModal}
                   disabled={editLoading}
-                  className="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg disabled:opacity-50 transition"
+                  className="flex flex-1 items-center justify-center gap-1.5 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg disabled:opacity-50 transition"
                 >
-                  ❌ Cancel
+                  <IoClose size={16} aria-hidden="true" />
+                  Cancel
                 </button>
               </div>
             </div>
@@ -607,8 +632,9 @@ const BroadcastNotifications = () => {
         {deleteTarget && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full border border-red-700">
-              <h2 className="text-2xl font-bold text-red-400 mb-4">
-                ⚠️ Permanently Delete{" "}
+              <h2 className="flex items-center gap-2 text-2xl font-bold text-red-400 mb-4">
+                <IoWarningOutline aria-hidden="true" />
+                Permanently Delete{" "}
                 {deleteTarget.type === "all"
                   ? "All Notifications"
                   : deleteTarget.type === "bulk"

@@ -3,6 +3,16 @@ import api from "../../axios"; // For backend (with cookies)
 import aiApi from "../../AI_axios";
 import Button from "../../components/UI/Button";
 import PageHeader from "../../components/UI/PageHeader";
+import {
+  IoHourglassOutline,
+  IoSparklesOutline,
+  IoImageOutline,
+  IoSaveOutline,
+  IoSyncOutline,
+  IoCloudUploadOutline,
+  IoCheckmark,
+  IoArrowUndoOutline,
+} from "react-icons/io5";
 
 const GenerateStory = () => {
   const [formData, setFormData] = useState({
@@ -206,7 +216,7 @@ const GenerateStory = () => {
         isPublished: true,
       });
 
-      setSuccess("Story published successfully! ✅");
+      setSuccess("Story published successfully!");
       setTimeout(() => {
         // Reset form
         setFormData({
@@ -337,12 +347,12 @@ const GenerateStory = () => {
             <Button type="submit" disabled={loading} fullWidth size="lg">
               {loading ? (
                 <>
-                  <span className="inline-block animate-spin">⏳</span>
+                  <IoHourglassOutline className="animate-spin" aria-hidden="true" />
                   Generating Story...
                 </>
               ) : (
                 <>
-                  <span>✨</span>
+                  <IoSparklesOutline aria-hidden="true" />
                   Generate Story
                 </>
               )}
@@ -490,8 +500,9 @@ const GenerateStory = () => {
 
             {/* Photo Upload Section */}
             <div className="mb-6 bg-slate-50 p-6 rounded-lg border border-slate-200 dark:bg-gray-700/50 dark:border-gray-600">
-              <h4 className="text-slate-800 dark:text-white font-semibold mb-4">
-                📸 Upload Photo (Optional)
+              <h4 className="flex items-center gap-2 text-slate-800 dark:text-white font-semibold mb-4">
+                <IoImageOutline size={18} aria-hidden="true" />
+                Upload Photo (Optional)
               </h4>
               {uploadedImage ? (
                 <div className="space-y-4">
@@ -550,7 +561,14 @@ const GenerateStory = () => {
                     disabled={loading}
                     fullWidth
                   >
-                    {loading ? "Saving..." : "💾 Save as Draft"}
+                    {loading ? (
+                      "Saving..."
+                    ) : (
+                      <span className="flex items-center justify-center gap-2">
+                        <IoSaveOutline size={18} aria-hidden="true" />
+                        Save as Draft
+                      </span>
+                    )}
                   </Button>
                   <Button
                     variant="secondary"
@@ -559,7 +577,10 @@ const GenerateStory = () => {
                     disabled={loading}
                     fullWidth
                   >
-                    ♻️ Regenerate
+                    <span className="flex items-center justify-center gap-2">
+                      <IoSyncOutline size={18} aria-hidden="true" />
+                      Regenerate
+                    </span>
                   </Button>
                 </>
               ) : (
@@ -572,9 +593,14 @@ const GenerateStory = () => {
                       disabled={loading || uploadingImage}
                       fullWidth
                     >
-                      {uploadingImage
-                        ? "Uploading..."
-                        : "📤 Upload Photo to Cloud"}
+                      {uploadingImage ? (
+                        "Uploading..."
+                      ) : (
+                        <span className="flex items-center justify-center gap-2">
+                          <IoCloudUploadOutline size={18} aria-hidden="true" />
+                          Upload Photo to Cloud
+                        </span>
+                      )}
                     </Button>
                   )}
                   <Button
@@ -584,7 +610,14 @@ const GenerateStory = () => {
                     disabled={loading}
                     fullWidth
                   >
-                    {loading ? "Publishing..." : "✅ Publish Story"}
+                    {loading ? (
+                      "Publishing..."
+                    ) : (
+                      <span className="flex items-center justify-center gap-2">
+                        <IoCheckmark size={18} aria-hidden="true" />
+                        Publish Story
+                      </span>
+                    )}
                   </Button>
                   <Button
                     variant="secondary"
@@ -593,7 +626,10 @@ const GenerateStory = () => {
                     disabled={loading}
                     fullWidth
                   >
-                    ↩️ Start Over
+                    <span className="flex items-center justify-center gap-2">
+                      <IoArrowUndoOutline size={18} aria-hidden="true" />
+                      Start Over
+                    </span>
                   </Button>
                 </>
               )}
