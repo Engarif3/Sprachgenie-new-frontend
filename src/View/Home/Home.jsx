@@ -55,10 +55,17 @@ const Home = () => {
   // The hero benefit icons used to render instantly while their labels
   // faded in via SplitText's staggered initialDelay (up to 3s apart), so
   // an icon could sit alone for seconds before its text appeared. Fading
-  // the icon in on the same delay keeps each icon+label pair in sync.
+  // the icon in on the same delay keeps each icon+label pair in sync —
+  // but SplitText's own GSAP timeline doesn't start at mount, it waits
+  // for document.fonts.ready (see SplitText.jsx's fontsLoaded state), so
+  // this has to wait on the same signal or the icon still jumps the gun.
   const [pillsRevealed, setPillsRevealed] = useState(false);
   useEffect(() => {
-    setPillsRevealed(true);
+    if (document.fonts.status === "loaded") {
+      setPillsRevealed(true);
+    } else {
+      document.fonts.ready.then(() => setPillsRevealed(true));
+    }
   }, []);
   const { t } = useTranslation("home");
   const { theme } = useTheme();
