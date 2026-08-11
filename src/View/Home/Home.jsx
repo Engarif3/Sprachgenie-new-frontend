@@ -52,6 +52,14 @@ const Home = () => {
   // its fade back to invisible mid-scroll. Reveal once and keep it that
   // way instead of toggling with the (now offscreen) title.
   const [featureCardsRevealed, setFeatureCardsRevealed] = useState(false);
+  // The hero benefit icons used to render instantly while their labels
+  // faded in via SplitText's staggered initialDelay (up to 3s apart), so
+  // an icon could sit alone for seconds before its text appeared. Fading
+  // the icon in on the same delay keeps each icon+label pair in sync.
+  const [pillsRevealed, setPillsRevealed] = useState(false);
+  useEffect(() => {
+    setPillsRevealed(true);
+  }, []);
   const { t } = useTranslation("home");
   const { theme } = useTheme();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -561,7 +569,8 @@ const Home = () => {
                   <div className="inline-flex items-center gap-1.5">
                     <IoHeartOutline
                       aria-hidden="true"
-                      className={theme === "dark" ? "text-white" : "text-black"}
+                      className={`${isMobile ? "" : `transition-opacity duration-500 ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
+                      style={isMobile ? undefined : { transitionDelay: "0ms" }}
                     />
                     {isMobile ? (
                       <div
@@ -589,7 +598,8 @@ const Home = () => {
                   <div className="inline-flex items-center gap-1.5">
                     <IoSparklesOutline
                       aria-hidden="true"
-                      className={theme === "dark" ? "text-white" : "text-black"}
+                      className={`${isMobile ? "" : `transition-opacity duration-500 ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
+                      style={isMobile ? undefined : { transitionDelay: "600ms" }}
                     />
                     {isMobile ? (
                       <div
@@ -617,7 +627,8 @@ const Home = () => {
                   <div className="inline-flex items-center gap-1.5">
                     <IoGlobeOutline
                       aria-hidden="true"
-                      className={theme === "dark" ? "text-white" : "text-black"}
+                      className={`${isMobile ? "" : `transition-opacity duration-500 ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
+                      style={isMobile ? undefined : { transitionDelay: "1200ms" }}
                     />
                     {isMobile ? (
                       <div
@@ -645,7 +656,8 @@ const Home = () => {
                   <div className="inline-flex items-center gap-1.5">
                     <IoStatsChartOutline
                       aria-hidden="true"
-                      className={theme === "dark" ? "text-white" : "text-black"}
+                      className={`${isMobile ? "" : `transition-opacity duration-500 ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
+                      style={isMobile ? undefined : { transitionDelay: "1800ms" }}
                     />
                     {isMobile ? (
                       <div
@@ -673,7 +685,8 @@ const Home = () => {
                   <div className="inline-flex items-center gap-1.5">
                     <IoTrendingUpOutline
                       aria-hidden="true"
-                      className={theme === "dark" ? "text-white" : "text-black"}
+                      className={`${isMobile ? "" : `transition-opacity duration-500 ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
+                      style={isMobile ? undefined : { transitionDelay: "2400ms" }}
                     />
                     {isMobile ? (
                       <div
@@ -701,7 +714,8 @@ const Home = () => {
                   <div className="inline-flex items-center gap-1.5">
                     <IoFlashOutline
                       aria-hidden="true"
-                      className={theme === "dark" ? "text-white" : "text-black"}
+                      className={`${isMobile ? "" : `transition-opacity duration-500 ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
+                      style={isMobile ? undefined : { transitionDelay: "3000ms" }}
                     />
                     {isMobile ? (
                       <div
