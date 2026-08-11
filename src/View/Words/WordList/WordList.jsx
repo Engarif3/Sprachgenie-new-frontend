@@ -2453,7 +2453,7 @@ const WordList = () => {
                 aria-label={`${activeFilterCount} active filter${
                   activeFilterCount > 1 ? "s" : ""
                 } active — click to clear filters and search all words`}
-                className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/20 py-1 pl-2.5 pr-2 text-xs font-semibold text-amber-300 transition-colors hover:bg-amber-500/30"
+                className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-full border border-amber-500/50 bg-amber-500/10 py-1 pl-2.5 pr-2 text-xs font-semibold text-amber-700 transition-colors hover:bg-amber-500/20 dark:border-amber-500/40 dark:bg-amber-500/20 dark:text-amber-300 dark:hover:bg-amber-500/30"
               >
                 <IoFunnelOutline size={13} aria-hidden="true" />
                 <span aria-hidden="true">{activeFilterCount}</span>
@@ -2619,7 +2619,7 @@ const WordList = () => {
         <div className=" min-h-screen  rounded-2xl p-0 md:p-1 lg:p-1">
           <div className="flex items-center justify-end gap-2 mb-2 px-2 relative">
             {isRefreshingPage && paginatedWords.length > 0 && (
-              <span className="text-xs  px-3 py-0 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 whitespace-nowrap">
+              <span className="text-xs  px-3 py-0 rounded-full bg-amber-500/10 border border-amber-500/50 text-amber-700 whitespace-nowrap dark:bg-amber-500/20 dark:border-amber-500/40 dark:text-amber-300">
                 Loading page...
               </span>
             )}

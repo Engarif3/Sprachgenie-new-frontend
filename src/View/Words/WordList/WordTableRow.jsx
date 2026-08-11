@@ -384,7 +384,7 @@ const WordTableRow = ({
 
       {/* Meaning */}
       <td
-        className={`pl-1 p-0 md:p-3 lg:p-3 text-sm md:text-lg lg:text-lg text-cyan-500 dark:text-cyan-300 font-serif outline-none focus:outline-none focus-visible:outline-none ${
+        className={`pl-1 p-0 md:p-3 lg:p-3 text-sm md:text-lg lg:text-lg text-cyan-700 dark:text-cyan-300 font-serif outline-none focus:outline-none focus-visible:outline-none ${
           learningMode
             ? isMouseActive
               ? "hover:cursor-pointer"
