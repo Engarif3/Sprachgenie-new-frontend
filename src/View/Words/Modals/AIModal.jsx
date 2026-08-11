@@ -5,6 +5,13 @@ import { useLockBodyScroll } from "./ModalScrolling";
 import aiApi from "../../../AI_axios";
 import api from "../../../axios";
 import { useAuth } from "../../../services/auth.services";
+import Button from "../../../components/UI/Button";
+import {
+  IoClose,
+  IoAlertCircleOutline,
+  IoCheckmark,
+  IoSparklesOutline,
+} from "react-icons/io5";
 
 // CSS text-transform: capitalize treats "/" as a word boundary too, which
 // wrongly capitalizes gendered nouns like "Abteilungsleiter/in" into
@@ -480,8 +487,9 @@ const AIModal = ({
             {activeWord?.aiMeanings?.length > 0 && (
               <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 p-2 md:p-4 lg:p-4 rounded-2xl border-2 border-green-400/50">
                 <p className="text-base md:text-lg">
-                  <strong className="text-green-400 font-semibold">
-                    🤖 AI Meanings:
+                  <strong className="inline-flex items-center gap-1.5 text-green-400 font-semibold">
+                    <IoSparklesOutline size={16} aria-hidden="true" />
+                    AI Meanings:
                   </strong>{" "}
                   <span className="text-white font-medium">
                     {activeWord.aiMeanings.join(", ")}
@@ -520,48 +528,50 @@ const AIModal = ({
                     placeholder="Explain exactly what the AI got wrong and what it should produce instead."
                   />
                   <div className="mt-3 flex justify-end">
-                    <button
-                      type="button"
+                    <Button
+                      variant="primary"
+                      surface="dark"
                       onClick={handlePromptCorrection}
                       disabled={promptLoading || saveLoading}
-                      className="rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-2.5 font-semibold text-slate-950 transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
                     >
                       {promptLoading
                         ? "Generating Preview..."
                         : "Regenerate With Prompt"}
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
                 {previewData && (
                   <div className="flex items-center justify-end gap-2 rounded-2xl border border-sky-300/30 bg-sky-500/10 px-4 py-3">
                     <div className="flex gap-3">
-                      <button
-                        type="button"
+                      <Button
+                        variant="secondary"
+                        surface="dark"
+                        size="sm"
                         onClick={() => {
                           setPreviewData(null);
                           setIsPreviewOpen(false);
                         }}
                         disabled={saveLoading}
-                        className="rounded-full border border-white/15 bg-slate-900/60 px-4 py-2 text-sm font-semibold text-white transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
                       >
                         Clear Preview
-                      </button>
-                      <button
-                        type="button"
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        surface="dark"
+                        size="sm"
                         onClick={() => setIsPreviewOpen(true)}
-                        className="rounded-full border border-sky-300/40 bg-sky-500/20 px-4 py-2 text-sm font-semibold text-sky-100 transition hover:bg-sky-500/30"
                       >
                         Open Preview
-                      </button>
-                      <button
-                        type="button"
+                      </Button>
+                      <Button
+                        variant="success"
+                        surface="dark"
                         onClick={handlePublishPreview}
                         disabled={saveLoading}
-                        className="rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 px-5 py-2.5 font-semibold text-slate-950 transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
                       >
                         {saveLoading ? "Publishing..." : "Publish Preview"}
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 )}
@@ -593,14 +603,14 @@ const AIModal = ({
                 </div>
 
                 <div className="flex justify-end gap-3">
-                  <button
-                    type="button"
+                  <Button
+                    variant="success"
+                    surface="dark"
                     onClick={handleSaveManualCorrections}
                     disabled={saveLoading}
-                    className="rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 px-5 py-2.5 font-semibold text-slate-950 transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
                   >
                     {saveLoading ? "Saving..." : "Save Manual Corrections"}
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
@@ -608,22 +618,23 @@ const AIModal = ({
 
           {isSuperAdmin && (
             <div className="mt-6 flex justify-center">
-              <button
-                type="button"
+              <Button
+                variant="secondary"
+                surface="dark"
                 onClick={() => setShowSuperAdminTools((prev) => !prev)}
-                className="rounded-full border border-amber-300/40 bg-amber-500/10 px-5 py-2.5 text-sm font-semibold text-amber-200 transition hover:border-amber-300/70 hover:bg-amber-500/20"
               >
                 {showSuperAdminTools
                   ? "Hide Super Admin Tools"
                   : "Show Super Admin Tools"}
-              </button>
+              </Button>
             </div>
           )}
 
           {isReportOpen && (
             <div className="mt-6 rounded-2xl border border-red-500/30 bg-red-950/10 p-4 md:p-6">
-              <h3 className="text-lg font-semibold text-red-300 mb-3">
-                🚨 Report an Issue
+              <h3 className="flex items-center gap-2 text-lg font-semibold text-red-300 mb-3">
+                <IoAlertCircleOutline size={20} aria-hidden="true" />
+                Report an Issue
               </h3>
 
               {reportOptionsLoading ? (
@@ -685,37 +696,45 @@ const AIModal = ({
               )}
 
               <div className="mt-4 flex gap-3">
-                <button
+                <Button
+                  variant="danger"
+                  surface="dark"
+                  size="sm"
                   onClick={handleReportSubmit}
                   disabled={reportLoading || reportOptionsLoading}
-                  className="px-4 py-1.5 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors"
                 >
                   {reportLoading ? "Submitting…" : "Submit report"}
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="secondary"
+                  surface="dark"
+                  size="sm"
                   onClick={() => setIsReportOpen(false)}
-                  className="px-4 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
                 >
                   Cancel
-                </button>
+                </Button>
               </div>
             </div>
           )}
 
           <div className="mt-8 flex justify-between gap-4">
-            <button
-              onClick={handleToggleReport}
-              className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 px-6 py-3 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/50"
-            >
-              {isReportOpen ? "✕ Hide Report Form" : "🚨 Report Issue"}
-            </button>
+            <Button variant="danger" surface="dark" size="lg" onClick={handleToggleReport}>
+              <span className="inline-flex items-center gap-1.5">
+                {isReportOpen ? (
+                  <IoClose size={16} aria-hidden="true" />
+                ) : (
+                  <IoAlertCircleOutline size={16} aria-hidden="true" />
+                )}
+                {isReportOpen ? "Hide Report Form" : "Report Issue"}
+              </span>
+            </Button>
 
-            <button
-              onClick={onClose}
-              className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 px-6 py-3 rounded-full font-semibold text-white transition-all duration-300 hover:scale-105 shadow-lg"
-            >
-              ✓ Close
-            </button>
+            <Button variant="secondary" surface="dark" size="lg" onClick={onClose}>
+              <span className="inline-flex items-center gap-1.5">
+                <IoCheckmark size={16} aria-hidden="true" />
+                Close
+              </span>
+            </Button>
           </div>
         </div>
       </div>
@@ -737,21 +756,21 @@ const AIModal = ({
                 </p>
               </div>
               <div className="flex gap-3">
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
+                  surface="dark"
                   onClick={() => setIsPreviewOpen(false)}
-                  className="rounded-full border border-white/15 bg-slate-900/60 px-5 py-2.5 font-semibold text-white transition hover:scale-105"
                 >
                   Close Preview
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  variant="success"
+                  surface="dark"
                   onClick={handlePublishPreview}
                   disabled={saveLoading}
-                  className="rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 px-5 py-2.5 font-semibold text-slate-950 transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
                 >
                   {saveLoading ? "Publishing..." : "Publish Preview"}
-                </button>
+                </Button>
               </div>
             </div>
 

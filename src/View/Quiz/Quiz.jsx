@@ -4,6 +4,18 @@ import Swal from "sweetalert2";
 import api from "../../axios";
 import { pronounceWord } from "../../utils/wordPronounciation";
 import { useAuth } from "../../services/auth.services";
+import Button from "../../components/UI/Button";
+import {
+  IoVolumeHighOutline,
+  IoCheckmark,
+  IoHeart,
+  IoHeartOutline,
+  IoWarningOutline,
+  IoTimeOutline,
+  IoTrendingUpOutline,
+  IoBulbOutline,
+  IoSearchOutline,
+} from "react-icons/io5";
 
 const QUIZ_STORAGE_KEY = "quizState";
 const QUIZ_LENGTH = 30;
@@ -318,12 +330,22 @@ const Quiz = () => {
                   >
                     <div className="flex items-start justify-between">
                       <div className="text-left">
-                        <div className="mb-0.5 text-lg font-bold md:text-xl">
+                        <div className="mb-0.5 flex items-center gap-2 text-lg font-bold md:text-xl">
+                          <span
+                            className={`inline-block h-2.5 w-2.5 rounded-full ${
+                              level === "1"
+                                ? "bg-green-500"
+                                : level === "2"
+                                  ? "bg-red-500"
+                                  : "bg-yellow-500"
+                            }`}
+                            aria-hidden="true"
+                          />
                           {level === "1"
-                            ? "🟢 Easy"
+                            ? "Easy"
                             : level === "2"
-                              ? "🔴 Difficult"
-                              : "🟡 Mixed"}
+                              ? "Difficult"
+                              : "Mixed"}
                         </div>
                         <div
                           className={`text-sm md:text-base ${
@@ -336,7 +358,9 @@ const Quiz = () => {
                         </div>
                       </div>
                       <div className="text-2xl md:text-3xl">
-                        {isSelected ? "✓" : ""}
+                        {isSelected ? (
+                          <IoCheckmark aria-hidden="true" />
+                        ) : null}
                       </div>
                     </div>
                   </button>
@@ -355,8 +379,9 @@ const Quiz = () => {
               >
                 <div className="flex items-start justify-between">
                   <div className="text-left">
-                    <div className="mb-0.5 text-lg font-bold md:text-xl">
-                      ❤️ My Favorites
+                    <div className="mb-0.5 flex items-center gap-2 text-lg font-bold md:text-xl">
+                      <IoHeartOutline aria-hidden="true" />
+                      My Favorites
                     </div>
                     <div
                       className={`text-sm md:text-base ${
@@ -371,7 +396,9 @@ const Quiz = () => {
                     </div>
                   </div>
                   <div className="text-2xl md:text-3xl">
-                    {source === "favorites" ? "✓" : ""}
+                    {source === "favorites" ? (
+                      <IoCheckmark aria-hidden="true" />
+                    ) : null}
                   </div>
                 </div>
               </button>
@@ -414,30 +441,30 @@ const Quiz = () => {
 
           {/* Start Button */}
           <div className="text-center">
-            <button
+            <Button
+              variant="success"
+              size="lg"
               disabled={!canStartQuiz}
               onClick={startQuiz}
-              className={`relative overflow-hidden rounded-full px-10 py-3 text-lg font-bold transition-all duration-300 md:px-14 md:py-3.5 md:text-xl ${
-                !canStartQuiz
-                  ? "cursor-not-allowed bg-slate-200 text-slate-400 dark:bg-slate-600 dark:text-slate-400"
-                  : "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-xl hover:scale-110 hover:from-green-600 hover:to-emerald-700 hover:shadow-2xl hover:shadow-green-500/50"
-              }`}
             >
-              <span className="relative z-10 flex items-center justify-center gap-3">
-                Start Quiz
-              </span>
-            </button>
+              Start Quiz
+            </Button>
 
             {!notEligibleForFavorites && preparedQuizWords.length === 0 && (
-              <p className="mt-2 animate-pulse text-xs text-orange-500 dark:text-orange-400">
-                ⚠️ Loading words... Please wait
+              <p className="mt-2 flex items-center justify-center gap-1.5 animate-pulse text-xs text-orange-500 dark:text-orange-400">
+                <IoWarningOutline size={14} aria-hidden="true" />
+                Loading words... Please wait
               </p>
             )}
           </div>
 
           {/* Info Footer */}
-          <p className="mt-3 text-center text-xs text-slate-400 dark:text-slate-500">
-            ⏱️ No time limit · 📈 Track your progress
+          <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-slate-400 dark:text-slate-500">
+            <IoTimeOutline size={14} aria-hidden="true" />
+            No time limit
+            <span aria-hidden="true">·</span>
+            <IoTrendingUpOutline size={14} aria-hidden="true" />
+            Track your progress
           </p>
         </div>
       </Container>
@@ -455,8 +482,9 @@ const Quiz = () => {
             {source === "favorites" ? (
               <>
                 Source:{" "}
-                <span className="font-bold text-pink-600 dark:text-pink-400">
-                  ❤️ My Favorites
+                <span className="inline-flex items-center gap-1.5 font-bold text-pink-600 dark:text-pink-400">
+                  <IoHeart size={14} aria-hidden="true" />
+                  My Favorites
                 </span>
               </>
             ) : (
@@ -468,12 +496,9 @@ const Quiz = () => {
               </>
             )}
           </div>
-          <button
-            onClick={resetQuiz}
-            className="rounded-full bg-gradient-to-r from-orange-500 to-red-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:from-orange-600 hover:to-red-600 hover:shadow-orange-500/50 md:px-7 md:text-base"
-          >
+          <Button variant="danger" onClick={resetQuiz}>
             Reset Quiz
-          </button>
+          </Button>
         </div>
 
         {/* Word counter */}
@@ -491,15 +516,17 @@ const Quiz = () => {
         </div>
 
         {/* Instruction */}
-        <p className="mb-3 text-center text-base italic text-pink-600 dark:text-pink-400">
-          💡 Guess the meaning of the word
+        <p className="mb-3 flex items-center justify-center gap-1.5 text-center text-base italic text-pink-600 dark:text-pink-400">
+          <IoBulbOutline size={16} aria-hidden="true" />
+          Guess the meaning of the word
         </p>
 
         {/* Main word display */}
         <div className="mb-4 rounded-3xl border-2 border-purple-200 bg-white p-4 shadow-sm transition-all duration-300 hover:border-purple-300 dark:border-purple-500/30 dark:bg-slate-900 dark:shadow-2xl dark:hover:border-purple-500/50 md:p-5">
           <div className="text-center">
             <div className="mb-2 flex items-center justify-center gap-2 md:mb-3 md:gap-4">
-              <button
+              <Button
+                variant="ghost"
                 onClick={() =>
                   pronounceWord(
                     `${currentWord?.article?.name ?? ""} ${
@@ -507,11 +534,10 @@ const Quiz = () => {
                     }`.trim(),
                   )
                 }
-                className="text-3xl transition-transform duration-300 hover:scale-110 hover:drop-shadow-[0_0_15px_rgba(59,130,246,0.8)] md:text-4xl"
                 title="Pronounce word"
               >
-                🔊
-              </button>
+                <IoVolumeHighOutline size={22} aria-hidden="true" />
+              </Button>
               <div className="text-2xl font-bold md:text-4xl">
                 <span className="mr-2 italic text-orange-500 dark:text-orange-400 md:mr-3">
                   {currentWord?.article?.name || ""}
@@ -533,14 +559,16 @@ const Quiz = () => {
                     "No meaning"}
                 </div>
               ) : (
-                <button
+                <Button
+                  variant="primary"
+                  size="lg"
                   onClick={() =>
                     dispatch({ type: "SET_SHOW_MEANING", payload: true })
                   }
-                  className="rounded-full bg-gradient-to-r from-blue-500 to-purple-500 px-7 py-3.5 text-lg font-bold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:from-blue-600 hover:to-purple-600 hover:shadow-blue-500/50"
                 >
-                  🔍 Reveal Meaning
-                </button>
+                  <IoSearchOutline size={18} aria-hidden="true" />
+                  Reveal Meaning
+                </Button>
               )}
             </div>
           </div>
@@ -558,28 +586,22 @@ const Quiz = () => {
               </div>
             </div>
             <div className="mt-4 flex justify-center gap-8 md:gap-12">
-              <button
+              <Button
+                variant="danger"
+                size="lg"
                 onClick={() => handleScoreAndNext(false)}
                 disabled={usedScore}
-                className={`rounded-full bg-gradient-to-r from-red-500 to-red-600 px-5 py-2.5 text-lg font-bold text-white shadow-lg transition-all duration-300 hover:scale-110 md:px-9 md:py-3 md:text-xl ${
-                  usedScore
-                    ? "cursor-not-allowed opacity-50"
-                    : "hover:from-red-600 hover:to-red-700 hover:shadow-red-500/50"
-                }`}
               >
                 <span> X</span>
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="success"
+                size="lg"
                 onClick={() => handleScoreAndNext(true)}
                 disabled={usedScore}
-                className={`rounded-full bg-gradient-to-r from-green-500 to-green-600 px-5 py-2.5 text-lg font-bold text-white shadow-lg transition-all duration-300 hover:scale-110 md:px-9 md:py-3 md:text-xl ${
-                  usedScore
-                    ? "cursor-not-allowed opacity-50"
-                    : "hover:from-green-600 hover:to-green-700 hover:shadow-green-500/50"
-                }`}
               >
-                ✓
-              </button>
+                <IoCheckmark aria-hidden="true" />
+              </Button>
             </div>
           </div>
         </div>

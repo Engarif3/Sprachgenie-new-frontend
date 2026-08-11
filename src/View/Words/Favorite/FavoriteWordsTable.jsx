@@ -2,7 +2,9 @@ import React from "react";
 import { pronounceWord } from "../../../utils/wordPronounciation";
 import { PuffLoader } from "react-spinners";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { IoVolumeHighOutline } from "react-icons/io5";
 import ConjugationModal from "../WordList/ConjugationModal";
+import Button from "../../../components/UI/Button";
 
 const normalizeText = (value) =>
   String(value ?? "")
@@ -210,7 +212,8 @@ const FavoriteWordsTable = ({
                 Level
               </th>
               <th className="py-3 text-sm md:text-lg lg:text-lg text-center text-slate-200 font-bold w-[3%] md:w-[3%] lg:w-[3%] border-b-2 border-slate-700/70 rounded-tr-xl">
-                🗑️
+                <RiDeleteBin6Line className="mx-auto" aria-hidden="true" />
+                <span className="sr-only">Remove from favorites</span>
               </th>
             </tr>
           </thead>
@@ -254,13 +257,14 @@ const FavoriteWordsTable = ({
                       </span>
 
                       <div className="flex gap-1 self-end md:gap-4 md:self-auto lg:gap-4">
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => pronounceWord(word.value)}
-                          className="text-md md:text-2xl lg:text-2xl hover:scale-110 transition-transform duration-200 hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]"
                           title="Pronounce word"
                         >
-                          🔊
-                        </button>
+                          <IoVolumeHighOutline size={18} aria-hidden="true" />
+                        </Button>
 
                         <button
                           type="button"
@@ -383,14 +387,15 @@ const FavoriteWordsTable = ({
 
                   {/* Remove from favorites */}
                   <td className="p-2 md:p-3 text-center">
-                    <button
+                    <Button
+                      variant="danger"
+                      size="sm"
                       onClick={() => handleRemoveFavorite(word.id)}
-                      className="inline-flex items-center justify-center h-7 w-7 rounded-full border-2 border-rose-400 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-lg transition-all duration-200 hover:scale-110 hover:shadow-red-500/50"
                       title="Remove from favorites"
                       aria-label="Remove from favorites"
                     >
                       <RiDeleteBin6Line size={14} />
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               );

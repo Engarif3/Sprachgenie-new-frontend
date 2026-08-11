@@ -1,5 +1,4 @@
 import { useRef, useCallback, useMemo, memo, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import { publicApi } from "../../../axios";
 import { useAuth } from "../../../services/auth.services";
@@ -7,12 +6,18 @@ import { pronounceWord } from "../../../utils/wordPronounciation";
 import FavoriteButton from "./FavoriteButton";
 import { RiCloseCircleFill } from "react-icons/ri";
 import { useLockBodyScroll } from "./ModalScrolling";
+import Button from "../../../components/UI/Button";
 import { IoMdArrowDropright } from "react-icons/io";
 import { HiSpeakerWave } from "react-icons/hi2";
 import { MdOutlineDoubleArrow } from "react-icons/md";
 import { SiGoogletranslate } from "react-icons/si";
 import { FaSpinner } from "react-icons/fa";
-import { IoInformationCircleOutline } from "react-icons/io5";
+import {
+  IoInformationCircleOutline,
+  IoPencilOutline,
+  IoDocumentTextOutline,
+  IoVolumeHighOutline,
+} from "react-icons/io5";
 import { highlightPrefixInSentence } from "../../../utils/sentencePrefixHighlighter.jsx";
 import WordReportSection from "./WordReportSection";
 
@@ -289,7 +294,10 @@ const SentenceRenderer = memo(
                   size={20}
                   className="mt-0 lg:mt-1 text-cyan-500 block lg:hidden"
                 />
-                <span className="text-xl hidden lg:block">🔊</span>
+                <HiSpeakerWave
+                  size={22}
+                  className="mt-0 lg:mt-1 text-cyan-500 hidden lg:block"
+                />
               </button>
               <span className="hidden lg:inline">
                 <IoMdArrowDropright className="text-pink-600 mt-1" size={20} />
@@ -297,9 +305,10 @@ const SentenceRenderer = memo(
             </span>
           )}
           {isBulletLine && (
-            <span className="flex-shrink-0" aria-hidden="true">
-              🟣
-            </span>
+            <span
+              className="inline-block h-1.5 w-1.5 rounded-full bg-purple-400 flex-shrink-0 mt-2"
+              aria-hidden="true"
+            />
           )}
           <span className={className}>{sentenceContent}</span>
           {showSpeakerButton && userLoggedIn && (
@@ -413,7 +422,7 @@ const WordListModal = ({
         console.error("Translation failed:", err);
         setTranslations((prev) => ({
           ...prev,
-          [sentence]: `❌ ${err.message}`,
+          [sentence]: err.message,
         }));
         setVisibleTranslations((prev) => ({ ...prev, [sentence]: true }));
       } finally {
@@ -552,18 +561,21 @@ const WordListModal = ({
             <span>Word Details</span>
             <button
               onClick={handlePronounceWord}
-              className="text-xl md:text-2xl lg:text-3xl hover:scale-110  hover:text-indigo-400 "
+              className="text-xl md:text-2xl lg:text-3xl text-indigo-500 dark:text-indigo-300 hover:scale-110 hover:text-indigo-400 "
               title="Pronounce"
             >
-              🔊
+              <IoVolumeHighOutline aria-hidden="true" />
             </button>
             {userLoggedIn && isAdmin && (
-              <Link
+              <Button
                 to={`/edit-word/${selectedWord.id}`}
-                className="px-2 md:px-3 lg:px-4 py-1 md:py-1.5 lg:py-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 rounded-full font-semibold text-white text-xs md:text-sm transition-all duration-200 hover:scale-105 shadow-md"
+                variant="primary"
+                surface="dark"
+                size="sm"
               >
-                ✏️ Edit
-              </Link>
+                <IoPencilOutline size={14} aria-hidden="true" />
+                Edit
+              </Button>
             )}
           </h3>
         </div>
@@ -745,8 +757,9 @@ const WordListModal = ({
             )}
           </div>
           <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm p-2 md:p-4 lg:p-3 rounded-2xl border border-gray-700/30 ">
-            <p className="text-md md:text-lg lg:text-lg text-blue-400 font-semibold mb-3">
-              📝 Sentences:
+            <p className="flex items-center gap-2 text-md md:text-lg lg:text-lg text-blue-400 font-semibold mb-3">
+              <IoDocumentTextOutline size={18} aria-hidden="true" />
+              Sentences:
             </p>
             {(selectedWord.sentences?.length || 0) > 0 ? (
               <ul className="space-y-2 ">
@@ -784,13 +797,15 @@ const WordListModal = ({
         )}
 
         <div className="sticky bottom-0 right-2 flex justify-end pr-2 pb-3 mt-6">
-          <button
+          <Button
+            variant="secondary"
+            surface="dark"
+            size="sm"
             onClick={handleCloseModal}
-            className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 p-1 rounded-full transition-all duration-200 hover:scale-110 shadow-xl hover:shadow-red-500/50"
             title="Close"
           >
             <RiCloseCircleFill size={28} className="text-white " />
-          </button>
+          </Button>
         </div>
       </div>
     </div>
