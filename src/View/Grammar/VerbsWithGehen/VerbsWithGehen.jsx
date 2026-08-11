@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import verbsData from "./VerbsWithGehen.json";
 import Container from "../../../utils/Container";
 import { useLockBodyScroll } from "../../Words/Modals/ModalScrolling";
+import { IoClose } from "react-icons/io5";
 
 const VerbSentencesModal = ({ verb, onClose }) => {
   useLockBodyScroll(!!verb);
@@ -34,7 +35,7 @@ const VerbSentencesModal = ({ verb, onClose }) => {
             className="rounded-full p-1 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-800 dark:hover:text-white"
             aria-label="Close"
           >
-            ✕
+            <IoClose aria-hidden="true" />
           </button>
         </div>
         <p className="mb-4 text-gray-700 dark:text-white">{verb.meaning}</p>

@@ -4,6 +4,7 @@ import emailjs from "@emailjs/browser";
 import Swal from "sweetalert2";
 import Container from "../../utils/Container";
 import { useTranslation } from "react-i18next";
+import { IoMailOutline, IoBulbOutline, IoPeopleOutline } from "react-icons/io5";
 
 const Contact = () => {
   const { t } = useTranslation("home");
@@ -65,8 +66,9 @@ const Contact = () => {
       <Container>
         <div className="text-center mb-16">
           <div className="mb-4">
-            <span className="inline-block px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
-              📧 {t("getInTouch")}
+            <span className="inline-flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
+              <IoMailOutline size={16} aria-hidden="true" />
+              {t("getInTouch")}
             </span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 dark:text-white pb-8">
@@ -85,8 +87,8 @@ const Contact = () => {
           <div className="w-full lg:w-1/2 md:w-full lg:max-w-lg space-y-6">
             <div className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-8 rounded-2xl border border-gray-700 hover:border-blue-500/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)]">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-2xl">
-                  ✉️
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-2xl text-white">
+                  <IoMailOutline aria-hidden="true" />
                 </div>
                 <h3 className="text-2xl font-bold text-white">{t("email")}</h3>
               </div>
@@ -95,8 +97,8 @@ const Contact = () => {
 
             <div className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-8 rounded-2xl border border-gray-700 hover:border-blue-500/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)]">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-2xl">
-                  💡
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-2xl text-white">
+                  <IoBulbOutline aria-hidden="true" />
                 </div>
                 <h3 className="text-2xl font-bold text-white">
                   {t("feedback")}
@@ -107,8 +109,8 @@ const Contact = () => {
 
             <div className="bg-gradient-to-br from-gray-800/80 to-gray-900 p-8 rounded-2xl border border-gray-700 hover:border-blue-500/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.2)]">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-2xl">
-                  🤝
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-2xl text-white">
+                  <IoPeopleOutline aria-hidden="true" />
                 </div>
                 <h3 className="text-2xl font-bold text-white">
                   {t("collaborate")}

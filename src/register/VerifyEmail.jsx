@@ -3,6 +3,7 @@ import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import DarkVeil from "../View/Home/DarkVeil";
 import api from "../axios";
+import { IoCheckmarkCircleOutline, IoCloseCircleOutline } from "react-icons/io5";
 
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
@@ -51,7 +52,9 @@ const VerifyEmail = () => {
             </>
           ) : verificationStatus === "success" ? (
             <>
-              <div className="text-6xl">✅</div>
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/40">
+                <IoCheckmarkCircleOutline size={44} aria-hidden="true" />
+              </div>
               <h2 className="text-2xl text-green-400 font-bold">
                 Email Verified!
               </h2>
@@ -71,7 +74,9 @@ const VerifyEmail = () => {
             </>
           ) : (
             <>
-              <div className="text-6xl">❌</div>
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-rose-600 text-white shadow-lg shadow-red-500/40">
+                <IoCloseCircleOutline size={44} aria-hidden="true" />
+              </div>
               <h2 className="text-2xl text-red-400 font-bold">
                 Verification Failed
               </h2>
