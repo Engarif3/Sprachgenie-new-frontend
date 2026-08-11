@@ -7,9 +7,24 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { defaultValues, validationSchema } from "./validation";
 import DarkVeil from "../View/Home/DarkVeil";
-import { IoBookOutline, IoClose, IoEye, IoEyeOff } from "react-icons/io5";
+import {
+  IoBookOutline,
+  IoClose,
+  IoEye,
+  IoEyeOff,
+  IoPersonOutline,
+  IoMailOutline,
+  IoKeyOutline,
+  IoLockClosedOutline,
+  IoCloseCircleOutline,
+  IoCheckmarkCircleOutline,
+  IoRefreshOutline,
+  IoWarningOutline,
+  IoCallOutline,
+} from "react-icons/io5";
 import AuthHomeLink from "../components/auth/AuthHomeLink";
 import { requestBrowserGeolocation } from "../utils/browserGeolocation";
+import Button from "../components/UI/Button";
 
 const NOTICE_COPY = {
   security: {
@@ -174,13 +189,15 @@ const Register = () => {
           </div>
 
           {error && (
-            <div className="bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 text-red-300 p-3 rounded-xl mb-4">
-              ⚠️ {error}
+            <div className="flex items-center gap-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 text-red-300 p-3 rounded-xl mb-4">
+              <IoWarningOutline size={16} className="shrink-0" aria-hidden="true" />
+              {error}
             </div>
           )}
           {emailVerificationMessage && (
-            <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/50 text-yellow-300 p-3 rounded-xl mb-4">
-              📧 {emailVerificationMessage}
+            <div className="flex items-center gap-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/50 text-yellow-300 p-3 rounded-xl mb-4">
+              <IoMailOutline size={16} className="shrink-0" aria-hidden="true" />
+              {emailVerificationMessage}
             </div>
           )}
           <form
@@ -191,9 +208,10 @@ const Register = () => {
             <div className="text-left">
               <label
                 htmlFor="register-name"
-                className="block text-sm font-semibold text-gray-300 mb-2 "
+                className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-gray-300"
               >
-                👤 Name
+                <IoPersonOutline aria-hidden="true" />
+                Name
               </label>
               <input
                 id="register-name"
@@ -205,7 +223,8 @@ const Register = () => {
               />
               {errors.basicUser?.name && (
                 <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                  ❌ {errors.basicUser.name.message}
+                  <IoCloseCircleOutline aria-hidden="true" />
+                  {errors.basicUser.name.message}
                 </p>
               )}
             </div>
@@ -214,9 +233,10 @@ const Register = () => {
             <div className="text-left">
               <label
                 htmlFor="register-email"
-                className="block text-sm font-semibold text-gray-300 mb-2"
+                className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-gray-300"
               >
-                📧 Email
+                <IoMailOutline aria-hidden="true" />
+                Email
               </label>
               <input
                 id="register-email"
@@ -228,7 +248,8 @@ const Register = () => {
               />
               {errors.basicUser?.email && (
                 <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                  ❌ {errors.basicUser.email.message}
+                  <IoCloseCircleOutline aria-hidden="true" />
+                  {errors.basicUser.email.message}
                 </p>
               )}
             </div>
@@ -237,9 +258,10 @@ const Register = () => {
             <div className="text-left">
               <label
                 htmlFor="register-password"
-                className="block text-sm font-semibold text-gray-300 mb-2"
+                className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-gray-300"
               >
-                🔑 Password
+                <IoKeyOutline aria-hidden="true" />
+                Password
               </label>
               <div className="relative">
                 <input
@@ -250,17 +272,21 @@ const Register = () => {
                   autoComplete="new-password"
                   className="w-full bg-gray-700/50 border border-gray-600 focus:border-purple-500 p-3 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500/50 transition-all duration-300"
                 />
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  surface="dark"
+                  size="sm"
                   onClick={togglePasswordVisibility}
-                  className="absolute inset-y-0 right-3 flex items-center justify-center w-8 h-8 text-gray-400 hover:text-white hover:bg-gray-600/50 rounded-lg transition-all duration-300 mt-2"
+                  className="absolute inset-y-0 right-3"
                 >
                   {showPassword ? <IoEyeOff size={24} /> : <IoEye size={24} />}
-                </button>
+                </Button>
               </div>
               {errors.password && (
                 <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                  ❌ {errors.password.message}
+                  <IoCloseCircleOutline aria-hidden="true" />
+                  {errors.password.message}
                 </p>
               )}
             </div>
@@ -269,9 +295,10 @@ const Register = () => {
             <div className="text-left">
               <label
                 htmlFor="register-confirm-password"
-                className="block text-sm font-semibold text-gray-300 mb-2"
+                className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-gray-300"
               >
-                🔐 Confirm Password
+                <IoLockClosedOutline aria-hidden="true" />
+                Confirm Password
               </label>
               <div className="relative">
                 <input
@@ -282,17 +309,21 @@ const Register = () => {
                   autoComplete="new-password"
                   className="w-full bg-gray-700/50 border border-gray-600 focus:border-purple-500 p-3 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500/50 transition-all duration-300"
                 />
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  surface="dark"
+                  size="sm"
                   onClick={togglePasswordVisibility}
-                  className="absolute inset-y-0 right-3 flex items-center justify-center w-8 h-8 text-gray-400 hover:text-white hover:bg-gray-600/50 rounded-lg transition-all duration-300 mt-2"
+                  className="absolute inset-y-0 right-3"
                 >
                   {showPassword ? <IoEyeOff size={24} /> : <IoEye size={24} />}
-                </button>
+                </Button>
               </div>
               {errors.confirmPassword && (
                 <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                  ❌ {errors.confirmPassword.message}
+                  <IoCloseCircleOutline aria-hidden="true" />
+                  {errors.confirmPassword.message}
                 </p>
               )}
             </div>
@@ -305,25 +336,29 @@ const Register = () => {
               />
               <span className="flex min-w-0 flex-1 items-start justify-between gap-3 text-sm leading-6 text-gray-300">
                 <span>I understand and agree to the security check.</span>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  surface="dark"
+                  size="sm"
                   onClick={(event) => {
                     event.preventDefault();
                     setNoticeType("security");
                     setNoticeLanguage("en");
                     setIsNoticeOpen(true);
                   }}
-                  className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-cyan-500/40 bg-cyan-500/10 text-cyan-200 transition-all duration-300 hover:border-cyan-400 hover:bg-cyan-500/20 hover:text-white"
+                  className="mt-0.5 shrink-0"
                   aria-label="Open security and privacy notice"
                   title="Open security and privacy notice"
                 >
                   <IoBookOutline size={18} />
-                </button>
+                </Button>
               </span>
             </label>
             {errors.privacyAcknowledged && (
               <p className="text-left text-red-400 text-xs mt-1 flex items-center gap-1">
-                ❌ {errors.privacyAcknowledged.message}
+                <IoCloseCircleOutline aria-hidden="true" />
+                {errors.privacyAcknowledged.message}
               </p>
             )}
 
@@ -335,35 +370,44 @@ const Register = () => {
               />
               <span className="flex min-w-0 flex-1 items-start justify-between gap-3 text-sm leading-6 text-gray-300">
                 <span> Allow location for better results (optional)</span>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  surface="dark"
+                  size="sm"
                   onClick={(event) => {
                     event.preventDefault();
                     setNoticeType("location");
                     setNoticeLanguage("en");
                     setIsNoticeOpen(true);
                   }}
-                  className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-cyan-500/40 bg-cyan-500/10 text-cyan-200 transition-all duration-300 hover:border-cyan-400 hover:bg-cyan-500/20 hover:text-white"
+                  className="mt-0.5 shrink-0"
                   aria-label="Open optional precise location notice"
                   title="Open optional precise location notice"
                 >
                   <IoBookOutline size={18} />
-                </button>
+                </Button>
               </span>
             </label>
 
             {/* Submit */}
-            <button
+            <Button
               type="submit"
+              variant="primary"
+              surface="dark"
+              size="lg"
+              fullWidth
               disabled={isSubmitting}
-              className={`w-full p-3 rounded-xl font-bold text-white shadow-lg transition-all duration-300 ${
-                isSubmitting
-                  ? "bg-gray-600 cursor-not-allowed"
-                  : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 hover:scale-105"
-              }`}
             >
-              {isSubmitting ? "🔄 Registering..." : " Register"}
-            </button>
+              {isSubmitting ? (
+                <span className="inline-flex items-center justify-center gap-1.5">
+                  <IoRefreshOutline className="animate-spin" aria-hidden="true" />
+                  Registering...
+                </span>
+              ) : (
+                " Register"
+              )}
+            </Button>
           </form>
 
           <div className="pt-4 border-t border-gray-700/50 mt-6">
@@ -371,18 +415,20 @@ const Register = () => {
               Already have an account?
               <Link
                 to="/login"
-                className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-500 hover:to-purple-500 font-bold ml-2 transition-all duration-300"
+                className="inline-flex items-center gap-1 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-500 hover:to-purple-500 font-bold ml-2 transition-all duration-300"
               >
-                🔐 Login
+                <IoLockClosedOutline size={14} className="text-blue-400" aria-hidden="true" />
+                Login
               </Link>
             </p>
             <p className="text-sm text-gray-400 mt-2">
               Need support?
               <Link
                 to="/#contact"
-                className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-400 hover:from-green-500 hover:to-blue-500 font-bold ml-2 transition-all duration-300"
+                className="inline-flex items-center gap-1 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-400 hover:from-green-500 hover:to-blue-500 font-bold ml-2 transition-all duration-300"
               >
-                📞 Contact Us
+                <IoCallOutline size={14} className="text-green-400" aria-hidden="true" />
+                Contact Us
               </Link>
             </p>
           </div>
@@ -392,8 +438,9 @@ const Register = () => {
         <div className="text-left p-6 mb-12 rounded-2xl w-full md:w-10/12 lg:w-10/12 bg-gradient-to-br from-gray-800/90 via-gray-900/90 to-black/90 border-2 border-gray-700/50 backdrop-blur-sm text-white text-sm shadow-2xl">
           <div className="text-center mb-4">
             <div className="inline-block px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-500/50 rounded-full">
-              <p className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 font-bold">
-                🔒 Password Requirements
+              <p className="flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 font-bold">
+                <IoLockClosedOutline size={16} className="text-cyan-400" aria-hidden="true" />
+                Password Requirements
               </p>
             </div>
           </div>
@@ -405,7 +452,19 @@ const Register = () => {
                   : "bg-gray-700/30"
               }`}
             >
-              <span className="text-xl">{rules.uppercase ? "✅" : "❌"}</span>
+              <span className="text-xl">
+                {rules.uppercase ? (
+                  <IoCheckmarkCircleOutline
+                    aria-hidden="true"
+                    className="text-green-400"
+                  />
+                ) : (
+                  <IoCloseCircleOutline
+                    aria-hidden="true"
+                    className="text-gray-500"
+                  />
+                )}
+              </span>
               <span
                 className={
                   rules.uppercase
@@ -423,7 +482,19 @@ const Register = () => {
                   : "bg-gray-700/30"
               }`}
             >
-              <span className="text-xl">{rules.lowercase ? "✅" : "❌"}</span>
+              <span className="text-xl">
+                {rules.lowercase ? (
+                  <IoCheckmarkCircleOutline
+                    aria-hidden="true"
+                    className="text-green-400"
+                  />
+                ) : (
+                  <IoCloseCircleOutline
+                    aria-hidden="true"
+                    className="text-gray-500"
+                  />
+                )}
+              </span>
               <span
                 className={
                   rules.lowercase
@@ -441,7 +512,19 @@ const Register = () => {
                   : "bg-gray-700/30"
               }`}
             >
-              <span className="text-xl">{rules.number ? "✅" : "❌"}</span>
+              <span className="text-xl">
+                {rules.number ? (
+                  <IoCheckmarkCircleOutline
+                    aria-hidden="true"
+                    className="text-green-400"
+                  />
+                ) : (
+                  <IoCloseCircleOutline
+                    aria-hidden="true"
+                    className="text-gray-500"
+                  />
+                )}
+              </span>
               <span
                 className={
                   rules.number
@@ -459,7 +542,19 @@ const Register = () => {
                   : "bg-gray-700/30"
               }`}
             >
-              <span className="text-xl">{rules.specialChar ? "✅" : "❌"}</span>
+              <span className="text-xl">
+                {rules.specialChar ? (
+                  <IoCheckmarkCircleOutline
+                    aria-hidden="true"
+                    className="text-green-400"
+                  />
+                ) : (
+                  <IoCloseCircleOutline
+                    aria-hidden="true"
+                    className="text-gray-500"
+                  />
+                )}
+              </span>
               <span
                 className={
                   rules.specialChar
@@ -477,7 +572,19 @@ const Register = () => {
                   : "bg-gray-700/30"
               }`}
             >
-              <span className="text-xl">{rules.length ? "✅" : "❌"}</span>
+              <span className="text-xl">
+                {rules.length ? (
+                  <IoCheckmarkCircleOutline
+                    aria-hidden="true"
+                    className="text-green-400"
+                  />
+                ) : (
+                  <IoCloseCircleOutline
+                    aria-hidden="true"
+                    className="text-gray-500"
+                  />
+                )}
+              </span>
               <span
                 className={
                   rules.length
@@ -495,14 +602,17 @@ const Register = () => {
       {isNoticeOpen && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
           <div className="relative w-full max-w-lg rounded-3xl border border-cyan-500/30 bg-gradient-to-br from-gray-900 via-slate-950 to-black p-6 text-left text-white shadow-2xl">
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              surface="dark"
+              size="sm"
               onClick={() => setIsNoticeOpen(false)}
-              className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-700 bg-white/5 text-gray-300 transition hover:border-cyan-400/50 hover:text-white"
+              className="absolute right-4 top-4"
               aria-label="Close notice"
             >
               <IoClose size={18} />
-            </button>
+            </Button>
 
             <div className="pr-12">
               <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
@@ -522,24 +632,28 @@ const Register = () => {
                 Language
               </p>
               <div className="flex items-center gap-2">
-                <button
+                <Button
                   type="button"
+                  variant="secondary"
+                  surface="dark"
+                  size="sm"
                   onClick={() =>
                     setNoticeLanguage((current) =>
                       current === "en" ? "de" : "en",
                     )
                   }
-                  className="rounded-full border border-cyan-500/40 bg-cyan-500/10 px-4 py-2 text-sm font-semibold text-cyan-200 transition hover:border-cyan-400 hover:bg-cyan-500/20 hover:text-white"
                 >
                   {activeNotice.toggleLabel}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="secondary"
+                  surface="dark"
+                  size="sm"
                   onClick={() => setIsNoticeOpen(false)}
-                  className="rounded-full border border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gray-500 hover:bg-white/5 hover:text-white"
                 >
                   Close
-                </button>
+                </Button>
               </div>
             </div>
           </div>

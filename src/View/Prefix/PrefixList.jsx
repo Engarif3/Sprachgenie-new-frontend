@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { FaPlus, FaMinus } from "react-icons/fa";
+import { FaPlus, FaMinus, FaFileAlt } from "react-icons/fa";
 import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
 import api from "../../axios";
+import Button from "../../components/UI/Button";
 
 const PrefixList = () => {
   const { id: prefixTypeId } = useParams();
@@ -101,14 +102,15 @@ const PrefixList = () => {
                   ({word.meaning.join(", ")})
                 </span>
               </div>
-              <button className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 hover:from-blue-500/40 hover:to-cyan-500/40 border border-blue-500/50 dark:text-white px-3 py-2 rounded-full hover:scale-110 transition-all duration-300">
+              <Button variant="secondary" size="sm">
                 {expandedWords[word.id] ? <FaMinus /> : <FaPlus />}
-              </button>
+              </Button>
             </div>
             {expandedWords[word.id] && (
               <div className="p-4 dark:bg-gradient-to-br from-gray-800/60 via-gray-900/60 to-black/60 border border-gray-700 border-dotted text-white">
-                <div className="inline-block px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/50 rounded-full font-semibold text-green-600 dark:text-green-400 mb-3">
-                  📝 Sentences
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/50 rounded-full font-semibold text-green-600 dark:text-green-400 mb-3">
+                  <FaFileAlt size={14} aria-hidden="true" />
+                  Sentences
                 </div>
                 <ul className="space-y-2 ml-4 border-l-4 border-pink-500 pl-4">
                   {word.sentences.map((sentence, idx) => (

@@ -1,9 +1,10 @@
 import { toast } from "sonner";
 import { removeUser, useAuth } from "../../../services/auth.services";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { startTransition } from "react";
 import { useTranslation } from "react-i18next";
 import Swal from "sweetalert2";
+import Button from "../Button";
 
 const AuthButton = ({
   forceLoggedOutView = false,
@@ -14,11 +15,6 @@ const AuthButton = ({
   const { userId } = useAuth();
   const navigate = useNavigate();
   const showLoggedInActions = userId && !forceLoggedOutView;
-
-  const buttonBaseClass =
-    "inline-flex items-center justify-center rounded-full border px-4 py-2 text-sm font-semibold tracking-wide transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-0";
-  const loginButtonClass = `${buttonBaseClass} border-sky-500/60 bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-lg shadow-sky-900/30 hover:from-sky-400 hover:to-blue-500 focus:ring-sky-400/60`;
-  const logoutButtonClass = `${buttonBaseClass} border-rose-500/45 bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-lg shadow-rose-950/30 hover:from-rose-500 hover:to-red-500 hover:shadow-xl hover:shadow-rose-950/40 focus:ring-rose-400/50`;
 
   const handleLogout = async () => {
     const result = await Swal.fire({
@@ -55,13 +51,13 @@ const AuthButton = ({
   return (
     <>
       {showLoggedInActions ? (
-        <button onClick={handleLogout} className={logoutButtonClass}>
+        <Button variant="danger" onClick={handleLogout}>
           {t("navbar.logout")}
-        </button>
+        </Button>
       ) : (
-        <Link className={loginButtonClass} to="/login">
+        <Button variant="primary" to="/login">
           {t("navbar.login")}
-        </Link>
+        </Button>
       )}
     </>
   );

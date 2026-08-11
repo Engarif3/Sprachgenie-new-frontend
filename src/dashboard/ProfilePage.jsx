@@ -12,6 +12,7 @@ import {
   isImageUploadAllowedForUser,
 } from "../utils/avatar";
 import PageHeader from "../components/UI/PageHeader";
+import Button from "../components/UI/Button";
 
 const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
 
@@ -745,13 +746,9 @@ const ProfilePage = () => {
                     </label>
 
                     {(profile?.profilePhoto || selectedFile) && (
-                      <button
-                        type="button"
-                        onClick={handleRemoveImage}
-                        className="rounded-2xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-600 transition hover:border-red-300 hover:bg-red-100 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300"
-                      >
+                      <Button type="button" variant="danger" onClick={handleRemoveImage}>
                         Delete Image
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -770,13 +767,15 @@ const ProfilePage = () => {
                 </div>
 
                 {canUploadPhoto && profile?.profilePhoto && activeAvatarId && (
-                  <button
+                  <Button
                     type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="shrink-0"
                     onClick={handleUsePhotoInstead}
-                    className="shrink-0 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:border-blue-300 hover:bg-blue-100 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300"
                   >
                     Use my uploaded photo instead
-                  </button>
+                  </Button>
                 )}
               </div>
 
@@ -813,13 +812,14 @@ const ProfilePage = () => {
                 Your login session remains protected by secure cookies. Profile
                 changes update only your own visible account details.
               </p>
-              <button
+              <Button
                 type="submit"
+                variant="primary"
+                size="lg"
                 disabled={isSaving || !isDirty}
-                className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:from-blue-700 hover:to-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSaving ? "Saving changes..." : "Save Profile"}
-              </button>
+              </Button>
             </div>
           </form>
         </section>

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../axios";
 import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
+import { IoTextOutline } from "react-icons/io5";
 
 const PrefixTypeList = () => {
   const [prefixTypes, setPrefixTypes] = useState([]);
@@ -34,8 +35,9 @@ const PrefixTypeList = () => {
         {/* Header Section */}
         <div className="text-center mb-12 mt-8">
           <div className="mb-4">
-            <span className="inline-block px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
-              🔤 Word Formation
+            <span className="inline-flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
+              <IoTextOutline size={16} aria-hidden="true" />
+              Word Formation
             </span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-4">
@@ -74,8 +76,8 @@ const PrefixTypeList = () => {
                   </div>
 
                   {/* Icon */}
-                  <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                    🔤
+                  <div className="mb-4 text-orange-400 group-hover:scale-110 transition-transform duration-300">
+                    <IoTextOutline aria-hidden="true" size={36} />
                   </div>
 
                   {/* Topic Title */}

@@ -126,9 +126,21 @@ import {
   syncCurrentUser,
 } from "../services/auth.services";
 import DarkVeil from "../View/Home/DarkVeil";
-import { IoEye, IoEyeOff } from "react-icons/io5";
+import {
+  IoEye,
+  IoEyeOff,
+  IoMailOutline,
+  IoKeyOutline,
+  IoCloseCircleOutline,
+  IoRefreshOutline,
+  IoLockClosedOutline,
+  IoWarningOutline,
+  IoCallOutline,
+  IoHourglassOutline,
+} from "react-icons/io5";
 import AuthHomeLink from "../components/auth/AuthHomeLink";
 import Swal from "sweetalert2";
+import Button from "../components/UI/Button";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -244,7 +256,11 @@ const Login = () => {
       <div className="w-full max-w-md text-white p-8 rounded-3xl shadow-2xl text-center z-10 bg-gradient-to-br from-gray-800/90 via-gray-900/90 to-black/90 border-2 border-gray-700/50 backdrop-blur-sm">
         <div className="mb-6">
           <div className="inline-block p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/50 rounded-full mb-4">
-            <span className="text-4xl">🔐</span>
+            <IoLockClosedOutline
+              size={36}
+              className="text-blue-300"
+              aria-hidden="true"
+            />
           </div>
           <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
             Welcome Back
@@ -255,8 +271,9 @@ const Login = () => {
         </div>
 
         {error && (
-          <div className="bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 text-red-300 text-sm p-3 rounded-xl mb-4">
-            ⚠️ {error}
+          <div className="flex items-center justify-center gap-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 text-red-300 text-sm p-3 rounded-xl mb-4">
+            <IoWarningOutline size={16} className="shrink-0" aria-hidden="true" />
+            {error}
           </div>
         )}
 
@@ -264,9 +281,10 @@ const Login = () => {
           <div className="text-left">
             <label
               htmlFor="login-email"
-              className="block text-sm font-semibold text-gray-300 mb-2"
+              className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-gray-300"
             >
-              📧 Email
+              <IoMailOutline aria-hidden="true" />
+              Email
             </label>
             <input
               id="login-email"
@@ -278,7 +296,8 @@ const Login = () => {
             />
             {errors.email && (
               <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                ❌ {errors.email.message}
+                <IoCloseCircleOutline aria-hidden="true" />
+                {errors.email.message}
               </p>
             )}
           </div>
@@ -286,9 +305,10 @@ const Login = () => {
           <div className="text-left">
             <label
               htmlFor="login-password"
-              className="block text-sm font-semibold text-gray-300 mb-2"
+              className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-gray-300"
             >
-              🔑 Password
+              <IoKeyOutline aria-hidden="true" />
+              Password
             </label>
             <div className="relative">
               <input
@@ -299,17 +319,21 @@ const Login = () => {
                 className="w-full bg-gray-700/50 border border-gray-600 focus:border-blue-500 p-3 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500/50 transition-all duration-300"
                 placeholder="••••••••••"
               />
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                surface="dark"
+                size="sm"
                 onClick={togglePasswordVisibility}
-                className="absolute inset-y-0 right-3 flex items-center justify-center w-8 h-8 text-gray-400 hover:text-white hover:bg-gray-600/50 rounded-lg transition-all duration-300 mt-2"
+                className="absolute inset-y-0 right-3"
               >
                 {showPassword ? <IoEyeOff size={24} /> : <IoEye size={24} />}
-              </button>
+              </Button>
             </div>
             {errors.password && (
               <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
-                ❌ {errors.password.message}
+                <IoCloseCircleOutline aria-hidden="true" />
+                {errors.password.message}
               </p>
             )}
           </div>
@@ -323,14 +347,13 @@ const Login = () => {
             </Link>
           </div>
 
-          <button
+          <Button
             type="submit"
+            variant="primary"
+            surface="dark"
+            size="lg"
+            fullWidth
             disabled={isSubmitting || loginCooldown > 0}
-            className={`w-full flex justify-center items-center gap-2 py-3 rounded-xl font-bold text-white shadow-lg transition-all duration-300 ${
-              isSubmitting || loginCooldown > 0
-                ? "bg-gray-600 cursor-not-allowed"
-                : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 hover:scale-105"
-            }`}
           >
             {isSubmitting && (
               <svg
@@ -354,12 +377,20 @@ const Login = () => {
                 ></path>
               </svg>
             )}
-            {isSubmitting
-              ? "🔄 Logging in..."
-              : loginCooldown > 0
-                ? `⏳ Try again in ${loginCooldown}s`
-                : " Login"}
-          </button>
+            {isSubmitting ? (
+              <span className="inline-flex items-center gap-1.5">
+                <IoRefreshOutline aria-hidden="true" />
+                Logging in...
+              </span>
+            ) : loginCooldown > 0 ? (
+              <span className="inline-flex items-center gap-1.5">
+                <IoHourglassOutline aria-hidden="true" />
+                {`Try again in ${loginCooldown}s`}
+              </span>
+            ) : (
+              " Login"
+            )}
+          </Button>
 
           <div className="pt-4 border-t border-gray-700/50">
             <p className="text-sm text-gray-400">
@@ -375,9 +406,10 @@ const Login = () => {
               Need support?
               <Link
                 to="/#contact"
-                className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-400 hover:from-green-500 hover:to-blue-500 font-bold ml-2 transition-all duration-300"
+                className="inline-flex items-center gap-1 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-400 hover:from-green-500 hover:to-blue-500 font-bold ml-2 transition-all duration-300"
               >
-                📞 Contact Us
+                <IoCallOutline size={14} className="text-green-400" aria-hidden="true" />
+                Contact Us
               </Link>
             </p>
           </div>
