@@ -2321,7 +2321,7 @@ const WordList = () => {
               >
                 {showRecentOnly ? "Recently added X" : "Recently added"}
               </Button>
-              {hasActiveFilterExcludingSearch && (
+              {hasResettableFilters && (
                 <Button
                   variant="danger"
                   size="sm"
