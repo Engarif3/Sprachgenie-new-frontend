@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { FaPen } from "react-icons/fa6";
+import { IoVolumeHighOutline } from "react-icons/io5";
 import { ChevronLeft, Pause, Play, RotateCcw } from "lucide-react";
 import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
@@ -825,10 +826,11 @@ const StoryDetail = () => {
                   <button
                     type="button"
                     onClick={() => pronounceWord(item.word)}
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg"
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg text-sky-600 dark:text-sky-400"
                     title={`Pronounce: ${item.word}`}
+                    aria-label={`Pronounce: ${item.word}`}
                   >
-                    🔊
+                    <IoVolumeHighOutline size={18} aria-hidden="true" />
                   </button>
                   <div className="font-bold text-sky-600 dark:text-sky-400">
                     {item.word}

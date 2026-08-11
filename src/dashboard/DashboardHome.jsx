@@ -3,27 +3,40 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../services/auth.services";
 import PageHeader from "../components/UI/PageHeader";
+import {
+  IoPersonOutline,
+  IoHeartOutline,
+  IoCreateOutline,
+  IoChatbubbleEllipsesOutline,
+  IoBookOutline,
+  IoNewspaperOutline,
+  IoShieldCheckmarkOutline,
+  IoPeopleOutline,
+  IoCheckmarkCircleOutline,
+  IoConstructOutline,
+  IoBulbOutline,
+} from "react-icons/io5";
 
 const DashboardHome = () => {
   const { safeUserInfo: userInfo, isAdmin, isSuperAdmin, userRole } = useAuth();
 
   const quickLinks = [
     {
-      icon: "👤",
+      icon: IoPersonOutline,
       title: "Profile Settings",
       description: "Update your information and profile image",
       link: "/dashboard/profile",
       gradient: "from-cyan-500 to-blue-500",
     },
     {
-      icon: "❤️",
+      icon: IoHeartOutline,
       title: "Favorite Words",
       description: "View and manage your saved vocabulary",
       link: "/dashboard/favorites-words",
       gradient: "from-red-500 to-pink-500",
     },
     {
-      icon: "📝",
+      icon: IoCreateOutline,
       title: "Create Word",
       description: "Add new vocabulary to the database",
       link: "/dashboard/create-word",
@@ -31,7 +44,7 @@ const DashboardHome = () => {
       admin: true,
     },
     {
-      icon: "💬",
+      icon: IoChatbubbleEllipsesOutline,
       title: "Conversations",
       description: "Manage dialogue content",
       link: "/dashboard/create-conversation",
@@ -39,7 +52,7 @@ const DashboardHome = () => {
       admin: true,
     },
     {
-      icon: "📖",
+      icon: IoBookOutline,
       title: "Generate Story",
       description: "Create AI-powered German stories",
       link: "/dashboard/generate-story",
@@ -47,7 +60,7 @@ const DashboardHome = () => {
       admin: true,
     },
     {
-      icon: "🎯",
+      icon: IoNewspaperOutline,
       title: "Manage Stories",
       description: "View, publish, and delete stories",
       link: "/dashboard/stories-management",
@@ -55,7 +68,7 @@ const DashboardHome = () => {
       admin: true,
     },
     {
-      icon: "🛡️",
+      icon: IoShieldCheckmarkOutline,
       title: "Registration Signals",
       description: "Review signup IP, device, and location metadata",
       link: "/dashboard/registration-metadata",
@@ -63,7 +76,7 @@ const DashboardHome = () => {
       admin: true,
     },
     {
-      icon: "👥",
+      icon: IoPeopleOutline,
       title: "Manage Users",
       description: "Control user access and permissions",
       link: isSuperAdmin
@@ -98,7 +111,7 @@ const DashboardHome = () => {
           <p className="text-2xl md:text-3xl font-bold text-blue-400 capitalize mb-2">
             {userRole.replace("_", " ") || "user"}
           </p>
-          <span className="text-2xl">👤</span>
+          <IoPersonOutline className="text-2xl" aria-hidden="true" />
         </div>
 
         <div className="dark:bg-gray-800/50 border border-gray-700 rounded-xl p-6 hover:border-purple-500/50 hover:bg-gray-800/70 transition-all duration-300">
@@ -108,7 +121,7 @@ const DashboardHome = () => {
           <p className="text-2xl md:text-3xl font-bold text-green-400 mb-2">
             Active
           </p>
-          <span className="text-2xl">✅</span>
+          <IoCheckmarkCircleOutline className="text-2xl" aria-hidden="true" />
         </div>
 
         <div className="dark:bg-gray-800/50 border border-gray-700 rounded-xl p-6 hover:border-orange-500/50 hover:bg-gray-800/70 transition-all duration-300">
@@ -118,7 +131,7 @@ const DashboardHome = () => {
           <p className="text-2xl md:text-3xl font-bold text-orange-400 mb-2">
             {quickLinks.filter((link) => !link.admin || isAdmin).length} Tools
           </p>
-          <span className="text-2xl"></span>
+          <IoConstructOutline className="text-2xl" aria-hidden="true" />
         </div>
       </div>
 
@@ -138,7 +151,7 @@ const DashboardHome = () => {
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="text-4xl md:text-5xl group-hover:scale-110 transition-transform duration-300">
-                    {link.icon}
+                    <link.icon aria-hidden="true" />
                   </div>
                   <span className="text-blue-400 text-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     →
@@ -157,7 +170,7 @@ const DashboardHome = () => {
 
       {/* Help Section */}
       <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-8 md:p-10 text-center max-w-4xl mx-auto hover:border-blue-500/50 transition-all duration-300">
-        <div className="text-4xl mb-4">💡</div>
+        <IoBulbOutline className="mx-auto mb-4 text-4xl" aria-hidden="true" />
         <h3 className="text-2xl md:text-3xl font-bold dark:text-white mb-3">
           Getting Started
         </h3>

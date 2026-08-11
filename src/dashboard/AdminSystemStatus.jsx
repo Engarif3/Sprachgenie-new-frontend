@@ -3,14 +3,30 @@ import { useSearchParams } from "react-router-dom";
 import api, { externalApi } from "../axios";
 import DateTime from "../components/UI/DateTime";
 import { formatTimeOnly } from "../utils/formatDateTime";
+import {
+  IoSpeedometerOutline,
+  IoGlobeOutline,
+  IoServerOutline,
+  IoFileTrayStackedOutline,
+  IoHardwareChipOutline,
+  IoClipboardOutline,
+  IoTimeOutline,
+  IoWarningOutline,
+  IoCheckmarkCircleOutline,
+  IoRefreshOutline,
+  IoAlertCircleOutline,
+  IoCloseCircleOutline,
+  IoDocumentTextOutline,
+  IoLockClosedOutline,
+} from "react-icons/io5";
 
 const DASHBOARD_TABS = [
-  { key: "overview", label: "Overview", icon: "🚦" },
-  { key: "frontend", label: "Frontend", icon: "🌐" },
-  { key: "backend", label: "Backend", icon: "🖥️" },
-  { key: "database", label: "Database & Cache", icon: "🗄️" },
-  { key: "ai", label: "AI Service", icon: "🤖" },
-  { key: "logs", label: "Logs & Alerts", icon: "📋" },
+  { key: "overview", label: "Overview", icon: IoSpeedometerOutline },
+  { key: "frontend", label: "Frontend", icon: IoGlobeOutline },
+  { key: "backend", label: "Backend", icon: IoServerOutline },
+  { key: "database", label: "Database & Cache", icon: IoFileTrayStackedOutline },
+  { key: "ai", label: "AI Service", icon: IoHardwareChipOutline },
+  { key: "logs", label: "Logs & Alerts", icon: IoClipboardOutline },
 ];
 
 const DECLARED_SYSTEMS = {
@@ -716,7 +732,10 @@ const AdminSystemStatus = () => {
                 : "border-slate-200 bg-white text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:border-white/10 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-200"
             }`}
           >
-            {tab.icon} {tab.label}
+            <span className="inline-flex items-center gap-1.5">
+              <tab.icon size={14} aria-hidden="true" />
+              {tab.label}
+            </span>
           </button>
         ))}
       </div>
@@ -726,8 +745,9 @@ const AdminSystemStatus = () => {
         <>
         {/* Response Time Metrics */}
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto dark:bg-gray-900 dark:border-gray-700 dark:shadow-none mt-6">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-            ⏱️ Response Time Metrics
+          <h2 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white mb-4">
+            <IoTimeOutline aria-hidden="true" />
+            Response Time Metrics
           </h2>
 
           {metricsLoading ? (
@@ -774,8 +794,9 @@ const AdminSystemStatus = () => {
 
         {/* At-a-glance status strip for every system — click a tab above for details */}
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto dark:bg-gray-900 dark:border-gray-700 dark:shadow-none">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-            🚦 All Systems
+          <h2 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white mb-4">
+            <IoSpeedometerOutline aria-hidden="true" />
+            All Systems
           </h2>
           {!infrastructureStatus ? (
             <p className="text-slate-500 dark:text-gray-400">
@@ -821,8 +842,13 @@ const AdminSystemStatus = () => {
         {["frontend", "backend", "database", "ai"].includes(activeTab) && (
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto dark:bg-gray-900 dark:border-gray-700 dark:shadow-none">
           <div className="mb-4">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-              {DASHBOARD_TABS.find((tab) => tab.key === activeTab)?.icon}{" "}
+            <h2 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white">
+              {(() => {
+                const ActiveIcon = DASHBOARD_TABS.find(
+                  (tab) => tab.key === activeTab,
+                )?.icon;
+                return ActiveIcon ? <ActiveIcon aria-hidden="true" /> : null;
+              })()}
               {DASHBOARD_TABS.find((tab) => tab.key === activeTab)?.label}
             </h2>
             <p className="mt-2 text-sm text-slate-500 dark:text-gray-400">
@@ -1991,8 +2017,9 @@ const AdminSystemStatus = () => {
         <>
         {/* Database Statistics */}
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto dark:bg-gray-900 dark:border-gray-700 dark:shadow-none mt-6">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-            🗄️ Database Layer Metrics
+          <h2 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white mb-4">
+            <IoFileTrayStackedOutline aria-hidden="true" />
+            Database Layer Metrics
           </h2>
           <p className="mb-4 text-sm text-slate-500 dark:text-gray-400">
             These metrics come from the backend querying the configured
@@ -2074,11 +2101,22 @@ const AdminSystemStatus = () => {
                           }}
                         />
                       </div>
-                      <p className="text-slate-500 dark:text-gray-400 text-xs">
+                      <p className="flex items-center gap-1.5 text-slate-500 dark:text-gray-400 text-xs">
                         {parseInt(databaseStats.performance?.queryTime || 0) >
-                        100
-                          ? "⚠️ Slower sample query"
-                          : "✅ Good sample query performance"}
+                        100 ? (
+                          <>
+                            <IoWarningOutline size={14} aria-hidden="true" />
+                            Slower sample query
+                          </>
+                        ) : (
+                          <>
+                            <IoCheckmarkCircleOutline
+                              size={14}
+                              aria-hidden="true"
+                            />
+                            Good sample query performance
+                          </>
+                        )}
                       </p>
                     </div>
                   </div>
@@ -2092,14 +2130,16 @@ const AdminSystemStatus = () => {
 
         {/* Rate Limiting Status */}
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto dark:bg-gray-900 dark:border-gray-700 dark:shadow-none mt-6">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-            🔄 Rate Limiting Status
+          <h2 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white mb-4">
+            <IoRefreshOutline aria-hidden="true" />
+            Rate Limiting Status
           </h2>
           {rateLimitStatus ? (
             <div className="space-y-4">
               <div className="p-4 bg-green-100 dark:bg-green-500/10 border border-green-300 dark:border-green-500/30 rounded-lg">
-                <p className="text-green-700 dark:text-green-300 font-medium">
-                  ✅ Rate Limiting Active
+                <p className="flex items-center gap-1.5 text-green-700 dark:text-green-300 font-medium">
+                  <IoCheckmarkCircleOutline size={16} aria-hidden="true" />
+                  Rate Limiting Active
                 </p>
               </div>
 
@@ -2143,8 +2183,9 @@ const AdminSystemStatus = () => {
         <>
         {/* Alert History */}
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto dark:bg-gray-900 dark:border-gray-700 dark:shadow-none mt-6">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-            🚨 Alert History
+          <h2 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white mb-4">
+            <IoAlertCircleOutline aria-hidden="true" />
+            Alert History
           </h2>
           {alertHistory.length > 0 ? (
             <div className="space-y-2 max-h-64 overflow-y-auto">
@@ -2180,8 +2221,9 @@ const AdminSystemStatus = () => {
 
         {/* Error Logs */}
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto dark:bg-gray-900 dark:border-gray-700 dark:shadow-none mt-6">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-            ❌ Recent Error Logs
+          <h2 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white mb-4">
+            <IoCloseCircleOutline aria-hidden="true" />
+            Recent Error Logs
           </h2>
           {errorLogs.length > 0 ? (
             <div className="space-y-2 max-h-64 overflow-y-auto">
@@ -2213,8 +2255,9 @@ const AdminSystemStatus = () => {
 
         {/* Activity Logs */}
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto dark:bg-gray-900 dark:border-gray-700 dark:shadow-none mt-6">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-            📝 Recent Activity
+          <h2 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white mb-4">
+            <IoDocumentTextOutline aria-hidden="true" />
+            Recent Activity
           </h2>
           {activityLogs.length > 0 ? (
             <div className="space-y-2 max-h-64 overflow-y-auto">
@@ -2244,16 +2287,18 @@ const AdminSystemStatus = () => {
 
         {/* SSL Certificate Status */}
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto dark:bg-gray-900 dark:border-gray-700 dark:shadow-none">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-            🔒 SSL Certificate Status
+          <h2 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white mb-4">
+            <IoLockClosedOutline aria-hidden="true" />
+            SSL Certificate Status
           </h2>
           <p className="text-slate-500 dark:text-gray-400 text-sm mb-4">
             UptimeRobot monitors your SSL certificate validity and will alert
             you before expiry.
           </p>
           <div className="p-4 bg-green-100 dark:bg-green-500/20 border border-green-300 dark:border-green-500/50 rounded-lg">
-            <p className="text-green-700 dark:text-green-300 font-medium">
-              ✅ SSL is monitored by UptimeRobot
+            <p className="flex items-center gap-1.5 text-green-700 dark:text-green-300 font-medium">
+              <IoCheckmarkCircleOutline size={16} aria-hidden="true" />
+              SSL is monitored by UptimeRobot
             </p>
           </div>
         </div>

@@ -5,6 +5,11 @@ import WordReports from "../AdminActions/SuperAdmin/WordReports";
 import HowToSayReports from "../AdminActions/SuperAdmin/HowToSayReports";
 import ReportsByUsers from "../AI/ReportsByUsers";
 import ConjugationReportsPage from "../AI/ConjugationReportsPage";
+import {
+  IoFlagOutline,
+  IoClipboardOutline,
+  IoLanguageOutline,
+} from "react-icons/io5";
 
 // WordReports/HowToSayReports have no auth check of their own — they relied
 // entirely on route-level protection (SUPER_ADMIN_ROLES in Routes.jsx) when
@@ -13,10 +18,10 @@ import ConjugationReportsPage from "../AI/ConjugationReportsPage";
 // tabs — mirrors the same `roles: ["super_admin"]` convention DashboardLayout
 // already uses to filter its nav items.
 const REPORT_TABS = [
-  { key: "words", label: "Word Reports", icon: "🚩", Component: WordReports, roles: ["super_admin"] },
-  { key: "howToSay", label: "How to Say Reports", icon: "🚩", Component: HowToSayReports, roles: ["super_admin"] },
-  { key: "paragraphs", label: "AI Paragraph Reports", icon: "📋", Component: ReportsByUsers },
-  { key: "conjugations", label: "Conjugation Reports", icon: "🔤", Component: ConjugationReportsPage },
+  { key: "words", label: "Word Reports", icon: IoFlagOutline, Component: WordReports, roles: ["super_admin"] },
+  { key: "howToSay", label: "How to Say Reports", icon: IoFlagOutline, Component: HowToSayReports, roles: ["super_admin"] },
+  { key: "paragraphs", label: "AI Paragraph Reports", icon: IoClipboardOutline, Component: ReportsByUsers },
+  { key: "conjugations", label: "Conjugation Reports", icon: IoLanguageOutline, Component: ConjugationReportsPage },
 ];
 
 const ReportsDashboard = () => {
@@ -73,7 +78,10 @@ const ReportsDashboard = () => {
                   : "border border-slate-200 bg-white text-slate-600 hover:border-orange-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-orange-500/50"
               }`}
             >
-              {tab.icon} {tab.label}
+              <span className="inline-flex items-center gap-1.5">
+                <tab.icon size={14} aria-hidden="true" />
+                {tab.label}
+              </span>
             </button>
           ))}
         </div>

@@ -60,6 +60,7 @@
 
 import { useState } from "react";
 import { IoMdArrowDropright } from "react-icons/io";
+import { IoVolumeHighOutline } from "react-icons/io5";
 import { publicApi } from "../axios";
 import { pronounceWord } from "../utils/wordPronounciation";
 
@@ -93,7 +94,7 @@ const Translator = ({ sentences }) => {
       console.error("Translation failed:", err);
       setTranslations((prev) => ({
         ...prev,
-        [sentence]: `❌ ${err.message}`,
+        [sentence]: err.message,
       }));
     } finally {
       setLoading((prev) => ({ ...prev, [sentence]: false }));
@@ -127,10 +128,10 @@ const Translator = ({ sentences }) => {
             {showSpeakerButton && (
               <button
                 onClick={() => pronounceWord(cleanSentence)}
-                className="text-blue-600 hover:text-blue-800"
+                className="flex items-center text-blue-600 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200"
                 title="Pronounce"
               >
-                🔊
+                <IoVolumeHighOutline size={18} aria-hidden="true" />
               </button>
             )}
             <span className={className}>{cleanSentence}</span>
