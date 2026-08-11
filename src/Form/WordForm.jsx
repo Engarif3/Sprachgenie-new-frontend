@@ -1152,8 +1152,9 @@ const WordForm = () => {
               {/* Verb Attributes - shown when verb is among the selected POS */}
               {selectedPosNames.includes("verb") && (
                 <div className="space-y-4 p-4 bg-blue-50 dark:bg-slate-800 rounded-lg border-2 border-blue-200 dark:border-blue-600">
-                  <h3 className="text-sm font-semibold text-blue-700 dark:text-blue-300">
-                    🔹 Verb Attributes
+                  <h3 className="flex items-center gap-1.5 text-sm font-semibold text-blue-700 dark:text-blue-300">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+                    Verb Attributes
                   </h3>
 
                   {/* Conjugation Type */}
@@ -1300,8 +1301,9 @@ const WordForm = () => {
               {/* Preposition Attributes - shown when preposition is among the selected POS */}
               {selectedPosNames.includes("preposition") && (
                 <div className="space-y-4 p-4 bg-purple-50 dark:bg-slate-800 rounded-lg border-2 border-purple-200 dark:border-purple-600">
-                  <h3 className="text-sm font-semibold text-purple-700 dark:text-purple-300">
-                    🔹 Preposition Attributes
+                  <h3 className="flex items-center gap-1.5 text-sm font-semibold text-purple-700 dark:text-purple-300">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+                    Preposition Attributes
                   </h3>
 
                   {/* Preposition Case */}
@@ -1348,8 +1350,9 @@ const WordForm = () => {
               {/* Adjective Attributes - shown when adjective is among the selected POS */}
               {selectedPosNames.includes("adjective") && (
                 <div className="space-y-4 p-4 bg-yellow-50 dark:bg-slate-800 rounded-lg border-2 border-yellow-200 dark:border-yellow-600">
-                  <h3 className="text-sm font-semibold text-yellow-700 dark:text-yellow-300">
-                    🔹 Adjective Attributes
+                  <h3 className="flex items-center gap-1.5 text-sm font-semibold text-yellow-700 dark:text-yellow-300">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+                    Adjective Attributes
                   </h3>
 
                   {/* Prepositional Checkbox */}

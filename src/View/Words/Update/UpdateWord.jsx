@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useParams, Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { FaChevronCircleUp, FaChevronCircleDown } from "react-icons/fa";
+import { IoCheckmark } from "react-icons/io5";
 import Container from "../../../utils/Container";
 import api from "../../../axios";
 import { useAuth } from "../../../services/auth.services";
@@ -2788,11 +2789,16 @@ const UpdateWord = () => {
                               }
                               className={`btn btn-sm ${relPOSOverrides.synonym[item] ? "bg-green-500 text-white" : "bg-orange-400 text-white"}`}
                             >
-                              {relPOSOverrides.synonym[item]
-                                ? `✓ ${relPOSOverrides.synonym[item].partOfSpeechName}`
-                                : currentRelationPOSNames.synonym[item]
-                                  ? currentRelationPOSNames.synonym[item]
-                                  : "Select POS"}
+                              {relPOSOverrides.synonym[item] ? (
+                                <span className="inline-flex items-center gap-1">
+                                  <IoCheckmark aria-hidden="true" />
+                                  {relPOSOverrides.synonym[item].partOfSpeechName}
+                                </span>
+                              ) : currentRelationPOSNames.synonym[item] ? (
+                                currentRelationPOSNames.synonym[item]
+                              ) : (
+                                "Select POS"
+                              )}
                             </button>
                           )}
                           <button
@@ -2870,11 +2876,16 @@ const UpdateWord = () => {
                               }
                               className={`btn btn-sm ${relPOSOverrides.antonym[item] ? "bg-green-500 text-white" : "bg-orange-400 text-white"}`}
                             >
-                              {relPOSOverrides.antonym[item]
-                                ? `✓ ${relPOSOverrides.antonym[item].partOfSpeechName}`
-                                : currentRelationPOSNames.antonym[item]
-                                  ? currentRelationPOSNames.antonym[item]
-                                  : "Select POS"}
+                              {relPOSOverrides.antonym[item] ? (
+                                <span className="inline-flex items-center gap-1">
+                                  <IoCheckmark aria-hidden="true" />
+                                  {relPOSOverrides.antonym[item].partOfSpeechName}
+                                </span>
+                              ) : currentRelationPOSNames.antonym[item] ? (
+                                currentRelationPOSNames.antonym[item]
+                              ) : (
+                                "Select POS"
+                              )}
                             </button>
                           )}
                           <button
@@ -2956,11 +2967,16 @@ const UpdateWord = () => {
                               }
                               className={`btn btn-sm  ${relPOSOverrides.similarWord[item] ? "btn-success" : "btn-info"}`}
                             >
-                              {relPOSOverrides.similarWord[item]
-                                ? `✓ ${relPOSOverrides.similarWord[item].partOfSpeechName}`
-                                : currentRelationPOSNames.similarWord[item]
-                                  ? currentRelationPOSNames.similarWord[item]
-                                  : "Select POS"}
+                              {relPOSOverrides.similarWord[item] ? (
+                                <span className="inline-flex items-center gap-1">
+                                  <IoCheckmark aria-hidden="true" />
+                                  {relPOSOverrides.similarWord[item].partOfSpeechName}
+                                </span>
+                              ) : currentRelationPOSNames.similarWord[item] ? (
+                                currentRelationPOSNames.similarWord[item]
+                              ) : (
+                                "Select POS"
+                              )}
                             </button>
                           )}
                           <button
@@ -3116,8 +3132,9 @@ const UpdateWord = () => {
                 {/* Verb Attributes - shown when verb is among the selected POS */}
                 {selectedPosNames.includes("verb") && (
                   <div className="space-y-4 p-4 bg-blue-50 dark:bg-slate-800 rounded-lg border-2 border-blue-200 dark:border-blue-600">
-                    <h3 className="text-sm font-semibold text-blue-700 dark:text-blue-300">
-                      🔹 Verb Attributes
+                    <h3 className="flex items-center gap-1.5 text-sm font-semibold text-blue-700 dark:text-blue-300">
+                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+                      Verb Attributes
                     </h3>
 
                     {/* Conjugation Type */}
@@ -3266,8 +3283,9 @@ const UpdateWord = () => {
                 {/* Preposition Attributes - shown when preposition is among the selected POS */}
                 {selectedPosNames.includes("preposition") && (
                   <div className="space-y-4 p-4 bg-purple-50 dark:bg-slate-800 rounded-lg border-2 border-purple-200 dark:border-purple-600">
-                    <h3 className="text-sm font-semibold text-purple-700 dark:text-purple-300">
-                      🔹 Preposition Attributes
+                    <h3 className="flex items-center gap-1.5 text-sm font-semibold text-purple-700 dark:text-purple-300">
+                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+                      Preposition Attributes
                     </h3>
 
                     {/* Preposition Case */}
@@ -3314,8 +3332,9 @@ const UpdateWord = () => {
                 {/* Adjective Attributes - shown when adjective is among the selected POS */}
                 {selectedPosNames.includes("adjective") && (
                   <div className="space-y-4 p-4 bg-yellow-50 dark:bg-slate-800 rounded-lg border-2 border-yellow-200 dark:border-yellow-600">
-                    <h3 className="text-sm font-semibold text-yellow-700 dark:text-yellow-300">
-                      🔹 Adjective Attributes
+                    <h3 className="flex items-center gap-1.5 text-sm font-semibold text-yellow-700 dark:text-yellow-300">
+                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+                      Adjective Attributes
                     </h3>
 
                     {/* Prepositional Checkbox */}
