@@ -406,12 +406,16 @@ const PartOfSpeechDropdown = ({
           role="menu"
         >
           <div className="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-700 rounded-xl shadow-2xl overflow-visible backdrop-blur-xl">
-            {/* All Types Option */}
+            {/* All Types Option — rounded-t-xl matches the panel's own
+            rounded-xl corners. The panel uses overflow-visible (not hidden)
+            so the verb/preposition/adjective submenus can flyout past its
+            edges, which means the panel's rounding doesn't auto-clip its
+            children — the first/last row has to round itself to match. */}
             <button
               onClick={() => handleSelect("")}
               className={`
-                w-full px-4 py-2.5 text-left text-base transition-colors duration-150
-                hover:bg-sky-50 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-700/30
+                w-full rounded-t-xl px-4 py-2.5 text-left text-base transition-colors duration-150
+                hover:bg-slate-100 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-700/30
                 ${!selectedPartOfSpeech ? "bg-cyan-500/20 text-cyan-700 dark:text-cyan-400" : "text-gray-700 dark:text-gray-300"}
               `}
               role="menuitem"
@@ -444,7 +448,7 @@ const PartOfSpeechDropdown = ({
                           ? adjectiveItemRef
                           : null
                   }
-                  className="relative"
+                  className="group relative"
                   onMouseEnter={() => {
                     // Only handle hover on desktop
                     if (isMobile) return;
@@ -509,13 +513,13 @@ const PartOfSpeechDropdown = ({
                     onClick={() => handleSelect(option.value)}
                     // className={`
                     //   w-full px-4 py-2.5 text-left text-base transition-colors duration-150
-                    //   hover:bg-sky-50 dark:hover:bg-cyan-500/20 border-b border-gray-700/30
+                    //   hover:bg-slate-100 dark:hover:bg-cyan-500/20 border-b border-gray-700/30
                     //   ${isSelected ? "bg-cyan-500/20 text-cyan-400" : "text-gray-300"}
                     //   ${isVerb || isPreposition || isAdjective ? "flex items-center justify-between" : ""}
                     // `}
                     className={`
-                      w-full px-4 py-2.5 text-left text-base transition-colors duration-150
-                      hover:bg-sky-50 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-700/30
+                      w-full px-4 py-2.5 text-left text-base transition-colors duration-150 group-last:rounded-b-xl
+                      hover:bg-slate-100 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-700/30
                       ${
                         isSelected
                           ? "bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 font-semibold"
@@ -578,7 +582,7 @@ const PartOfSpeechDropdown = ({
                             onClick={() => handleSelect("verb", true)}
                             className={`
                               w-full px-4 py-3 text-left transition-all duration-150
-                              hover:bg-sky-50 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-600/50
+                              hover:bg-slate-100 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-600/50
                               ${
                                 selectedPartOfSpeech === "verb" &&
                                 !selectedVerbFilter
@@ -603,7 +607,7 @@ const PartOfSpeechDropdown = ({
                               }
                               className={`
                                 w-full px-4 py-3 text-left transition-all duration-150
-                                hover:bg-sky-50 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-600/50 last:border-b-0
+                                hover:bg-slate-100 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-600/50 last:border-b-0
                                 ${
                                   selectedVerbFilter === filter.value
                                     ? "bg-cyan-500/20 text-cyan-700 dark:text-cyan-400"
@@ -668,7 +672,7 @@ const PartOfSpeechDropdown = ({
                               onClick={() => handleSelect("preposition", true)}
                               className={`
                                 w-full px-4 py-3 text-left transition-all duration-150
-                                hover:bg-sky-50 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-600/50
+                                hover:bg-slate-100 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-600/50
                                 ${
                                   selectedPartOfSpeech === "preposition" &&
                                   !selectedPrepositionFilter
@@ -693,7 +697,7 @@ const PartOfSpeechDropdown = ({
                                 }
                                 className={`
                                 w-full px-4 py-3 text-left transition-all duration-150
-                                hover:bg-sky-50 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-600/50 last:border-b-0
+                                hover:bg-slate-100 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-600/50 last:border-b-0
                                 ${
                                   selectedPrepositionFilter === filter.value
                                     ? "bg-cyan-500/20 text-cyan-700 dark:text-cyan-400"
@@ -756,7 +760,7 @@ const PartOfSpeechDropdown = ({
                               onClick={() => handleSelect("adjective", true)}
                               className={`
                                 w-full px-4 py-3 text-left transition-all duration-150
-                                hover:bg-sky-50 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-600/50
+                                hover:bg-slate-100 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-600/50
                                 ${
                                   selectedPartOfSpeech === "adjective" &&
                                   !selectedAdjectiveFilter
@@ -781,7 +785,7 @@ const PartOfSpeechDropdown = ({
                                 }
                                 className={`
                                 w-full px-4 py-3 text-left transition-all duration-150
-                                hover:bg-sky-50 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-600/50 last:border-b-0
+                                hover:bg-slate-100 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-600/50 last:border-b-0
                                 ${
                                   selectedAdjectiveFilter === filter.value
                                     ? "bg-cyan-500/20 text-cyan-700 dark:text-cyan-400"
@@ -819,8 +823,8 @@ const PartOfSpeechDropdown = ({
               <button
                 onClick={() => handleSelect(notSpecifiedValue)}
                 className={`
-                  w-full px-4 py-2.5 text-left text-base transition-colors duration-150
-                  hover:bg-sky-50 dark:hover:bg-cyan-500/20
+                  w-full rounded-b-xl px-4 py-2.5 text-left text-base transition-colors duration-150
+                  hover:bg-slate-100 dark:hover:bg-cyan-500/20
                   ${selectedPartOfSpeech === notSpecifiedValue ? "bg-cyan-500/20 text-cyan-700 dark:text-cyan-400" : "text-gray-700 dark:text-gray-300"}
                 `}
                 role="menuitem"

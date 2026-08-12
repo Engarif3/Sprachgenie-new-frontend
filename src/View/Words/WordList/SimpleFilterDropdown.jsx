@@ -75,7 +75,7 @@ const SimpleFilterDropdown = ({
               <button
                 type="button"
                 onClick={() => handleSelect("")}
-                className={`w-full px-4 py-2.5 text-left text-base transition-colors duration-150 hover:bg-sky-50 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-700/30 ${
+                className={`w-full px-4 py-2.5 text-left text-base transition-colors duration-150 hover:bg-slate-100 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-700/30 ${
                   !selectedValue
                     ? "bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 font-semibold"
                     : "text-gray-700 dark:text-gray-300"
@@ -97,7 +97,7 @@ const SimpleFilterDropdown = ({
                     key={entry.value}
                     type="button"
                     onClick={() => handleSelect(entry.value)}
-                    className={`w-full px-4 py-2.5 text-left text-base transition-colors duration-150 hover:bg-sky-50 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-700/30 last:border-b-0 ${
+                    className={`w-full px-4 py-2.5 text-left text-base transition-colors duration-150 hover:bg-slate-100 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-700/30 last:border-b-0 ${
                       selectedValue === entry.value
                         ? "bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 font-semibold"
                         : "text-gray-700 dark:text-gray-300"
