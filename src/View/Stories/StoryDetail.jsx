@@ -491,13 +491,6 @@ const StoryDetail = () => {
     // lookup above — don't let a now-stale utterance start speaking.
     if (narrationTokenRef.current !== token) return;
 
-    // Checked against the same generic preference pick used everywhere else
-    // (not `finalVoice`) — narration deliberately steers toward a local
-    // voice for onboundary/highlighting support regardless of quality, so
-    // `finalVoice` alone isn't a reliable signal for whether this browser
-    // actually has a good German voice available.
-    maybeShowChromeVoiceHint(getBestGermanVoiceSync(), "story");
-
     isLocalVoiceRef.current = !!(finalVoice && finalVoice.localService);
     voiceKeyRef.current = finalVoice
       ? `${finalVoice.name}|${finalVoice.lang}`
@@ -559,6 +552,15 @@ const StoryDetail = () => {
     narrationPausedMsRef.current = 0;
     pauseStartedAtRef.current = null;
     window.speechSynthesis.speak(utterance);
+
+    // Checked against the same generic preference pick used everywhere else
+    // (not `finalVoice`) — narration deliberately steers toward a local
+    // voice for onboundary/highlighting support regardless of quality, so
+    // `finalVoice` alone isn't a reliable signal for whether this browser
+    // actually has a good German voice available. Called after speak() so
+    // it can never delay narration start.
+    maybeShowChromeVoiceHint(getBestGermanVoiceSync(), "story");
+
     startKeepAlive(token);
     armTicker(token);
   };
