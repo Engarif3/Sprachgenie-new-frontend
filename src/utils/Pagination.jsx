@@ -72,7 +72,7 @@ const Pagination = ({
               disabled={currentPage === 1}
               title="First page"
               aria-label="First page"
-              className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-sky-500 text-sky-600 dark:border-sky-400 dark:text-sky-400 transition-all duration-200 hover:scale-105 hover:bg-sky-500/10 disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-300 dark:disabled:border-slate-700 dark:disabled:text-slate-600 disabled:hover:scale-100 disabled:hover:bg-transparent"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-sky-500 text-sky-600 dark:border-sky-400 dark:text-sky-400 transition-all duration-200 hover:scale-105 hover:bg-sky-500/10 disabled:cursor-not-allowed disabled:opacity-30 disabled:border-slate-400 disabled:text-slate-400 dark:disabled:border-slate-600 dark:disabled:text-slate-600 disabled:hover:scale-100 disabled:hover:bg-transparent"
             >
               <HiChevronDoubleLeft size={17} />
             </button>
@@ -84,7 +84,7 @@ const Pagination = ({
               disabled={currentPage === 1}
               title="Previous page"
               aria-label="Previous page"
-              className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-sky-500 text-sky-600 dark:border-sky-400 dark:text-sky-400 transition-all duration-200 hover:scale-105 hover:bg-sky-500/10 disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-300 dark:disabled:border-slate-700 dark:disabled:text-slate-600 disabled:hover:scale-100 disabled:hover:bg-transparent"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-sky-500 text-sky-600 dark:border-sky-400 dark:text-sky-400 transition-all duration-200 hover:scale-105 hover:bg-sky-500/10 disabled:cursor-not-allowed disabled:opacity-30 disabled:border-slate-400 disabled:text-slate-400 dark:disabled:border-slate-600 dark:disabled:text-slate-600 disabled:hover:scale-100 disabled:hover:bg-transparent"
             >
               <HiChevronLeft size={19} />
             </button>
@@ -105,7 +105,7 @@ const Pagination = ({
               disabled={currentPage === totalPages}
               title="Next page"
               aria-label="Next page"
-              className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-sky-500 text-sky-600 dark:border-sky-400 dark:text-sky-400 transition-all duration-200 hover:scale-105 hover:bg-sky-500/10 disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-300 dark:disabled:border-slate-700 dark:disabled:text-slate-600 disabled:hover:scale-100 disabled:hover:bg-transparent"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-sky-500 text-sky-600 dark:border-sky-400 dark:text-sky-400 transition-all duration-200 hover:scale-105 hover:bg-sky-500/10 disabled:cursor-not-allowed disabled:opacity-30 disabled:border-slate-400 disabled:text-slate-400 dark:disabled:border-slate-600 dark:disabled:text-slate-600 disabled:hover:scale-100 disabled:hover:bg-transparent"
             >
               <HiChevronRight size={19} />
             </button>
@@ -115,7 +115,7 @@ const Pagination = ({
               disabled={currentPage === totalPages}
               title="Last page"
               aria-label="Last page"
-              className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-sky-500 text-sky-600 dark:border-sky-400 dark:text-sky-400 transition-all duration-200 hover:scale-105 hover:bg-sky-500/10 disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-300 dark:disabled:border-slate-700 dark:disabled:text-slate-600 disabled:hover:scale-100 disabled:hover:bg-transparent"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-sky-500 text-sky-600 dark:border-sky-400 dark:text-sky-400 transition-all duration-200 hover:scale-105 hover:bg-sky-500/10 disabled:cursor-not-allowed disabled:opacity-30 disabled:border-slate-400 disabled:text-slate-400 dark:disabled:border-slate-600 dark:disabled:text-slate-600 disabled:hover:scale-100 disabled:hover:bg-transparent"
             >
               <HiChevronDoubleRight size={17} />
             </button>
