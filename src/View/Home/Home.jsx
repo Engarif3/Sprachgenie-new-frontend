@@ -248,8 +248,6 @@ const Home = () => {
       text: t("vocabCardDesc", { count: wordCountText }),
       link: "/words",
       eyebrow: "Core Library",
-      index: "01",
-      tone: "blue",
       icon: (
         <svg
           viewBox="0 0 24 24"
@@ -282,8 +280,6 @@ const Home = () => {
       text: t("challengeCardDesc"),
       link: "/challenge",
       eyebrow: "Daily Challenge",
-      index: "02",
-      tone: "cyan",
       icon: (
         <svg
           viewBox="0 0 24 24"
@@ -308,8 +304,6 @@ const Home = () => {
       text: t("radioCardDesc"),
       link: "/radio",
       eyebrow: "Live Listening",
-      index: "03",
-      tone: "rose",
       icon: (
         <svg
           viewBox="0 0 24 24"
@@ -339,8 +333,6 @@ const Home = () => {
       text: t("storiesCardDesc"),
       link: "/stories",
       eyebrow: "Narrative Practice",
-      index: "04",
-      tone: "teal",
       icon: (
         <svg
           viewBox="0 0 24 24"
@@ -368,8 +360,6 @@ const Home = () => {
       text: t("conversationCardDesc"),
       link: "/conversation-titles",
       eyebrow: "Speaking Flows",
-      index: "05",
-      tone: "indigo",
       icon: (
         <svg
           viewBox="0 0 24 24"
@@ -397,8 +387,6 @@ const Home = () => {
       text: t("grammarCardDesc"),
       link: "/grammar",
       eyebrow: "Rule System",
-      index: "06",
-      tone: "violet",
       icon: (
         <svg
           viewBox="0 0 24 24"
@@ -421,8 +409,6 @@ const Home = () => {
       text: t("prefixCardDesc"),
       link: "/prefix-types",
       eyebrow: "Word Building",
-      index: "07",
-      tone: "amber",
       icon: (
         <svg
           viewBox="0 0 24 24"
@@ -456,8 +442,6 @@ const Home = () => {
       text: t("quizCardDesc"),
       link: "/quiz",
       eyebrow: "Retention Check",
-      index: "08",
-      tone: "emerald",
       icon: (
         <svg
           viewBox="0 0 24 24"
@@ -915,8 +899,6 @@ const Home = () => {
                     link={card.link}
                     icon={card.icon}
                     eyebrow={card.eyebrow}
-                    index={card.index}
-                    tone={card.tone}
                   />
                 );
               }
@@ -930,8 +912,6 @@ const Home = () => {
                       link={card.link}
                       icon={card.icon}
                       eyebrow={card.eyebrow}
-                      index={card.index}
-                      tone={card.tone}
                     />
                   </div>
                 </div>
