@@ -532,7 +532,7 @@ const Quiz = () => {
         {/* Main word display */}
         <div className="mb-4 min-h-[220px] md:min-h-[260px] rounded-3xl border border-purple-200 bg-white p-4 shadow-sm transition-all duration-300 hover:border-purple-300 dark:border-purple-500/30 dark:bg-slate-900 dark:shadow-2xl dark:hover:border-purple-500/50 md:p-5">
           <div className="text-center">
-            <div className="mb-2 flex items-center justify-start gap-2 md:mb-3 md:gap-4">
+            <div className="mb-2 flex min-h-[70px] items-center justify-start gap-2 md:mb-3 md:min-h-[100px] md:gap-4">
               <Button
                 variant="ghost"
                 onClick={() =>
