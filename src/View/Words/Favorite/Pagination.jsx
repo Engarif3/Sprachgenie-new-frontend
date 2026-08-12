@@ -56,14 +56,14 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
     <Container>
       {totalPages > 1 && (
         <div className="flex flex-wrap justify-center items-center gap-1 sm:gap-2 md:gap-3 my-4 md:my-6">
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
+            type="button"
             onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
+            className="rounded-full border border-sky-500 px-3 py-1.5 text-sm font-semibold text-sky-600 transition-all duration-200 hover:bg-sky-500/10 disabled:cursor-not-allowed disabled:border-slate-400 disabled:text-slate-400 disabled:opacity-30 disabled:hover:bg-transparent dark:border-sky-400 dark:text-sky-400 dark:disabled:border-slate-600 dark:disabled:text-slate-600"
           >
             Prev
-          </Button>
+          </button>
 
           {/* Render Page Buttons and Ellipses */}
           {visiblePages.map((page, index) => {
@@ -90,16 +90,16 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
             );
           })}
 
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
+            type="button"
             onClick={() =>
               setCurrentPage((prev) => Math.min(totalPages, prev + 1))
             }
             disabled={currentPage === totalPages}
+            className="rounded-full border border-sky-500 px-3 py-1.5 text-sm font-semibold text-sky-600 transition-all duration-200 hover:bg-sky-500/10 disabled:cursor-not-allowed disabled:border-slate-400 disabled:text-slate-400 disabled:opacity-30 disabled:hover:bg-transparent dark:border-sky-400 dark:text-sky-400 dark:disabled:border-slate-600 dark:disabled:text-slate-600"
           >
             Next
-          </Button>
+          </button>
         </div>
       )}
     </Container>
