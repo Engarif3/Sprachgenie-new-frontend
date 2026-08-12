@@ -414,7 +414,7 @@ const ConversationTitleList = () => {
 
   return (
     <Container>
-      <div className="mx-auto min-h-screen max-w-6xl p-4 pb-12">
+      <div className="mx-auto min-h-screen max-w-6xl px-4 pt-1 pb-12">
         {/* Header */}
         <div className="mb-3 mt-4 text-center">
           <span className="mb-3 inline-flex items-center gap-2 rounded-full border border-orange-500/50 bg-gradient-to-r from-orange-500/20 to-pink-500/20 px-6 py-1.5 text-sm font-semibold text-orange-500 dark:text-orange-400">
