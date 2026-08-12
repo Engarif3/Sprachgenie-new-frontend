@@ -115,6 +115,9 @@ const IpUsage = lazy(() => import("../AI/IpUsage"));
 const ProfilePhotoSettings = lazy(
   () => import("../AdminActions/SuperAdmin/ProfilePhotoSettings"),
 );
+const BackupManagement = lazy(
+  () => import("../AdminActions/SuperAdmin/BackupManagement"),
+);
 const Usage = lazy(() => import("../AI/Usage"));
 
 //translator
@@ -206,6 +209,7 @@ const UserLimitsWithSuspense = withSuspense(UserLimits);
 const IpRateLimitsWithSuspense = withSuspense(IpRateLimits);
 const IpUsageWithSuspense = withSuspense(IpUsage);
 const ProfilePhotoSettingsWithSuspense = withSuspense(ProfilePhotoSettings);
+const BackupManagementWithSuspense = withSuspense(BackupManagement);
 const UsageWithSuspense = withSuspense(Usage);
 
 //translator
@@ -525,6 +529,13 @@ export const router = createBrowserRouter(
               path: "profile-photo-settings",
               element: protectRoute(
                 <ProfilePhotoSettingsWithSuspense />,
+                SUPER_ADMIN_ROLES,
+              ),
+            },
+            {
+              path: "backup-management",
+              element: protectRoute(
+                <BackupManagementWithSuspense />,
                 SUPER_ADMIN_ROLES,
               ),
             },

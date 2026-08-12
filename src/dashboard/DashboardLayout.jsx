@@ -37,6 +37,7 @@ import {
   IoShieldCheckmarkOutline,
   IoDesktopOutline,
   IoAlertCircleOutline,
+  IoCloudUploadOutline,
 } from "react-icons/io5";
 import { ChevronRight } from "lucide-react";
 
@@ -66,6 +67,7 @@ const SECTION_ROUTES = {
     "/dashboard/user-limits",
     "/dashboard/ip-rate-limits",
     "/dashboard/profile-photo-settings",
+    "/dashboard/backup-management",
   ],
   analytics: [
     "/dashboard/users-favorite-count",
@@ -200,6 +202,12 @@ const NAV_SECTIONS = [
         to: "/dashboard/profile-photo-settings",
         icon: IoImageOutline,
         label: "Profile Photo Settings",
+        roles: ["super_admin"],
+      },
+      {
+        to: "/dashboard/backup-management",
+        icon: IoCloudUploadOutline,
+        label: "Backup Management",
         roles: ["super_admin"],
       },
     ],
