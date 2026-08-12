@@ -2255,36 +2255,11 @@ const WordList = () => {
 
   return (
     <Container>
-      {/* Modern Header Section */}
-      <div className="text-center mt-4 mb-2 md:mb-8 lg:mb-8 ">
-        <div className="flex justify-between items-center mb-2 ml-2">
-          <div className="flex items-center gap-1.5 md:gap-3 lg:gap-3">
-            <Button to="/quiz" variant="primary" size="sm">
-              <IoGameControllerOutline size={16} aria-hidden="true" />
-              Play Quiz
-            </Button>
-
-            <Button to="/challenge" variant="success" size="sm">
-              <IoTrophyOutline size={16} aria-hidden="true" />
-              Daily Challenge
-            </Button>
-          </div>
-
-          <span className="text-sm block md:hidden lg:hidden text-pink-400 font-bold mr-2">
-            {displayedWordsCount} {wordCountLabel} Words
-          </span>
-
-          {/* {userLoggedIn && isAdmin && (
-            <span className="text-sm block md:hidden lg:hidden text-pink-400 font-bold mr-2">
-              {wordCountLabel}: {displayedWordsCount} words
-            </span>
-          )} */}
-          {/* {!isAdmin && (
-            <span className="text-sm text-pink-400 font-bold mr-2">
-              {wordCountLabel}: {displayedWordsCount} words
-            </span>
-          )} */}
-        </div>
+      {/* Modern Header Section — text block starts immediately (no button
+      row above it) so its distance from the navbar matches every other
+      page's header. The Play Quiz / Daily Challenge buttons render in
+      their own row right after instead of pushing the title down. */}
+      <div className="text-center mt-4 mb-2 md:mb-4 lg:mb-4 ">
         <div className="mb-3 hidden md:inline-block lg:inline-block">
           <span className="inline-flex items-center gap-2 px-6 py-1.5 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
             <IoLibraryOutline size={16} aria-hidden="true" />
@@ -2300,6 +2275,35 @@ const WordList = () => {
         <div className="hidden md:flex lg:flex justify-center mt-3">
           <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
         </div>
+      </div>
+
+      <div className="flex justify-between items-center mb-2 md:mb-6 lg:mb-6 ml-2">
+        <div className="flex items-center gap-1.5 md:gap-3 lg:gap-3">
+          <Button to="/quiz" variant="primary" size="sm">
+            <IoGameControllerOutline size={16} aria-hidden="true" />
+            Play Quiz
+          </Button>
+
+          <Button to="/challenge" variant="success" size="sm">
+            <IoTrophyOutline size={16} aria-hidden="true" />
+            Daily Challenge
+          </Button>
+        </div>
+
+        <span className="text-sm block md:hidden lg:hidden text-pink-400 font-bold mr-2">
+          {displayedWordsCount} {wordCountLabel} Words
+        </span>
+
+        {/* {userLoggedIn && isAdmin && (
+          <span className="text-sm block md:hidden lg:hidden text-pink-400 font-bold mr-2">
+            {wordCountLabel}: {displayedWordsCount} words
+          </span>
+        )} */}
+        {/* {!isAdmin && (
+          <span className="text-sm text-pink-400 font-bold mr-2">
+            {wordCountLabel}: {displayedWordsCount} words
+          </span>
+        )} */}
       </div>
 
       {/* =============radio buttons ========== */}
