@@ -1224,10 +1224,14 @@ const WordList = () => {
         // Regular autocomplete suggestions are commented out — the table
         // itself already re-sorts/filters live as you type, so a second
         // list showing the same matches was redundant. "Did you mean"
-        // (typo correction) stays on, since the table can't tell the user
-        // "you meant X" on its own. To restore the regular dropdown,
-        // pass `results` directly instead of filtering here.
-        const displayResults = results.filter((item) => item.isFuzzy);
+        // (typo correction) and plural-form matches stay on, since the
+        // table can't explain to the user *why* a word that doesn't
+        // literally contain what they typed showed up. To restore the
+        // regular dropdown, pass `results` directly instead of filtering
+        // here.
+        const displayResults = results.filter(
+          (item) => item.isFuzzy || item.isPluralMatch,
+        );
 
         setSuggestions(displayResults);
         setSuggestionsOpen(displayResults.length > 0);
@@ -2521,7 +2525,15 @@ const WordList = () => {
                       : "text-gray-700 dark:text-gray-200 hover:bg-slate-100 dark:hover:bg-white/5"
                   }`}
                 >
-                  {suggestion.isFuzzy ? (
+                  {suggestion.isPluralMatch ? (
+                    <span className="text-sky-700 dark:text-sky-300">
+                      <span className="italic">{searchValue.trim()}</span> is
+                      the plural of{" "}
+                      <span className="font-semibold not-italic text-sky-900 dark:text-sky-200">
+                        {suggestion.value}
+                      </span>
+                    </span>
+                  ) : suggestion.isFuzzy ? (
                     <span className="italic text-amber-700 dark:text-amber-300">
                       Did you mean{" "}
                       <span className="font-semibold not-italic text-amber-900 dark:text-amber-200">
