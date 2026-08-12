@@ -803,22 +803,19 @@ const WordListModal = ({
           </div>
         </div>
 
-        {userLoggedIn && (
-          <WordReportSection
-            wordId={selectedWord.id}
-            sentences={selectedWord.sentences}
-          />
-        )}
-
-          <div className="flex justify-end px-3 pb-4 pt-2 md:px-5">
-            <Button
-              variant="secondary"
-              surface="dark"
-              onClick={handleCloseModal}
-            >
-              Close
-            </Button>
-          </div>
+        <div className="flex items-center justify-between gap-3 px-3 pb-4 pt-2 md:px-5">
+          {userLoggedIn ? (
+            <WordReportSection
+              wordId={selectedWord.id}
+              sentences={selectedWord.sentences}
+            />
+          ) : (
+            <span />
+          )}
+          <Button variant="secondary" surface="dark" onClick={handleCloseModal}>
+            Close
+          </Button>
+        </div>
         </div>
       </div>
     </div>

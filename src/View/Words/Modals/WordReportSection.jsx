@@ -149,7 +149,7 @@ const WordReportSection = ({ wordId, sentences }) => {
   };
 
   return (
-    <div className="mx-1 mt-4 px-1 md:px-3 lg:px-2">
+    <div className="mx-1 px-1 md:px-3 lg:px-2">
       <button
         type="button"
         onClick={handleExpand}
