@@ -178,6 +178,7 @@ const Home = () => {
         "bg-[linear-gradient(135deg,#0f172a_0%,#10243f_30%,#123a5a_68%,#1d5b72_100%)]",
       edge: " border-cyan-100/25",
       glow: "bg-cyan-300/25",
+      iconRing: "border-cyan-300/40 bg-cyan-400/20 text-cyan-100",
       chip: "AI-first",
     },
     {
@@ -190,6 +191,7 @@ const Home = () => {
         "bg-[linear-gradient(135deg,#111827_0%,#14213d_34%,#1d3557_70%,#345b8c_100%)]",
       edge: "border-sky-100/25",
       glow: "bg-sky-300/25",
+      iconRing: "border-sky-300/40 bg-sky-400/20 text-sky-100",
       chip: "Structured",
     },
     {
@@ -202,6 +204,7 @@ const Home = () => {
         "bg-[linear-gradient(135deg,#16112b_0%,#221b3a_32%,#31265a_68%,#4b3f72_100%)]",
       edge: "border-violet-100/25",
       glow: "bg-violet-300/22",
+      iconRing: "border-violet-300/40 bg-violet-400/20 text-violet-100",
       chip: "Real-world",
     },
     {
@@ -214,6 +217,7 @@ const Home = () => {
         "bg-[linear-gradient(135deg,#0b132b_0%,#102542_28%,#1c3d5a_68%,#2c5364_100%)]",
       edge: "border-teal-100/25",
       glow: "bg-teal-300/25",
+      iconRing: "border-teal-300/40 bg-teal-400/20 text-teal-100",
       chip: "Context-rich",
     },
     {
@@ -226,6 +230,7 @@ const Home = () => {
         "bg-[linear-gradient(135deg,#0a1f1c_0%,#12332f_30%,#1b4d46_68%,#2b6a63_100%)]",
       edge: "border-emerald-100/25",
       glow: "bg-emerald-300/22",
+      iconRing: "border-emerald-300/40 bg-emerald-400/20 text-emerald-100",
       chip: "Clarity",
     },
     {
@@ -238,6 +243,7 @@ const Home = () => {
         "bg-[linear-gradient(135deg,#111827_0%,#1e293b_24%,#2b3a55_62%,#44506b_100%)]",
       edge: "border-slate-100/25",
       glow: "bg-indigo-300/20",
+      iconRing: "border-indigo-300/40 bg-indigo-400/20 text-indigo-100",
       chip: "Playful",
     },
   ];
@@ -1000,7 +1006,7 @@ const Home = () => {
                 >
                   <div className="absolute inset-0 rounded-[40px] bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.3),transparent_34%)] opacity-80 " />
                   <div
-                    className={`absolute -right-16 top-0 h-56 w-56 rounded-full blur-3xl ${feature.glow}`}
+                    className={`absolute -right-16 top-0 h-56 w-56 animate-[pulse_5s_ease-in-out_infinite] rounded-full blur-3xl ${feature.glow}`}
                   />
                   <div
                     className={`absolute inset-x-0 top-0 h-24 bg-gradient-to-r ${feature.accent} opacity-55`}
@@ -1013,7 +1019,9 @@ const Home = () => {
                             {feature.eyebrow}
                           </div>
                           <div className="flex items-center gap-3">
-                            <div className="flex h-14 w-14 items-center justify-center rounded-[18px] border border-white/30 bg-slate-950/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_10px_28px_rgba(0,0,0,0.18)]">
+                            <div
+                              className={`flex h-14 w-14 items-center justify-center rounded-[18px] border shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_10px_28px_rgba(0,0,0,0.18)] transition-transform duration-300 group-hover:scale-110 ${feature.iconRing}`}
+                            >
                               <feature.icon size={28} aria-hidden="true" />
                             </div>
                             <div className="rounded-full border border-white/30 bg-slate-950/60 px-3 py-1.5 text-sm font-semibold tracking-[0.14em] text-white shadow-[0_8px_24px_rgba(0,0,0,0.18)]">
@@ -1068,7 +1076,9 @@ const Home = () => {
 
                   <div className="relative">
                     <div className="mb-5 flex items-center justify-between gap-4 rounded-[22px] bg-slate-950/28 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-sm">
-                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/30 bg-slate-950/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_10px_24px_rgba(0,0,0,0.18)]">
+                      <div
+                        className={`flex h-14 w-14 items-center justify-center rounded-2xl border shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_10px_24px_rgba(0,0,0,0.18)] ${feature.iconRing}`}
+                      >
                         <feature.icon size={24} aria-hidden="true" />
                       </div>
                       <div className="rounded-full border border-white/30 bg-slate-950/60 px-3 py-1.5 text-sm font-semibold tracking-[0.14em] text-white shadow-[0_8px_20px_rgba(0,0,0,0.18)]">
