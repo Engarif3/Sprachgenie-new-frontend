@@ -654,21 +654,19 @@ const NavBar = () => {
                 {isContentMenuOpen && renderContentMenu(desktopContentMenuRef)}
               </div>
 
-              {userLoggedIn && (
-                <>
-                  <Link
-                    to="/favorites"
-                    className="group hidden xl:flex items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 transition-all duration-300"
-                  >
-                    <FaHeart
-                      className="text-sky-500 group-hover:text-sky-500 transition-colors group-hover:animate-bounce"
-                      size={18}
-                    />
-                    <span className="ml-2 text-xl text-white group-hover:text-sky-400 transition-colors">
-                      {t("navbar.favorites")}
-                    </span>
-                  </Link>
-                </>
+              {userLoggedIn && location.pathname !== "/favorites" && (
+                <Link
+                  to="/favorites"
+                  className="group hidden xl:flex items-center border-b-2 border-white rounded-md hover:scale-105 hover:border-sky-400 px-1 transition-all duration-300"
+                >
+                  <FaHeart
+                    className="text-sky-500 group-hover:text-sky-500 transition-colors group-hover:animate-bounce"
+                    size={18}
+                  />
+                  <span className="ml-2 text-xl text-white group-hover:text-sky-400 transition-colors">
+                    {t("navbar.favorites")}
+                  </span>
+                </Link>
               )}
               {/* {userLoggedIn && (
             <Link
