@@ -2759,9 +2759,9 @@ const WordList = () => {
                               {`"${trimmedSearchValue}"`} is not available in
                               your filtered scope.
                             </span>
-                            <span className="text-sm sm:text-base font-normal text-emerald-400">
+                            <span className="text-sm sm:text-base font-normal text-emerald-700 dark:text-emerald-400">
                               But found globally:{" "}
-                              <span className="font-semibold text-white">
+                              <span className="font-semibold text-slate-900 dark:text-white">
                                 {globalMatches[0].value}
                               </span>
                               {globalMatches.length > 1 &&
