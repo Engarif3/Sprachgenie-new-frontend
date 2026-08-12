@@ -292,6 +292,13 @@ const SentenceRenderer = memo(
       ? highlightPrefixInSentence(word, cleanSentence)
       : cleanSentence;
 
+    // A "##" heading whose title itself starts with "1)"/"1." etc. (e.g.
+    // "## 1) Nominativ") gets that leading marker split out so it can be
+    // colored differently from the rest of the heading text.
+    const headerMarker = isHeaderLine
+      ? splitMeaningMarkerFromText(sentenceContent)
+      : null;
+
     return (
       <div
         className={
@@ -334,8 +341,15 @@ const SentenceRenderer = memo(
           )}
           {isHeaderLine ? (
             <div className="w-full my-1.5 pl-1 md:pl-1.5 lg:pl-1.5">
-              <span className="inline-flex items-center px-3 py-0.5 rounded-full bg-gradient-to-r from-orange-500/15 to-pink-500/15 dark:from-orange-400/20 dark:to-pink-500/20 border border-orange-500/40 dark:border-orange-400/30 font-bold text-sm md:text-base text-orange-600 dark:text-orange-400 tracking-wide capitalize">
-                {sentenceContent}
+              <span className="inline-flex items-center px-3 py-0.5 rounded-full bg-gradient-to-r from-orange-500/15 to-pink-500/15 dark:from-orange-400/20 dark:to-pink-500/20 border border-orange-500/40 dark:border-orange-400/30 font-bold text-sm md:text-base tracking-wide capitalize">
+                {headerMarker?.marker && (
+                  <span className="text-pink-600 dark:text-pink-400 mr-1.5">
+                    {headerMarker.marker}
+                  </span>
+                )}
+                <span className="text-orange-600 dark:text-orange-400">
+                  {headerMarker?.marker ? headerMarker.text : sentenceContent}
+                </span>
               </span>
             </div>
           ) : isSubHeaderLine ? (
