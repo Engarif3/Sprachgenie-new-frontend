@@ -3,6 +3,7 @@ import Swal from "sweetalert2";
 import api from "../../axios";
 import PageHeader from "../../components/UI/PageHeader";
 import Button from "../../components/UI/Button";
+import DateTime from "../../components/UI/DateTime";
 import {
   IoCloudUploadOutline,
   IoCheckmarkCircle,
@@ -24,6 +25,27 @@ const formatBytes = (bytes) => {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+// Older history rows always wrote the literal "day(s)" regardless of count
+// (e.g. "1 day(s)") — normalize to proper singular/plural ("1 day",
+// "3 days") since new rows already get this right at the source.
+const fixDaySuffix = (text) =>
+  text.replace(
+    /(\d+)\s*day\(s\)/gi,
+    (_, count) => `${count} day${Number(count) === 1 ? "" : "s"}`,
+  );
+
+// Strips only the outer wrapping "(...)." / "(...)" from an interval label
+// (e.g. "(interval: 1 day(s))." -> "interval: 1 day(s)") without touching
+// inner parens like the "(s)" in "day(s)".
+const stripOuterParens = (text) => {
+  let result = text.trim();
+  if (result.startsWith("(")) result = result.slice(1);
+  if (result.endsWith(").")) result = result.slice(0, -2);
+  else if (result.endsWith(")")) result = result.slice(0, -1);
+  else if (result.endsWith(".")) result = result.slice(0, -1);
+  return result;
 };
 
 const STATUS_BADGE = {
@@ -218,7 +240,7 @@ const ServiceSettingsCard = ({ serviceKey, label, onTriggered }) => {
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-700 dark:text-gray-300">
-            Dropbox backups to keep
+            Keep last {form.dropboxMaxBackups || "N"} Dropbox backups
           </label>
           <input
             type="number"
@@ -246,7 +268,7 @@ const ServiceSettingsCard = ({ serviceKey, label, onTriggered }) => {
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-700 dark:text-gray-300">
-            Google Drive backups to keep
+            Keep last {form.driveMaxBackups || "N"} Google Drive backups
           </label>
           <input
             type="number"
@@ -317,7 +339,6 @@ const BackupHistoryTable = ({ refreshKey }) => {
     destination: "",
     status: "",
   });
-
   const fetchHistory = useCallback(
     async (page = 1) => {
       setLoading(true);
@@ -408,35 +429,55 @@ const BackupHistoryTable = ({ refreshKey }) => {
         </p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-sm">
+          <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
             <thead>
-              <tr className="border-b border-slate-200 text-slate-500 dark:border-gray-700 dark:text-gray-400">
-                <th className="py-2 pr-4 font-medium">When</th>
-                <th className="py-2 pr-4 font-medium">Service</th>
-                <th className="py-2 pr-4 font-medium">Destination</th>
-                <th className="py-2 pr-4 font-medium">Status</th>
-                <th className="py-2 pr-4 font-medium">File</th>
-                <th className="py-2 pr-4 font-medium">Size</th>
-                <th className="py-2 font-medium">Details</th>
+              <tr className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                <th className="px-4 py-3">When</th>
+                <th className="px-4 py-3">Service</th>
+                <th className="px-4 py-3">Destination</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">File</th>
+                <th className="px-4 py-3">Size</th>
+                <th className="px-4 py-3">Details</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
               {history.map((row) => {
                 const badge = STATUS_BADGE[row.status] || STATUS_BADGE.SKIPPED;
                 const BadgeIcon = badge.icon;
+                const details = fixDaySuffix(
+                  row.errorMessage || row.skipReason || "",
+                );
+                // Older history rows (recorded before the wording was
+                // cleaned up) still have the interval as a trailing
+                // "(interval: X day(s))." parenthetical instead of the
+                // current " — interval is X days." suffix — badge both.
+                const oldIntervalMatch = details.match(
+                  /\s*\(interval:.*\)\.?$/i,
+                );
+                const [detailsMain, detailsInterval] = details.includes(" — ")
+                  ? details.split(" — ")
+                  : oldIntervalMatch
+                    ? [
+                        details.slice(0, oldIntervalMatch.index).trim(),
+                        oldIntervalMatch[0].trim(),
+                      ]
+                    : [details, null];
                 return (
                   <tr
                     key={row.id}
-                    className="border-b border-slate-100 text-slate-700 dark:border-gray-800 dark:text-gray-300"
+                    className="transition hover:bg-slate-50 dark:hover:bg-slate-950/60"
                   >
-                    <td className="py-2 pr-4 whitespace-nowrap">
-                      {new Date(row.createdAt).toLocaleString()}
+                    <td className="whitespace-nowrap px-4 py-4 text-slate-700 dark:text-slate-200">
+                      <DateTime value={row.createdAt} />
                     </td>
-                    <td className="py-2 pr-4 capitalize">{row.service}</td>
-                    <td className="py-2 pr-4 capitalize">
+                    <td className="whitespace-nowrap px-4 py-4 capitalize text-slate-700 dark:text-slate-200">
+                      {row.service}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-4 capitalize text-slate-700 dark:text-slate-200">
                       {row.destination.toLowerCase()}
                     </td>
-                    <td className="py-2 pr-4">
+                    <td className="whitespace-nowrap px-4 py-4">
                       <span
                         className={`inline-flex items-center gap-1 font-medium ${badge.className}`}
                       >
@@ -444,12 +485,56 @@ const BackupHistoryTable = ({ refreshKey }) => {
                         {badge.label}
                       </span>
                     </td>
-                    <td className="py-2 pr-4">{row.fileName || "—"}</td>
-                    <td className="py-2 pr-4">
-                      {formatBytes(row.fileSizeBytes)}
+                    <td className="max-w-[16rem] px-4 py-4 pr-8">
+                      {row.fileName ? (
+                        <span
+                          title={row.fileName}
+                          className="block max-w-[16rem] truncate text-xs text-slate-700 dark:text-slate-200"
+                        >
+                          {row.fileName}
+                        </span>
+                      ) : (
+                        <span className="block text-center text-slate-400 dark:text-slate-500">
+                          —
+                        </span>
+                      )}
                     </td>
-                    <td className="py-2 max-w-xs truncate" title={row.errorMessage || row.skipReason || ""}>
-                      {row.errorMessage || row.skipReason || "—"}
+                    <td className="whitespace-nowrap px-4 py-4 pl-6 font-medium text-sky-600 dark:text-sky-400">
+                      {row.fileSizeBytes === null ||
+                      row.fileSizeBytes === undefined ? (
+                        <span className="block text-center text-slate-400 dark:text-slate-500">
+                          —
+                        </span>
+                      ) : (
+                        formatBytes(row.fileSizeBytes)
+                      )}
+                    </td>
+                    <td className="max-w-md px-4 py-4">
+                      {details ? (
+                        <div
+                          title={details}
+                          className="flex max-w-md items-center gap-2 overflow-hidden text-xs"
+                        >
+                          <span
+                            className={`min-w-0 truncate rounded-lg px-2 py-1 ${
+                              row.errorMessage
+                                ? "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400"
+                                : "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"
+                            }`}
+                          >
+                            {detailsMain}
+                          </span>
+                          {detailsInterval && (
+                            <span className="shrink-0 rounded-lg bg-slate-200 px-2 py-1 font-medium text-slate-700 dark:bg-slate-700/70 dark:text-slate-200">
+                              {stripOuterParens(detailsInterval)}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="block text-center text-slate-400 dark:text-slate-500">
+                          —
+                        </span>
+                      )}
                     </td>
                   </tr>
                 );
@@ -482,6 +567,7 @@ const BackupHistoryTable = ({ refreshKey }) => {
           </div>
         </div>
       )}
+
     </div>
   );
 };
@@ -491,7 +577,7 @@ const BackupManagement = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 md:p-8">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-7xl">
         <div className="mb-8">
           <PageHeader
             title="Backup Management"
