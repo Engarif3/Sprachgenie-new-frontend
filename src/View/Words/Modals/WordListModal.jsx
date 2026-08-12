@@ -337,7 +337,7 @@ const SentenceRenderer = memo(
             </>
           )}
           {isHeaderLine ? (
-            <div className="w-full my-1 py-1.5 rounded-md bg-gradient-to-l from-orange-500/25 dark:from-orange-400/20 to-transparent">
+            <div className="w-full my-1 py-1.5 rounded-md bg-gradient-to-r from-orange-500/25 dark:from-orange-400/20 to-transparent">
               <p className="text-left pl-8 md:pl-9 lg:pl-10 pr-2 font-bold text-md md:text-lg lg:text-lg text-orange-600 dark:text-orange-400 tracking-wide capitalize">
                 {sentenceContent}
               </p>
