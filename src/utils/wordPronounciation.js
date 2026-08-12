@@ -5,20 +5,21 @@ import { getBestGermanVoiceSync } from "./voiceSettings";
 // fall back to a much weaker system voice. Rather than sniffing the browser
 // itself (unreliable — Edge/Opera/Brave all report as "Chrome" in their user
 // agent), this checks what actually matters: whether a Google voice was
-// actually resolved for this browser. Shown once per tab session (not on
-// every click) so it's a helpful nudge, not a nag.
-const CHROME_HINT_SESSION_KEY = "sprachgenie_chrome_voice_hint_shown";
+// actually resolved for this browser. Persisted in localStorage (not
+// sessionStorage) so it's shown exactly once ever per browser/device, not
+// once per tab session — a helpful one-time nudge, never a recurring nag.
+const CHROME_HINT_STORAGE_KEY = "sprachgenie_chrome_voice_hint_shown";
 
 const maybeShowChromeVoiceHint = (preferredVoice) => {
   const isGoogleVoice = preferredVoice?.name?.toLowerCase().includes("google");
   if (isGoogleVoice) return;
 
   try {
-    if (sessionStorage.getItem(CHROME_HINT_SESSION_KEY)) return;
-    sessionStorage.setItem(CHROME_HINT_SESSION_KEY, "1");
+    if (localStorage.getItem(CHROME_HINT_STORAGE_KEY)) return;
+    localStorage.setItem(CHROME_HINT_STORAGE_KEY, "1");
   } catch {
     // Private-browsing storage restrictions etc. — just skip the
-    // once-per-session dedupe rather than blocking the hint entirely.
+    // once-ever dedupe rather than blocking the hint entirely.
   }
 
   void Swal.fire({
