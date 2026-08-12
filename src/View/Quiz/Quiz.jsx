@@ -306,7 +306,7 @@ const Quiz = () => {
                 Test Your Skills
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-2">
+            <h1 className="text-4xl md:text-5xl font-bold leading-tight text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-2">
               Quiz
             </h1>
             <p className="text-xl max-w-2xl mx-auto text-slate-500 dark:text-slate-400">

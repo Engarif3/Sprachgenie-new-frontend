@@ -359,7 +359,7 @@ const StoryTitleList = () => {
             <BookOpen size={16} aria-hidden="true" />
             Read & Learn
           </span>
-          <h2 className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-4xl font-bold text-transparent md:text-5xl">
+          <h2 className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-4xl font-bold leading-tight text-transparent md:text-5xl pb-2">
             German Stories
           </h2>
           <p

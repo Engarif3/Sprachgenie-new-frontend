@@ -1288,7 +1288,7 @@ const HowToSayList = () => {
             <MessageCircle size={16} aria-hidden="true" />
             Learn Phrases
           </span>
-          <h2 className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-4xl font-bold text-transparent md:text-5xl">
+          <h2 className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-4xl font-bold leading-tight text-transparent md:text-5xl pb-2">
             How to Say It in German
           </h2>
           <p

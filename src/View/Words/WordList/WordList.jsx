@@ -2266,7 +2266,7 @@ const WordList = () => {
             Learn Vocabulary
           </span>
         </div>
-        <h2 className="text-2xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-1 md:pb-2 lg:pb-2">
+        <h2 className="text-2xl md:text-5xl font-bold leading-tight text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-1 md:pb-2 lg:pb-2">
           Vocabulary Library
         </h2>
         <p className="text-xl text-gray-950 dark:text-gray-300 max-w-2xl mx-auto hidden md:inline-block lg:inline-block">

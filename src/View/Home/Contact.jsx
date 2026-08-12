@@ -74,7 +74,7 @@ const Contact = () => {
               {t("getInTouch")}
             </span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 dark:text-white pb-2">
+          <h2 className="text-4xl md:text-5xl font-bold leading-tight text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 dark:text-white pb-2">
             {t("contactMe")}
           </h2>
           <p className="text-xl text-gray-950 dark:text-gray-300 max-w-2xl mx-auto">

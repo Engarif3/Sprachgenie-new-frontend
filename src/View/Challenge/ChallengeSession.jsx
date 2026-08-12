@@ -337,15 +337,21 @@ const ChallengeSession = () => {
           // Mirrors the server's scoring rules (challenge.service.ts) using
           // our own countdown deadline, since nothing here is persisted.
           const elapsedMs = deadlineAt
-            ? Math.max(0, Date.now() - (deadlineAt - QUESTION_TIME_SECONDS * 1000))
+            ? Math.max(
+                0,
+                Date.now() - (deadlineAt - QUESTION_TIME_SECONDS * 1000),
+              )
             : 0;
-          const answeredFast = elapsedMs <= CORRECT_FAST_THRESHOLD_SECONDS * 1000;
+          const answeredFast =
+            elapsedMs <= CORRECT_FAST_THRESHOLD_SECONDS * 1000;
 
           let xpDelta;
           let nextWrongStreak;
 
           if (isCorrect) {
-            xpDelta = answeredFast ? XP_PER_CORRECT_ANSWER : XP_CORRECT_SLOW_ANSWER;
+            xpDelta = answeredFast
+              ? XP_PER_CORRECT_ANSWER
+              : XP_CORRECT_SLOW_ANSWER;
             nextWrongStreak = 0;
           } else if (timedOut) {
             xpDelta = -XP_TIMEOUT_PENALTY;
@@ -385,7 +391,11 @@ const ChallengeSession = () => {
               setCurrentIndex((index) => index + 1);
             } else {
               setLevelFinished(true);
-              void finishLevel(nextCorrectCount, nextXpEarned, questions.length);
+              void finishLevel(
+                nextCorrectCount,
+                nextXpEarned,
+                questions.length,
+              );
             }
           }, 1100);
           return;
@@ -477,15 +487,15 @@ const ChallengeSession = () => {
   if (view === "levels") {
     return (
       <Container>
-        <div className="mx-auto flex min-h-[65vh] max-w-5xl flex-col gap-8 py-4">
-          <div className="text-center mb-4 mt-4">
-            <div className="mb-4">
-              <span className="inline-flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
+        <div className="mx-auto flex min-h-[65vh] max-w-5xl flex-col gap-3 py-1">
+          <div className="text-center mb-3 mt-4">
+            <div className="mb-3">
+              <span className="inline-flex items-center gap-2 px-6 py-1.5 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
                 <Zap size={16} aria-hidden="true" />
                 Timed Challenge
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-4">
+            <h1 className="text-4xl md:text-5xl font-bold leading-tight text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-2">
               Daily Challenge
             </h1>
             <p
@@ -493,7 +503,7 @@ const ChallengeSession = () => {
             >
               20 random words a day, per level. Answer fast — 15 seconds each.
             </p>
-            <div className="flex justify-center mt-6">
+            <div className="flex justify-center mt-3">
               <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
             </div>
           </div>
@@ -564,7 +574,7 @@ const ChallengeSession = () => {
                 return (
                   <div
                     key={key}
-                    className={`group relative flex min-h-[320px] flex-col overflow-hidden rounded-3xl border p-8 text-center shadow-sm transition-all duration-300 ${cardClass} ${
+                    className={`group relative flex min-h-[400px] flex-col overflow-hidden rounded-3xl border mt-4 mb-20 p-6 mx-2 text-center shadow-sm transition-all duration-300 ${cardClass} ${
                       locked ? "" : "hover:-translate-y-1 hover:shadow-xl"
                     }`}
                   >
