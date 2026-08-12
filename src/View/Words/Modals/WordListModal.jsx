@@ -4,7 +4,6 @@ import { publicApi } from "../../../axios";
 import { useAuth } from "../../../services/auth.services";
 import { pronounceWord } from "../../../utils/wordPronounciation";
 import FavoriteButton from "./FavoriteButton";
-import { RiCloseCircleFill } from "react-icons/ri";
 import { useLockBodyScroll } from "./ModalScrolling";
 import Button from "../../../components/UI/Button";
 import { IoMdArrowDropright } from "react-icons/io";
@@ -17,6 +16,7 @@ import {
   IoPencilOutline,
   IoDocumentTextOutline,
   IoVolumeHighOutline,
+  IoClose,
 } from "react-icons/io5";
 import { highlightPrefixInSentence } from "../../../utils/sentencePrefixHighlighter.jsx";
 import WordReportSection from "./WordReportSection";
@@ -537,16 +537,25 @@ const WordListModal = ({
         ref={modalRef}
         className="relative  bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl max-w-6xl w-full mx-3 shadow-2xl transform transition-all duration-300 dark:border-2 border-gray-700/50 max-h-[90vh] overflow-y-auto"
       >
-        {/* Favorite Toggle Button */}
-
-        {userLoggedIn && (
-          <FavoriteButton
-            isFavorite={favorites.includes(selectedWord.id)}
-            loading={loadingFavorites[selectedWord.id]}
-            onClick={handleToggleFavorite}
-            className="absolute top-2 right-2 "
-          />
-        )}
+        {/* Favorite + Close buttons, top-right */}
+        <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
+          {userLoggedIn && (
+            <FavoriteButton
+              isFavorite={favorites.includes(selectedWord.id)}
+              loading={loadingFavorites[selectedWord.id]}
+              onClick={handleToggleFavorite}
+              className="rounded-full bg-white/5 p-2 hover:bg-white/10"
+            />
+          )}
+          <button
+            onClick={handleCloseModal}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-gray-300 transition-colors hover:bg-white/10 hover:text-white"
+            aria-label="Close"
+            title="Close"
+          >
+            <IoClose size={22} aria-hidden="true" />
+          </button>
+        </div>
         <p className="text-center mt-8 md:mt-6 lg:mt-6 px-4 md:px-6">
           <span className="inline-block px-4 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full">
             <span className="text-blue-400 text-lg font-bold">Topic:</span>
@@ -796,15 +805,9 @@ const WordListModal = ({
           />
         )}
 
-        <div className="sticky bottom-0 right-2 flex justify-end pr-2 pb-3 mt-6">
-          <Button
-            variant="secondary"
-            surface="dark"
-            size="sm"
-            onClick={handleCloseModal}
-            title="Close"
-          >
-            <RiCloseCircleFill size={28} className="text-white " />
+        <div className="flex justify-end px-3 pb-4 pt-2 md:px-5">
+          <Button variant="secondary" surface="dark" onClick={handleCloseModal}>
+            Close
           </Button>
         </div>
       </div>
