@@ -314,10 +314,24 @@ const SentenceRenderer = memo(
             </span>
           )}
           {isBulletLine && (
-            <span
-              className="inline-block h-1.5 w-1.5 rounded-full bg-purple-400 flex-shrink-0 mt-2"
-              aria-hidden="true"
-            />
+            <>
+              {/* Invisible spacer matching the speaker-icon block's exact
+              box model (size + margin + arrow) so the bullet lines up with
+              where sentence text starts, not flush against the left edge. */}
+              <span
+                className="flex items-start flex-shrink-0 invisible"
+                aria-hidden="true"
+              >
+                <span className="h-7 w-7 lg:h-8 lg:w-8 mr-1 md:mr-0 lg:mr-0" />
+                <span className="hidden lg:inline">
+                  <IoMdArrowDropright size={20} />
+                </span>
+              </span>
+              <span
+                className="inline-block h-1.5 w-1.5 rounded-full bg-purple-400 flex-shrink-0 mt-2"
+                aria-hidden="true"
+              />
+            </>
           )}
           {isSubHeaderLine ? (
             <div className="flex items-center gap-2 w-full my-1">
