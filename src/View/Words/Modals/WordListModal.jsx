@@ -368,7 +368,7 @@ const SentenceRenderer = memo(
           ) : isBulletLine ? (
             <span className="relative">
               <span
-                className="absolute -left-3 top-2 h-1.5 w-1.5 rounded-full bg-purple-400"
+                className="absolute -left-3 top-3 h-1.5 w-1.5 rounded-full bg-purple-400"
                 aria-hidden="true"
               />
               <span className={className}>{sentenceContent}</span>
