@@ -34,7 +34,11 @@ const HomeCard = ({ title, text, link, icon, eyebrow }) => {
           </div>
 
           <div
-            className={`inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-md transition-transform duration-300 group-hover:scale-105`}
+            className={`inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border transition-transform duration-300 group-hover:scale-105 ${
+              isLight
+                ? "border-sky-200 bg-sky-50 text-sky-600"
+                : "border-sky-500/20 bg-sky-500/10 text-sky-400"
+            }`}
           >
             {icon}
           </div>
