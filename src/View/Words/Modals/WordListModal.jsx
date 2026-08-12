@@ -312,11 +312,11 @@ const SentenceRenderer = memo(
             <span className="flex items-start flex-shrink-0">
               <button
                 onClick={handlePronounce}
-                className="flex items-center justify-center h-7 w-7 lg:h-8 lg:w-8 rounded-full bg-cyan-500/10 dark:bg-cyan-500/15 border border-cyan-500/30 dark:border-cyan-400/30 text-cyan-600 dark:text-cyan-400 transition-all duration-200 hover:bg-cyan-500/20 hover:border-cyan-500/50 hover:scale-110 hover:text-cyan-700 dark:hover:text-cyan-300 mr-1 md:mr-0 lg:mr-0"
+                className="flex items-center justify-center h-6 w-6 lg:h-7 lg:w-7 rounded-full bg-cyan-500/10 dark:bg-cyan-500/15 border border-cyan-500/30 dark:border-cyan-400/30 text-cyan-600 dark:text-cyan-400 transition-all duration-200 hover:bg-cyan-500/20 hover:border-cyan-500/50 hover:scale-110 hover:text-cyan-700 dark:hover:text-cyan-300 mr-1 md:mr-0 lg:mr-0"
                 title="Pronounce"
               >
-                <HiSpeakerWave size={16} className="lg:hidden" />
-                <HiSpeakerWave size={18} className="hidden lg:block" />
+                <HiSpeakerWave size={13} className="lg:hidden" />
+                <HiSpeakerWave size={15} className="hidden lg:block" />
               </button>
               <span className="hidden lg:inline">
                 <IoMdArrowDropright className="text-pink-600 dark:text-pink-500 mt-1.5" size={20} />
@@ -333,7 +333,7 @@ const SentenceRenderer = memo(
               className="flex items-start flex-shrink-0 invisible"
               aria-hidden="true"
             >
-              <span className="h-7 w-7 lg:h-8 lg:w-8 mr-1 md:mr-0 lg:mr-0" />
+              <span className="h-6 w-6 lg:h-7 lg:w-7 mr-1 md:mr-0 lg:mr-0" />
               <span className="hidden lg:inline">
                 <IoMdArrowDropright size={20} />
               </span>
