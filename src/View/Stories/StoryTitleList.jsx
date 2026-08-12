@@ -367,6 +367,9 @@ const StoryTitleList = () => {
           >
             Choose a level, then pick a story to read.
           </p>
+          <div className="flex justify-center mt-3">
+            <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
+          </div>
           {isAdmin && (
             <button
               type="button"

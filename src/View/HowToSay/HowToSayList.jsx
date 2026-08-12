@@ -1296,6 +1296,9 @@ const HowToSayList = () => {
           >
             Pick an English phrase and see how it's actually said in German.
           </p>
+          <div className="flex justify-center mt-3">
+            <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
+          </div>
         </div>
 
         {/* Search + admin create */}
