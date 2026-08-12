@@ -1171,7 +1171,7 @@ const Home = () => {
         className={`py-20 mx-0 md:mx-8 lg:mx-8 rounded-none md:rounded-[40px] ${
           theme === "dark"
             ? "bg-[linear-gradient(135deg,#111827_0%,#0f172a_50%,#1e1b2e_100%)]"
-            : "bg-gradient-to-br from-slate-50 via-orange-50/40 to-slate-50 border border-slate-200"
+            : "bg-white border border-slate-200 shadow-sm"
         }`}
         id="stats"
         data-animate
@@ -1279,7 +1279,7 @@ const Home = () => {
           className={`py-20 mx-0 md:mx-8 rounded-none md:rounded-[40px] ${
             theme === "dark"
               ? "bg-[linear-gradient(135deg,#111827_0%,#0f172a_50%,#1e1b2e_100%)]"
-              : "bg-gradient-to-br from-slate-50 via-orange-50/40 to-slate-50 border border-slate-200"
+              : "bg-white border border-slate-200 shadow-sm"
           }`}
           id="cta"
           data-animate
