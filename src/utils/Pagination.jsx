@@ -58,7 +58,7 @@ const Pagination = ({
         )}
       </div>
       {/* Pagination Buttons */}
-      <div className="flex justify-between md:justify-end items-center gap-4 w-full md:w-auto">
+      <div className="flex justify-between md:justify-end items-center gap-4 w-full md:w-auto md:mr-4 lg:mr-6">
         <div className="w-full">
           <div className="flex gap-1 md:gap-1.5 justify-center items-center">
             {/* Bordered icon buttons instead of Button's `ghost` variant —
