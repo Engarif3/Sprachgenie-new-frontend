@@ -39,7 +39,7 @@ const ConjugationCell = ({ conjugation, highlightAuxiliary }) => {
     <>
       {before}
       {before && " "}
-      <span className="text-orange-400">{words[auxIndex]}</span>
+      <span className="text-orange-600 dark:text-orange-400">{words[auxIndex]}</span>
       {after && " "}
       {after}
     </>
@@ -49,11 +49,11 @@ const ConjugationCell = ({ conjugation, highlightAuxiliary }) => {
 const ConjugationTable = ({ rows, highlightAuxiliary = false }) => (
   <table className="w-full text-sm border-collapse">
     <thead>
-      <tr className="border-b border-gray-700">
-        <th className="text-left py-2 px-3 text-gray-400 font-semibold w-1/3">
+      <tr className="border-b border-gray-200 dark:border-gray-700">
+        <th className="text-left py-2 px-3 text-gray-500 dark:text-gray-400 font-semibold w-1/3">
           Pronoun
         </th>
-        <th className="text-left py-2 px-3 text-gray-400 font-semibold">
+        <th className="text-left py-2 px-3 text-gray-500 dark:text-gray-400 font-semibold">
           Conjugation
         </th>
       </tr>
@@ -62,10 +62,10 @@ const ConjugationTable = ({ rows, highlightAuxiliary = false }) => (
       {rows.map(({ pronoun, conjugation }) => (
         <tr
           key={pronoun}
-          className="border-b border-gray-800 hover:bg-white/5 transition-colors"
+          className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
         >
-          <td className="py-2 px-3 text-cyan-400 font-medium">{pronoun}</td>
-          <td className="py-2 px-3 text-white font-semibold">
+          <td className="py-2 px-3 text-cyan-600 dark:text-cyan-400 font-medium">{pronoun}</td>
+          <td className="py-2 px-3 text-gray-900 dark:text-white font-semibold">
             <ConjugationCell
               conjugation={conjugation}
               highlightAuxiliary={highlightAuxiliary}
@@ -78,13 +78,13 @@ const ConjugationTable = ({ rows, highlightAuxiliary = false }) => (
 );
 
 const TenseSection = ({ label, children }) => (
-  <div className="rounded-xl border border-gray-700 overflow-hidden">
-    <div className="px-4 py-2.5 bg-gray-800 border-b border-gray-700">
-      <span className="text-sm font-bold text-violet-300 tracking-wide">
+  <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div className="px-4 py-2.5 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <span className="text-sm font-bold text-violet-700 dark:text-violet-300 tracking-wide">
         {label}
       </span>
     </div>
-    <div className="bg-gray-900/60">{children}</div>
+    <div className="bg-white dark:bg-gray-900/60">{children}</div>
   </div>
 );
 
@@ -238,19 +238,19 @@ const ConjugationModal = ({
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
       <div
-        className="relative z-10 w-full max-w-lg md:max-w-4xl max-h-[90vh] flex flex-col rounded-2xl border border-gray-700 bg-gray-900 shadow-2xl shadow-black/50"
+        className="relative z-10 w-full max-w-lg md:max-w-4xl max-h-[90vh] flex flex-col rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl shadow-black/10 dark:shadow-black/50"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 px-6 py-4 border-b border-gray-700">
+        <div className="flex items-start justify-between gap-4 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-violet-400 mb-1">
+            <p className="text-xs font-semibold uppercase tracking-widest text-violet-600 dark:text-violet-400 mb-1">
               AI Conjugation
             </p>
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
               {verbLabel}{" "}
               {meaning && (
-                <span className="text-base font-normal text-gray-400">
+                <span className="text-base font-normal text-gray-500 dark:text-gray-400">
                   {meaning}
                 </span>
               )}
@@ -258,7 +258,7 @@ const ConjugationModal = ({
           </div>
           <button
             onClick={onClose}
-            className="mt-1 flex-shrink-0 rounded-full p-1.5 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+            className="mt-1 flex-shrink-0 rounded-full p-1.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
             aria-label="Close"
           >
             <svg
@@ -277,7 +277,7 @@ const ConjugationModal = ({
           {isLoading && (
             <div className="flex flex-col items-center justify-center py-16 gap-4">
               <div className="w-10 h-10 rounded-full border-4 border-violet-500 border-t-transparent animate-spin" />
-              <p className="text-gray-400 text-sm">
+              <p className="text-gray-500 dark:text-gray-400 text-sm">
                 Generating conjugation table…
               </p>
             </div>
@@ -285,8 +285,8 @@ const ConjugationModal = ({
 
           {error && !isLoading && (
             <div className="flex flex-col items-center justify-center py-12 gap-3 text-center">
-              <IoWarningOutline size={30} className="text-red-400" aria-hidden="true" />
-              <p className="text-red-400 font-semibold">
+              <IoWarningOutline size={30} className="text-red-600 dark:text-red-400" aria-hidden="true" />
+              <p className="text-red-600 dark:text-red-400 font-semibold">
                 Failed to generate conjugation
               </p>
               <p className="text-gray-500 text-sm">{error}</p>
@@ -326,12 +326,12 @@ const ConjugationModal = ({
 
               {/* Admin regenerate panel */}
               {isAdmin && adminPromptOpen && (
-                <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-4 space-y-3">
-                  <p className="text-sm font-semibold text-amber-300">
+                <div className="rounded-xl border border-amber-500/30 bg-amber-50 dark:bg-amber-950/20 p-4 space-y-3">
+                  <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">
                     Regenerate with custom instruction
                   </p>
                   <textarea
-                    className="w-full rounded-lg bg-gray-800 border border-gray-600 text-sm text-white px-3 py-2 placeholder-gray-500 focus:outline-none focus:border-amber-400 resize-none"
+                    className="w-full rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-sm text-gray-900 dark:text-white px-3 py-2 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-amber-400 resize-none"
                     rows={2}
                     placeholder={`Optional: tell AI what to fix (e.g. "Use sein not haben — ${verbLabel} is a movement verb")`}
                     value={adminPrompt}
@@ -353,7 +353,7 @@ const ConjugationModal = ({
                         setAdminPromptOpen(false);
                         setAdminPrompt("");
                       }}
-                      className="px-4 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
+                      className="px-4 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm rounded-lg transition-colors"
                     >
                       Cancel
                     </button>
@@ -363,20 +363,20 @@ const ConjugationModal = ({
 
               {/* Report form */}
               {reportOpen && (
-                <div className="rounded-xl border border-red-500/30 bg-red-950/20 p-4 space-y-3">
-                  <p className="text-sm font-semibold text-red-300">
+                <div className="rounded-xl border border-red-500/30 bg-red-50 dark:bg-red-950/20 p-4 space-y-3">
+                  <p className="text-sm font-semibold text-red-700 dark:text-red-300">
                     Report incorrect conjugation
                   </p>
 
                   {reportOptionsLoading ? (
-                    <p className="text-gray-400 text-sm">Loading...</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">Loading...</p>
                   ) : (
                     <>
                       <div className="space-y-1.5">
                         {reportReasons.map((reason) => (
                           <label
                             key={reason.id}
-                            className="flex items-start gap-2 text-sm text-gray-300 cursor-pointer"
+                            className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
                           >
                             <input
                               type="checkbox"
@@ -397,10 +397,10 @@ const ConjugationModal = ({
                       {showReportNoteField && (
                         <>
                           <textarea
-                            className={`w-full rounded-lg bg-gray-800 border text-sm text-white px-3 py-2 placeholder-gray-500 focus:outline-none resize-none ${
+                            className={`w-full rounded-lg bg-white dark:bg-gray-800 border text-sm text-gray-900 dark:text-white px-3 py-2 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none resize-none ${
                               reportMessageTooLong
                                 ? "border-red-400 focus:border-red-400"
-                                : "border-gray-600 focus:border-red-400"
+                                : "border-gray-300 dark:border-gray-600 focus:border-red-400"
                             }`}
                             rows={2}
                             placeholder="Optional: describe the error (e.g. wrong haben/sein)"
@@ -408,7 +408,7 @@ const ConjugationModal = ({
                             onChange={(e) => setReportMessage(e.target.value)}
                           />
                           <p
-                            className={`text-xs ${reportMessageTooLong ? "text-red-400" : "text-gray-500"}`}
+                            className={`text-xs ${reportMessageTooLong ? "text-red-500 dark:text-red-400" : "text-gray-500"}`}
                           >
                             {reportMessageCharCount}/{reportMaxCharacters} characters
                           </p>
@@ -418,7 +418,7 @@ const ConjugationModal = ({
                   )}
 
                   {reportError && (
-                    <p className="text-xs text-red-400">{reportError}</p>
+                    <p className="text-xs text-red-600 dark:text-red-400">{reportError}</p>
                   )}
                   <div className="flex gap-2">
                     <button
@@ -433,7 +433,7 @@ const ConjugationModal = ({
                         setReportOpen(false);
                         setReportError("");
                       }}
-                      className="px-4 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
+                      className="px-4 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm rounded-lg transition-colors"
                     >
                       Cancel
                     </button>
@@ -446,8 +446,8 @@ const ConjugationModal = ({
 
         {/* Footer */}
         {data && !isLoading && (
-          <div className="px-6 py-3 border-t border-gray-800 flex items-center justify-between gap-3">
-            <span className="text-xs text-gray-600">
+          <div className="px-6 py-3 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between gap-3">
+            <span className="text-xs text-gray-500 dark:text-gray-600">
               Generated by AI · verify with a grammar reference
             </span>
             <div className="flex items-center gap-3 shrink-0">
@@ -455,7 +455,7 @@ const ConjugationModal = ({
               {isAdmin && onAdminRegenerate && (
                 <button
                   onClick={() => setAdminPromptOpen((v) => !v)}
-                  className="text-xs text-amber-400 hover:text-amber-200 transition-colors"
+                  className="text-xs text-amber-600 dark:text-amber-400 hover:text-amber-500 dark:hover:text-amber-200 transition-colors"
                 >
                   {adminPromptOpen ? "Cancel regenerate" : "Regenerate"}
                 </button>
@@ -466,14 +466,14 @@ const ConjugationModal = ({
               {userId &&
                 !reportOpen &&
                 (reportDone ? (
-                  <span className="inline-flex items-center gap-1 text-xs text-green-500">
+                  <span className="inline-flex items-center gap-1 text-xs text-green-600 dark:text-green-500">
                     <IoCheckmark size={12} aria-hidden="true" />
                     Reported
                   </span>
                 ) : (
                   <button
                     onClick={handleOpenReport}
-                    className="text-xs text-red-400 hover:text-red-200 transition-colors"
+                    className="text-xs text-red-600 dark:text-red-400 hover:text-red-500 dark:hover:text-red-200 transition-colors"
                   >
                     Report error
                   </button>
@@ -481,7 +481,7 @@ const ConjugationModal = ({
 
               <button
                 onClick={onClose}
-                className="text-xs text-gray-400 hover:text-white transition-colors"
+                className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
               >
                 Close
               </button>
