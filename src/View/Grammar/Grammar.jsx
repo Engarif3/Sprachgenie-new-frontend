@@ -38,7 +38,7 @@ const Grammar = () => {
           {grammarTypes.map((grammarType) => (
             <div
               key={grammarType.id}
-              className="group relative border border-slate-200 bg-white p-6 rounded-2xl transition-all duration-500 cursor-pointer hover:-translate-y-3 hover:scale-105 overflow-hidden shadow-md hover:border-orange-400 hover:shadow-[0_0_20px_rgba(249,115,22,0.15)] dark:border-gray-700/50 dark:bg-gradient-to-br dark:from-gray-800/80 dark:via-gray-900 dark:to-black dark:hover:border-orange-500 dark:hover:shadow-[0_0_20px_rgba(249,115,22,0.25)]"
+              className="group relative border border-slate-200 bg-white p-6 rounded-2xl transition-all duration-500 cursor-pointer hover:-translate-y-3 hover:scale-105 overflow-hidden shadow-[0_10px_30px_rgba(15,23,42,0.1)] hover:border-orange-400 hover:shadow-[0_25px_50px_rgba(15,23,42,0.18),0_0_20px_rgba(249,115,22,0.15)] dark:border-gray-700/50 dark:bg-gradient-to-br dark:from-gray-800/80 dark:via-gray-900 dark:to-black dark:shadow-[0_10px_30px_rgba(0,0,0,0.5)] dark:hover:border-orange-500 dark:hover:shadow-[0_25px_50px_rgba(0,0,0,0.6),0_0_20px_rgba(249,115,22,0.25)]"
               onClick={() => navigate(`/grammar/${grammarType.id}`)}
             >
               {/* Animated gradient background on hover */}
