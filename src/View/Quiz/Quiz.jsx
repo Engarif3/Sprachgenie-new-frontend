@@ -297,15 +297,24 @@ const Quiz = () => {
   if (!quizStarted) {
     return (
       <Container>
-        <div className="mx-auto w-full max-w-xl px-2 py-6 md:py-8">
+        <div className="mx-auto w-full max-w-xl px-2 pt-1 pb-6 md:pb-8">
           {/* Main Title */}
-          <div className="mb-4 text-center">
-            <h1 className="mb-1 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-3xl font-bold text-transparent md:text-4xl">
+          <div className="text-center mb-3 mt-4">
+            <div className="mb-3">
+              <span className="inline-flex items-center gap-2 px-6 py-1.5 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
+                <IoBulbOutline size={16} aria-hidden="true" />
+                Test Your Skills
+              </span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-2">
               Quiz
             </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400 md:text-base">
+            <p className="text-xl max-w-2xl mx-auto text-slate-500 dark:text-slate-400">
               Test your vocabulary and improve your German skills
             </p>
+            <div className="flex justify-center mt-3">
+              <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
+            </div>
           </div>
 
           {/* Difficulty Selection */}
