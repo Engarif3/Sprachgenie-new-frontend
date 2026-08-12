@@ -488,10 +488,10 @@ const Quiz = () => {
       <div className="mx-auto w-full max-w-2xl px-2 py-6 md:py-8">
         {/* Header with difficulty and reset */}
         <div className="mb-4 flex w-full flex-col items-center justify-between gap-3 sm:flex-row">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
             {source === "favorites" ? (
               <>
-                Source:{" "}
+                Source:
                 <span className="inline-flex items-center gap-1.5 font-bold text-pink-600 dark:text-pink-400">
                   <IoHeart size={14} aria-hidden="true" />
                   My Favorites
@@ -499,7 +499,7 @@ const Quiz = () => {
               </>
             ) : (
               <>
-                Difficulty:{" "}
+                Difficulty:
                 <span className="font-bold text-blue-600 dark:text-blue-400">
                   {DIFFICULTY_LEVELS[difficulty].name}
                 </span>
