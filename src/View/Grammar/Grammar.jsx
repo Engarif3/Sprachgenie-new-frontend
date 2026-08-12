@@ -38,7 +38,7 @@ const Grammar = () => {
           {grammarTypes.map((grammarType) => (
             <div
               key={grammarType.id}
-              className="group relative border-2 border-slate-200 bg-white p-6 rounded-2xl transition-all duration-500 cursor-pointer hover:-translate-y-3 hover:scale-105 overflow-hidden shadow-md hover:border-orange-400 hover:shadow-[0_0_50px_rgba(249,115,22,0.25)] dark:border-gray-700/50 dark:bg-gradient-to-br dark:from-gray-800/80 dark:via-gray-900 dark:to-black dark:hover:border-orange-500 dark:hover:shadow-[0_0_50px_rgba(249,115,22,0.5)]"
+              className="group relative border border-slate-200 bg-white p-6 rounded-2xl transition-all duration-500 cursor-pointer hover:-translate-y-3 hover:scale-105 overflow-hidden shadow-md hover:border-orange-400 hover:shadow-[0_0_50px_rgba(249,115,22,0.25)] dark:border-gray-700/50 dark:bg-gradient-to-br dark:from-gray-800/80 dark:via-gray-900 dark:to-black dark:hover:border-orange-500 dark:hover:shadow-[0_0_50px_rgba(249,115,22,0.5)]"
               onClick={() => navigate(`/grammar/${grammarType.id}`)}
             >
               {/* Animated gradient background on hover */}
@@ -49,8 +49,10 @@ const Grammar = () => {
 
               <div className="relative z-10">
                 {/* Icon */}
-                <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-orange-200 bg-orange-50 text-orange-600 transition-transform duration-300 group-hover:scale-110 dark:border-orange-500/30 dark:bg-orange-500/10 dark:text-orange-400">
-                  <IoBookOutline aria-hidden="true" size={28} />
+                <div className="mb-4 flex justify-end">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-orange-200 bg-orange-50 text-orange-600 transition-transform duration-300 group-hover:scale-110 dark:border-orange-500/30 dark:bg-orange-500/10 dark:text-orange-400">
+                    <IoBookOutline aria-hidden="true" size={28} />
+                  </div>
                 </div>
 
                 {/* Topic Title */}
