@@ -317,24 +317,20 @@ const SentenceRenderer = memo(
             </span>
           )}
           {isBulletLine && (
-            <>
-              {/* Invisible spacer matching the speaker-icon block's exact
-              box model (size + margin + arrow) so the bullet lines up with
-              where sentence text starts, not flush against the left edge. */}
-              <span
-                className="flex items-start flex-shrink-0 invisible"
-                aria-hidden="true"
-              >
-                <span className="h-7 w-7 lg:h-8 lg:w-8 mr-1 md:mr-0 lg:mr-0" />
-                <span className="hidden lg:inline">
-                  <IoMdArrowDropright size={20} />
-                </span>
+            // Invisible spacer matching the speaker-icon block's exact box
+            // model (size + margin + arrow) so the bullet's text starts
+            // exactly where sentence text starts. The dot itself is drawn
+            // via absolute positioning on the text span below (not as a
+            // flex sibling here), so it doesn't push the text further right.
+            <span
+              className="flex items-start flex-shrink-0 invisible"
+              aria-hidden="true"
+            >
+              <span className="h-7 w-7 lg:h-8 lg:w-8 mr-1 md:mr-0 lg:mr-0" />
+              <span className="hidden lg:inline">
+                <IoMdArrowDropright size={20} />
               </span>
-              <span
-                className="inline-block h-1.5 w-1.5 rounded-full bg-purple-400 flex-shrink-0 mt-2"
-                aria-hidden="true"
-              />
-            </>
+            </span>
           )}
           {isHeaderLine ? (
             <div className="w-full my-1.5 pl-3 md:pl-4 lg:pl-4">
@@ -356,6 +352,14 @@ const SentenceRenderer = memo(
                 aria-hidden="true"
               />
             </div>
+          ) : isBulletLine ? (
+            <span className="relative">
+              <span
+                className="absolute -left-3 top-2 h-1.5 w-1.5 rounded-full bg-purple-400"
+                aria-hidden="true"
+              />
+              <span className={className}>{sentenceContent}</span>
+            </span>
           ) : (
             <span className={className}>{sentenceContent}</span>
           )}
