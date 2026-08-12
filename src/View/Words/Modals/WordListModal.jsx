@@ -225,8 +225,6 @@ const SentenceRenderer = memo(
 
     // Determine styling and clean sentence
     if (trimmed.startsWith("##")) {
-      className =
-        "font-bold text-md md:text-lg lg:text-lg text-sky-600 dark:text-sky-400 list-none w-full text-center underline decoration-2 underline-offset-4 tracking-wide capitalize";
       cleanSentence = sentence.replace(/^##\s*/, "");
     } else if (trimmed.startsWith("--")) {
       cleanSentence = sentence.replace(/^--\s*/, "");
@@ -238,6 +236,11 @@ const SentenceRenderer = memo(
         .replace(/\*\*$/, "")
         .trim();
     }
+
+    // "##"-prefixed lines are the top-level header — rendered as a
+    // full-width bar whose background color is strongest in the middle and
+    // fades to transparent at both edges, instead of plain underlined text.
+    const isHeaderLine = trimmed.startsWith("##");
 
     // "--"-prefixed lines are a smaller sub-header nested under the nearest
     // "##" above them — rendered as its own labeled-divider layout (flanking
@@ -333,7 +336,13 @@ const SentenceRenderer = memo(
               />
             </>
           )}
-          {isSubHeaderLine ? (
+          {isHeaderLine ? (
+            <div className="w-full my-1 py-1.5 rounded-md bg-gradient-to-r from-transparent via-sky-500/20 to-transparent dark:via-sky-400/20">
+              <p className="text-center font-bold text-md md:text-lg lg:text-lg text-sky-600 dark:text-sky-400 tracking-wide capitalize">
+                {sentenceContent}
+              </p>
+            </div>
+          ) : isSubHeaderLine ? (
             <div className="flex items-center gap-2 w-full my-1">
               <span
                 className="h-px flex-1 bg-gradient-to-r from-transparent to-indigo-400/50 dark:to-indigo-400/40"
