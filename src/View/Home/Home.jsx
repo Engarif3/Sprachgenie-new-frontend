@@ -488,6 +488,29 @@ const Home = () => {
     },
   ];
 
+  const statTiles = [
+    {
+      icon: IoLibraryOutline,
+      value: t("wordCount", { count: wordCountText }),
+      label: t("words"),
+    },
+    {
+      icon: IoChatbubblesOutline,
+      value: t("practicalConversations"),
+      label: t("conversationTopics"),
+    },
+    {
+      icon: IoSchoolOutline,
+      value: t("cefrLevels"),
+      label: t("cefrLabel"),
+    },
+    {
+      icon: IoHardwareChipOutline,
+      value: t("aiPowered"),
+      label: t("powered"),
+    },
+  ];
+
   const faqItems = [
     { question: t("isFree"), answer: t("isFreeAnswer") },
     { question: t("levelsQuestion"), answer: t("levelsAnswer") },
@@ -1140,44 +1163,28 @@ const Home = () => {
       >
         <Container>
           <div
-            className={`grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8 px-4 transition-all duration-1000 ${
+            className={`grid grid-cols-2 gap-4 px-4 transition-all duration-1000 md:gap-6 lg:grid-cols-4 ${
               visibleSections.has("stats")
                 ? "opacity-100 scale-100"
                 : "opacity-0 scale-95"
             }`}
           >
-            <div className="text-center">
-              <div className="text-4xl md:text-6xl lg:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-3">
-                {t("wordCount", { count: wordCountText })}
+            {statTiles.map((stat) => (
+              <div
+                key={stat.label}
+                className="group flex flex-col items-center rounded-3xl border border-white/10 bg-white/5 px-4 py-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-orange-400/30 hover:bg-white/[0.08]"
+              >
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-orange-400/20 bg-orange-500/10 text-orange-400 transition-transform duration-300 group-hover:scale-105">
+                  <stat.icon size={22} aria-hidden="true" />
+                </div>
+                <div className="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-2">
+                  {stat.value}
+                </div>
+                <p className="text-gray-300 text-base md:text-lg font-semibold">
+                  {stat.label}
+                </p>
               </div>
-              <p className="text-white dark:text-gray-300 text-lg font-semibold">
-                {t("words")}
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-6xl lg:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-3">
-                {t("practicalConversations")}
-              </div>
-              <p className="text-white dark:text-gray-300 text-lg font-semibold">
-                {t("conversationTopics")}
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 mb-2">
-                {t("cefrLevels")}
-              </div>
-              <p className="text-white dark:text-gray-300 text-lg font-semibold">
-                {t("cefrLabel")}
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-3">
-                {t("aiPowered")}
-              </div>
-              <p className="text-white dark:text-gray-300 text-lg font-semibold">
-                {t("powered")}
-              </p>
-            </div>
+            ))}
           </div>
         </Container>
       </div>
