@@ -2793,7 +2793,19 @@ const WordList = () => {
                           </div>
                         )
                       ) : (
-                        "No words available. Will be added soon!"
+                        <div className="flex flex-col items-center gap-2">
+                          <span>No words available. Will be added soon!</span>
+                          {trimmedSearchValue && (
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              className="mt-1"
+                              onClick={handleClearSearchText}
+                            >
+                              Clear Search
+                            </Button>
+                          )}
+                        </div>
                       )}
                     </td>
                   </tr>
