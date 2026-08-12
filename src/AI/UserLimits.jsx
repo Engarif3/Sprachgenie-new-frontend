@@ -216,7 +216,7 @@ const UserLimits = () => {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
-        <ScaleLoader color="#36d7b7" loading={loading} size={150} />
+        <ScaleLoader color="oklch(0.5 0.134 242.749)" loading={loading} size={150} />
       </div>
     );
   }

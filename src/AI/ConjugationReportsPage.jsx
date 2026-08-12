@@ -450,7 +450,7 @@ const ConjugationReportsPage = () => {
 
       {loading ? (
         <div className="flex justify-center mt-16">
-          <ScaleLoader color="#36d7b7" />
+          <ScaleLoader color="oklch(0.5 0.134 242.749)" />
         </div>
       ) : reports.length === 0 ? (
         <div className="text-center text-slate-400 dark:text-gray-500 mt-16 text-lg">
