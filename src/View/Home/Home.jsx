@@ -963,7 +963,7 @@ const Home = () => {
           <div
             id="features-title"
             data-animate
-            className={`text-center mb-10 transition-all duration-1000 ${
+            className={`text-center mb-3 transition-all duration-1000 ${
               visibleSections.has("features-title")
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-10"
