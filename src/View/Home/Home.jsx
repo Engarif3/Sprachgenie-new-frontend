@@ -881,7 +881,7 @@ const Home = () => {
 
         <Container>
           <div
-            className={`mb-3 relative transition-all duration-1000 ${
+            className={`mb-10 relative transition-all duration-1000 ${
               visibleSections.has("resources")
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-10"
