@@ -478,20 +478,24 @@ const ChallengeSession = () => {
     return (
       <Container>
         <div className="mx-auto flex min-h-[65vh] max-w-5xl flex-col gap-8 py-4">
-          <div className="text-center">
-            <h1
-              className={`flex items-center justify-center gap-2 text-3xl font-bold sm:text-4xl ${isLight ? "text-slate-900" : "text-white"}`}
-            >
-              {/* <span className="text-4xl">🎯</span> */}
-              <span className="bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 bg-clip-text text-transparent pb-8">
-                Daily Challenge
+          <div className="text-center mb-4 mt-4">
+            <div className="mb-4">
+              <span className="inline-flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
+                <Zap size={16} aria-hidden="true" />
+                Timed Challenge
               </span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-4">
+              Daily Challenge
             </h1>
             <p
-              className={`mt-2 text-sm ${isLight ? "text-slate-500" : "text-slate-400"}`}
+              className={`text-xl max-w-2xl mx-auto ${isLight ? "text-slate-600" : "text-slate-300"}`}
             >
               20 random words a day, per level. Answer fast — 15 seconds each.
             </p>
+            <div className="flex justify-center mt-6">
+              <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
+            </div>
           </div>
 
           <div
