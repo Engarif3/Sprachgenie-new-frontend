@@ -898,7 +898,7 @@ const Home = () => {
             <p className="text-center  text-xl md:text-2xl text-gray-950 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
               {t("everythingYouNeed")}
             </p>
-            <div className="flex justify-center mt-6">
+            <div className="flex justify-center mt-3">
               <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
             </div>
           </div>
@@ -977,7 +977,7 @@ const Home = () => {
               {t("poweredByAI")}
             </p>
 
-            <div className="flex justify-center mt-6">
+            <div className="flex justify-center mt-3">
               <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
             </div>
           </div>
@@ -1125,7 +1125,7 @@ const Home = () => {
             <p className="text-xl text-gray-950 dark:text-gray-300 max-w-2xl mx-auto">
               {t("startYourJourneySteps")}
             </p>
-            <div className="flex justify-center mt-6">
+            <div className="flex justify-center mt-3">
               <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
             </div>
           </div>
@@ -1234,7 +1234,7 @@ const Home = () => {
             <p className="text-xl text-gray-950 dark:text-gray-300 max-w-2xl mx-auto">
               {t("everythingYouNeedToKnow")}
             </p>
-            <div className="flex justify-center mt-6">
+            <div className="flex justify-center mt-3">
               <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
             </div>
           </div>
