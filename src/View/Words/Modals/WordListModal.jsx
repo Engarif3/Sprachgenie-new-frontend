@@ -537,25 +537,26 @@ const WordListModal = ({
         ref={modalRef}
         className="relative  bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl max-w-6xl w-full mx-3 shadow-2xl transform transition-all duration-300 dark:border-2 border-gray-700/50 max-h-[90vh] overflow-y-auto"
       >
-        {/* Favorite + Close buttons, top-right */}
-        <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
-          {userLoggedIn && (
-            <FavoriteButton
-              isFavorite={favorites.includes(selectedWord.id)}
-              loading={loadingFavorites[selectedWord.id]}
-              onClick={handleToggleFavorite}
-              className="rounded-full bg-white/5 p-2 hover:bg-white/10"
-            />
-          )}
-          <button
-            onClick={handleCloseModal}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-gray-300 transition-colors hover:bg-white/10 hover:text-white"
-            aria-label="Close"
-            title="Close"
-          >
-            <IoClose size={22} aria-hidden="true" />
-          </button>
-        </div>
+        {/* Favorite toggle — top-left, away from Close so the two aren't
+        sitting shoulder to shoulder inviting a mis-click. */}
+        {userLoggedIn && (
+          <FavoriteButton
+            isFavorite={favorites.includes(selectedWord.id)}
+            loading={loadingFavorites[selectedWord.id]}
+            onClick={handleToggleFavorite}
+            className="absolute top-3 left-3 z-10 rounded-full bg-white/5 p-2 hover:bg-white/10"
+          />
+        )}
+
+        {/* Close — top-right, the one spot users always expect it. */}
+        <button
+          onClick={handleCloseModal}
+          className="absolute top-3 right-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-gray-300 transition-colors hover:bg-white/10 hover:text-white"
+          aria-label="Close"
+          title="Close"
+        >
+          <IoClose size={22} aria-hidden="true" />
+        </button>
         <p className="text-center mt-8 md:mt-6 lg:mt-6 px-4 md:px-6">
           <span className="inline-block px-4 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full">
             <span className="text-blue-400 text-lg font-bold">Topic:</span>
