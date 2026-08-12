@@ -10,7 +10,7 @@ import { getBestGermanVoiceSync } from "./voiceSettings";
 // once per tab session — a helpful one-time nudge, never a recurring nag.
 const CHROME_HINT_STORAGE_KEY = "sprachgenie_chrome_voice_hint_shown";
 
-const maybeShowChromeVoiceHint = (preferredVoice) => {
+export const maybeShowChromeVoiceHint = (preferredVoice) => {
   const isGoogleVoice = preferredVoice?.name?.toLowerCase().includes("google");
   if (isGoogleVoice) return;
 

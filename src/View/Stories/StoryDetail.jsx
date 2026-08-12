@@ -13,9 +13,13 @@ import FavoriteButton from "../Words/Modals/FavoriteButton";
 import {
   getAvailableGermanVoices,
   getBestGermanVoice,
+  getBestGermanVoiceSync,
 } from "../../utils/voiceSettings";
 import { formatDateOnly } from "../../utils/formatDateTime";
-import { pronounceWord } from "../../utils/wordPronounciation";
+import {
+  pronounceWord,
+  maybeShowChromeVoiceHint,
+} from "../../utils/wordPronounciation";
 
 // Chrome (and Chromium derivatives) has a long-standing bug where
 // utterance.onboundary never fires for remote/"network" voices — which is
@@ -486,6 +490,13 @@ const StoryDetail = () => {
     // one already finished) may have run while we were awaiting the voice
     // lookup above — don't let a now-stale utterance start speaking.
     if (narrationTokenRef.current !== token) return;
+
+    // Checked against the same generic preference pick used everywhere else
+    // (not `finalVoice`) — narration deliberately steers toward a local
+    // voice for onboundary/highlighting support regardless of quality, so
+    // `finalVoice` alone isn't a reliable signal for whether this browser
+    // actually has a good German voice available.
+    maybeShowChromeVoiceHint(getBestGermanVoiceSync());
 
     isLocalVoiceRef.current = !!(finalVoice && finalVoice.localService);
     voiceKeyRef.current = finalVoice
