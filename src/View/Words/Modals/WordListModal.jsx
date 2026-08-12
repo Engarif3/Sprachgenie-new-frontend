@@ -219,17 +219,18 @@ const SentenceRenderer = memo(
     isFlagged,
   }) => {
     const trimmed = sentence.trim();
-    let className = "text-slate-300 text-sm md:text-base lg:text-lg";
+    let className =
+      "text-slate-700 dark:text-slate-300 text-sm md:text-base lg:text-lg";
     let cleanSentence = sentence;
 
     // Determine styling and clean sentence
     if (trimmed.startsWith("##")) {
       className =
-        "font-semibold text-md md:text-lg lg:text-lg text-sky-600 list-none w-full text-center underline capitalize";
+        "font-semibold text-md md:text-lg lg:text-lg text-sky-600 dark:text-sky-400 list-none w-full text-center underline capitalize";
       cleanSentence = sentence.replace(/^##\s*/, "");
     } else if (trimmed.startsWith("**")) {
       className =
-        "text-gray-400 list-none text-sm md:text-base lg:text-lg first-letter:uppercase font-normal";
+        "text-gray-500 dark:text-gray-400 list-none text-sm md:text-base lg:text-lg first-letter:uppercase font-normal";
       cleanSentence = sentence
         .replace(/^\*\*\s*/, "")
         .replace(/\*\*$/, "")
@@ -282,25 +283,25 @@ const SentenceRenderer = memo(
             : undefined
         }
       >
-        <div className="text-gray-600 flex items-start gap-2">
+        <div className="text-gray-700 dark:text-gray-300 flex items-start gap-2">
           {showSpeakerButton && (
             <span className="flex items-start flex-shrink-0">
               <button
                 onClick={handlePronounce}
-                className="text-blue-600 hover:text-blue-800 mr-1 md:mr-0 lg:mr-0"
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 mr-1 md:mr-0 lg:mr-0"
                 title="Pronounce"
               >
                 <HiSpeakerWave
                   size={20}
-                  className="mt-0 lg:mt-1 text-cyan-500 block lg:hidden"
+                  className="mt-0 lg:mt-1 text-cyan-600 dark:text-cyan-500 block lg:hidden"
                 />
                 <HiSpeakerWave
                   size={22}
-                  className="mt-0 lg:mt-1 text-cyan-500 hidden lg:block"
+                  className="mt-0 lg:mt-1 text-cyan-600 dark:text-cyan-500 hidden lg:block"
                 />
               </button>
               <span className="hidden lg:inline">
-                <IoMdArrowDropright className="text-pink-600 mt-1" size={20} />
+                <IoMdArrowDropright className="text-pink-600 dark:text-pink-500 mt-1" size={20} />
               </span>
             </span>
           )}
@@ -335,7 +336,7 @@ const SentenceRenderer = memo(
           {showSpeakerButton && !userLoggedIn && (
             <button
               onClick={handleTranslateLocked}
-              className="flex-shrink-0 flex items-center justify-center mt-0 lg:mt-1 text-gray-300 cursor-pointer hover:text-gray-200 transition-colors"
+              className="flex-shrink-0 flex items-center justify-center mt-0 lg:mt-1 text-gray-400 dark:text-gray-300 cursor-pointer hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
               title="Sign in to use translation feature"
             >
               <SiGoogletranslate size={16} />
@@ -344,10 +345,10 @@ const SentenceRenderer = memo(
         </div>
 
         {translation && (
-          <p className="text-sky-500 ml-6 mt-1 italic text-xs md:text-sm flex items-center gap-2">
+          <p className="text-sky-600 dark:text-sky-500 ml-6 mt-1 italic text-xs md:text-sm flex items-center gap-2">
             <MdOutlineDoubleArrow
               size={16}
-              className="flex-shrink-0 text-pink-600 ml-0 lg:ml-1"
+              className="flex-shrink-0 text-pink-600 dark:text-pink-500 ml-0 lg:ml-1"
             />
             <span>{translation}</span>
           </p>
@@ -540,7 +541,7 @@ const WordListModal = ({
         negative-offset button instead of letting it hang over the edge. */}
         <button
           onClick={handleCloseModal}
-          className="absolute -top-3 -right-3 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-gray-700 bg-gray-800 text-gray-300 shadow-lg transition-colors hover:bg-gray-700 hover:text-white"
+          className="absolute -top-3 -right-3 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 shadow-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
           aria-label="Close"
           title="Close"
         >
@@ -549,19 +550,19 @@ const WordListModal = ({
 
         <div
           ref={modalRef}
-          className="relative  bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl w-full shadow-2xl transform transition-all duration-300 dark:border-2 border-gray-700/50 max-h-[90vh] overflow-y-auto"
+          className="relative bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-black rounded-3xl w-full shadow-2xl transform transition-all duration-300 border border-gray-200 dark:border-2 dark:border-gray-700/50 max-h-[90vh] overflow-y-auto"
         >
           <p className="text-center mt-8 md:mt-6 lg:mt-6 px-4 md:px-6">
           <span className="inline-block px-4 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full">
-            <span className="text-blue-400 text-lg font-bold">Topic:</span>
-            <span className="text-md md:text-xl lg:text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-400 ml-2">
+            <span className="text-blue-600 dark:text-blue-400 text-lg font-bold">Topic:</span>
+            <span className="text-md md:text-xl lg:text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 dark:from-orange-400 dark:to-pink-400 ml-2">
               {selectedWord.topic?.name || ""}
             </span>
           </span>
         </p>
-        <hr className="border-0 h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent mx-8 mt-4" />
+        <hr className="border-0 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent mx-8 mt-4" />
         <div className="flex justify-between items-center px-3 md:px-5 lg:px-8 mt-6 ml-1 ">
-          <h3 className="text-lg md:text-2xl lg:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 flex items-center gap-4">
+          <h3 className="text-lg md:text-2xl lg:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500 dark:from-blue-400 dark:to-purple-400 flex items-center gap-4">
             <span>Word Details</span>
             <button
               onClick={handlePronounceWord}
@@ -594,28 +595,28 @@ const WordListModal = ({
           )}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5 lg:gap-3 mx-1 px-1 md:px-3 lg:px-2 mt-4 ">
-          <div className="space-y-3 bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm p-2 md:p-4 lg:p-4 rounded-2xl border border-gray-700/30">
+          <div className="space-y-3 bg-gray-100/70 dark:bg-gradient-to-br dark:from-gray-800/60 dark:to-gray-900/60 backdrop-blur-sm p-2 md:p-4 lg:p-4 rounded-2xl border border-gray-200 dark:border-gray-700/30">
             <p className="text-sm md:text-base lg:text-lg">
-              <span className="text-blue-400 font-semibold">Word:</span>{" "}
-              <span className="mr-2 font-bold text-orange-400 text-center text-md md:text-lg lg:text-xl">
+              <span className="text-blue-600 dark:text-blue-400 font-semibold">Word:</span>{" "}
+              <span className="mr-2 font-bold text-orange-600 dark:text-orange-400 text-center text-md md:text-lg lg:text-xl">
                 {selectedWord.article?.name}
               </span>
-              <span className="text-white font-bold text-sm md:text-lg lg:text-xl">
+              <span className="text-gray-900 dark:text-white font-bold text-sm md:text-lg lg:text-xl">
                 {renderWordWithPrefix(selectedWord)}
               </span>
             </p>
             {isEnumeratedMeaning ? (
               <div className="text-sm md:text-base lg:text-lg">
-                <span className="text-blue-400 font-semibold">Meaning:</span>
+                <span className="text-blue-600 dark:text-blue-400 font-semibold">Meaning:</span>
                 <div className="mt-1 pl-6 space-y-0.5">
                   {enumeratedMeaningParts.map((item, index) => {
                     const { marker, text } = splitMeaningMarkerFromText(item);
                     return (
                       <p
                         key={index}
-                        className="text-cyan-500 tracking-wide font-normal italic flex gap-1"
+                        className="text-cyan-700 dark:text-cyan-400 tracking-wide font-normal italic flex gap-1"
                       >
-                        <span className="flex-shrink-0 text-white font-normal not-italic">
+                        <span className="flex-shrink-0 text-gray-900 dark:text-white font-normal not-italic">
                           {marker}
                         </span>
                         <span>{text}</span>
@@ -626,10 +627,10 @@ const WordListModal = ({
               </div>
             ) : (
               <p className="text-sm md:text-base lg:text-lg flex gap-1">
-                <span className="text-blue-400 font-semibold flex-shrink-0">
+                <span className="text-blue-600 dark:text-blue-400 font-semibold flex-shrink-0">
                   Meaning:
                 </span>
-                <span className="text-cyan-500 tracking-wide font-normal italic">
+                <span className="text-cyan-700 dark:text-cyan-400 tracking-wide font-normal italic">
                   {meaningsList}
                 </span>
               </p>
@@ -637,13 +638,13 @@ const WordListModal = ({
 
             {selectedWord.pluralForm && (
               <p className="text-sm md:text-base lg:text-lg">
-                <span className="text-blue-400 font-semibold">Plural:</span>{" "}
+                <span className="text-blue-600 dark:text-blue-400 font-semibold">Plural:</span>{" "}
                 {selectedWord.pluralForm && (
                   <>
-                    <span className="font-bold text-orange-400 text-md md:text-lg lg:text-xl">
+                    <span className="font-bold text-orange-600 dark:text-orange-400 text-md md:text-lg lg:text-xl">
                       die
                     </span>{" "}
-                    <span className="text-white font-bold">
+                    <span className="text-gray-900 dark:text-white font-bold">
                       {capitalizedPluralForm}
                     </span>
                   </>
@@ -653,21 +654,21 @@ const WordListModal = ({
 
             {(selectedWord.synonyms?.length || 0) > 0 && (
               <p className="text-sm md:text-base lg:text-lg">
-                <span className="text-blue-400 font-semibold capitalize">
+                <span className="text-blue-600 dark:text-blue-400 font-semibold capitalize">
                   Synonyms:
                 </span>{" "}
-                <span className=" dark:text-gray-400 font-medium italic">
+                <span className="text-gray-600 dark:text-gray-400 font-medium italic">
                   {synonymsList.map((item, idx) => (
                     <span key={idx}>
                       {item.article && (
-                        <span className="text-orange-400 font-bold">
+                        <span className="text-orange-600 dark:text-orange-400 font-bold">
                           {item.article}{" "}
                         </span>
                       )}
-                      <span className="text-gray-300 ">
+                      <span className="text-gray-700 dark:text-gray-300 ">
                         {item.article ? capitalizeFirstLetter(item.value) : item.value}
                       </span>
-                      <span className="text-orange-400 ">
+                      <span className="text-orange-600 dark:text-orange-400 ">
                         {idx < synonymsList.length - 1 && ", "}
                       </span>
                     </span>
@@ -678,21 +679,21 @@ const WordListModal = ({
 
             {(selectedWord.antonyms?.length || 0) > 0 && (
               <p className="text-sm md:text-base lg:text-lg ">
-                <span className="text-blue-400 font-semibold capitalize">
+                <span className="text-blue-600 dark:text-blue-400 font-semibold capitalize">
                   Antonyms:
                 </span>{" "}
-                <span className=" dark:text-gray-400 font-medium italic">
+                <span className="text-gray-600 dark:text-gray-400 font-medium italic">
                   {antonymsList.map((item, idx) => (
                     <span key={idx}>
                       {item.article && (
-                        <span className="text-orange-400 font-bold">
+                        <span className="text-orange-600 dark:text-orange-400 font-bold">
                           {item.article}{" "}
                         </span>
                       )}
-                      <span className="text-gray-300 ">
+                      <span className="text-gray-700 dark:text-gray-300 ">
                         {item.article ? capitalizeFirstLetter(item.value) : item.value}
                       </span>
-                      <span className="text-orange-400 ">
+                      <span className="text-orange-600 dark:text-orange-400 ">
                         {idx < antonymsList.length - 1 && ", "}
                       </span>
                     </span>
@@ -703,22 +704,22 @@ const WordListModal = ({
 
             {(selectedWord.similarWords?.length || 0) > 0 && (
               <p className="text-sm md:text-base lg:text-lg ">
-                <span className="text-blue-400 font-semibold">
+                <span className="text-blue-600 dark:text-blue-400 font-semibold">
                   Word to Watch:
                 </span>{" "}
-                <span className=" font-medium italic">
+                <span className="text-gray-700 dark:text-gray-300 font-medium italic">
                   {similarWordsList.map((item, idx) => (
                     <span key={idx}>
                       {item.article && (
-                        <span className="text-orange-400 font-bold">
+                        <span className="text-orange-600 dark:text-orange-400 font-bold">
                           {item.article}{" "}
                         </span>
                       )}
-                      <span className="text-gray-300 ">
+                      <span className="text-gray-700 dark:text-gray-300 ">
                         {item.article ? capitalizeFirstLetter(item.value) : item.value}
                       </span>
                       {/* {idx < similarWordsList.length - 1 && ", "} */}
-                      <span className="text-orange-400">
+                      <span className="text-orange-600 dark:text-orange-400">
                         {idx < similarWordsList.length - 1 && ", "}
                       </span>
                     </span>
@@ -728,8 +729,8 @@ const WordListModal = ({
             )}
 
             <p className="text-sm md:text-base lg:text-lg">
-              <span className="text-blue-400 font-semibold">Level:</span>{" "}
-              <span className="inline-block px-2 md:px-2 py-0 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-md text-orange-400 font-bold text-xs md:text-sm">
+              <span className="text-blue-600 dark:text-blue-400 font-semibold">Level:</span>{" "}
+              <span className="inline-block px-2 md:px-2 py-0 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-md text-orange-600 dark:text-orange-400 font-bold text-xs md:text-sm">
                 {selectedWord.level?.level || ""}
               </span>
             </p>
@@ -750,10 +751,10 @@ const WordListModal = ({
             )} */}
             {getWordInfo(selectedWord).length > 0 && (
               <p className="text-sm md:text-base lg:text-lg flex  items-center ">
-                <span className="text-blue-400 font-semibold ">
+                <span className="text-blue-600 dark:text-blue-400 font-semibold ">
                   <IoInformationCircleOutline
                     size={23}
-                    className="text-white cursor-pointer hover:text-blue-500 transition mr-1 mt-[1px] animate-pulse "
+                    className="text-gray-700 dark:text-white cursor-pointer hover:text-blue-500 transition mr-1 mt-[1px] animate-pulse "
                   />
                 </span>
 
@@ -761,7 +762,7 @@ const WordListModal = ({
                   {getWordInfo(selectedWord).map((item, index) => (
                     <span
                       key={index}
-                      className="text-orange-400 text-xs md:text-sm italic bg-slate-800 border border-cyan-500 rounded-md  px-1 flex justify-center items-center "
+                      className="text-orange-700 dark:text-orange-400 text-xs md:text-sm italic bg-slate-100 dark:bg-slate-800 border border-cyan-600 dark:border-cyan-500 rounded-md  px-1 flex justify-center items-center "
                     >
                       <span className=""> {item}</span>
                     </span>
@@ -770,8 +771,8 @@ const WordListModal = ({
               </p>
             )}
           </div>
-          <div className="bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm p-2 md:p-4 lg:p-3 rounded-2xl border border-gray-700/30 ">
-            <p className="flex items-center gap-2 text-md md:text-lg lg:text-lg text-blue-400 font-semibold mb-3">
+          <div className="bg-gray-100/70 dark:bg-gradient-to-br dark:from-gray-800/60 dark:to-gray-900/60 backdrop-blur-sm p-2 md:p-4 lg:p-3 rounded-2xl border border-gray-200 dark:border-gray-700/30 ">
+            <p className="flex items-center gap-2 text-md md:text-lg lg:text-lg text-blue-600 dark:text-blue-400 font-semibold mb-3">
               <IoDocumentTextOutline size={18} aria-hidden="true" />
               Sentences:
             </p>
@@ -796,7 +797,7 @@ const WordListModal = ({
                 ))}
               </ul>
             ) : (
-              <span className="text-gray-400 italic">
+              <span className="text-gray-500 dark:text-gray-400 italic">
                 No sentences available.
               </span>
             )}

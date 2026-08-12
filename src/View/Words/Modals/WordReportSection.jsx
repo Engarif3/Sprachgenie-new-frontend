@@ -153,35 +153,35 @@ const WordReportSection = ({ wordId, sentences }) => {
       <button
         type="button"
         onClick={handleExpand}
-        className="inline-flex items-center gap-1.5 text-sm font-semibold text-red-400 hover:text-red-300 transition-colors ml-4"
+        className="inline-flex items-center gap-1.5 text-sm font-semibold text-red-600 dark:text-red-400 hover:text-red-500 dark:hover:text-red-300 transition-colors ml-4"
       >
         <IoFlagOutline size={14} aria-hidden="true" />
         {expanded ? "Hide report" : "Report a problem"}
       </button>
 
       {expanded && (
-        <div className="mt-3 rounded-2xl border border-gray-700/50 bg-gray-900/60 p-4">
+        <div className="mt-3 rounded-2xl border border-gray-200 dark:border-gray-700/50 bg-gray-50 dark:bg-gray-900/60 p-4">
           {loading ? (
-            <p className="text-gray-400 text-sm">Loading...</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">Loading...</p>
           ) : submitted ? (
-            <p className="flex items-center gap-1.5 text-emerald-400 text-sm font-medium">
+            <p className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-sm font-medium">
               <IoCheckmarkCircleOutline size={16} aria-hidden="true" />
               Thanks — your report has been submitted.
             </p>
           ) : alreadyReported ? (
-            <p className="text-amber-400 text-sm font-medium">
+            <p className="text-amber-600 dark:text-amber-400 text-sm font-medium">
               You have already reported this word.
             </p>
           ) : (
             <>
-              <p className="text-gray-300 text-sm font-semibold mb-2">
+              <p className="text-gray-700 dark:text-gray-300 text-sm font-semibold mb-2">
                 What's wrong?
               </p>
               <div className="space-y-2 mb-3">
                 {reasons.map((reason) => (
                   <label
                     key={reason.id}
-                    className="flex items-start gap-2 text-sm text-gray-300 cursor-pointer"
+                    className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
                   >
                     <input
                       type="checkbox"
@@ -196,7 +196,7 @@ const WordReportSection = ({ wordId, sentences }) => {
 
               {needsSentence && (
                 <div className="mb-3">
-                  <p className="text-gray-300 text-sm font-semibold mb-2">
+                  <p className="text-gray-700 dark:text-gray-300 text-sm font-semibold mb-2">
                     Which sentence?
                   </p>
                   {reportableSentences.length === 0 ? (
@@ -204,11 +204,11 @@ const WordReportSection = ({ wordId, sentences }) => {
                       This word has no sentences to select.
                     </p>
                   ) : (
-                    <div className="custom-scrollbar max-h-40 space-y-1.5 overflow-y-auto rounded-lg border border-gray-700/60 bg-gray-950/50 p-2.5 pr-1.5">
+                    <div className="custom-scrollbar max-h-40 space-y-1.5 overflow-y-auto rounded-lg border border-gray-200 dark:border-gray-700/60 bg-white dark:bg-gray-950/50 p-2.5 pr-1.5">
                       {reportableSentences.map(({ text, index }) => (
                         <label
                           key={index}
-                          className="flex items-start gap-2 text-sm text-gray-400 cursor-pointer"
+                          className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer"
                         >
                           <input
                             type="radio"
@@ -229,7 +229,7 @@ const WordReportSection = ({ wordId, sentences }) => {
                 <div className="mb-3">
                   <label
                     htmlFor="word-report-message"
-                    className="block text-gray-300 text-sm font-semibold mb-1"
+                    className="block text-gray-700 dark:text-gray-300 text-sm font-semibold mb-1"
                   >
                     Anything else? (optional)
                   </label>
@@ -238,15 +238,15 @@ const WordReportSection = ({ wordId, sentences }) => {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     rows={2}
-                    className={`w-full rounded-lg border bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 ${
+                    className={`w-full rounded-lg border bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 ${
                       messageTooLong
                         ? "border-red-500 focus:ring-red-500/30"
-                        : "border-gray-600 focus:ring-blue-500/30"
+                        : "border-gray-300 dark:border-gray-600 focus:ring-blue-500/30"
                     }`}
                     placeholder="Describe the mistake..."
                   />
                   <p
-                    className={`mt-1 text-xs ${messageTooLong ? "text-red-400" : "text-gray-500"}`}
+                    className={`mt-1 text-xs ${messageTooLong ? "text-red-500 dark:text-red-400" : "text-gray-500"}`}
                   >
                     {messageCharCount}/{maxCharacters} characters
                   </p>
@@ -254,7 +254,7 @@ const WordReportSection = ({ wordId, sentences }) => {
               )}
 
               {submitError && (
-                <p className="mb-3 text-sm text-red-400">{submitError}</p>
+                <p className="mb-3 text-sm text-red-600 dark:text-red-400">{submitError}</p>
               )}
 
               <button

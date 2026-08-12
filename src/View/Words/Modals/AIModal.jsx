@@ -462,21 +462,21 @@ const AIModal = ({
         className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50"
         onClick={handleBackgroundClick}
       >
-        <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl shadow-2xl p-1 md:p-8 lg:p-8 w-full md:w-2/3 lg:w-1/2 max-h-[90vh] overflow-y-auto mx-1 border-2 border-gray-700/50">
+        <div className="bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-black rounded-3xl shadow-2xl p-1 md:p-8 lg:p-8 w-full md:w-2/3 lg:w-1/2 max-h-[90vh] overflow-y-auto mx-1 border border-gray-200 dark:border-2 dark:border-gray-700/50">
           <h2 className="text-3xl md:text-5xl lg:text-5xl font-bold text-center mb-4">
-            <span className="text-sky-400 font-bold">
+            <span className="text-sky-600 dark:text-sky-400 font-bold">
               {typeof activeWord?.article === "string"
                 ? activeWord.article
                 : activeWord?.article?.name || ""}
             </span>{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 dark:from-orange-400 dark:via-pink-400 dark:to-purple-400">
               {activeWord?.isShortForm
                 ? activeWord.value?.toUpperCase()
                 : capitalizeFirstLetter(activeWord?.value)}
             </span>
           </h2>
           <div className="flex justify-center mb-6 ">
-            <p className="text-center text-cyan-300 text-md px-4 py-2 bg-cyan-500/10 rounded-2xl border border-cyan-500/30">
+            <p className="text-center text-cyan-700 dark:text-cyan-300 text-md px-4 py-2 bg-cyan-500/10 rounded-2xl border border-cyan-500/30">
               {Array.isArray(activeWord?.meaning)
                 ? activeWord.meaning.join(", ")
                 : activeWord?.meaning || ""}
@@ -487,11 +487,11 @@ const AIModal = ({
             {activeWord?.aiMeanings?.length > 0 && (
               <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 p-2 md:p-4 lg:p-4 rounded-2xl border-2 border-green-400/50">
                 <p className="text-base md:text-lg">
-                  <strong className="inline-flex items-center gap-1.5 text-green-400 font-semibold">
+                  <strong className="inline-flex items-center gap-1.5 text-green-700 dark:text-green-400 font-semibold">
                     <IoSparklesOutline size={16} aria-hidden="true" />
                     AI Meanings:
                   </strong>{" "}
-                  <span className="text-white font-medium">
+                  <span className="text-gray-900 dark:text-white font-medium">
                     {activeWord.aiMeanings.join(", ")}
                   </span>
                 </p>
@@ -499,7 +499,7 @@ const AIModal = ({
             )}
 
             <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 p-2 md:p-6 lg:p-6 rounded-2xl border-2 border-blue-400/50">
-              <p className="text-white text-xl leading-relaxed whitespace-pre-line ">
+              <p className="text-gray-900 dark:text-white text-xl leading-relaxed whitespace-pre-line ">
                 {currentParagraph}
               </p>
             </div>
@@ -507,24 +507,24 @@ const AIModal = ({
             {isSuperAdmin && showSuperAdminTools && (
               <div className="space-y-4 rounded-2xl border-2 border-amber-400/40 bg-gradient-to-br from-amber-500/10 to-orange-500/10 p-4 md:p-6">
                 <div>
-                  <h3 className="text-xl font-semibold text-amber-300">
+                  <h3 className="text-xl font-semibold text-amber-700 dark:text-amber-300">
                     Super Admin Correction
                   </h3>
-                  <p className="mt-1 text-sm text-slate-300">
+                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
                     Use a correction prompt to regenerate, then manually save
                     the final meaning and paragraph.
                   </p>
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-amber-200">
+                  <label className="mb-2 block text-sm font-medium text-amber-700 dark:text-amber-200">
                     Correction Prompt
                   </label>
                   <textarea
                     value={correctionPrompt}
                     onChange={(e) => setCorrectionPrompt(e.target.value)}
                     rows={4}
-                    className="w-full rounded-xl border border-amber-300/30 bg-slate-950/60 p-3 text-sm text-white outline-none transition focus:border-amber-300/60"
+                    className="w-full rounded-xl border border-amber-400/40 dark:border-amber-300/30 bg-white dark:bg-slate-950/60 p-3 text-sm text-gray-900 dark:text-white outline-none transition focus:border-amber-500 dark:focus:border-amber-300/60"
                     placeholder="Explain exactly what the AI got wrong and what it should produce instead."
                   />
                   <div className="mt-3 flex justify-end">
@@ -577,27 +577,27 @@ const AIModal = ({
                 )}
 
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-amber-200">
+                  <label className="mb-2 block text-sm font-medium text-amber-700 dark:text-amber-200">
                     Meanings
                   </label>
                   <textarea
                     value={manualMeanings}
                     onChange={(e) => setManualMeanings(e.target.value)}
                     rows={6}
-                    className="w-full rounded-xl border border-white/10 bg-slate-950/60 p-3 text-sm text-white outline-none transition focus:border-amber-300/60"
+                    className="w-full rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-slate-950/60 p-3 text-sm text-gray-900 dark:text-white outline-none transition focus:border-amber-500 dark:focus:border-amber-300/60"
                     placeholder="One meaning per line"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-amber-200">
+                  <label className="mb-2 block text-sm font-medium text-amber-700 dark:text-amber-200">
                     Paragraph
                   </label>
                   <textarea
                     value={manualParagraph}
                     onChange={(e) => setManualParagraph(e.target.value)}
                     rows={7}
-                    className="w-full rounded-xl border border-white/10 bg-slate-950/60 p-3 text-sm leading-6 text-white outline-none transition focus:border-amber-300/60"
+                    className="w-full rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-slate-950/60 p-3 text-sm leading-6 text-gray-900 dark:text-white outline-none transition focus:border-amber-500 dark:focus:border-amber-300/60"
                     placeholder="Enter the final paragraph to store for this word"
                   />
                 </div>
@@ -632,23 +632,23 @@ const AIModal = ({
 
           {isReportOpen && (
             <div className="mt-6 rounded-2xl border border-red-500/30 bg-red-950/10 p-4 md:p-6">
-              <h3 className="flex items-center gap-2 text-lg font-semibold text-red-300 mb-3">
+              <h3 className="flex items-center gap-2 text-lg font-semibold text-red-700 dark:text-red-300 mb-3">
                 <IoAlertCircleOutline size={20} aria-hidden="true" />
                 Report an Issue
               </h3>
 
               {reportOptionsLoading ? (
-                <p className="text-gray-400 text-sm">Loading...</p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm">Loading...</p>
               ) : (
                 <>
-                  <p className="text-gray-300 text-sm font-semibold mb-2">
+                  <p className="text-gray-700 dark:text-gray-300 text-sm font-semibold mb-2">
                     What's wrong?
                   </p>
                   <div className="space-y-2 mb-4">
                     {reportReasons.map((reason) => (
                       <label
                         key={reason.id}
-                        className="flex items-start gap-2 text-sm text-gray-300 cursor-pointer"
+                        className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
                       >
                         <input
                           type="checkbox"
@@ -671,16 +671,16 @@ const AIModal = ({
                       <textarea
                         value={reportMessage}
                         onChange={(e) => setReportMessage(e.target.value)}
-                        className={`w-full rounded-lg bg-gray-900 border text-sm text-white px-3 py-2 placeholder-gray-500 focus:outline-none resize-none ${
+                        className={`w-full rounded-lg bg-white dark:bg-gray-900 border text-sm text-gray-900 dark:text-white px-3 py-2 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none resize-none ${
                           reportMessageTooLong
                             ? "border-red-400 focus:border-red-400"
-                            : "border-gray-600 focus:border-red-400"
+                            : "border-gray-300 dark:border-gray-600 focus:border-red-400"
                         }`}
                         rows={3}
                         placeholder="Anything else? (optional)"
                       />
                       <p
-                        className={`mt-1 text-xs ${reportMessageTooLong ? "text-red-400" : "text-gray-500"}`}
+                        className={`mt-1 text-xs ${reportMessageTooLong ? "text-red-500 dark:text-red-400" : "text-gray-500"}`}
                       >
                         {reportMessageCharCount}/{reportMaxCharacters} characters
                       </p>
@@ -688,7 +688,7 @@ const AIModal = ({
                   )}
 
                   {reportValidationError && (
-                    <p className="mt-3 text-sm text-red-400">
+                    <p className="mt-3 text-sm text-red-600 dark:text-red-400">
                       {reportValidationError}
                     </p>
                   )}
@@ -744,13 +744,13 @@ const AIModal = ({
           className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm"
           onClick={handlePreviewBackgroundClick}
         >
-          <div className="mx-3 max-h-[92vh] w-full max-w-6xl overflow-y-auto rounded-3xl border border-sky-300/25 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 shadow-2xl md:p-8">
+          <div className="mx-3 max-h-[92vh] w-full max-w-6xl overflow-y-auto rounded-3xl border border-sky-400/40 dark:border-sky-300/25 bg-white dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-4 shadow-2xl md:p-8">
             <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
               <div>
-                <h3 className="text-2xl font-bold text-sky-200">
+                <h3 className="text-2xl font-bold text-sky-700 dark:text-sky-200">
                   Preview Changes
                 </h3>
-                <p className="mt-1 text-sm text-slate-300">
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
                   Compare the current AI content with the proposed regenerated
                   content before publishing.
                 </p>
@@ -775,51 +775,51 @@ const AIModal = ({
             </div>
 
             <div className="grid gap-5 lg:grid-cols-2">
-              <div className="space-y-5 rounded-2xl border border-white/10 bg-slate-950/40 p-4">
-                <h4 className="text-lg font-semibold text-slate-100">
+              <div className="space-y-5 rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-slate-950/40 p-4">
+                <h4 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                   Current
                 </h4>
 
-                <div className="rounded-xl border border-white/10 bg-slate-900/50 p-4">
-                  <p className="mb-2 text-sm font-semibold text-slate-200">
+                <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-slate-900/50 p-4">
+                  <p className="mb-2 text-sm font-semibold text-gray-700 dark:text-slate-200">
                     AI Meanings
                   </p>
-                  <p className="text-sm whitespace-pre-line text-slate-300">
+                  <p className="text-sm whitespace-pre-line text-gray-600 dark:text-slate-300">
                     {currentMeanings.length
                       ? currentMeanings.join("\n")
                       : "No stored AI meanings yet."}
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-white/10 bg-slate-900/50 p-4">
-                  <p className="mb-2 text-sm font-semibold text-slate-200">
+                <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-slate-900/50 p-4">
+                  <p className="mb-2 text-sm font-semibold text-gray-700 dark:text-slate-200">
                     Paragraph
                   </p>
-                  <p className="text-sm whitespace-pre-line text-slate-300">
+                  <p className="text-sm whitespace-pre-line text-gray-600 dark:text-slate-300">
                     {currentParagraph || "No stored paragraph yet."}
                   </p>
                 </div>
               </div>
 
               <div className="space-y-5 rounded-2xl border border-sky-300/30 bg-sky-500/10 p-4">
-                <h4 className="text-lg font-semibold text-sky-100">Proposed</h4>
+                <h4 className="text-lg font-semibold text-sky-700 dark:text-sky-100">Proposed</h4>
 
-                <div className="rounded-xl border border-sky-300/30 bg-slate-900/60 p-4">
-                  <p className="mb-2 text-sm font-semibold text-sky-200">
+                <div className="rounded-xl border border-sky-300/30 bg-white dark:bg-slate-900/60 p-4">
+                  <p className="mb-2 text-sm font-semibold text-sky-700 dark:text-sky-200">
                     AI Meanings
                   </p>
-                  <p className="text-sm whitespace-pre-line text-white">
+                  <p className="text-sm whitespace-pre-line text-gray-900 dark:text-white">
                     {previewData.meanings.length
                       ? previewData.meanings.join("\n")
                       : "No meanings returned."}
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-sky-300/30 bg-slate-900/60 p-4">
-                  <p className="mb-2 text-sm font-semibold text-sky-200">
+                <div className="rounded-xl border border-sky-300/30 bg-white dark:bg-slate-900/60 p-4">
+                  <p className="mb-2 text-sm font-semibold text-sky-700 dark:text-sky-200">
                     Paragraph
                   </p>
-                  <p className="text-sm whitespace-pre-line text-white">
+                  <p className="text-sm whitespace-pre-line text-gray-900 dark:text-white">
                     {previewData.paragraph || "No paragraph returned."}
                   </p>
                 </div>
