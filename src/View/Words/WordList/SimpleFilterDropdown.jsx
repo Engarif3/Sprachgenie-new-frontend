@@ -51,7 +51,7 @@ const SimpleFilterDropdown = ({
         onKeyDown={(event) => {
           if (event.key === "Escape") setIsOpen(false);
         }}
-        className={`border border-gray-600 dark:bg-gray-800 backdrop-blur-sm rounded-xl px-4 py-3 w-full dark:text-white ${focusBorderClass} focus:ring-2 ${focusRingClass} transition-all text-left flex items-center justify-between`}
+        className={`border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 backdrop-blur-sm rounded-xl px-4 py-3 w-full text-gray-900 dark:text-white ${focusBorderClass} focus:ring-2 ${focusRingClass} transition-all text-left flex items-center justify-between`}
         aria-label={ariaLabel}
         aria-expanded={isOpen}
         aria-haspopup="true"
@@ -70,15 +70,15 @@ const SimpleFilterDropdown = ({
           className="absolute top-full left-0 right-0 mt-2 z-50 animate-slideDown"
           role="menu"
         >
-          <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl">
+          <div className="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-700 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl">
             <div className="max-h-80 overflow-y-auto custom-scrollbar">
               <button
                 type="button"
                 onClick={() => handleSelect("")}
-                className={`w-full px-4 py-2.5 text-left text-base transition-colors duration-150 hover:bg-cyan-500/20 border-b border-gray-700/30 ${
+                className={`w-full px-4 py-2.5 text-left text-base transition-colors duration-150 hover:bg-sky-50 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-700/30 ${
                   !selectedValue
-                    ? "bg-cyan-500/20 text-cyan-400 font-semibold"
-                    : "text-gray-300"
+                    ? "bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 font-semibold"
+                    : "text-gray-700 dark:text-gray-300"
                 }`}
                 role="menuitem"
               >
@@ -89,7 +89,7 @@ const SimpleFilterDropdown = ({
                 entry.type === "separator" ? (
                   <div
                     key={`separator-${index}`}
-                    className="border-t border-gray-700/60 my-1"
+                    className="border-t border-gray-200 dark:border-gray-700/60 my-1"
                     role="separator"
                   />
                 ) : (
@@ -97,10 +97,10 @@ const SimpleFilterDropdown = ({
                     key={entry.value}
                     type="button"
                     onClick={() => handleSelect(entry.value)}
-                    className={`w-full px-4 py-2.5 text-left text-base transition-colors duration-150 hover:bg-cyan-500/20 border-b border-gray-700/30 last:border-b-0 ${
+                    className={`w-full px-4 py-2.5 text-left text-base transition-colors duration-150 hover:bg-sky-50 dark:hover:bg-cyan-500/20 border-b border-gray-200 dark:border-gray-700/30 last:border-b-0 ${
                       selectedValue === entry.value
-                        ? "bg-cyan-500/20 text-cyan-400 font-semibold"
-                        : "text-gray-300"
+                        ? "bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 font-semibold"
+                        : "text-gray-700 dark:text-gray-300"
                     }`}
                     role="menuitem"
                   >
