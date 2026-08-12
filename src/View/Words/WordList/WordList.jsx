@@ -2303,7 +2303,7 @@ const WordList = () => {
       </div>
 
       {/* =============radio buttons ========== */}
-      <div className="dark:text-white mb-4 dark:bg-gradient-to-r from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-2 md:px-4 mx-0 md:mx-2 lg:mx-2">
+      <div className="relative z-20 dark:text-white mb-4 dark:bg-gradient-to-r from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-2 md:px-4 mx-0 md:mx-2 lg:mx-2">
         <div className="flex flex-col  gap-2.5 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2 min-w-0 overflow-hidden md:flex-1">
             <div className="flex items-center gap-1.5 flex-nowrap min-w-0 ">
