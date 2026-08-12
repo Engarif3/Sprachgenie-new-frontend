@@ -226,14 +226,9 @@ const SentenceRenderer = memo(
     // Determine styling and clean sentence
     if (trimmed.startsWith("##")) {
       className =
-        "font-semibold text-md md:text-lg lg:text-lg text-sky-600 dark:text-sky-400 list-none w-full text-center underline capitalize";
+        "font-bold text-md md:text-lg lg:text-lg text-sky-600 dark:text-sky-400 list-none w-full text-center underline decoration-2 underline-offset-4 tracking-wide capitalize";
       cleanSentence = sentence.replace(/^##\s*/, "");
     } else if (trimmed.startsWith("--")) {
-      // Sub-header of "##" — same centered/capitalized heading treatment
-      // but smaller and un-underlined, plus a different accent color, so
-      // it visually reads as nested under the nearest "##" line above it.
-      className =
-        "font-semibold text-sm md:text-base lg:text-base text-purple-600 dark:text-purple-400 list-none w-full text-center capitalize";
       cleanSentence = sentence.replace(/^--\s*/, "");
     } else if (trimmed.startsWith("**")) {
       className =
@@ -243,6 +238,13 @@ const SentenceRenderer = memo(
         .replace(/\*\*$/, "")
         .trim();
     }
+
+    // "--"-prefixed lines are a smaller sub-header nested under the nearest
+    // "##" above them — rendered as its own labeled-divider layout (flanking
+    // lines around an indigo label) rather than the plain "##"/"**" span, so
+    // it's unmistakable at a glance as a third, distinct tier rather than a
+    // slightly-smaller "##" or a slightly-different "**".
+    const isSubHeaderLine = trimmed.startsWith("--");
 
     // "**"-prefixed lines (e.g. "Related") show a bullet marker — rendered
     // as its own fixed-width flex item rather than concatenated into the
@@ -317,7 +319,23 @@ const SentenceRenderer = memo(
               aria-hidden="true"
             />
           )}
-          <span className={className}>{sentenceContent}</span>
+          {isSubHeaderLine ? (
+            <div className="flex items-center gap-2 w-full my-1">
+              <span
+                className="h-px flex-1 bg-gradient-to-r from-transparent to-indigo-400/50 dark:to-indigo-400/40"
+                aria-hidden="true"
+              />
+              <span className="flex-shrink-0 text-xs md:text-sm font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                {sentenceContent}
+              </span>
+              <span
+                className="h-px flex-1 bg-gradient-to-l from-transparent to-indigo-400/50 dark:to-indigo-400/40"
+                aria-hidden="true"
+              />
+            </div>
+          ) : (
+            <span className={className}>{sentenceContent}</span>
+          )}
           {showSpeakerButton && userLoggedIn && (
             <button
               onClick={() => onTranslate(cleanSentence)}
