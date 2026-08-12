@@ -1283,8 +1283,8 @@ const HowToSayList = () => {
     <Container>
       <div className="mx-auto min-h-screen max-w-6xl p-4 pb-12">
         {/* Header */}
-        <div className="mb-10 mt-8 text-center">
-          <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-orange-500/50 bg-gradient-to-r from-orange-500/20 to-pink-500/20 px-6 py-2 text-sm font-semibold text-orange-500 dark:text-orange-400">
+        <div className="mb-3 mt-4 text-center">
+          <span className="mb-3 inline-flex items-center gap-2 rounded-full border border-orange-500/50 bg-gradient-to-r from-orange-500/20 to-pink-500/20 px-6 py-1.5 text-sm font-semibold text-orange-500 dark:text-orange-400">
             <MessageCircle size={16} aria-hidden="true" />
             Learn Phrases
           </span>

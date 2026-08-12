@@ -881,18 +881,18 @@ const Home = () => {
 
         <Container>
           <div
-            className={`mb-16  relative transition-all duration-1000 ${
+            className={`mb-3 relative transition-all duration-1000 ${
               visibleSections.has("resources")
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-10"
             }`}
           >
-            <div className="text-center mb-4">
-              <span className="inline-block px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm mb-6">
+            <div className="text-center mb-3">
+              <span className="inline-block px-6 py-1.5 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
                 {t("learningHub")}
               </span>
             </div>
-            <h2 className="text-center text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 dark:text-white pb-8">
+            <h2 className="text-center text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 dark:text-white pb-2">
               {t("learningResources")}
             </h2>
             <p className="text-center  text-xl md:text-2xl text-gray-950 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
@@ -963,13 +963,13 @@ const Home = () => {
           <div
             id="features-title"
             data-animate
-            className={`text-center mb-16  transition-all duration-1000 ${
+            className={`text-center mb-3 transition-all duration-1000 ${
               visibleSections.has("features-title")
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-10"
             }`}
           >
-            <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 dark:text-white pb-8">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 dark:text-white pb-2">
               {t("whyChooseSprachGenie")}
             </h2>
 
@@ -1113,13 +1113,13 @@ const Home = () => {
       <div className="pb-20" id="how-it-works" data-animate>
         <Container>
           <div
-            className={`text-center mb-16 transition-all duration-1000 ${
+            className={`text-center mb-3 transition-all duration-1000 ${
               visibleSections.has("how-it-works")
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-10"
             }`}
           >
-            <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 dark:text-white pb-8 ">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 dark:text-white pb-2 ">
               {t("howItWorks")}
             </h2>
             <p className="text-xl text-gray-950 dark:text-gray-300 max-w-2xl mx-auto">
@@ -1222,13 +1222,13 @@ const Home = () => {
       <div className=" py-20" id="faq" data-animate>
         <Container>
           <div
-            className={`text-center mb-16 transition-all duration-1000 ${
+            className={`text-center mb-3 transition-all duration-1000 ${
               visibleSections.has("faq")
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-10"
             }`}
           >
-            <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 dark:text-white pb-8">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 dark:text-white pb-2">
               {t("frequentlyAskedQuestions")}
             </h2>
             <p className="text-xl text-gray-950 dark:text-gray-300 max-w-2xl mx-auto">

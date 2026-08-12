@@ -2256,7 +2256,7 @@ const WordList = () => {
   return (
     <Container>
       {/* Modern Header Section */}
-      <div className="text-center my-2 md:my-8 lg:my-8 ">
+      <div className="text-center mt-4 mb-2 md:mb-8 lg:mb-8 ">
         <div className="flex justify-between items-center mb-2 md:mb-6 lg:mb-6 ml-2">
           <div className="flex items-center gap-1.5 md:gap-3 lg:gap-3">
             <Button to="/quiz" variant="primary" size="sm">
@@ -2285,13 +2285,13 @@ const WordList = () => {
             </span>
           )} */}
         </div>
-        <div className="mb-4 hidden md:inline-block lg:inline-block">
-          <span className="inline-flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
+        <div className="mb-3 hidden md:inline-block lg:inline-block">
+          <span className="inline-flex items-center gap-2 px-6 py-1.5 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-sm">
             <IoLibraryOutline size={16} aria-hidden="true" />
             Learn Vocabulary
           </span>
         </div>
-        <h2 className="text-2xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-1 md:pb-4 lg:pb-4">
+        <h2 className="text-2xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 pb-1 md:pb-2 lg:pb-2">
           Vocabulary Library
         </h2>
         <p className="text-xl text-gray-950 dark:text-gray-300 max-w-2xl mx-auto hidden md:inline-block lg:inline-block">
