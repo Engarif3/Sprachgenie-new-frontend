@@ -566,7 +566,7 @@ const UpdateUserStatus = () => {
               loadingAdmins ? (
                 <div className="flex min-h-[260px] items-center justify-center rounded-[28px] border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 shadow-xl shadow-slate-200/70 dark:shadow-none">
                   <ScaleLoader
-                    color="#155e75"
+                    color="#36d7b7"
                     loading={loadingAdmins}
                     size={150}
                   />
@@ -590,7 +590,7 @@ const UpdateUserStatus = () => {
             ) : loadingUsers ? (
               <div className="flex min-h-[260px] items-center justify-center rounded-[28px] border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 shadow-xl shadow-slate-200/70 dark:shadow-none">
                 <ScaleLoader
-                  color="#155e75"
+                  color="#36d7b7"
                   loading={loadingUsers}
                   size={150}
                 />

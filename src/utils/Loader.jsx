@@ -4,7 +4,7 @@ const Loader = ({ loading }) => {
     <p className="flex min-h-screen items-center justify-center">
       <span>
         <ScaleLoader
-          color="oklch(0.5 0.134 242.749)"
+          color="#36d7b7"
           loading={loading}
           // cssOverride={override}
           size={150}

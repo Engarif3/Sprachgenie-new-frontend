@@ -242,7 +242,7 @@ const ConversationsList = () => {
         <p className="flex justify-center items-center  ">
           <span>
             <ScaleLoader
-              color="oklch(0.5 0.134 242.749)"
+              color="#36d7b7"
               loading={loading}
               // cssOverride={override}
               size={150}

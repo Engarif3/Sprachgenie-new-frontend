@@ -111,7 +111,7 @@ const UsersFavoriteCount = () => {
 
         {isLoading ? (
           <div className="flex justify-center py-8">
-            <ScaleLoader color="oklch(0.5 0.134 242.749)" loading={isLoading} />
+            <ScaleLoader color="#36d7b7" loading={isLoading} />
           </div>
         ) : error ? (
           <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-center text-red-700 dark:border-red-700 dark:bg-red-900/30 dark:text-red-200">
