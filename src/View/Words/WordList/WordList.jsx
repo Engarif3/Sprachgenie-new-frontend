@@ -2356,14 +2356,14 @@ const WordList = () => {
                 name="adminCompletenessFilter"
                 value={adminCompletenessFilter}
                 onChange={handleAdminCompletenessFilterChange}
-                className="min-h-[30px] w-full sm:w-auto md:w-auto px-2 py-2 md:px-2.5 md:py-1.5 rounded-full font-semibold text-sm shadow-lg border border-stone-500 bg-stone-800 text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50"
+                className="min-h-[30px] w-full sm:w-auto md:w-auto px-2 py-2 md:px-2.5 md:py-1.5 rounded-full font-semibold text-sm shadow-lg border border-stone-300 dark:border-stone-500 bg-white dark:bg-stone-800 text-stone-900 dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50"
                 aria-label="Admin word completeness filter"
               >
                 {ADMIN_COMPLETENESS_FILTER_OPTIONS.map((option) => (
                   <option
                     key={option.value || "all"}
                     value={option.value}
-                    className="bg-stone-800 text-white"
+                    className="bg-white dark:bg-stone-800 text-stone-900 dark:text-white"
                   >
                     {option.label}
                   </option>
@@ -2486,7 +2486,7 @@ const WordList = () => {
             <ul
               id="word-search-suggestions"
               role="listbox"
-              className="relative z-30 max-h-60 overflow-y-auto rounded-xl border border-gray-600 bg-gray-900/95 backdrop-blur-sm shadow-xl"
+              className="relative z-30 max-h-60 overflow-y-auto rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900/95 backdrop-blur-sm shadow-xl"
             >
               {suggestions.map((suggestion, index) => (
                 <li
@@ -2502,14 +2502,14 @@ const WordList = () => {
                   onMouseEnter={() => setHighlightedSuggestionIndex(index)}
                   className={`px-4 py-2 cursor-pointer text-sm truncate ${
                     index === highlightedSuggestionIndex
-                      ? "bg-blue-600/30 text-white"
-                      : "text-gray-200 hover:bg-white/5"
+                      ? "bg-blue-600/10 text-blue-900 dark:bg-blue-600/30 dark:text-white"
+                      : "text-gray-700 dark:text-gray-200 hover:bg-slate-100 dark:hover:bg-white/5"
                   }`}
                 >
                   {suggestion.isFuzzy ? (
-                    <span className="italic text-amber-300">
+                    <span className="italic text-amber-700 dark:text-amber-300">
                       Did you mean{" "}
-                      <span className="font-semibold not-italic text-amber-200">
+                      <span className="font-semibold not-italic text-amber-900 dark:text-amber-200">
                         {searchType === "meaning" && suggestion.meaning?.[0]
                           ? suggestion.meaning[0]
                           : suggestion.value}
@@ -2520,7 +2520,7 @@ const WordList = () => {
                     <>
                       <span className="font-semibold">{suggestion.value}</span>
                       {suggestion.meaning?.[0] && (
-                        <span className="text-gray-400">
+                        <span className="text-gray-500 dark:text-gray-400">
                           {" "}
                           — {suggestion.meaning[0]}
                         </span>
