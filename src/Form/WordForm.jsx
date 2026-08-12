@@ -982,6 +982,26 @@ const WordForm = () => {
                 >
                   Sentences(Optional, eg. sentence A. | Sentence B.)
                 </label>
+                <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-300">
+                  <span className="inline-flex items-center gap-1">
+                    <span className="rounded bg-orange-500/15 px-1.5 py-0.5 font-mono font-semibold text-orange-400">
+                      ##
+                    </span>
+                    Header
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <span className="rounded bg-indigo-500/15 px-1.5 py-0.5 font-mono font-semibold text-indigo-400">
+                      --
+                    </span>
+                    Sub-header (under a ## above it)
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <span className="rounded bg-purple-500/15 px-1.5 py-0.5 font-mono font-semibold text-purple-400">
+                      **text**
+                    </span>
+                    Note / bullet
+                  </span>
+                </div>
                 <input
                   type="text"
                   id="sentences"
