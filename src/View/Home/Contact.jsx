@@ -67,7 +67,7 @@ const Contact = () => {
   return (
     <div className=" py-20" id="contact">
       <Container>
-        <div className="text-center mb-3 mt-4">
+        <div className="text-center mb-10 mt-4">
           <div className="mb-3">
             <span className="inline-flex items-center gap-2 px-6 py-1.5 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-600 dark:text-orange-400 font-semibold text-sm">
               <IoMailOutline size={16} aria-hidden="true" />

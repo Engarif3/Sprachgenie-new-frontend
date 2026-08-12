@@ -963,7 +963,7 @@ const Home = () => {
           <div
             id="features-title"
             data-animate
-            className={`text-center mb-3 transition-all duration-1000 ${
+            className={`text-center mb-10 transition-all duration-1000 ${
               visibleSections.has("features-title")
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-10"
@@ -1113,7 +1113,7 @@ const Home = () => {
       <div className="pb-20" id="how-it-works" data-animate>
         <Container>
           <div
-            className={`text-center mb-3 transition-all duration-1000 ${
+            className={`text-center mb-10 transition-all duration-1000 ${
               visibleSections.has("how-it-works")
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-10"
@@ -1222,7 +1222,7 @@ const Home = () => {
       <div className=" py-20" id="faq" data-animate>
         <Container>
           <div
-            className={`text-center mb-3 transition-all duration-1000 ${
+            className={`text-center mb-10 transition-all duration-1000 ${
               visibleSections.has("faq")
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-10"
