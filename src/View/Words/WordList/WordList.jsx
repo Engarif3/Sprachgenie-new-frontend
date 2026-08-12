@@ -35,6 +35,7 @@ import {
   IoGameControllerOutline,
   IoTrophyOutline,
   IoLibraryOutline,
+  IoStatsChartOutline,
 } from "react-icons/io5";
 import useDebounce from "../../../hooks/useDebounce";
 import WordTableRow from "./WordTableRow";
@@ -2260,7 +2261,7 @@ const WordList = () => {
           </div>
 
           <span className="text-sm block md:hidden lg:hidden text-pink-400 font-bold mr-2">
-            {wordCountLabel}: {displayedWordsCount} words
+            {displayedWordsCount} {wordCountLabel} Words
           </span>
 
           {/* {userLoggedIn && isAdmin && (
@@ -2385,8 +2386,9 @@ const WordList = () => {
               </p> */}
             </div>
           )}
-          <p className="text-md font-bold whitespace-nowrap hidden md:block px-2 py-1 md:px-2.5 md:py-1.5 bg-sky-600  rounded-full text-white">
-            {wordCountLabel}: {displayedWordsCount} words
+          <p className="hidden md:inline-flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap px-3 py-1.5 md:px-3.5 rounded-full border border-sky-500/50 bg-sky-500/10 text-sky-700 dark:text-sky-300">
+            <IoStatsChartOutline size={15} aria-hidden="true" />
+            {displayedWordsCount} {wordCountLabel} Words
           </p>
         </div>
       </div>
