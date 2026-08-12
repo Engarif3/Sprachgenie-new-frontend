@@ -16,6 +16,11 @@ const SimpleFilterDropdown = ({
   items,
   focusBorderClass = "focus:border-cyan-500",
   focusRingClass = "focus:ring-cyan-500/50",
+  // Level/Topic/Part-of-speech sit in their own row and use the taller
+  // default size. This shrinks the trigger to a pill matching neighboring
+  // buttons/badges (e.g. admin's word-completeness filter next to the
+  // "Recently Limit" and "Total Words" pills), without affecting them.
+  compact = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -51,7 +56,11 @@ const SimpleFilterDropdown = ({
         onKeyDown={(event) => {
           if (event.key === "Escape") setIsOpen(false);
         }}
-        className={`border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 backdrop-blur-sm rounded-xl px-4 py-3 w-full text-gray-900 dark:text-white ${focusBorderClass} focus:ring-2 ${focusRingClass} transition-all text-left flex items-center justify-between`}
+        className={`border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 backdrop-blur-sm w-full text-gray-900 dark:text-white ${focusBorderClass} focus:ring-2 ${focusRingClass} transition-all text-left flex items-center justify-between ${
+          compact
+            ? "min-h-[30px] rounded-full px-2.5 py-1.5 text-sm font-semibold shadow-lg"
+            : "rounded-xl px-4 py-3"
+        }`}
         aria-label={ariaLabel}
         aria-expanded={isOpen}
         aria-haspopup="true"
@@ -61,13 +70,15 @@ const SimpleFilterDropdown = ({
           className={`ml-2 transition-transform duration-200 flex-shrink-0 ${
             isOpen ? "rotate-180" : ""
           }`}
-          size={18}
+          size={compact ? 15 : 18}
         />
       </button>
 
       {isOpen && (
         <div
-          className="absolute top-full left-0 right-0 mt-2 z-50 animate-slideDown"
+          className={`absolute top-full mt-2 z-50 animate-slideDown ${
+            compact ? "left-0 min-w-[200px]" : "left-0 right-0"
+          }`}
           role="menu"
         >
           <div className="bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-700 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl">

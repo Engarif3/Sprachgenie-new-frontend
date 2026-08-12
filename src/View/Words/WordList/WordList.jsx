@@ -2303,7 +2303,7 @@ const WordList = () => {
       </div>
 
       {/* =============radio buttons ========== */}
-      <div className="dark:text-white mb-4 dark:bg-gradient-to-r from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-2 md:px-4 mx-0 md:mx-2 lg:mx-2 overflow-hidden">
+      <div className="dark:text-white mb-4 dark:bg-gradient-to-r from-gray-800/60 to-gray-900/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-2 md:px-4 mx-0 md:mx-2 lg:mx-2">
         <div className="flex flex-col  gap-2.5 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2 min-w-0 overflow-hidden md:flex-1">
             <div className="flex items-center gap-1.5 flex-nowrap min-w-0 ">
@@ -2361,7 +2361,7 @@ const WordList = () => {
           </div>
           {showAdminControls && (
             <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-white/10 md:pt-0 md:border-t-0 md:flex-nowrap md:justify-end md:gap-3 md:flex-shrink-0">
-              <div className="w-full sm:w-56">
+              <div className="w-full sm:w-auto md:w-auto">
                 <label
                   htmlFor="admin-completeness-filter"
                   className="sr-only"
@@ -2376,6 +2376,7 @@ const WordList = () => {
                   selectedValue={adminCompletenessFilter}
                   onSelect={handleAdminCompletenessFilterChange}
                   items={adminCompletenessFilterItems}
+                  compact
                 />
               </div>
               {isSuperAdmin && (
