@@ -162,7 +162,16 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    if (visibleSections.has("features-title")) {
+    // Either edge of the stack can trigger reveal: the title above it
+    // (normal top-to-bottom scroll) or the thin sentinel just after the
+    // last card (scrolling up into the section from below it — e.g. a
+    // refresh that restores scroll position at the page bottom, where
+    // the title marker isn't reached until AFTER scrolling past the
+    // entire — much taller — stack).
+    if (
+      visibleSections.has("features-title") ||
+      visibleSections.has("features-stack-end")
+    ) {
       setFeatureCardsRevealed(true);
     }
   }, [visibleSections]);
@@ -988,6 +997,7 @@ const Home = () => {
             <ScrollStack
               layoutVersion={userLoggedIn ? "logged-in" : "guest"}
               revealed={featureCardsRevealed}
+              endMarkerId="features-stack-end"
             >
               {featureCards.map((feature, index) => (
                 <ScrollStackItem

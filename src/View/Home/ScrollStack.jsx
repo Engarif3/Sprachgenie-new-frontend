@@ -31,6 +31,15 @@ const ScrollStack = ({
   // folded into that same transform string on just the first card instead
   // of adding a separate animated wrapper.
   revealed = true,
+  // Optional id for the thin end-of-stack sentinel below, so a caller can
+  // observe it (e.g. via IntersectionObserver + data-animate) as a second,
+  // symmetric trigger alongside a marker above the stack. A tall stack's
+  // own bounding box can be several times the viewport height, so an
+  // observer threshold like 0.2 may never be satisfied by the stack itself
+  // — and a marker placed only above it never gets crossed until AFTER
+  // scrolling past the entire stack when approaching from below (e.g. a
+  // page reload that restores scroll position at the bottom).
+  endMarkerId,
 }) => {
   const childArray = Children.toArray(children);
   const stackTop = `${Math.round(stackPosition * 100)}vh`;
@@ -72,7 +81,11 @@ const ScrollStack = ({
         className="scroll-stack-inner px-4 pt-[6vh] md:px-10 lg:px-20"
       >
         {stickyChildren}
-        <div className="scroll-stack-end h-px w-full" />
+        <div
+          id={endMarkerId}
+          data-animate={endMarkerId ? true : undefined}
+          className="scroll-stack-end h-px w-full"
+        />
       </div>
     </div>
   );
