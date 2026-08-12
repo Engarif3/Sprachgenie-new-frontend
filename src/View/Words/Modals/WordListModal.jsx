@@ -228,6 +228,13 @@ const SentenceRenderer = memo(
       className =
         "font-semibold text-md md:text-lg lg:text-lg text-sky-600 dark:text-sky-400 list-none w-full text-center underline capitalize";
       cleanSentence = sentence.replace(/^##\s*/, "");
+    } else if (trimmed.startsWith("--")) {
+      // Sub-header of "##" — same centered/capitalized heading treatment
+      // but smaller and un-underlined, plus a different accent color, so
+      // it visually reads as nested under the nearest "##" line above it.
+      className =
+        "font-semibold text-sm md:text-base lg:text-base text-purple-600 dark:text-purple-400 list-none w-full text-center capitalize";
+      cleanSentence = sentence.replace(/^--\s*/, "");
     } else if (trimmed.startsWith("**")) {
       className =
         "text-gray-500 dark:text-gray-400 list-none text-sm md:text-base lg:text-lg first-letter:uppercase font-normal";
@@ -245,7 +252,9 @@ const SentenceRenderer = memo(
     const isBulletLine = trimmed.startsWith("**");
 
     const showSpeakerButton =
-      !trimmed.startsWith("##") && !trimmed.startsWith("**");
+      !trimmed.startsWith("##") &&
+      !trimmed.startsWith("--") &&
+      !trimmed.startsWith("**");
 
     const handlePronounce = useCallback(() => {
       if (showSpeakerButton) {
@@ -270,7 +279,10 @@ const SentenceRenderer = memo(
     };
 
     // Determine if this is a normal sentence for highlighting
-    const isNormalSentence = !trimmed.startsWith("##") && !trimmed.startsWith("**");
+    const isNormalSentence =
+      !trimmed.startsWith("##") &&
+      !trimmed.startsWith("--") &&
+      !trimmed.startsWith("**");
     const sentenceContent = isNormalSentence
       ? highlightPrefixInSentence(word, cleanSentence)
       : cleanSentence;

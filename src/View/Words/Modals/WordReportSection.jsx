@@ -18,7 +18,11 @@ const getReportableSentences = (sentences) =>
     .map((text, index) => ({ text, index }))
     .filter(({ text }) => {
       const trimmed = text.trim();
-      return !trimmed.startsWith("##") && !trimmed.startsWith("**");
+      return (
+        !trimmed.startsWith("##") &&
+        !trimmed.startsWith("--") &&
+        !trimmed.startsWith("**")
+      );
     });
 
 // Nested inside WordListModal — shared by both the WordList and Favorites
