@@ -2,17 +2,37 @@ import Swal from "sweetalert2";
 import { getBestGermanVoiceSync } from "./voiceSettings";
 
 // Chrome bundles a high-quality Google German voice; most other browsers
-// fall back to a much weaker system voice. Rather than sniffing the browser
-// itself (unreliable — Edge/Opera/Brave all report as "Chrome" in their user
-// agent), this checks what actually matters: whether a Google voice was
-// actually resolved for this browser. Persisted in localStorage (not
-// sessionStorage) so it's shown once ever per browser/device — but keyed
-// per section (word/story/conversation) rather than one shared key, so a
-// user who first hits it in the WordList still gets the same one-time nudge
-// the first time they try pronunciation in Stories or Conversations too.
+// fall back to a much weaker system voice. Skipped entirely for anyone
+// already on Chrome (see isChromeBrowser below), and otherwise gated on
+// whether a Google voice was actually resolved for this browser — a non-
+// Chrome browser can still have one installed. Persisted in localStorage
+// (not sessionStorage) so it's shown once ever per browser/device — but
+// keyed per section (word/story/conversation) rather than one shared key,
+// so a user who first hits it in the WordList still gets the same one-time
+// nudge the first time they try pronunciation in Stories or Conversations.
 const CHROME_HINT_STORAGE_KEY_PREFIX = "sprachgenie_chrome_voice_hint_shown_";
 
+// Voice-name matching alone isn't a reliable "is this Chrome" signal on
+// mobile — iOS forces every browser (including Chrome, reported as
+// "CriOS/") onto Apple's shared system voices, so a Chrome-on-iOS user can
+// resolve a non-Google voice despite already being on Chrome. Suggesting
+// they "try Chrome" in that case is nonsensical, so this checks the browser
+// directly as a hard guard, independent of which voice got picked. Edge,
+// Opera, and Samsung Internet all also report "Chrome/" in their UA, so
+// those are explicitly excluded.
+const isChromeBrowser = () => {
+  const ua = navigator.userAgent || "";
+  if (/CriOS\//.test(ua)) return true;
+  if (!/Chrome\//.test(ua)) return false;
+  if (/Edg\//.test(ua) || /OPR\//.test(ua) || /SamsungBrowser\//.test(ua)) {
+    return false;
+  }
+  return true;
+};
+
 export const maybeShowChromeVoiceHint = (preferredVoice, section = "word") => {
+  if (isChromeBrowser()) return;
+
   const isGoogleVoice = preferredVoice?.name?.toLowerCase().includes("google");
   if (isGoogleVoice) return;
 
