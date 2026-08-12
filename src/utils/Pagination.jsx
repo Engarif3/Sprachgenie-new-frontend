@@ -26,7 +26,7 @@ const Pagination = ({
         isAdmin
           ? "flex-col md:flex-row lg:flex-row"
           : "flex-row md:flex-row lg:flex-row"
-      } justify-between items-center gap-1 md:gap-8 mb-2 mt-6`}
+      } justify-between items-center gap-1 md:gap-8 mb-2 mt-6 mx-0 md:mx-2 lg:mx-2`}
     >
       {/* Left Side Controls */}
       <div className="flex gap-1 justify-between md:justify-start w-full md:w-auto ">
