@@ -2113,16 +2113,26 @@ const WordList = () => {
   }, [isSuperAdmin, recentlyAddedLimit, totalWordCount]);
 
   const handleAdminCompletenessFilterChange = useCallback(
-    (event) => {
+    (selected) => {
       if (!isAdmin) {
         return;
       }
 
-      setAdminCompletenessFilter(event.target.value);
+      setAdminCompletenessFilter(selected);
       setCurrentPage(1);
     },
     [isAdmin],
   );
+
+  // First option ("All words") is SimpleFilterDropdown's built-in
+  // placeholder/clear slot, not a regular item — only the rest go in items.
+  const adminCompletenessFilterItems = ADMIN_COMPLETENESS_FILTER_OPTIONS.slice(
+    1,
+  ).map((option) => ({ type: "item", value: option.value, label: option.label }));
+  const adminCompletenessFilterLabel =
+    ADMIN_COMPLETENESS_FILTER_OPTIONS.find(
+      (option) => option.value === adminCompletenessFilter,
+    )?.label || "All words";
 
   // to show info
   useEffect(() => {
@@ -2351,24 +2361,23 @@ const WordList = () => {
           </div>
           {showAdminControls && (
             <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-white/10 md:pt-0 md:border-t-0 md:flex-nowrap md:justify-end md:gap-3 md:flex-shrink-0">
-              <select
-                id="admin-completeness-filter"
-                name="adminCompletenessFilter"
-                value={adminCompletenessFilter}
-                onChange={handleAdminCompletenessFilterChange}
-                className="min-h-[30px] w-full sm:w-auto md:w-auto px-2 py-2 md:px-2.5 md:py-1.5 rounded-full font-semibold text-sm shadow-lg border border-stone-300 dark:border-stone-500 bg-white dark:bg-stone-800 text-stone-900 dark:text-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50"
-                aria-label="Admin word completeness filter"
-              >
-                {ADMIN_COMPLETENESS_FILTER_OPTIONS.map((option) => (
-                  <option
-                    key={option.value || "all"}
-                    value={option.value}
-                    className="bg-white dark:bg-stone-800 text-stone-900 dark:text-white"
-                  >
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+              <div className="w-full sm:w-56">
+                <label
+                  htmlFor="admin-completeness-filter"
+                  className="sr-only"
+                >
+                  Filter by word completeness
+                </label>
+                <SimpleFilterDropdown
+                  id="admin-completeness-filter"
+                  ariaLabel="Admin word completeness filter"
+                  placeholder="All words"
+                  displayLabel={adminCompletenessFilterLabel}
+                  selectedValue={adminCompletenessFilter}
+                  onSelect={handleAdminCompletenessFilterChange}
+                  items={adminCompletenessFilterItems}
+                />
+              </div>
               {isSuperAdmin && (
                 <button
                   type="button"
