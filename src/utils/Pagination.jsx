@@ -60,29 +60,34 @@ const Pagination = ({
       {/* Pagination Buttons */}
       <div className="flex justify-between md:justify-end items-center gap-4 w-full md:w-auto">
         <div className="w-full">
-          <div className="flex gap-1.5 md:gap-2 justify-center items-center">
-            <Button
-              variant="ghost"
-              size="sm"
+          <div className="flex gap-1 md:gap-1.5 justify-center items-center">
+            {/* Gradient icon buttons instead of Button's `ghost` variant —
+            ghost is text-only with no background by design (kept plain on
+            purpose for the app's everyday buttons), which made these arrows
+            nearly invisible in both themes. Plain buttons here, not Button,
+            since Button's variant system deliberately excludes gradients. */}
+            <button
+              type="button"
               onClick={() => setCurrentPage(1)}
               disabled={currentPage === 1}
               title="First page"
               aria-label="First page"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-400 disabled:opacity-60 disabled:hover:scale-100 dark:disabled:from-slate-700 dark:disabled:to-slate-800"
             >
-              <HiChevronDoubleLeft size={19} />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
+              <HiChevronDoubleLeft size={17} />
+            </button>
+            <button
+              type="button"
               onClick={() =>
                 setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
               }
               disabled={currentPage === 1}
               title="Previous page"
               aria-label="Previous page"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-400 disabled:opacity-60 disabled:hover:scale-100 dark:disabled:from-slate-700 dark:disabled:to-slate-800"
             >
-              <HiChevronLeft size={21} />
-            </Button>
+              <HiChevronLeft size={19} />
+            </button>
             <span className="px-3 md:px-4 py-1.5 md:py-2 bg-gradient-to-r from-gray-800/80 to-gray-900/80 border border-gray-700 rounded-full text-white font-thin md:font-semibold lg:font-semibold text-sm md:text-md lg:text-md backdrop-blur-sm">
               <span className="hidden sm:inline">Page </span>
               {currentPage}
@@ -90,9 +95,8 @@ const Pagination = ({
               <span className="sm:hidden">/</span>
               {totalPages}
             </span>
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
+              type="button"
               onClick={() =>
                 setCurrentPage((prevPage) =>
                   Math.min(prevPage + 1, totalPages),
@@ -101,19 +105,20 @@ const Pagination = ({
               disabled={currentPage === totalPages}
               title="Next page"
               aria-label="Next page"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-400 disabled:opacity-60 disabled:hover:scale-100 dark:disabled:from-slate-700 dark:disabled:to-slate-800"
             >
-              <HiChevronRight size={21} />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
+              <HiChevronRight size={19} />
+            </button>
+            <button
+              type="button"
               onClick={() => setCurrentPage(totalPages)}
               disabled={currentPage === totalPages}
               title="Last page"
               aria-label="Last page"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-sm transition-all duration-200 hover:scale-105 hover:shadow-md disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-400 disabled:opacity-60 disabled:hover:scale-100 dark:disabled:from-slate-700 dark:disabled:to-slate-800"
             >
-              <HiChevronDoubleRight size={19} />
-            </Button>
+              <HiChevronDoubleRight size={17} />
+            </button>
           </div>
         </div>
       </div>
