@@ -2128,7 +2128,11 @@ const WordList = () => {
   // placeholder/clear slot, not a regular item — only the rest go in items.
   const adminCompletenessFilterItems = ADMIN_COMPLETENESS_FILTER_OPTIONS.slice(
     1,
-  ).map((option) => ({ type: "item", value: option.value, label: option.label }));
+  ).map((option) => ({
+    type: "item",
+    value: option.value,
+    label: option.label,
+  }));
   const adminCompletenessFilterLabel =
     ADMIN_COMPLETENESS_FILTER_OPTIONS.find(
       (option) => option.value === adminCompletenessFilter,
@@ -2277,7 +2281,7 @@ const WordList = () => {
         </div>
       </div>
 
-      <div className="flex justify-between items-center mb-2 mx-0 md:mx-2 lg:mx-2">
+      <div className="relative flex justify-between items-center mb-2 mx-0 md:mx-2 lg:mx-2">
         <div className="flex items-center gap-1.5 md:gap-3 lg:gap-3">
           <Button to="/quiz" variant="primary" size="sm">
             <IoGameControllerOutline size={16} aria-hidden="true" />
@@ -2290,7 +2294,7 @@ const WordList = () => {
           </Button>
         </div>
 
-        <div className="relative flex items-center gap-2 mr-2">
+        <div className="flex items-center gap-2 mr-2">
           <span className="text-sm block md:hidden lg:hidden text-pink-400 font-bold">
             {displayedWordsCount} {wordCountLabel} Words
           </span>
@@ -2308,7 +2312,7 @@ const WordList = () => {
 
           <IoInformationCircleOutline
             size={22}
-            className="text-blue-400 cursor-pointer hover:text-blue-500 transition"
+            className="text-blue-400 cursor-pointer hover:text-blue-500 transition mt-2"
             onClick={(e) => {
               e.stopPropagation(); // prevent the click from closing immediately
               setShowInfo((prev) => !prev);
@@ -2319,8 +2323,8 @@ const WordList = () => {
             <div className="absolute top-8 right-0 z-50 w-10/12 md:w-6/12 p-3 rounded-lg bg-gray-900 text-gray-200 text-sm shadow-xl border border-gray-700 italic">
               Please be aware that certain word meanings are context-dependent
               and sourced from official TELC PDF materials. Words may have
-              additional meanings not listed here. Entries are updated
-              regularly as needed. Thank you for your understanding.
+              additional meanings not listed here. Entries are updated regularly
+              as needed. Thank you for your understanding.
             </div>
           )}
         </div>
@@ -2386,10 +2390,7 @@ const WordList = () => {
           {showAdminControls && (
             <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-white/10 md:pt-0 md:border-t-0 md:flex-nowrap md:justify-end md:gap-3 md:flex-shrink-0">
               <div className="w-full sm:w-auto md:w-auto">
-                <label
-                  htmlFor="admin-completeness-filter"
-                  className="sr-only"
-                >
+                <label htmlFor="admin-completeness-filter" className="sr-only">
                   Filter by word completeness
                 </label>
                 <SimpleFilterDropdown
