@@ -1,4 +1,36 @@
+import Swal from "sweetalert2";
 import { getBestGermanVoiceSync } from "./voiceSettings";
+
+// Chrome bundles a high-quality Google German voice; most other browsers
+// fall back to a much weaker system voice. Rather than sniffing the browser
+// itself (unreliable — Edge/Opera/Brave all report as "Chrome" in their user
+// agent), this checks what actually matters: whether a Google voice was
+// actually resolved for this browser. Shown once per tab session (not on
+// every click) so it's a helpful nudge, not a nag.
+const CHROME_HINT_SESSION_KEY = "sprachgenie_chrome_voice_hint_shown";
+
+const maybeShowChromeVoiceHint = (preferredVoice) => {
+  const isGoogleVoice = preferredVoice?.name?.toLowerCase().includes("google");
+  if (isGoogleVoice) return;
+
+  try {
+    if (sessionStorage.getItem(CHROME_HINT_SESSION_KEY)) return;
+    sessionStorage.setItem(CHROME_HINT_SESSION_KEY, "1");
+  } catch {
+    // Private-browsing storage restrictions etc. — just skip the
+    // once-per-session dedupe rather than blocking the hint entirely.
+  }
+
+  void Swal.fire({
+    toast: true,
+    position: "top-end",
+    icon: "info",
+    title: "For the best German pronunciation, try Google Chrome",
+    showConfirmButton: false,
+    timer: 4500,
+    timerProgressBar: true,
+  });
+};
 
 // Deliberately synchronous, all the way through — speechSynthesis.speak()
 // has to run in the same tick as the click that triggered this, or mobile
@@ -22,4 +54,6 @@ export const pronounceWord = (word) => {
   }
 
   speechSynthesis.speak(utterance);
+
+  maybeShowChromeVoiceHint(preferredVoice);
 };
