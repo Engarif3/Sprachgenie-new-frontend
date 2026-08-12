@@ -1157,7 +1157,11 @@ const Home = () => {
 
       {/* Stats Section */}
       <div
-        className="bg-gradient-to-r from-gray-800 to-gray-900 py-20 mx-0 md:mx-8 lg:mx-8"
+        className={`py-20 mx-0 md:mx-8 lg:mx-8 rounded-none md:rounded-[40px] ${
+          theme === "dark"
+            ? "bg-[linear-gradient(135deg,#111827_0%,#0f172a_50%,#1e1b2e_100%)]"
+            : "bg-gradient-to-br from-slate-50 via-orange-50/40 to-slate-50 border border-slate-200"
+        }`}
         id="stats"
         data-animate
       >
@@ -1172,15 +1176,19 @@ const Home = () => {
             {statTiles.map((stat) => (
               <div
                 key={stat.label}
-                className="group flex flex-col items-center rounded-3xl border border-white/10 bg-white/5 px-4 py-8 text-center transition-all duration-300 hover:-translate-y-1 hover:border-orange-400/30 hover:bg-white/[0.08]"
+                className={`group flex flex-col items-center rounded-3xl border px-4 py-8 text-center transition-all duration-300 hover:-translate-y-1 ${
+                  theme === "dark"
+                    ? "border-white/10 bg-white/5 hover:border-orange-400/30 hover:bg-white/[0.08]"
+                    : "border-slate-200 bg-white hover:border-orange-300 hover:shadow-md"
+                }`}
               >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-orange-400/20 bg-orange-500/10 text-orange-400 transition-transform duration-300 group-hover:scale-105">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-orange-400/20 bg-orange-500/10 text-orange-500 transition-transform duration-300 group-hover:scale-105 dark:text-orange-400">
                   <stat.icon size={22} aria-hidden="true" />
                 </div>
                 <div className="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500 pb-2">
                   {stat.value}
                 </div>
-                <p className="text-gray-300 text-base md:text-lg font-semibold">
+                <p className="text-slate-600 dark:text-gray-300 text-base md:text-lg font-semibold">
                   {stat.label}
                 </p>
               </div>
