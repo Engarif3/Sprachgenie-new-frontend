@@ -2471,7 +2471,7 @@ const WordList = () => {
                 onClick={handleClearSearchText}
                 title="Clear search"
                 aria-label="Clear search"
-                className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
+                className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-900/10 hover:text-gray-900 dark:hover:bg-white/10 dark:hover:text-white"
               >
                 <IoClose size={20} aria-hidden="true" />
               </button>
