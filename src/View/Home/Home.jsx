@@ -469,20 +469,23 @@ const Home = () => {
 
   const howItWorksSteps = [
     {
-      number: "1",
       icon: IoPersonAddOutline,
+      color: "from-sky-500 to-blue-600 shadow-sky-500/30",
+      glow: "bg-sky-500/50",
       title: t("signUp"),
       description: t("signUpDesc"),
     },
     {
-      number: "2",
       icon: IoCompassOutline,
+      color: "from-violet-500 to-purple-600 shadow-violet-500/30",
+      glow: "bg-violet-500/50",
       title: t("chooseYourPath"),
       description: `${t("chooseYourPathDesc")} on your goals`,
     },
     {
-      number: "3",
       icon: IoRocketOutline,
+      color: "from-orange-500 to-pink-500 shadow-orange-500/30",
+      glow: "bg-orange-500/50",
       title: t("learnAndPractice"),
       description: `${t("learnAndPracticeDesc")} skills consistently`,
     },
@@ -1126,19 +1129,27 @@ const Home = () => {
           >
             {howItWorksSteps.map((step) => (
               <div
-                key={step.number}
+                key={step.title}
                 className={`group relative flex flex-col rounded-3xl border p-8 text-center shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl ${
                   theme === "dark"
                     ? "border-white/10 bg-gradient-to-br from-gray-800/80 to-gray-900/80 hover:border-orange-400/40"
                     : "border-slate-200 bg-white hover:border-orange-300"
                 }`}
               >
-                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-pink-500 shadow-lg shadow-orange-500/30 transition-transform duration-300 group-hover:scale-105">
-                  <step.icon size={32} className="text-white" aria-hidden="true" />
+                <div className="relative mx-auto mb-6 flex h-20 w-20 items-center justify-center">
+                  <div
+                    className={`absolute inset-0 rounded-2xl blur-xl ${step.glow}`}
+                  />
+                  <div
+                    className={`relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br shadow-lg transition-transform duration-300 group-hover:scale-105 ${step.color}`}
+                  >
+                    <step.icon
+                      size={32}
+                      className="text-white"
+                      aria-hidden="true"
+                    />
+                  </div>
                 </div>
-                <span className="mx-auto mb-3 inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-r from-orange-500 to-pink-500 text-sm font-bold text-white">
-                  {step.number}
-                </span>
                 <h3
                   className={`mb-3 text-2xl font-bold ${theme === "dark" ? "text-white" : "text-black"}`}
                 >
