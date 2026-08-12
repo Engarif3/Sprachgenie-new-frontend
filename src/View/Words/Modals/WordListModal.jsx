@@ -237,9 +237,9 @@ const SentenceRenderer = memo(
         .trim();
     }
 
-    // "##"-prefixed lines are the top-level header — rendered as a
-    // full-width bar whose background color is strongest in the middle and
-    // fades to transparent at both edges, instead of plain underlined text.
+    // "##"-prefixed lines are the top-level header — rendered as a small
+    // orange/pink pill badge (matching the Topic pill above it) instead of
+    // plain underlined text.
     const isHeaderLine = trimmed.startsWith("##");
 
     // "--"-prefixed lines are a smaller sub-header nested under the nearest
