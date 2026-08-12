@@ -2383,7 +2383,7 @@ const WordList = () => {
                 <button
                   type="button"
                   onClick={handleSetRecentlyAddedLimit}
-                  className="min-h-[30px] w-full sm:w-auto md:w-auto px-2 py-2 md:px-2.5 md:py-1.5 rounded-full font-semibold text-sm shadow-lg border border-cyan-500 bg-cyan-700/40 text-white hover:bg-cyan-700/60 transition-all"
+                  className="min-h-[30px] w-full sm:w-auto md:w-auto px-2 py-2 md:px-2.5 md:py-1.5 rounded-full font-semibold text-sm shadow-lg border border-cyan-500 bg-cyan-50 text-cyan-700 hover:bg-cyan-100 dark:bg-cyan-700/40 dark:text-white dark:hover:bg-cyan-700/60 transition-all"
                   title='Set how many words "Recently added" shows'
                 >
                   {typeof recentlyAddedLimit === "number"
