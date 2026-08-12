@@ -496,7 +496,7 @@ const StoryDetail = () => {
     // voice for onboundary/highlighting support regardless of quality, so
     // `finalVoice` alone isn't a reliable signal for whether this browser
     // actually has a good German voice available.
-    maybeShowChromeVoiceHint(getBestGermanVoiceSync());
+    maybeShowChromeVoiceHint(getBestGermanVoiceSync(), "story");
 
     isLocalVoiceRef.current = !!(finalVoice && finalVoice.localService);
     voiceKeyRef.current = finalVoice
@@ -836,7 +836,7 @@ const StoryDetail = () => {
                 >
                   <button
                     type="button"
-                    onClick={() => pronounceWord(item.word)}
+                    onClick={() => pronounceWord(item.word, "story")}
                     className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg text-sky-600 dark:text-sky-400"
                     title={`Pronounce: ${item.word}`}
                     aria-label={`Pronounce: ${item.word}`}

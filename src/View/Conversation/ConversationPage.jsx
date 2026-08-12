@@ -323,7 +323,7 @@ const ConversationPage = () => {
                             throughout the word list/modal. */}
                         <button
                           type="button"
-                          onClick={() => pronounceWord(message.message)}
+                          onClick={() => pronounceWord(message.message, "conversation")}
                           title="Pronounce"
                           className="flex items-center transition-transform hover:scale-110"
                         >
