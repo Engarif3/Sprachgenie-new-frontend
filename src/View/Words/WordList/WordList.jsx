@@ -2277,7 +2277,7 @@ const WordList = () => {
         </div>
       </div>
 
-      <div className="flex justify-between items-center mb-2 md:mb-6 lg:mb-6 ml-2">
+      <div className="flex justify-between items-center mb-2 mx-0 md:mx-2 lg:mx-2">
         <div className="flex items-center gap-1.5 md:gap-3 lg:gap-3">
           <Button to="/quiz" variant="primary" size="sm">
             <IoGameControllerOutline size={16} aria-hidden="true" />
@@ -2290,20 +2290,40 @@ const WordList = () => {
           </Button>
         </div>
 
-        <span className="text-sm block md:hidden lg:hidden text-pink-400 font-bold mr-2">
-          {displayedWordsCount} {wordCountLabel} Words
-        </span>
+        <div className="relative flex items-center gap-2 mr-2">
+          <span className="text-sm block md:hidden lg:hidden text-pink-400 font-bold">
+            {displayedWordsCount} {wordCountLabel} Words
+          </span>
 
-        {/* {userLoggedIn && isAdmin && (
-          <span className="text-sm block md:hidden lg:hidden text-pink-400 font-bold mr-2">
-            {wordCountLabel}: {displayedWordsCount} words
-          </span>
-        )} */}
-        {/* {!isAdmin && (
-          <span className="text-sm text-pink-400 font-bold mr-2">
-            {wordCountLabel}: {displayedWordsCount} words
-          </span>
-        )} */}
+          {/* {userLoggedIn && isAdmin && (
+            <span className="text-sm block md:hidden lg:hidden text-pink-400 font-bold">
+              {wordCountLabel}: {displayedWordsCount} words
+            </span>
+          )} */}
+          {/* {!isAdmin && (
+            <span className="text-sm text-pink-400 font-bold">
+              {wordCountLabel}: {displayedWordsCount} words
+            </span>
+          )} */}
+
+          <IoInformationCircleOutline
+            size={22}
+            className="text-blue-400 cursor-pointer hover:text-blue-500 transition"
+            onClick={(e) => {
+              e.stopPropagation(); // prevent the click from closing immediately
+              setShowInfo((prev) => !prev);
+            }}
+          />
+
+          {showInfo && (
+            <div className="absolute top-8 right-0 z-50 w-10/12 md:w-6/12 p-3 rounded-lg bg-gray-900 text-gray-200 text-sm shadow-xl border border-gray-700 italic">
+              Please be aware that certain word meanings are context-dependent
+              and sourced from official TELC PDF materials. Words may have
+              additional meanings not listed here. Entries are updated
+              regularly as needed. Thank you for your understanding.
+            </div>
+          )}
+        </div>
       </div>
 
       {/* =============radio buttons ========== */}
@@ -2633,30 +2653,13 @@ const WordList = () => {
         </div>
       ) : (
         <div className=" min-h-screen  rounded-2xl p-0 md:p-1 lg:p-1">
-          <div className="flex items-center justify-end gap-2 mb-2 px-2 relative">
-            {isRefreshingPage && paginatedWords.length > 0 && (
+          {isRefreshingPage && paginatedWords.length > 0 && (
+            <div className="flex items-center justify-end gap-2 mb-2 px-2">
               <span className="text-xs  px-3 py-0 rounded-full bg-amber-500/10 border border-amber-500/50 text-amber-700 whitespace-nowrap dark:bg-amber-500/20 dark:border-amber-500/40 dark:text-amber-300">
                 Loading page...
               </span>
-            )}
-            <IoInformationCircleOutline
-              size={22}
-              className="text-blue-400 cursor-pointer hover:text-blue-500 transition "
-              onClick={(e) => {
-                e.stopPropagation(); // prevent the click from closing immediately
-                setShowInfo((prev) => !prev);
-              }}
-            />
-
-            {showInfo && (
-              <div className="absolute top-8 right-0 z-50 w-10/12 md:w-6/12 p-3 rounded-lg bg-gray-900 text-gray-200 text-sm shadow-xl border border-gray-700 italic">
-                Please be aware that certain word meanings are context-dependent
-                and sourced from official TELC PDF materials. Words may have
-                additional meanings not listed here. Entries are updated
-                regularly as needed. Thank you for your understanding.
-              </div>
-            )}
-          </div>
+            </div>
+          )}
           <div className="overflow-x-auto  border-gray-700/50 rounded-2xl shadow-2xl">
             <table
               className="w-full border-collapse"
