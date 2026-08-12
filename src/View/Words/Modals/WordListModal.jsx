@@ -533,31 +533,25 @@ const WordListModal = ({
       className="fixed z-50 inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center transition-opacity duration-300"
       onClick={handleBackgroundClick}
     >
-      <div
-        ref={modalRef}
-        className="relative  bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl max-w-6xl w-full mx-3 shadow-2xl transform transition-all duration-300 dark:border-2 border-gray-700/50 max-h-[90vh] overflow-y-auto"
-      >
-        {/* Favorite toggle — top-left, away from Close so the two aren't
-        sitting shoulder to shoulder inviting a mis-click. */}
-        {userLoggedIn && (
-          <FavoriteButton
-            isFavorite={favorites.includes(selectedWord.id)}
-            loading={loadingFavorites[selectedWord.id]}
-            onClick={handleToggleFavorite}
-            className="absolute top-3 left-3 z-10 rounded-full bg-white/5 p-2 hover:bg-white/10"
-          />
-        )}
-
-        {/* Close — top-right, the one spot users always expect it. */}
+      <div className="relative max-w-6xl w-full mx-3">
+        {/* Close — floats on the card's outer corner (half in, half out).
+        Positioned relative to THIS non-scrolling wrapper, not the card
+        itself, since the card's own overflow-y-auto would clip a
+        negative-offset button instead of letting it hang over the edge. */}
         <button
           onClick={handleCloseModal}
-          className="absolute top-3 right-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/5 text-gray-300 transition-colors hover:bg-white/10 hover:text-white"
+          className="absolute -top-3 -right-3 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-gray-700 bg-gray-800 text-gray-300 shadow-lg transition-colors hover:bg-gray-700 hover:text-white"
           aria-label="Close"
           title="Close"
         >
           <IoClose size={22} aria-hidden="true" />
         </button>
-        <p className="text-center mt-8 md:mt-6 lg:mt-6 px-4 md:px-6">
+
+        <div
+          ref={modalRef}
+          className="relative  bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-3xl w-full shadow-2xl transform transition-all duration-300 dark:border-2 border-gray-700/50 max-h-[90vh] overflow-y-auto"
+        >
+          <p className="text-center mt-8 md:mt-6 lg:mt-6 px-4 md:px-6">
           <span className="inline-block px-4 py-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full">
             <span className="text-blue-400 text-lg font-bold">Topic:</span>
             <span className="text-md md:text-xl lg:text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-400 ml-2">
@@ -588,6 +582,16 @@ const WordListModal = ({
               </Button>
             )}
           </h3>
+
+          {/* Favorite toggle — opposite side of the Word Details row. */}
+          {userLoggedIn && (
+            <FavoriteButton
+              isFavorite={favorites.includes(selectedWord.id)}
+              loading={loadingFavorites[selectedWord.id]}
+              onClick={handleToggleFavorite}
+              className="mr-2"
+            />
+          )}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5 lg:gap-3 mx-1 px-1 md:px-3 lg:px-2 mt-4 ">
           <div className="space-y-3 bg-gradient-to-br from-gray-800/60 to-gray-900/60 backdrop-blur-sm p-2 md:p-4 lg:p-4 rounded-2xl border border-gray-700/30">
@@ -806,10 +810,15 @@ const WordListModal = ({
           />
         )}
 
-        <div className="flex justify-end px-3 pb-4 pt-2 md:px-5">
-          <Button variant="secondary" surface="dark" onClick={handleCloseModal}>
-            Close
-          </Button>
+          <div className="flex justify-end px-3 pb-4 pt-2 md:px-5">
+            <Button
+              variant="secondary"
+              surface="dark"
+              onClick={handleCloseModal}
+            >
+              Close
+            </Button>
+          </div>
         </div>
       </div>
     </div>
