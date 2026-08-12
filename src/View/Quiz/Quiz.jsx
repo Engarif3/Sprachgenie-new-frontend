@@ -8,6 +8,7 @@ import Button from "../../components/UI/Button";
 import {
   IoVolumeHighOutline,
   IoCheckmark,
+  IoClose,
   IoHeart,
   IoHeartOutline,
   IoWarningOutline,
@@ -529,9 +530,9 @@ const Quiz = () => {
         </p>
 
         {/* Main word display */}
-        <div className="mb-4 rounded-3xl border border-purple-200 bg-white p-4 shadow-sm transition-all duration-300 hover:border-purple-300 dark:border-purple-500/30 dark:bg-slate-900 dark:shadow-2xl dark:hover:border-purple-500/50 md:p-5">
+        <div className="mb-4 min-h-[220px] md:min-h-[260px] rounded-3xl border border-purple-200 bg-white p-4 shadow-sm transition-all duration-300 hover:border-purple-300 dark:border-purple-500/30 dark:bg-slate-900 dark:shadow-2xl dark:hover:border-purple-500/50 md:p-5">
           <div className="text-center">
-            <div className="mb-2 flex items-center justify-center gap-2 md:mb-3 md:gap-4">
+            <div className="mb-2 flex items-center justify-start gap-2 md:mb-3 md:gap-4">
               <Button
                 variant="ghost"
                 onClick={() =>
@@ -596,18 +597,22 @@ const Quiz = () => {
               <Button
                 variant="danger"
                 size="lg"
+                className="!rounded-full !p-4"
+                aria-label="Mark as incorrect"
                 onClick={() => handleScoreAndNext(false)}
                 disabled={usedScore}
               >
-                <span> X</span>
+                <IoClose size={24} aria-hidden="true" />
               </Button>
               <Button
                 variant="success"
                 size="lg"
+                className="!rounded-full !p-4"
+                aria-label="Mark as correct"
                 onClick={() => handleScoreAndNext(true)}
                 disabled={usedScore}
               >
-                <IoCheckmark aria-hidden="true" />
+                <IoCheckmark size={24} aria-hidden="true" />
               </Button>
             </div>
           </div>
