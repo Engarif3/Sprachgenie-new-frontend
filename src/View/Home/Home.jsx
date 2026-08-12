@@ -1276,7 +1276,11 @@ const Home = () => {
       {/* CTA Section */}
       {!userLoggedIn && (
         <div
-          className="bg-gradient-to-r from-gray-800 to-gray-900 py-20 mx-8"
+          className={`py-20 mx-0 md:mx-8 rounded-none md:rounded-[40px] ${
+            theme === "dark"
+              ? "bg-[linear-gradient(135deg,#111827_0%,#0f172a_50%,#1e1b2e_100%)]"
+              : "bg-gradient-to-br from-slate-50 via-orange-50/40 to-slate-50 border border-slate-200"
+          }`}
           id="cta"
           data-animate
         >
@@ -1288,16 +1292,17 @@ const Home = () => {
                   : "opacity-0 scale-95"
               }`}
             >
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              <h2 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 mb-6 pb-2">
                 {t("readyToMaster")}
               </h2>
-              <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto">
+              <p className="text-xl md:text-2xl text-slate-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
                 {t("startYourFreeJourney")}
               </p>
               <Link
                 to="/register"
-                className="inline-block px-12 py-5 bg-pink-700 text-white font-bold rounded-full hover:bg-pink-600 hover:shadow-2xl hover:scale-105 transition-all duration-300 text-xl"
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 px-12 py-5 text-xl font-bold text-white shadow-lg shadow-orange-500/30 transition-all duration-300 hover:scale-105 hover:shadow-xl"
               >
+                <IoRocketOutline size={22} aria-hidden="true" />
                 {t("startLearning")}
               </Link>
             </div>
