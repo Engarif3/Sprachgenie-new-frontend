@@ -532,7 +532,7 @@ const WordTableRow = ({
 
       {/* Level */}
       <td className="p-2 md:p-3 hidden md:table-cell text-center">
-        <span className="inline-block px-3 py-1 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-xs sm:text-sm">
+        <span className="inline-block px-2.5 py-1 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full text-orange-400 font-semibold text-xs sm:text-sm">
           {word.level?.level}
         </span>
       </td>
