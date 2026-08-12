@@ -486,8 +486,8 @@ const Quiz = () => {
     <Container>
       <div className="mx-auto w-full max-w-2xl px-2 py-6 md:py-8">
         {/* Header with difficulty and reset */}
-        <div className="mb-4 flex w-full flex-col items-center justify-between gap-4 sm:flex-row">
-          <div className="rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm text-slate-700 dark:border-blue-500/40 dark:bg-slate-900 dark:text-slate-200">
+        <div className="mb-4 flex w-full flex-col items-center justify-between gap-3 sm:flex-row">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             {source === "favorites" ? (
               <>
                 Source:{" "}
@@ -504,25 +504,23 @@ const Quiz = () => {
                 </span>
               </>
             )}
-          </div>
-          <Button variant="danger" onClick={resetQuiz}>
+          </p>
+          <Button variant="danger" size="sm" onClick={resetQuiz}>
             Reset Quiz
           </Button>
         </div>
 
         {/* Word counter */}
-        <div className="mb-3 text-center">
-          <div className="inline-block rounded-full border border-slate-200 bg-slate-100 px-6 py-2 dark:border-slate-700 dark:bg-slate-800">
-            <span className="text-slate-500 dark:text-slate-300">Question</span>{" "}
-            <span className="text-xl font-bold text-slate-900 dark:text-white">
-              {currentIndex + 1}
-            </span>
-            <span className="text-slate-400 dark:text-slate-400"> of </span>
-            <span className="text-xl font-bold text-slate-900 dark:text-white">
-              {quizWords.length}
-            </span>
-          </div>
-        </div>
+        <p className="mb-3 text-center text-slate-500 dark:text-slate-400">
+          Question{" "}
+          <span className="text-lg font-bold text-slate-900 dark:text-white">
+            {currentIndex + 1}
+          </span>{" "}
+          of{" "}
+          <span className="text-lg font-bold text-slate-900 dark:text-white">
+            {quizWords.length}
+          </span>
+        </p>
 
         {/* Instruction */}
         <p className="mb-3 flex items-center justify-center gap-1.5 text-center text-base italic text-pink-600 dark:text-pink-400">
@@ -531,7 +529,7 @@ const Quiz = () => {
         </p>
 
         {/* Main word display */}
-        <div className="mb-4 rounded-3xl border-2 border-purple-200 bg-white p-4 shadow-sm transition-all duration-300 hover:border-purple-300 dark:border-purple-500/30 dark:bg-slate-900 dark:shadow-2xl dark:hover:border-purple-500/50 md:p-5">
+        <div className="mb-4 rounded-3xl border border-purple-200 bg-white p-4 shadow-sm transition-all duration-300 hover:border-purple-300 dark:border-purple-500/30 dark:bg-slate-900 dark:shadow-2xl dark:hover:border-purple-500/50 md:p-5">
           <div className="text-center">
             <div className="mb-2 flex items-center justify-center gap-2 md:mb-3 md:gap-4">
               <Button
@@ -563,7 +561,7 @@ const Quiz = () => {
             {/* Meaning reveal area */}
             <div className="flex min-h-[80px] items-center justify-center">
               {showMeaning ? (
-                <div className="animate-fade-in rounded-2xl border border-yellow-300 bg-yellow-50 px-6 py-3 text-lg font-semibold text-yellow-700 dark:border-yellow-500/30 dark:bg-slate-900 dark:text-yellow-300">
+                <div className="animate-fade-in text-lg font-semibold text-yellow-700 dark:text-yellow-300">
                   {(currentWord?.meaning && currentWord.meaning.join(", ")) ||
                     "No meaning"}
                 </div>
@@ -585,7 +583,7 @@ const Quiz = () => {
 
         {/* Player score card */}
         <div className="mb-4 flex flex-col justify-center gap-4 md:flex-row md:gap-8">
-          <div className="w-full rounded-2xl border-2 border-blue-200 bg-white p-3 shadow-sm transition-all duration-300 hover:border-blue-300 dark:border-blue-500/30 dark:bg-slate-900 dark:shadow-xl dark:hover:border-blue-500/50 md:max-w-sm md:flex-1 md:p-5">
+          <div className="w-full rounded-2xl border border-blue-200 bg-white p-3 shadow-sm transition-all duration-300 hover:border-blue-300 dark:border-blue-500/30 dark:bg-slate-900 dark:shadow-xl dark:hover:border-blue-500/50 md:max-w-sm md:flex-1 md:p-5">
             <div className="mb-2 text-center">
               <div className="mb-1 text-base font-bold text-blue-600 dark:text-blue-400 md:text-xl">
                 YOUR SCORE
