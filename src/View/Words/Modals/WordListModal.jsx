@@ -595,7 +595,7 @@ const WordListModal = ({
           )}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5 lg:gap-3 mx-1 px-1 md:px-3 lg:px-2 mt-4 ">
-          <div className="space-y-3 bg-gray-100/70 dark:bg-gradient-to-br dark:from-gray-800/60 dark:to-gray-900/60 backdrop-blur-sm p-2 md:p-4 lg:p-4 rounded-2xl border border-gray-200 dark:border-gray-700/30">
+          <div className="space-y-3 bg-gray-100/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-800/60 dark:to-gray-900/60 backdrop-blur-sm p-2 md:p-4 lg:p-4 rounded-2xl border border-gray-200 dark:border-gray-700/30">
             <p className="text-sm md:text-base lg:text-lg">
               <span className="text-blue-600 dark:text-blue-400 font-semibold">Word:</span>{" "}
               <span className="mr-2 font-bold text-orange-600 dark:text-orange-400 text-center text-md md:text-lg lg:text-xl">
@@ -771,7 +771,7 @@ const WordListModal = ({
               </p>
             )}
           </div>
-          <div className="bg-gray-100/70 dark:bg-gradient-to-br dark:from-gray-800/60 dark:to-gray-900/60 backdrop-blur-sm p-2 md:p-4 lg:p-3 rounded-2xl border border-gray-200 dark:border-gray-700/30 ">
+          <div className="bg-gray-100/70 dark:bg-transparent dark:bg-gradient-to-br dark:from-gray-800/60 dark:to-gray-900/60 backdrop-blur-sm p-2 md:p-4 lg:p-3 rounded-2xl border border-gray-200 dark:border-gray-700/30 ">
             <p className="flex items-center gap-2 text-md md:text-lg lg:text-lg text-blue-600 dark:text-blue-400 font-semibold mb-3">
               <IoDocumentTextOutline size={18} aria-hidden="true" />
               Sentences:
