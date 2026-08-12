@@ -162,16 +162,7 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    // Either edge of the stack can trigger reveal: the title above it
-    // (normal top-to-bottom scroll) or the thin sentinel just after the
-    // last card (scrolling up into the section from below it — e.g. a
-    // refresh that restores scroll position at the page bottom, where
-    // the title marker isn't reached until AFTER scrolling past the
-    // entire — much taller — stack).
-    if (
-      visibleSections.has("features-title") ||
-      visibleSections.has("features-stack-end")
-    ) {
+    if (visibleSections.has("features-title")) {
       setFeatureCardsRevealed(true);
     }
   }, [visibleSections]);
@@ -980,24 +971,21 @@ const Home = () => {
           </div>
         </Container>
 
-        {/* ScrollStack — opacity-only fade (no translate-y/transform) since
-        the cards rely on position: sticky for the stacking-scroll effect,
-        and a transform on any ancestor breaks sticky positioning in most
-        browsers. Uses featureCardsRevealed (reveal-once) rather than the
-        toggling visibleSections, since the title marker used to detect
-        entry scrolls out of view long before you're done scrolling through
-        the (much taller) sticky stack — toggling on that would fade the
-        cards back out mid-scroll, well before the section actually ends. */}
+        {/* ScrollStack — always rendered at full opacity, no scroll-gated
+        fade for the section as a whole. It used to hide behind a
+        scroll-triggered reveal (matching the fade-in used elsewhere on the
+        page), but the section's own height is several times the viewport,
+        so any single small trigger marker — above it, below it, wherever —
+        could only ever catch ONE scroll direction quickly; approaching from
+        the other direction meant scrolling through the whole (invisible)
+        stack first. Only the first card's own small slide-up-and-fade
+        entrance (via `revealed`, scoped to that one card in ScrollStack.jsx)
+        still plays, since that can't hide the rest of the section. */}
         {isDesktop ? (
-          <div
-            className={`mx-auto w-full max-w-6xl px-4 transition-opacity duration-1000 delay-300 ${
-              featureCardsRevealed ? "opacity-100" : "opacity-0"
-            }`}
-          >
+          <div className="mx-auto w-full max-w-6xl px-4">
             <ScrollStack
               layoutVersion={userLoggedIn ? "logged-in" : "guest"}
               revealed={featureCardsRevealed}
-              endMarkerId="features-stack-end"
             >
               {featureCards.map((feature, index) => (
                 <ScrollStackItem
