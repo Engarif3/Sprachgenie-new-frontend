@@ -2794,7 +2794,7 @@ const WordList = () => {
                         )
                       ) : (
                         <div className="flex flex-col items-center gap-2">
-                          <span>No words available. Will be added soon!</span>
+                          <span>No words available for this search</span>
                           {trimmedSearchValue && (
                             <Button
                               variant="secondary"
