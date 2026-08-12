@@ -2257,7 +2257,7 @@ const WordList = () => {
     <Container>
       {/* Modern Header Section */}
       <div className="text-center mt-4 mb-2 md:mb-8 lg:mb-8 ">
-        <div className="flex justify-between items-center mb-2 md:mb-6 lg:mb-6 ml-2">
+        <div className="flex justify-between items-center mb-2 ml-2">
           <div className="flex items-center gap-1.5 md:gap-3 lg:gap-3">
             <Button to="/quiz" variant="primary" size="sm">
               <IoGameControllerOutline size={16} aria-hidden="true" />
