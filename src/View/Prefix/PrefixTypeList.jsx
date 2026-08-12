@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../axios";
 import Container from "../../utils/Container";
 import Loader from "../../utils/Loader";
-import { IoTextOutline } from "react-icons/io5";
+import { IoTextOutline, IoArrowForwardOutline } from "react-icons/io5";
 
 const PrefixTypeList = () => {
   const [prefixTypes, setPrefixTypes] = useState([]);
@@ -57,10 +57,10 @@ const PrefixTypeList = () => {
           </div>
         ) : prefixTypes.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {prefixTypes.map((prefixType, index) => (
+            {prefixTypes.map((prefixType) => (
               <div
                 key={prefixType.id}
-                className="group relative bg-gradient-to-br from-gray-800/80 via-gray-900 to-black border-2 border-gray-700/50 hover:border-orange-500 p-6 rounded-2xl transition-all duration-500 cursor-pointer hover:-translate-y-3 hover:scale-105 overflow-hidden shadow-xl hover:shadow-[0_0_50px_rgba(249,115,22,0.5)]"
+                className="group relative border border-slate-200 bg-white p-6 rounded-2xl transition-all duration-500 cursor-pointer hover:-translate-y-3 hover:scale-105 overflow-hidden shadow-[0_10px_30px_rgba(15,23,42,0.1)] hover:border-orange-200 hover:shadow-[0_25px_50px_rgba(15,23,42,0.18),0_0_20px_rgba(249,115,22,0.15)] dark:border-gray-700/50 dark:bg-gradient-to-br dark:from-gray-800/80 dark:via-gray-900 dark:to-black dark:shadow-[0_10px_30px_rgba(0,0,0,0.5)] dark:hover:border-orange-500/40 dark:hover:shadow-[0_25px_50px_rgba(0,0,0,0.6),0_0_20px_rgba(249,115,22,0.25)]"
                 onClick={() => navigate(`/prefix-list/${prefixType.id}`)}
               >
                 {/* Animated gradient background on hover */}
@@ -70,27 +70,26 @@ const PrefixTypeList = () => {
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12"></div>
 
                 <div className="relative z-10">
-                  {/* Topic Number Badge */}
-                  <div className="absolute -top-2 -right-2 w-10 h-10 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                    {index + 1}
-                  </div>
-
                   {/* Icon */}
-                  <div className="mb-4 text-orange-400 group-hover:scale-110 transition-transform duration-300">
-                    <IoTextOutline aria-hidden="true" size={36} />
+                  <div className="mb-4 flex justify-end">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-orange-200 bg-orange-50 text-orange-600 transition-transform duration-300 group-hover:scale-110 dark:border-orange-500/30 dark:bg-orange-500/10 dark:text-orange-400">
+                      <IoTextOutline aria-hidden="true" size={28} />
+                    </div>
                   </div>
 
                   {/* Topic Title */}
-                  <h3 className="text-xl font-bold text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-orange-400 group-hover:to-pink-400 transition-all duration-300 mb-3">
+                  <h3 className="text-xl font-bold text-slate-900 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-orange-400 group-hover:to-pink-400 transition-all duration-300 mb-3 dark:text-white">
                     {prefixType.name}
                   </h3>
 
                   {/* View Button */}
-                  <div className="flex items-center gap-2 text-orange-500 font-semibold text-sm group-hover:gap-3 transition-all duration-300">
+                  <div className="flex items-center gap-2 text-orange-600 dark:text-orange-500 font-semibold text-sm group-hover:gap-3 transition-all duration-300">
                     <span>Explore Words</span>
-                    <span className="text-lg transform group-hover:translate-x-1 transition-transform duration-300">
-                      →
-                    </span>
+                    <IoArrowForwardOutline
+                      size={16}
+                      aria-hidden="true"
+                      className="transform group-hover:translate-x-1 transition-transform duration-300"
+                    />
                   </div>
                 </div>
               </div>
