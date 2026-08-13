@@ -4,7 +4,7 @@ import api from "../../axios";
 import PageHeader from "../../components/UI/PageHeader";
 import Button from "../../components/UI/Button";
 import DateTime from "../../components/UI/DateTime";
-import { formatDateTimeText } from "../../utils/formatDateTime";
+import { formatTimeOnly } from "../../utils/formatDateTime";
 import {
   IoCloudUploadOutline,
   IoCheckmarkCircle,
@@ -84,9 +84,14 @@ const NextRunCountdown = ({ value }) => {
   const isCountingDown =
     remainingMs !== null && remainingMs > 0 && remainingMs < 24 * 60 * 60 * 1000;
 
+  // Always ticking (not just once isCountingDown is already true) — otherwise
+  // this component never re-renders on its own while showing the "in X days"
+  // form, so it can never notice the moment it crosses under 24h and should
+  // switch to the live countdown. Ticks slowly until then to avoid needless
+  // re-renders.
   useEffect(() => {
-    if (!isCountingDown) return undefined;
-    const id = setInterval(() => setNow(Date.now()), 1000);
+    const tickMs = isCountingDown ? 1000 : 60 * 1000;
+    const id = setInterval(() => setNow(Date.now()), tickMs);
     return () => clearInterval(id);
   }, [isCountingDown]);
 
@@ -116,9 +121,11 @@ const NextRunCountdown = ({ value }) => {
     );
   }
 
+  const totalDays = Math.floor(remainingMs / (24 * 60 * 60 * 1000));
+  const dayLabel = totalDays === 1 ? "1 day" : `${totalDays} days`;
   return (
     <span className="shrink-0 whitespace-nowrap text-xs font-medium text-slate-600 dark:text-gray-300">
-      {formatDateTimeText(value)}
+      in {dayLabel} at {formatTimeOnly(value)}
     </span>
   );
 };
