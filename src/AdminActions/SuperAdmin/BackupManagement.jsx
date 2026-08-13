@@ -4,12 +4,14 @@ import api from "../../axios";
 import PageHeader from "../../components/UI/PageHeader";
 import Button from "../../components/UI/Button";
 import DateTime from "../../components/UI/DateTime";
+import { formatDateTimeText } from "../../utils/formatDateTime";
 import {
   IoCloudUploadOutline,
   IoCheckmarkCircle,
   IoCloseCircle,
   IoRemoveCircleOutline,
   IoRefreshOutline,
+  IoTimeOutline,
 } from "react-icons/io5";
 
 const SERVICES = [
@@ -25,27 +27,6 @@ const formatBytes = (bytes) => {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-};
-
-// Older history rows always wrote the literal "day(s)" regardless of count
-// (e.g. "1 day(s)") — normalize to proper singular/plural ("1 day",
-// "3 days") since new rows already get this right at the source.
-const fixDaySuffix = (text) =>
-  text.replace(
-    /(\d+)\s*day\(s\)/gi,
-    (_, count) => `${count} day${Number(count) === 1 ? "" : "s"}`,
-  );
-
-// Strips only the outer wrapping "(...)." / "(...)" from an interval label
-// (e.g. "(interval: 1 day(s))." -> "interval: 1 day(s)") without touching
-// inner parens like the "(s)" in "day(s)".
-const stripOuterParens = (text) => {
-  let result = text.trim();
-  if (result.startsWith("(")) result = result.slice(1);
-  if (result.endsWith(").")) result = result.slice(0, -2);
-  else if (result.endsWith(")")) result = result.slice(0, -1);
-  else if (result.endsWith(".")) result = result.slice(0, -1);
-  return result;
 };
 
 const STATUS_BADGE = {
@@ -89,6 +70,57 @@ const confirmWithPassword = async ({ title, html, confirmButtonText }) => {
     color: "#f5f5f4",
   });
   return result.isConfirmed ? result.value : null;
+};
+
+const pad2 = (n) => String(n).padStart(2, "0");
+
+// Shows the absolute next-run date/time (matching the site's DateTime
+// convention) until less than 24h remain, then switches to a live
+// HH:MM:SS countdown that ticks every second.
+const NextRunCountdown = ({ value }) => {
+  const [now, setNow] = useState(() => Date.now());
+  const target = value ? new Date(value).getTime() : null;
+  const remainingMs = target !== null ? target - now : null;
+  const isCountingDown =
+    remainingMs !== null && remainingMs > 0 && remainingMs < 24 * 60 * 60 * 1000;
+
+  useEffect(() => {
+    if (!isCountingDown) return undefined;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [isCountingDown]);
+
+  if (!value || target === null) {
+    return <span className="text-slate-400 dark:text-slate-500">—</span>;
+  }
+
+  if (remainingMs <= 0) {
+    return (
+      <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+        <IoTimeOutline size={11} aria-hidden="true" />
+        Due now
+      </span>
+    );
+  }
+
+  if (isCountingDown) {
+    const totalSeconds = Math.floor(remainingMs / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return (
+      <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-sky-700 dark:bg-sky-500/10 dark:text-sky-400">
+        <IoTimeOutline size={11} aria-hidden="true" />
+        in {pad2(hours)}:{pad2(minutes)}:{pad2(seconds)}
+      </span>
+    );
+  }
+
+  return (
+    <span className="shrink-0 whitespace-nowrap text-xs font-medium text-slate-600 dark:text-gray-300">
+      {formatDateTimeText(value)}
+    </span>
+  );
 };
 
 const ServiceSettingsCard = ({ serviceKey, label, onTriggered }) => {
@@ -282,6 +314,21 @@ const ServiceSettingsCard = ({ serviceKey, label, onTriggered }) => {
         </div>
       </div>
 
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div className="flex items-center justify-between gap-2 overflow-hidden rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 dark:border-gray-700 dark:bg-gray-900/40">
+          <span className="truncate text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-gray-400">
+            Next Dropbox
+          </span>
+          <NextRunCountdown value={settings.dropboxNextRunAt} />
+        </div>
+        <div className="flex items-center justify-between gap-2 overflow-hidden rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 dark:border-gray-700 dark:bg-gray-900/40">
+          <span className="truncate text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-gray-400">
+            Next Drive
+          </span>
+          <NextRunCountdown value={settings.driveNextRunAt} />
+        </div>
+      </div>
+
       <div>
         <label className="block text-sm font-medium text-slate-700 dark:text-gray-300">
           History retention (days)
@@ -438,31 +485,13 @@ const BackupHistoryTable = ({ refreshKey }) => {
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">File</th>
                 <th className="px-4 py-3">Size</th>
-                <th className="px-4 py-3">Details</th>
+                <th className="px-4 py-3">Error</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
               {history.map((row) => {
                 const badge = STATUS_BADGE[row.status] || STATUS_BADGE.SKIPPED;
                 const BadgeIcon = badge.icon;
-                const details = fixDaySuffix(
-                  row.errorMessage || row.skipReason || "",
-                );
-                // Older history rows (recorded before the wording was
-                // cleaned up) still have the interval as a trailing
-                // "(interval: X day(s))." parenthetical instead of the
-                // current " — interval is X days." suffix — badge both.
-                const oldIntervalMatch = details.match(
-                  /\s*\(interval:.*\)\.?$/i,
-                );
-                const [detailsMain, detailsInterval] = details.includes(" — ")
-                  ? details.split(" — ")
-                  : oldIntervalMatch
-                    ? [
-                        details.slice(0, oldIntervalMatch.index).trim(),
-                        oldIntervalMatch[0].trim(),
-                      ]
-                    : [details, null];
                 return (
                   <tr
                     key={row.id}
@@ -510,26 +539,13 @@ const BackupHistoryTable = ({ refreshKey }) => {
                       )}
                     </td>
                     <td className="max-w-md px-4 py-4">
-                      {details ? (
-                        <div
-                          title={details}
-                          className="flex max-w-md items-center gap-2 overflow-hidden text-xs"
+                      {row.errorMessage ? (
+                        <span
+                          title={row.errorMessage}
+                          className="block max-w-md truncate rounded-lg bg-red-50 px-2 py-1 text-xs text-red-700 dark:bg-red-500/10 dark:text-red-400"
                         >
-                          <span
-                            className={`min-w-0 truncate rounded-lg px-2 py-1 ${
-                              row.errorMessage
-                                ? "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400"
-                                : "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"
-                            }`}
-                          >
-                            {detailsMain}
-                          </span>
-                          {detailsInterval && (
-                            <span className="shrink-0 rounded-lg bg-slate-200 px-2 py-1 font-medium text-slate-700 dark:bg-slate-700/70 dark:text-slate-200">
-                              {stripOuterParens(detailsInterval)}
-                            </span>
-                          )}
-                        </div>
+                          {row.errorMessage}
+                        </span>
                       ) : (
                         <span className="block text-center text-slate-400 dark:text-slate-500">
                           —
