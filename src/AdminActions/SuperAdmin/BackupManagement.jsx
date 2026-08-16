@@ -128,10 +128,12 @@ const NextRunCountdown = ({ value }) => {
   }
 
   const totalDays = Math.floor(remainingMs / (24 * 60 * 60 * 1000));
-  const dayLabel = totalDays === 1 ? "1 day" : `${totalDays} days`;
+  const timeLabel = formatTimeOnly(value);
   return (
     <span className="shrink-0 whitespace-nowrap text-xs font-medium text-slate-600 dark:text-gray-300">
-      in {dayLabel} at {formatTimeOnly(value)}
+      {totalDays === 1
+        ? `tomorrow at ${timeLabel}`
+        : `in ${totalDays} days at ${timeLabel}`}
     </span>
   );
 };
