@@ -22,11 +22,17 @@ const SERVICES = [
 const inputClass =
   "mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-sky-500 focus:outline-none focus:ring focus:ring-sky-500/30 dark:border-gray-700 dark:bg-gray-900/60 dark:text-white dark:placeholder-gray-500";
 
+// Decimal (SI) units — 1000-based, not 1024-based — to match how Dropbox
+// and Google Drive display file sizes in their own UIs. Using 1024 here
+// while labeling the result "MB" (a common mix-up, e.g. Windows Explorer)
+// made this dashboard show a smaller number for the exact same file than
+// what you'd see on Dropbox/Drive directly, even though the byte count
+// stored is identical — confirmed via Dropbox's API against the DB value.
 const formatBytes = (bytes) => {
   if (bytes === null || bytes === undefined) return "—";
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes < 1000) return `${bytes} B`;
+  if (bytes < 1000 * 1000) return `${(bytes / 1000).toFixed(1)} KB`;
+  return `${(bytes / (1000 * 1000)).toFixed(1)} MB`;
 };
 
 const STATUS_BADGE = {
