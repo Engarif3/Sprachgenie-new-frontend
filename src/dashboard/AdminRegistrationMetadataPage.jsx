@@ -783,7 +783,10 @@ const AdminRegistrationMetadataPage = () => {
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                         Account
                       </p>
-                      <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">
+                      <p className="mt-2 text-base font-semibold text-slate-900 dark:text-white">
+                        {selectedRecord.name || selectedUserProfile?.name || "Unknown"}
+                      </p>
+                      <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
                         {selectedRecord.email}
                       </p>
                       <p className="mt-1 font-mono text-xs text-slate-500 dark:text-slate-400">
@@ -843,7 +846,7 @@ const AdminRegistrationMetadataPage = () => {
                             Name
                           </p>
                           <p className="mt-2 text-sm text-slate-900 dark:text-white">
-                            {selectedUserProfile?.name || "Unknown"}
+                            {selectedRecord.name || selectedUserProfile?.name || "Unknown"}
                           </p>
                         </div>
 
