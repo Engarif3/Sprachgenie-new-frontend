@@ -28,11 +28,22 @@ const SplitText = ({
   // away and back, since it's already "in view" with nothing left to
   // trigger.
   scrollTrigger: useScrollTrigger = true,
+  // Optional: lets a parent that ALSO gates a sibling element (e.g. an
+  // icon fading in next to this text) on document.fonts.ready pass its own
+  // already-resolved boolean here instead of this component listening for
+  // fonts.ready a second time independently. Two separate listeners on the
+  // same promise don't necessarily resolve their React state updates in
+  // the same commit — the few-ms drift between them was exactly why an
+  // icon and its label sometimes started their reveal together and
+  // sometimes didn't. Falls back to this component's own detection when
+  // not provided, for any other caller that doesn't need to sync anything.
+  fontsReady,
 }) => {
   const ref = useRef(null);
   const animationCompletedRef = useRef(false);
   const onCompleteRef = useRef(onLetterAnimationComplete);
-  const [fontsLoaded, setFontsLoaded] = useState(false);
+  const [internalFontsLoaded, setInternalFontsLoaded] = useState(false);
+  const fontsLoaded = fontsReady !== undefined ? fontsReady : internalFontsLoaded;
 
   // Keep callback ref updated
   useEffect(() => {
@@ -40,14 +51,15 @@ const SplitText = ({
   }, [onLetterAnimationComplete]);
 
   useEffect(() => {
+    if (fontsReady !== undefined) return; // parent already supplies the signal
     if (document.fonts.status === "loaded") {
-      setFontsLoaded(true);
+      setInternalFontsLoaded(true);
     } else {
       document.fonts.ready.then(() => {
-        setFontsLoaded(true);
+        setInternalFontsLoaded(true);
       });
     }
-  }, []);
+  }, [fontsReady]);
 
   useGSAP(
     () => {

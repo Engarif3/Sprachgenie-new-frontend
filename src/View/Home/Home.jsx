@@ -67,13 +67,15 @@ const Home = () => {
   // its fade back to invisible mid-scroll. Reveal once and keep it that
   // way instead of toggling with the (now offscreen) title.
   const [featureCardsRevealed, setFeatureCardsRevealed] = useState(false);
-  // The hero benefit icons used to render instantly while their labels
-  // faded in via SplitText's staggered initialDelay (up to 3s apart), so
-  // an icon could sit alone for seconds before its text appeared. Fading
-  // the icon in on the same delay keeps each icon+label pair in sync —
-  // but SplitText's own GSAP timeline doesn't start at mount, it waits
-  // for document.fonts.ready (see SplitText.jsx's fontsLoaded state), so
-  // this has to wait on the same signal or the icon still jumps the gun.
+  // The hero benefit icons fade in alongside their SplitText label, driven
+  // by this one shared flag — passed straight into each SplitText instance
+  // below as `fontsReady` instead of letting SplitText detect
+  // document.fonts.ready on its own. Two independent listeners on that
+  // same promise (one here, one inside each of the 6 SplitText instances)
+  // don't necessarily land their React state updates in the same commit,
+  // and that few-ms drift was exactly why the icon and its label sometimes
+  // started together and sometimes didn't. One flag, read by both, removes
+  // the race entirely.
   const [pillsRevealed, setPillsRevealed] = useState(false);
   useEffect(() => {
     if (document.fonts.status === "loaded") {
@@ -637,6 +639,7 @@ const Home = () => {
                         rootMargin="-100px"
                         initialDelay={0}
                         scrollTrigger={false}
+                        fontsReady={pillsRevealed}
                       />
                     )}
                   </div>
@@ -673,6 +676,7 @@ const Home = () => {
                         rootMargin="-100px"
                         initialDelay={600}
                         scrollTrigger={false}
+                        fontsReady={pillsRevealed}
                       />
                     )}
                   </div>
@@ -709,6 +713,7 @@ const Home = () => {
                         rootMargin="-100px"
                         initialDelay={1200}
                         scrollTrigger={false}
+                        fontsReady={pillsRevealed}
                       />
                     )}
                   </div>
@@ -745,6 +750,7 @@ const Home = () => {
                         rootMargin="-100px"
                         initialDelay={1800}
                         scrollTrigger={false}
+                        fontsReady={pillsRevealed}
                       />
                     )}
                   </div>
@@ -781,6 +787,7 @@ const Home = () => {
                         rootMargin="-100px"
                         initialDelay={2400}
                         scrollTrigger={false}
+                        fontsReady={pillsRevealed}
                       />
                     )}
                   </div>
@@ -817,6 +824,7 @@ const Home = () => {
                         rootMargin="-100px"
                         initialDelay={3000}
                         scrollTrigger={false}
+                        fontsReady={pillsRevealed}
                       />
                     )}
                   </div>
