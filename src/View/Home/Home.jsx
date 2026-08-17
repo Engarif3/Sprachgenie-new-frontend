@@ -1,7 +1,6 @@
 import Container from "../../utils/Container";
 import HomeCard from "./HomeCard";
 import CircularText from "./CircularText";
-import SplitText from "./SplitText";
 import { useAuth } from "../../services/auth.services";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -34,21 +33,6 @@ import {
 // Rounds down to the nearest hundred and appends "+", so the displayed
 // count never needs a manual edit as the vocabulary grows (4680 -> "4600+",
 // 5145 -> "5100+") and never overstates how many words actually exist.
-// The icon next to each hero benefit label used to fade in over a fixed
-// 500ms while SplitText reveals the label one character at a time — for
-// longer words (e.g. "Lieblingswörter", "Fortschrittsverfolgung") that
-// per-character reveal takes noticeably longer than 500ms, so the icon
-// finished fading in and sat fully visible while the word was still
-// animating in. Deriving the icon's fade duration from the same formula
-// SplitText itself uses (see SplitText.jsx: initialDelay + (chars-1) *
-// stagger + duration) keeps them finishing together regardless of word
-// length or active language.
-const SPLIT_TEXT_STAGGER_MS = 20; // matches this page's SplitText delay={20}
-const SPLIT_TEXT_BASE_DURATION_MS = 600; // matches this page's SplitText duration={0.6}
-const getIconFadeDurationMs = (text) =>
-  SPLIT_TEXT_BASE_DURATION_MS +
-  Math.max((text?.length ?? 1) - 1, 0) * SPLIT_TEXT_STAGGER_MS;
-
 const formatWordCountLabel = (totalWords) => {
   if (!Number.isFinite(totalWords) || totalWords <= 0) {
     return null;
@@ -67,15 +51,13 @@ const Home = () => {
   // its fade back to invisible mid-scroll. Reveal once and keep it that
   // way instead of toggling with the (now offscreen) title.
   const [featureCardsRevealed, setFeatureCardsRevealed] = useState(false);
-  // The hero benefit icons fade in alongside their SplitText label, driven
-  // by this one shared flag — passed straight into each SplitText instance
-  // below as `fontsReady` instead of letting SplitText detect
-  // document.fonts.ready on its own. Two independent listeners on that
-  // same promise (one here, one inside each of the 6 SplitText instances)
-  // don't necessarily land their React state updates in the same commit,
-  // and that few-ms drift was exactly why the icon and its label sometimes
-  // started together and sometimes didn't. One flag, read by both, removes
-  // the race entirely.
+  // Gates the hero benefit rows' fade-in — each row (icon + label) is one
+  // element with one CSS transition, not an icon and a separately-animated
+  // per-character text; a previous version drove the icon via plain CSS and
+  // the text via a per-letter GSAP SplitText animation, two independent
+  // systems that stayed out of sync no matter how carefully their delays
+  // were hand-matched. Waiting for fonts.ready first just avoids a visible
+  // reflow if a web font swaps in mid-fade.
   const [pillsRevealed, setPillsRevealed] = useState(false);
   useEffect(() => {
     if (document.fonts.status === "loaded") {
@@ -606,228 +588,40 @@ const Home = () => {
                   {t("featuresUnlocked")}
                 </p>
                 <div className="flex flex-wrap justify-center gap-x-1 gap-y-1 md:gap-x-8 md:gap-y-2 lg:gap-x-8 lg:gap-y-2">
-                  <div className="inline-flex items-center gap-1.5">
-                    <IoHeartOutline
-                      aria-hidden="true"
-                      className={`${isMobile ? "" : `transition-opacity ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
-                      style={
+                  {[
+                    { Icon: IoHeartOutline, label: t("favoriteWords"), delayMs: 0 },
+                    { Icon: IoSparklesOutline, label: t("aiPoweredLearning"), delayMs: 600 },
+                    { Icon: IoGlobeOutline, label: t("translationFeatures"), delayMs: 1200 },
+                    { Icon: IoStatsChartOutline, label: t("personalDashboard"), delayMs: 1800 },
+                    { Icon: IoTrendingUpOutline, label: t("progressTracking"), delayMs: 2400 },
+                    { Icon: IoFlashOutline, label: t("muchMore"), delayMs: 3000 },
+                  ].map(({ Icon, label, delayMs }) => (
+                    <div
+                      key={label}
+                      className={`inline-flex items-center gap-1.5 ${
                         isMobile
-                          ? undefined
-                          : {
-                              transitionDelay: "0ms",
-                              transitionDuration: `${getIconFadeDurationMs(t("favoriteWords"))}ms`,
-                            }
-                      }
-                    />
-                    {isMobile ? (
-                      <div
-                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
-                      >
-                        {t("favoriteWords")}
-                      </div>
-                    ) : (
-                      <SplitText
-                        text={t("favoriteWords")}
-                        delay={20}
-                        duration={0.6}
-                        ease="power3.out"
-                        splitType="chars"
-                        from={{ opacity: 0, y: 20 }}
-                        to={{ opacity: 1, y: 0 }}
-                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
-                        threshold={0.1}
-                        rootMargin="-100px"
-                        initialDelay={0}
-                        scrollTrigger={false}
-                        fontsReady={pillsRevealed}
-                      />
-                    )}
-                  </div>
-                  <div className="inline-flex items-center gap-1.5">
-                    <IoSparklesOutline
-                      aria-hidden="true"
-                      className={`${isMobile ? "" : `transition-opacity ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
+                          ? ""
+                          : `transition-all duration-500 ${
+                              pillsRevealed
+                                ? "translate-y-0 opacity-100"
+                                : "translate-y-2 opacity-0"
+                            }`
+                      }`}
                       style={
-                        isMobile
-                          ? undefined
-                          : {
-                              transitionDelay: "600ms",
-                              transitionDuration: `${getIconFadeDurationMs(t("aiPoweredLearning"))}ms`,
-                            }
+                        isMobile ? undefined : { transitionDelay: `${delayMs}ms` }
                       }
-                    />
-                    {isMobile ? (
-                      <div
-                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
-                      >
-                        {t("aiPoweredLearning")}
-                      </div>
-                    ) : (
-                      <SplitText
-                        text={t("aiPoweredLearning")}
-                        delay={20}
-                        duration={0.6}
-                        ease="power3.out"
-                        splitType="chars"
-                        from={{ opacity: 0, y: 20 }}
-                        to={{ opacity: 1, y: 0 }}
-                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
-                        threshold={0.1}
-                        rootMargin="-100px"
-                        initialDelay={600}
-                        scrollTrigger={false}
-                        fontsReady={pillsRevealed}
+                    >
+                      <Icon
+                        aria-hidden="true"
+                        className={theme === "dark" ? "text-white" : "text-black"}
                       />
-                    )}
-                  </div>
-                  <div className="inline-flex items-center gap-1.5">
-                    <IoGlobeOutline
-                      aria-hidden="true"
-                      className={`${isMobile ? "" : `transition-opacity ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
-                      style={
-                        isMobile
-                          ? undefined
-                          : {
-                              transitionDelay: "1200ms",
-                              transitionDuration: `${getIconFadeDurationMs(t("translationFeatures"))}ms`,
-                            }
-                      }
-                    />
-                    {isMobile ? (
-                      <div
-                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
+                      <span
+                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md md:text-lg`}
                       >
-                        {t("translationFeatures")}
-                      </div>
-                    ) : (
-                      <SplitText
-                        text={t("translationFeatures")}
-                        delay={20}
-                        duration={0.6}
-                        ease="power3.out"
-                        splitType="chars"
-                        from={{ opacity: 0, y: 20 }}
-                        to={{ opacity: 1, y: 0 }}
-                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
-                        threshold={0.1}
-                        rootMargin="-100px"
-                        initialDelay={1200}
-                        scrollTrigger={false}
-                        fontsReady={pillsRevealed}
-                      />
-                    )}
-                  </div>
-                  <div className="inline-flex items-center gap-1.5">
-                    <IoStatsChartOutline
-                      aria-hidden="true"
-                      className={`${isMobile ? "" : `transition-opacity ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
-                      style={
-                        isMobile
-                          ? undefined
-                          : {
-                              transitionDelay: "1800ms",
-                              transitionDuration: `${getIconFadeDurationMs(t("personalDashboard"))}ms`,
-                            }
-                      }
-                    />
-                    {isMobile ? (
-                      <div
-                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
-                      >
-                        {t("personalDashboard")}
-                      </div>
-                    ) : (
-                      <SplitText
-                        text={t("personalDashboard")}
-                        delay={20}
-                        duration={0.6}
-                        ease="power3.out"
-                        splitType="chars"
-                        from={{ opacity: 0, y: 20 }}
-                        to={{ opacity: 1, y: 0 }}
-                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
-                        threshold={0.1}
-                        rootMargin="-100px"
-                        initialDelay={1800}
-                        scrollTrigger={false}
-                        fontsReady={pillsRevealed}
-                      />
-                    )}
-                  </div>
-                  <div className="inline-flex items-center gap-1.5">
-                    <IoTrendingUpOutline
-                      aria-hidden="true"
-                      className={`${isMobile ? "" : `transition-opacity ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
-                      style={
-                        isMobile
-                          ? undefined
-                          : {
-                              transitionDelay: "2400ms",
-                              transitionDuration: `${getIconFadeDurationMs(t("progressTracking"))}ms`,
-                            }
-                      }
-                    />
-                    {isMobile ? (
-                      <div
-                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
-                      >
-                        {t("progressTracking")}
-                      </div>
-                    ) : (
-                      <SplitText
-                        text={t("progressTracking")}
-                        delay={20}
-                        duration={0.6}
-                        ease="power3.out"
-                        splitType="chars"
-                        from={{ opacity: 0, y: 20 }}
-                        to={{ opacity: 1, y: 0 }}
-                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
-                        threshold={0.1}
-                        rootMargin="-100px"
-                        initialDelay={2400}
-                        scrollTrigger={false}
-                        fontsReady={pillsRevealed}
-                      />
-                    )}
-                  </div>
-                  <div className="inline-flex items-center gap-1.5">
-                    <IoFlashOutline
-                      aria-hidden="true"
-                      className={`${isMobile ? "" : `transition-opacity ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
-                      style={
-                        isMobile
-                          ? undefined
-                          : {
-                              transitionDelay: "3000ms",
-                              transitionDuration: `${getIconFadeDurationMs(t("muchMore"))}ms`,
-                            }
-                      }
-                    />
-                    {isMobile ? (
-                      <div
-                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-md`}
-                      >
-                        {t("muchMore")}
-                      </div>
-                    ) : (
-                      <SplitText
-                        text={t("muchMore")}
-                        delay={20}
-                        duration={0.6}
-                        ease="power3.out"
-                        splitType="chars"
-                        from={{ opacity: 0, y: 20 }}
-                        to={{ opacity: 1, y: 0 }}
-                        className={`${theme === "dark" ? "text-white" : "text-black"} font-semibold text-lg`}
-                        threshold={0.1}
-                        rootMargin="-100px"
-                        initialDelay={3000}
-                        scrollTrigger={false}
-                        fontsReady={pillsRevealed}
-                      />
-                    )}
-                  </div>
+                        {label}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
