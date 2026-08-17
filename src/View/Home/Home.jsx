@@ -56,15 +56,29 @@ const Home = () => {
   // per-character text; a previous version drove the icon via plain CSS and
   // the text via a per-letter GSAP SplitText animation, two independent
   // systems that stayed out of sync no matter how carefully their delays
-  // were hand-matched. Waiting for fonts.ready first just avoids a visible
-  // reflow if a web font swaps in mid-fade.
+  // were hand-matched.
+  //
+  // This used to wait on document.fonts.ready, but that resolves
+  // synchronously (fonts.status is already "loaded") on almost every visit
+  // in this SPA — the very first page load caches them, and every later
+  // visit to this route is a client-side navigation, not a fresh load. That
+  // meant pillsRevealed was already true on the very first render nearly
+  // every time, so the "hidden" state never actually got painted before
+  // flipping to "revealed" — nothing for the browser to transition from, so
+  // the fade silently never played except on a genuinely cold first load.
+  // A double rAF instead guarantees the hidden state paints on the first
+  // frame no matter how fast anything else resolves, then flips to revealed
+  // on a later frame — so the transition fires every time.
   const [pillsRevealed, setPillsRevealed] = useState(false);
   useEffect(() => {
-    if (document.fonts.status === "loaded") {
-      setPillsRevealed(true);
-    } else {
-      document.fonts.ready.then(() => setPillsRevealed(true));
-    }
+    let secondFrame;
+    const firstFrame = requestAnimationFrame(() => {
+      secondFrame = requestAnimationFrame(() => setPillsRevealed(true));
+    });
+    return () => {
+      cancelAnimationFrame(firstFrame);
+      if (secondFrame) cancelAnimationFrame(secondFrame);
+    };
   }, []);
   const { t } = useTranslation("home");
   const { theme } = useTheme();
