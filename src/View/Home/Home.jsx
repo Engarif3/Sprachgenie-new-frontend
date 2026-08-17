@@ -34,6 +34,21 @@ import {
 // Rounds down to the nearest hundred and appends "+", so the displayed
 // count never needs a manual edit as the vocabulary grows (4680 -> "4600+",
 // 5145 -> "5100+") and never overstates how many words actually exist.
+// The icon next to each hero benefit label used to fade in over a fixed
+// 500ms while SplitText reveals the label one character at a time — for
+// longer words (e.g. "Lieblingswörter", "Fortschrittsverfolgung") that
+// per-character reveal takes noticeably longer than 500ms, so the icon
+// finished fading in and sat fully visible while the word was still
+// animating in. Deriving the icon's fade duration from the same formula
+// SplitText itself uses (see SplitText.jsx: initialDelay + (chars-1) *
+// stagger + duration) keeps them finishing together regardless of word
+// length or active language.
+const SPLIT_TEXT_STAGGER_MS = 20; // matches this page's SplitText delay={20}
+const SPLIT_TEXT_BASE_DURATION_MS = 600; // matches this page's SplitText duration={0.6}
+const getIconFadeDurationMs = (text) =>
+  SPLIT_TEXT_BASE_DURATION_MS +
+  Math.max((text?.length ?? 1) - 1, 0) * SPLIT_TEXT_STAGGER_MS;
+
 const formatWordCountLabel = (totalWords) => {
   if (!Number.isFinite(totalWords) || totalWords <= 0) {
     return null;
@@ -592,8 +607,15 @@ const Home = () => {
                   <div className="inline-flex items-center gap-1.5">
                     <IoHeartOutline
                       aria-hidden="true"
-                      className={`${isMobile ? "" : `transition-opacity duration-500 ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
-                      style={isMobile ? undefined : { transitionDelay: "0ms" }}
+                      className={`${isMobile ? "" : `transition-opacity ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
+                      style={
+                        isMobile
+                          ? undefined
+                          : {
+                              transitionDelay: "0ms",
+                              transitionDuration: `${getIconFadeDurationMs(t("favoriteWords"))}ms`,
+                            }
+                      }
                     />
                     {isMobile ? (
                       <div
@@ -621,8 +643,15 @@ const Home = () => {
                   <div className="inline-flex items-center gap-1.5">
                     <IoSparklesOutline
                       aria-hidden="true"
-                      className={`${isMobile ? "" : `transition-opacity duration-500 ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
-                      style={isMobile ? undefined : { transitionDelay: "600ms" }}
+                      className={`${isMobile ? "" : `transition-opacity ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
+                      style={
+                        isMobile
+                          ? undefined
+                          : {
+                              transitionDelay: "600ms",
+                              transitionDuration: `${getIconFadeDurationMs(t("aiPoweredLearning"))}ms`,
+                            }
+                      }
                     />
                     {isMobile ? (
                       <div
@@ -650,8 +679,15 @@ const Home = () => {
                   <div className="inline-flex items-center gap-1.5">
                     <IoGlobeOutline
                       aria-hidden="true"
-                      className={`${isMobile ? "" : `transition-opacity duration-500 ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
-                      style={isMobile ? undefined : { transitionDelay: "1200ms" }}
+                      className={`${isMobile ? "" : `transition-opacity ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
+                      style={
+                        isMobile
+                          ? undefined
+                          : {
+                              transitionDelay: "1200ms",
+                              transitionDuration: `${getIconFadeDurationMs(t("translationFeatures"))}ms`,
+                            }
+                      }
                     />
                     {isMobile ? (
                       <div
@@ -679,8 +715,15 @@ const Home = () => {
                   <div className="inline-flex items-center gap-1.5">
                     <IoStatsChartOutline
                       aria-hidden="true"
-                      className={`${isMobile ? "" : `transition-opacity duration-500 ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
-                      style={isMobile ? undefined : { transitionDelay: "1800ms" }}
+                      className={`${isMobile ? "" : `transition-opacity ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
+                      style={
+                        isMobile
+                          ? undefined
+                          : {
+                              transitionDelay: "1800ms",
+                              transitionDuration: `${getIconFadeDurationMs(t("personalDashboard"))}ms`,
+                            }
+                      }
                     />
                     {isMobile ? (
                       <div
@@ -708,8 +751,15 @@ const Home = () => {
                   <div className="inline-flex items-center gap-1.5">
                     <IoTrendingUpOutline
                       aria-hidden="true"
-                      className={`${isMobile ? "" : `transition-opacity duration-500 ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
-                      style={isMobile ? undefined : { transitionDelay: "2400ms" }}
+                      className={`${isMobile ? "" : `transition-opacity ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
+                      style={
+                        isMobile
+                          ? undefined
+                          : {
+                              transitionDelay: "2400ms",
+                              transitionDuration: `${getIconFadeDurationMs(t("progressTracking"))}ms`,
+                            }
+                      }
                     />
                     {isMobile ? (
                       <div
@@ -737,8 +787,15 @@ const Home = () => {
                   <div className="inline-flex items-center gap-1.5">
                     <IoFlashOutline
                       aria-hidden="true"
-                      className={`${isMobile ? "" : `transition-opacity duration-500 ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
-                      style={isMobile ? undefined : { transitionDelay: "3000ms" }}
+                      className={`${isMobile ? "" : `transition-opacity ${pillsRevealed ? "opacity-100" : "opacity-0"}`} ${theme === "dark" ? "text-white" : "text-black"}`}
+                      style={
+                        isMobile
+                          ? undefined
+                          : {
+                              transitionDelay: "3000ms",
+                              transitionDuration: `${getIconFadeDurationMs(t("muchMore"))}ms`,
+                            }
+                      }
                     />
                     {isMobile ? (
                       <div
