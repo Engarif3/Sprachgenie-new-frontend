@@ -12,7 +12,7 @@ const PrivacyPolicy = () => {
       <P>
         Md Arifur Rahman
         <br />
-        Vetterstraße 52, 09126 Chemnitz, Germany
+        Vettersstraße 52, 09126 Chemnitz, Germany
         <br />
         Email:{" "}
         <a
@@ -40,7 +40,9 @@ const PrivacyPolicy = () => {
         <strong>Visitor and analytics data.</strong> For every visit, we
         record your IP address, browser, operating system, device type, and
         an approximate location derived from your network (city/region
-        level). We do not request your device's precise GPS location.
+        level). We do not request your device's precise GPS location. This
+        data is deleted automatically after 30 days of inactivity from that
+        visitor.
       </P>
       <P>
         <strong>Content you create.</strong> Favorites, quiz and challenge
@@ -119,7 +121,9 @@ const PrivacyPolicy = () => {
         Account data is kept for as long as your account is active. Signup
         security metadata (IP, device, approximate location) is kept for up
         to 30 days and is then automatically deleted, and is
-        access-restricted to authorized admins while it exists. You can
+        access-restricted to authorized admins while it exists. General
+        visitor/analytics data (see Section 1) is likewise deleted
+        automatically after 30 days of inactivity from that visitor. You can
         request deletion of your account and associated data at any time
         (see Section 6).
       </P>

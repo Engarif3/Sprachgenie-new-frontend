@@ -3,12 +3,12 @@ import LegalPageLayout, { H2, P } from "./LegalPageLayout";
 const Impressum = () => {
   return (
     <LegalPageLayout title="Impressum" lastUpdated="August 5, 2026">
-      <P>Information according to § 5 TMG (German Telemedia Act):</P>
+      <P>Information according to § 5 DDG (German Digital Services Act):</P>
 
       <P>
         Md Arifur Rahman
         <br />
-        Vetterstraße 52
+        Vettersstraße 52
         <br />
         09126 Chemnitz, Germany
       </P>
@@ -38,17 +38,7 @@ const Impressum = () => {
 
       <H2>Dispute Resolution</H2>
       <P>
-        The European Commission provides a platform for online dispute
-        resolution (OS):{" "}
-        <a
-          href="https://ec.europa.eu/consumers/odr/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-orange-500 hover:underline dark:text-orange-400"
-        >
-          ec.europa.eu/consumers/odr
-        </a>
-        . We are not obligated and generally not willing to participate in
+        We are not obligated and generally not willing to participate in
         dispute resolution proceedings before a consumer arbitration board.
       </P>
 
@@ -87,7 +77,7 @@ const Impressum = () => {
 
       <P>
         <em>
-          This page is provided in good faith to meet the § 5 TMG disclosure
+          This page is provided in good faith to meet the § 5 DDG disclosure
           requirements and is not legal advice. If you have any doubt about
           your specific obligations, please consult a qualified lawyer.
         </em>

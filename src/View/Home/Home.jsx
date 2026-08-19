@@ -499,14 +499,14 @@ const Home = () => {
       color: "from-violet-500 to-purple-600 shadow-violet-500/30",
       glow: "bg-violet-500/50",
       title: t("chooseYourPath"),
-      description: `${t("chooseYourPathDesc")} on your goals`,
+      description: t("chooseYourPathDesc"),
     },
     {
       icon: IoRocketOutline,
       color: "from-orange-500 to-pink-500 shadow-orange-500/30",
       glow: "bg-orange-500/50",
       title: t("learnAndPractice"),
-      description: `${t("learnAndPracticeDesc")} skills consistently`,
+      description: t("learnAndPracticeDesc"),
     },
   ];
 

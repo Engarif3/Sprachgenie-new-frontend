@@ -29,12 +29,12 @@ const NOTICE_COPY = {
   security: {
     en: {
       title: "Security And Privacy Notice",
-      body: "To protect accounts and reduce fraud, we record limited signup metadata such as your IP address, browser, device type, and approximate location derived from your network. This data is access-restricted to authorized admins and kept only for a limited retention period.",
+      body: "To protect accounts and reduce fraud, we record limited signup metadata such as your IP address, browser, device type, and approximate location derived from your network. This data is access-restricted to authorized admins and kept for up to 30 days.",
       toggleLabel: "German",
     },
     de: {
       title: "Sicherheits- und Datenschutzhinweis",
-      body: "Zum Schutz von Konten und zur Reduzierung von Missbrauch erfassen wir bei der Registrierung begrenzte Metadaten wie Ihre IP-Adresse, Ihren Browser, den Gerätetyp und einen ungefähren Standort, der aus Ihrem Netzwerk abgeleitet wird. Diese Daten sind nur für autorisierte Administratoren zugänglich und werden nur für einen begrenzten Aufbewahrungszeitraum gespeichert.",
+      body: "Zum Schutz von Konten und zur Reduzierung von Missbrauch erfassen wir bei der Registrierung begrenzte Metadaten wie Ihre IP-Adresse, Ihren Browser, den Gerätetyp und einen ungefähren Standort, der aus Ihrem Netzwerk abgeleitet wird. Diese Daten sind nur für autorisierte Administratoren zugänglich und werden maximal 30 Tage lang gespeichert.",
       toggleLabel: "English",
     },
   },
@@ -299,14 +299,15 @@ const Register = () => {
               )}
             </div>
 
-            <label className="flex items-start gap-3 rounded-2xl border border-gray-700/60 bg-gray-900/40 p-4 text-left transition-all duration-300 hover:border-cyan-500/40">
-              <input
-                {...register("privacyAcknowledged")}
-                type="checkbox"
-                className="mt-1 h-4 w-4 rounded border-gray-500 bg-gray-800 text-cyan-500 focus:ring-2 focus:ring-cyan-500/40"
-              />
+            {/* Informational only — not something to "agree" to, since this
+                is legitimate-interest security processing (fraud/abuse
+                prevention), not consent-based. */}
+            <div className="flex items-start gap-3 rounded-2xl border border-gray-700/60 bg-gray-900/40 p-4 text-left">
               <span className="flex min-w-0 flex-1 items-start justify-between gap-3 text-sm leading-6 text-gray-300">
-                <span>I understand and agree to the security check.</span>
+                <span>
+                  For account security, we record limited signup metadata
+                  (IP address, device, and approximate location).
+                </span>
                 <Button
                   type="button"
                   variant="ghost"
@@ -324,6 +325,37 @@ const Register = () => {
                 >
                   <IoBookOutline size={18} />
                 </Button>
+              </span>
+            </div>
+
+            <label className="flex items-start gap-3 rounded-2xl border border-gray-700/60 bg-gray-900/40 p-4 text-left transition-all duration-300 hover:border-cyan-500/40">
+              <input
+                {...register("privacyAcknowledged")}
+                type="checkbox"
+                className="mt-1 h-4 w-4 rounded border-gray-500 bg-gray-800 text-cyan-500 focus:ring-2 focus:ring-cyan-500/40"
+              />
+              <span className="text-sm leading-6 text-gray-300">
+                I agree to the{" "}
+                <Link
+                  to="/terms-of-service"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(event) => event.stopPropagation()}
+                  className="text-cyan-400 underline hover:text-cyan-300"
+                >
+                  Terms of Service
+                </Link>{" "}
+                and confirm that I have read the{" "}
+                <Link
+                  to="/privacy-policy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(event) => event.stopPropagation()}
+                  className="text-cyan-400 underline hover:text-cyan-300"
+                >
+                  Privacy Policy
+                </Link>
+                .
               </span>
             </label>
             {errors.privacyAcknowledged && (

@@ -61,7 +61,7 @@ export const validationSchema = z
     confirmPassword: z.string().min(10, "Please confirm your password"),
     privacyAcknowledged: z.boolean().refine((value) => value === true, {
       message:
-        "Please confirm that you understand the security and privacy notice.",
+        "Please agree to the Terms of Service and confirm you've read the Privacy Policy.",
     }),
     basicUser: UserValidationSchema,
   })
