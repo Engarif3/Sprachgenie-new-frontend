@@ -155,6 +155,70 @@ const AdminVisitorsPage = () => {
     ipAddress: null,
     records: [],
   });
+  const [retentionDays, setRetentionDays] = useState(null);
+  const [retentionInput, setRetentionInput] = useState("");
+  const [retentionLoading, setRetentionLoading] = useState(true);
+  const [retentionSaving, setRetentionSaving] = useState(false);
+
+  const fetchRetentionSettings = async () => {
+    setRetentionLoading(true);
+    try {
+      const response = await api.get("/visitors/settings");
+      const days = response.data?.data?.retentionDays;
+      setRetentionDays(days ?? null);
+      setRetentionInput(days !== undefined && days !== null ? String(days) : "");
+    } catch (requestError) {
+      console.error("Failed to load visitor retention settings:", requestError);
+    } finally {
+      setRetentionLoading(false);
+    }
+  };
+
+  const handleSaveRetention = async () => {
+    const parsed = Number(retentionInput);
+    if (!Number.isInteger(parsed) || parsed < 7 || parsed > 365) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid value",
+        text: "Retention must be a whole number of days between 7 and 365.",
+      });
+      return;
+    }
+
+    setRetentionSaving(true);
+    try {
+      const response = await api.patch("/visitors/settings", {
+        retentionDays: parsed,
+      });
+      const days = response.data?.data?.retentionDays;
+      setRetentionDays(days ?? parsed);
+      Swal.fire({
+        toast: true,
+        position: "top",
+        icon: "success",
+        title: "Retention period updated",
+        showConfirmButton: false,
+        timer: 2200,
+      });
+    } catch (requestError) {
+      console.error("Failed to update visitor retention settings:", requestError);
+      Swal.fire({
+        icon: "error",
+        title: "Update failed",
+        text:
+          requestError.response?.data?.message ||
+          "Please try again in a moment.",
+      });
+    } finally {
+      setRetentionSaving(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isSuperAdmin) {
+      fetchRetentionSettings();
+    }
+  }, [isSuperAdmin]);
 
   const fetchRecentVisitors = async (page = 1) => {
     setRecentLoading(true);
@@ -651,6 +715,53 @@ const AdminVisitorsPage = () => {
             </Button>
           </div>
         </div>
+
+        {isSuperAdmin && (
+          <div className="mb-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950/70 p-5 shadow-[0_24px_20px_rgba(2,6,23,0.45)] md:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-sky-700 dark:text-sky-300/80">
+                  Data Retention
+                </p>
+                <h3 className="mt-1 text-lg font-semibold text-slate-900 dark:text-white">
+                  Visitor record retention
+                </h3>
+                <p className="mt-1 max-w-xl text-sm text-slate-600 dark:text-slate-400">
+                  Visitor records (including IP address) are deleted
+                  automatically after this many days of inactivity from that
+                  visitor.
+                  {retentionDays !== null && !retentionLoading && (
+                    <> Currently kept for <strong>{retentionDays} days</strong>.</>
+                  )}
+                </p>
+              </div>
+              <div className="flex items-end gap-3">
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                    Days
+                  </span>
+                  <input
+                    type="number"
+                    min={7}
+                    max={365}
+                    value={retentionInput}
+                    disabled={retentionLoading}
+                    onChange={(e) => setRetentionInput(e.target.value)}
+                    className="w-28 rounded-2xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 dark:border-slate-700 dark:bg-slate-950/70 dark:text-white dark:focus:border-sky-400"
+                  />
+                </label>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={handleSaveRetention}
+                  disabled={retentionLoading || retentionSaving}
+                >
+                  {retentionSaving ? "Saving..." : "Save"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="mb-6 flex flex-wrap gap-3 rounded-2xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950/75 p-3 shadow-[0_18px_40px_rgba(2,6,23,0.3)]">
           <button
