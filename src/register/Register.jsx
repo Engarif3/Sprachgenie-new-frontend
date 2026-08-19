@@ -23,7 +23,6 @@ import {
   IoCallOutline,
 } from "react-icons/io5";
 import AuthHomeLink from "../components/auth/AuthHomeLink";
-import { requestBrowserGeolocation } from "../utils/browserGeolocation";
 import Button from "../components/UI/Button";
 
 const NOTICE_COPY = {
@@ -36,18 +35,6 @@ const NOTICE_COPY = {
     de: {
       title: "Sicherheits- und Datenschutzhinweis",
       body: "Zum Schutz von Konten und zur Reduzierung von Missbrauch erfassen wir bei der Registrierung begrenzte Metadaten wie Ihre IP-Adresse, Ihren Browser, den Gerätetyp und einen ungefähren Standort, der aus Ihrem Netzwerk abgeleitet wird. Diese Daten sind nur für autorisierte Administratoren zugänglich und werden nur für einen begrenzten Aufbewahrungszeitraum gespeichert.",
-      toggleLabel: "English",
-    },
-  },
-  location: {
-    en: {
-      title: "Location Sharing",
-      body: "This option is enabled by default. If it stays enabled, SprachGenie may ask your browser for your current device location during signup to improve security accuracy. If you deny permission or your browser cannot provide a location, registration still continues with approximate network-based location only.",
-      toggleLabel: "German",
-    },
-    de: {
-      title: "Standortfreigabe",
-      body: "Diese Option ist standardmäßig aktiviert. Wenn sie aktiviert bleibt, kann SprachGenie Ihren Browser während der Registrierung nach Ihrem aktuellen Gerätestandort fragen, um die Sicherheitsgenauigkeit zu verbessern. Wenn Sie die Berechtigung ablehnen oder Ihr Browser keinen Standort liefern kann, wird die Registrierung dennoch nur mit einem ungefähren netzbasierten Standort fortgesetzt.",
       toggleLabel: "English",
     },
   },
@@ -103,23 +90,7 @@ const Register = () => {
     setIsSubmitting(true); // disable button immediately
     setError("");
 
-    const { optionalPreciseLocationConsent, ...restFormData } = formData;
-    const preciseLocation = optionalPreciseLocationConsent
-      ? await requestBrowserGeolocation()
-      : null;
-
-    const submissionData = {
-      ...restFormData,
-      ...(preciseLocation
-        ? {
-            registrationMetadata: {
-              browserGeolocation: preciseLocation,
-            },
-          }
-        : {}),
-    };
-
-    const data = modifyPayload(submissionData);
+    const data = modifyPayload(formData);
 
     try {
       const res = await registerUser(data);
@@ -361,34 +332,6 @@ const Register = () => {
                 {errors.privacyAcknowledged.message}
               </p>
             )}
-
-            <label className="flex items-start gap-3 rounded-2xl border border-gray-700/60 bg-gray-900/40 p-4 text-left transition-all duration-300 hover:border-cyan-500/40">
-              <input
-                {...register("optionalPreciseLocationConsent")}
-                type="checkbox"
-                className="mt-1 h-4 w-4 rounded border-gray-500 bg-gray-800 text-cyan-500 focus:ring-2 focus:ring-cyan-500/40"
-              />
-              <span className="flex min-w-0 flex-1 items-start justify-between gap-3 text-sm leading-6 text-gray-300">
-                <span> Allow location for better results (optional)</span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  surface="dark"
-                  size="sm"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    setNoticeType("location");
-                    setNoticeLanguage("en");
-                    setIsNoticeOpen(true);
-                  }}
-                  className="mt-0.5 shrink-0"
-                  aria-label="Open optional precise location notice"
-                  title="Open optional precise location notice"
-                >
-                  <IoBookOutline size={18} />
-                </Button>
-              </span>
-            </label>
 
             {/* Submit */}
             <Button

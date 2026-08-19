@@ -40,10 +40,7 @@ const PrivacyPolicy = () => {
         <strong>Visitor and analytics data.</strong> For every visit, we
         record your IP address, browser, operating system, device type, and
         an approximate location derived from your network (city/region
-        level). If you accept the optional location prompt, we additionally
-        request your device's precise GPS location for more accurate
-        analytics; declining has no effect on your ability to use the
-        Service.
+        level). We do not request your device's precise GPS location.
       </P>
       <P>
         <strong>Content you create.</strong> Favorites, quiz and challenge
@@ -78,10 +75,9 @@ const PrivacyPolicy = () => {
       </Ul>
       <P>
         The legal basis for this processing is performance of a contract
-        (Art. 6(1)(b) GDPR) for account and learning features, our legitimate
-        interest in keeping the Service secure and reliable (Art. 6(1)(f)
-        GDPR) for visitor/analytics data, and your consent (Art. 6(1)(a)
-        GDPR) for precise device location.
+        (Art. 6(1)(b) GDPR) for account and learning features, and our
+        legitimate interest in keeping the Service secure and reliable (Art.
+        6(1)(f) GDPR) for visitor/analytics data.
       </P>
 
       <H2>3. Cookies &amp; Local Storage</H2>
@@ -121,10 +117,11 @@ const PrivacyPolicy = () => {
       <H2>5. Data Retention</H2>
       <P>
         Account data is kept for as long as your account is active. Signup
-        security metadata (IP, device, approximate location) is kept only for
-        a limited retention period and is access-restricted to authorized
-        admins. You can request deletion of your account and associated data
-        at any time (see Section 6).
+        security metadata (IP, device, approximate location) is kept for up
+        to 30 days and is then automatically deleted, and is
+        access-restricted to authorized admins while it exists. You can
+        request deletion of your account and associated data at any time
+        (see Section 6).
       </P>
 
       <H2>6. Your Rights</H2>

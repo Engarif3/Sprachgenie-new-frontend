@@ -240,6 +240,10 @@ const AdminRegistrationMetadataPage = () => {
   const [derivedCoordinates, setDerivedCoordinates] = useState(null);
   const [derivedCoordinatesLoading, setDerivedCoordinatesLoading] =
     useState(false);
+  const [retentionDays, setRetentionDays] = useState(null);
+  const [retentionInput, setRetentionInput] = useState("");
+  const [retentionLoading, setRetentionLoading] = useState(true);
+  const [retentionSaving, setRetentionSaving] = useState(false);
 
   const fetchRecords = async (page = 1, nextFilters = filters) => {
     setLoading(true);
@@ -267,12 +271,69 @@ const AdminRegistrationMetadataPage = () => {
     }
   };
 
+  const fetchRetentionSettings = async () => {
+    setRetentionLoading(true);
+    try {
+      const response = await api.get("/user/registration-metadata/settings");
+      const days = response.data?.data?.retentionDays;
+      setRetentionDays(days ?? null);
+      setRetentionInput(days !== undefined && days !== null ? String(days) : "");
+    } catch (requestError) {
+      console.error("Failed to load retention settings:", requestError);
+    } finally {
+      setRetentionLoading(false);
+    }
+  };
+
+  const handleSaveRetention = async () => {
+    const parsed = Number(retentionInput);
+    if (!Number.isInteger(parsed) || parsed < 7 || parsed > 365) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid value",
+        text: "Retention must be a whole number of days between 7 and 365.",
+      });
+      return;
+    }
+
+    setRetentionSaving(true);
+    try {
+      const response = await api.patch("/user/registration-metadata/settings", {
+        retentionDays: parsed,
+      });
+      const days = response.data?.data?.retentionDays;
+      setRetentionDays(days ?? parsed);
+      Swal.fire({
+        toast: true,
+        position: "top",
+        icon: "success",
+        title: "Retention period updated",
+        showConfirmButton: false,
+        timer: 2200,
+      });
+    } catch (requestError) {
+      console.error("Failed to update retention settings:", requestError);
+      Swal.fire({
+        icon: "error",
+        title: "Update failed",
+        text:
+          requestError.response?.data?.message ||
+          "Please try again in a moment.",
+      });
+    } finally {
+      setRetentionSaving(false);
+    }
+  };
+
   useEffect(() => {
     if (!canAccess) {
       return;
     }
 
     fetchRecords(1, filters);
+    if (role === "super_admin") {
+      fetchRetentionSettings();
+    }
   }, []);
 
   useEffect(() => {
@@ -490,6 +551,51 @@ const AdminRegistrationMetadataPage = () => {
             </div>
           </div>
         </section>
+
+        {role === "super_admin" && (
+          <section className="rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-lg shadow-slate-900/5 dark:border-slate-800 dark:bg-slate-900/85 dark:shadow-black/20">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                  Data Retention
+                </p>
+                <h3 className="mt-1 text-lg font-semibold text-slate-900 dark:text-white">
+                  Registration metadata retention
+                </h3>
+                <p className="mt-1 max-w-xl text-sm text-slate-500 dark:text-slate-400">
+                  Signup metadata (including IP address) older than this is
+                  deleted automatically every day.
+                  {retentionDays !== null && !retentionLoading && (
+                    <> Currently kept for <strong>{retentionDays} days</strong>.</>
+                  )}
+                </p>
+              </div>
+              <div className="flex items-end gap-3">
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                    Days
+                  </span>
+                  <input
+                    type="number"
+                    min={7}
+                    max={365}
+                    value={retentionInput}
+                    disabled={retentionLoading}
+                    onChange={(e) => setRetentionInput(e.target.value)}
+                    className="w-28 rounded-2xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 dark:border-slate-700 dark:bg-slate-950/70 dark:text-white dark:focus:border-sky-400"
+                  />
+                </label>
+                <Button
+                  type="button"
+                  onClick={handleSaveRetention}
+                  disabled={retentionLoading || retentionSaving}
+                >
+                  {retentionSaving ? "Saving..." : "Save"}
+                </Button>
+              </div>
+            </div>
+          </section>
+        )}
 
         <section className="rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-lg shadow-slate-900/5 dark:border-slate-800 dark:bg-slate-900/85 dark:shadow-black/20">
           <form

@@ -1,16 +1,11 @@
 import "./i18n";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Suspense, lazy, useEffect, useState } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import NavBar from "./navbar/NavBar";
 import Footer from "./footer/Footer";
 import ScrollToTop from "./ScrollToTop";
 import ErrorBoundary from "./components/ErrorBoundary";
 import RadioMiniPlayer from "./View/Radio/RadioMiniPlayer";
-import VisitorLocationConsent, {
-  getStoredLocationConsent,
-  setStoredLocationConsent,
-} from "./components/VisitorLocationConsent";
-import { requestBrowserGeolocation } from "./utils/browserGeolocation";
 import Swal from "sweetalert2";
 import { publicApi } from "./axios";
 import {
@@ -30,16 +25,6 @@ import { LanguageProvider } from "./context/LanguageContext";
 // of 1 cuts that idle-tab cost by two thirds with no user-visible effect.
 const AUTH_SYNC_INTERVAL_MS = 180000;
 const VISITOR_TRACK_DELAY_MS = 1500;
-// Gates the exact-GPS request to once ever per browser (localStorage, not
-// sessionStorage) — a sessionStorage flag only stopped the prompt from
-// repeating on every refresh within the same tab session, but since consent
-// itself is remembered forever, every NEW session (closing and reopening
-// the browser, a fresh tab after sessionStorage clears) still re-triggered
-// navigator.geolocation.getCurrentPosition() and re-showed the browser's
-// native permission prompt — the exact "it's asking again" complaint this
-// is meant to fix. One data point is enough for visit analytics; there's no
-// need to ever ask again after the first successful capture.
-const LOCATION_CAPTURED_KEY = "sg_visitor_location_captured";
 const DarkVeil = lazy(() => import("./View/Home/DarkVeil"));
 
 const AppContent = () => {
@@ -56,17 +41,6 @@ const AppContent = () => {
   const noHeaderFooter = ["/login", "/register"].some((p) =>
     location.pathname.startsWith(p),
   );
-
-  const [locationConsent, setLocationConsent] = useState(() =>
-    getStoredLocationConsent(),
-  );
-  const hasGrantedLocation = locationConsent === "granted";
-
-  const handleLocationConsentDecision = (granted) => {
-    const value = granted ? "granted" : "denied";
-    setStoredLocationConsent(value);
-    setLocationConsent(value);
-  };
 
   // Same auth & env logic...
   useEffect(() => {
@@ -91,37 +65,7 @@ const AppContent = () => {
   useEffect(() => {
     const trackVisitor = async () => {
       try {
-        let alreadyCapturedEver = false;
-        try {
-          alreadyCapturedEver = Boolean(
-            window.localStorage.getItem(LOCATION_CAPTURED_KEY),
-          );
-        } catch {
-          // Storage disabled (e.g. private browsing) — fall back to
-          // requesting once for this page load, same as before this change.
-        }
-
-        const shouldCaptureGeolocation =
-          hasGrantedLocation && !alreadyCapturedEver;
-
-        const browserGeolocation = shouldCaptureGeolocation
-          ? await requestBrowserGeolocation()
-          : null;
-
-        if (shouldCaptureGeolocation) {
-          try {
-            window.localStorage.setItem(LOCATION_CAPTURED_KEY, "1");
-          } catch {
-            // Ignore — worst case we ask again next reload.
-          }
-        }
-
-        await publicApi.post(
-          "/visitors/track",
-          browserGeolocation
-            ? { registrationMetadata: { browserGeolocation } }
-            : undefined,
-        );
+        await publicApi.post("/visitors/track");
       } catch (error) {
         console.error("Failed to track visitor:", error);
       }
@@ -154,7 +98,7 @@ const AppContent = () => {
         window.clearTimeout(timeoutId);
       }
     };
-  }, [hasGrantedLocation]);
+  }, []);
 
   useEffect(() => {
     const handleLogoutNavigation = () => {
@@ -225,10 +169,6 @@ const AppContent = () => {
 
       <ScrollToTop />
       {!noHeaderFooter && <NavBar />}
-
-      {!noHeaderFooter && locationConsent === null && (
-        <VisitorLocationConsent onDecision={handleLocationConsentDecision} />
-      )}
 
       <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
         <Outlet />
