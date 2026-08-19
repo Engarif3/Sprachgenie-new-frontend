@@ -2280,7 +2280,7 @@ const UpdateWord = () => {
                 name="value"
                 value={formData.value}
                 onChange={handleInputChange}
-                className="w-full text-4xl font-semibold p-3 border-2 border-blue-500 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2 capitalize text-slate-950"
+                className="w-full text-4xl font-semibold p-3 border-2 border-blue-500 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2 text-slate-950"
                 placeholder="Enter the word"
               />
             </div>
