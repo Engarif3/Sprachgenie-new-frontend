@@ -8,10 +8,13 @@ import {
   IoSwapHorizontalOutline,
   IoLinkOutline,
   IoPricetagOutline,
-  IoTimeOutline,
+  IoListOutline,
   IoWalkOutline,
 } from "react-icons/io5";
 
+// Display order — independent of each topic's id (which is what /grammar/:id
+// routes on). Passive Voice's detail page is still a "Coming soon"
+// placeholder, so it's kept last instead of showing near the top.
 const grammarTypes = [
   {
     id: 1,
@@ -19,13 +22,6 @@ const grammarTypes = [
     description:
       "Understand subordinate and coordinate clauses and how they change German word order.",
     icon: IoGitBranchOutline,
-  },
-  {
-    id: 2,
-    topic: "Passive Voice",
-    description:
-      "Learn how to form and use the passive voice across different tenses.",
-    icon: IoSwapHorizontalOutline,
   },
   {
     id: 3,
@@ -43,10 +39,10 @@ const grammarTypes = [
   },
   {
     id: 5,
-    topic: "Perfekt & Präteritum",
+    topic: "Strong & Irregular Verbs",
     description:
-      "Compare the two main past tenses and know when to use each one.",
-    icon: IoTimeOutline,
+      "Browse strong and irregular verbs with their Präsens, Präteritum, and Perfekt forms.",
+    icon: IoListOutline,
   },
   {
     id: 6,
@@ -54,6 +50,13 @@ const grammarTypes = [
     description:
       "Explore compound verbs built from 'gehen' and what each one means.",
     icon: IoWalkOutline,
+  },
+  {
+    id: 2,
+    topic: "Passive Voice",
+    description:
+      "Learn how to form and use the passive voice across different tenses.",
+    icon: IoSwapHorizontalOutline,
   },
 ];
 
