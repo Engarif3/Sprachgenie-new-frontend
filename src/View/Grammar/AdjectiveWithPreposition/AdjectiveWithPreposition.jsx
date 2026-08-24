@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import data from "./AdjectiveWithPreposition.json"; // Import the JSON file with the data
 import Container from "../../../utils/Container";
+import PrepositionLabel from "../../../components/UI/PrepositionLabel";
 
 const AdjectiveWithPreposition = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -54,8 +55,8 @@ const AdjectiveWithPreposition = () => {
                           {item.Adjective}
                         </span>{" "}
                         -{" "}
-                        <span className=" font-mono">
-                          {item["Preposition"]}
+                        <span className="font-mono">
+                          <PrepositionLabel text={item["Preposition"]} />
                         </span>
                         <span className=" text-orange-600 dark:text-orange-400 font-bold ml-2">
                           Case:{" "}
@@ -113,8 +114,8 @@ const AdjectiveWithPreposition = () => {
                   <td className="py-2 px-4 text-start font-bold ">
                     {item.Adjective}
                   </td>
-                  <td className="py-2 px-4 text-center ">
-                    {item["Preposition"]}
+                  <td className="py-2 px-4 text-center">
+                    <PrepositionLabel text={item["Preposition"]} />
                   </td>
                   <td className="py-2 px-4 text-start w-[22%]">
                     {item.Meaning}

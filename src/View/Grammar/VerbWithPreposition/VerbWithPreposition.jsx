@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import data from "./VerbWithPreposition.json"; // Import the JSON file with the data
 import Container from "../../../utils/Container";
+import PrepositionLabel from "../../../components/UI/PrepositionLabel";
 
 const VerbWithPreposition = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -52,8 +53,8 @@ const VerbWithPreposition = () => {
                         {item.Verb}
                       </span>{" "}
                       -{" "}
-                      <span className=" ">
-                        {item["Preposition"]}{" "}
+                      <span className="inline-flex flex-wrap items-baseline gap-x-1.5">
+                        <PrepositionLabel text={item["Preposition"]} />
                         <span className="text-orange-600 dark:text-orange-400 font-bold">
                           Case:{" "}
                         </span>
@@ -68,9 +69,9 @@ const VerbWithPreposition = () => {
                       {item.Verb}
                     </span>{" "}
                     -{" "}
-                    <span className=" py-2">
-                      {item["Preposition"]}{" "}
-                      <span className="text-orange-600 dark:text-orange-400 font-bold py-2">
+                    <span className="inline-flex flex-wrap items-baseline gap-x-1.5 py-2">
+                      <PrepositionLabel text={item["Preposition"]} />
+                      <span className="text-orange-600 dark:text-orange-400 font-bold">
                         Case:{" "}
                       </span>
                       {item.Kasus}
@@ -118,8 +119,8 @@ const VerbWithPreposition = () => {
                   <td className="py-2 px-4 text-start font-bold ">
                     {item.Verb}
                   </td>
-                  <td className="py-2 px-4 text-start ">
-                    {item["Preposition"]}
+                  <td className="py-2 px-4 text-start whitespace-nowrap">
+                    <PrepositionLabel text={item["Preposition"]} />
                   </td>
                   <td className="py-2 px-4 text-start w-[22%]">
                     {item.Meaning}
