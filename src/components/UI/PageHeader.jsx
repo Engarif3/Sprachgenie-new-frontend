@@ -5,6 +5,8 @@
 // gradient stays a deliberate choice instead of copy-pasted everywhere.
 const EYEBROW_TONE_CLASSES = {
   sky: "border-sky-500/40 bg-sky-500/10 text-sky-700 dark:text-sky-300",
+  orange:
+    "border-orange-300/60 bg-orange-50 text-orange-700 dark:border-orange-500/30 dark:bg-orange-500/10 dark:text-orange-300",
   rose: "border-rose-300/60 bg-rose-50 text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300",
   emerald:
     "border-emerald-300/60 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300",
@@ -14,6 +16,7 @@ const EYEBROW_TONE_CLASSES = {
 
 const PageHeader = ({
   eyebrow,
+  eyebrowIcon: EyebrowIcon,
   eyebrowTone = "sky",
   title,
   subtitle,
@@ -44,8 +47,9 @@ const PageHeader = ({
     <div className={`${alignClass} ${className}`}>
       {eyebrow && (
         <span
-          className={`mb-3 inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${EYEBROW_TONE_CLASSES[eyebrowTone] || EYEBROW_TONE_CLASSES.sky}`}
+          className={`mb-3 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${EYEBROW_TONE_CLASSES[eyebrowTone] || EYEBROW_TONE_CLASSES.sky}`}
         >
+          {EyebrowIcon && <EyebrowIcon size={14} aria-hidden="true" />}
           {eyebrow}
         </span>
       )}
