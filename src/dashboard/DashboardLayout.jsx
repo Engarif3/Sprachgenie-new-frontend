@@ -2,6 +2,7 @@ import { createPortal } from "react-dom";
 import { Navigate, Outlet, NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../services/auth.services";
 import { useNotifications } from "../hooks/useNotifications";
+import { useReportCounts } from "../hooks/useReportCounts";
 import { useProfileSettings } from "../hooks/useProfileSettings";
 import { getAvatarUrl } from "../utils/avatar";
 import Container from "../utils/Container";
@@ -326,6 +327,7 @@ const DashboardLayout = () => {
     isBootstrapResolved,
   } = useAuth();
   const { unreadCount } = useNotifications();
+  const { total: totalReportCount } = useReportCounts();
   const { settings: profileSettings } = useProfileSettings();
   const avatarUrl = isBootstrapResolved
     ? getAvatarUrl(userInfo, profileSettings)
@@ -608,6 +610,12 @@ const DashboardLayout = () => {
                         <span className="flex items-center gap-2">
                           <section.icon size={16} aria-hidden="true" />
                           <span>{section.label}</span>
+                          {section.key === "reports" &&
+                            totalReportCount > 0 && (
+                              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1.5 text-xs font-bold text-white">
+                                {totalReportCount}
+                              </span>
+                            )}
                         </span>
                         <ChevronRight
                           size={16}
@@ -643,6 +651,12 @@ const DashboardLayout = () => {
                               >
                                 <item.icon size={16} aria-hidden="true" />
                                 <span>{item.label}</span>
+                                {item.to === "/dashboard/reports" &&
+                                  totalReportCount > 0 && (
+                                    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1.5 text-xs font-bold text-white">
+                                      {totalReportCount}
+                                    </span>
+                                  )}
                               </NavLink>
                             ))}
                           </div>,
