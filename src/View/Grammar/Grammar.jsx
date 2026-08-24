@@ -10,11 +10,15 @@ import {
   IoPricetagOutline,
   IoListOutline,
   IoWalkOutline,
+  IoTextOutline,
 } from "react-icons/io5";
 
 // Display order — independent of each topic's id (which is what /grammar/:id
 // routes on). Passive Voice's detail page is still a "Coming soon"
-// placeholder, so it's kept last instead of showing near the top.
+// placeholder, so it's kept last instead of showing near the top. Prefix
+// Types lives at its own route (/prefix-types, not /grammar/:id) since it's
+// a dynamically fetched list rather than a static grammar writeup — `path`
+// overrides the default /grammar/:id link for it.
 const grammarTypes = [
   {
     id: 1,
@@ -52,6 +56,14 @@ const grammarTypes = [
     icon: IoWalkOutline,
   },
   {
+    id: "prefix-types",
+    topic: "Prefix Types",
+    description:
+      "Understand German word formation with prefix combinations.",
+    icon: IoTextOutline,
+    path: "/prefix-types",
+  },
+  {
     id: 2,
     topic: "Passive Voice",
     description:
@@ -86,7 +98,9 @@ const Grammar = () => {
               title={grammarType.topic}
               description={grammarType.description}
               actionLabel="Learn More"
-              onClick={() => navigate(`/grammar/${grammarType.id}`)}
+              onClick={() =>
+                navigate(grammarType.path || `/grammar/${grammarType.id}`)
+              }
             />
           ))}
         </div>

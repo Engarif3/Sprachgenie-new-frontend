@@ -11,7 +11,6 @@ import {
   FaBookOpen,
   FaComments,
   FaBrain,
-  FaPuzzlePiece,
   FaQuestionCircle,
   FaTrophy,
   FaLanguage,
@@ -194,7 +193,6 @@ const NavBar = () => {
     },
     { to: "/radio", label: t("navbar.radio"), Icon: RiRadioFill },
     { to: "/grammar", label: t("navbar.grammar"), Icon: FaBrain },
-    { to: "/prefix-types", label: t("navbar.prefixes"), Icon: FaPuzzlePiece },
     {
       to: "/how-to-say-in-german",
       label: t("navbar.howToSay"),

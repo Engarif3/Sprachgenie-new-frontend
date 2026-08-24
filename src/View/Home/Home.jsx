@@ -424,39 +424,6 @@ const Home = () => {
       ),
     },
     {
-      title: t("prefixCardTitle"),
-      text: t("prefixCardDesc"),
-      link: "/prefix-types",
-      eyebrow: "Word Building",
-      icon: (
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          className="h-7 w-7"
-          aria-hidden="true"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M4 8h8v8H4z" />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M16 4h4v4h-4z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M16 16h4v4h-4z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 12h4M18 8v8"
-          />
-        </svg>
-      ),
-    },
-    {
       title: t("quizCardTitle"),
       text: t("quizCardDesc"),
       link: "/quiz",
