@@ -550,9 +550,6 @@ const PrefixList = () => {
 
         {definition && definition.groups && (
           <div className="mb-4">
-            <p className="text-center text-sm font-semibold text-slate-500 dark:text-slate-400 mb-4">
-              More examples by prefix
-            </p>
             {definition.groups.map((group) => (
               <div key={group.prefix} className="mb-4">
                 <h3 className="text-xl font-bold text-red-600 dark:text-red-400 mb-2 ml-2">
