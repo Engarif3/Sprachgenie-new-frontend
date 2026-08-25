@@ -113,7 +113,11 @@ const VerifyEmail = () => {
       <div className="flex flex-col justify-center items-center gap-4">
         <h2 className="text-2xl text-white">
           Please verify your email before logging in.
-        </h2>{" "}
+        </h2>
+        <p className="text-gray-300 text-sm max-w-md text-center">
+          Email may take up to 10 minutes to arrive — don't forget to check
+          your spam folder too.
+        </p>
         <p className="mb-12">
           <Link
             to="/login"
