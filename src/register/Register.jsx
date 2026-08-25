@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { modifyPayload } from "../utils/modifyPayload";
@@ -8,8 +8,6 @@ import { useForm } from "react-hook-form";
 import { defaultValues, validationSchema } from "./validation";
 import DarkVeil from "../View/Home/DarkVeil";
 import {
-  IoBookOutline,
-  IoClose,
   IoEye,
   IoEyeOff,
   IoPersonOutline,
@@ -25,51 +23,14 @@ import {
 import AuthHomeLink from "../components/auth/AuthHomeLink";
 import Button from "../components/UI/Button";
 
-const NOTICE_COPY = {
-  security: {
-    en: {
-      title: "Security And Privacy Notice",
-      body: "To protect accounts and reduce fraud, we record limited signup metadata such as your IP address, browser, device type, and approximate location derived from your network. This data is access-restricted to authorized admins and kept for up to 30 days.",
-      toggleLabel: "German",
-    },
-    de: {
-      title: "Sicherheits- und Datenschutzhinweis",
-      body: "Zum Schutz von Konten und zur Reduzierung von Missbrauch erfassen wir bei der Registrierung begrenzte Metadaten wie Ihre IP-Adresse, Ihren Browser, den Gerätetyp und einen ungefähren Standort, der aus Ihrem Netzwerk abgeleitet wird. Diese Daten sind nur für autorisierte Administratoren zugänglich und werden maximal 30 Tage lang gespeichert.",
-      toggleLabel: "English",
-    },
-  },
-};
-
 const Register = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [emailVerificationMessage, setEmailVerificationMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isNoticeOpen, setIsNoticeOpen] = useState(false);
-  const [noticeType, setNoticeType] = useState("security");
-  const [noticeLanguage, setNoticeLanguage] = useState("en");
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
-  const activeNotice = NOTICE_COPY[noticeType][noticeLanguage];
-
-  useEffect(() => {
-    if (!isNoticeOpen) {
-      return undefined;
-    }
-
-    const handleEscape = (event) => {
-      if (event.key === "Escape") {
-        setIsNoticeOpen(false);
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [isNoticeOpen]);
 
   const {
     register,
@@ -297,35 +258,6 @@ const Register = () => {
                   {errors.confirmPassword.message}
                 </p>
               )}
-            </div>
-
-            {/* Informational only — not something to "agree" to, since this
-                is legitimate-interest security processing (fraud/abuse
-                prevention), not consent-based. */}
-            <div className="flex items-start gap-3 rounded-2xl border border-gray-700/60 bg-gray-900/40 p-4 text-left">
-              <span className="flex min-w-0 flex-1 items-start justify-between gap-3 text-sm leading-6 text-gray-300">
-                <span>
-                  For account security, we record limited signup metadata
-                  (IP address, device, and approximate location).
-                </span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  surface="dark"
-                  size="sm"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    setNoticeType("security");
-                    setNoticeLanguage("en");
-                    setIsNoticeOpen(true);
-                  }}
-                  className="mt-0.5 shrink-0"
-                  aria-label="Open security and privacy notice"
-                  title="Open security and privacy notice"
-                >
-                  <IoBookOutline size={18} />
-                </Button>
-              </span>
             </div>
 
             <label className="flex items-start gap-3 rounded-2xl border border-gray-700/60 bg-gray-900/40 p-4 text-left transition-all duration-300 hover:border-cyan-500/40">
@@ -574,66 +506,6 @@ const Register = () => {
         </div>
       </div>
 
-      {isNoticeOpen && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
-          <div className="relative w-full max-w-lg rounded-3xl border border-cyan-500/30 bg-gradient-to-br from-gray-900 via-slate-950 to-black p-6 text-left text-white shadow-2xl">
-            <Button
-              type="button"
-              variant="ghost"
-              surface="dark"
-              size="sm"
-              onClick={() => setIsNoticeOpen(false)}
-              className="absolute right-4 top-4"
-              aria-label="Close notice"
-            >
-              <IoClose size={18} />
-            </Button>
-
-            <div className="pr-12">
-              <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
-                <IoBookOutline size={14} />
-                Notice
-              </div>
-              <h3 className="mt-4 text-2xl font-bold text-white">
-                {activeNotice.title}
-              </h3>
-              <p className="mt-4 text-sm leading-7 text-gray-300">
-                {activeNotice.body}
-              </p>
-            </div>
-
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-gray-800 pt-5">
-              <p className="text-xs uppercase tracking-[0.18em] text-gray-500">
-                Language
-              </p>
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  surface="dark"
-                  size="sm"
-                  onClick={() =>
-                    setNoticeLanguage((current) =>
-                      current === "en" ? "de" : "en",
-                    )
-                  }
-                >
-                  {activeNotice.toggleLabel}
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  surface="dark"
-                  size="sm"
-                  onClick={() => setIsNoticeOpen(false)}
-                >
-                  Close
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
