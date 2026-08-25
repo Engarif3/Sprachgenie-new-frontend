@@ -202,7 +202,7 @@ const Register = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••••"
                   autoComplete="new-password"
-                  className="w-full bg-gray-700/50 border border-gray-600 focus:border-purple-500 p-3 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500/50 transition-all duration-300"
+                  className="w-full bg-gray-700/50 border border-gray-600 focus:border-purple-500 p-3 pr-12 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500/50 transition-all duration-300"
                 />
                 <Button
                   type="button"
@@ -210,7 +210,7 @@ const Register = () => {
                   surface="dark"
                   size="sm"
                   onClick={togglePasswordVisibility}
-                  className="absolute inset-y-0 right-3"
+                  className="absolute right-2 top-1/2 -translate-y-1/2"
                 >
                   {showPassword ? <IoEyeOff size={24} /> : <IoEye size={24} />}
                 </Button>
@@ -239,7 +239,7 @@ const Register = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••••"
                   autoComplete="new-password"
-                  className="w-full bg-gray-700/50 border border-gray-600 focus:border-purple-500 p-3 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500/50 transition-all duration-300"
+                  className="w-full bg-gray-700/50 border border-gray-600 focus:border-purple-500 p-3 pr-12 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500/50 transition-all duration-300"
                 />
                 <Button
                   type="button"
@@ -247,7 +247,7 @@ const Register = () => {
                   surface="dark"
                   size="sm"
                   onClick={togglePasswordVisibility}
-                  className="absolute inset-y-0 right-3"
+                  className="absolute right-2 top-1/2 -translate-y-1/2"
                 >
                   {showPassword ? <IoEyeOff size={24} /> : <IoEye size={24} />}
                 </Button>
