@@ -151,6 +151,158 @@ const FeatureSection = ({ description, feature, levels }) => {
   );
 };
 
+const GAME_SETTINGS_FIELDS = [
+  { key: "questionTimeLimitSeconds", label: "Question Timer (seconds)", min: 1 },
+  {
+    key: "correctFastThresholdSeconds",
+    label: "Fast-Answer Threshold (seconds)",
+    min: 1,
+  },
+  { key: "xpCorrectFast", label: "XP: Correct (Fast)", min: 0 },
+  { key: "xpCorrectSlow", label: "XP: Correct (Slow)", min: 0 },
+  { key: "xpWrongBasePenalty", label: "XP: Wrong Answer (base)", min: 0 },
+  { key: "xpTimeoutPenalty", label: "XP: No Answer (Timeout)", min: 0 },
+];
+
+// Daily Challenge's per-question timer + the four XP amounts — separate
+// endpoint/save from the level-tier FeatureSection above (different backend
+// resource), shown together in the same tab since both are Daily
+// Challenge-specific admin config.
+const ChallengeGameSettingsCard = () => {
+  const [settings, setSettings] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get("/challenge-game-settings");
+        setSettings(response.data?.data || null);
+      } catch (err) {
+        console.error("Error fetching challenge game settings:", err);
+        setError("Failed to load settings");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
+  const setField = (key, rawValue) => {
+    const value = rawValue === "" ? "" : Number(rawValue);
+    setSettings((prev) => ({ ...prev, [key]: value }));
+  };
+
+  // Same rule the backend enforces (see challengeGameSettings.service.ts) —
+  // checked here too so a bad combination is caught before the round trip.
+  const thresholdExceedsTimer =
+    settings &&
+    Number(settings.correctFastThresholdSeconds) >
+      Number(settings.questionTimeLimitSeconds);
+
+  const hasInvalidField = settings
+    ? GAME_SETTINGS_FIELDS.some(({ key, min }) => {
+        const value = settings[key];
+        return (
+          value === "" || !Number.isInteger(Number(value)) || Number(value) < min
+        );
+      })
+    : true;
+
+  const handleSave = async () => {
+    if (hasInvalidField) {
+      setError("Every field must be a whole number within its allowed range");
+      setTimeout(() => setError(""), 4000);
+      return;
+    }
+    if (thresholdExceedsTimer) {
+      setError("Fast-answer threshold can't be greater than the question timer");
+      setTimeout(() => setError(""), 4000);
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+    try {
+      const payload = Object.fromEntries(
+        GAME_SETTINGS_FIELDS.map(({ key }) => [key, Number(settings[key])]),
+      );
+      const response = await api.patch("/challenge-game-settings", payload);
+      setSettings(response.data?.data || settings);
+      setSuccess("Saved!");
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err) {
+      console.error("Error saving challenge game settings:", err);
+      setError(err.response?.data?.message || "Failed to save settings");
+      setTimeout(() => setError(""), 4000);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="mt-6 rounded-lg border border-slate-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
+      <h3 className="text-lg font-bold text-slate-800 dark:text-white">
+        Timing & Scoring
+      </h3>
+      <p className="text-sm text-slate-500 dark:text-gray-400">
+        The per-question timer and XP amounts for Daily Challenge.
+      </p>
+
+      {error && (
+        <div className="mt-4 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-700 dark:bg-red-900/30 dark:text-red-200">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="mt-4 rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-700 dark:border-green-700 dark:bg-green-900/30 dark:text-green-200">
+          {success}
+        </div>
+      )}
+
+      {loading || !settings ? (
+        <p className="mt-6 text-slate-500 dark:text-gray-400">
+          Loading settings...
+        </p>
+      ) : (
+        <>
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {GAME_SETTINGS_FIELDS.map(({ key, label, min }) => (
+              <label key={key} className="block">
+                <span className="mb-1 block text-sm font-semibold text-slate-800 dark:text-white">
+                  {label}
+                </span>
+                <input
+                  type="number"
+                  min={min}
+                  step={1}
+                  value={settings[key]}
+                  onChange={(e) => setField(key, e.target.value)}
+                  className="w-full rounded-md border border-slate-300 bg-white p-2 text-slate-900 shadow-sm focus:border-sky-500 focus:outline-none focus:ring focus:ring-sky-500 focus:ring-opacity-50 dark:border-gray-600 dark:bg-gray-900/60 dark:text-white"
+                />
+              </label>
+            ))}
+          </div>
+
+          {thresholdExceedsTimer && !error && (
+            <p className="mt-4 text-sm text-red-600 dark:text-red-400">
+              Fast-answer threshold can't be greater than the question timer.
+            </p>
+          )}
+
+          <Button onClick={handleSave} disabled={saving} className="mt-6">
+            {saving ? "Saving..." : "Save Settings"}
+          </Button>
+        </>
+      )}
+    </div>
+  );
+};
+
 const DifficultySettings = () => {
   const [levels, setLevels] = useState([]);
   const [levelsError, setLevelsError] = useState("");
@@ -236,6 +388,8 @@ const DifficultySettings = () => {
               feature={active.key}
               levels={levels}
             />
+
+            {active.key === "challenge" && <ChallengeGameSettingsCard />}
           </>
         )}
       </div>

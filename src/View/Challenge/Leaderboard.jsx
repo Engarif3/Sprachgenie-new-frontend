@@ -91,9 +91,14 @@ const hashString = (value) => {
   return hash;
 };
 
-// 20 questions/day × 10 XP × 7 days — the same theoretical weekly ceiling
-// the backend validates a self-XP edit against.
-const MAX_WEEKLY_XP_PER_LEVEL = 20 * 10 * 7;
+// 20 questions/day × xpCorrectFast × 7 days — the same theoretical weekly
+// ceiling the backend validates a self-XP edit against. xpCorrectFast is
+// admin-configurable now (ChallengeGameSettings) — 10 is only the fallback
+// used before that fetch resolves.
+const DAILY_CHALLENGE_WORD_COUNT = 20;
+const XP_CORRECT_FAST_FALLBACK = 10;
+const computeMaxWeeklyXp = (xpCorrectFast) =>
+  DAILY_CHALLENGE_WORD_COUNT * xpCorrectFast * 7;
 
 const isValidLevel = (value) => LEVELS.some((level) => level.key === value);
 
@@ -130,6 +135,9 @@ const Leaderboard = () => {
   const activeLevel = isValidLevel(requestedLevel) ? requestedLevel : "easy";
   const levelTheme = LEVEL_THEME[activeLevel];
 
+  const [maxWeeklyXpPerLevel, setMaxWeeklyXpPerLevel] = useState(
+    computeMaxWeeklyXp(XP_CORRECT_FAST_FALLBACK),
+  );
   const [entries, setEntries] = useState([]);
   const [me, setMe] = useState({ rank: null, weeklyXp: 0, totalXp: 0 });
   const [daysUntilReset, setDaysUntilReset] = useState(null);
@@ -218,6 +226,22 @@ const Leaderboard = () => {
       signal.cancelled = true;
     };
   }, [refresh]);
+
+  useEffect(() => {
+    const loadMaxWeeklyXp = async () => {
+      try {
+        const response = await api.get("/challenge-game-settings");
+        const xpCorrectFast = response.data?.data?.xpCorrectFast;
+        if (typeof xpCorrectFast === "number") {
+          setMaxWeeklyXpPerLevel(computeMaxWeeklyXp(xpCorrectFast));
+        }
+      } catch (error) {
+        console.error("Error loading challenge game settings:", error);
+      }
+    };
+
+    void loadMaxWeeklyXp();
+  }, []);
 
   const toggleBots = async () => {
     const nextEnabled = !botsEnabled;
@@ -364,9 +388,9 @@ const Leaderboard = () => {
     const { value: newXp } = await Swal.fire({
       title: "Edit your XP",
       input: "number",
-      inputLabel: `Weekly XP (0 - ${MAX_WEEKLY_XP_PER_LEVEL})`,
+      inputLabel: `Weekly XP (0 - ${maxWeeklyXpPerLevel})`,
       inputValue: currentWeeklyXp,
-      inputAttributes: { min: 0, max: MAX_WEEKLY_XP_PER_LEVEL, step: 1 },
+      inputAttributes: { min: 0, max: maxWeeklyXpPerLevel, step: 1 },
       showCancelButton: true,
       confirmButtonText: "Save",
       inputValidator: (value) => {
@@ -374,9 +398,9 @@ const Leaderboard = () => {
         if (
           !Number.isInteger(num) ||
           num < 0 ||
-          num > MAX_WEEKLY_XP_PER_LEVEL
+          num > maxWeeklyXpPerLevel
         ) {
-          return `Enter a whole number between 0 and ${MAX_WEEKLY_XP_PER_LEVEL}`;
+          return `Enter a whole number between 0 and ${maxWeeklyXpPerLevel}`;
         }
       },
     });

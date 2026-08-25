@@ -19,17 +19,20 @@ import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../services/auth.services";
 import CountdownRing from "./CountdownRing";
 
-const QUESTION_TIME_SECONDS = 15;
-
-// Mirrors the backend's scoring constants (challenge.constant.ts) so a
-// guest's practice run can show the same live XP feedback the real,
-// persisted challenge would — the guest score itself is never sent
-// anywhere, so this is purely for display until they log in.
-const CORRECT_FAST_THRESHOLD_SECONDS = 10;
-const XP_PER_CORRECT_ANSWER = 10;
-const XP_CORRECT_SLOW_ANSWER = 9;
-const XP_WRONG_ANSWER_BASE_PENALTY = 2;
-const XP_TIMEOUT_PENALTY = 2;
+// Admin-configurable now (see Dashboard > Settings > Difficulty Settings >
+// Daily Challenge tab) — this is only the fallback shown before that fetch
+// resolves (or if it fails). Mirrors the backend's scoring defaults
+// (ChallengeGameSettings) so a guest's practice run can show the same live
+// XP feedback the real, persisted challenge would — the guest score itself
+// is never sent anywhere, so this is purely for display until they log in.
+const GAME_SETTINGS_FALLBACK = {
+  questionTimeLimitSeconds: 15,
+  correctFastThresholdSeconds: 10,
+  xpCorrectFast: 10,
+  xpCorrectSlow: 9,
+  xpWrongBasePenalty: 2,
+  xpTimeoutPenalty: 2,
+};
 
 // Admin-configurable now (see Dashboard > Settings > Difficulty Settings) —
 // this is only the fallback shown before that fetch resolves (or if it
@@ -149,6 +152,7 @@ const ChallengeSession = () => {
 
   const [view, setView] = useState("levels"); // "levels" | "challenge"
   const [levels, setLevels] = useState(LEVELS_FALLBACK);
+  const [gameSettings, setGameSettings] = useState(GAME_SETTINGS_FALLBACK);
   const [loadingLevels, setLoadingLevels] = useState(true);
   const [levelStatus, setLevelStatus] = useState(null);
   const [streakLoggedToday, setStreakLoggedToday] = useState(false);
@@ -225,6 +229,21 @@ const ChallengeSession = () => {
     void loadLevelCefr();
   }, []);
 
+  useEffect(() => {
+    const loadGameSettings = async () => {
+      try {
+        const response = await api.get("/challenge-game-settings");
+        if (response.data?.data) {
+          setGameSettings(response.data.data);
+        }
+      } catch (error) {
+        console.error("Error loading challenge game settings:", error);
+      }
+    };
+
+    void loadGameSettings();
+  }, []);
+
   const startLevel = async (levelKey) => {
     setLoadingChallenge(true);
 
@@ -245,7 +264,7 @@ const ChallengeSession = () => {
         setAnswerFeedback(null);
         setGuestWrongStreak(0);
         setLevelFinished(false);
-        setDeadlineAt(Date.now() + QUESTION_TIME_SECONDS * 1000);
+        setDeadlineAt(Date.now() + gameSettings.questionTimeLimitSeconds * 1000);
         setView("challenge");
         return;
       }
@@ -271,7 +290,7 @@ const ChallengeSession = () => {
       setDeadlineAt(
         data.currentQuestionStartedAt
           ? new Date(data.currentQuestionStartedAt).getTime() +
-              QUESTION_TIME_SECONDS * 1000
+              gameSettings.questionTimeLimitSeconds * 1000
           : null,
       );
       setView("challenge");
@@ -380,26 +399,26 @@ const ChallengeSession = () => {
           const elapsedMs = deadlineAt
             ? Math.max(
                 0,
-                Date.now() - (deadlineAt - QUESTION_TIME_SECONDS * 1000),
+                Date.now() - (deadlineAt - gameSettings.questionTimeLimitSeconds * 1000),
               )
             : 0;
           const answeredFast =
-            elapsedMs <= CORRECT_FAST_THRESHOLD_SECONDS * 1000;
+            elapsedMs <= gameSettings.correctFastThresholdSeconds * 1000;
 
           let xpDelta;
           let nextWrongStreak;
 
           if (isCorrect) {
             xpDelta = answeredFast
-              ? XP_PER_CORRECT_ANSWER
-              : XP_CORRECT_SLOW_ANSWER;
+              ? gameSettings.xpCorrectFast
+              : gameSettings.xpCorrectSlow;
             nextWrongStreak = 0;
           } else if (timedOut) {
-            xpDelta = -XP_TIMEOUT_PENALTY;
+            xpDelta = -gameSettings.xpTimeoutPenalty;
             nextWrongStreak = 0;
           } else {
             nextWrongStreak = guestWrongStreak + 1;
-            xpDelta = -(XP_WRONG_ANSWER_BASE_PENALTY + (nextWrongStreak - 1));
+            xpDelta = -(gameSettings.xpWrongBasePenalty + (nextWrongStreak - 1));
           }
 
           const nextCorrectCount = isCorrect ? correctCount + 1 : correctCount;
@@ -428,7 +447,7 @@ const ChallengeSession = () => {
               // its now-unpaused CountdownRing) became visible, ~1.1s of
               // its 15s was already gone: it would always visibly start at
               // 14, not 15.
-              setDeadlineAt(Date.now() + QUESTION_TIME_SECONDS * 1000);
+              setDeadlineAt(Date.now() + gameSettings.questionTimeLimitSeconds * 1000);
               setCurrentIndex((index) => index + 1);
             } else {
               setLevelFinished(true);
@@ -490,7 +509,7 @@ const ChallengeSession = () => {
             // QUESTION_TIME_GRACE_MS (3s) comfortably covers this gap, so an
             // answer submitted right as this display hits 0 is still scored
             // as on-time.
-            setDeadlineAt(Date.now() + QUESTION_TIME_SECONDS * 1000);
+            setDeadlineAt(Date.now() + gameSettings.questionTimeLimitSeconds * 1000);
             setCurrentIndex((index) => index + 1);
           } else {
             setLevelFinished(true);
@@ -514,6 +533,7 @@ const ChallengeSession = () => {
       guestWrongStreak,
       deadlineAt,
       finishLevel,
+      gameSettings,
     ],
   );
 
@@ -542,7 +562,8 @@ const ChallengeSession = () => {
             <p
               className={`text-xl max-w-2xl mx-auto ${isLight ? "text-slate-600" : "text-slate-300"}`}
             >
-              20 random words a day, per level. Answer fast — 15 seconds each.
+              20 random words a day, per level. Answer fast —{" "}
+              {gameSettings.questionTimeLimitSeconds} seconds each.
             </p>
             <div className="flex justify-center mt-3">
               <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
@@ -563,28 +584,37 @@ const ChallengeSession = () => {
             >
               <li className="flex items-center gap-2">
                 <Check size={13} className="shrink-0 text-emerald-500" />
-                Correct within 10s: <b>+10 XP</b>
+                Correct within {gameSettings.correctFastThresholdSeconds}s:{" "}
+                <b>+{gameSettings.xpCorrectFast} XP</b>
               </li>
               <li className="flex items-center gap-2">
                 <Check size={13} className="shrink-0 text-emerald-500" />
-                Correct after 10s: <b>+9 XP</b>
+                Correct after {gameSettings.correctFastThresholdSeconds}s:{" "}
+                <b>+{gameSettings.xpCorrectSlow} XP</b>
               </li>
               <li className="hidden md:flex items-center gap-2 ">
                 <X size={13} className="shrink-0 text-rose-500" />
-                Wrong answer: <b>-2 XP</b>, +1 more for each consecutive wrong
-                answer in a row (-2, -3, -4…)
+                Wrong answer: <b>-{gameSettings.xpWrongBasePenalty} XP</b>,
+                +1 more for each consecutive wrong answer in a row (-
+                {gameSettings.xpWrongBasePenalty}, -
+                {gameSettings.xpWrongBasePenalty + 1}, -
+                {gameSettings.xpWrongBasePenalty + 2}…)
               </li>
               <li className="flex md:hidden items-center gap-2 ">
                 <X size={13} className="shrink-0 text-rose-500" />
-                Wrong answer: <b>-2 XP</b>
+                Wrong answer: <b>-{gameSettings.xpWrongBasePenalty} XP</b>
               </li>
               <li className="flex md:hidden items-center gap-2 ">
                 <X size={13} className="shrink-0 text-rose-500" />
-                +1 more for each consecutive wrong answer in a row (-2, -3, -4…)
+                +1 more for each consecutive wrong answer in a row (-
+                {gameSettings.xpWrongBasePenalty}, -
+                {gameSettings.xpWrongBasePenalty + 1}, -
+                {gameSettings.xpWrongBasePenalty + 2}…)
               </li>
               <li className="flex items-center gap-2">
                 <Clock size={13} className="shrink-0 text-rose-500" />
-                No answer within 15s: <b>-2 XP</b> flat
+                No answer within {gameSettings.questionTimeLimitSeconds}s:{" "}
+                <b>-{gameSettings.xpTimeoutPenalty} XP</b> flat
               </li>
               <li className="flex items-center gap-2">
                 <Sparkles size={13} className="shrink-0 text-amber-500" />A
@@ -764,7 +794,7 @@ const ChallengeSession = () => {
         </div>
 
         <CountdownRing
-          totalSeconds={QUESTION_TIME_SECONDS}
+          totalSeconds={gameSettings.questionTimeLimitSeconds}
           deadlineAt={deadlineAt}
           onExpire={handleTimeout}
           paused={Boolean(answerFeedback) || levelFinished}
