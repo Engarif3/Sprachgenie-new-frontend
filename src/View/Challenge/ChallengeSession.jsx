@@ -31,11 +31,31 @@ const XP_CORRECT_SLOW_ANSWER = 9;
 const XP_WRONG_ANSWER_BASE_PENALTY = 2;
 const XP_TIMEOUT_PENALTY = 2;
 
-const LEVELS = [
+// Admin-configurable now (see Dashboard > Settings > Difficulty Settings) —
+// this is only the fallback shown before that fetch resolves (or if it
+// fails). Tier identity (key/label) stays fixed here; only `cefr` — the
+// specific levels each tier currently draws from — is replaced with live
+// data, so the display text never goes stale after an admin changes it.
+const LEVELS_FALLBACK = [
   { key: "easy", label: "Easy", cefr: "A1 · A2" },
   { key: "intermediate", label: "Intermediate", cefr: "A2 · B1" },
   { key: "difficult", label: "Difficult", cefr: "B1 · B2" },
 ];
+
+const buildLevelsWithCefr = (tiers, levels) => {
+  const levelNameById = new Map(levels.map((lvl) => [lvl.id, lvl.level]));
+  const cefrByTier = new Map(
+    tiers.map(({ tier, levelIds }) => [
+      tier,
+      levelIds.map((id) => levelNameById.get(id)).filter(Boolean).join(" · "),
+    ]),
+  );
+
+  return LEVELS_FALLBACK.map((level) => ({
+    ...level,
+    cefr: cefrByTier.get(level.key) || level.cefr,
+  }));
+};
 
 // Shared per-level color identity across the level picker and question screen.
 const LEVEL_THEME = {
@@ -128,6 +148,7 @@ const ChallengeSession = () => {
   const { isSuperAdmin, isLoggedIn } = useAuth();
 
   const [view, setView] = useState("levels"); // "levels" | "challenge"
+  const [levels, setLevels] = useState(LEVELS_FALLBACK);
   const [loadingLevels, setLoadingLevels] = useState(true);
   const [levelStatus, setLevelStatus] = useState(null);
   const [streakLoggedToday, setStreakLoggedToday] = useState(false);
@@ -183,6 +204,26 @@ const ChallengeSession = () => {
   useEffect(() => {
     void refreshLevelStatus();
   }, [refreshLevelStatus]);
+
+  useEffect(() => {
+    const loadLevelCefr = async () => {
+      try {
+        const [settingsRes, levelsRes] = await Promise.all([
+          api.get("/difficulty-settings/challenge"),
+          api.get("/level/all"),
+        ]);
+        const tiers = settingsRes.data?.data?.tiers || [];
+        const allLevels = levelsRes.data?.data || [];
+        if (tiers.length > 0) {
+          setLevels(buildLevelsWithCefr(tiers, allLevels));
+        }
+      } catch (error) {
+        console.error("Error loading difficulty settings:", error);
+      }
+    };
+
+    void loadLevelCefr();
+  }, []);
 
   const startLevel = async (levelKey) => {
     setLoadingChallenge(true);
@@ -560,7 +601,7 @@ const ChallengeSession = () => {
             </p>
           ) : (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-              {LEVELS.map(({ key, label, cefr }) => {
+              {levels.map(({ key, label, cefr }) => {
                 const status = levelStatus?.[key];
                 const locked = Boolean(status?.locked);
                 const answered = status?.questionsAnswered ?? 0;
@@ -679,7 +720,7 @@ const ChallengeSession = () => {
   }
 
   const currentWord = questions[currentIndex];
-  const levelMeta = LEVELS.find((level) => level.key === activeLevel);
+  const levelMeta = levels.find((level) => level.key === activeLevel);
   const levelTheme = LEVEL_THEME[activeLevel] || LEVEL_THEME.easy;
   const progressPct =
     ((currentIndex + (answerFeedback ? 1 : 0)) / questions.length) * 100;

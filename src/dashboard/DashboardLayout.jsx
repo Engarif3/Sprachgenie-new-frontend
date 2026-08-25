@@ -39,6 +39,7 @@ import {
   IoDesktopOutline,
   IoAlertCircleOutline,
   IoCloudUploadOutline,
+  IoSpeedometerOutline,
 } from "react-icons/io5";
 import { ChevronRight } from "lucide-react";
 
@@ -203,6 +204,12 @@ const NAV_SECTIONS = [
         to: "/dashboard/profile-photo-settings",
         icon: IoImageOutline,
         label: "Profile Photo Settings",
+        roles: ["super_admin"],
+      },
+      {
+        to: "/dashboard/difficulty-settings",
+        icon: IoSpeedometerOutline,
+        label: "Difficulty Settings",
         roles: ["super_admin"],
       },
       {

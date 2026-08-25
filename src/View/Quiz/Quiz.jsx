@@ -21,16 +21,42 @@ import {
 const QUIZ_STORAGE_KEY = "quizState";
 const QUIZ_LENGTH = 30;
 
-const DIFFICULTY_LEVELS = {
+// Admin-configurable now (see Dashboard > Settings > Difficulty Settings) —
+// this is only the fallback shown before that fetch resolves (or if it
+// fails), so the picker isn't ever fully blank.
+const DIFFICULTY_LEVELS_FALLBACK = {
   1: { name: "Easy", description: "Level A1 & A2 words (Beginner)" },
   2: {
     name: "Difficult",
     description: "Level B1 & B2 words (Intermediate/Advanced)",
   },
   3: {
-    name: "Easy + Difficult",
+    name: "Mixed",
     description: "All levels mixed together",
   },
+};
+
+// Builds "{name}: Level A1, A2 words" style descriptions from the real,
+// currently-configured levels, so this never goes stale the moment an
+// admin changes which levels a tier draws from.
+const buildDifficultyLevels = (tiers, levels) => {
+  const levelNameById = new Map(levels.map((lvl) => [lvl.id, lvl.level]));
+  const result = {};
+
+  tiers.forEach(({ tier, label, levelIds }) => {
+    const names = levelIds
+      .map((id) => levelNameById.get(id))
+      .filter(Boolean);
+    result[tier] = {
+      name: label,
+      description:
+        names.length > 0
+          ? `Level ${names.join(names.length <= 2 ? " & " : ", ")} words`
+          : DIFFICULTY_LEVELS_FALLBACK[tier]?.description || "",
+    };
+  });
+
+  return result;
 };
 
 const loadQuizWords = async (source, difficulty) => {
@@ -95,8 +121,31 @@ const Quiz = () => {
   };
 
   const [state, dispatch] = useReducer(quizReducer, initialState);
+  const [difficultyLevels, setDifficultyLevels] = useState(
+    DIFFICULTY_LEVELS_FALLBACK,
+  );
 
   const { isLoggedIn } = useAuth();
+
+  useEffect(() => {
+    const loadDifficultyLevels = async () => {
+      try {
+        const [settingsRes, levelsRes] = await Promise.all([
+          api.get("/difficulty-settings/quiz"),
+          api.get("/level/all"),
+        ]);
+        const tiers = settingsRes.data?.data?.tiers || [];
+        const levels = levelsRes.data?.data || [];
+        if (tiers.length > 0) {
+          setDifficultyLevels(buildDifficultyLevels(tiers, levels));
+        }
+      } catch (error) {
+        console.error("Error loading difficulty settings:", error);
+      }
+    };
+
+    void loadDifficultyLevels();
+  }, []);
 
   // Destructure for cleaner JSX
   const {
@@ -325,7 +374,7 @@ const Quiz = () => {
             </h2>
 
             <div className="flex flex-col gap-3">
-              {Object.entries(DIFFICULTY_LEVELS).map(([level, config]) => {
+              {Object.entries(difficultyLevels).map(([level, config]) => {
                 const isSelected =
                   source === "difficulty" && difficulty === parseInt(level);
                 return (
@@ -351,11 +400,7 @@ const Quiz = () => {
                             }`}
                             aria-hidden="true"
                           />
-                          {level === "1"
-                            ? "Easy"
-                            : level === "2"
-                              ? "Difficult"
-                              : "Mixed"}
+                          {config.name}
                         </div>
                         <div
                           className={`text-sm md:text-base ${
@@ -443,7 +488,7 @@ const Quiz = () => {
                 <div className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
                   {source === "favorites"
                     ? "In Your Favorites"
-                    : `For ${DIFFICULTY_LEVELS[difficulty].name}`}
+                    : `For ${difficultyLevels[difficulty]?.name}`}
                 </div>
               </div>
             </div>
@@ -501,7 +546,7 @@ const Quiz = () => {
               <>
                 Difficulty:
                 <span className="font-bold text-blue-600 dark:text-blue-400">
-                  {DIFFICULTY_LEVELS[difficulty].name}
+                  {difficultyLevels[difficulty]?.name}
                 </span>
               </>
             )}
