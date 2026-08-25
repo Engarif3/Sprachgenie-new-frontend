@@ -1,7 +1,16 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import api from "../axios";
 import DarkVeil from "../View/Home/DarkVeil";
+import {
+  IoPaperPlaneOutline,
+  IoMailOutline,
+  IoWarningOutline,
+  IoCheckmarkCircleOutline,
+  IoHourglassOutline,
+} from "react-icons/io5";
+import AuthHomeLink from "../components/auth/AuthHomeLink";
+import Button from "../components/UI/Button";
 
 const RESEND_VERIFICATION_COOLDOWN_MINUTES = 5;
 const RESEND_VERIFICATION_STORAGE_KEY = "resendVerificationTimestamp";
@@ -107,45 +116,82 @@ const ResendVerification = () => {
   };
 
   return (
-    <div className="text-center flex justify-center items-center min-h-screen">
+    <div className="relative min-h-screen flex items-center justify-center px-3">
       <div className="fixed inset-0 -z-10">
         <DarkVeil />
       </div>
-      <div>
-        <h2 className="text-2xl font-semibold mb-12 text-white">
-          Resend Verification Link
-        </h2>
-        <p className="flex justify-center items-center gap-4">
+
+      <AuthHomeLink />
+
+      <div className="w-full max-w-md text-white p-8 rounded-3xl shadow-2xl text-center z-10 bg-gradient-to-br from-gray-800/90 via-gray-900/90 to-black/90 border-2 border-gray-700/50 backdrop-blur-sm">
+        <div className="mb-6">
+          <div className="inline-block p-4 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-500/50 rounded-full mb-4">
+            <IoPaperPlaneOutline size={36} className="text-cyan-300" aria-hidden="true" />
+          </div>
+          <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400">
+            Resend Verification
+          </h2>
+          <p className="text-gray-400 text-sm mt-2">
+            We'll send a new verification link to your inbox
+          </p>
+        </div>
+
+        {error && (
+          <div className="flex items-center gap-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 text-red-300 text-sm p-3 rounded-xl mb-4">
+            <IoWarningOutline size={16} className="shrink-0" aria-hidden="true" />
+            {error}
+          </div>
+        )}
+
+        {message && (
+          <div className="flex items-center gap-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/50 text-green-300 text-sm p-3 rounded-xl mb-4">
+            <IoCheckmarkCircleOutline size={16} className="shrink-0" aria-hidden="true" />
+            {message}
+          </div>
+        )}
+
+        <div className="text-left mb-4">
+          <label
+            htmlFor="resend-verification-email"
+            className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-gray-300"
+          >
+            <IoMailOutline aria-hidden="true" />
+            Email
+          </label>
           <input
+            id="resend-verification-email"
             type="email"
             autoComplete="email"
-            placeholder="Enter your email"
-            className="border border-purple-600 rounded text-lg p-2"
+            placeholder="your@email.com"
+            className="w-full bg-gray-700/50 border border-gray-600 focus:border-cyan-500 p-3 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-500/50 transition-all duration-300 disabled:opacity-60"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isSending || cooldown > 0}
           />
-          <button
-            className="btn  btn-primary"
-            onClick={handleResendVerification}
-            disabled={isSending || cooldown > 0}
-          >
-            {isSending
-              ? "Sending..."
-              : cooldown > 0
-                ? `Try again in ${formatCooldown(cooldown)}`
-                : "Send"}
-          </button>
-        </p>
-        <div className="mt-4">
-          {message && <p className="text-green-700 font-semibold">{message}</p>}
-          {error && <p className="text-red-600 font-semibold">{error}</p>}
-          {cooldown > 0 && (
-            <p className="mt-3 text-sm text-white">
-              Did not get the email? Try again in {formatCooldown(cooldown)}.
-            </p>
-          )}
         </div>
+
+        <Button
+          type="button"
+          variant="primary"
+          surface="dark"
+          size="lg"
+          fullWidth
+          onClick={handleResendVerification}
+          disabled={isSending || cooldown > 0}
+        >
+          {isSending
+            ? "Sending..."
+            : cooldown > 0
+              ? `Try again in ${formatCooldown(cooldown)}`
+              : "Send"}
+        </Button>
+
+        {cooldown > 0 && (
+          <p className="mt-4 text-sm text-gray-400 flex items-center justify-center gap-1.5">
+            <IoHourglassOutline aria-hidden="true" />
+            Didn't get the email? Try again in {formatCooldown(cooldown)}.
+          </p>
+        )}
       </div>
     </div>
   );

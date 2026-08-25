@@ -1,61 +1,15 @@
-// import { useState } from "react";
-// import api from "../axios";
-// import DarkVeil from "../View/Home/DarkVeil";
-
-// const ForgotPassword = () => {
-//   const [email, setEmail] = useState("");
-//   const [message, setMessage] = useState();
-//   const [error, setError] = useState();
-
-//   const handleForgotPassword = async () => {
-//     try {
-//       const response = await api.post("/auth/forgot-password", { email });
-//       setMessage(response.data.message);
-//       setError(null);
-//     } catch (err) {
-//       setError(
-//         err.response?.data?.message ||
-//           "An error occurred while sending the request."
-//       );
-//       setMessage(null);
-//     }
-//   };
-
-//   return (
-//     <div className="text-center flex justify-center items-center min-h-screen">
-//       <div className="fixed inset-0 -z-10">
-//         <DarkVeil />
-//       </div>
-//       <div>
-//         <h2 className="text-2xl font-semibold mb-12 text-white">
-//           Forgot Password
-//         </h2>
-//         <p className="flex justify-center items-center gap-4">
-//           <input
-//             type="email"
-//             placeholder="Enter your email"
-//             className="border border-purple-600 rounded text-lg p-2"
-//             value={email}
-//             onChange={(e) => setEmail(e.target.value)}
-//           />
-//           <button className="btn  btn-primary" onClick={handleForgotPassword}>
-//             Send
-//           </button>
-//         </p>
-//         {message && (
-//           <p className="mt-4 text-green-700 font-semibold">{message}</p>
-//         )}
-//         {error && <p className="mt-4 text-red-600 font-semibold">{error}</p>}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ForgotPassword;
-
 import { useState, useEffect } from "react";
 import api from "../axios";
 import DarkVeil from "../View/Home/DarkVeil";
+import {
+  IoKeyOutline,
+  IoMailOutline,
+  IoWarningOutline,
+  IoCheckmarkCircleOutline,
+  IoHourglassOutline,
+} from "react-icons/io5";
+import AuthHomeLink from "../components/auth/AuthHomeLink";
+import Button from "../components/UI/Button";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -117,7 +71,7 @@ const ForgotPassword = () => {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          "An error occurred while sending the request."
+          "An error occurred while sending the request.",
       );
       setMessage(null);
     } finally {
@@ -132,57 +86,76 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="text-center flex justify-center items-center min-h-screen">
+    <div className="relative min-h-screen flex items-center justify-center px-3">
       <div className="fixed inset-0 -z-10">
         <DarkVeil />
       </div>
-      <div className="bg-stone-800 p-8 md:p-16 lg:p-16 rounded-md">
-        <h2 className="text-2xl font-semibold mb-12 text-white ">
-          Forgot Password
-        </h2>
-        <p className="flex justify-center items-center gap-4">
+
+      <AuthHomeLink />
+
+      <div className="w-full max-w-md text-white p-8 rounded-3xl shadow-2xl text-center z-10 bg-gradient-to-br from-gray-800/90 via-gray-900/90 to-black/90 border-2 border-gray-700/50 backdrop-blur-sm">
+        <div className="mb-6">
+          <div className="inline-block p-4 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/50 rounded-full mb-4">
+            <IoKeyOutline size={36} className="text-orange-300" aria-hidden="true" />
+          </div>
+          <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400">
+            Forgot Password
+          </h2>
+          <p className="text-gray-400 text-sm mt-2">
+            Enter your email and we'll send you a reset link
+          </p>
+        </div>
+
+        {error && (
+          <div className="flex items-center gap-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/50 text-red-300 text-sm p-3 rounded-xl mb-4">
+            <IoWarningOutline size={16} className="shrink-0" aria-hidden="true" />
+            {error}
+          </div>
+        )}
+
+        {message && (
+          <div className="flex items-center gap-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/50 text-green-300 text-sm p-3 rounded-xl mb-4">
+            <IoCheckmarkCircleOutline size={16} className="shrink-0" aria-hidden="true" />
+            {message}
+          </div>
+        )}
+
+        <div className="text-left mb-4">
+          <label
+            htmlFor="forgot-password-email"
+            className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-gray-300"
+          >
+            <IoMailOutline aria-hidden="true" />
+            Email
+          </label>
           <input
+            id="forgot-password-email"
             type="email"
             autoComplete="email"
-            placeholder="Enter your email"
-            className="border border-purple-600 rounded text-lg p-2"
+            placeholder="your@email.com"
+            className="w-full bg-gray-700/50 border border-gray-600 focus:border-orange-500 p-3 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-orange-500/50 transition-all duration-300 disabled:opacity-60"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isSubmitted}
           />
-          <button
-            className={`btn btn-primary ${
-              isSubmitted || isLoading ? "opacity-70 cursor-not-allowed" : ""
-            }`}
-            onClick={handleForgotPassword}
-            disabled={isSubmitted || isLoading}
-          >
-            {isLoading ? "Sending..." : "Send"}
-          </button>
-        </p>
-        {message && (
-          <p className="mt-4 text-green-700 font-semibold">{message}</p>
-        )}
-        <br />
-        <div className="mt-8">
-          {isSubmitted && timeLeft > 0 && (
-            <p className="ml-2 text-white text-sm">
-              <span className="text-sky-600">
-                Check your email to reset your password.
-              </span>
-              <br />
-              <br />
-              <span className="text-warning">
-                {" "}
-                Did not get any email? Try again {formatTime(timeLeft)} later
-              </span>
-            </p>
-          )}
         </div>
-        {error && <p className="mt-4 text-red-600 font-semibold">{error}</p>}
-        {isSubmitted && timeLeft <= 0 && (
-          <p className="mt-4 text-blue-600 font-semibold">
-            Please check your email.
+
+        <Button
+          type="button"
+          variant="primary"
+          surface="dark"
+          size="lg"
+          fullWidth
+          onClick={handleForgotPassword}
+          disabled={isSubmitted || isLoading}
+        >
+          {isLoading ? "Sending..." : "Send Reset Link"}
+        </Button>
+
+        {isSubmitted && timeLeft > 0 && (
+          <p className="mt-4 text-sm text-gray-400 flex items-center justify-center gap-1.5">
+            <IoHourglassOutline aria-hidden="true" />
+            Didn't get the email? Try again in {formatTime(timeLeft)}
           </p>
         )}
       </div>
