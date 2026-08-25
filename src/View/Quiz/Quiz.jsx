@@ -19,7 +19,11 @@ import {
 } from "react-icons/io5";
 
 const QUIZ_STORAGE_KEY = "quizState";
-const QUIZ_LENGTH = 30;
+
+// Admin-configurable now (see Dashboard > Settings > Difficulty Settings >
+// Quiz) — this is only the fallback used before that fetch resolves (or if
+// it fails), same pattern as DIFFICULTY_LEVELS_FALLBACK below.
+const QUIZ_LENGTH_FALLBACK = 30;
 
 // Admin-configurable now (see Dashboard > Settings > Difficulty Settings) —
 // this is only the fallback shown before that fetch resolves (or if it
@@ -59,11 +63,11 @@ const buildDifficultyLevels = (tiers, levels) => {
   return result;
 };
 
-const loadQuizWords = async (source, difficulty) => {
+const loadQuizWords = async (source, difficulty, quizLength) => {
   const query =
     source === "favorites"
-      ? `source=favorites&limit=${QUIZ_LENGTH}`
-      : `difficulty=${difficulty}&limit=${QUIZ_LENGTH}`;
+      ? `source=favorites&limit=${quizLength}`
+      : `difficulty=${difficulty}&limit=${quizLength}`;
   const response = await api.get(`/word/quiz?${query}`);
 
   return {
@@ -124,20 +128,26 @@ const Quiz = () => {
   const [difficultyLevels, setDifficultyLevels] = useState(
     DIFFICULTY_LEVELS_FALLBACK,
   );
+  const [quizLength, setQuizLength] = useState(QUIZ_LENGTH_FALLBACK);
 
   const { isLoggedIn } = useAuth();
 
   useEffect(() => {
     const loadDifficultyLevels = async () => {
       try {
-        const [settingsRes, levelsRes] = await Promise.all([
+        const [settingsRes, levelsRes, quizSettingsRes] = await Promise.all([
           api.get("/difficulty-settings/quiz"),
           api.get("/level/all"),
+          api.get("/quiz-settings"),
         ]);
         const tiers = settingsRes.data?.data?.tiers || [];
         const levels = levelsRes.data?.data || [];
         if (tiers.length > 0) {
           setDifficultyLevels(buildDifficultyLevels(tiers, levels));
+        }
+        const questionCount = quizSettingsRes.data?.data?.questionCount;
+        if (typeof questionCount === "number") {
+          setQuizLength(questionCount);
         }
       } catch (error) {
         console.error("Error loading difficulty settings:", error);
@@ -174,7 +184,7 @@ const Quiz = () => {
 
       dispatch({ type: "SET_LOADING", payload: true });
       try {
-        const data = await loadQuizWords("difficulty", difficulty);
+        const data = await loadQuizWords("difficulty", difficulty, quizLength);
         dispatch({ type: "SET_PREPARED_QUIZ_WORDS", payload: data.words });
         dispatch({
           type: "SET_AVAILABLE_WORDS_COUNT",
@@ -188,6 +198,10 @@ const Quiz = () => {
     };
 
     void init();
+    // Mount-only by design — the loadForSelection effect below re-fires on
+    // mount too (and again once quizLength resolves from its fallback), so
+    // it's the one responsible for keeping the prepared word list in sync;
+    // this initial call just gets something on screen immediately.
   }, []);
 
   useEffect(() => {
@@ -206,15 +220,15 @@ const Quiz = () => {
       dispatch({ type: "SET_PREPARED_QUIZ_WORDS", payload: [] });
       dispatch({ type: "SET_AVAILABLE_WORDS_COUNT", payload: 0 });
       try {
-        const data = await loadQuizWords(source, difficulty);
+        const data = await loadQuizWords(source, difficulty, quizLength);
         dispatch({ type: "SET_PREPARED_QUIZ_WORDS", payload: data.words });
         dispatch({
           type: "SET_AVAILABLE_WORDS_COUNT",
           payload: data.availableCount,
         });
 
-        if (source === "favorites" && data.availableCount < QUIZ_LENGTH) {
-          const missing = QUIZ_LENGTH - data.availableCount;
+        if (source === "favorites" && data.availableCount < quizLength) {
+          const missing = quizLength - data.availableCount;
           Swal.fire({
             icon: "warning",
             title: "You are not eligible",
@@ -230,7 +244,7 @@ const Quiz = () => {
     };
 
     void loadForSelection();
-  }, [difficulty, source, isLoggedIn, quizStarted]);
+  }, [difficulty, source, isLoggedIn, quizStarted, quizLength]);
 
   useEffect(() => {
     if (quizStarted) {
@@ -272,7 +286,7 @@ const Quiz = () => {
     dispatch({ type: "SET_SOURCE", payload: "favorites" });
   };
 
-  const missingFavoritesCount = Math.max(QUIZ_LENGTH - availableWordsCount, 0);
+  const missingFavoritesCount = Math.max(quizLength - availableWordsCount, 0);
   const notEligibleForFavorites =
     source === "favorites" && missingFavoritesCount > 0;
   const canStartQuiz = preparedQuizWords.length > 0 && !notEligibleForFavorites;
@@ -280,7 +294,7 @@ const Quiz = () => {
   const startQuiz = () => {
     const selected = preparedQuizWords.slice(
       0,
-      Math.min(QUIZ_LENGTH, preparedQuizWords.length),
+      Math.min(quizLength, preparedQuizWords.length),
     );
 
     dispatch({ type: "SET_QUIZ_WORDS", payload: selected });
@@ -468,7 +482,7 @@ const Quiz = () => {
                   Quiz Length
                 </div>
                 <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
-                  {QUIZ_LENGTH}
+                  {quizLength}
                 </div>
                 <div className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
                   Questions

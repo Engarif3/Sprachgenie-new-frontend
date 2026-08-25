@@ -305,6 +305,134 @@ const ChallengeGameSettingsCard = () => {
   );
 };
 
+const QUIZ_SETTINGS_FIELDS = [
+  { key: "questionCount", label: "Questions Per Quiz", min: 1, max: 100 },
+];
+
+// Quiz's question count — separate endpoint/save from the level-tier
+// FeatureSection above (different backend resource), shown together in the
+// same tab since both are Quiz-specific admin config.
+const QuizGameSettingsCard = () => {
+  const [settings, setSettings] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get("/quiz-settings");
+        setSettings(response.data?.data || null);
+      } catch (err) {
+        console.error("Error fetching quiz settings:", err);
+        setError("Failed to load settings");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
+  const setField = (key, rawValue) => {
+    const value = rawValue === "" ? "" : Number(rawValue);
+    setSettings((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const hasInvalidField = settings
+    ? QUIZ_SETTINGS_FIELDS.some(({ key, min, max }) => {
+        const value = settings[key];
+        return (
+          value === "" ||
+          !Number.isInteger(Number(value)) ||
+          Number(value) < min ||
+          Number(value) > max
+        );
+      })
+    : true;
+
+  const handleSave = async () => {
+    if (hasInvalidField) {
+      setError("Every field must be a whole number within its allowed range");
+      setTimeout(() => setError(""), 4000);
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+    try {
+      const payload = Object.fromEntries(
+        QUIZ_SETTINGS_FIELDS.map(({ key }) => [key, Number(settings[key])]),
+      );
+      const response = await api.patch("/quiz-settings", payload);
+      setSettings(response.data?.data || settings);
+      setSuccess("Saved!");
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err) {
+      console.error("Error saving quiz settings:", err);
+      setError(err.response?.data?.message || "Failed to save settings");
+      setTimeout(() => setError(""), 4000);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="mt-6 rounded-lg border border-slate-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800/50 dark:shadow-none">
+      <h3 className="text-lg font-bold text-slate-800 dark:text-white">
+        Quiz Length
+      </h3>
+      <p className="text-sm text-slate-500 dark:text-gray-400">
+        How many questions make up a Quiz round.
+      </p>
+
+      {error && (
+        <div className="mt-4 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-700 dark:bg-red-900/30 dark:text-red-200">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="mt-4 rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-700 dark:border-green-700 dark:bg-green-900/30 dark:text-green-200">
+          {success}
+        </div>
+      )}
+
+      {loading || !settings ? (
+        <p className="mt-6 text-slate-500 dark:text-gray-400">
+          Loading settings...
+        </p>
+      ) : (
+        <>
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {QUIZ_SETTINGS_FIELDS.map(({ key, label, min, max }) => (
+              <label key={key} className="block">
+                <span className="mb-1 block text-sm font-semibold text-slate-800 dark:text-white">
+                  {label}
+                </span>
+                <input
+                  type="number"
+                  min={min}
+                  max={max}
+                  step={1}
+                  value={settings[key]}
+                  onChange={(e) => setField(key, e.target.value)}
+                  className="w-full rounded-md border border-slate-300 bg-white p-2 text-slate-900 shadow-sm focus:border-sky-500 focus:outline-none focus:ring focus:ring-sky-500 focus:ring-opacity-50 dark:border-gray-600 dark:bg-gray-900/60 dark:text-white"
+                />
+              </label>
+            ))}
+          </div>
+
+          <Button onClick={handleSave} disabled={saving} className="mt-6">
+            {saving ? "Saving..." : "Save Settings"}
+          </Button>
+        </>
+      )}
+    </div>
+  );
+};
+
 const DifficultySettings = () => {
   const [levels, setLevels] = useState([]);
   const [levelsError, setLevelsError] = useState("");
@@ -391,6 +519,7 @@ const DifficultySettings = () => {
               levels={levels}
             />
 
+            {active.key === "quiz" && <QuizGameSettingsCard />}
             {active.key === "challenge" && <ChallengeGameSettingsCard />}
           </>
         )}
