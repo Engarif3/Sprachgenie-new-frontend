@@ -453,11 +453,17 @@ const DashboardLayout = () => {
         : "border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:border-slate-800 dark:hover:bg-white/5 dark:hover:text-white"
     }`;
 
-  const sectionHeaderClass = (isHighlighted) =>
+  // "active" = this section contains the page you're actually on. "open" =
+  // you've merely clicked this section's flyout open, which may be a
+  // completely different section — kept visually distinct (neutral slate,
+  // not sky-blue) so opening a flyout never masquerades as "you are here".
+  const sectionHeaderClass = (variant) =>
     `flex w-full cursor-pointer items-center justify-between rounded-2xl border px-4 py-3 text-sm font-semibold transition-all duration-300 ${
-      isHighlighted
+      variant === "active"
         ? "border-sky-200 bg-sky-50/80 text-sky-800 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-200"
-        : "border-transparent text-slate-700 hover:border-slate-200 hover:bg-slate-100 dark:text-slate-200 dark:hover:border-slate-800 dark:hover:bg-white/5"
+        : variant === "open"
+          ? "border-slate-300 bg-slate-100 text-slate-900 dark:border-slate-700 dark:bg-white/10 dark:text-white"
+          : "border-transparent text-slate-700 hover:border-slate-200 hover:bg-slate-100 dark:text-slate-200 dark:hover:border-slate-800 dark:hover:bg-white/5"
     }`;
 
   return (
@@ -599,8 +605,12 @@ const DashboardLayout = () => {
                   if (visibleItems.length === 0) return null;
 
                   const isOpenSection = openSection === section.key;
-                  const isHighlighted =
-                    isOpenSection || activeSection === section.key;
+                  const isActiveSection = activeSection === section.key;
+                  const headerVariant = isActiveSection
+                    ? "active"
+                    : isOpenSection
+                      ? "open"
+                      : "default";
 
                   return (
                     <div key={section.key} className="relative">
@@ -610,7 +620,7 @@ const DashboardLayout = () => {
                         }}
                         type="button"
                         onClick={() => toggleSection(section.key)}
-                        className={sectionHeaderClass(isHighlighted)}
+                        className={sectionHeaderClass(headerVariant)}
                         aria-expanded={isOpenSection}
                         aria-haspopup="true"
                       >
@@ -627,9 +637,11 @@ const DashboardLayout = () => {
                         <ChevronRight
                           size={16}
                           className={`shrink-0 transition-colors duration-200 ${
-                            isHighlighted
+                            headerVariant === "active"
                               ? "text-sky-500"
-                              : "text-slate-400 dark:text-slate-500"
+                              : headerVariant === "open"
+                                ? "text-slate-600 dark:text-slate-300"
+                                : "text-slate-400 dark:text-slate-500"
                           }`}
                         />
                       </button>
