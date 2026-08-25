@@ -75,9 +75,9 @@ const SECTION_ROUTES = {
     "/dashboard/users-favorite-count",
     "/dashboard/get-usage",
     "/dashboard/ip-usage",
+    "/dashboard/registration-metadata",
   ],
   monitoring: [
-    "/dashboard/registration-metadata",
     "/dashboard/system-status",
     "/dashboard/visitors-info",
     "/dashboard/visitors",
@@ -236,6 +236,11 @@ const NAV_SECTIONS = [
         label: "AI Usage",
       },
       { to: "/dashboard/ip-usage", icon: IoRadioOutline, label: "IP Usage" },
+      {
+        to: "/dashboard/registration-metadata",
+        icon: IoShieldCheckmarkOutline,
+        label: "Registration Signals",
+      },
     ],
   },
   {
@@ -243,11 +248,6 @@ const NAV_SECTIONS = [
     icon: IoPulseOutline,
     label: "Monitoring",
     items: [
-      {
-        to: "/dashboard/registration-metadata",
-        icon: IoShieldCheckmarkOutline,
-        label: "Registration Signals",
-      },
       {
         to: "/dashboard/system-status",
         icon: IoDesktopOutline,
