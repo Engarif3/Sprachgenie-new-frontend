@@ -32,6 +32,7 @@ const GAME_SETTINGS_FALLBACK = {
   xpCorrectSlow: 9,
   xpWrongBasePenalty: 2,
   xpTimeoutPenalty: 2,
+  dailyWordCount: 20,
 };
 
 // Admin-configurable now (see Dashboard > Settings > Difficulty Settings) —
@@ -562,8 +563,9 @@ const ChallengeSession = () => {
             <p
               className={`text-xl max-w-2xl mx-auto ${isLight ? "text-slate-600" : "text-slate-300"}`}
             >
-              20 random words a day, per level. Answer fast —{" "}
-              {gameSettings.questionTimeLimitSeconds} seconds each.
+              {gameSettings.dailyWordCount} random words a day, per level.
+              Answer fast — {gameSettings.questionTimeLimitSeconds} seconds
+              each.
             </p>
             <div className="flex justify-center mt-3">
               <div className="h-1 w-32 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full"></div>
@@ -635,7 +637,7 @@ const ChallengeSession = () => {
                 const status = levelStatus?.[key];
                 const locked = Boolean(status?.locked);
                 const answered = status?.questionsAnswered ?? 0;
-                const total = status?.totalWords ?? 20;
+                const total = status?.totalWords ?? gameSettings.dailyWordCount;
                 const inProgress = !locked && answered > 0;
                 const levelTheme = LEVEL_THEME[key];
                 const LevelIcon = levelTheme.icon;

@@ -162,6 +162,7 @@ const GAME_SETTINGS_FIELDS = [
   { key: "xpCorrectSlow", label: "XP: Correct (Slow)", min: 0 },
   { key: "xpWrongBasePenalty", label: "XP: Wrong Answer (base)", min: 0 },
   { key: "xpTimeoutPenalty", label: "XP: No Answer (Timeout)", min: 0 },
+  { key: "dailyWordCount", label: "Questions Per Day", min: 1 },
 ];
 
 // Daily Challenge's per-question timer + the four XP amounts — separate
@@ -250,7 +251,8 @@ const ChallengeGameSettingsCard = () => {
         Timing & Scoring
       </h3>
       <p className="text-sm text-slate-500 dark:text-gray-400">
-        The per-question timer and XP amounts for Daily Challenge.
+        The per-question timer, XP amounts, and question count for Daily
+        Challenge.
       </p>
 
       {error && (

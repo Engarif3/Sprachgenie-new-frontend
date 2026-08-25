@@ -91,14 +91,14 @@ const hashString = (value) => {
   return hash;
 };
 
-// 20 questions/day × xpCorrectFast × 7 days — the same theoretical weekly
-// ceiling the backend validates a self-XP edit against. xpCorrectFast is
-// admin-configurable now (ChallengeGameSettings) — 10 is only the fallback
-// used before that fetch resolves.
-const DAILY_CHALLENGE_WORD_COUNT = 20;
+// dailyWordCount × xpCorrectFast × 7 days — the same theoretical weekly
+// ceiling the backend validates a self-XP edit against. Both factors are
+// admin-configurable now (ChallengeGameSettings) — these are only the
+// fallbacks used before that fetch resolves.
+const DAILY_WORD_COUNT_FALLBACK = 20;
 const XP_CORRECT_FAST_FALLBACK = 10;
-const computeMaxWeeklyXp = (xpCorrectFast) =>
-  DAILY_CHALLENGE_WORD_COUNT * xpCorrectFast * 7;
+const computeMaxWeeklyXp = (dailyWordCount, xpCorrectFast) =>
+  dailyWordCount * xpCorrectFast * 7;
 
 const isValidLevel = (value) => LEVELS.some((level) => level.key === value);
 
@@ -136,7 +136,7 @@ const Leaderboard = () => {
   const levelTheme = LEVEL_THEME[activeLevel];
 
   const [maxWeeklyXpPerLevel, setMaxWeeklyXpPerLevel] = useState(
-    computeMaxWeeklyXp(XP_CORRECT_FAST_FALLBACK),
+    computeMaxWeeklyXp(DAILY_WORD_COUNT_FALLBACK, XP_CORRECT_FAST_FALLBACK),
   );
   const [entries, setEntries] = useState([]);
   const [me, setMe] = useState({ rank: null, weeklyXp: 0, totalXp: 0 });
@@ -231,9 +231,12 @@ const Leaderboard = () => {
     const loadMaxWeeklyXp = async () => {
       try {
         const response = await api.get("/challenge-game-settings");
-        const xpCorrectFast = response.data?.data?.xpCorrectFast;
-        if (typeof xpCorrectFast === "number") {
-          setMaxWeeklyXpPerLevel(computeMaxWeeklyXp(xpCorrectFast));
+        const { xpCorrectFast, dailyWordCount } = response.data?.data || {};
+        if (
+          typeof xpCorrectFast === "number" &&
+          typeof dailyWordCount === "number"
+        ) {
+          setMaxWeeklyXpPerLevel(computeMaxWeeklyXp(dailyWordCount, xpCorrectFast));
         }
       } catch (error) {
         console.error("Error loading challenge game settings:", error);
